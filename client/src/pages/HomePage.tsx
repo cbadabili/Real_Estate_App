@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { SEOHead } from '../components/common/SEOHead';
+// import { SEOHead } from '../components/common/SEOHead';
 import { motion } from 'framer-motion';
 import { 
   Search, 
@@ -85,13 +85,7 @@ const HomePage = () => {
   const featuredProperties = sampleProperties.slice(0, 3);
 
   return (
-    <>
-      <SEOHead 
-        title="BeeDab - Modern Real Estate Platform | Find Your Dream Property"
-        description="Discover properties across Botswana with BeeDab's innovative platform. Browse FSBO listings, connect with REAC-certified agents, and find your perfect home."
-        keywords="real estate Botswana, FSBO, REAC agents, property search, homes for sale, buy property Botswana"
-      />
-      <motion.div
+    <motion.div
         variants={containerVariants}
         initial="hidden"
         animate="visible"

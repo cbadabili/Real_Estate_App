@@ -125,14 +125,14 @@ const TestAPIPage = () => {
         <div className="bg-white rounded-lg shadow-md p-6">
           <h2 className="text-xl font-semibold mb-4">Neighborhood Data API (ZIP: 78701)</h2>
           {neighborhoodLoading && <LoadingSpinner />}
-          {neighborhoodData && (
+          {neighborhoodData ? (
             <div>
               <p className="text-green-600 mb-4">✓ Successfully loaded neighborhood data</p>
-              <pre className="text-sm bg-neutral-100 p-4 rounded-lg overflow-auto">
-                {JSON.stringify(neighborhoodData, null, 2)}
-              </pre>
+              <div className="text-sm bg-neutral-100 p-4 rounded-lg">
+                <p>Data loaded successfully</p>
+              </div>
             </div>
-          )}
+          ) : null}
         </div>
       </div>
     </div>
