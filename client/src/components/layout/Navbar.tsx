@@ -23,6 +23,7 @@ const Navbar = () => {
     { name: 'Home', href: '/', icon: Home },
     { name: 'Properties', href: '/properties', icon: Building2 },
     { name: 'Map Search', href: '/map-search', icon: Map },
+    { name: 'API Test', href: '/test-api', icon: Search },
     ...(user ? [
       { name: 'Create Listing', href: '/create-listing', icon: PlusCircle },
       ...(user.type === 'fsbo' ? [

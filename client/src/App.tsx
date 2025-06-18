@@ -1,15 +1,17 @@
-import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import Navbar from './components/layout/Navbar';
 import HomePage from './pages/HomePage';
 import PropertiesPage from './pages/PropertiesPage';
+import RealPropertiesPage from './pages/RealPropertiesPage';
 import MapSearchPage from './pages/MapSearchPage';
 import FSBODashboard from './pages/FSBODashboard';
 import CreateListingPage from './pages/CreateListingPage';
+import CreatePropertyPage from './pages/CreatePropertyPage';
 import PropertyDetailsPage from './pages/PropertyDetailsPage';
 import AgentDashboard from './pages/AgentDashboard';
 import ProfilePage from './pages/ProfilePage';
+import TestAPIPage from './pages/TestAPIPage';
 import { AuthProvider } from './contexts/AuthContext';
 import { PropertyProvider } from './contexts/PropertyContext';
 
@@ -22,13 +24,16 @@ function App() {
           <AnimatePresence mode="wait">
             <Routes>
               <Route path="/" element={<HomePage />} />
-              <Route path="/properties" element={<PropertiesPage />} />
+              <Route path="/properties" element={<RealPropertiesPage />} />
+              <Route path="/sample-properties" element={<PropertiesPage />} />
               <Route path="/map-search" element={<MapSearchPage />} />
               <Route path="/property/:id" element={<PropertyDetailsPage />} />
               <Route path="/fsbo-dashboard" element={<FSBODashboard />} />
-              <Route path="/create-listing" element={<CreateListingPage />} />
+              <Route path="/create-listing" element={<CreatePropertyPage />} />
+              <Route path="/sample-create-listing" element={<CreateListingPage />} />
               <Route path="/agent-dashboard" element={<AgentDashboard />} />
               <Route path="/profile" element={<ProfilePage />} />
+              <Route path="/test-api" element={<TestAPIPage />} />
             </Routes>
           </AnimatePresence>
         </div>
