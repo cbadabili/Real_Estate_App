@@ -157,7 +157,7 @@ export class DatabaseStorage implements IStorage {
     }
 
     if (conditions.length > 0) {
-      query = query.where(and(...conditions));
+      query = query.where(and(...conditions)) as any;
     }
 
     // Sorting
@@ -170,18 +170,18 @@ export class DatabaseStorage implements IStorage {
       }[filters.sortBy];
 
       if (sortColumn) {
-        query = query.orderBy(filters.sortOrder === 'asc' ? asc(sortColumn) : desc(sortColumn));
+        query = query.orderBy(filters.sortOrder === 'asc' ? asc(sortColumn) : desc(sortColumn)) as any;
       }
     } else {
-      query = query.orderBy(desc(properties.createdAt));
+      query = query.orderBy(desc(properties.createdAt)) as any;
     }
 
     // Pagination
     if (filters.limit) {
-      query = query.limit(filters.limit);
+      query = query.limit(filters.limit) as any;
     }
     if (filters.offset) {
-      query = query.offset(filters.offset);
+      query = query.offset(filters.offset) as any;
     }
 
     return await query;
@@ -190,15 +190,33 @@ export class DatabaseStorage implements IStorage {
   async createProperty(property: InsertProperty): Promise<Property> {
     const [newProperty] = await db
       .insert(properties)
-      .values(property)
+      .values({
+        ...property,
+        price: property.price.toString(),
+        bathrooms: property.bathrooms?.toString(),
+        latitude: property.latitude?.toString(),
+        longitude: property.longitude?.toString(),
+        lotSize: property.lotSize?.toString(),
+        propertyTaxes: property.propertyTaxes?.toString(),
+        hoaFees: property.hoaFees?.toString(),
+      } as any)
       .returning();
     return newProperty;
   }
 
   async updateProperty(id: number, updates: Partial<InsertProperty>): Promise<Property | undefined> {
+    const updateData = { ...updates } as any;
+    if (updates.price !== undefined) updateData.price = updates.price.toString();
+    if (updates.bathrooms !== undefined) updateData.bathrooms = updates.bathrooms?.toString();
+    if (updates.latitude !== undefined) updateData.latitude = updates.latitude?.toString();
+    if (updates.longitude !== undefined) updateData.longitude = updates.longitude?.toString();
+    if (updates.lotSize !== undefined) updateData.lotSize = updates.lotSize?.toString();
+    if (updates.propertyTaxes !== undefined) updateData.propertyTaxes = updates.propertyTaxes?.toString();
+    if (updates.hoaFees !== undefined) updateData.hoaFees = updates.hoaFees?.toString();
+    
     const [property] = await db
       .update(properties)
-      .set({ ...updates, updatedAt: new Date() })
+      .set({ ...updateData, updatedAt: new Date() })
       .where(eq(properties.id, id))
       .returning();
     return property || undefined;
@@ -206,7 +224,7 @@ export class DatabaseStorage implements IStorage {
 
   async deleteProperty(id: number): Promise<boolean> {
     const result = await db.delete(properties).where(eq(properties.id, id));
-    return result.rowCount > 0;
+    return (result.rowCount || 0) > 0;
   }
 
   async getUserProperties(userId: number): Promise<Property[]> {
@@ -358,7 +376,7 @@ export class DatabaseStorage implements IStorage {
         eq(savedProperties.userId, userId),
         eq(savedProperties.propertyId, propertyId)
       ));
-    return result.rowCount > 0;
+    return (result.rowCount || 0) > 0;
   }
 
   async isPropertySaved(userId: number, propertyId: number): Promise<boolean> {
