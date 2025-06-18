@@ -21,9 +21,9 @@ const Navbar = () => {
 
   const navigation = [
     { name: 'Home', href: '/', icon: Home },
+    { name: 'Dashboard', href: '/dashboard', icon: BarChart3 },
     { name: 'Properties', href: '/properties', icon: Building2 },
     { name: 'Map Search', href: '/map-search', icon: Map },
-    { name: 'API Test', href: '/test-api', icon: Search },
     ...(user ? [
       { name: 'Create Listing', href: '/create-listing', icon: PlusCircle },
       ...(user.type === 'fsbo' ? [

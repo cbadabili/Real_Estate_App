@@ -1,5 +1,5 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
+import { SEOHead } from '../components/common/SEOHead';
 import { motion } from 'framer-motion';
 import { 
   Search, 
@@ -85,12 +85,18 @@ const HomePage = () => {
   const featuredProperties = sampleProperties.slice(0, 3);
 
   return (
-    <motion.div
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-      className="min-h-screen"
-    >
+    <>
+      <SEOHead 
+        title="BeeDab - Modern Real Estate Platform | Find Your Dream Property"
+        description="Discover properties across Botswana with BeeDab's innovative platform. Browse FSBO listings, connect with REAC-certified agents, and find your perfect home."
+        keywords="real estate Botswana, FSBO, REAC agents, property search, homes for sale, buy property Botswana"
+      />
+      <motion.div
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        className="min-h-screen"
+      >
       {/* Hero Section */}
       <section className="relative bg-gradient-to-br from-beedab-darkblue via-primary-800 to-secondary-900 text-white overflow-hidden">
         <div className="absolute inset-0 bg-black/20"></div>

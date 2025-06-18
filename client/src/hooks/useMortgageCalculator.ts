@@ -17,10 +17,20 @@ export interface MortgageCalculationResult {
 
 export const useMortgageCalculator = () => {
   return useMutation({
-    mutationFn: (data: MortgageCalculationData): Promise<MortgageCalculationResult> =>
-      apiRequest('/api/mortgage/calculate', {
+    mutationFn: async (data: MortgageCalculationData): Promise<MortgageCalculationResult> => {
+      const response = await fetch('/api/mortgage/calculate', {
         method: 'POST',
-        body: data,
-      }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      return response.json();
+    },
   });
 };

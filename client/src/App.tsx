@@ -12,6 +12,7 @@ import PropertyDetailsPage from './pages/PropertyDetailsPage';
 import AgentDashboard from './pages/AgentDashboard';
 import ProfilePage from './pages/ProfilePage';
 import TestAPIPage from './pages/TestAPIPage';
+import DashboardPage from './pages/DashboardPage';
 import { AuthProvider } from './contexts/AuthContext';
 import { PropertyProvider } from './contexts/PropertyContext';
 
@@ -24,6 +25,7 @@ function App() {
           <AnimatePresence mode="wait">
             <Routes>
               <Route path="/" element={<HomePage />} />
+              <Route path="/dashboard" element={<DashboardPage />} />
               <Route path="/properties" element={<RealPropertiesPage />} />
               <Route path="/sample-properties" element={<PropertiesPage />} />
               <Route path="/map-search" element={<MapSearchPage />} />
