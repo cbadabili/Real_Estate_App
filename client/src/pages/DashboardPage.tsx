@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { useProperties } from '../hooks/useProperties';
-import { MortgageCalculator } from '../components/features/MortgageCalculator';
+// import { MortgageCalculator } from '../components/features/MortgageCalculator';
 import { LoadingSpinner } from '../components/ui/LoadingSpinner';
 import { 
   Home, 
@@ -230,9 +230,12 @@ const DashboardPage = () => {
             </div>
           </div>
 
-          {/* Mortgage Calculator Sidebar */}
+          {/* Placeholder for Mortgage Calculator Sidebar */}
           <div className="lg:col-span-1">
-            <MortgageCalculator className="sticky top-8" />
+            <div className="bg-white rounded-xl shadow-lg border border-neutral-200 p-6 sticky top-8">
+              <h3 className="text-lg font-semibold text-neutral-900 mb-4">Mortgage Calculator</h3>
+              <p className="text-neutral-600">Financial tools coming soon...</p>
+            </div>
           </div>
         </div>
       </div>

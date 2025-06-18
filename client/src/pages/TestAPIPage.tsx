@@ -128,20 +128,9 @@ const TestAPIPage = () => {
           {neighborhoodData && (
             <div>
               <p className="text-green-600 mb-4">✓ Successfully loaded neighborhood data</p>
-              <div className="grid grid-cols-2 gap-6">
-                <div>
-                  <h3 className="font-semibold mb-2">Demographics</h3>
-                  <p>Median Income: ${(neighborhoodData as any).demographics?.medianIncome?.toLocaleString()}</p>
-                  <p>Population Density: {(neighborhoodData as any).demographics?.populationDensity}/sq mi</p>
-                  <p>Average Age: {(neighborhoodData as any).demographics?.averageAge}</p>
-                </div>
-                <div>
-                  <h3 className="font-semibold mb-2">Quality of Life</h3>
-                  <p>Walk Score: {(neighborhoodData as any).walkScore}/100</p>
-                  <p>Crime Index: {(neighborhoodData as any).crimeIndex}/10</p>
-                  <p>Schools: {(neighborhoodData as any).schools?.length} nearby</p>
-                </div>
-              </div>
+              <pre className="text-sm bg-neutral-100 p-4 rounded-lg overflow-auto">
+                {JSON.stringify(neighborhoodData, null, 2)}
+              </pre>
             </div>
           )}
         </div>
