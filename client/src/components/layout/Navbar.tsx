@@ -41,11 +41,12 @@ const Navbar = () => {
         <div className="flex justify-between items-center h-24">
           {/* Logo */}
           <div className="flex items-center">
-            <Link to="/" className="flex items-center space-x-3">
-              <div className="w-14 h-14 bg-beedab-blue rounded-lg flex items-center justify-center">
-                <Building2 className="h-8 w-8 text-white" />
-              </div>
-              <span className="text-3xl font-bold text-neutral-900">beedab</span>
+            <Link to="/" className="flex items-center space-x-2">
+              <img 
+                src="@assets/logo_1750328372393.png" 
+                alt="beedab Real Estate Platform" 
+                className="h-16 w-auto"
+              />
             </Link>
           </div>
 
