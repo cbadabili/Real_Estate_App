@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
-// import { SEOHead } from '../components/common/SEOHead';
 import { motion } from 'framer-motion';
+import { AISearchBar } from '../components/search/AISearchBar';
 import { 
   Search, 
   Map, 

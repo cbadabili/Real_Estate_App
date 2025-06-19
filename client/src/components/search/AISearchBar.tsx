@@ -1,0 +1,133 @@
+import { useState } from 'react';
+import { motion } from 'framer-motion';
+import { Search, Sparkles, Loader2 } from 'lucide-react';
+
+interface AISearchBarProps {
+  onSearch?: (query: string, filters?: any) => void;
+  className?: string;
+}
+
+export const AISearchBar = ({ onSearch, className = '' }: AISearchBarProps) => {
+  const [query, setQuery] = useState('');
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  const handleSearch = async () => {
+    if (!query.trim()) return;
+    
+    setIsProcessing(true);
+    
+    try {
+      const response = await fetch('/api/search/ai', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ query }),
+      });
+      
+      if (response.ok) {
+        const result = await response.json();
+        console.log('AI Search Result:', result);
+        
+        if (onSearch) {
+          onSearch(query, result.parsedFilters);
+        }
+      } else {
+        console.error('AI search failed:', response.statusText);
+        if (onSearch) {
+          onSearch(query);
+        }
+      }
+    } catch (error) {
+      console.error('AI search error:', error);
+      if (onSearch) {
+        onSearch(query);
+      }
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
+
+  const exampleQueries = [
+    "3 bedroom house under $500k near good schools",
+    "Modern condo downtown with city views",
+    "Family home with large backyard in quiet neighborhood",
+    "Investment property with high rental potential"
+  ];
+
+  return (
+    <div className={`w-full max-w-4xl mx-auto ${className}`}>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="relative"
+      >
+        <div className="relative bg-white rounded-2xl shadow-xl border-2 border-beedab-yellow/20 overflow-hidden">
+          <div className="flex items-center p-2">
+            <div className="flex items-center pl-4 pr-3">
+              <Sparkles className="h-6 w-6 text-beedab-yellow mr-2" />
+              <span className="text-sm font-medium text-beedab-darkblue">AI Search</span>
+            </div>
+            <input
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              onKeyPress={handleKeyPress}
+              placeholder="Describe your dream property... (e.g., '3 bedroom house near schools under $500k')"
+              className="flex-1 px-4 py-4 text-lg placeholder-neutral-400 focus:outline-none"
+              disabled={isProcessing}
+            />
+            <button
+              onClick={handleSearch}
+              disabled={isProcessing || !query.trim()}
+              className="mr-2 bg-gradient-to-r from-beedab-yellow to-amber-400 text-beedab-darkblue px-8 py-4 rounded-xl font-semibold hover:from-amber-400 hover:to-beedab-yellow transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+            >
+              {isProcessing ? (
+                <>
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                  <span>Searching...</span>
+                </>
+              ) : (
+                <>
+                  <Search className="h-5 w-5" />
+                  <span>Search</span>
+                </>
+              )}
+            </button>
+          </div>
+        </div>
+
+        <div className="mt-4 flex flex-wrap gap-2 justify-center">
+          {exampleQueries.map((example, index) => (
+            <button
+              key={index}
+              onClick={() => setQuery(example)}
+              className="px-4 py-2 bg-white/80 backdrop-blur-sm text-sm text-beedab-darkblue rounded-full border border-beedab-yellow/30 hover:bg-beedab-yellow/10 hover:border-beedab-yellow transition-all"
+            >
+              {example}
+            </button>
+          ))}
+        </div>
+
+        {isProcessing && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="mt-4 text-center"
+          >
+            <div className="inline-flex items-center space-x-2 bg-white/90 backdrop-blur-sm px-6 py-3 rounded-full border border-beedab-yellow/30">
+              <Sparkles className="h-4 w-4 text-beedab-yellow animate-pulse" />
+              <span className="text-beedab-darkblue font-medium">AI is analyzing your search...</span>
+            </div>
+          </motion.div>
+        )}
+      </motion.div>
+    </div>
+  );
+};
