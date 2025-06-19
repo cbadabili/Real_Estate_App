@@ -68,11 +68,11 @@ export const AISearchBar = ({ onSearch, className = '' }: AISearchBarProps) => {
         animate={{ opacity: 1, y: 0 }}
         className="relative"
       >
-        <div className="relative bg-white rounded-2xl shadow-xl border-2 border-beedab-yellow/20 overflow-hidden">
+        <div className="relative bg-white rounded-2xl shadow-xl border-2 border-beedab-blue/20 overflow-hidden">
           <div className="flex items-center p-2">
             <div className="flex items-center pl-4 pr-3">
-              <Sparkles className="h-6 w-6 text-beedab-yellow mr-2" />
-              <span className="text-sm font-medium text-beedab-darkblue">AI Search</span>
+              <Sparkles className="h-6 w-6 text-beedab-blue mr-2" />
+              <span className="text-sm font-medium text-beedab-black">AI Search</span>
             </div>
             <input
               type="text"
@@ -86,7 +86,7 @@ export const AISearchBar = ({ onSearch, className = '' }: AISearchBarProps) => {
             <button
               onClick={handleSearch}
               disabled={isProcessing || !query.trim()}
-              className="mr-2 bg-gradient-to-r from-beedab-yellow to-amber-400 text-beedab-darkblue px-8 py-4 rounded-xl font-semibold hover:from-amber-400 hover:to-beedab-yellow transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+              className="mr-2 bg-gradient-to-r from-beedab-blue to-beedab-lightblue text-white px-8 py-4 rounded-xl font-semibold hover:from-beedab-lightblue hover:to-beedab-blue transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
             >
               {isProcessing ? (
                 <>
@@ -108,7 +108,7 @@ export const AISearchBar = ({ onSearch, className = '' }: AISearchBarProps) => {
             <button
               key={index}
               onClick={() => setQuery(example)}
-              className="px-4 py-2 bg-white/80 backdrop-blur-sm text-sm text-beedab-darkblue rounded-full border border-beedab-yellow/30 hover:bg-beedab-yellow/10 hover:border-beedab-yellow transition-all"
+              className="px-4 py-2 bg-white/80 backdrop-blur-sm text-sm text-beedab-black rounded-full border border-beedab-blue/30 hover:bg-beedab-blue/10 hover:border-beedab-blue transition-all"
             >
               {example}
             </button>
@@ -121,9 +121,9 @@ export const AISearchBar = ({ onSearch, className = '' }: AISearchBarProps) => {
             animate={{ opacity: 1 }}
             className="mt-4 text-center"
           >
-            <div className="inline-flex items-center space-x-2 bg-white/90 backdrop-blur-sm px-6 py-3 rounded-full border border-beedab-yellow/30">
-              <Sparkles className="h-4 w-4 text-beedab-yellow animate-pulse" />
-              <span className="text-beedab-darkblue font-medium">AI is analyzing your search...</span>
+            <div className="inline-flex items-center space-x-2 bg-white/90 backdrop-blur-sm px-6 py-3 rounded-full border border-beedab-blue/30">
+              <Sparkles className="h-4 w-4 text-beedab-blue animate-pulse" />
+              <span className="text-beedab-black font-medium">AI is analyzing your search...</span>
             </div>
           </motion.div>
         )}

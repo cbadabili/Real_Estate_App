@@ -3,9 +3,10 @@
 @tailwind utilities;
 
 :root {
-  /* BeeDab Brand Colors */
-  --beedab-yellow: #F7DC6F;
-  --beedab-darkblue: #1B4F72;
-  --beedab-lightblue: #5DADE2;
-  --beedab-gold: #F4D03F;
+  /* BeeDab Brand Colors - Based on actual logo */
+  --beedab-black: #000000;        /* Black text in logo */
+  --beedab-blue: #4A90E2;         /* Blue from logo */
+  --beedab-lightblue: #6BB6FF;    /* Lighter blue shade */
+  --beedab-darkblue: #2E5B94;     /* Darker blue shade */
+  --beedab-accent: #87CEEB;       /* Sky blue accent */
 }

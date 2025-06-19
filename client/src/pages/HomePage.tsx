@@ -92,7 +92,7 @@ const HomePage = () => {
         className="min-h-screen"
       >
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-beedab-darkblue via-primary-800 to-secondary-900 text-white overflow-hidden">
+      <section className="relative bg-gradient-to-br from-beedab-darkblue via-beedab-blue to-beedab-lightblue text-white overflow-hidden">
         <div className="absolute inset-0 bg-black/20"></div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 lg:py-32">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
@@ -111,7 +111,7 @@ const HomePage = () => {
                   variants={itemVariants}
                 >
                   Find Your Perfect Property in
-                  <span className="block bg-gradient-to-r from-beedab-lightblue to-beedab-yellow bg-clip-text text-transparent">
+                  <span className="block bg-gradient-to-r from-beedab-lightblue to-beedab-accent bg-clip-text text-transparent">
                     Beautiful Botswana
                   </span>
                 </motion.h1>

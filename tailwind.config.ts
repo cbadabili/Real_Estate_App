@@ -12,10 +12,11 @@ export default {
       },
       colors: {
         // BeeDab brand colors
-        'beedab-yellow': 'var(--beedab-yellow)',
-        'beedab-darkblue': 'var(--beedab-darkblue)',
+        'beedab-black': 'var(--beedab-black)',
+        'beedab-blue': 'var(--beedab-blue)',
         'beedab-lightblue': 'var(--beedab-lightblue)',
-        'beedab-gold': 'var(--beedab-gold)',
+        'beedab-darkblue': 'var(--beedab-darkblue)',
+        'beedab-accent': 'var(--beedab-accent)',
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         card: {
