@@ -12,12 +12,12 @@ import SecureTransactionsPage from './pages/SecureTransactionsPage';
 import CommunicationPage from './pages/CommunicationPage';
 import AgentNetworkPage from './pages/AgentNetworkPage';
 import MapSearchPage from './pages/MapSearchPage';
+import ProfilePage from './pages/ProfilePage';
 import FSBODashboard from './pages/FSBODashboard';
 import CreateListingPage from './pages/CreateListingPage';
 import CreatePropertyPage from './pages/CreatePropertyPage';
 import PropertyDetailsPage from './pages/PropertyDetailsPage';
 import AgentDashboard from './pages/AgentDashboard';
-import ProfilePage from './pages/ProfilePage';
 import TestAPIPage from './pages/TestAPIPage';
 import DashboardPage from './pages/DashboardPage';
 import { AuthProvider } from './contexts/AuthContext';
@@ -43,6 +43,7 @@ function App() {
               <Route path="/agent-network" element={<AgentNetworkPage />} />
               <Route path="/sample-properties" element={<PropertiesPage />} />
               <Route path="/map-search" element={<MapSearchPage />} />
+              <Route path="/profile" element={<ProfilePage />} />
               <Route path="/property/:id" element={<PropertyDetailsPage />} />
               <Route path="/fsbo-dashboard" element={<FSBODashboard />} />
               <Route path="/create-property" element={<CreatePropertyPage />} />

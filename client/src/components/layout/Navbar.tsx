@@ -30,7 +30,7 @@ const Navbar = () => {
   ];
 
   const postDropdownNavigation = [
-    { name: 'My Properties', href: '/fsbo-dashboard', icon: Building },
+    { name: 'My Properties', href: '/dashboard', icon: Building },
     { name: 'Map Search', href: '/map-search', icon: MapPin },
   ];
 
