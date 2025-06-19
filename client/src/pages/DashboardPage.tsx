@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Link } from 'wouter';
+import { Link } from 'react-router-dom';
 import { useProperties } from '../hooks/useProperties';
 // import { MortgageCalculator } from '../components/features/MortgageCalculator';
 import { LoadingSpinner } from '../components/ui/LoadingSpinner';

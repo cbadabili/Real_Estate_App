@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
-import { Link } from 'wouter';
+import { Link } from 'react-router-dom';
 import { AISearchBar } from '../components/search/AISearchBar';
 import { 
   ChevronLeft,

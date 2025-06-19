@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useParams } from 'wouter';
+import { useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
   Heart, 

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useLocation } from 'wouter';
+import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Menu, 
@@ -22,7 +22,7 @@ const Navbar = () => {
   const [sellDropdownOpen, setSellDropdownOpen] = useState(false);
   const [rentDropdownOpen, setRentDropdownOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
-  const [location] = useLocation();
+  const location = useLocation();
   const { user, logout } = useAuth();
 
   const navigation = [
