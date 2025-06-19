@@ -41,7 +41,7 @@ const Navbar = () => {
   return (
     <nav className="bg-white shadow-lg border-b border-neutral-200 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+        <div className="flex justify-between items-center h-24">
           <div className="flex items-center">
             <Link to="/" className="flex items-center">
               <motion.div 
@@ -51,8 +51,8 @@ const Navbar = () => {
               >
                 <img 
                   src="/logo.png" 
-                  alt="BeeDab Real Estate Platform" 
-                  className="h-12 w-auto"
+                  alt="beedab Real Estate Platform" 
+                  className="h-20 w-auto"
                 />
               </motion.div>
             </Link>

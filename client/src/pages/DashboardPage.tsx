@@ -41,8 +41,8 @@ const DashboardPage = () => {
     {
       label: 'Average Price',
       value: recentProperties?.length ? 
-        `$${Math.round(recentProperties.reduce((sum: number, prop: any) => sum + parseFloat(prop.price || '0'), 0) / recentProperties.length).toLocaleString()}` : 
-        '$0',
+        `P${Math.round(recentProperties.reduce((sum: number, prop: any) => sum + parseFloat(prop.price || '0'), 0) / recentProperties.length).toLocaleString()}` : 
+        'P0',
       icon: DollarSign,
       change: '+5% vs last month',
       color: 'text-purple-600 bg-purple-100'
@@ -204,7 +204,7 @@ const DashboardPage = () => {
                       </p>
                       <div className="flex justify-between items-center">
                         <p className="font-bold text-primary-600">
-                          ${parseFloat(property.price || '0').toLocaleString()}
+                          P{parseFloat(property.price || '0').toLocaleString()}
                         </p>
                         <div className="flex items-center text-xs text-neutral-500">
                           <Eye className="h-3 w-3 mr-1" />

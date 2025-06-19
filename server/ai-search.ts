@@ -35,13 +35,13 @@ export async function parseNaturalLanguageSearch(query: string): Promise<AISearc
           role: "system",
           content: `You are a real estate search assistant. Parse natural language property search queries into structured filters.
 
-Extract the following information from the user's query:
-- Price range (minPrice, maxPrice)
-- Property type (house, condo, townhouse, apartment)
+Extract the following information from the user's query for Botswana real estate:
+- Price range in Botswana Pula (minPrice, maxPrice) - note P for Pula, k for thousands, M for millions
+- Property type (house, apartment, townhouse, plot)
 - Number of bedrooms (minBedrooms)
 - Number of bathrooms (minBathrooms)
-- Location (city, state)
-- Features (pool, garage, backyard, etc.)
+- Location (city like Gaborone, Francistown, Maun, Kasane, etc.)
+- Features (pool, garage, backyard, security, etc.)
 - Listing type (fsbo, agent, mls)
 
 Respond with JSON in this exact format:
@@ -86,12 +86,14 @@ function parseQueryFallback(query: string): AISearchResult {
   const lowerQuery = query.toLowerCase();
   const filters: SearchFilters = {};
 
-  // Extract price information
-  const priceMatches = lowerQuery.match(/(?:under|below|less than|<)\s*\$?(\d+(?:,\d{3})*(?:k|000)?)/);
+  // Extract price information (Botswana Pula)
+  const priceMatches = lowerQuery.match(/(?:under|below|less than|<)\s*p?(\d+(?:,\d{3})*(?:k|m|000)?)/i);
   if (priceMatches) {
     let price = priceMatches[1].replace(/,/g, '');
-    if (price.endsWith('k')) {
+    if (price.toLowerCase().endsWith('k')) {
       price = price.slice(0, -1) + '000';
+    } else if (price.toLowerCase().endsWith('m')) {
+      price = price.slice(0, -1) + '000000';
     }
     filters.maxPrice = parseInt(price);
   }
@@ -110,16 +112,18 @@ function parseQueryFallback(query: string): AISearchResult {
 
   // Extract property type
   if (lowerQuery.includes('house')) filters.propertyType = 'house';
-  else if (lowerQuery.includes('condo')) filters.propertyType = 'condo';
+  else if (lowerQuery.includes('apartment') || lowerQuery.includes('flat')) filters.propertyType = 'condo';
   else if (lowerQuery.includes('townhouse')) filters.propertyType = 'townhouse';
-  else if (lowerQuery.includes('apartment')) filters.propertyType = 'apartment';
+  else if (lowerQuery.includes('plot') || lowerQuery.includes('land')) filters.propertyType = 'land';
 
   // Extract features
   const features: string[] = [];
   if (lowerQuery.includes('pool')) features.push('Pool');
   if (lowerQuery.includes('garage')) features.push('Garage');
   if (lowerQuery.includes('backyard') || lowerQuery.includes('yard')) features.push('Large Backyard');
-  if (lowerQuery.includes('downtown') || lowerQuery.includes('city view')) features.push('City Views');
+  if (lowerQuery.includes('cbd') || lowerQuery.includes('city view') || lowerQuery.includes('downtown')) features.push('City Views');
+  if (lowerQuery.includes('security') || lowerQuery.includes('gated')) features.push('Security');
+  if (lowerQuery.includes('borehole') || lowerQuery.includes('water')) features.push('Borehole');
   if (features.length > 0) filters.features = features;
 
   // Extract listing type

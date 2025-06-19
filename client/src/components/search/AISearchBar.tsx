@@ -55,18 +55,18 @@ export const AISearchBar = ({ onSearch, className = '' }: AISearchBarProps) => {
   };
 
   const exampleQueries = [
-    "3 bedroom house under $500k near good schools",
-    "Modern condo downtown with city views",
-    "Family home with large backyard in quiet neighborhood",
-    "Investment property with high rental potential"
+    "3 bedroom house under P2M in Gaborone near good schools",
+    "Modern apartment in CBD with city views",
+    "Family home with large yard in quiet area of Francistown",
+    "Investment property in Maun with rental potential"
   ];
 
   return (
-    <div className={`w-full max-w-4xl mx-auto ${className}`}>
+    <div className={`w-full max-w-5xl mx-auto px-4 ${className}`}>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="relative"
+        className="relative flex flex-col items-center"
       >
         <div className="relative bg-white rounded-2xl shadow-xl border-2 border-beedab-blue/20 overflow-hidden">
           <div className="flex items-center p-2">
@@ -79,7 +79,7 @@ export const AISearchBar = ({ onSearch, className = '' }: AISearchBarProps) => {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onKeyPress={handleKeyPress}
-              placeholder="Describe your dream property... (e.g., '3 bedroom house near schools under $500k')"
+              placeholder="Describe your dream property... (e.g., '3 bedroom house near schools under P2M')"
               className="flex-1 px-4 py-4 text-lg placeholder-neutral-400 focus:outline-none"
               disabled={isProcessing}
             />
@@ -103,7 +103,7 @@ export const AISearchBar = ({ onSearch, className = '' }: AISearchBarProps) => {
           </div>
         </div>
 
-        <div className="mt-4 flex flex-wrap gap-2 justify-center">
+        <div className="mt-4 flex flex-wrap gap-2 justify-center max-w-4xl">
           {exampleQueries.map((example, index) => (
             <button
               key={index}

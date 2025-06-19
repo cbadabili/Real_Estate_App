@@ -98,12 +98,14 @@ const HomePage = () => {
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <motion.div variants={itemVariants} className="space-y-8">
               {/* AI Search Bar positioned before the heading */}
-              <AISearchBar 
-                onSearch={(query) => {
-                  window.location.href = `/properties?search=${encodeURIComponent(query)}`;
-                }}
-                className="mb-8"
-              />
+              <div className="w-full flex justify-center mb-8">
+                <AISearchBar 
+                  onSearch={(query: string) => {
+                    window.location.href = `/properties?search=${encodeURIComponent(query)}`;
+                  }}
+                  className=""
+                />
+              </div>
               
               <div className="space-y-4">
                 <motion.h1 
