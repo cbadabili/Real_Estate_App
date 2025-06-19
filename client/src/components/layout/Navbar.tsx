@@ -112,7 +112,7 @@ const Navbar = () => {
                         onClick={() => setSellDropdownOpen(false)}
                       >
                         <div className="flex items-center">
-                          <Calculator className="h-4 w-4 mr-2 text-green-500" />
+                          <Building className="h-4 w-4 mr-2 text-green-500" />
                           <div>
                             <div className="font-medium">Planning & Budgeting</div>
                             <div className="text-xs text-gray-500">Calculate affordability & get pre-approved</div>
@@ -126,7 +126,7 @@ const Navbar = () => {
                         onClick={() => setSellDropdownOpen(false)}
                       >
                         <div className="flex items-center">
-                          <Search className="h-4 w-4 mr-2 text-blue-500" />
+                          <MapPin className="h-4 w-4 mr-2 text-blue-500" />
                           <div>
                             <div className="font-medium">Property Search</div>
                             <div className="text-xs text-gray-500">Find your perfect home with AI assistance</div>
@@ -140,7 +140,7 @@ const Navbar = () => {
                         onClick={() => setSellDropdownOpen(false)}
                       >
                         <div className="flex items-center">
-                          <Eye className="h-4 w-4 mr-2 text-purple-500" />
+                          <Building className="h-4 w-4 mr-2 text-purple-500" />
                           <div>
                             <div className="font-medium">Viewing & Evaluation</div>
                             <div className="text-xs text-gray-500">Schedule viewings & neighborhood insights</div>
@@ -154,7 +154,7 @@ const Navbar = () => {
                         onClick={() => setSellDropdownOpen(false)}
                       >
                         <div className="flex items-center">
-                          <FileText className="h-4 w-4 mr-2 text-orange-500" />
+                          <Building className="h-4 w-4 mr-2 text-orange-500" />
                           <div>
                             <div className="font-medium">Making Offers</div>
                             <div className="text-xs text-gray-500">Negotiate & secure your property</div>
@@ -171,7 +171,7 @@ const Navbar = () => {
                         onClick={() => setSellDropdownOpen(false)}
                       >
                         <div className="flex items-center">
-                          <Scale className="h-4 w-4 mr-2 text-beedab-blue" />
+                          <Building className="h-4 w-4 mr-2 text-beedab-blue" />
                           <div>
                             <div className="font-medium">Legal Services</div>
                             <div className="text-xs text-gray-500">Lawyers & conveyancing experts</div>
@@ -185,7 +185,7 @@ const Navbar = () => {
                         onClick={() => setSellDropdownOpen(false)}
                       >
                         <div className="flex items-center">
-                          <DollarSign className="h-4 w-4 mr-2 text-beedab-blue" />
+                          <Building className="h-4 w-4 mr-2 text-beedab-blue" />
                           <div>
                             <div className="font-medium">Financing Options</div>
                             <div className="text-xs text-gray-500">Banks & mortgage advisors</div>
