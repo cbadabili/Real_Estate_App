@@ -39,20 +39,29 @@ const Navbar = () => {
     <nav className="bg-white shadow-lg border-b border-neutral-200 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-24">
+          {/* Logo */}
           <div className="flex items-center">
-            <Link to="/" className="flex items-center">
-              <motion.div 
-                className="flex items-center"
-                whileHover={{ scale: 1.05 }}
-                transition={{ type: "spring", stiffness: 400, damping: 10 }}
-              >
-                <img 
-                  src="/logo.png" 
-                  alt="beedab Real Estate Platform" 
-                  className="h-20 w-auto"
-                />
-              </motion.div>
+            <Link to="/" className="flex items-center space-x-3">
+              <div className="w-14 h-14 bg-beedab-blue rounded-lg flex items-center justify-center">
+                <Building2 className="h-8 w-8 text-white" />
+              </div>
+              <span className="text-3xl font-bold text-neutral-900">beedab</span>
             </Link>
+          </div>
+
+          {/* Guided Search Bar */}
+          <div className="hidden lg:flex items-center flex-1 max-w-md mx-8">
+            <div className="flex-1 bg-gray-50 rounded-full px-4 py-2 flex items-center space-x-3">
+              <Search className="h-5 w-5 text-gray-400" />
+              <input 
+                type="text" 
+                placeholder="Search properties..."
+                className="flex-1 bg-transparent text-sm focus:outline-none"
+              />
+              <div className="text-xs text-gray-500 px-2 border-l border-gray-300">
+                P{(priceRange[0]/1000).toFixed(0)}K - P{(priceRange[1]/1000).toFixed(0)}K
+              </div>
+            </div>
           </div>
 
           {/* Desktop Navigation */}
