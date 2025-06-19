@@ -21,7 +21,8 @@ import {
   Car,
   Wifi,
   TreePine,
-  Zap
+  Zap,
+  CheckCircle
 } from 'lucide-react';
 import { sampleProperties } from '../data/sampleData';
 
