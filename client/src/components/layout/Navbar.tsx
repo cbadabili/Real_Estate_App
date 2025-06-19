@@ -43,7 +43,7 @@ const Navbar = () => {
           <div className="flex items-center">
             <Link to="/" className="flex items-center space-x-2">
               <img 
-                src="@assets/logo_1750328372393.png" 
+                src="/attached_assets/logo_1750328372393.png" 
                 alt="beedab Real Estate Platform" 
                 className="h-16 w-auto"
               />
