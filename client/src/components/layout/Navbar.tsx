@@ -19,9 +19,11 @@ import { useAuth } from '../../contexts/AuthContext';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [buyDropdownOpen, setBuyDropdownOpen] = useState(false);
   const [sellDropdownOpen, setSellDropdownOpen] = useState(false);
   const [rentDropdownOpen, setRentDropdownOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const [priceRange, setPriceRange] = useState([100000, 2000000]);
   const location = useLocation();
   const { user, logout } = useAuth();
 
@@ -56,18 +58,19 @@ const Navbar = () => {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
             {/* Buy Dropdown */}
-            <div className="relative">
-              <button
-                onClick={() => setSellDropdownOpen(!sellDropdownOpen)}
-                className="flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100 transition-colors"
-              >
+            <div 
+              className="relative"
+              onMouseEnter={() => setBuyDropdownOpen(true)}
+              onMouseLeave={() => setBuyDropdownOpen(false)}
+            >
+              <button className="flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100 transition-colors">
                 <Building2 className="h-4 w-4" />
                 <span>Buy</span>
                 <ChevronDown className="h-3 w-3" />
               </button>
               
               <AnimatePresence>
-                {sellDropdownOpen && (
+                {buyDropdownOpen && (
                   <motion.div
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -256,18 +259,19 @@ const Navbar = () => {
             </div>
 
             {/* Rent Dropdown */}
-            <div className="relative">
-              <button
-                onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
-                className="flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100 transition-colors"
-              >
+            <div 
+              className="relative"
+              onMouseEnter={() => setRentDropdownOpen(true)}
+              onMouseLeave={() => setRentDropdownOpen(false)}
+            >
+              <button className="flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100 transition-colors">
                 <HomeIcon className="h-4 w-4" />
                 <span>Rent</span>
                 <ChevronDown className="h-3 w-3" />
               </button>
               
               <AnimatePresence>
-                {profileDropdownOpen && (
+                {rentDropdownOpen && (
                   <motion.div
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -279,36 +283,56 @@ const Navbar = () => {
                       <Link
                         to="/rent/search"
                         className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
-                        onClick={() => setProfileDropdownOpen(false)}
+                        onClick={() => setRentDropdownOpen(false)}
                       >
-                        Find Rental Property
-                        <span className="block text-xs text-gray-500">Browse available rentals</span>
+                        <div className="flex items-center">
+                          <Search className="h-4 w-4 mr-2 text-blue-500" />
+                          <div>
+                            <div className="font-medium">Find Rental Property</div>
+                            <div className="text-xs text-gray-500">Browse available rentals</div>
+                          </div>
+                        </div>
                       </Link>
                       <Link
                         to="/services/tenant-support"
                         className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
-                        onClick={() => setProfileDropdownOpen(false)}
+                        onClick={() => setRentDropdownOpen(false)}
                       >
-                        Tenant Support
-                        <span className="block text-xs text-gray-500">Rights, agreements & advice</span>
+                        <div className="flex items-center">
+                          <User className="h-4 w-4 mr-2 text-green-500" />
+                          <div>
+                            <div className="font-medium">Tenant Support</div>
+                            <div className="text-xs text-gray-500">Rights, agreements & advice</div>
+                          </div>
+                        </div>
                       </Link>
                       <div className="border-t border-gray-100 my-2"></div>
                       <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide px-2 py-1">For Landlords</div>
                       <Link
                         to="/rent/list-property"
                         className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
-                        onClick={() => setProfileDropdownOpen(false)}
+                        onClick={() => setRentDropdownOpen(false)}
                       >
-                        List Your Property
-                        <span className="block text-xs text-gray-500">Rent out your property</span>
+                        <div className="flex items-center">
+                          <Building className="h-4 w-4 mr-2 text-purple-500" />
+                          <div>
+                            <div className="font-medium">List Your Property</div>
+                            <div className="text-xs text-gray-500">Rent out your property</div>
+                          </div>
+                        </div>
                       </Link>
                       <Link
                         to="/services/property-management"
                         className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
-                        onClick={() => setProfileDropdownOpen(false)}
+                        onClick={() => setRentDropdownOpen(false)}
                       >
-                        Property Management
-                        <span className="block text-xs text-gray-500">Full-service rental management</span>
+                        <div className="flex items-center">
+                          <Building className="h-4 w-4 mr-2 text-orange-500" />
+                          <div>
+                            <div className="font-medium">Property Management</div>
+                            <div className="text-xs text-gray-500">Full-service rental management</div>
+                          </div>
+                        </div>
                       </Link>
                     </div>
                   </motion.div>
