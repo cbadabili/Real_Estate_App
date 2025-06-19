@@ -43,18 +43,17 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center">
-            <Link to="/" className="flex items-center">
+            <Link to="/" className="flex items-center space-x-4">
               <motion.div 
                 className="flex items-center"
                 whileHover={{ scale: 1.05 }}
                 transition={{ type: "spring", stiffness: 400, damping: 10 }}
               >
-                <img 
-                  src="/logo.jpg" 
-                  alt="BeeDab" 
-                  className="h-12 w-auto"
-                />
+                <div className="h-16 w-16 bg-gradient-to-br from-beedab-yellow to-amber-400 rounded-xl flex items-center justify-center shadow-lg">
+                  <span className="text-beedab-darkblue font-bold text-2xl">B</span>
+                </div>
               </motion.div>
+              <span className="text-3xl font-bold bg-gradient-to-r from-beedab-darkblue to-beedab-yellow bg-clip-text text-transparent">BeeDab</span>
             </Link>
           </div>
 

@@ -97,13 +97,21 @@ const HomePage = () => {
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 lg:py-32">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <motion.div variants={itemVariants} className="space-y-8">
+              {/* AI Search Bar positioned before the heading */}
+              <AISearchBar 
+                onSearch={(query) => {
+                  window.location.href = `/properties?search=${encodeURIComponent(query)}`;
+                }}
+                className="mb-8"
+              />
+              
               <div className="space-y-4">
                 <motion.h1 
                   className="text-4xl lg:text-6xl font-bold leading-tight"
                   variants={itemVariants}
                 >
                   Find Your Perfect Property in
-                  <span className="block bg-gradient-to-r from-beedab-blue to-beedab-lightblue bg-clip-text text-transparent">
+                  <span className="block bg-gradient-to-r from-beedab-lightblue to-beedab-yellow bg-clip-text text-transparent">
                     Beautiful Botswana
                   </span>
                 </motion.h1>

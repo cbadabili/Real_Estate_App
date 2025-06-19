@@ -1,3 +1,11 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root {
+  /* BeeDab Brand Colors */
+  --beedab-yellow: #F7DC6F;
+  --beedab-darkblue: #1B4F72;
+  --beedab-lightblue: #5DADE2;
+  --beedab-gold: #F4D03F;
+}

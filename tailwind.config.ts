@@ -11,6 +11,11 @@ export default {
         sm: "calc(var(--radius) - 4px)",
       },
       colors: {
+        // BeeDab brand colors
+        'beedab-yellow': 'var(--beedab-yellow)',
+        'beedab-darkblue': 'var(--beedab-darkblue)',
+        'beedab-lightblue': 'var(--beedab-lightblue)',
+        'beedab-gold': 'var(--beedab-gold)',
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         card: {
