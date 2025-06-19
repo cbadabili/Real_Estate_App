@@ -15,7 +15,7 @@ import {
   Share2,
   BarChart3
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link } from 'wouter';
 
 const FSBODashboard = () => {
   const [activeTab, setActiveTab] = useState('overview');
