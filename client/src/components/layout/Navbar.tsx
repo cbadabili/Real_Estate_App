@@ -26,7 +26,6 @@ const Navbar = () => {
   const { user, logout } = useAuth();
 
   const navigation = [
-    { name: 'Buy', href: '/properties', icon: Building2 },
     { name: 'Map Search', href: '/map-search', icon: MapPin },
   ];
 
@@ -116,7 +115,7 @@ const Navbar = () => {
             {/* Rent Dropdown */}
             <div className="relative">
               <button
-                onClick={() => setRentDropdownOpen(!rentDropdownOpen)}
+                onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
                 className="flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100 transition-colors"
               >
                 <HomeIcon className="h-4 w-4" />
@@ -125,27 +124,50 @@ const Navbar = () => {
               </button>
               
               <AnimatePresence>
-                {rentDropdownOpen && (
+                {profileDropdownOpen && (
                   <motion.div
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
-                    className="absolute top-full left-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-neutral-200 z-50"
+                    className="absolute top-full left-0 mt-2 w-64 bg-white rounded-md shadow-lg border border-neutral-200 z-50"
                   >
-                    <Link
-                      to="/rent"
-                      className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100"
-                      onClick={() => setRentDropdownOpen(false)}
-                    >
-                      Find Rental
-                    </Link>
-                    <Link
-                      to="/rent-out"
-                      className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 border-t border-neutral-100"
-                      onClick={() => setRentDropdownOpen(false)}
-                    >
-                      Rent Out Property
-                    </Link>
+                    <div className="p-2">
+                      <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide px-2 py-1">For Tenants</div>
+                      <Link
+                        to="/rent/search"
+                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
+                        onClick={() => setProfileDropdownOpen(false)}
+                      >
+                        Find Rental Property
+                        <span className="block text-xs text-gray-500">Browse available rentals</span>
+                      </Link>
+                      <Link
+                        to="/services/tenant-support"
+                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
+                        onClick={() => setProfileDropdownOpen(false)}
+                      >
+                        Tenant Support
+                        <span className="block text-xs text-gray-500">Rights, agreements & advice</span>
+                      </Link>
+                      <div className="border-t border-gray-100 my-2"></div>
+                      <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide px-2 py-1">For Landlords</div>
+                      <Link
+                        to="/rent/list-property"
+                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
+                        onClick={() => setProfileDropdownOpen(false)}
+                      >
+                        List Your Property
+                        <span className="block text-xs text-gray-500">Rent out your property</span>
+                      </Link>
+                      <Link
+                        to="/services/property-management"
+                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
+                        onClick={() => setProfileDropdownOpen(false)}
+                      >
+                        Property Management
+                        <span className="block text-xs text-gray-500">Full-service rental management</span>
+                      </Link>
+                    </div>
                   </motion.div>
                 )}
               </AnimatePresence>
