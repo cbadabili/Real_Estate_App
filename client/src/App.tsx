@@ -6,6 +6,11 @@ import PropertiesPage from './pages/PropertiesPage';
 import RealPropertiesPage from './pages/RealPropertiesPage';
 import RentPage from './pages/RentPage';
 import RentOutPage from './pages/RentOutPage';
+import BuyerSellerPlatformPage from './pages/BuyerSellerPlatformPage';
+import MarketIntelligencePage from './pages/MarketIntelligencePage';
+import SecureTransactionsPage from './pages/SecureTransactionsPage';
+import CommunicationPage from './pages/CommunicationPage';
+import AgentNetworkPage from './pages/AgentNetworkPage';
 import MapSearchPage from './pages/MapSearchPage';
 import FSBODashboard from './pages/FSBODashboard';
 import CreateListingPage from './pages/CreateListingPage';
@@ -31,6 +36,11 @@ function App() {
               <Route path="/properties" element={<RealPropertiesPage />} />
               <Route path="/rent" element={<RentPage />} />
               <Route path="/rent-out" element={<RentOutPage />} />
+              <Route path="/buyer-seller-platform" element={<BuyerSellerPlatformPage />} />
+              <Route path="/market-intelligence" element={<MarketIntelligencePage />} />
+              <Route path="/secure-transactions" element={<SecureTransactionsPage />} />
+              <Route path="/communication" element={<CommunicationPage />} />
+              <Route path="/agent-network" element={<AgentNetworkPage />} />
               <Route path="/sample-properties" element={<PropertiesPage />} />
               <Route path="/map-search" element={<MapSearchPage />} />
               <Route path="/property/:id" element={<PropertyDetailsPage />} />

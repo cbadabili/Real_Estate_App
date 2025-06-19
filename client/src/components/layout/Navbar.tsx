@@ -13,7 +13,6 @@ import {
   ChevronDown,
   LogOut,
   Home as HomeIcon,
-  DollarSign,
   Building
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
@@ -28,8 +27,11 @@ const Navbar = () => {
 
   const navigation = [
     { name: 'Buy', href: '/properties', icon: Building2 },
-    { name: 'Map Search', href: '/map-search', icon: MapPin },
+  ];
+
+  const postDropdownNavigation = [
     { name: 'My Properties', href: '/fsbo-dashboard', icon: Building },
+    { name: 'Map Search', href: '/map-search', icon: MapPin },
   ];
 
   return (
@@ -79,7 +81,7 @@ const Navbar = () => {
                 onClick={() => setSellDropdownOpen(!sellDropdownOpen)}
                 className="flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100 transition-colors"
               >
-                <DollarSign className="h-4 w-4" />
+                <span className="text-beedab-blue font-bold text-xs">BWP</span>
                 <span>Sell</span>
                 <ChevronDown className="h-3 w-3" />
               </button>
@@ -148,6 +150,26 @@ const Navbar = () => {
                 )}
               </AnimatePresence>
             </div>
+
+            {/* Post-dropdown Navigation */}
+            {postDropdownNavigation.map((item) => {
+              const Icon = item.icon;
+              const isActive = location === item.href;
+              return (
+                <Link
+                  key={item.name}
+                  to={item.href}
+                  className={`flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                    isActive
+                      ? 'bg-beedab-blue/10 text-beedab-blue'
+                      : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100'
+                  }`}
+                >
+                  <Icon className="h-4 w-4" />
+                  <span>{item.name}</span>
+                </Link>
+              );
+            })}
           </div>
 
           {/* User Profile Avatar */}
@@ -236,6 +258,27 @@ const Navbar = () => {
           >
             <div className="px-4 py-2 space-y-1">
               {navigation.map((item) => {
+                const Icon = item.icon;
+                const isActive = location === item.href;
+                return (
+                  <Link
+                    key={item.name}
+                    to={item.href}
+                    onClick={() => setIsOpen(false)}
+                    className={`flex items-center space-x-3 px-3 py-3 rounded-lg text-sm font-medium transition-colors ${
+                      isActive
+                        ? 'bg-beedab-blue/10 text-beedab-blue'
+                        : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100'
+                    }`}
+                  >
+                    <Icon className="h-5 w-5" />
+                    <span>{item.name}</span>
+                  </Link>
+                );
+              })}
+
+              {/* Post-dropdown Navigation for Mobile */}
+              {postDropdownNavigation.map((item) => {
                 const Icon = item.icon;
                 const isActive = location === item.href;
                 return (
