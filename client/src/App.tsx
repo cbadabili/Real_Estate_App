@@ -5,6 +5,7 @@ import HomePage from './pages/HomePage';
 import PropertiesPage from './pages/PropertiesPage';
 import RealPropertiesPage from './pages/RealPropertiesPage';
 import RentPage from './pages/RentPage';
+import RentOutPage from './pages/RentOutPage';
 import MapSearchPage from './pages/MapSearchPage';
 import FSBODashboard from './pages/FSBODashboard';
 import CreateListingPage from './pages/CreateListingPage';
@@ -29,6 +30,7 @@ function App() {
               <Route path="/dashboard" element={<DashboardPage />} />
               <Route path="/properties" element={<RealPropertiesPage />} />
               <Route path="/rent" element={<RentPage />} />
+              <Route path="/rent-out" element={<RentOutPage />} />
               <Route path="/sample-properties" element={<PropertiesPage />} />
               <Route path="/map-search" element={<MapSearchPage />} />
               <Route path="/property/:id" element={<PropertyDetailsPage />} />

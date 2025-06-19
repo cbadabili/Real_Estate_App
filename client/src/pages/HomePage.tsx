@@ -11,7 +11,10 @@ import {
   Building2,
   Users,
   Star,
-  ArrowRight
+  ArrowRight,
+  Shield,
+  MessageCircle,
+  TrendingUp
 } from 'lucide-react';
 
 const HomePage = () => {
@@ -280,6 +283,88 @@ const HomePage = () => {
         </div>
       </section>
 
+      {/* Featured Properties Section */}
+      <section className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div variants={containerVariants} className="flex justify-between items-center mb-12">
+            <div>
+              <h2 className="text-3xl font-bold text-gray-900 mb-4">Featured Properties</h2>
+              <p className="text-gray-600">
+                Discover premium properties handpicked by our experts
+              </p>
+            </div>
+            <Link
+              to="/properties"
+              className="flex items-center text-beedab-blue hover:text-beedab-darkblue font-medium"
+            >
+              View All Properties
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Link>
+          </motion.div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[
+              {
+                id: 1,
+                image: 'https://images.unsplash.com/photo-1605146769289-440113cc3d00?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80',
+                location: 'Gaborone West',
+                price: 'P2,500,000',
+                bedrooms: 3,
+                bathrooms: 2,
+                sqft: 1200,
+                type: 'House'
+              },
+              {
+                id: 2,
+                image: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80',
+                location: 'Francistown',
+                price: 'P1,800,000',
+                bedrooms: 2,
+                bathrooms: 2,
+                sqft: 900,
+                type: 'Apartment'
+              },
+              {
+                id: 3,
+                image: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80',
+                location: 'Maun',
+                price: 'P3,200,000',
+                bedrooms: 4,
+                bathrooms: 3,
+                sqft: 1800,
+                type: 'Villa'
+              }
+            ].map((property) => (
+              <motion.div
+                key={property.id}
+                variants={itemVariants}
+                className="bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-lg transition-shadow overflow-hidden"
+              >
+                <div className="relative">
+                  <img
+                    src={property.image}
+                    alt={property.location}
+                    className="w-full h-48 object-cover"
+                  />
+                  <div className="absolute top-3 right-3 bg-white px-2 py-1 rounded text-sm font-medium text-beedab-blue">
+                    {property.type}
+                  </div>
+                </div>
+                <div className="p-6">
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">{property.location}</h3>
+                  <p className="text-2xl font-bold text-beedab-blue mb-4">{property.price}</p>
+                  <div className="flex justify-between text-sm text-gray-600">
+                    <span>{property.bedrooms} Bedrooms</span>
+                    <span>{property.bathrooms} Bathrooms</span>
+                    <span>{property.sqft} sqft</span>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Features Section */}
       <section className="py-16 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -290,22 +375,37 @@ const HomePage = () => {
             </p>
           </motion.div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
               {
-                icon: Building2,
-                title: 'Comprehensive Listings',
-                description: 'Browse thousands of verified properties from FSBO sellers and professional agents'
+                icon: Users,
+                title: 'Buyer and Seller Platform',
+                description: 'Complete For Sale By Owner tools including listing creation, legal documents, and transaction management for Batswana'
+              },
+              {
+                icon: TrendingUp,
+                title: 'Market Intelligence',
+                description: 'AI-powered property valuations, market trends, and investment analytics tailored for the Botswana property market'
+              },
+              {
+                icon: Shield,
+                title: 'Secure Transactions',
+                description: 'REAC-compliant transaction processing and secure payment systems designed for Botswana real estate laws'
+              },
+              {
+                icon: MessageCircle,
+                title: 'Instant Communication',
+                description: 'Real-time messaging in English and Setswana, video calls, and collaboration tools for seamless property negotiations'
               },
               {
                 icon: Users,
-                title: 'Expert Agents',
-                description: 'Connect with trusted real estate professionals across Botswana'
+                title: 'REAC Agent Network',
+                description: 'Connect with certified REAC agents across Botswana and access professional real estate services'
               },
               {
-                icon: Star,
-                title: 'Premium Service',
-                description: 'Experience world-class service with local market expertise'
+                icon: Building2,
+                title: 'Comprehensive Listings',
+                description: 'Browse thousands of verified properties from direct sellers and professional agents across Botswana'
               }
             ].map((feature, index) => {
               const Icon = feature.icon;

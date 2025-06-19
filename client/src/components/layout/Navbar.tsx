@@ -13,22 +13,23 @@ import {
   ChevronDown,
   LogOut,
   Home as HomeIcon,
-  DollarSign
+  DollarSign,
+  Building
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [sellDropdownOpen, setSellDropdownOpen] = useState(false);
+  const [rentDropdownOpen, setRentDropdownOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [location] = useLocation();
   const { user, logout } = useAuth();
 
   const navigation = [
     { name: 'Buy', href: '/properties', icon: Building2 },
-    { name: 'Rent', href: '/rent', icon: HomeIcon },
     { name: 'Map Search', href: '/map-search', icon: MapPin },
-    { name: 'My Properties', href: '/fsbo-dashboard', icon: Settings },
+    { name: 'My Properties', href: '/fsbo-dashboard', icon: Building },
   ];
 
   return (
@@ -96,14 +97,52 @@ const Navbar = () => {
                       className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100"
                       onClick={() => setSellDropdownOpen(false)}
                     >
-                      Sell a Property
+                      Agent Listing
                     </Link>
                     <Link
                       to="/create-listing"
                       className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 border-t border-neutral-100"
                       onClick={() => setSellDropdownOpen(false)}
                     >
-                      Rent Out a Property
+                      Direct Sellers
+                    </Link>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            {/* Rent Dropdown */}
+            <div className="relative">
+              <button
+                onClick={() => setRentDropdownOpen(!rentDropdownOpen)}
+                className="flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100 transition-colors"
+              >
+                <HomeIcon className="h-4 w-4" />
+                <span>Rent</span>
+                <ChevronDown className="h-3 w-3" />
+              </button>
+              
+              <AnimatePresence>
+                {rentDropdownOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="absolute top-full left-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-neutral-200 z-50"
+                  >
+                    <Link
+                      to="/rent"
+                      className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100"
+                      onClick={() => setRentDropdownOpen(false)}
+                    >
+                      Find Rental
+                    </Link>
+                    <Link
+                      to="/rent-out"
+                      className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 border-t border-neutral-100"
+                      onClick={() => setRentDropdownOpen(false)}
+                    >
+                      Rent Out Property
                     </Link>
                   </motion.div>
                 )}
@@ -223,14 +262,32 @@ const Navbar = () => {
                   onClick={() => setIsOpen(false)}
                   className="block px-3 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
                 >
-                  Sell a Property
+                  Agent Listing
                 </Link>
                 <Link
                   to="/create-listing"
                   onClick={() => setIsOpen(false)}
                   className="block px-3 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
                 >
-                  Rent Out a Property
+                  Direct Sellers
+                </Link>
+              </div>
+              
+              <div className="px-3 py-2 border-t border-neutral-100">
+                <p className="text-xs font-medium text-neutral-500 mb-2">RENT</p>
+                <Link
+                  to="/rent"
+                  onClick={() => setIsOpen(false)}
+                  className="block px-3 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
+                >
+                  Find Rental
+                </Link>
+                <Link
+                  to="/rent-out"
+                  onClick={() => setIsOpen(false)}
+                  className="block px-3 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
+                >
+                  Rent Out Property
                 </Link>
               </div>
               
