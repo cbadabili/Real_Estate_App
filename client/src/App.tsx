@@ -15,6 +15,8 @@ import MapSearchPage from './pages/MapSearchPage';
 import ProfilePage from './pages/ProfilePage';
 import LegalServicesPage from './pages/services/LegalServicesPage';
 import FinancingPage from './pages/services/FinancingPage';
+import PlanningPage from './pages/buyer-journey/PlanningPage';
+import SearchingPage from './pages/buyer-journey/SearchingPage';
 import FSBODashboard from './pages/FSBODashboard';
 import CreateListingPage from './pages/CreateListingPage';
 import CreatePropertyPage from './pages/CreatePropertyPage';
@@ -52,6 +54,8 @@ function App() {
             <Route path="/agent-dashboard" element={<AgentDashboard />} />
             <Route path="/services/legal" element={<LegalServicesPage />} />
             <Route path="/services/financing" element={<FinancingPage />} />
+            <Route path="/buyer-journey/planning" element={<PlanningPage />} />
+            <Route path="/buyer-journey/searching" element={<SearchingPage />} />
             <Route path="/test-api" element={<TestAPIPage />} />
           </Routes>
         </div>
