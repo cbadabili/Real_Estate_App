@@ -1,42 +1,35 @@
-import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { useState } from 'react';
+import { Link, useLocation } from 'wouter';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Home, 
-  Search, 
-  Map, 
-  PlusCircle, 
-  User, 
   Menu, 
   X, 
+  Search, 
+  MapPin, 
+  PlusCircle, 
+  User, 
+  Settings,
   Building2,
-  BarChart3
+  ChevronDown,
+  LogOut,
+  Home as HomeIcon,
+  DollarSign
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const location = useLocation();
+  const [sellDropdownOpen, setSellDropdownOpen] = useState(false);
+  const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const [location] = useLocation();
   const { user, logout } = useAuth();
 
   const navigation = [
-    { name: 'Home', href: '/', icon: Home },
-    { name: 'Dashboard', href: '/dashboard', icon: BarChart3 },
-    { name: 'Properties', href: '/properties', icon: Building2 },
-    { name: 'Map Search', href: '/map-search', icon: Map },
-    ...(user ? [
-      { name: 'Create Listing', href: '/create-listing', icon: PlusCircle },
-      ...(user.type === 'fsbo' ? [
-        { name: 'FSBO Dashboard', href: '/fsbo-dashboard', icon: BarChart3 }
-      ] : []),
-      ...(user.type === 'agent' ? [
-        { name: 'Agent Dashboard', href: '/agent-dashboard', icon: BarChart3 }
-      ] : []),
-      { name: 'Profile', href: '/profile', icon: User }
-    ] : [])
+    { name: 'Buy', href: '/properties', icon: Building2 },
+    { name: 'Rent', href: '/rent', icon: HomeIcon },
+    { name: 'Map Search', href: '/map-search', icon: MapPin },
+    { name: 'My Properties', href: '/fsbo-dashboard', icon: Settings },
   ];
-
-  const isActive = (path: string) => location.pathname === path;
 
   return (
     <nav className="bg-white shadow-lg border-b border-neutral-200 sticky top-0 z-50">
@@ -59,17 +52,18 @@ const Navbar = () => {
           </div>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-1">
+          <div className="hidden md:flex items-center space-x-8">
             {navigation.map((item) => {
               const Icon = item.icon;
+              const isActive = location === item.href;
               return (
                 <Link
                   key={item.name}
                   to={item.href}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center space-x-2 ${
-                    isActive(item.href)
-                      ? 'bg-beedab-lightblue text-beedab-darkblue'
-                      : 'text-neutral-600 hover:text-beedab-darkblue hover:bg-neutral-100'
+                  className={`flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                    isActive
+                      ? 'bg-beedab-blue/10 text-beedab-blue'
+                      : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100'
                   }`}
                 >
                   <Icon className="h-4 w-4" />
@@ -78,32 +72,113 @@ const Navbar = () => {
               );
             })}
             
-            {!user && (
-              <div className="flex items-center space-x-3 ml-4">
-                <button className="text-neutral-600 hover:text-beedab-darkblue px-4 py-2 text-sm font-medium">
-                  Sign In
-                </button>
-                <button className="bg-beedab-blue hover:bg-beedab-darkblue text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
-                  Get Started
-                </button>
-              </div>
-            )}
-            
-            {user && (
+            {/* Sell Dropdown */}
+            <div className="relative">
               <button
-                onClick={logout}
-                className="text-neutral-600 hover:text-error-600 px-4 py-2 text-sm font-medium ml-4"
+                onClick={() => setSellDropdownOpen(!sellDropdownOpen)}
+                className="flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100 transition-colors"
               >
-                Sign Out
+                <DollarSign className="h-4 w-4" />
+                <span>Sell</span>
+                <ChevronDown className="h-3 w-3" />
               </button>
+              
+              <AnimatePresence>
+                {sellDropdownOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="absolute top-full left-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-neutral-200 z-50"
+                  >
+                    <Link
+                      to="/create-property"
+                      className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100"
+                      onClick={() => setSellDropdownOpen(false)}
+                    >
+                      Sell a Property
+                    </Link>
+                    <Link
+                      to="/create-listing"
+                      className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 border-t border-neutral-100"
+                      onClick={() => setSellDropdownOpen(false)}
+                    >
+                      Rent Out a Property
+                    </Link>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          </div>
+
+          {/* User Profile Avatar */}
+          <div className="flex items-center space-x-4">
+            {user ? (
+              <div className="relative">
+                <button
+                  onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
+                  className="h-10 w-10 bg-beedab-blue rounded-full flex items-center justify-center text-white font-semibold hover:bg-beedab-darkblue transition-colors"
+                >
+                  {user.name.charAt(0).toUpperCase()}
+                </button>
+                
+                <AnimatePresence>
+                  {profileDropdownOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      className="absolute top-full right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-neutral-200 z-50"
+                    >
+                      <div className="px-4 py-3 border-b border-neutral-100">
+                        <p className="text-sm font-medium text-neutral-900">{user.name}</p>
+                        <p className="text-xs text-neutral-500">{user.email}</p>
+                      </div>
+                      <Link
+                        to="/profile"
+                        className="flex items-center px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100"
+                        onClick={() => setProfileDropdownOpen(false)}
+                      >
+                        <Settings className="h-4 w-4 mr-2" />
+                        Account Settings
+                      </Link>
+                      <button
+                        onClick={() => {
+                          logout();
+                          setProfileDropdownOpen(false);
+                        }}
+                        className="flex items-center w-full px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 border-t border-neutral-100"
+                      >
+                        <LogOut className="h-4 w-4 mr-2" />
+                        Sign Out
+                      </button>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            ) : (
+              <div className="flex items-center space-x-2">
+                <Link
+                  to="/login"
+                  className="text-sm font-medium text-neutral-600 hover:text-neutral-900"
+                >
+                  Sign In
+                </Link>
+                <Link
+                  to="/register"
+                  className="bg-beedab-blue text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-beedab-darkblue transition-colors"
+                >
+                  Sign Up
+                </Link>
+              </div>
             )}
           </div>
 
           {/* Mobile menu button */}
-          <div className="md:hidden flex items-center">
+          <div className="md:hidden">
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="text-neutral-600 hover:text-beedab-darkblue p-2"
+              className="text-neutral-600 hover:text-neutral-900 p-2"
             >
               {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
@@ -112,56 +187,95 @@ const Navbar = () => {
       </div>
 
       {/* Mobile Navigation */}
-      <motion.div
-        initial={false}
-        animate={isOpen ? { height: 'auto', opacity: 1 } : { height: 0, opacity: 0 }}
-        transition={{ duration: 0.2 }}
-        className="md:hidden overflow-hidden bg-white border-t border-neutral-200"
-      >
-        <div className="px-4 py-2 space-y-1">
-          {navigation.map((item) => {
-            const Icon = item.icon;
-            return (
-              <Link
-                key={item.name}
-                to={item.href}
-                onClick={() => setIsOpen(false)}
-                className={`flex items-center space-x-3 px-3 py-3 rounded-lg text-sm font-medium transition-colors ${
-                  isActive(item.href)
-                    ? 'bg-beedab-lightblue text-beedab-darkblue'
-                    : 'text-neutral-600 hover:text-beedab-darkblue hover:bg-neutral-100'
-                }`}
-              >
-                <Icon className="h-5 w-5" />
-                <span>{item.name}</span>
-              </Link>
-            );
-          })}
-          
-          {!user && (
-            <>
-              <button className="w-full text-left px-3 py-3 text-sm font-medium text-neutral-600 hover:text-beedab-darkblue">
-                Sign In
-              </button>
-              <button className="w-full text-left px-3 py-3 text-sm font-medium bg-beedab-blue text-white rounded-lg">
-                Get Started
-              </button>
-            </>
-          )}
-          
-          {user && (
-            <button
-              onClick={() => {
-                logout();
-                setIsOpen(false);
-              }}
-              className="w-full text-left px-3 py-3 text-sm font-medium text-error-600"
-            >
-              Sign Out
-            </button>
-          )}
-        </div>
-      </motion.div>
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="md:hidden bg-white border-t border-neutral-200"
+          >
+            <div className="px-4 py-2 space-y-1">
+              {navigation.map((item) => {
+                const Icon = item.icon;
+                const isActive = location === item.href;
+                return (
+                  <Link
+                    key={item.name}
+                    to={item.href}
+                    onClick={() => setIsOpen(false)}
+                    className={`flex items-center space-x-3 px-3 py-3 rounded-lg text-sm font-medium transition-colors ${
+                      isActive
+                        ? 'bg-beedab-blue/10 text-beedab-blue'
+                        : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100'
+                    }`}
+                  >
+                    <Icon className="h-5 w-5" />
+                    <span>{item.name}</span>
+                  </Link>
+                );
+              })}
+              
+              <div className="px-3 py-2 border-t border-neutral-100">
+                <p className="text-xs font-medium text-neutral-500 mb-2">SELL</p>
+                <Link
+                  to="/create-property"
+                  onClick={() => setIsOpen(false)}
+                  className="block px-3 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
+                >
+                  Sell a Property
+                </Link>
+                <Link
+                  to="/create-listing"
+                  onClick={() => setIsOpen(false)}
+                  className="block px-3 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
+                >
+                  Rent Out a Property
+                </Link>
+              </div>
+              
+              {user ? (
+                <div className="px-3 py-2 border-t border-neutral-100">
+                  <p className="text-xs font-medium text-neutral-500 mb-2">ACCOUNT</p>
+                  <Link
+                    to="/profile"
+                    onClick={() => setIsOpen(false)}
+                    className="block px-3 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
+                  >
+                    Account Settings
+                  </Link>
+                  <button
+                    onClick={() => {
+                      logout();
+                      setIsOpen(false);
+                    }}
+                    className="block w-full text-left px-3 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
+                  >
+                    Sign Out
+                  </button>
+                </div>
+              ) : (
+                <div className="px-3 py-2 border-t border-neutral-100 space-y-2">
+                  <Link
+                    to="/login"
+                    onClick={() => setIsOpen(false)}
+                    className="block px-3 py-2 text-sm font-medium text-neutral-600 hover:bg-neutral-100 rounded"
+                  >
+                    Sign In
+                  </Link>
+                  <Link
+                    to="/register"
+                    onClick={() => setIsOpen(false)}
+                    className="block px-3 py-2 text-sm font-medium bg-beedab-blue text-white rounded hover:bg-beedab-darkblue"
+                  >
+                    Sign Up
+                  </Link>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </nav>
   );
 };

@@ -1,0 +1,98 @@
+Objective:
+Redesign the homepage navigation and hero section for a modern, user-focused real estate experience. Prioritize clarity, responsiveness, and engagement, while showcasing premium properties and agency partners.
+
+Navigation Bar
+Remove the “Home” tab; clicking the logo should always return the user to the homepage.
+
+Replace “Dashboard” and “Properties” with two clear tabs:
+
+Buy (for property buyers)
+
+Rent (for property renters)
+
+Keep “Map Search” as a main tab.
+
+Change “Create Listing” to a single “Sell” tab. When clicked, open a modal or dropdown for:
+
+“Sell a Property”
+
+“Rent Out a Property”
+
+Change “FSBO Dashboard” to “My Properties” (for users to manage their own listings).
+
+Replace “Profile” with a circular avatar (showing user initials or uploaded photo). Clicking it opens a dropdown with account settings and sign-out.
+
+AI Search Bar
+Center the AI search bar both vertically and horizontally in the hero section for all screen sizes, including large desktops and ultrawide screens.
+
+Use a responsive design (Flexbox/Grid) so the search bar and prompts always remain visually centered and balanced.
+
+Make the search bar visually distinct with a contrasting background and subtle shadow, following modern search UX best practices.
+
+Hero Section & Background
+Replace the static blue background with a full-width, responsive slideshow/carousel of premium property images.
+
+Overlay each slide with:
+
+Property details (location, price, key features)
+
+Agent’s photo, name, and contact info (inspired by Redfin’s listing cards)
+
+Subtle dark gradient for text readability.
+
+AI search bar and prompts should appear above the slideshow, always centered and readable.
+
+Stats & Agency Carousel
+Where you currently show stats (e.g., Active Listings, Happy Clients, Properties Sold), replace static numbers with a carousel or ticker:
+
+Rotate through featured property agencies, showing their logo, a short tagline, and a link to their website.
+
+Optionally, expand this in the future to include developers, service providers, or other industry players.
+
+Each agency card should be clickable, opening their website in a new tab.
+
+Other UI Enhancements
+Ensure all elements are mobile-optimized and accessible.
+
+Use clear, minimalist icons and intuitive labels for all navigation and action buttons.
+
+Maintain a distraction-free, visually clean layout so users focus on property discovery.
+
+Example Navigation Structure
+| Logo | Buy | Rent | Map Search | Sell | My Properties | [Profile Avatar] |
+
+Example Hero Section Structure
+text
+[Premium Property Slideshow]
+    [Agent Info Overlay]
+    [Property Details Overlay]
+    [Centered AI Search Bar + Prompts]
+Design References:
+
+Redfin (agent details on listings, immersive hero images)
+
+Booking.com (map search and property overlays)
+
+Modern real estate UI kits (Dribbble, DesignRush)
+
+Responsive CSS Reference:
+
+Use Flexbox/Grid for centering and responsiveness
+
+Ensure search bar and overlays adapt smoothly to all screen sizes
+
+Future Expansion:
+
+Agency carousel can later include developers, mortgage providers, and service partners.
+
+Summary:
+This redesign will create a visually engaging, intuitive homepage that guides users to buy, rent, or sell, while showcasing premium listings and trusted agencies—delivering a modern, Redfin-inspired experience tailored for your market.
+
+You can hand this prompt directly to Cursor or your front-end team for implementation.
+
+Related
+How can I make the AI search prominently centered on all screen sizes
+What visual effects can showcase premium properties in a slideshow background
+How to create smooth, slow transitions for agency and industry partner logos
+What features should I include for the My Properties FSBO dashboard and profile icon
+How to integrate clickable links to property agencies and developers within stats section

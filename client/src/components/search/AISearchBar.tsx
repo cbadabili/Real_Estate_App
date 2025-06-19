@@ -68,7 +68,7 @@ export const AISearchBar = ({ onSearch, className = '' }: AISearchBarProps) => {
         animate={{ opacity: 1, y: 0 }}
         className="relative flex flex-col items-center"
       >
-        <div className="relative bg-white rounded-2xl shadow-xl border-2 border-beedab-blue/20 overflow-hidden">
+        <div className="relative bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl border-2 border-beedab-blue/20 overflow-hidden">
           <div className="flex items-center p-2">
             <div className="flex items-center pl-4 pr-3">
               <Sparkles className="h-6 w-6 text-beedab-blue mr-2" />
@@ -104,11 +104,12 @@ export const AISearchBar = ({ onSearch, className = '' }: AISearchBarProps) => {
         </div>
 
         <div className="mt-4 flex flex-wrap gap-2 justify-center max-w-4xl">
+          <p className="w-full text-center text-white/80 text-sm mb-2">Try these examples:</p>
           {exampleQueries.map((example, index) => (
             <button
               key={index}
               onClick={() => setQuery(example)}
-              className="px-4 py-2 bg-white/80 backdrop-blur-sm text-sm text-beedab-black rounded-full border border-beedab-blue/30 hover:bg-beedab-blue/10 hover:border-beedab-blue transition-all"
+              className="px-4 py-2 bg-white/90 backdrop-blur-sm text-sm text-beedab-black rounded-full border border-white/50 hover:bg-white hover:border-beedab-blue transition-all shadow-lg"
             >
               {example}
             </button>
