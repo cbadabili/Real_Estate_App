@@ -16,6 +16,7 @@ import {
   Building
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { AISearchBar } from '../search/AISearchBar';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -50,19 +51,15 @@ const Navbar = () => {
             </Link>
           </div>
 
-          {/* Guided Search Bar */}
-          <div className="hidden lg:flex items-center flex-1 max-w-md mx-8">
-            <div className="flex-1 bg-gray-50 rounded-full px-4 py-2 flex items-center space-x-3">
-              <Search className="h-5 w-5 text-gray-400" />
-              <input 
-                type="text" 
-                placeholder="Search properties..."
-                className="flex-1 bg-transparent text-sm focus:outline-none"
-              />
-              <div className="text-xs text-gray-500 px-2 border-l border-gray-300">
-                P{(priceRange[0]/1000).toFixed(0)}K - P{(priceRange[1]/1000).toFixed(0)}K
-              </div>
-            </div>
+          {/* AI Search Bar */}
+          <div className="hidden lg:flex items-center flex-1 max-w-2xl mx-8">
+            <AISearchBar 
+              onSearch={(query, filters) => {
+                console.log('Search:', query, filters);
+                // Handle search logic here
+              }}
+              className="w-full"
+            />
           </div>
 
           {/* Desktop Navigation */}
