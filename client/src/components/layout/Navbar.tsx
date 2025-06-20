@@ -45,7 +45,7 @@ const Navbar = () => {
               <img 
                 src="/logo.png" 
                 alt="beedab Real Estate Platform" 
-                className="h-16 w-auto"
+                className="h-20 w-auto"
               />
             </Link>
           </div>
