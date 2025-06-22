@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Calendar, Users, MapPin, Star, Filter, Grid3X3, List, Heart } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { AISearchBar } from '../components/search/AISearchBar';
 
 const RentalsPage = () => {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
@@ -122,12 +123,11 @@ const RentalsPage = () => {
             {/* Search Filters */}
             <div className="flex flex-wrap gap-3">
               <div className="flex-1 min-w-48">
-                <input
-                  type="text"
-                  placeholder="Where to?"
-                  value={filters.location}
-                  onChange={(e) => setFilters(prev => ({ ...prev, location: e.target.value }))}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
+                <AISearchBar
+                  onSearch={(query: string) => {
+                    setFilters(prev => ({ ...prev, location: query }));
+                  }}
+                  className="w-full"
                 />
               </div>
               <div className="flex gap-2">
