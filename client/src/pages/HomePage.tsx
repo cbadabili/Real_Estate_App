@@ -204,7 +204,7 @@ const HomePage = () => {
         </button>
 
         {/* Centered AI Search Bar */}
-        <div className="absolute inset-0 flex items-center justify-center z-20">
+        <div className="absolute inset-0 flex items-center justify-center z-20 pb-32">
           <div className="w-full max-w-4xl px-4">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
