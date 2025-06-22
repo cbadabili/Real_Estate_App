@@ -239,32 +239,50 @@ const Navbar = () => {
                     className="absolute top-full left-0 mt-2 w-80 bg-white rounded-md shadow-lg border border-neutral-200 z-50"
                   >
                     <div className="p-3">
-                      <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide px-2 py-1">Seller's Emotional Journey</div>
+                      <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide px-2 py-1">Selling Options</div>
                       
+                      {/* Primary Selling Options */}
                       <Link
-                        to="/seller-journey/contemplation"
-                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
+                        to="/fsbo-dashboard"
+                        className="block px-4 py-3 text-sm text-neutral-700 hover:bg-beedab-blue/5 rounded border border-beedab-blue/20 mb-2"
                         onClick={() => setSellDropdownOpen(false)}
                       >
                         <div className="flex items-center">
-                          <Building className="h-4 w-4 mr-2 text-yellow-500" />
+                          <Home className="h-4 w-4 mr-2 text-beedab-blue" />
                           <div>
-                            <div className="font-medium">Contemplating the Sale</div>
-                            <div className="text-xs text-gray-500">Life changes, downsizing, or investment opportunities</div>
+                            <div className="font-semibold">Sell Yourself (FSBO)</div>
+                            <div className="text-xs text-gray-500">No agent fees, full control</div>
                           </div>
                         </div>
                       </Link>
                       
                       <Link
-                        to="/seller-journey/emotional-attachment"
+                        to="/agent-network"
+                        className="block px-4 py-3 text-sm text-neutral-700 hover:bg-gray-50 rounded border border-gray-200 mb-3"
+                        onClick={() => setSellDropdownOpen(false)}
+                      >
+                        <div className="flex items-center">
+                          <Users className="h-4 w-4 mr-2 text-gray-600" />
+                          <div>
+                            <div className="font-semibold">List with Agent</div>
+                            <div className="text-xs text-gray-500">Professional assistance</div>
+                          </div>
+                        </div>
+                      </Link>
+                      
+                      <div className="border-t border-gray-100 my-2"></div>
+                      <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide px-2 py-1">Preparation Tools</div>
+                      
+                      <Link
+                        to="/seller-journey/valuation"
                         className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
                         onClick={() => setSellDropdownOpen(false)}
                       >
                         <div className="flex items-center">
-                          <Building className="h-4 w-4 mr-2 text-red-500" />
+                          <TrendingUp className="h-4 w-4 mr-2 text-beedab-blue" />
                           <div>
-                            <div className="font-medium">Emotional Attachment</div>
-                            <div className="text-xs text-gray-500">Letting go of memories and sentimental value</div>
+                            <div className="font-medium">Home Value Assessment</div>
+                            <div className="text-xs text-gray-500">Get your property valued</div>
                           </div>
                         </div>
                       </Link>
@@ -275,72 +293,30 @@ const Navbar = () => {
                         onClick={() => setSellDropdownOpen(false)}
                       >
                         <div className="flex items-center">
-                          <Building className="h-4 w-4 mr-2 text-green-500" />
+                          <Wrench className="h-4 w-4 mr-2 text-beedab-blue" />
                           <div>
-                            <div className="font-medium">Preparing for Market</div>
-                            <div className="text-xs text-gray-500">Property valuation, staging, and improvements</div>
+                            <div className="font-medium">Prepare Your Home</div>
+                            <div className="text-xs text-gray-500">Staging and improvements</div>
                           </div>
                         </div>
                       </Link>
                       
                       <Link
-                        to="/seller-journey/anxiety"
+                        to="/services/legal"
                         className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
                         onClick={() => setSellDropdownOpen(false)}
                       >
                         <div className="flex items-center">
-                          <Building className="h-4 w-4 mr-2 text-orange-500" />
+                          <FileText className="h-4 w-4 mr-2 text-beedab-blue" />
                           <div>
-                            <div className="font-medium">Market Anxiety</div>
-                            <div className="text-xs text-gray-500">Pricing concerns and market timing fears</div>
-                          </div>
-                        </div>
-                      </Link>
-                      
-                      <Link
-                        to="/seller-journey/marketing"
-                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
-                        onClick={() => setSellDropdownOpen(false)}
-                      >
-                        <div className="flex items-center">
-                          <Building className="h-4 w-4 mr-2 text-blue-500" />
-                          <div>
-                            <div className="font-medium">Active Marketing</div>
-                            <div className="text-xs text-gray-500">Showings, open houses, and buyer feedback</div>
-                          </div>
-                        </div>
-                      </Link>
-                      
-                      <Link
-                        to="/seller-journey/negotiation"
-                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
-                        onClick={() => setSellDropdownOpen(false)}
-                      >
-                        <div className="flex items-center">
-                          <Building className="h-4 w-4 mr-2 text-purple-500" />
-                          <div>
-                            <div className="font-medium">Negotiation Stress</div>
-                            <div className="text-xs text-gray-500">Offers, counteroffers, and deal uncertainty</div>
-                          </div>
-                        </div>
-                      </Link>
-                      
-                      <Link
-                        to="/seller-journey/relief"
-                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
-                        onClick={() => setSellDropdownOpen(false)}
-                      >
-                        <div className="flex items-center">
-                          <Building className="h-4 w-4 mr-2 text-teal-500" />
-                          <div>
-                            <div className="font-medium">Sale Completion</div>
-                            <div className="text-xs text-gray-500">Relief, closure, and new beginnings</div>
+                            <div className="font-medium">Legal Requirements</div>
+                            <div className="text-xs text-gray-500">Documents and compliance</div>
                           </div>
                         </div>
                       </Link>
                       
                       <div className="border-t border-gray-100 my-2"></div>
-                      <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide px-2 py-1">Selling Support</div>
+                      <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide px-2 py-1">Marketing & Sales</div>
                       
                       <Link
                         to="/create-listing"
@@ -348,10 +324,69 @@ const Navbar = () => {
                         onClick={() => setSellDropdownOpen(false)}
                       >
                         <div className="flex items-center">
-                          <Building className="h-4 w-4 mr-2 text-beedab-blue" />
+                          <PlusCircle className="h-4 w-4 mr-2 text-beedab-blue" />
                           <div>
-                            <div className="font-medium">List with Agent</div>
-                            <div className="text-xs text-gray-500">Professional emotional & marketing support</div>
+                            <div className="font-medium">Create Listing</div>
+                            <div className="text-xs text-gray-500">List your property</div>
+                          </div>
+                        </div>
+                      </Link>
+                      
+                      <Link
+                        to="/seller-journey/pricing"
+                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
+                        onClick={() => setSellDropdownOpen(false)}
+                      >
+                        <div className="flex items-center">
+                          <DollarSign className="h-4 w-4 mr-2 text-beedab-blue" />
+                          <div>
+                            <div className="font-medium">Pricing Guide</div>
+                            <div className="text-xs text-gray-500">Set competitive prices</div>
+                          </div>
+                        </div>
+                      </Link>
+                      
+                      <Link
+                        to="/seller-journey/showings"
+                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
+                        onClick={() => setSellDropdownOpen(false)}
+                      >
+                        <div className="flex items-center">
+                          <Calendar className="h-4 w-4 mr-2 text-beedab-blue" />
+                          <div>
+                            <div className="font-medium">Manage Showings</div>
+                            <div className="text-xs text-gray-500">Schedule viewings</div>
+                          </div>
+                        </div>
+                      </Link>
+                      
+                      <Link
+                        to="/seller-journey/offers"
+                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
+                        onClick={() => setSellDropdownOpen(false)}
+                      >
+                        <div className="flex items-center">
+                          <Handshake className="h-4 w-4 mr-2 text-beedab-blue" />
+                          <div>
+                            <div className="font-medium">Handle Offers</div>
+                            <div className="text-xs text-gray-500">Review and negotiate</div>
+                          </div>
+                        </div>
+                      </Link>
+                      
+                      <div className="border-t border-gray-100 my-2"></div>
+                      <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide px-2 py-1">Closing Process</div>
+                      
+                      <Link
+                        to="/services/legal"
+                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
+                        onClick={() => setSellDropdownOpen(false)}
+                      >
+                        <div className="flex items-center">
+                          <FileCheck className="h-4 w-4 mr-2 text-beedab-blue" />
+                          <div>
+                            <div className="font-medium">Transfer Process</div>
+                            <div className="text-xs text-gray-500">Complete the sale</div>
                           </div>
                         </div>
                       </Link>
