@@ -34,7 +34,7 @@ export const properties = pgTable("properties", {
   latitude: decimal("latitude", { precision: 10, scale: 8 }),
   longitude: decimal("longitude", { precision: 11, scale: 8 }),
   propertyType: text("property_type").notNull(), // 'house', 'condo', 'townhouse', 'apartment', 'commercial', 'land'
-  listingType: text("listing_type").notNull(), // 'fsbo', 'mls', 'agent'
+  listingType: text("listing_type").notNull(), // 'owner', 'mls', 'agent', 'rental'
   bedrooms: integer("bedrooms"),
   bathrooms: decimal("bathrooms", { precision: 3, scale: 1 }),
   squareFeet: integer("square_feet"),

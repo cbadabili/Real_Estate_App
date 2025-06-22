@@ -6,6 +6,8 @@ import PropertiesPage from './pages/PropertiesPage';
 import RealPropertiesPage from './pages/RealPropertiesPage';
 import RentPage from './pages/RentPage';
 import RentOutPage from './pages/RentOutPage';
+import RentalsPage from './pages/RentalsPage';
+import RentalDetailsPage from './pages/RentalDetailsPage';
 import BuyerSellerPlatformPage from './pages/BuyerSellerPlatformPage';
 import MarketIntelligencePage from './pages/MarketIntelligencePage';
 import SecureTransactionsPage from './pages/SecureTransactionsPage';
