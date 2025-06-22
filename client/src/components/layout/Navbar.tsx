@@ -218,7 +218,7 @@ const Navbar = () => {
               );
             })}
             
-            {/* Sell Dropdown with Seller's Emotional Journey */}
+            {/* Sell Dropdown */}
             <div 
               className="relative"
               onMouseEnter={() => setSellDropdownOpen(true)}
@@ -392,15 +392,15 @@ const Navbar = () => {
                       </Link>
                       
                       <Link
-                        to="/create-property"
+                        to="/seller-journey/handover"
                         className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
                         onClick={() => setSellDropdownOpen(false)}
                       >
                         <div className="flex items-center">
-                          <Building className="h-4 w-4 mr-2 text-beedab-blue" />
+                          <Key className="h-4 w-4 mr-2 text-beedab-blue" />
                           <div>
-                            <div className="font-medium">Sell Yourself (FSBO)</div>
-                            <div className="text-xs text-gray-500">Take control of your selling journey</div>
+                            <div className="font-medium">Property Handover</div>
+                            <div className="text-xs text-gray-500">Transfer ownership</div>
                           </div>
                         </div>
                       </Link>
