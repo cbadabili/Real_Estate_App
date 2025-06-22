@@ -14,7 +14,12 @@ import {
   ArrowRight,
   Shield,
   MessageCircle,
-  TrendingUp
+  TrendingUp,
+  Calculator,
+  Eye,
+  MapPin,
+  Heart,
+  Sparkles
 } from 'lucide-react';
 
 const HomePage = () => {
