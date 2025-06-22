@@ -9,7 +9,7 @@ interface Property {
   bathrooms: number;
   sqft: number;
   type: string;
-  listingType: 'mls' | 'fsbo';
+  listingType: 'mls' | 'owner';
   images: string[];
   features: string[];
   description: string;

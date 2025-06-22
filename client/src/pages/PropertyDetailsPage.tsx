@@ -134,7 +134,7 @@ const PropertyDetailsPage = () => {
                 <div>
                   <div className="flex items-center space-x-3 mb-2">
                     <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                      property.listingType === 'fsbo' 
+                      property.listingType === 'owner' 
                         ? 'bg-accent-100 text-accent-800' 
                         : 'bg-primary-100 text-primary-800'
                     }`}>

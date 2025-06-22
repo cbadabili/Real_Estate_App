@@ -4,13 +4,13 @@ interface User {
   id: string;
   name: string;
   email: string;
-  type: 'fsbo' | 'agent' | 'buyer';
+  type: 'owner' | 'agent' | 'buyer';
   avatar?: string;
 }
 
 interface AuthContextType {
   user: User | null;
-  login: (email: string, password: string, type: 'fsbo' | 'agent' | 'buyer') => Promise<void>;
+  login: (email: string, password: string, type: 'owner' | 'agent' | 'buyer') => Promise<void>;
   logout: () => void;
   register: (userData: any) => Promise<void>;
 }

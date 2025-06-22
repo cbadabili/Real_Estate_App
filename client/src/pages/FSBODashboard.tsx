@@ -114,7 +114,7 @@ const FSBODashboard = () => {
         <div className="mb-8">
           <div className="flex justify-between items-start">
             <div>
-              <h1 className="text-3xl font-bold text-neutral-900">FSBO Dashboard</h1>
+              <h1 className="text-3xl font-bold text-neutral-900">Owner Seller Dashboard</h1>
               <p className="text-neutral-600 mt-1">Manage your property listings and track performance</p>
             </div>
             <Link
