@@ -51,16 +51,7 @@ const Navbar = () => {
             </Link>
           </div>
 
-          {/* AI Search Bar */}
-          <div className="hidden lg:flex items-center flex-1 max-w-2xl mx-8">
-            <AISearchBar 
-              onSearch={(query, filters) => {
-                console.log('Search:', query, filters);
-                // Handle search logic here
-              }}
-              className="w-full"
-            />
-          </div>
+
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
