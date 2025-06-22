@@ -20,7 +20,7 @@ import {
   Wrench,
   FileText,
   Camera,
-  DollarSign,
+  CircleDollarSign,
   Calendar,
   Handshake,
   FileCheck,

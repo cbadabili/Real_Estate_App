@@ -152,10 +152,10 @@ const PropertyDetailsPage = () => {
                 </div>
                 <div className="text-right">
                   <div className="text-4xl font-bold text-primary-600">
-                    ${property.price.toLocaleString()}
+                    P {property.price.toLocaleString()}
                   </div>
                   <div className="text-neutral-500">
-                    ${property.pricePerSqft}/sqft
+                    P {property.pricePerSqft}/sqft
                   </div>
                 </div>
               </div>
@@ -205,7 +205,7 @@ const PropertyDetailsPage = () => {
                   </div>
                   <div className="flex items-center text-success-600">
                     <TrendingUp className="h-4 w-4 mr-1" />
-                    Price reduced $10,000
+                    Price reduced P 10,000
                   </div>
                 </div>
               </div>
@@ -393,7 +393,7 @@ const PropertyDetailsPage = () => {
                 <div className="pt-4 border-t border-neutral-200">
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-neutral-600">Monthly Payment:</span>
-                    <span className="text-lg font-bold text-primary-600">$3,247</span>
+                    <span className="text-lg font-bold text-primary-600">P 3,247</span>
                   </div>
                 </div>
               </div>

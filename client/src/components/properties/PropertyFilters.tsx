@@ -78,7 +78,7 @@ const PropertyFilters: React.FC<PropertyFiltersProps> = ({
         {/* Price Range */}
         <div>
           <label className="flex items-center text-sm font-medium text-neutral-700 mb-3">
-            <DollarSign className="h-4 w-4 mr-2" />
+            <span className="font-bold text-sm mr-2">P</span>
             Price Range (Pula)
           </label>
           <div className="space-y-3">

@@ -6,7 +6,7 @@ import {
   MessageSquare, 
   Calendar, 
   TrendingUp, 
-  DollarSign,
+  CircleDollarSign,
   Home,
   Users,
   Clock,
@@ -292,7 +292,7 @@ const FSBODashboard = () => {
                       </div>
                       
                       <div className="text-2xl font-bold text-primary-600 mb-4">
-                        ${listing.price.toLocaleString()}
+                        P {listing.price.toLocaleString()}
                       </div>
                       
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">

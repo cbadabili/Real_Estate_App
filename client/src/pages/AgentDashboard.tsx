@@ -4,7 +4,7 @@ import {
   Users, 
   Home, 
   TrendingUp, 
-  DollarSign,
+  CircleDollarSign,
   Calendar,
   MessageSquare,
   Star,
@@ -23,7 +23,7 @@ const AgentDashboard = () => {
     { label: 'Active Listings', value: '24', icon: Home, change: '+3', changeType: 'increase' },
     { label: 'Total Clients', value: '156', icon: Users, change: '+12', changeType: 'increase' },
     { label: 'Properties Sold', value: '8', icon: TrendingUp, change: '+2', changeType: 'increase' },
-    { label: 'Commission Earned', value: '$125K', icon: DollarSign, change: '+$15K', changeType: 'increase' }
+    { label: 'Commission Earned', value: 'P 125K', icon: CircleDollarSign, change: '+P 15K', changeType: 'increase' }
   ];
 
   const recentListings = [
@@ -68,7 +68,7 @@ const AgentDashboard = () => {
       name: 'John & Sarah Miller',
       type: 'Buyers',
       status: 'Active',
-      budget: '$600K - $800K',
+      budget: 'P 600K - P 800K',
       lastContact: '2 hours ago',
       priority: 'high'
     },
@@ -77,7 +77,7 @@ const AgentDashboard = () => {
       name: 'Robert Chen',
       type: 'Seller',
       status: 'Listing Prep',
-      budget: '$1.2M',
+      budget: 'P 1.2M',
       lastContact: '1 day ago',
       priority: 'medium'
     },
@@ -86,7 +86,7 @@ const AgentDashboard = () => {
       name: 'Emily Davis',
       type: 'Buyer',
       status: 'Under Contract',
-      budget: '$450K',
+      budget: 'P 450K',
       lastContact: '3 days ago',
       priority: 'low'
     }
@@ -236,7 +236,7 @@ const AgentDashboard = () => {
                         </div>
                         <div className="text-right">
                           <div className="text-sm font-semibold text-neutral-900">
-                            ${listing.price.toLocaleString()}
+                            P {listing.price.toLocaleString()}
                           </div>
                           <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                             listing.status === 'active' ? 'bg-success-100 text-success-800' :
