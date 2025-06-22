@@ -5,7 +5,6 @@ import {
   Upload, 
   MapPin, 
   Home, 
-  DollarSign, 
   Info, 
   Camera,
   X,
@@ -218,7 +217,7 @@ const CreateListingPage = () => {
                         Price *
                       </label>
                       <div className="relative">
-                        <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-neutral-400" />
+                        <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-neutral-400 font-bold">P</span>
                         <input
                           type="number"
                           {...register('price', { required: 'Price is required', min: 1 })}

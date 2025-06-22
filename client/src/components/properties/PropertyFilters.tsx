@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { X, DollarSign, Home, Bed, Bath } from 'lucide-react';
+import { X, Home, Bed, Bath } from 'lucide-react';
 
 interface PropertyFiltersProps {
   filters: any;

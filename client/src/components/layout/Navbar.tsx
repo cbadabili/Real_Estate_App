@@ -350,7 +350,7 @@ const Navbar = () => {
                         onClick={() => setSellDropdownOpen(false)}
                       >
                         <div className="flex items-center">
-                          <DollarSign className="h-4 w-4 mr-2 text-beedab-blue" />
+                          <span className="font-bold text-base mr-2 text-beedab-blue">P</span>
                           <div>
                             <div className="font-medium">Pricing Guide</div>
                             <div className="text-xs text-gray-500">Set competitive prices</div>
