@@ -220,12 +220,39 @@ const HomePage = () => {
               </h1>
             </motion.div>
             
-            <AISearchBar 
-              onSearch={(query: string) => {
-                window.location.href = `/properties?search=${encodeURIComponent(query)}`;
-              }}
-              className="backdrop-blur-sm"
-            />
+            <div className="bg-white rounded-2xl p-2 shadow-2xl">
+              <div className="flex items-center space-x-2 sm:space-x-3">
+                <div className="flex items-center text-beedab-blue px-2 sm:px-4">
+                  <Sparkles className="h-4 w-4 sm:h-5 sm:w-5 mr-1 sm:mr-2" />
+                  <span className="text-xs sm:text-sm lg:text-base font-medium">AI Search</span>
+                </div>
+                <input
+                  type="text"
+                  placeholder="Describe your dream property..."
+                  className="flex-1 px-2 sm:px-4 py-3 sm:py-4 text-sm sm:text-lg text-gray-700 placeholder-gray-500 focus:outline-none"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      const query = (e.target as HTMLInputElement).value;
+                      if (query.trim()) {
+                        window.location.href = `/properties?search=${encodeURIComponent(query)}`;
+                      }
+                    }
+                  }}
+                />
+                <button 
+                  className="bg-beedab-blue text-white px-4 sm:px-6 lg:px-8 py-3 sm:py-4 rounded-xl text-sm sm:text-base font-semibold hover:bg-beedab-darkblue transition-colors"
+                  onClick={(e) => {
+                    const input = e.currentTarget.parentElement?.querySelector('input');
+                    const query = input?.value;
+                    if (query?.trim()) {
+                      window.location.href = `/properties?search=${encodeURIComponent(query)}`;
+                    }
+                  }}
+                >
+                  Search
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </section>
