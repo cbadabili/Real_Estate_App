@@ -13,7 +13,19 @@ import {
   ChevronDown,
   LogOut,
   Home as HomeIcon,
-  Building
+  Home,
+  Building,
+  Bell,
+  TrendingUp,
+  Wrench,
+  FileText,
+  Camera,
+  DollarSign,
+  Calendar,
+  Handshake,
+  FileCheck,
+  Key,
+  Users
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { AISearchBar } from '../search/AISearchBar';
