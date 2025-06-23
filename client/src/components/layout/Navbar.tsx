@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import beedabLogo from '@assets/image_1750694075395.png';
 import { 
   Menu, 
   X, 
@@ -54,15 +53,12 @@ const Navbar = () => {
         <div className="flex justify-between items-center h-24">
           {/* Logo */}
           <div className="flex items-center">
-            <Link to="/" className="flex items-center space-x-3">
-              <div className="w-12 h-12 rounded-lg overflow-hidden bg-gradient-to-br from-blue-900/10 to-blue-600/10 p-1 flex items-center justify-center">
-                <img 
-                  src={beedabLogo} 
-                  alt="Beedab Real Estate Platform" 
-                  className="w-10 h-10 object-contain"
-                />
-              </div>
-              <span className="text-2xl font-bold text-beedab-black">beedab</span>
+            <Link to="/" className="flex items-center space-x-2">
+              <img 
+                src="/logo.png" 
+                alt="beedab Real Estate Platform" 
+                className="h-20 w-auto"
+              />
             </Link>
           </div>
 
