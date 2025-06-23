@@ -32,7 +32,9 @@ const PropertyFilters: React.FC<PropertyFiltersProps> = ({
     { value: 'house', label: 'House' },
     { value: 'apartment', label: 'Apartment' },
     { value: 'townhouse', label: 'Townhouse' },
-    { value: 'commercial', label: 'Commercial' }
+    { value: 'commercial', label: 'Commercial' },
+    { value: 'farm', label: 'Farm' },
+    { value: 'land', label: 'Land' }
   ];
 
   const bedroomOptions = [
@@ -54,8 +56,8 @@ const PropertyFilters: React.FC<PropertyFiltersProps> = ({
 
   const listingTypes = [
     { value: 'all', label: 'All Listings' },
-    { value: 'mls', label: 'Agent Listings' },
-    { value: 'fsbo', label: 'FSBO Only' }
+    { value: 'agent', label: 'Agent Listings' },
+    { value: 'owner', label: 'Owner Seller' }
   ];
 
   return (

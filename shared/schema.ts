@@ -33,8 +33,8 @@ export const properties = pgTable("properties", {
   zipCode: text("zip_code").notNull(),
   latitude: decimal("latitude", { precision: 10, scale: 8 }),
   longitude: decimal("longitude", { precision: 11, scale: 8 }),
-  propertyType: text("property_type").notNull(), // 'house', 'condo', 'townhouse', 'apartment', 'commercial', 'land'
-  listingType: text("listing_type").notNull(), // 'owner', 'mls', 'agent', 'rental'
+  propertyType: text("property_type").notNull(), // 'house', 'apartment', 'townhouse', 'commercial', 'farm', 'land'
+  listingType: text("listing_type").notNull(), // 'owner', 'agent', 'rental'
   bedrooms: integer("bedrooms"),
   bathrooms: decimal("bathrooms", { precision: 3, scale: 1 }),
   squareFeet: integer("square_feet"),

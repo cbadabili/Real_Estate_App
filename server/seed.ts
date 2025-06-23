@@ -111,7 +111,7 @@ async function seed() {
         latitude: '30.5052',
         longitude: '-97.8203',
         propertyType: 'townhouse',
-        listingType: 'mls',
+        listingType: 'agent',
         bedrooms: 3,
         bathrooms: '2.5',
         squareFeet: 1800,
