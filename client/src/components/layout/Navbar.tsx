@@ -281,42 +281,45 @@ const Navbar = () => {
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
-                    className="absolute top-full left-0 mt-2 w-80 bg-white rounded-md shadow-lg border border-neutral-200 z-50"
+                    className="absolute top-full left-0 mt-2 w-[600px] bg-white rounded-md shadow-lg border border-neutral-200 z-50"
                   >
-                    <div className="p-3">
-                      <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide px-2 py-1">Selling Options</div>
-                      
-                      {/* Primary Selling Options */}
-                      <Link
-                        to="/fsbo-dashboard"
-                        className="block px-4 py-3 text-sm text-neutral-700 hover:bg-beedab-blue/5 rounded border border-beedab-blue/20 mb-2"
-                        onClick={() => setSellDropdownOpen(false)}
-                      >
-                        <div className="flex items-center">
-                          <Home className="h-4 w-4 mr-2 text-beedab-blue" />
-                          <div>
-                            <div className="font-semibold">Sell Yourself (FSBO)</div>
-                            <div className="text-xs text-gray-500">No agent fees, full control</div>
+                    <div className="p-3 flex">
+                      {/* Left Column - Selling Options */}
+                      <div className="w-1/2 pr-3">
+                        <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide px-2 py-1">Selling Options</div>
+                        
+                        <Link
+                          to="/fsbo-dashboard"
+                          className="block px-4 py-3 text-sm text-neutral-700 hover:bg-beedab-blue/5 rounded border border-beedab-blue/20 mb-2"
+                          onClick={() => setSellDropdownOpen(false)}
+                        >
+                          <div className="flex items-center">
+                            <Home className="h-4 w-4 mr-2 text-beedab-blue" />
+                            <div>
+                              <div className="font-semibold">Owner Seller</div>
+                              <div className="text-xs text-gray-500">No agent fees, full control</div>
+                            </div>
                           </div>
-                        </div>
-                      </Link>
-                      
-                      <Link
-                        to="/agent-network"
-                        className="block px-4 py-3 text-sm text-neutral-700 hover:bg-gray-50 rounded border border-gray-200 mb-3"
-                        onClick={() => setSellDropdownOpen(false)}
-                      >
-                        <div className="flex items-center">
-                          <Users className="h-4 w-4 mr-2 text-gray-600" />
-                          <div>
-                            <div className="font-semibold">List with Agent</div>
-                            <div className="text-xs text-gray-500">Professional assistance</div>
+                        </Link>
+                        
+                        <Link
+                          to="/agent-network"
+                          className="block px-4 py-3 text-sm text-neutral-700 hover:bg-gray-50 rounded border border-gray-200 mb-3"
+                          onClick={() => setSellDropdownOpen(false)}
+                        >
+                          <div className="flex items-center">
+                            <Users className="h-4 w-4 mr-2 text-gray-600" />
+                            <div>
+                              <div className="font-semibold">List with Agent</div>
+                              <div className="text-xs text-gray-500">Professional assistance</div>
+                            </div>
                           </div>
-                        </div>
-                      </Link>
+                        </Link>
+                      </div>
                       
-                      <div className="border-t border-gray-100 my-2"></div>
-                      <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide px-2 py-1">Preparation Tools</div>
+                      {/* Right Column - Seller Journey & Tools */}
+                      <div className="w-1/2 pl-3 border-l border-gray-100">
+                        <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide px-2 py-1">Preparation Tools</div>
                       
                       <Link
                         to="/seller-journey/valuation"
@@ -358,10 +361,10 @@ const Navbar = () => {
                             <div className="text-xs text-gray-500">Documents and compliance</div>
                           </div>
                         </div>
-                      </Link>
-                      
-                      <div className="border-t border-gray-100 my-2"></div>
-                      <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide px-2 py-1">Marketing & Sales</div>
+                        </Link>
+                        
+                        <div className="border-t border-gray-100 my-2"></div>
+                        <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide px-2 py-1">Marketing & Sales</div>
                       
                       <Link
                         to="/create-listing"
@@ -448,7 +451,8 @@ const Navbar = () => {
                             <div className="text-xs text-gray-500">Transfer ownership</div>
                           </div>
                         </div>
-                      </Link>
+                        </Link>
+                      </div>
                     </div>
                   </motion.div>
                 )}
