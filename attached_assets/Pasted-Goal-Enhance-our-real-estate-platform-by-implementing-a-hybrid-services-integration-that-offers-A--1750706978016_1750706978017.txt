@@ -1,0 +1,150 @@
+Goal
+Enhance our real estate platform by implementing a hybrid services integration that offers:
+
+A browsable, SEO-friendly “Services” Directory Tab for all service providers (e.g., legal, movers, finance, inspectors, etc.).
+
+A Contextual Ad Engine that triggers relevant, non-intrusive service prompts based on specific user actions within buy, sell, and rent flows.
+
+Why Hybrid?
+Botswana’s real estate market requires easy access to vetted service providers (for both locals and expats) as well as “in-the-moment” recommendations.
+
+A directory helps users actively searching for services (SEO, completeness, trust).
+
+Contextual prompts ensure users get solutions just in time—e.g., after uploading photos, calculating a bond, or inquiring about a rental—boosting engagement, trust, and revenue.
+
+1. Database Models
+A. ServiceProviders Table
+sql
+Copy
+Edit
+CREATE TABLE ServiceProviders (
+    id SERIAL PRIMARY KEY,
+    company_name VARCHAR(255) NOT NULL,
+    service_category VARCHAR(100) NOT NULL,      -- e.g. 'Legal', 'Moving', 'Photography'
+    contact_person VARCHAR(255),
+    phone_number VARCHAR(20),
+    email VARCHAR(255) UNIQUE,
+    website_url VARCHAR(255),
+    logo_url VARCHAR(255),
+    description TEXT,
+    reac_certified BOOLEAN DEFAULT FALSE,         -- Real Estate Advisory Council certified?
+    date_joined TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+B. ServiceAds Table
+sql
+Copy
+Edit
+CREATE TABLE ServiceAds (
+    id SERIAL PRIMARY KEY,
+    provider_id INT REFERENCES ServiceProviders(id),
+    ad_title VARCHAR(255) NOT NULL,
+    ad_copy TEXT,
+    ad_image_url VARCHAR(255),
+    target_audience VARCHAR(50) NOT NULL,         -- 'Seller', 'Buyer', 'Renter', etc.
+    context_trigger VARCHAR(100) UNIQUE NOT NULL  -- e.g. 'post_photo_upload', 'after_mortgage_calculation'
+);
+2. API Endpoints
+Directory:
+
+GET /api/services/categories – list unique service categories
+
+GET /api/services/:categoryName – list all providers in a category
+
+GET /api/service-providers/:providerId – get detailed provider profile
+
+Contextual Ads:
+
+GET /api/ads/contextual/:triggerName – return ad where context_trigger = triggerName
+
+3. Frontend Implementation
+A. Services Directory (Library)
+Create a “Services” tab in top navigation.
+
+ServicesPage.js: Fetches categories and displays cards for each (icons, Botswana blue, black & white theme).
+
+CategoryDetail.js: Lists providers in selected category, each with a profile summary and “View More”.
+
+ProviderProfile.js: Detailed info page with reviews, certification badge, images of work, contact info, direct inquiry form.
+
+B. Contextual Ad Engine (Smart Assistant)
+In Sell Flow (Photo Upload, Offer Received, Dashboard): Show relevant prompts (e.g., book photographer, connect with conveyancer, find handyman).
+
+In Buy Flow (After Mortgage Calculator, After Inquiry): Show mortgage broker, home inspection, insurance prompts.
+
+In Rent Flow: Show moving companies, internet installers, utility switching.
+
+Example:
+
+After photo upload (post_photo_upload), show:
+“85% of buyers value great photos. Book a pro photographer in Gaborone now.”
+
+C. Reusable ContextualAd Component
+Takes a trigger prop, fetches /api/ads/contextual/${trigger} on mount, displays ad if present.
+
+Used anywhere a contextual prompt is needed.
+
+jsx
+Copy
+Edit
+import React, { useState, useEffect } from 'react';
+
+const ContextualAd = ({ trigger }) => {
+    const [ad, setAd] = useState(null);
+
+    useEffect(() => {
+        fetch(`/api/ads/contextual/${trigger}`)
+            .then(res => res.json())
+            .then(data => setAd(data));
+    }, [trigger]);
+
+    if (!ad) return null;
+
+    return (
+        <div className="contextual-ad-container">
+            {ad.ad_image_url && <img src={ad.ad_image_url} alt="Service Ad" />}
+            <h3>{ad.ad_title}</h3>
+            <p>{ad.ad_copy}</p>
+            <a href={`/services/provider/${ad.provider_id}`} className="cta-button">
+                Learn More
+            </a>
+        </div>
+    );
+};
+4. Triggers & Flow Integration
+Define clear frontend triggers for every key action (e.g., after photo upload, after mortgage calc, after inquiry, after lease sign).
+
+In each user journey step, fire the appropriate trigger and render <ContextualAd trigger="..." /> in the UI.
+
+5. UX/Design Guidance
+Use Botswana national colours (blue, black, white) for UI consistency.
+
+Directory: Clean, grid-based, mobile-first.
+
+Contextual ads: Card or banner format, non-intrusive, can be dismissed, never more than one per view.
+
+6. Admin Panel
+Add UI for admins to create/edit ServiceProviders and ServiceAds.
+
+Allow mapping of ads to triggers and previewing ad placements.
+
+7. Botswana Localization
+Service categories, terminology, legal/financing partners should reflect local Botswana context (e.g., “Conveyancing Lawyer”, “Bond Originator”, “Certified Plumber”, “BPC Electricity Connection”).
+
+Reviews and service badges to build trust.
+
+Summary to Replit
+Build a hybrid services integration:
+
+Full directory for all services (SEO-friendly, comprehensive, always accessible).
+
+Smart, context-triggered prompts for in-the-moment help, tailored to each step in property buying/selling/renting.
+
+Clean, modern UI in Botswana colours.
+
+Admin panel for managing providers and ads.
+
+Everything integrated, with clear database models, API, and React-like frontend logic.
+
+If you need code for any specific piece, ask for it by section (e.g., API routes, frontend components, admin UI, etc.).
+
+End of Prompt
