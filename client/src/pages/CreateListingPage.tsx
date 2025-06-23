@@ -252,8 +252,8 @@ const CreateListingPage = () => {
                         <input
                           type="text"
                           {...register('address', { required: 'Address is required' })}
-                          className="w-full pl-10 pr-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
-                          placeholder="123 Main Street, Austin, TX 78701"
+                          className="w-full pl-10 pr-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent transition-all"
+                          placeholder="123 Main Street, Gaborone"
                         />
                       </div>
                       {errors.address && (
@@ -261,70 +261,122 @@ const CreateListingPage = () => {
                       )}
                     </div>
 
-                    <div>
-                      <label className="block text-sm font-medium text-neutral-700 mb-2">
-                        Bedrooms *
-                      </label>
-                      <select
-                        {...register('bedrooms', { required: 'Number of bedrooms is required' })}
-                        className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
-                      >
-                        <option value="">Select bedrooms</option>
-                        {[1, 2, 3, 4, 5, 6].map(num => (
-                          <option key={num} value={num}>{num} bedroom{num !== 1 ? 's' : ''}</option>
-                        ))}
-                        <option value="7+">7+ bedrooms</option>
-                      </select>
-                      {errors.bedrooms && (
-                        <p className="text-error-600 text-sm mt-1">{errors.bedrooms.message as string}</p>
-                      )}
-                    </div>
+                    {/* Plot Size - Show for Farm and House */}
+                    {(watchedPropertyType === 'farm' || watchedPropertyType === 'house') && (
+                      <div>
+                        <label className="block text-sm font-medium text-neutral-700 mb-2">
+                          Plot Size *
+                        </label>
+                        <div className="flex space-x-2">
+                          <input
+                            type="number"
+                            {...register('plotSize', { required: 'Plot size is required', min: 1 })}
+                            className="flex-1 px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent transition-all"
+                            placeholder="1000"
+                          />
+                          {watchedPropertyType === 'farm' && (
+                            <select
+                              {...register('plotUnit', { required: 'Plot unit is required' })}
+                              className="px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
+                            >
+                              <option value="">Unit</option>
+                              <option value="hectares">Hectares</option>
+                              <option value="acres">Acres</option>
+                              <option value="sqm">Square Meters</option>
+                            </select>
+                          )}
+                          {watchedPropertyType === 'house' && (
+                            <span className="px-4 py-3 bg-neutral-100 border border-neutral-300 rounded-lg text-neutral-600">
+                              sqm
+                            </span>
+                          )}
+                        </div>
+                        {errors.plotSize && (
+                          <p className="text-error-600 text-sm mt-1">{errors.plotSize.message as string}</p>
+                        )}
+                      </div>
+                    )}
 
-                    <div>
-                      <label className="block text-sm font-medium text-neutral-700 mb-2">
-                        Bathrooms *
-                      </label>
-                      <select
-                        {...register('bathrooms', { required: 'Number of bathrooms is required' })}
-                        className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
-                      >
-                        <option value="">Select bathrooms</option>
-                        {[1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5].map(num => (
-                          <option key={num} value={num}>{num} bathroom{num !== 1 ? 's' : ''}</option>
-                        ))}
-                        <option value="5.5+">5.5+ bathrooms</option>
-                      </select>
-                      {errors.bathrooms && (
-                        <p className="text-error-600 text-sm mt-1">{errors.bathrooms.message as string}</p>
-                      )}
-                    </div>
+                    {/* Building Size - Show for House and Apartment */}
+                    {(watchedPropertyType === 'house' || watchedPropertyType === 'apartment') && (
+                      <div>
+                        <label className="block text-sm font-medium text-neutral-700 mb-2">
+                          Building Size *
+                        </label>
+                        <div className="flex items-center space-x-2">
+                          <input
+                            type="number"
+                            {...register('buildingSize', { required: 'Building size is required', min: 1 })}
+                            className="flex-1 px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent transition-all"
+                            placeholder="150"
+                          />
+                          <span className="px-4 py-3 bg-neutral-100 border border-neutral-300 rounded-lg text-neutral-600">
+                            sqm
+                          </span>
+                        </div>
+                        {errors.buildingSize && (
+                          <p className="text-error-600 text-sm mt-1">{errors.buildingSize.message as string}</p>
+                        )}
+                      </div>
+                    )}
 
-                    <div>
-                      <label className="block text-sm font-medium text-neutral-700 mb-2">
-                        Square Footage *
-                      </label>
-                      <input
-                        type="number"
-                        {...register('sqft', { required: 'Square footage is required', min: 1 })}
-                        className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
-                        placeholder="2500"
-                      />
-                      {errors.sqft && (
-                        <p className="text-error-600 text-sm mt-1">{errors.sqft.message as string}</p>
-                      )}
-                    </div>
+                    {/* Bedrooms and Bathrooms - Show for House and Apartment only */}
+                    {(watchedPropertyType === 'house' || watchedPropertyType === 'apartment') && (
+                      <>
+                        <div>
+                          <label className="block text-sm font-medium text-neutral-700 mb-2">
+                            Bedrooms *
+                          </label>
+                          <select
+                            {...register('bedrooms', { required: 'Number of bedrooms is required' })}
+                            className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent transition-all"
+                          >
+                            <option value="">Select bedrooms</option>
+                            {[1, 2, 3, 4, 5, 6].map(num => (
+                              <option key={num} value={num}>{num} bedroom{num !== 1 ? 's' : ''}</option>
+                            ))}
+                            <option value="7+">7+ bedrooms</option>
+                          </select>
+                          {errors.bedrooms && (
+                            <p className="text-error-600 text-sm mt-1">{errors.bedrooms.message as string}</p>
+                          )}
+                        </div>
 
-                    <div>
-                      <label className="block text-sm font-medium text-neutral-700 mb-2">
-                        Year Built
-                      </label>
-                      <input
-                        type="number"
-                        {...register('yearBuilt', { min: 1800, max: new Date().getFullYear() })}
-                        className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent transition-all"
-                        placeholder="2020"
-                      />
-                    </div>
+                        <div>
+                          <label className="block text-sm font-medium text-neutral-700 mb-2">
+                            Bathrooms *
+                          </label>
+                          <select
+                            {...register('bathrooms', { required: 'Number of bathrooms is required' })}
+                            className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent transition-all"
+                          >
+                            <option value="">Select bathrooms</option>
+                            {[1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5].map(num => (
+                              <option key={num} value={num}>{num} bathroom{num !== 1 ? 's' : ''}</option>
+                            ))}
+                            <option value="5.5+">5.5+ bathrooms</option>
+                          </select>
+                          {errors.bathrooms && (
+                            <p className="text-error-600 text-sm mt-1">{errors.bathrooms.message as string}</p>
+                          )}
+                        </div>
+                      </>
+                    )}
+
+                    {/* Year Built - Show for House and Apartment */}
+                    {(watchedPropertyType === 'house' || watchedPropertyType === 'apartment') && (
+                      <div>
+                        <label className="block text-sm font-medium text-neutral-700 mb-2">
+                          Year Built
+                        </label>
+                        <input
+                          type="number"
+                          {...register('yearBuilt', { min: 1800, max: new Date().getFullYear() })}
+                          className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent transition-all"
+                          placeholder="2020"
+                        />
+                      </div>
+                    )}
                   </div>
                 </div>
               </motion.div>
