@@ -3,7 +3,6 @@ import { ChevronDown, MapPin } from 'lucide-react';
 import { 
   botswanaDistricts, 
   getCityByName, 
-  getZipCodesByCity, 
   getWardsByCity,
   getAllCities,
   getAllDistricts 
@@ -13,12 +12,10 @@ interface GeographySelectorProps {
   onLocationChange: (location: {
     city: string;
     state: string;
-    zipCode: string;
     ward?: string;
   }) => void;
   initialCity?: string;
   initialState?: string;
-  initialZipCode?: string;
   initialWard?: string;
   className?: string;
 }
@@ -27,16 +24,13 @@ export const GeographySelector: React.FC<GeographySelectorProps> = ({
   onLocationChange,
   initialCity = '',
   initialState = '',
-  initialZipCode = '',
   initialWard = '',
   className = ''
 }) => {
   const [selectedCity, setSelectedCity] = useState(initialCity);
   const [selectedState, setSelectedState] = useState(initialState);
-  const [selectedZipCode, setSelectedZipCode] = useState(initialZipCode);
   const [selectedWard, setSelectedWard] = useState(initialWard);
   
-  const [availableZipCodes, setAvailableZipCodes] = useState<string[]>([]);
   const [availableWards, setAvailableWards] = useState<string[]>([]);
   
   const [citySearch, setCitySearch] = useState(initialCity);
@@ -61,34 +55,25 @@ export const GeographySelector: React.FC<GeographySelectorProps> = ({
       const cityData = getCityByName(selectedCity);
       if (cityData) {
         setSelectedState(cityData.district.name);
-        setAvailableZipCodes(cityData.city.zipCodes);
-        setAvailableWards(cityData.city.wards || []);
-        
-        // Auto-select first zip code if only one available
-        if (cityData.city.zipCodes.length === 1) {
-          setSelectedZipCode(cityData.city.zipCodes[0]);
-        }
+        setAvailableWards(cityData.city.wards);
       }
     } else {
       setSelectedState('');
-      setAvailableZipCodes([]);
       setAvailableWards([]);
-      setSelectedZipCode('');
       setSelectedWard('');
     }
   }, [selectedCity]);
 
   // Notify parent component of changes
   useEffect(() => {
-    if (selectedCity && selectedState && selectedZipCode) {
+    if (selectedCity && selectedState) {
       onLocationChange({
         city: selectedCity,
         state: selectedState,
-        zipCode: selectedZipCode,
         ward: selectedWard
       });
     }
-  }, [selectedCity, selectedState, selectedZipCode, selectedWard, onLocationChange]);
+  }, [selectedCity, selectedState, selectedWard, onLocationChange]);
 
   const handleCitySelect = (city: string) => {
     setSelectedCity(city);
@@ -148,52 +133,31 @@ export const GeographySelector: React.FC<GeographySelectorProps> = ({
         )}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* State/District - Auto-populated */}
-        <div>
-          <label className="block text-sm font-medium text-neutral-700 mb-2">
-            District *
-          </label>
-          <input
-            type="text"
-            value={selectedState}
-            readOnly
-            className="w-full px-4 py-3 border border-neutral-300 rounded-lg bg-gray-50 text-gray-700"
-            placeholder="Select city first"
-          />
-        </div>
-
-        {/* Zip Code - Auto-populated options */}
-        <div>
-          <label className="block text-sm font-medium text-neutral-700 mb-2">
-            Postal Code *
-          </label>
-          <select
-            value={selectedZipCode}
-            onChange={(e) => setSelectedZipCode(e.target.value)}
-            className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-            disabled={availableZipCodes.length === 0}
-          >
-            <option value="">Select postal code</option>
-            {availableZipCodes.map((zipCode) => (
-              <option key={zipCode} value={zipCode}>
-                {zipCode}
-              </option>
-            ))}
-          </select>
-        </div>
+      {/* State/District - Auto-populated */}
+      <div>
+        <label className="block text-sm font-medium text-neutral-700 mb-2">
+          District *
+        </label>
+        <input
+          type="text"
+          value={selectedState}
+          readOnly
+          className="w-full px-4 py-3 border border-neutral-300 rounded-lg bg-gray-50 text-gray-700"
+          placeholder="Select city first"
+        />
       </div>
 
-      {/* Ward/Area - Optional but helpful for precise location */}
+      {/* Ward/Area - Enhanced with comprehensive options */}
       {availableWards.length > 0 && (
         <div>
           <label className="block text-sm font-medium text-neutral-700 mb-2">
-            Ward/Area (Optional)
+            Ward/Area *
           </label>
           <select
             value={selectedWard}
             onChange={(e) => setSelectedWard(e.target.value)}
             className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            required
           >
             <option value="">Select ward/area</option>
             {availableWards.map((ward) => (
@@ -206,11 +170,11 @@ export const GeographySelector: React.FC<GeographySelectorProps> = ({
       )}
 
       {/* Location Preview */}
-      {selectedCity && selectedState && selectedZipCode && (
+      {selectedCity && selectedState && (
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
           <p className="text-sm text-blue-800">
             <strong>Selected Location:</strong><br />
-            {selectedWard && `${selectedWard}, `}{selectedCity}, {selectedState} {selectedZipCode}
+            {selectedWard && `${selectedWard}, `}{selectedCity}, {selectedState}
           </p>
         </div>
       )}

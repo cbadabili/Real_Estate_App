@@ -7,8 +7,7 @@ export interface District {
 
 export interface City {
   name: string;
-  zipCodes: string[];
-  wards?: string[];
+  wards: string[];
 }
 
 export const botswanaDistricts: District[] = [
@@ -18,30 +17,77 @@ export const botswanaDistricts: District[] = [
     cities: [
       {
         name: "Gaborone",
-        zipCodes: ["0000", "0001", "0002", "0003"],
         wards: [
+          // Central Gaborone
           "Broadhurst",
+          "Block 1", "Block 2", "Block 3", "Block 4", "Block 5", 
+          "Block 6", "Block 7", "Block 8", "Block 9",
+          "Phase 1", "Phase 2", "Phase 3", "Phase 4",
+          
+          // Extensions
           "Extension 1", "Extension 2", "Extension 3", "Extension 4",
           "Extension 5", "Extension 6", "Extension 7", "Extension 8",
           "Extension 9", "Extension 10", "Extension 11", "Extension 12",
           "Extension 13", "Extension 14", "Extension 15", "Extension 16",
           "Extension 17", "Extension 18", "Extension 19", "Extension 20",
+          
+          // Modern Areas
           "Gaborone West",
-          "Mogoditshane",
+          "CBD (Central Business District)",
+          "Fairgrounds",
+          "Government Enclave",
+          "Village",
+          "The Mall",
           "Old Naledi",
+          "White City",
+          "Bontleng",
+          "Sebele",
+          
+          // Peri-urban Areas
+          "Mogoditshane",
+          "Gabane",
+          "Tlokweng",
+          "Mmopane",
+          "Kumakwane",
+          
+          // Upmarket Areas
           "Phakalane",
-          "Tlokweng"
+          "Phakalane Estates",
+          "Phakalane Golf Estate",
+          "River Walk",
+          "Masa Centre",
+          "Gaborone North",
+          "Ledumang",
+          "Tawana",
+          
+          // Industrial Areas
+          "Gaborone International Commerce Park",
+          "Block 3 Industrial",
+          "Block 5 Industrial",
+          "Broadhurst Industrial"
         ]
       },
       {
         name: "Lobatse",
-        zipCodes: ["0100", "0101"],
-        wards: ["Block A", "Block B", "Block C", "Peleng"]
+        wards: [
+          "Block 1", "Block 2", "Block 3", "Block 4", "Block 5",
+          "Block 6", "Block 7", "Block 8", "Block 9",
+          "Phase 1", "Phase 2", "Phase 3", "Phase 4",
+          "Peleng",
+          "Lobatse Central",
+          "Industrial Area",
+          "New Stands"
+        ]
       },
       {
         name: "Ramotswa",
-        zipCodes: ["0200"],
-        wards: ["Ramotswa Ward 1", "Ramotswa Ward 2"]
+        wards: [
+          "Block 1", "Block 2", "Block 3", "Block 4", "Block 5",
+          "Block 6", "Block 7", "Block 8", "Block 9",
+          "Phase 1", "Phase 2", "Phase 3", "Phase 4",
+          "Ramotswa Central",
+          "New Layout"
+        ]
       }
     ]
   },
@@ -51,18 +97,39 @@ export const botswanaDistricts: District[] = [
     cities: [
       {
         name: "Serowe",
-        zipCodes: ["0300", "0301"],
-        wards: ["Serowe Ward 1", "Serowe Ward 2", "Serowe Ward 3"]
+        wards: [
+          "Block 1", "Block 2", "Block 3", "Block 4", "Block 5",
+          "Block 6", "Block 7", "Block 8", "Block 9",
+          "Phase 1", "Phase 2", "Phase 3", "Phase 4",
+          "Serowe Central",
+          "Boiteko",
+          "Sekgoma",
+          "Motswasele",
+          "New Layout"
+        ]
       },
       {
         name: "Palapye",
-        zipCodes: ["0400"],
-        wards: ["Palapye Ward 1", "Palapye Ward 2"]
+        wards: [
+          "Block 1", "Block 2", "Block 3", "Block 4", "Block 5",
+          "Block 6", "Block 7", "Block 8", "Block 9",
+          "Phase 1", "Phase 2", "Phase 3", "Phase 4",
+          "Palapye Central",
+          "Lotsane",
+          "New Stands",
+          "Industrial Area"
+        ]
       },
       {
         name: "Mahalapye",
-        zipCodes: ["0500"],
-        wards: ["Mahalapye Ward 1", "Mahalapye Ward 2"]
+        wards: [
+          "Block 1", "Block 2", "Block 3", "Block 4", "Block 5",
+          "Block 6", "Block 7", "Block 8", "Block 9",
+          "Phase 1", "Phase 2", "Phase 3", "Phase 4",
+          "Mahalapye Central",
+          "Shoshong Road",
+          "New Layout"
+        ]
       }
     ]
   },
@@ -72,17 +139,39 @@ export const botswanaDistricts: District[] = [
     cities: [
       {
         name: "Francistown",
-        zipCodes: ["0600", "0601", "0602"],
         wards: [
+          "Block 1", "Block 2", "Block 3", "Block 4", "Block 5",
+          "Block 6", "Block 7", "Block 8", "Block 9",
+          "Phase 1", "Phase 2", "Phase 3", "Phase 4",
           "Area A", "Area B", "Area C", "Area D",
-          "Monarch", "Tati Siding", "Gerald Estate",
-          "Tshesebe", "Copper Sunrise"
+          "Monarch",
+          "Tati Siding",
+          "Gerald Estate",
+          "Tshesebe",
+          "Copper Sunrise",
+          "Donga",
+          "Kgaphamadi",
+          "Francistown Central",
+          "Industrial Area",
+          "New Layout",
+          "Tonota Road",
+          "Blue Jacket Street",
+          "Nyangabgwe",
+          "Riverside"
         ]
       },
       {
         name: "Selebi-Phikwe",
-        zipCodes: ["0700"],
-        wards: ["Boseja", "Selebi", "Phikwe"]
+        wards: [
+          "Block 1", "Block 2", "Block 3", "Block 4", "Block 5",
+          "Block 6", "Block 7", "Block 8", "Block 9",
+          "Phase 1", "Phase 2", "Phase 3", "Phase 4",
+          "Boseja",
+          "Selebi",
+          "Phikwe",
+          "Central",
+          "New Layout"
+        ]
       }
     ]
   },
@@ -92,13 +181,30 @@ export const botswanaDistricts: District[] = [
     cities: [
       {
         name: "Maun",
-        zipCodes: ["0800"],
-        wards: ["Boro", "Disaneng", "Mathiba", "Sexaxa"]
+        wards: [
+          "Block 1", "Block 2", "Block 3", "Block 4", "Block 5",
+          "Block 6", "Block 7", "Block 8", "Block 9",
+          "Phase 1", "Phase 2", "Phase 3", "Phase 4",
+          "Boro",
+          "Disaneng",
+          "Mathiba",
+          "Sexaxa",
+          "Maun Central",
+          "Boseja",
+          "Matlapaneng",
+          "Chanoga",
+          "Sedie"
+        ]
       },
       {
         name: "Shakawe",
-        zipCodes: ["0900"],
-        wards: ["Shakawe Ward 1", "Shakawe Ward 2"]
+        wards: [
+          "Block 1", "Block 2", "Block 3", "Block 4", "Block 5",
+          "Block 6", "Block 7", "Block 8", "Block 9",
+          "Phase 1", "Phase 2", "Phase 3", "Phase 4",
+          "Shakawe Central",
+          "New Layout"
+        ]
       }
     ]
   },
@@ -108,13 +214,22 @@ export const botswanaDistricts: District[] = [
     cities: [
       {
         name: "Ghanzi",
-        zipCodes: ["1000"],
-        wards: ["Ghanzi Ward 1", "Ghanzi Ward 2"]
+        wards: [
+          "Block 1", "Block 2", "Block 3", "Block 4", "Block 5",
+          "Block 6", "Block 7", "Block 8", "Block 9",
+          "Phase 1", "Phase 2", "Phase 3", "Phase 4",
+          "Ghanzi Central",
+          "New Layout"
+        ]
       },
       {
         name: "Tsabong",
-        zipCodes: ["1100"],
-        wards: ["Tsabong Ward 1"]
+        wards: [
+          "Block 1", "Block 2", "Block 3", "Block 4", "Block 5",
+          "Block 6", "Block 7", "Block 8", "Block 9",
+          "Phase 1", "Phase 2", "Phase 3", "Phase 4",
+          "Tsabong Central"
+        ]
       }
     ]
   },
@@ -124,8 +239,15 @@ export const botswanaDistricts: District[] = [
     cities: [
       {
         name: "Mochudi",
-        zipCodes: ["1200"],
-        wards: ["Mochudi Ward 1", "Mochudi Ward 2", "Mochudi Ward 3"]
+        wards: [
+          "Block 1", "Block 2", "Block 3", "Block 4", "Block 5",
+          "Block 6", "Block 7", "Block 8", "Block 9",
+          "Phase 1", "Phase 2", "Phase 3", "Phase 4",
+          "Mochudi Central",
+          "Segwagwa",
+          "Mmakgodumo",
+          "New Layout"
+        ]
       }
     ]
   },
@@ -135,8 +257,15 @@ export const botswanaDistricts: District[] = [
     cities: [
       {
         name: "Molepolole",
-        zipCodes: ["1300"],
-        wards: ["Molepolole Ward 1", "Molepolole Ward 2", "Molepolole Ward 3"]
+        wards: [
+          "Block 1", "Block 2", "Block 3", "Block 4", "Block 5",
+          "Block 6", "Block 7", "Block 8", "Block 9",
+          "Phase 1", "Phase 2", "Phase 3", "Phase 4",
+          "Molepolole Central",
+          "Ntlhantlhe",
+          "Mmopane",
+          "New Layout"
+        ]
       }
     ]
   },
@@ -146,13 +275,26 @@ export const botswanaDistricts: District[] = [
     cities: [
       {
         name: "Kanye",
-        zipCodes: ["1400"],
-        wards: ["Kanye Ward 1", "Kanye Ward 2", "Kanye Ward 3"]
+        wards: [
+          "Block 1", "Block 2", "Block 3", "Block 4", "Block 5",
+          "Block 6", "Block 7", "Block 8", "Block 9",
+          "Phase 1", "Phase 2", "Phase 3", "Phase 4",
+          "Kanye Central",
+          "Selokolela",
+          "Mmankgodi",
+          "New Layout"
+        ]
       },
       {
         name: "Jwaneng",
-        zipCodes: ["1500"],
-        wards: ["Units 1", "Units 2", "Units 3", "Units 4"]
+        wards: [
+          "Block 1", "Block 2", "Block 3", "Block 4", "Block 5",
+          "Block 6", "Block 7", "Block 8", "Block 9",
+          "Phase 1", "Phase 2", "Phase 3", "Phase 4",
+          "Units 1", "Units 2", "Units 3", "Units 4",
+          "Extensions",
+          "New Stands"
+        ]
       }
     ]
   },
@@ -162,8 +304,14 @@ export const botswanaDistricts: District[] = [
     cities: [
       {
         name: "Kasane",
-        zipCodes: ["1600"],
-        wards: ["Kasane Ward 1", "Kasane Ward 2"]
+        wards: [
+          "Block 1", "Block 2", "Block 3", "Block 4", "Block 5",
+          "Block 6", "Block 7", "Block 8", "Block 9",
+          "Phase 1", "Phase 2", "Phase 3", "Phase 4",
+          "Kasane Central",
+          "Kazungula",
+          "New Layout"
+        ]
       }
     ]
   }
@@ -188,14 +336,9 @@ export const getCityByName = (cityName: string): { city: City; district: Distric
   return undefined;
 };
 
-export const getZipCodesByCity = (cityName: string): string[] => {
-  const result = getCityByName(cityName);
-  return result ? result.city.zipCodes : [];
-};
-
 export const getWardsByCity = (cityName: string): string[] => {
   const result = getCityByName(cityName);
-  return result ? result.city.wards || [] : [];
+  return result ? result.city.wards : [];
 };
 
 export const getAllCities = (): string[] => {

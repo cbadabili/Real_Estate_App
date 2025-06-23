@@ -28,7 +28,7 @@ const propertySchema = z.object({
   address: z.string().min(1, 'Address is required'),
   city: z.string().min(1, 'City is required'),
   state: z.string().min(1, 'State is required'),
-  zipCode: z.string().min(1, 'Zip code is required'),
+  ward: z.string().min(1, 'Ward is required'),
   propertyType: z.string().min(1, 'Property type is required'),
   listingType: z.string().min(1, 'Listing type is required'),
   bedrooms: z.number().min(0),
@@ -99,7 +99,7 @@ const CreatePropertyPage = () => {
       case 1:
         return ['title', 'description', 'propertyType', 'listingType'];
       case 2:
-        return ['price', 'address', 'city', 'state', 'zipCode'];
+        return ['price', 'address', 'city', 'state', 'ward'];
       case 3:
         return ['bedrooms', 'bathrooms', 'squareFeet'];
       default:
@@ -444,16 +444,16 @@ const CreatePropertyPage = () => {
                 onLocationChange={(location) => {
                   setValue('city', location.city);
                   setValue('state', location.state);
-                  setValue('zipCode', location.zipCode);
-                  trigger(['city', 'state', 'zipCode']);
+                  setValue('ward', location.ward || '');
+                  trigger(['city', 'state', 'ward']);
                 }}
                 initialCity={watchedValues.city}
                 initialState={watchedValues.state}
-                initialZipCode={watchedValues.zipCode}
+                initialWard={watchedValues.ward}
               />
 
               {/* Display any validation errors for geography fields */}
-              {(errors.city || errors.state || errors.zipCode) && (
+              {(errors.city || errors.state || errors.ward) && (
                 <div className="bg-red-50 border border-red-200 rounded-lg p-3">
                   <p className="text-sm text-red-600">
                     Please ensure all location fields are properly filled.
@@ -668,8 +668,8 @@ const CreatePropertyPage = () => {
                         <span className="font-medium">{watchedValues.state}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-gray-600">Postal Code:</span>
-                        <span className="font-medium">{watchedValues.zipCode}</span>
+                        <span className="text-gray-600">Ward:</span>
+                        <span className="font-medium">{watchedValues.ward}</span>
                       </div>
                     </div>
                   </div>
