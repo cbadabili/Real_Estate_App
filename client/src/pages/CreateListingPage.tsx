@@ -310,7 +310,7 @@ const CreateListingPage = () => {
                     {(watchedPropertyType === 'farm' || watchedPropertyType === 'house' || watchedPropertyType === 'commercial') && (
                       <div>
                         <label className="block text-sm font-medium text-neutral-700 mb-2">
-                          Plot Size *
+                          {watchedPropertyType === 'farm' ? 'Land Size *' : 'Plot Size *'}
                         </label>
                         <div className="flex space-x-2">
                           <input
@@ -674,7 +674,7 @@ const CreateListingPage = () => {
                           
                           {/* Plot Size - Show for Farm, House and Commercial */}
                           {(watchedPropertyType === 'farm' || watchedPropertyType === 'house' || watchedPropertyType === 'commercial') && watch('plotSize') && (
-                            <li>Plot Size: {parseInt(watch('plotSize') || '0').toLocaleString()} {watchedPropertyType === 'farm' ? watch('plotUnit') : 'sqm'}</li>
+                            <li>{watchedPropertyType === 'farm' ? 'Land Size' : 'Plot Size'}: {parseInt(watch('plotSize') || '0').toLocaleString()} {watchedPropertyType === 'farm' ? watch('plotUnit') : 'sqm'}</li>
                           )}
                           
                           {/* Building Size - Show for House, Apartment, Townhouse and Commercial */}
@@ -701,6 +701,15 @@ const CreateListingPage = () => {
                           {/* Farm specific fields */}
                           {watchedPropertyType === 'farm' && watch('farmType') && (
                             <li>Farm Type: {watch('farmType')}</li>
+                          )}
+                          {watchedPropertyType === 'farm' && watch('fencing') && (
+                            <li>Fencing: {watch('fencing') === 'yes' ? 'Yes' : 'No'}</li>
+                          )}
+                          {watchedPropertyType === 'farm' && watch('waterAccess') && Array.isArray(watch('waterAccess')) && watch('waterAccess').length > 0 && (
+                            <li>Water Access: {watch('waterAccess').join(', ')}</li>
+                          )}
+                          {watchedPropertyType === 'farm' && watch('farmBuildings') && Array.isArray(watch('farmBuildings')) && watch('farmBuildings').length > 0 && (
+                            <li>Buildings: {watch('farmBuildings').join(', ')}</li>
                           )}
                         </ul>
                       </div>
