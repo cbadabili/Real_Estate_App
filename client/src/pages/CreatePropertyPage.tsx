@@ -17,12 +17,23 @@ const propertySchema = z.object({
   state: z.string().min(1, 'State is required'),
   zipCode: z.string().min(5, 'Valid ZIP code required'),
   propertyType: z.enum(['house', 'condo', 'townhouse', 'apartment', 'commercial', 'land']),
-  listingType: z.enum(['fsbo', 'agent', 'mls']),
+  listingType: z.enum(['owner', 'agent', 'rental', 'auction']),
   bedrooms: z.number().min(0).optional(),
   bathrooms: z.number().min(0).optional(),
   squareFeet: z.number().min(1).optional(),
   yearBuilt: z.number().min(1800).max(new Date().getFullYear()).optional(),
   ownerId: z.number().min(1, 'Owner ID is required'),
+  // Auction-specific fields
+  auctionDate: z.string().optional(),
+  auctionTime: z.string().optional(),
+  startingBid: z.number().min(1).optional(),
+  reservePrice: z.number().min(1).optional(),
+  auctionHouse: z.string().optional(),
+  auctioneerName: z.string().optional(),
+  auctioneerContact: z.string().optional(),
+  bidIncrement: z.number().min(1).optional(),
+  depositRequired: z.number().min(0).max(100).optional(),
+  lotNumber: z.string().optional(),
 });
 
 type PropertyFormData = z.infer<typeof propertySchema>;
@@ -46,7 +57,7 @@ const CreatePropertyPage = () => {
     resolver: zodResolver(propertySchema),
     defaultValues: {
       ownerId: 1, // Default owner ID - in real app this would come from auth
-      listingType: 'fsbo'
+      listingType: 'owner'
     }
   });
 
@@ -213,9 +224,10 @@ const CreatePropertyPage = () => {
                     {...register('listingType')}
                     className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   >
-                    <option value="fsbo">For Sale By Owner (FSBO)</option>
+                    <option value="owner">Owner Seller</option>
                     <option value="agent">List with Agent</option>
-                    <option value="mls">MLS Listing</option>
+                    <option value="rental">Rental Property</option>
+                    <option value="auction">Auction Property</option>
                   </select>
                   {errors.listingType && (
                     <p className="mt-1 text-sm text-red-600">{errors.listingType.message}</p>
@@ -319,6 +331,118 @@ const CreatePropertyPage = () => {
                   <p className="mt-1 text-sm text-red-600">{errors.price.message}</p>
                 )}
               </div>
+
+              {/* Auction-specific fields */}
+              {watchedValues.listingType === 'auction' && (
+                <div className="bg-blue-50 p-6 rounded-lg space-y-4">
+                  <h3 className="text-lg font-semibold text-beedab-blue mb-4">Auction Details</h3>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-neutral-700 mb-2">
+                        Auction Date *
+                      </label>
+                      <input
+                        {...register('auctionDate')}
+                        type="date"
+                        className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-neutral-700 mb-2">
+                        Auction Time *
+                      </label>
+                      <input
+                        {...register('auctionTime')}
+                        type="time"
+                        className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-neutral-700 mb-2">
+                        Starting Bid (P) *
+                      </label>
+                      <input
+                        {...register('startingBid', { valueAsNumber: true })}
+                        type="number"
+                        className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                        placeholder="300000"
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-neutral-700 mb-2">
+                        Reserve Price (P)
+                      </label>
+                      <input
+                        {...register('reservePrice', { valueAsNumber: true })}
+                        type="number"
+                        className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                        placeholder="400000"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-neutral-700 mb-2">
+                        Auction House *
+                      </label>
+                      <input
+                        {...register('auctionHouse')}
+                        type="text"
+                        className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                        placeholder="First National Bank of Botswana"
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-neutral-700 mb-2">
+                        Lot Number
+                      </label>
+                      <input
+                        {...register('lotNumber')}
+                        type="text"
+                        className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                        placeholder="102"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-neutral-700 mb-2">
+                        Auctioneer Contact
+                      </label>
+                      <input
+                        {...register('auctioneerContact')}
+                        type="text"
+                        className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                        placeholder="72192666 / 300 8293"
+                      />
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-neutral-700 mb-2">
+                        Deposit Required (%)
+                      </label>
+                      <input
+                        {...register('depositRequired', { valueAsNumber: true })}
+                        type="number"
+                        min="0"
+                        max="100"
+                        step="0.1"
+                        className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                        placeholder="12.5"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
