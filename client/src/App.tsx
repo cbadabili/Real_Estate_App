@@ -44,6 +44,7 @@ function App() {
             <Route path="/rent" element={<RentPage />} />
             <Route path="/rent-out" element={<RentOutPage />} />
             <Route path="/buyer-seller-platform" element={<BuyerSellerPlatformPage />} />
+            <Route path="/platform" element={<BuyerSellerPlatformPage />} />
             <Route path="/market-intelligence" element={<MarketIntelligencePage />} />
             <Route path="/secure-transactions" element={<SecureTransactionsPage />} />
             <Route path="/communication" element={<CommunicationPage />} />
