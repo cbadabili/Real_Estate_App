@@ -624,11 +624,39 @@ const CreateListingPage = () => {
                         <ul className="space-y-1 text-sm text-neutral-600">
                           <li>Type: {watch('propertyType')}</li>
                           <li>Title: {watch('title')}</li>
-                          <li>Price: ${parseInt(watch('price') || '0').toLocaleString()}</li>
+                          <li>Price: P{parseInt(watch('price') || '0').toLocaleString()}</li>
                           <li>Address: {watch('address')}</li>
-                          <li>Bedrooms: {watch('bedrooms')}</li>
-                          <li>Bathrooms: {watch('bathrooms')}</li>
-                          <li>Square Feet: {parseInt(watch('sqft') || '0').toLocaleString()}</li>
+                          
+                          {/* Plot Size - Show for Farm, House and Commercial */}
+                          {(watchedPropertyType === 'farm' || watchedPropertyType === 'house' || watchedPropertyType === 'commercial') && watch('plotSize') && (
+                            <li>Plot Size: {parseInt(watch('plotSize') || '0').toLocaleString()} {watchedPropertyType === 'farm' ? watch('plotUnit') : 'sqm'}</li>
+                          )}
+                          
+                          {/* Building Size - Show for House, Apartment, Townhouse and Commercial */}
+                          {(watchedPropertyType === 'house' || watchedPropertyType === 'apartment' || watchedPropertyType === 'townhouse' || watchedPropertyType === 'commercial') && watch('buildingSize') && (
+                            <li>Building Size: {parseInt(watch('buildingSize') || '0').toLocaleString()} sqm</li>
+                          )}
+                          
+                          {/* Bedrooms and Bathrooms - Show for House, Apartment and Townhouse */}
+                          {(watchedPropertyType === 'house' || watchedPropertyType === 'apartment' || watchedPropertyType === 'townhouse') && watch('bedrooms') && (
+                            <li>Bedrooms: {watch('bedrooms')}</li>
+                          )}
+                          {(watchedPropertyType === 'house' || watchedPropertyType === 'apartment' || watchedPropertyType === 'townhouse') && watch('bathrooms') && (
+                            <li>Bathrooms: {watch('bathrooms')}</li>
+                          )}
+                          
+                          {/* Commercial specific fields */}
+                          {watchedPropertyType === 'commercial' && watch('zoningType') && (
+                            <li>Zoning: {watch('zoningType')}</li>
+                          )}
+                          {watchedPropertyType === 'commercial' && watch('numberOfUnits') && (
+                            <li>Units: {watch('numberOfUnits')}</li>
+                          )}
+                          
+                          {/* Farm specific fields */}
+                          {watchedPropertyType === 'farm' && watch('farmType') && (
+                            <li>Farm Type: {watch('farmType')}</li>
+                          )}
                         </ul>
                       </div>
                       <div>
