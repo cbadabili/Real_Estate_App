@@ -95,7 +95,7 @@ const CreateListingPage = () => {
       const propertyData = {
         title: data.title,
         description: data.description,
-        price: parseInt(data.price),
+        price: data.price.toString(), // Convert to string to match schema
         address: data.address,
         city: data.city || 'Gaborone',
         state: data.state || 'South-East',
@@ -103,7 +103,7 @@ const CreateListingPage = () => {
         propertyType: data.propertyType,
         listingType: data.listingType === 'fsbo' ? 'owner' : 'agent',
         bedrooms: data.bedrooms ? parseInt(data.bedrooms) : null,
-        bathrooms: data.bathrooms ? parseFloat(data.bathrooms) : null,
+        bathrooms: data.bathrooms ? data.bathrooms.toString() : null,
         squareFeet: data.buildingSize ? parseInt(data.buildingSize) : (data.plotSize ? parseInt(data.plotSize) : null),
         yearBuilt: data.yearBuilt ? parseInt(data.yearBuilt) : null,
         ownerId: 1, // Default owner ID - in real app this would come from auth
