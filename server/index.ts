@@ -1,6 +1,7 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import { testDatabaseConnection } from "./db";
 
 const app = express();
 app.use(express.json());
@@ -37,14 +38,23 @@ app.use((req, res, next) => {
 });
 
 (async () => {
+  // Test database connection before starting server
+  console.log('Testing database connection...');
+  const dbConnected = await testDatabaseConnection();
+  if (!dbConnected) {
+    console.error('Failed to connect to database. Server will not start.');
+    process.exit(1);
+  }
+
   const server = await registerRoutes(app);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
     const message = err.message || "Internal Server Error";
 
+    console.error('Express error:', err);
     res.status(status).json({ message });
-    throw err;
+    // Don't re-throw to prevent crash
   });
 
   // importantly only setup vite in development and after
