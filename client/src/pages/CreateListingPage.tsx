@@ -194,18 +194,36 @@ const CreateListingPage = () => {
                           value={type.value}
                           className="sr-only"
                         />
-                        <div className={`border-2 rounded-xl p-6 transition-colors ${
+                        <div className={`border-2 rounded-xl p-6 transition-all duration-200 ${
                           watchedListingType === type.value 
-                            ? 'border-beedab-blue bg-beedab-blue/10' 
-                            : 'border-neutral-200 hover:border-beedab-blue/50'
+                            ? 'border-beedab-blue bg-beedab-blue shadow-md' 
+                            : 'border-beedab-blue/30 hover:border-beedab-blue hover:bg-beedab-blue/5'
                         }`}>
                           <div className="flex justify-between items-start mb-4">
-                            <h3 className="text-lg font-semibold text-neutral-900">{type.label}</h3>
-                            <span className="text-sm font-medium text-primary-600">{type.price}</span>
+                            <h3 className={`text-lg font-semibold ${
+                              watchedListingType === type.value 
+                                ? 'text-white' 
+                                : 'text-neutral-900'
+                            }`}>{type.label}</h3>
+                            <span className={`text-sm font-medium ${
+                              watchedListingType === type.value 
+                                ? 'text-white/90' 
+                                : 'text-beedab-blue'
+                            }`}>{type.price}</span>
                           </div>
-                          <p className="text-neutral-600 mb-4">{type.description}</p>
-                          <div className="flex items-center text-primary-600">
-                            <Check className="h-5 w-5 mr-2 opacity-0 has-[:checked]:opacity-100" />
+                          <p className={`mb-4 ${
+                            watchedListingType === type.value 
+                              ? 'text-white/80' 
+                              : 'text-neutral-600'
+                          }`}>{type.description}</p>
+                          <div className={`flex items-center ${
+                            watchedListingType === type.value 
+                              ? 'text-white' 
+                              : 'text-beedab-blue'
+                          }`}>
+                            <Check className={`h-5 w-5 mr-2 transition-opacity ${
+                              watchedListingType === type.value ? 'opacity-100' : 'opacity-0'
+                            }`} />
                             <span className="text-sm font-medium">Choose this option</span>
                           </div>
                         </div>
@@ -232,15 +250,19 @@ const CreateListingPage = () => {
                         />
                         <div className={`border-2 rounded-xl p-6 text-center transition-all duration-200 hover:scale-105 ${
                           watchedPropertyType === type.value 
-                            ? 'border-beedab-blue bg-beedab-blue/10 shadow-md' 
-                            : 'border-neutral-200 hover:border-beedab-blue/50 hover:bg-neutral-50 shadow-sm'
+                            ? 'border-beedab-blue bg-beedab-blue shadow-md' 
+                            : 'border-beedab-blue/30 hover:border-beedab-blue hover:bg-beedab-blue/5 shadow-sm'
                         }`}>
                           <type.icon className={`w-8 h-8 mx-auto mb-3 ${
                             watchedPropertyType === type.value 
-                              ? 'text-beedab-blue' 
-                              : 'text-neutral-600'
+                              ? 'text-white' 
+                              : 'text-beedab-blue'
                           }`} />
-                          <div className="text-sm font-medium text-neutral-900">{type.label}</div>
+                          <div className={`text-sm font-medium ${
+                            watchedPropertyType === type.value 
+                              ? 'text-white' 
+                              : 'text-neutral-900'
+                          }`}>{type.label}</div>
                         </div>
                       </label>
                     ))}
