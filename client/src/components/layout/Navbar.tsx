@@ -41,11 +41,11 @@ const Navbar = () => {
 
   const navigation = [
     { name: 'Map Search', href: '/map-search', icon: MapPin },
-    { name: 'Auctions', href: '/auctions', icon: Handshake },
   ];
 
   const postDropdownNavigation = [
     { name: 'My Properties', href: '/dashboard', icon: Building },
+    { name: 'Auctions', href: '/auctions', icon: Handshake },
   ];
 
   return (
