@@ -16,7 +16,7 @@ import {
   type InsertSavedProperty
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, and, desc, asc, gte, lte, like, sql } from "drizzle-orm";
+import { eq, and, desc, asc, gte, lte, like, ilike, or, sql } from "drizzle-orm";
 
 export interface IStorage {
   // User methods
@@ -141,7 +141,12 @@ export class DatabaseStorage implements IStorage {
       conditions.push(lte(properties.squareFeet, filters.maxSquareFeet));
     }
     if (filters.city) {
-      conditions.push(ilike(properties.city, `%${filters.city}%`));
+      conditions.push(
+        or(
+          ilike(properties.city, `%${filters.city}%`),
+          ilike(properties.address, `%${filters.city}%`)
+        )
+      );
     }
     if (filters.state) {
       conditions.push(eq(properties.state, filters.state));
