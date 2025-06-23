@@ -306,11 +306,11 @@ const CreateListingPage = () => {
                       )}
                     </div>
 
-                    {/* Plot Size - Show for Farm, House and Commercial */}
-                    {(watchedPropertyType === 'farm' || watchedPropertyType === 'house' || watchedPropertyType === 'commercial') && (
+                    {/* Plot Size - Show for Farm, House, Commercial and Land */}
+                    {(watchedPropertyType === 'farm' || watchedPropertyType === 'house' || watchedPropertyType === 'commercial' || watchedPropertyType === 'land') && (
                       <div>
                         <label className="block text-sm font-medium text-neutral-700 mb-2">
-                          {watchedPropertyType === 'farm' ? 'Land Size *' : 'Plot Size *'}
+                          {(watchedPropertyType === 'farm' || watchedPropertyType === 'land') ? 'Land Size *' : 'Plot Size *'}
                         </label>
                         <div className="flex space-x-2">
                           <input
@@ -319,7 +319,7 @@ const CreateListingPage = () => {
                             className="flex-1 px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent transition-all"
                             placeholder="1000"
                           />
-                          {watchedPropertyType === 'farm' && (
+                          {(watchedPropertyType === 'farm' || watchedPropertyType === 'land') && (
                             <select
                               {...register('plotUnit', { required: 'Plot unit is required' })}
                               className="px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
@@ -714,9 +714,9 @@ const CreateListingPage = () => {
                           <li>Price: P{parseInt(watch('price') || '0').toLocaleString()}</li>
                           <li>Address: {watch('address')}</li>
                           
-                          {/* Plot Size - Show for Farm, House and Commercial */}
-                          {(watchedPropertyType === 'farm' || watchedPropertyType === 'house' || watchedPropertyType === 'commercial') && watch('plotSize') && (
-                            <li>{watchedPropertyType === 'farm' ? 'Land Size' : 'Plot Size'}: {parseInt(watch('plotSize') || '0').toLocaleString()} {watchedPropertyType === 'farm' ? watch('plotUnit') : 'sqm'}</li>
+                          {/* Plot Size - Show for Farm, House, Commercial and Land */}
+                          {(watchedPropertyType === 'farm' || watchedPropertyType === 'house' || watchedPropertyType === 'commercial' || watchedPropertyType === 'land') && watch('plotSize') && (
+                            <li>{(watchedPropertyType === 'farm' || watchedPropertyType === 'land') ? 'Land Size' : 'Plot Size'}: {parseInt(watch('plotSize') || '0').toLocaleString()} {(watchedPropertyType === 'farm' || watchedPropertyType === 'land') ? watch('plotUnit') : 'sqm'}</li>
                           )}
                           
                           {/* Building Size - Show for House, Apartment, Townhouse and Commercial */}
@@ -752,6 +752,23 @@ const CreateListingPage = () => {
                           )}
                           {watchedPropertyType === 'farm' && watch('farmBuildings') && Array.isArray(watch('farmBuildings')) && watch('farmBuildings').length > 0 && (
                             <li>Buildings: {watch('farmBuildings').join(', ')}</li>
+                          )}
+                          
+                          {/* Land specific fields */}
+                          {watchedPropertyType === 'land' && watch('zoningType') && (
+                            <li>Zoning: {watch('zoningType')}</li>
+                          )}
+                          {watchedPropertyType === 'land' && watch('fenced') && (
+                            <li>Fenced: {watch('fenced') === 'yes' ? 'Yes' : 'No'}</li>
+                          )}
+                          {watchedPropertyType === 'land' && watch('serviced') && (
+                            <li>Serviced: {watch('serviced') === 'yes' ? 'Yes' : 'No'}</li>
+                          )}
+                          {watchedPropertyType === 'land' && watch('topography') && (
+                            <li>Topography: {watch('topography')}</li>
+                          )}
+                          {watchedPropertyType === 'land' && watch('roadAccess') && (
+                            <li>Road Access: {watch('roadAccess')}</li>
                           )}
                         </ul>
                       </div>
