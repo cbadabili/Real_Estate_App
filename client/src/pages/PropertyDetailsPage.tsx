@@ -152,10 +152,10 @@ const PropertyDetailsPage = () => {
                 </div>
                 <div className="text-right">
                   <div className="text-4xl font-bold text-primary-600">
-                    P {property.price.toLocaleString()}
+                    P{property.price.toLocaleString()}
                   </div>
                   <div className="text-neutral-500">
-                    P {property.pricePerSqft}/sqft
+                    P{Math.round(property.price / (property.sqft || 1))}/sqm • {property.sqft?.toLocaleString()} sqm
                   </div>
                 </div>
               </div>

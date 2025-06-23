@@ -97,7 +97,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, viewMode = 'grid'
                     P{property.price.toLocaleString()}
                   </div>
                   <div className="text-sm text-neutral-500">
-                    P{property.pricePerSqft}/sqft
+                    P{Math.round(property.price / (property.sqft || 1))}/sqm
                   </div>
                 </div>
               )}
@@ -180,7 +180,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, viewMode = 'grid'
                   P{property.price.toLocaleString()}
                 </div>
                 <div className="text-sm text-neutral-500">
-                  P{property.pricePerSqft}/sqft
+                  P{Math.round(property.price / (property.sqft || 1))}/sqm
                 </div>
               </div>
               
