@@ -133,6 +133,34 @@ const Navbar = () => {
                         </Link>
                         
                         <Link
+                          to="/properties?type=commercial"
+                          className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
+                          onClick={() => setBuyDropdownOpen(false)}
+                        >
+                          <div className="flex items-center">
+                            <Building2 className="h-4 w-4 mr-2 text-beedab-blue" />
+                            <div>
+                              <div className="font-medium">Commercial</div>
+                              <div className="text-xs text-gray-500">Offices, retail & industrial</div>
+                            </div>
+                          </div>
+                        </Link>
+                        
+                        <Link
+                          to="/properties?type=farm"
+                          className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
+                          onClick={() => setBuyDropdownOpen(false)}
+                        >
+                          <div className="flex items-center">
+                            <Home className="h-4 w-4 mr-2 text-beedab-blue" />
+                            <div>
+                              <div className="font-medium">Farms</div>
+                              <div className="text-xs text-gray-500">Agricultural & farming properties</div>
+                            </div>
+                          </div>
+                        </Link>
+                        
+                        <Link
                           to="/properties?type=land"
                           className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
                           onClick={() => setBuyDropdownOpen(false)}

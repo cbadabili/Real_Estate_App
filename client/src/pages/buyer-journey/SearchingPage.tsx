@@ -139,6 +139,8 @@ const SearchingPage = () => {
               <option value="house">House</option>
               <option value="apartment">Apartment</option>
               <option value="townhouse">Townhouse</option>
+              <option value="commercial">Commercial</option>
+              <option value="farm">Farm</option>
               <option value="land">Land</option>
             </select>
             

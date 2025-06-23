@@ -112,8 +112,10 @@ function parseQueryFallback(query: string): AISearchResult {
 
   // Extract property type
   if (lowerQuery.includes('house')) filters.propertyType = 'house';
-  else if (lowerQuery.includes('apartment') || lowerQuery.includes('flat')) filters.propertyType = 'condo';
+  else if (lowerQuery.includes('apartment') || lowerQuery.includes('flat')) filters.propertyType = 'apartment';
   else if (lowerQuery.includes('townhouse')) filters.propertyType = 'townhouse';
+  else if (lowerQuery.includes('commercial') || lowerQuery.includes('office') || lowerQuery.includes('retail')) filters.propertyType = 'commercial';
+  else if (lowerQuery.includes('farm') || lowerQuery.includes('agricultural')) filters.propertyType = 'farm';
   else if (lowerQuery.includes('plot') || lowerQuery.includes('land')) filters.propertyType = 'land';
 
   // Extract features
