@@ -15,7 +15,15 @@ import {
   Calculator,
   Home,
   Building,
-  Plus
+  Plus,
+  Zap,
+  Wrench,
+  Hammer,
+  Paintbrush,
+  Trees,
+  Waves,
+  Lock,
+  Layers
 } from 'lucide-react';
 import ServiceProviderRegistration from '../components/ServiceProviderRegistration';
 
@@ -56,16 +64,16 @@ const ServicesPage = () => {
     'Insurance': Shield,
     'Cleaning': Home,
     'Construction': Building,
-    'Maintenance': Building,
-    'HVAC': Building,
-    'Plumbing': Building,
-    'Electrical': Building,
-    'Garden': Building,
-    'Pool': Building,
-    'Security': Shield,
-    'Roofing': Building,
-    'Flooring': Building,
-    'Painting': Building
+    'Maintenance': Wrench,
+    'HVAC': Zap,
+    'Plumbing': Wrench,
+    'Electrical': Zap,
+    'Garden': Trees,
+    'Pool': Waves,
+    'Security': Lock,
+    'Roofing': Hammer,
+    'Flooring': Layers,
+    'Painting': Paintbrush
   };
 
   const categoryStructure = {
@@ -112,7 +120,7 @@ const ServicesPage = () => {
       ]
     },
     'Maintenance': {
-      icon: Building,
+      icon: Wrench,
       description: 'Property maintenance and repair services',
       subcategories: [
         'HVAC',

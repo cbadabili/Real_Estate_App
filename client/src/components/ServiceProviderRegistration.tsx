@@ -19,7 +19,15 @@ import {
   Truck,
   Calculator,
   Home,
-  X
+  X,
+  Zap,
+  Wrench,
+  Hammer,
+  Paintbrush,
+  Trees,
+  Waves,
+  Lock,
+  Layers
 } from 'lucide-react';
 
 const serviceProviderSchema = z.object({
@@ -57,7 +65,16 @@ const ServiceProviderRegistration: React.FC<ServiceProviderRegistrationProps> = 
     'Insurance': Shield,
     'Cleaning': Home,
     'Construction': Building,
-    'Maintenance': Building
+    'Maintenance': Wrench,
+    'HVAC': Zap,
+    'Plumbing': Wrench,
+    'Electrical': Zap,
+    'Garden': Trees,
+    'Pool': Waves,
+    'Security': Lock,
+    'Roofing': Hammer,
+    'Flooring': Layers,
+    'Painting': Paintbrush
   };
 
   const serviceCategories = [
