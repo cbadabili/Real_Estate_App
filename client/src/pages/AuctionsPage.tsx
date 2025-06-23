@@ -126,7 +126,7 @@ const AuctionsPage = () => {
   const AuctionCard = ({ auction }: { auction: any }) => (
     <motion.div
       layoutId={`auction-${auction.id}`}
-      className="bg-white rounded-xl shadow-lg overflow-hidden border border-orange-200 hover:shadow-xl transition-all duration-300"
+      className="bg-white rounded-xl shadow-lg overflow-hidden border border-amber-200 hover:shadow-xl transition-all duration-300"
       whileHover={{ y: -2 }}
     >
       <div className="relative">
@@ -135,10 +135,10 @@ const AuctionsPage = () => {
           alt={auction.title}
           className="w-full h-48 object-cover"
         />
-        <div className="absolute top-3 left-3 bg-orange-500 text-white px-3 py-1 rounded-full text-sm font-bold">
+        <div className="absolute top-3 left-3 bg-amber-500 text-white px-3 py-1 rounded-full text-sm font-bold">
           Lot {auction.lotNumber}
         </div>
-        <div className="absolute top-3 right-3 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-bold flex items-center">
+        <div className="absolute top-3 right-3 bg-red-600 text-white px-3 py-1 rounded-full text-sm font-bold flex items-center">
           <Clock className="h-3 w-3 mr-1" />
           {timeLeft[auction.id] || 'Loading...'}
         </div>
@@ -171,7 +171,7 @@ const AuctionsPage = () => {
 
         <div className="border-t pt-4">
           <div className="flex justify-between items-center mb-2">
-            <span className="text-lg font-bold text-orange-600">
+            <span className="text-lg font-bold text-amber-600">
               Starting bid: P{auction.startingBid.toLocaleString()}
             </span>
           </div>
@@ -192,15 +192,15 @@ const AuctionsPage = () => {
             <div><strong>Deputy Sheriff:</strong> {auction.deputySheriff}</div>
           </div>
 
-          <div className="bg-orange-50 p-3 rounded-lg mb-3">
-            <div className="flex items-center text-orange-700 mb-1">
+          <div className="bg-amber-50 p-3 rounded-lg mb-3">
+            <div className="flex items-center text-amber-700 mb-1">
               <AlertCircle className="h-4 w-4 mr-1" />
               <span className="text-sm font-medium">Deposit Required</span>
             </div>
             <span className="text-sm">{auction.depositRequired}% of bid price on sale date</span>
           </div>
 
-          <button className="w-full bg-orange-500 text-white py-2 px-4 rounded-lg font-medium hover:bg-orange-600 transition-colors flex items-center justify-center">
+          <button className="w-full bg-gradient-to-r from-amber-500 to-orange-500 text-white py-2 px-4 rounded-lg font-medium hover:from-amber-600 hover:to-orange-600 transition-colors flex items-center justify-center">
             <Gavel className="h-4 w-4 mr-2" />
             Register to Bid
           </button>
@@ -210,35 +210,35 @@ const AuctionsPage = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-yellow-50">
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50">
       {/* Header */}
-      <div className="bg-white border-b border-orange-200">
+      <div className="bg-gradient-to-r from-amber-600 to-orange-600 text-white border-b border-orange-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center">
             <div className="flex items-center justify-center mb-4">
-              <Gavel className="h-8 w-8 text-orange-500 mr-3" />
-              <h1 className="text-4xl font-bold text-gray-900">Property Auctions</h1>
+              <Gavel className="h-8 w-8 text-white mr-3" />
+              <h1 className="text-4xl font-bold text-white">Property Auctions</h1>
             </div>
-            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+            <p className="text-lg text-amber-100 max-w-3xl mx-auto">
               Bank foreclosure auctions and distressed property sales across Botswana. 
               All auctions conducted by registered auctioneers and deputy sheriffs.
             </p>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8 max-w-4xl mx-auto">
-              <div className="bg-orange-100 p-4 rounded-lg">
-                <TrendingUp className="h-6 w-6 text-orange-600 mx-auto mb-2" />
-                <div className="text-2xl font-bold text-orange-600">{sampleAuctions.length}</div>
-                <div className="text-sm text-gray-600">Active Auctions</div>
+              <div className="bg-white/20 backdrop-blur-sm p-4 rounded-lg border border-white/30">
+                <TrendingUp className="h-6 w-6 text-white mx-auto mb-2" />
+                <div className="text-2xl font-bold text-white">{sampleAuctions.length}</div>
+                <div className="text-sm text-amber-100">Active Auctions</div>
               </div>
-              <div className="bg-blue-100 p-4 rounded-lg">
-                <Eye className="h-6 w-6 text-blue-600 mx-auto mb-2" />
-                <div className="text-2xl font-bold text-blue-600">12.5%</div>
-                <div className="text-sm text-gray-600">Deposit Required</div>
+              <div className="bg-white/20 backdrop-blur-sm p-4 rounded-lg border border-white/30">
+                <Eye className="h-6 w-6 text-white mx-auto mb-2" />
+                <div className="text-2xl font-bold text-white">12.5%</div>
+                <div className="text-sm text-amber-100">Deposit Required</div>
               </div>
-              <div className="bg-green-100 p-4 rounded-lg">
-                <Users className="h-6 w-6 text-green-600 mx-auto mb-2" />
-                <div className="text-2xl font-bold text-green-600">FNB</div>
-                <div className="text-sm text-gray-600">Authorized Bank</div>
+              <div className="bg-white/20 backdrop-blur-sm p-4 rounded-lg border border-white/30">
+                <Users className="h-6 w-6 text-white mx-auto mb-2" />
+                <div className="text-2xl font-bold text-white">FNB</div>
+                <div className="text-sm text-amber-100">Authorized Bank</div>
               </div>
             </div>
           </div>
@@ -247,12 +247,12 @@ const AuctionsPage = () => {
 
       {/* Important Notice */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div className="bg-yellow-100 border border-yellow-300 rounded-lg p-4 mb-6">
+        <div className="bg-amber-100 border border-amber-300 rounded-lg p-4 mb-6">
           <div className="flex items-start">
-            <AlertCircle className="h-5 w-5 text-yellow-600 mr-3 mt-0.5" />
+            <AlertCircle className="h-5 w-5 text-amber-600 mr-3 mt-0.5" />
             <div>
-              <h3 className="font-bold text-yellow-800 mb-1">Important Auction Information</h3>
-              <p className="text-yellow-700 text-sm">
+              <h3 className="font-bold text-amber-800 mb-1">Important Auction Information</h3>
+              <p className="text-amber-700 text-sm">
                 Each successful bidder will be required to pay 12.5% of the bid price on the date of the sale. 
                 All properties are sold "as is" and subject to the terms and conditions of the respective auction houses.
               </p>
