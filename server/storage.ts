@@ -141,7 +141,7 @@ export class DatabaseStorage implements IStorage {
       conditions.push(lte(properties.squareFeet, filters.maxSquareFeet));
     }
     if (filters.city) {
-      conditions.push(like(properties.city, `%${filters.city}%`));
+      conditions.push(ilike(properties.city, `%${filters.city}%`));
     }
     if (filters.state) {
       conditions.push(eq(properties.state, filters.state));
