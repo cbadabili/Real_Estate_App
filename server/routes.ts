@@ -7,7 +7,8 @@ import {
   insertUserSchema, 
   insertPropertySchema, 
   insertInquirySchema, 
-  insertAppointmentSchema 
+  insertAppointmentSchema,
+  insertServiceProviderSchema
 } from "@shared/schema";
 import { z } from "zod";
 
@@ -440,6 +441,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Get providers by category error:", error);
       res.status(500).json({ message: "Failed to fetch providers by category" });
+    }
+  });
+
+  app.post("/api/services/providers", async (req, res) => {
+    try {
+      const providerData = insertServiceProviderSchema.parse(req.body);
+      const provider = await servicesStorage.createServiceProvider(providerData);
+      res.status(201).json(provider);
+    } catch (error) {
+      console.error("Create service provider error:", error);
+      res.status(400).json({ message: "Invalid service provider data" });
     }
   });
 

@@ -14,8 +14,10 @@ import {
   Truck,
   Calculator,
   Home,
-  Building
+  Building,
+  Plus
 } from 'lucide-react';
+import ServiceProviderRegistration from '../components/ServiceProviderRegistration';
 
 interface ServiceProvider {
   id: number;
@@ -43,6 +45,7 @@ const ServicesPage = () => {
   const [filteredProviders, setFilteredProviders] = useState<ServiceProvider[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
+  const [showRegistration, setShowRegistration] = useState(false);
 
   // Category icons mapping
   const categoryIcons: { [key: string]: any } = {
@@ -151,6 +154,12 @@ const ServicesPage = () => {
     }
   };
 
+  const handleRegistrationSuccess = () => {
+    // Refresh the providers list
+    setLoading(true);
+    fetchProviders();
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -171,10 +180,21 @@ const ServicesPage = () => {
             <h1 className="text-3xl font-bold text-gray-900 mb-4">
               Professional Services Directory
             </h1>
-            <p className="text-lg text-gray-600 max-w-3xl mx-auto mb-8">
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto mb-6">
               Connect with verified service providers across Botswana. 
               From legal services to photography, find trusted professionals for your property needs.
             </p>
+
+            {/* Register Button */}
+            <div className="mb-8">
+              <button
+                onClick={() => setShowRegistration(true)}
+                className="bg-beedab-blue text-white px-6 py-3 rounded-lg hover:bg-beedab-darkblue transition-colors flex items-center space-x-2 mx-auto"
+              >
+                <Plus className="h-5 w-5" />
+                <span>Register as Service Provider</span>
+              </button>
+            </div>
             
             {/* Search Bar */}
             <div className="max-w-md mx-auto relative">
@@ -386,6 +406,14 @@ const ServicesPage = () => {
           </div>
         )}
       </div>
+
+      {/* Registration Modal */}
+      {showRegistration && (
+        <ServiceProviderRegistration
+          onClose={() => setShowRegistration(false)}
+          onSuccess={handleRegistrationSuccess}
+        />
+      )}
     </div>
   );
 };
