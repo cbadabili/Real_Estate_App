@@ -241,6 +241,15 @@ const AuctionsPage = () => {
                 <div className="text-sm text-blue-100">Authorized Bank</div>
               </div>
             </div>
+            
+            <div className="flex justify-center mt-6">
+              <a
+                href="/create-property"
+                className="bg-white text-beedab-blue px-6 py-3 rounded-lg font-medium hover:bg-blue-50 transition-colors border border-white/30"
+              >
+                + Add Auction Property
+              </a>
+            </div>
           </div>
         </div>
       </div>
