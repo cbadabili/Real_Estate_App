@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Filter, Grid, List as ListIcon, Search, MapPin, Bed, Bath, Square, Heart, Share2 } from 'lucide-react';
 import { useProperties, type PropertyFilters } from '../hooks/useProperties';
 import { LoadingSpinner } from '../components/ui/LoadingSpinner';
+import { useLocation } from 'react-router-dom';
 
 const RealPropertiesPage = () => {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
@@ -12,6 +13,33 @@ const RealPropertiesPage = () => {
     status: 'active',
     limit: 20
   });
+  
+  const location = useLocation();
+  
+  // Parse URL parameters and set initial filters
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const propertyType = searchParams.get('type');
+    const minPrice = searchParams.get('minPrice');
+    const maxPrice = searchParams.get('maxPrice');
+    const bedrooms = searchParams.get('bedrooms');
+    const bathrooms = searchParams.get('bathrooms');
+    const city = searchParams.get('city');
+    
+    setFilters(prev => ({
+      ...prev,
+      ...(propertyType && { propertyType }),
+      ...(minPrice && { minPrice: parseInt(minPrice) }),
+      ...(maxPrice && { maxPrice: parseInt(maxPrice) }),
+      ...(bedrooms && { minBedrooms: parseInt(bedrooms) }),
+      ...(bathrooms && { minBathrooms: parseInt(bathrooms) }),
+      ...(city && { city })
+    }));
+    
+    if (searchParams.get('city')) {
+      setSearchTerm(searchParams.get('city') || '');
+    }
+  }, [location.search]);
 
   const { data: properties, isLoading, error } = useProperties({
     ...filters,
@@ -124,6 +152,11 @@ const RealPropertiesPage = () => {
             <div>
               <h1 className="text-3xl font-bold text-neutral-900">Properties</h1>
               <p className="text-neutral-600 mt-1">
+                {filters.propertyType && (
+                  <span className="inline-block bg-beedab-blue text-white px-2 py-1 rounded text-sm mr-2 capitalize">
+                    {filters.propertyType}
+                  </span>
+                )}
                 {properties ? `${properties.length} properties found` : 'Loading properties...'}
               </p>
             </div>
