@@ -45,6 +45,10 @@ const CreatePropertyPage = () => {
   const totalSteps = 4;
 
   const createProperty = useCreateProperty();
+  
+  // Check for URL parameters to pre-fill listing type
+  const urlParams = new URLSearchParams(window.location.search);
+  const initialListingType = urlParams.get('listingType') || 'owner';
 
   const {
     register,
@@ -57,7 +61,7 @@ const CreatePropertyPage = () => {
     resolver: zodResolver(propertySchema),
     defaultValues: {
       ownerId: 1, // Default owner ID - in real app this would come from auth
-      listingType: 'owner'
+      listingType: initialListingType as 'owner' | 'agent' | 'rental' | 'auction'
     }
   });
 
