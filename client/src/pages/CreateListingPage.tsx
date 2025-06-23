@@ -297,8 +297,8 @@ const CreateListingPage = () => {
                       </div>
                     )}
 
-                    {/* Building Size - Show for House and Apartment */}
-                    {(watchedPropertyType === 'house' || watchedPropertyType === 'apartment') && (
+                    {/* Building Size - Show for House, Apartment and Townhouse */}
+                    {(watchedPropertyType === 'house' || watchedPropertyType === 'apartment' || watchedPropertyType === 'townhouse') && (
                       <div>
                         <label className="block text-sm font-medium text-neutral-700 mb-2">
                           Building Size *
@@ -320,8 +320,8 @@ const CreateListingPage = () => {
                       </div>
                     )}
 
-                    {/* Bedrooms and Bathrooms - Show for House and Apartment only */}
-                    {(watchedPropertyType === 'house' || watchedPropertyType === 'apartment') && (
+                    {/* Bedrooms and Bathrooms - Show for House, Apartment and Townhouse */}
+                    {(watchedPropertyType === 'house' || watchedPropertyType === 'apartment' || watchedPropertyType === 'townhouse') && (
                       <>
                         <div>
                           <label className="block text-sm font-medium text-neutral-700 mb-2">
@@ -363,8 +363,8 @@ const CreateListingPage = () => {
                       </>
                     )}
 
-                    {/* Year Built - Show for House and Apartment */}
-                    {(watchedPropertyType === 'house' || watchedPropertyType === 'apartment') && (
+                    {/* Year Built - Show for House, Apartment and Townhouse */}
+                    {(watchedPropertyType === 'house' || watchedPropertyType === 'apartment' || watchedPropertyType === 'townhouse') && (
                       <div>
                         <label className="block text-sm font-medium text-neutral-700 mb-2">
                           Year Built
@@ -408,8 +408,8 @@ const CreateListingPage = () => {
                       )}
                     </div>
 
-                    {/* Amenities - Show for House and Apartment */}
-                    {(watchedPropertyType === 'house' || watchedPropertyType === 'apartment') && (
+                    {/* Amenities - Show for House, Apartment and Townhouse */}
+                    {(watchedPropertyType === 'house' || watchedPropertyType === 'apartment' || watchedPropertyType === 'townhouse') && (
                       <div>
                         <label className="block text-sm font-medium text-neutral-700 mb-4">
                           Amenities & Features
