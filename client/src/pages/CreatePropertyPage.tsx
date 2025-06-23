@@ -19,6 +19,7 @@ import {
 import { LoadingSpinner } from '../components/ui/LoadingSpinner';
 import { useCreateProperty } from '../hooks/useProperties';
 import ContextualAd from '../components/services/ContextualAd';
+import GeographySelector from '../components/GeographySelector';
 
 const propertySchema = z.object({
   title: z.string().min(1, 'Title is required'),
@@ -425,7 +426,7 @@ const CreatePropertyPage = () => {
 
               <div>
                 <label className="block text-sm font-medium text-neutral-700 mb-2">
-                  Address *
+                  Street Address *
                 </label>
                 <input
                   {...register('address')}
@@ -438,52 +439,27 @@ const CreatePropertyPage = () => {
                 )}
               </div>
 
-              <div className="grid grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-neutral-700 mb-2">
-                    City *
-                  </label>
-                  <input
-                    {...register('city')}
-                    type="text"
-                    className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                    placeholder="Gaborone"
-                  />
-                  {errors.city && (
-                    <p className="mt-1 text-sm text-red-600">{errors.city.message}</p>
-                  )}
-                </div>
+              {/* Enhanced Geography Selector */}
+              <GeographySelector
+                onLocationChange={(location) => {
+                  setValue('city', location.city);
+                  setValue('state', location.state);
+                  setValue('zipCode', location.zipCode);
+                  trigger(['city', 'state', 'zipCode']);
+                }}
+                initialCity={watchedValues.city}
+                initialState={watchedValues.state}
+                initialZipCode={watchedValues.zipCode}
+              />
 
-                <div>
-                  <label className="block text-sm font-medium text-neutral-700 mb-2">
-                    State *
-                  </label>
-                  <input
-                    {...register('state')}
-                    type="text"
-                    className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                    placeholder="South-East"
-                  />
-                  {errors.state && (
-                    <p className="mt-1 text-sm text-red-600">{errors.state.message}</p>
-                  )}
+              {/* Display any validation errors for geography fields */}
+              {(errors.city || errors.state || errors.zipCode) && (
+                <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                  <p className="text-sm text-red-600">
+                    Please ensure all location fields are properly filled.
+                  </p>
                 </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-neutral-700 mb-2">
-                    Zip Code *
-                  </label>
-                  <input
-                    {...register('zipCode')}
-                    type="text"
-                    className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                    placeholder="0000"
-                  />
-                  {errors.zipCode && (
-                    <p className="mt-1 text-sm text-red-600">{errors.zipCode.message}</p>
-                  )}
-                </div>
-              </div>
+              )}
             </motion.div>
           )}
 
@@ -641,24 +617,158 @@ const CreatePropertyPage = () => {
             >
               <div>
                 <h2 className="text-2xl font-bold text-gray-900 mb-2">Review & Submit</h2>
-                <p className="text-gray-600">Review your property details before submitting</p>
+                <p className="text-gray-600">Carefully review all property details before submitting your listing</p>
               </div>
 
-              <div className="bg-gray-50 rounded-lg p-6">
-                <h3 className="text-lg font-semibold mb-4">Property Summary</h3>
-                <div className="space-y-2 text-sm">
-                  <p><strong>Title:</strong> {watchedValues.title}</p>
-                  <p><strong>Type:</strong> {watchedValues.propertyType}</p>
-                  <p><strong>Listing Type:</strong> {watchedValues.listingType}</p>
-                  <p><strong>Price:</strong> P {watchedValues.price?.toLocaleString()}</p>
-                  <p><strong>Location:</strong> {watchedValues.address}, {watchedValues.city}</p>
-                  {watchedValues.bedrooms && <p><strong>Bedrooms:</strong> {watchedValues.bedrooms}</p>}
-                  {watchedValues.bathrooms && <p><strong>Bathrooms:</strong> {watchedValues.bathrooms}</p>}
-                  {watchedValues.squareFeet && <p><strong>Square Meters:</strong> {watchedValues.squareFeet.toLocaleString()}</p>}
-                  {features.length > 0 && <p><strong>Features:</strong> {features.join(', ')}</p>}
+              {/* Comprehensive Property Summary */}
+              <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg p-6 border border-gray-200">
+                <h3 className="text-xl font-semibold mb-6 text-gray-900 flex items-center">
+                  <Home className="h-5 w-5 mr-2 text-beedab-blue" />
+                  Property Summary
+                </h3>
+                
+                <div className="grid md:grid-cols-2 gap-6">
+                  {/* Basic Information */}
+                  <div>
+                    <h4 className="font-medium text-gray-900 mb-3">Basic Information</h4>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Title:</span>
+                        <span className="font-medium text-right">{watchedValues.title}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Property Type:</span>
+                        <span className="font-medium capitalize">{watchedValues.propertyType}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Listing Type:</span>
+                        <span className="font-medium capitalize">{watchedValues.listingType}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Price:</span>
+                        <span className="font-medium text-green-600">P {watchedValues.price?.toLocaleString()}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Location Details */}
+                  <div>
+                    <h4 className="font-medium text-gray-900 mb-3">Location</h4>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Address:</span>
+                        <span className="font-medium text-right">{watchedValues.address}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">City:</span>
+                        <span className="font-medium">{watchedValues.city}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">District:</span>
+                        <span className="font-medium">{watchedValues.state}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Postal Code:</span>
+                        <span className="font-medium">{watchedValues.zipCode}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Property Features */}
+                  <div>
+                    <h4 className="font-medium text-gray-900 mb-3">Property Features</h4>
+                    <div className="space-y-2 text-sm">
+                      {watchedValues.bedrooms && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Bedrooms:</span>
+                          <span className="font-medium">{watchedValues.bedrooms}</span>
+                        </div>
+                      )}
+                      {watchedValues.bathrooms && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Bathrooms:</span>
+                          <span className="font-medium">{watchedValues.bathrooms}</span>
+                        </div>
+                      )}
+                      {watchedValues.squareFeet && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Size:</span>
+                          <span className="font-medium">{watchedValues.squareFeet.toLocaleString()} m²</span>
+                        </div>
+                      )}
+                      {watchedValues.yearBuilt && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Year Built:</span>
+                          <span className="font-medium">{watchedValues.yearBuilt}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Additional Features */}
+                  {features.length > 0 && (
+                    <div>
+                      <h4 className="font-medium text-gray-900 mb-3">Additional Features</h4>
+                      <div className="flex flex-wrap gap-2">
+                        {features.map((feature, index) => (
+                          <span
+                            key={index}
+                            className="inline-flex px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-medium"
+                          >
+                            {feature}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
+
+                {/* Auction Details if applicable */}
+                {watchedValues.listingType === 'auction' && (
+                  <div className="mt-6 pt-6 border-t border-gray-200">
+                    <h4 className="font-medium text-gray-900 mb-3 text-beedab-blue">Auction Details</h4>
+                    <div className="grid md:grid-cols-2 gap-4 text-sm">
+                      {watchedValues.auctionDate && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Auction Date:</span>
+                          <span className="font-medium">{watchedValues.auctionDate}</span>
+                        </div>
+                      )}
+                      {watchedValues.auctionTime && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Auction Time:</span>
+                          <span className="font-medium">{watchedValues.auctionTime}</span>
+                        </div>
+                      )}
+                      {watchedValues.startingBid && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Starting Bid:</span>
+                          <span className="font-medium text-green-600">P {watchedValues.startingBid.toLocaleString()}</span>
+                        </div>
+                      )}
+                      {watchedValues.reservePrice && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Reserve Price:</span>
+                          <span className="font-medium">P {watchedValues.reservePrice.toLocaleString()}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
 
+              {/* Terms and Conditions */}
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <h4 className="font-medium text-blue-900 mb-2">Before You Submit</h4>
+                <ul className="text-sm text-blue-800 space-y-1">
+                  <li>• Ensure all information provided is accurate and up-to-date</li>
+                  <li>• Property photos and documents can be uploaded after submission</li>
+                  <li>• Your listing will be reviewed before going live</li>
+                  <li>• You can edit your listing anytime from your dashboard</li>
+                </ul>
+              </div>
+
+              {/* Contextual Ad after submission */}
               {showListingAd && (
                 <ContextualAd 
                   trigger="property_listing_created" 
