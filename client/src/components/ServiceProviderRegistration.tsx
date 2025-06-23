@@ -68,7 +68,13 @@ const ServiceProviderRegistration: React.FC<ServiceProviderRegistrationProps> = 
     'Insurance',
     'Cleaning',
     'Construction',
-    'Maintenance'
+    'Maintenance',
+    'HVAC Maintenance',
+    'Plumbing Maintenance',
+    'Electrical Maintenance',
+    'Garden Maintenance',
+    'Pool Maintenance',
+    'Security Maintenance'
   ];
 
   const {
@@ -176,14 +182,20 @@ const ServiceProviderRegistration: React.FC<ServiceProviderRegistrationProps> = 
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
                 >
                   <option value="">Select a category</option>
-                  {serviceCategories.map((category) => {
-                    const Icon = categoryIcons[category];
-                    return (
+                  <optgroup label="Main Categories">
+                    {serviceCategories.filter(cat => !cat.includes(' Maintenance')).map((category) => (
                       <option key={category} value={category}>
                         {category}
                       </option>
-                    );
-                  })}
+                    ))}
+                  </optgroup>
+                  <optgroup label="Maintenance Specializations">
+                    {serviceCategories.filter(cat => cat.includes(' Maintenance')).map((category) => (
+                      <option key={category} value={category}>
+                        {category}
+                      </option>
+                    ))}
+                  </optgroup>
                 </select>
                 {errors.serviceCategory && (
                   <p className="text-red-600 text-sm mt-1">{errors.serviceCategory.message}</p>

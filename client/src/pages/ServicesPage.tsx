@@ -56,18 +56,63 @@ const ServicesPage = () => {
     'Insurance': Shield,
     'Cleaning': Home,
     'Construction': Building,
-    'Maintenance': Building
+    'Maintenance': Building,
+    'HVAC Maintenance': Building,
+    'Plumbing Maintenance': Building,
+    'Electrical Maintenance': Building,
+    'Garden Maintenance': Building,
+    'Pool Maintenance': Building,
+    'Security Maintenance': Shield
   };
 
-  const categoryDescriptions: { [key: string]: string } = {
-    'Photography': 'Professional property and lifestyle photography',
-    'Legal': 'Lawyers, conveyancers, and legal advisory services',
-    'Moving': 'Relocation and moving services across Botswana',
-    'Finance': 'Mortgage brokers, financial advisors, and lending',
-    'Insurance': 'Property, life, and comprehensive insurance coverage',
-    'Cleaning': 'Move-in, move-out, and regular cleaning services',
-    'Construction': 'Home renovation, building, and construction',
-    'Maintenance': 'Property maintenance and repair services'
+  const categoryStructure = {
+    'Photography': {
+      icon: Camera,
+      description: 'Professional property and lifestyle photography',
+      subcategories: []
+    },
+    'Legal': {
+      icon: Scale,
+      description: 'Lawyers, conveyancers, and legal advisory services',
+      subcategories: []
+    },
+    'Moving': {
+      icon: Truck,
+      description: 'Relocation and moving services across Botswana',
+      subcategories: []
+    },
+    'Finance': {
+      icon: Calculator,
+      description: 'Mortgage brokers, financial advisors, and lending',
+      subcategories: []
+    },
+    'Insurance': {
+      icon: Shield,
+      description: 'Property, life, and comprehensive insurance coverage',
+      subcategories: []
+    },
+    'Cleaning': {
+      icon: Home,
+      description: 'Move-in, move-out, and regular cleaning services',
+      subcategories: []
+    },
+    'Construction': {
+      icon: Building,
+      description: 'Home renovation, building, and construction',
+      subcategories: []
+    },
+    'Maintenance': {
+      icon: Building,
+      description: 'Property maintenance and repair services',
+      subcategories: [
+        'HVAC Maintenance',
+        'Plumbing Maintenance', 
+        'Electrical Maintenance',
+        'Garden Maintenance',
+        'Pool Maintenance',
+        'Security Maintenance'
+      ]
+    }
   };
 
   useEffect(() => {
@@ -217,27 +262,69 @@ const ServicesPage = () => {
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Service Categories</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3">
             {categories.map((category) => {
-              const Icon = categoryIcons[category] || Building;
+              const categoryData = categoryStructure[category as keyof typeof categoryStructure];
+              const Icon = categoryData?.icon || categoryIcons[category] || Building;
               const isSelected = selectedCategory === category;
+              const hasSubcategories = categoryData?.subcategories && categoryData.subcategories.length > 0;
               
               return (
-                <button
-                  key={category}
-                  onClick={() => handleCategorySelect(category)}
-                  className={`p-3 rounded-lg border-2 transition-all text-center ${
-                    isSelected
-                      ? 'border-beedab-blue bg-beedab-blue text-white'
-                      : 'border-gray-200 bg-white text-gray-700 hover:border-beedab-blue hover:text-beedab-blue'
-                  }`}
-                >
-                  <Icon className="h-6 w-6 mx-auto mb-2" />
-                  <span className="text-sm font-medium capitalize">
-                    {category === 'all' ? 'All Services' : category}
-                  </span>
-                </button>
+                <div key={category} className="relative group">
+                  <button
+                    onClick={() => handleCategorySelect(category)}
+                    className={`w-full p-3 rounded-lg border-2 transition-all text-center ${
+                      isSelected
+                        ? 'border-beedab-blue bg-beedab-blue text-white'
+                        : 'border-gray-200 bg-white text-gray-700 hover:border-beedab-blue hover:text-beedab-blue'
+                    }`}
+                  >
+                    <Icon className="h-6 w-6 mx-auto mb-2" />
+                    <span className="text-sm font-medium capitalize">
+                      {category === 'all' ? 'All Services' : category}
+                    </span>
+                    {hasSubcategories && (
+                      <div className="text-xs text-gray-500 mt-1">
+                        {categoryData.subcategories.length} specializations
+                      </div>
+                    )}
+                  </button>
+                </div>
               );
             })}
           </div>
+
+          {/* Subcategory Pills for Selected Category */}
+          {selectedCategory && categoryStructure[selectedCategory as keyof typeof categoryStructure]?.subcategories?.length > 0 && (
+            <div className="mt-6 p-4 bg-blue-50 rounded-lg">
+              <div className="text-sm font-medium text-gray-700 mb-3">
+                {selectedCategory} Specializations:
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  onClick={() => handleCategorySelect(selectedCategory)}
+                  className={`px-3 py-2 text-sm rounded-lg transition-colors ${
+                    selectedCategory && !categoryStructure[selectedCategory as keyof typeof categoryStructure].subcategories.includes(selectedCategory)
+                      ? 'bg-beedab-blue text-white'
+                      : 'bg-white text-beedab-blue border border-beedab-blue hover:bg-beedab-blue hover:text-white'
+                  }`}
+                >
+                  All {selectedCategory}
+                </button>
+                {categoryStructure[selectedCategory as keyof typeof categoryStructure].subcategories.map((subcat) => (
+                  <button
+                    key={subcat}
+                    onClick={() => handleCategorySelect(subcat)}
+                    className={`px-3 py-2 text-sm rounded-lg transition-colors ${
+                      selectedCategory === subcat
+                        ? 'bg-beedab-blue text-white'
+                        : 'bg-white text-beedab-blue border border-beedab-blue hover:bg-beedab-blue hover:text-white'
+                    }`}
+                  >
+                    {subcat.replace(' Maintenance', '')}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Results Header */}
