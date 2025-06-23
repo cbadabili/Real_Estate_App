@@ -356,24 +356,68 @@ const CreateListingPage = () => {
                       )}
                     </div>
 
-                    <div>
-                      <label className="block text-sm font-medium text-neutral-700 mb-4">
-                        Amenities & Features
-                      </label>
-                      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                        {amenities.map((amenity) => (
-                          <label key={amenity} className="flex items-center space-x-2 cursor-pointer">
-                            <input
-                              type="checkbox"
-                              {...register('amenities')}
-                              value={amenity}
-                              className="rounded border-neutral-300 text-beedab-blue focus:ring-beedab-blue"
-                            />
-                            <span className="text-sm text-neutral-700">{amenity}</span>
-                          </label>
-                        ))}
+                    {/* Amenities - Show for House and Apartment */}
+                    {(watchedPropertyType === 'house' || watchedPropertyType === 'apartment') && (
+                      <div>
+                        <label className="block text-sm font-medium text-neutral-700 mb-4">
+                          Amenities & Features
+                        </label>
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                          {amenities.map((amenity) => (
+                            <label key={amenity} className="flex items-center space-x-2 cursor-pointer">
+                              <input
+                                type="checkbox"
+                                {...register('amenities')}
+                                value={amenity}
+                                className="rounded border-neutral-300 text-beedab-blue focus:ring-beedab-blue"
+                              />
+                              <span className="text-sm text-neutral-700">{amenity}</span>
+                            </label>
+                          ))}
+                        </div>
                       </div>
-                    </div>
+                    )}
+
+                    {/* Farm-specific fields */}
+                    {watchedPropertyType === 'farm' && (
+                      <div className="space-y-4">
+                        <div>
+                          <label className="block text-sm font-medium text-neutral-700 mb-2">
+                            Farm Type
+                          </label>
+                          <select
+                            {...register('farmType')}
+                            className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent transition-all"
+                          >
+                            <option value="">Select farm type</option>
+                            <option value="crop">Crop Farm</option>
+                            <option value="livestock">Livestock Farm</option>
+                            <option value="mixed">Mixed Farm</option>
+                            <option value="dairy">Dairy Farm</option>
+                            <option value="poultry">Poultry Farm</option>
+                          </select>
+                        </div>
+                        
+                        <div>
+                          <label className="block text-sm font-medium text-neutral-700 mb-2">
+                            Water Source
+                          </label>
+                          <div className="grid grid-cols-2 gap-3">
+                            {['Borehole', 'River Access', 'Municipal Water', 'Dam/Reservoir'].map((source) => (
+                              <label key={source} className="flex items-center space-x-2 cursor-pointer">
+                                <input
+                                  type="checkbox"
+                                  {...register('waterSources')}
+                                  value={source}
+                                  className="rounded border-neutral-300 text-beedab-blue focus:ring-beedab-blue"
+                                />
+                                <span className="text-sm text-neutral-700">{source}</span>
+                              </label>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </motion.div>
