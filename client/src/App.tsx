@@ -24,6 +24,7 @@ import CreateListingPage from './pages/CreateListingPage';
 import CreatePropertyPage from './pages/CreatePropertyPage';
 import PropertyDetailsPage from './pages/PropertyDetailsPage';
 import AgentDashboard from './pages/AgentDashboard';
+import MyPropertiesPage from './pages/MyPropertiesPage';
 import TestAPIPage from './pages/TestAPIPage';
 import DashboardPage from './pages/DashboardPage';
 import { AuthProvider } from './contexts/AuthContext';
@@ -54,6 +55,7 @@ function App() {
             <Route path="/create-property" element={<CreatePropertyPage />} />
             <Route path="/create-listing" element={<CreateListingPage />} />
             <Route path="/agent-dashboard" element={<AgentDashboard />} />
+        <Route path="/my-properties" element={<MyPropertiesPage />} />
             <Route path="/services/legal" element={<LegalServicesPage />} />
             <Route path="/services/financing" element={<FinancingPage />} />
             <Route path="/buyer-journey/planning" element={<PlanningPage />} />
