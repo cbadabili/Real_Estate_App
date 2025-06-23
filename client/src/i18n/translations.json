@@ -1,0 +1,104 @@
+{
+  "en": {
+    "chat": {
+      "title": "Property Chat",
+      "placeholder": "Type a message...",
+      "welcome": "Hello! How can I assist you with this property?",
+      "connecting": "Connecting...",
+      "offline": "Offline"
+    },
+    "documents": {
+      "title": "Document Management",
+      "upload": "Upload Documents",
+      "dragDrop": "Drag and drop files here, or click to select files",
+      "requirements": "Required Documents",
+      "categories": {
+        "deed": "Title Deed",
+        "id": "Identity Document",
+        "proof_of_income": "Proof of Income",
+        "bank_statement": "Bank Statement",
+        "other": "Other"
+      }
+    },
+    "valuation": {
+      "title": "AI Property Valuation",
+      "estimatedValue": "Estimated Value",
+      "confidence": "Confidence",
+      "pricePerSqm": "Price per m²",
+      "marketActivity": "Market Activity",
+      "lastUpdated": "Last Updated"
+    },
+    "compliance": {
+      "title": "Legal Compliance Guide",
+      "progress": "Compliance Progress",
+      "required": "Required",
+      "completed": "Completed",
+      "titleVerification": "Title Deed Verification",
+      "tribalClearance": "Tribal Land Board Clearance",
+      "planningPermission": "Planning Permission Verification",
+      "rateClearance": "Rates and Taxes Clearance"
+    },
+    "navigation": {
+      "home": "Home",
+      "buy": "Buy",
+      "sell": "Sell", 
+      "rent": "Rent",
+      "auctions": "Auctions",
+      "services": "Services",
+      "profile": "Profile",
+      "myProperties": "My Properties",
+      "documents": "Documents"
+    }
+  },
+  "tn": {
+    "chat": {
+      "title": "Puisano ya Ntlo",
+      "placeholder": "Kwala molaetsa...",
+      "welcome": "Dumela! Ke ka go thusa jang ka ntlo e?",
+      "connecting": "E kgokagano...",
+      "offline": "Ga e kgokagane"
+    },
+    "documents": {
+      "title": "Taolo ya Dikwalo",
+      "upload": "Tsenya Dikwalo",
+      "dragDrop": "Gogela o behe difaele fano, kgotsa tobetsa go tlhopha difaele",
+      "requirements": "Dikwalo Tse di Batlileng",
+      "categories": {
+        "deed": "Kwalo ya Ntlo",
+        "id": "Setlankana sa Boitsebiso",
+        "proof_of_income": "Pono ya Lotseno",
+        "bank_statement": "Pegelo ya Bank",
+        "other": "Tse Dingwe"
+      }
+    },
+    "valuation": {
+      "title": "Tekolo ya Ntlo ka AI",
+      "estimatedValue": "Boleng jo bo Solofetsweng",
+      "confidence": "Tshepo",
+      "pricePerSqm": "Theko ka m²",
+      "marketActivity": "Tiro ya Mebaraka",
+      "lastUpdated": "E Ntšhwafaditšwe Bošeng"
+    },
+    "compliance": {
+      "title": "Kaelo ya Molao",
+      "progress": "Tswelelopele ya Molao",
+      "required": "E Batlilwe",
+      "completed": "E Feditswe",
+      "titleVerification": "Netefatso ya Kwalo ya Ntlo",
+      "tribalClearance": "Tumelelo ya Lekgotla la Morafe",
+      "planningPermission": "Netefatso ya Tumelelo ya Rulaganyetso",
+      "rateClearance": "Phimolo ya Lekgetho le Dituelo"
+    },
+    "navigation": {
+      "home": "Gae",
+      "buy": "Reka",
+      "sell": "Rekisa",
+      "rent": "Hirisa",
+      "auctions": "Diauction",
+      "services": "Ditirelo",
+      "profile": "Profaele",
+      "myProperties": "Dintlo Tsa Me",
+      "documents": "Dikwalo"
+    }
+  }
+}

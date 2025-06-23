@@ -1,0 +1,58 @@
+You have an existing Next.js + Tailwind + TypeScript skeleton for “BeeDaB,” a Botswana-focused real-estate marketplace. Your task is to enhance it so that **every** feature from our pain-point matrix is scaffolded, well-commented and linked end-to-end (UI ↔ API ↔ DB).  
+
+1. **Analyse the repo**  
+   - Read through the current `/pages`, `/components`, `/api`, and `prisma/schema.prisma`.  
+   - Identify which modules (filters, map, chat, AI valuations, etc.) are missing or stubbed.  
+
+2. **Feature modules**  
+   - **Affordable Housing**:  
+     - Create `components/SearchFilters.tsx` with price & rent-to-own toggles.  
+     - Add `/pages/api/filters.ts` stub that returns filter options.  
+   - **Serviced Land Map**:  
+     - Add `components/ServicedMap.tsx` using Mapbox/Leaflet.  
+     - Stub `/pages/api/plots.ts` delivering geoJSON plot data.  
+   - **Direct-Seller Dashboard**:  
+     - Scaffold `pages/seller/dashboard.tsx` with listing management UI.  
+     - API stubs in `/pages/api/seller/*` for CRUD operations.  
+   - **Digital Transactions & e-Sign**:  
+     - Add `components/EstateCheckout.tsx` with DocuSign placeholder.  
+     - Stub `/pages/api/transactions.ts` with status polling.  
+   - **AI Valuations & Trends**:  
+     - Create `components/ValuationCard.tsx` and `TrendDashboard.tsx`.  
+     - Stub `/pages/api/valuation.ts` and `/pages/api/trends.ts`.  
+   - **Real-time Bilingual Chat**:  
+     - Scaffold `components/ChatWidget.tsx` (Socket.io/Pusher).  
+     - API `/pages/api/chat/[room].ts`; add i18n JSON for Setswana + English.  
+   - **Compliance & Bank Integration**:  
+     - Add `components/ComplianceGuide.tsx`; `components/BankPreApproval.tsx`.  
+     - Stub `/pages/api/compliance.ts` and `/pages/api/bank-connect.ts`.  
+   - **Document Management**:  
+     - Add `components/DocumentUploader.tsx` with drag-and-drop.  
+     - Stub `/pages/api/documents.ts` for upload/list.  
+
+3. **Database schema**  
+   - Update `prisma/schema.prisma` to include models:  
+     - User, Listing, Plot, Transaction, Message, Valuation, Document, Alert.  
+   - Generate migration stub and example `prisma.seed.ts`.  
+
+4. **Wiring & Comments**  
+   - In every new file, insert clear `// TODO: implement X` and `/** Feature: Y — how it addresses pain point Z */`.  
+   - Show code diffs in markdown fenced blocks (e.g. `diff --git a/... b/...`).  
+
+5. **README & docs**  
+   - Append “Features” section with usage instructions for each module.  
+   - Add setup commands for Mapbox key, DocuSign stub, Prisma migrate & seed, chat server.  
+
+6. **Testing hooks**  
+   - For each API stub, generate one Jest test in `__tests__/*.test.ts`.  
+   - Add cURL examples in README.  
+
+**Deliverable:**  
+A single markdown response containing:  
+1. A bullet-list of the files added/updated.  
+2. Fenced-code diffs for each change.  
+3. Snippets for key components & API stubs with comments.  
+4. Updated `prisma/schema.prisma` model definitions.  
+5. README additions.
+
+Apply these enhancements automatically so I can review, merge, and start fleshing out the real logic.  
