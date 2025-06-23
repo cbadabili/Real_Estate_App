@@ -261,8 +261,8 @@ const CreateListingPage = () => {
                       )}
                     </div>
 
-                    {/* Plot Size - Show for Farm and House */}
-                    {(watchedPropertyType === 'farm' || watchedPropertyType === 'house') && (
+                    {/* Plot Size - Show for Farm, House and Commercial */}
+                    {(watchedPropertyType === 'farm' || watchedPropertyType === 'house' || watchedPropertyType === 'commercial') && (
                       <div>
                         <label className="block text-sm font-medium text-neutral-700 mb-2">
                           Plot Size *
@@ -285,7 +285,7 @@ const CreateListingPage = () => {
                               <option value="sqm">Square Meters</option>
                             </select>
                           )}
-                          {watchedPropertyType === 'house' && (
+                          {(watchedPropertyType === 'house' || watchedPropertyType === 'commercial') && (
                             <span className="px-4 py-3 bg-neutral-100 border border-neutral-300 rounded-lg text-neutral-600">
                               sqm
                             </span>
@@ -297,8 +297,8 @@ const CreateListingPage = () => {
                       </div>
                     )}
 
-                    {/* Building Size - Show for House, Apartment and Townhouse */}
-                    {(watchedPropertyType === 'house' || watchedPropertyType === 'apartment' || watchedPropertyType === 'townhouse') && (
+                    {/* Building Size - Show for House, Apartment, Townhouse and Commercial */}
+                    {(watchedPropertyType === 'house' || watchedPropertyType === 'apartment' || watchedPropertyType === 'townhouse' || watchedPropertyType === 'commercial') && (
                       <div>
                         <label className="block text-sm font-medium text-neutral-700 mb-2">
                           Building Size *
@@ -426,6 +426,59 @@ const CreateListingPage = () => {
                               <span className="text-sm text-neutral-700">{amenity}</span>
                             </label>
                           ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Commercial-specific fields */}
+                    {watchedPropertyType === 'commercial' && (
+                      <div className="space-y-4">
+                        <div>
+                          <label className="block text-sm font-medium text-neutral-700 mb-2">
+                            Zoning Type
+                          </label>
+                          <select
+                            {...register('zoningType')}
+                            className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent transition-all"
+                          >
+                            <option value="">Select zoning type</option>
+                            <option value="industrial">Industrial</option>
+                            <option value="retail">Retail</option>
+                            <option value="office">Office</option>
+                            <option value="mixed-use">Mixed-Use</option>
+                            <option value="warehouse">Warehouse</option>
+                          </select>
+                        </div>
+                        
+                        <div>
+                          <label className="block text-sm font-medium text-neutral-700 mb-2">
+                            Number of Units
+                          </label>
+                          <input
+                            type="number"
+                            {...register('numberOfUnits')}
+                            className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent transition-all"
+                            placeholder="e.g., 10 for shopping complex"
+                          />
+                        </div>
+                        
+                        <div>
+                          <label className="block text-sm font-medium text-neutral-700 mb-2">
+                            Commercial Amenities
+                          </label>
+                          <div className="grid grid-cols-2 gap-3">
+                            {['Parking Bays', 'Loading Docks', 'Elevators/Lifts', 'Security System', 'Generator Backup', 'Air Conditioning'].map((amenity) => (
+                              <label key={amenity} className="flex items-center space-x-2 cursor-pointer">
+                                <input
+                                  type="checkbox"
+                                  {...register('commercialAmenities')}
+                                  value={amenity}
+                                  className="rounded border-neutral-300 text-beedab-blue focus:ring-beedab-blue"
+                                />
+                                <span className="text-sm text-neutral-700">{amenity}</span>
+                              </label>
+                            ))}
+                          </div>
                         </div>
                       </div>
                     )}
