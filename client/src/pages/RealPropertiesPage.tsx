@@ -122,7 +122,7 @@ const RealPropertiesPage = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between space-y-4 lg:space-y-0">
             <div>
-              <h1 className="text-3xl font-bold text-neutral-900">Real Properties</h1>
+              <h1 className="text-3xl font-bold text-neutral-900">Properties</h1>
               <p className="text-neutral-600 mt-1">
                 {properties ? `${properties.length} properties found` : 'Loading properties...'}
               </p>
