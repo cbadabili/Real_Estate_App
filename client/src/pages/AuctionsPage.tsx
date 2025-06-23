@@ -237,8 +237,8 @@ const AuctionsPage = () => {
               </div>
               <div className="bg-white/20 backdrop-blur-sm p-4 rounded-lg border border-white/30">
                 <Users className="h-6 w-6 text-white mx-auto mb-2" />
-                <div className="text-2xl font-bold text-white">FNB</div>
-                <div className="text-sm text-blue-100">Authorized Bank</div>
+                <div className="text-2xl font-bold text-white">5+</div>
+                <div className="text-sm text-blue-100">Authorized Banks</div>
               </div>
             </div>
             
@@ -262,8 +262,9 @@ const AuctionsPage = () => {
             <div>
               <h3 className="font-bold text-beedab-blue mb-1">Important Auction Information</h3>
               <p className="text-beedab-blue/80 text-sm">
-                Each successful bidder will be required to pay 12.5% of the bid price on the date of the sale. 
+                Deposit requirements vary by auction house (typically 10-15% of bid price). 
                 All properties are sold "as is" and subject to the terms and conditions of the respective auction houses.
+                Verify specific requirements with each auctioneer before bidding.
               </p>
             </div>
           </div>
