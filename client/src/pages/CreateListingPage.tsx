@@ -325,9 +325,8 @@ const CreateListingPage = () => {
                               className="px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
                             >
                               <option value="">Unit</option>
-                              <option value="hectares">Hectares</option>
-                              <option value="acres">Acres</option>
-                              <option value="sqm">Square Meters</option>
+                              <option value="hectares">Hectares (ha)</option>
+                              <option value="sqm">Square Meters (sqm)</option>
                             </select>
                           )}
                           {(watchedPropertyType === 'house' || watchedPropertyType === 'commercial') && (
@@ -548,18 +547,63 @@ const CreateListingPage = () => {
                         
                         <div>
                           <label className="block text-sm font-medium text-neutral-700 mb-2">
-                            Water Source
+                            Water Access
                           </label>
                           <div className="grid grid-cols-2 gap-3">
-                            {['Borehole', 'River Access', 'Municipal Water', 'Dam/Reservoir'].map((source) => (
-                              <label key={source} className="flex items-center space-x-2 cursor-pointer">
+                            {['Borehole', 'River', 'Dam', 'Irrigation'].map((water) => (
+                              <label key={water} className="flex items-center space-x-2 cursor-pointer">
                                 <input
                                   type="checkbox"
-                                  {...register('waterSources')}
-                                  value={source}
+                                  {...register('waterAccess')}
+                                  value={water}
                                   className="rounded border-neutral-300 text-beedab-blue focus:ring-beedab-blue"
                                 />
-                                <span className="text-sm text-neutral-700">{source}</span>
+                                <span className="text-sm text-neutral-700">{water}</span>
+                              </label>
+                            ))}
+                          </div>
+                        </div>
+                        
+                        <div>
+                          <label className="block text-sm font-medium text-neutral-700 mb-2">
+                            Fencing
+                          </label>
+                          <div className="flex gap-4">
+                            <label className="flex items-center space-x-2 cursor-pointer">
+                              <input
+                                type="radio"
+                                {...register('fencing')}
+                                value="yes"
+                                className="text-beedab-blue focus:ring-beedab-blue"
+                              />
+                              <span className="text-sm text-neutral-700">Yes</span>
+                            </label>
+                            <label className="flex items-center space-x-2 cursor-pointer">
+                              <input
+                                type="radio"
+                                {...register('fencing')}
+                                value="no"
+                                className="text-beedab-blue focus:ring-beedab-blue"
+                              />
+                              <span className="text-sm text-neutral-700">No</span>
+                            </label>
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-neutral-700 mb-2">
+                            Buildings/Structures
+                          </label>
+                          <div className="grid grid-cols-2 gap-3">
+                            {['Barns', 'Housing', 'Storage', 'Equipment Shed', 'Greenhouse', 'Processing Facility'].map((building) => (
+                              <label key={building} className="flex items-center space-x-2 cursor-pointer">
+                                <input
+                                  type="checkbox"
+                                  {...register('farmBuildings')}
+                                  value={building}
+                                  className="rounded border-neutral-300 text-beedab-blue focus:ring-beedab-blue"
+                                />
+                                <span className="text-sm text-neutral-700">{building}</span>
                               </label>
                             ))}
                           </div>
