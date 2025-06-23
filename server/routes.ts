@@ -382,6 +382,67 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Services API endpoints
+  app.get("/api/services/providers", async (req, res) => {
+    try {
+      const filters = {
+        category: req.query.category as string,
+        city: req.query.city as string,
+        verified: req.query.verified === 'true' ? true : req.query.verified === 'false' ? false : undefined,
+        featured: req.query.featured === 'true' ? true : req.query.featured === 'false' ? false : undefined,
+        reacCertified: req.query.reacCertified === 'true' ? true : req.query.reacCertified === 'false' ? false : undefined,
+        minRating: req.query.minRating ? parseFloat(req.query.minRating as string) : undefined,
+        limit: req.query.limit ? parseInt(req.query.limit as string) : undefined,
+        offset: req.query.offset ? parseInt(req.query.offset as string) : undefined,
+        sortBy: req.query.sortBy as 'rating' | 'reviewCount' | 'name' | 'newest',
+        sortOrder: req.query.sortOrder as 'asc' | 'desc'
+      };
+
+      const providers = await servicesStorage.getServiceProviders(filters);
+      res.json(providers);
+    } catch (error) {
+      console.error("Get service providers error:", error);
+      res.status(500).json({ message: "Failed to fetch service providers" });
+    }
+  });
+
+  app.get("/api/services/categories", async (req, res) => {
+    try {
+      const categories = await servicesStorage.getServiceCategories();
+      res.json(categories);
+    } catch (error) {
+      console.error("Get service categories error:", error);
+      res.status(500).json({ message: "Failed to fetch service categories" });
+    }
+  });
+
+  app.get("/api/services/providers/:id", async (req, res) => {
+    try {
+      const providerId = parseInt(req.params.id);
+      const provider = await servicesStorage.getServiceProvider(providerId);
+      
+      if (!provider) {
+        return res.status(404).json({ message: "Service provider not found" });
+      }
+
+      res.json(provider);
+    } catch (error) {
+      console.error("Get service provider error:", error);
+      res.status(500).json({ message: "Failed to fetch service provider" });
+    }
+  });
+
+  app.get("/api/services/providers/category/:category", async (req, res) => {
+    try {
+      const category = req.params.category;
+      const providers = await servicesStorage.getServiceProvidersByCategory(category);
+      res.json(providers);
+    } catch (error) {
+      console.error("Get providers by category error:", error);
+      res.status(500).json({ message: "Failed to fetch providers by category" });
+    }
+  });
+
   // Mortgage calculator API
   app.post("/api/mortgage/calculate", async (req, res) => {
     try {
