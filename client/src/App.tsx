@@ -27,6 +27,7 @@ import AgentDashboard from './pages/AgentDashboard';
 import MyPropertiesPage from './pages/MyPropertiesPage';
 import TestAPIPage from './pages/TestAPIPage';
 import DashboardPage from './pages/DashboardPage';
+import AuctionsPage from './pages/AuctionsPage';
 import { AuthProvider } from './contexts/AuthContext';
 import { PropertyProvider } from './contexts/PropertyContext';
 
@@ -60,6 +61,7 @@ function App() {
             <Route path="/services/financing" element={<FinancingPage />} />
             <Route path="/buyer-journey/planning" element={<PlanningPage />} />
             <Route path="/buyer-journey/searching" element={<SearchingPage />} />
+            <Route path="/auctions" element={<AuctionsPage />} />
             <Route path="/test-api" element={<TestAPIPage />} />
           </Routes>
         </div>
