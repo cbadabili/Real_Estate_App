@@ -44,7 +44,6 @@ const Navbar = () => {
   ];
 
   const postDropdownNavigation = [
-    { name: 'My Properties', href: '/dashboard', icon: Building },
     { name: 'Auctions', href: '/auctions', icon: Handshake },
     { name: 'Services', href: '/services', icon: Users },
   ];
@@ -632,6 +631,14 @@ const Navbar = () => {
                         <p className="text-xs text-neutral-500">{user.email}</p>
                       </div>
                       <Link
+                        to="/dashboard"
+                        className="flex items-center px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100"
+                        onClick={() => setProfileDropdownOpen(false)}
+                      >
+                        <Building className="h-4 w-4 mr-2" />
+                        My Properties
+                      </Link>
+                      <Link
                         to="/profile"
                         className="flex items-center px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100"
                         onClick={() => setProfileDropdownOpen(false)}
@@ -773,6 +780,13 @@ const Navbar = () => {
               {user ? (
                 <div className="px-3 py-2 border-t border-neutral-100">
                   <p className="text-xs font-medium text-neutral-500 mb-2">ACCOUNT</p>
+                  <Link
+                    to="/dashboard"
+                    onClick={() => setIsOpen(false)}
+                    className="block px-3 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
+                  >
+                    My Properties
+                  </Link>
                   <Link
                     to="/profile"
                     onClick={() => setIsOpen(false)}
