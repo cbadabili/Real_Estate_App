@@ -32,5 +32,10 @@ export const useMortgageCalculator = () => {
       
       return response.json();
     },
+    onSuccess: () => {
+      // Trigger contextual ad for mortgage calculation
+      const event = new CustomEvent('mortgageCalculated');
+      window.dispatchEvent(event);
+    }
   });
 };

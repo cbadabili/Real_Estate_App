@@ -596,12 +596,17 @@ const CreatePropertyPage = () => {
                   </button>
                 </div>
                 
+                {/* Always show contextual ad for testing */}
+                <ContextualAd 
+                  trigger="post_photo_upload" 
+                  className="mt-4"
+                  onClose={() => setShowPhotoAd(false)}
+                />
+                
                 {showPhotoAd && (
-                  <ContextualAd 
-                    trigger="post_photo_upload" 
-                    className="mt-4"
-                    onClose={() => setShowPhotoAd(false)}
-                  />
+                  <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <p className="text-sm text-blue-800">Photo upload completed! Consider professional photography services.</p>
+                  </div>
                 )}
               </div>
             </motion.div>
@@ -769,12 +774,17 @@ const CreatePropertyPage = () => {
               </div>
 
               {/* Contextual Ad after submission */}
+              {/* Always show legal services ad for testing */}
+              <ContextualAd 
+                trigger="property_listing_created" 
+                className="mt-4"
+                onClose={() => setShowListingAd(false)}
+              />
+              
               {showListingAd && (
-                <ContextualAd 
-                  trigger="property_listing_created" 
-                  className="mt-4"
-                  onClose={() => setShowListingAd(false)}
-                />
+                <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+                  <p className="text-sm text-green-800">Listing created successfully! Consider legal review services.</p>
+                </div>
               )}
             </motion.div>
           )}

@@ -37,17 +37,15 @@ export const ContextualAd: React.FC<ContextualAdProps> = ({
   const [hasBeenShown, setHasBeenShown] = useState(false);
 
   useEffect(() => {
-    // Check if this ad has already been shown in this session
-    const shownAds = JSON.parse(sessionStorage.getItem('shownContextualAds') || '[]');
-    if (shownAds.includes(trigger)) {
-      return;
-    }
-
+    // For testing, don't check session storage initially
     const fetchAd = async () => {
       try {
+        console.log('Fetching ad for trigger:', trigger);
         const response = await fetch(`/api/ads/contextual/${trigger}`);
+        console.log('Ad response status:', response.status);
         if (response.ok) {
           const adData = await response.json();
+          console.log('Ad data received:', adData);
           setAd(adData);
           setIsVisible(true);
           

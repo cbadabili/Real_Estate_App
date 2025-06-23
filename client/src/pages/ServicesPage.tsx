@@ -81,7 +81,10 @@ const ServicesPage = () => {
       const response = await fetch('/api/services/categories');
       if (response.ok) {
         const data = await response.json();
+        console.log('Categories fetched:', data);
         setCategories(['all', ...data]);
+      } else {
+        console.error('Failed to fetch categories:', response.status);
       }
     } catch (error) {
       console.error('Failed to fetch categories:', error);
@@ -93,7 +96,10 @@ const ServicesPage = () => {
       const response = await fetch('/api/services/providers');
       if (response.ok) {
         const data = await response.json();
+        console.log('Providers fetched:', data.length, 'providers');
         setProviders(data);
+      } else {
+        console.error('Failed to fetch providers:', response.status);
       }
     } catch (error) {
       console.error('Failed to fetch providers:', error);
@@ -224,8 +230,37 @@ const ServicesPage = () => {
           </h3>
         </div>
 
+        {/* Debug Info */}
+        <div className="mb-4 p-3 bg-gray-100 rounded text-sm">
+          <p>Categories: {categories.length} | Providers: {providers.length} | Filtered: {filteredProviders.length}</p>
+          <p>Selected Category: {selectedCategory} | Search: "{searchTerm}"</p>
+        </div>
+
         {/* Service Providers Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {!loading && filteredProviders.length === 0 && (
+            <div className="col-span-full text-center py-12">
+              <div className="text-gray-400 mb-4">
+                <Building className="h-16 w-16 mx-auto" />
+              </div>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">No services found</h3>
+              <p className="text-gray-600">
+                {searchTerm || selectedCategory !== 'all' 
+                  ? 'Try adjusting your search or category filter.'
+                  : 'Service providers will appear here once they are added.'}
+              </p>
+              <button 
+                onClick={() => {
+                  setLoading(true);
+                  fetchProviders();
+                }} 
+                className="mt-4 bg-beedab-blue text-white px-4 py-2 rounded-lg"
+              >
+                Reload Services
+              </button>
+            </div>
+          )}
+          
           {filteredProviders.map((provider, index) => (
             <motion.div
               key={provider.id}
