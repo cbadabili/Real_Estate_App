@@ -303,6 +303,20 @@ const Navbar = () => {
                         </Link>
                         
                         <Link
+                          to="/create-listing"
+                          className="block px-4 py-2 text-sm text-neutral-700 hover:bg-beedab-blue/5 rounded mb-2"
+                          onClick={() => setSellDropdownOpen(false)}
+                        >
+                          <div className="flex items-center">
+                            <PlusCircle className="h-4 w-4 mr-2 text-beedab-blue" />
+                            <div>
+                              <div className="font-medium">Create Listing</div>
+                              <div className="text-xs text-gray-500">List your property now</div>
+                            </div>
+                          </div>
+                        </Link>
+                        
+                        <Link
                           to="/agent-network"
                           className="block px-4 py-3 text-sm text-neutral-700 hover:bg-gray-50 rounded border border-gray-200 mb-3"
                           onClick={() => setSellDropdownOpen(false)}
