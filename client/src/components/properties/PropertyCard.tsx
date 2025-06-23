@@ -30,7 +30,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, viewMode = 'grid'
     >
       <div className={`relative ${isListView ? 'w-1/3' : ''}`}>
         <img 
-          src={property.images[0]} 
+          src={property.images ? (typeof property.images === 'string' ? JSON.parse(property.images)[0] : property.images[0]) : 'https://images.pexels.com/photos/106399/pexels-photo-106399.jpeg?auto=compress&cs=tinysrgb&w=800'} 
           alt={property.title}
           className={`object-cover ${isListView ? 'w-full h-full' : 'w-full h-48'}`}
         />
@@ -38,13 +38,13 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, viewMode = 'grid'
         {/* Status Badge */}
         <div className="absolute top-3 left-3">
           <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-            property.listingType === 'fsbo' 
+            property.listingType === 'owner' 
               ? 'bg-accent-100 text-accent-800' 
               : property.status === 'new'
               ? 'bg-success-100 text-success-800'
               : 'bg-beedab-lightblue text-beedab-darkblue'
           }`}>
-            {property.status === 'new' ? 'New Listing' : property.listingType.toUpperCase()}
+            {property.status === 'new' ? 'New Listing' : (property.listingType === 'owner' ? 'OWNER' : 'AGENT')}
           </span>
         </div>
         
@@ -68,7 +68,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, viewMode = 'grid'
         
         {/* Image Count Indicator */}
         <div className="absolute bottom-3 right-3 bg-black/70 text-white text-xs px-2 py-1 rounded-full">
-          {property.images.length} photos
+          {property.images ? (typeof property.images === 'string' ? JSON.parse(property.images).length : property.images.length) : 1} photos
         </div>
       </div>
       
@@ -88,7 +88,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, viewMode = 'grid'
                 </Link>
                 <p className="text-neutral-600 flex items-center text-sm">
                   <MapPin className="h-4 w-4 mr-1 flex-shrink-0" />
-                  {property.location}
+                  {property.location || `${property.city}, ${property.state}`}
                 </p>
               </div>
               {!isListView && (
@@ -120,10 +120,10 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, viewMode = 'grid'
             </div>
             
             {/* Features */}
-            {property.features && property.features.length > 0 && (
+            {property.features && (
               <div className="mb-4">
                 <div className="flex flex-wrap gap-2">
-                  {property.features.slice(0, 3).map((feature: string, index: number) => (
+                  {(typeof property.features === 'string' ? JSON.parse(property.features) : property.features).slice(0, 3).map((feature: string, index: number) => (
                     <span 
                       key={index}
                       className="px-2 py-1 bg-neutral-100 text-neutral-700 text-xs rounded-full"
@@ -131,9 +131,9 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, viewMode = 'grid'
                       {feature}
                     </span>
                   ))}
-                  {property.features.length > 3 && (
+                  {(typeof property.features === 'string' ? JSON.parse(property.features) : property.features).length > 3 && (
                     <span className="px-2 py-1 bg-neutral-100 text-neutral-700 text-xs rounded-full">
-                      +{property.features.length - 3} more
+                      +{(typeof property.features === 'string' ? JSON.parse(property.features) : property.features).length - 3} more
                     </span>
                   )}
                 </div>
@@ -145,20 +145,12 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, viewMode = 'grid'
               <div className="flex items-center space-x-4 text-sm text-neutral-500">
                 <div className="flex items-center">
                   <Eye className="h-4 w-4 mr-1" />
-                  {property.views} views
+                  {property.views || 0} views
                 </div>
                 <div className="flex items-center">
                   <Calendar className="h-4 w-4 mr-1" />
-                  {property.daysOnMarket} days
+                  Listed {new Date(property.createdAt || Date.now()).toLocaleDateString()}
                 </div>
-                {property.priceChange && (
-                  <div className={`flex items-center ${
-                    property.priceChange > 0 ? 'text-error-600' : 'text-success-600'
-                  }`}>
-                    <TrendingUp className="h-4 w-4 mr-1" />
-                    {property.priceChange > 0 ? '+' : ''}P{Math.abs(property.priceChange).toLocaleString()}
-                  </div>
-                )}
               </div>
               
               {!isListView && (
