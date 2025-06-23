@@ -84,154 +84,160 @@ const Navbar = () => {
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
-                    className="absolute top-full left-0 mt-2 w-72 bg-white rounded-md shadow-lg border border-neutral-200 z-50"
+                    className="absolute top-full left-0 mt-2 w-[600px] bg-white rounded-md shadow-lg border border-neutral-200 z-50"
                   >
-                    <div className="p-3">
-                      <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide px-2 py-1">Property Types</div>
-                      <Link
-                        to="/properties?type=house"
-                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
-                        onClick={() => setSellDropdownOpen(false)}
-                      >
-                        <div className="flex items-center">
-                          <Home className="h-4 w-4 mr-2 text-beedab-blue" />
-                          <div>
-                            <div className="font-medium">Houses</div>
-                            <div className="text-xs text-gray-500">Family homes & residential properties</div>
+                    <div className="p-3 flex">
+                      {/* Left Column - Property Types */}
+                      <div className="w-1/2 pr-3">
+                        <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide px-2 py-1">Property Types</div>
+                        <Link
+                          to="/properties?type=house"
+                          className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
+                          onClick={() => setBuyDropdownOpen(false)}
+                        >
+                          <div className="flex items-center">
+                            <Home className="h-4 w-4 mr-2 text-beedab-blue" />
+                            <div>
+                              <div className="font-medium">Houses</div>
+                              <div className="text-xs text-gray-500">Family homes & residential properties</div>
+                            </div>
                           </div>
-                        </div>
-                      </Link>
-                      
-                      <Link
-                        to="/properties?type=apartment"
-                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
-                        onClick={() => setSellDropdownOpen(false)}
-                      >
-                        <div className="flex items-center">
-                          <Building2 className="h-4 w-4 mr-2 text-beedab-blue" />
-                          <div>
-                            <div className="font-medium">Apartments</div>
-                            <div className="text-xs text-gray-500">Flats & apartment units</div>
+                        </Link>
+                        
+                        <Link
+                          to="/properties?type=apartment"
+                          className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
+                          onClick={() => setBuyDropdownOpen(false)}
+                        >
+                          <div className="flex items-center">
+                            <Building2 className="h-4 w-4 mr-2 text-beedab-blue" />
+                            <div>
+                              <div className="font-medium">Apartments</div>
+                              <div className="text-xs text-gray-500">Flats & apartment units</div>
+                            </div>
                           </div>
-                        </div>
-                      </Link>
-                      
-                      <Link
-                        to="/properties?type=townhouse"
-                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
-                        onClick={() => setSellDropdownOpen(false)}
-                      >
-                        <div className="flex items-center">
-                          <Building className="h-4 w-4 mr-2 text-beedab-blue" />
-                          <div>
-                            <div className="font-medium">Townhouses</div>
-                            <div className="text-xs text-gray-500">Multi-level attached homes</div>
+                        </Link>
+                        
+                        <Link
+                          to="/properties?type=townhouse"
+                          className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
+                          onClick={() => setBuyDropdownOpen(false)}
+                        >
+                          <div className="flex items-center">
+                            <Building className="h-4 w-4 mr-2 text-beedab-blue" />
+                            <div>
+                              <div className="font-medium">Townhouses</div>
+                              <div className="text-xs text-gray-500">Multi-level attached homes</div>
+                            </div>
                           </div>
-                        </div>
-                      </Link>
-                      <Link
-                        to="/properties?type=land"
-                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
-                        onClick={() => setSellDropdownOpen(false)}
-                      >
-                        <div className="flex items-center">
-                          <MapPin className="h-4 w-4 mr-2 text-beedab-blue" />
-                          <div>
-                            <div className="font-medium">Land for Development</div>
-                            <div className="text-xs text-gray-500">Build your dream property</div>
+                        </Link>
+                        
+                        <Link
+                          to="/properties?type=land"
+                          className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
+                          onClick={() => setBuyDropdownOpen(false)}
+                        >
+                          <div className="flex items-center">
+                            <MapPin className="h-4 w-4 mr-2 text-beedab-blue" />
+                            <div>
+                              <div className="font-medium">Land for Development</div>
+                              <div className="text-xs text-gray-500">Build your dream property</div>
+                            </div>
                           </div>
-                        </div>
-                      </Link>
+                        </Link>
+                      </div>
                       
-                      <div className="border-t border-gray-100 my-2"></div>
-                      <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide px-2 py-1">Buyer Journey</div>
-                      
-                      <Link
-                        to="/buyer-journey/planning"
-                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
-                        onClick={() => setSellDropdownOpen(false)}
-                      >
-                        <div className="flex items-center">
-                          <Building className="h-4 w-4 mr-2 text-green-500" />
-                          <div>
-                            <div className="font-medium">Planning & Budgeting</div>
-                            <div className="text-xs text-gray-500">Calculate affordability & get pre-approved</div>
+                      {/* Right Column - Buyer Journey & Professional Services */}
+                      <div className="w-1/2 pl-3 border-l border-gray-100">
+                        <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide px-2 py-1">Buyer Journey</div>
+                        
+                        <Link
+                          to="/buyer-journey/planning"
+                          className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
+                          onClick={() => setBuyDropdownOpen(false)}
+                        >
+                          <div className="flex items-center">
+                            <Building className="h-4 w-4 mr-2 text-green-500" />
+                            <div>
+                              <div className="font-medium">Planning & Budgeting</div>
+                              <div className="text-xs text-gray-500">Calculate affordability & get pre-approved</div>
+                            </div>
                           </div>
-                        </div>
-                      </Link>
-                      
-                      <Link
-                        to="/buyer-journey/searching"
-                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
-                        onClick={() => setSellDropdownOpen(false)}
-                      >
-                        <div className="flex items-center">
-                          <MapPin className="h-4 w-4 mr-2 text-blue-500" />
-                          <div>
-                            <div className="font-medium">Property Search</div>
-                            <div className="text-xs text-gray-500">Find your perfect home with AI assistance</div>
+                        </Link>
+                        
+                        <Link
+                          to="/buyer-journey/searching"
+                          className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
+                          onClick={() => setBuyDropdownOpen(false)}
+                        >
+                          <div className="flex items-center">
+                            <MapPin className="h-4 w-4 mr-2 text-blue-500" />
+                            <div>
+                              <div className="font-medium">Property Search</div>
+                              <div className="text-xs text-gray-500">Find your perfect home with AI assistance</div>
+                            </div>
                           </div>
-                        </div>
-                      </Link>
-                      
-                      <Link
-                        to="/buyer-journey/viewing"
-                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
-                        onClick={() => setSellDropdownOpen(false)}
-                      >
-                        <div className="flex items-center">
-                          <Building className="h-4 w-4 mr-2 text-purple-500" />
-                          <div>
-                            <div className="font-medium">Viewing & Evaluation</div>
-                            <div className="text-xs text-gray-500">Schedule viewings & neighborhood insights</div>
+                        </Link>
+                        
+                        <Link
+                          to="/buyer-journey/viewing"
+                          className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
+                          onClick={() => setBuyDropdownOpen(false)}
+                        >
+                          <div className="flex items-center">
+                            <Building className="h-4 w-4 mr-2 text-purple-500" />
+                            <div>
+                              <div className="font-medium">Viewing & Evaluation</div>
+                              <div className="text-xs text-gray-500">Schedule viewings & neighborhood insights</div>
+                            </div>
                           </div>
-                        </div>
-                      </Link>
-                      
-                      <Link
-                        to="/buyer-journey/offers"
-                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
-                        onClick={() => setSellDropdownOpen(false)}
-                      >
-                        <div className="flex items-center">
-                          <Building className="h-4 w-4 mr-2 text-orange-500" />
-                          <div>
-                            <div className="font-medium">Making Offers</div>
-                            <div className="text-xs text-gray-500">Negotiate & secure your property</div>
+                        </Link>
+                        
+                        <Link
+                          to="/buyer-journey/offers"
+                          className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
+                          onClick={() => setBuyDropdownOpen(false)}
+                        >
+                          <div className="flex items-center">
+                            <Building className="h-4 w-4 mr-2 text-orange-500" />
+                            <div>
+                              <div className="font-medium">Making Offers</div>
+                              <div className="text-xs text-gray-500">Negotiate & secure your property</div>
+                            </div>
                           </div>
-                        </div>
-                      </Link>
-                      
-                      <div className="border-t border-gray-100 my-2"></div>
-                      <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide px-2 py-1">Professional Services</div>
-                      
-                      <Link
-                        to="/services/legal"
-                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
-                        onClick={() => setSellDropdownOpen(false)}
-                      >
-                        <div className="flex items-center">
-                          <Building className="h-4 w-4 mr-2 text-beedab-blue" />
-                          <div>
-                            <div className="font-medium">Legal Services</div>
-                            <div className="text-xs text-gray-500">Lawyers & conveyancing experts</div>
+                        </Link>
+                        
+                        <div className="border-t border-gray-100 my-2"></div>
+                        <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide px-2 py-1">Professional Services</div>
+                        
+                        <Link
+                          to="/services/legal"
+                          className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
+                          onClick={() => setBuyDropdownOpen(false)}
+                        >
+                          <div className="flex items-center">
+                            <Building className="h-4 w-4 mr-2 text-beedab-blue" />
+                            <div>
+                              <div className="font-medium">Legal Services</div>
+                              <div className="text-xs text-gray-500">Lawyers & conveyancing experts</div>
+                            </div>
                           </div>
-                        </div>
-                      </Link>
-                      
-                      <Link
-                        to="/services/financing"
-                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
-                        onClick={() => setSellDropdownOpen(false)}
-                      >
-                        <div className="flex items-center">
-                          <Building className="h-4 w-4 mr-2 text-beedab-blue" />
-                          <div>
-                            <div className="font-medium">Financing Options</div>
-                            <div className="text-xs text-gray-500">Banks & mortgage advisors</div>
+                        </Link>
+                        
+                        <Link
+                          to="/services/financing"
+                          className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
+                          onClick={() => setBuyDropdownOpen(false)}
+                        >
+                          <div className="flex items-center">
+                            <Building className="h-4 w-4 mr-2 text-beedab-blue" />
+                            <div>
+                              <div className="font-medium">Financing Options</div>
+                              <div className="text-xs text-gray-500">Banks & mortgage advisors</div>
+                            </div>
                           </div>
-                        </div>
-                      </Link>
+                        </Link>
+                      </div>
                     </div>
                   </motion.div>
                 )}
