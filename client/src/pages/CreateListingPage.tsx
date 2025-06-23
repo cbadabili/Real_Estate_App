@@ -9,7 +9,11 @@ import {
   Camera,
   X,
   Plus,
-  Check
+  Check,
+  Building2,
+  Store,
+  Tractor,
+  Mountain
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -24,20 +28,20 @@ const CreateListingPage = () => {
   const progress = ((currentStep - 1) / (totalSteps - 1)) * 100;
 
   const propertyTypes = [
-    { value: 'house', label: 'House', icon: '🏠' },
-    { value: 'apartment', label: 'Apartment', icon: '🏢' },
-    { value: 'townhouse', label: 'Townhouse', icon: '🏘️' },
-    { value: 'commercial', label: 'Commercial', icon: '🏪' },
-    { value: 'farm', label: 'Farm', icon: '🚜' },
-    { value: 'land', label: 'Land', icon: '🏞️' }
+    { value: 'house', label: 'House', icon: Home },
+    { value: 'apartment', label: 'Apartment', icon: Building2 },
+    { value: 'townhouse', label: 'Townhouse', icon: Home },
+    { value: 'commercial', label: 'Commercial', icon: Store },
+    { value: 'farm', label: 'Farm', icon: Tractor },
+    { value: 'land', label: 'Land', icon: Mountain }
   ];
 
   const listingTypes = [
     { 
       value: 'fsbo', 
-      label: 'For Sale By Owner (FSBO)', 
+      label: 'Owner Seller', 
       description: 'Sell directly without an agent',
-      price: 'Starting at $99'
+      price: 'Starting at P99'
     },
     { 
       value: 'agent', 
@@ -226,12 +230,16 @@ const CreateListingPage = () => {
                           value={type.value}
                           className="sr-only"
                         />
-                        <div className={`border-2 rounded-xl p-4 text-center transition-colors ${
+                        <div className={`border-2 rounded-xl p-6 text-center transition-all duration-200 hover:scale-105 ${
                           watchedPropertyType === type.value 
-                            ? 'border-beedab-blue bg-beedab-blue/10' 
-                            : 'border-neutral-200 hover:border-beedab-blue/50'
+                            ? 'border-beedab-blue bg-beedab-blue/10 shadow-md' 
+                            : 'border-neutral-200 hover:border-beedab-blue/50 hover:bg-neutral-50 shadow-sm'
                         }`}>
-                          <div className="text-3xl mb-2">{type.icon}</div>
+                          <type.icon className={`w-8 h-8 mx-auto mb-3 ${
+                            watchedPropertyType === type.value 
+                              ? 'text-beedab-blue' 
+                              : 'text-neutral-600'
+                          }`} />
                           <div className="text-sm font-medium text-neutral-900">{type.label}</div>
                         </div>
                       </label>
