@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from 'wouter';
 import { motion } from 'framer-motion';
 import { 
   Heart, 
@@ -94,10 +94,10 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, viewMode = 'grid'
               {!isListView && (
                 <div className="text-right">
                   <div className="text-2xl font-bold text-beedab-darkblue">
-                    P{property.price.toLocaleString()}
+                    P{parseFloat(property.price || 0).toLocaleString()}
                   </div>
                   <div className="text-sm text-neutral-500">
-                    P{Math.round(property.price / (property.sqft || 1))}/sqm
+                    P{Math.round(parseFloat(property.price || 0) / (property.squareFeet || 1))}/sqm
                   </div>
                 </div>
               )}
@@ -115,7 +115,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, viewMode = 'grid'
               </div>
               <div className="flex items-center">
                 <Square className="h-4 w-4 mr-1" />
-                <span className="text-sm">{property.sqft.toLocaleString()} sqft</span>
+                <span className="text-sm">{(property.squareFeet || 0).toLocaleString()} sqm</span>
               </div>
             </div>
             
@@ -177,10 +177,10 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, viewMode = 'grid'
             <div className="text-right flex flex-col justify-between">
               <div>
                 <div className="text-3xl font-bold text-beedab-darkblue">
-                  P{property.price.toLocaleString()}
+                  P{parseFloat(property.price || 0).toLocaleString()}
                 </div>
                 <div className="text-sm text-neutral-500">
-                  P{Math.round(property.price / (property.sqft || 1))}/sqm
+                  P{Math.round(parseFloat(property.price || 0) / (property.squareFeet || 1))}/sqm
                 </div>
               </div>
               

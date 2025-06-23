@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { Filter, Search, Grid, List as ListIcon, SlidersHorizontal } from 'lucide-react';
 import PropertyCard from '../components/properties/PropertyCard';
 import PropertyFilters from '../components/properties/PropertyFilters';
-import { sampleProperties } from '../data/sampleData';
+import { useProperties } from '../hooks/useProperties';
 
 const PropertiesPage = () => {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
@@ -18,6 +18,8 @@ const PropertiesPage = () => {
     listingType: 'all'
   });
 
+  const { data: properties = [], isLoading } = useProperties();
+
   const sortOptions = [
     { value: 'newest', label: 'Newest First' },
     { value: 'price-low', label: 'Price: Low to High' },
@@ -26,13 +28,13 @@ const PropertiesPage = () => {
     { value: 'bedrooms', label: 'Most Bedrooms' }
   ];
 
-  const filteredProperties = sampleProperties.filter(property => {
+  const filteredProperties = properties.filter(property => {
     if (searchTerm && !property.title.toLowerCase().includes(searchTerm.toLowerCase()) &&
         !property.location.toLowerCase().includes(searchTerm.toLowerCase())) {
       return false;
     }
     
-    if (filters.propertyType !== 'all' && property.type !== filters.propertyType) {
+    if (filters.propertyType !== 'all' && property.propertyType !== filters.propertyType) {
       return false;
     }
     
@@ -40,7 +42,7 @@ const PropertiesPage = () => {
       return false;
     }
     
-    if (property.price < filters.priceRange[0] || property.price > filters.priceRange[1]) {
+    if (parseFloat(property.price) < filters.priceRange[0] || parseFloat(property.price) > filters.priceRange[1]) {
       return false;
     }
     
@@ -58,13 +60,13 @@ const PropertiesPage = () => {
   const sortedProperties = [...filteredProperties].sort((a, b) => {
     switch (sortBy) {
       case 'price-low':
-        return a.price - b.price;
+        return parseFloat(a.price) - parseFloat(b.price);
       case 'price-high':
-        return b.price - a.price;
+        return parseFloat(b.price) - parseFloat(a.price);
       case 'sqft-large':
-        return b.sqft - a.sqft;
+        return (b.squareFeet || 0) - (a.squareFeet || 0);
       case 'bedrooms':
-        return b.bedrooms - a.bedrooms;
+        return (b.bedrooms || 0) - (a.bedrooms || 0);
       default:
         return 0;
     }
@@ -166,7 +168,11 @@ const PropertiesPage = () => {
 
           {/* Properties Grid/List */}
           <div className="flex-1">
-            {sortedProperties.length === 0 ? (
+            {isLoading ? (
+              <div className="text-center py-12">
+                <div className="text-neutral-500">Loading properties...</div>
+              </div>
+            ) : sortedProperties.length === 0 ? (
               <div className="text-center py-12">
                 <div className="text-neutral-400 mb-4">
                   <Search className="h-16 w-16 mx-auto" />

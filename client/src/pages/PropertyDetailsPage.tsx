@@ -181,7 +181,7 @@ const PropertyDetailsPage = () => {
                     <Square className="h-6 w-6 text-primary-600 mr-2" />
                     <span className="text-2xl font-bold text-neutral-900">{property.sqft.toLocaleString()}</span>
                   </div>
-                  <div className="text-sm text-neutral-600">Sq Ft</div>
+                  <div className="text-sm text-neutral-600">Sq Meters</div>
                 </div>
                 <div className="text-center">
                   <div className="flex items-center justify-center mb-2">
