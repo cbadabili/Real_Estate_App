@@ -1,6 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
+import { servicesStorage } from "./services-storage";
 import { parseNaturalLanguageSearch } from './ai-search';
 import { 
   insertUserSchema, 

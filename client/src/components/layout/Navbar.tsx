@@ -46,6 +46,7 @@ const Navbar = () => {
   const postDropdownNavigation = [
     { name: 'My Properties', href: '/dashboard', icon: Building },
     { name: 'Auctions', href: '/auctions', icon: Handshake },
+    { name: 'Services', href: '/services', icon: Users },
   ];
 
   return (

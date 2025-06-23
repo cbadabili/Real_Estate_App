@@ -1,0 +1,185 @@
+We'll define the data models, the API logic, and the frontend triggers required to build this system effectively.
+
+Objective:
+To build a system that displays relevant service advertisements to users in two ways:
+
+A browsable, central Services Directory.
+Contextual Prompts that are triggered by specific user actions within the Buy/Sell/Rent flows.
+1. The Data Model (Database Schema)
+You'll need a few key tables in your database (e.g., PostgreSQL).
+
+ServiceProviders Table: Stores information about the businesses advertising.
+
+SQL
+
+CREATE TABLE ServiceProviders (
+    id SERIAL PRIMARY KEY,
+    company_name VARCHAR(255) NOT NULL,
+    service_category VARCHAR(100) NOT NULL, -- e.g., 'Photography', 'Legal', 'Moving'
+    contact_person VARCHAR(255),
+    phone_number VARCHAR(20),
+    email VARCHAR(255) UNIQUE,
+    website_url VARCHAR(255),
+    logo_url VARCHAR(255),
+    description TEXT,
+    reac_certified BOOLEAN DEFAULT FALSE, -- Real Estate Advisory Council certification
+    date_joined TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+ServiceAds Table: Stores the actual ad content linked to a provider.
+
+SQL
+
+CREATE TABLE ServiceAds (
+    id SERIAL PRIMARY KEY,
+    provider_id INT REFERENCES ServiceProviders(id),
+    ad_title VARCHAR(255) NOT NULL,
+    ad_copy TEXT, -- e.g., "Make your listing shine. Book a pro photoshoot."
+    ad_image_url VARCHAR(255),
+    target_audience VARCHAR(50) NOT NULL, -- 'Seller', 'Buyer', 'Renter', 'New_Homeowner'
+    context_trigger VARCHAR(100) UNIQUE NOT NULL -- The specific event that shows this ad
+);
+context_trigger is the magic key. It's a unique identifier for the specific event in the user journey where the ad should appear. Examples: post_photo_upload, after_mortgage_calculation, on_offer_received.
+
+2. The "Services" Tab - Central Directory Logic
+This is a standard Create-Read-Update-Delete (CRUD) feature.
+
+Backend (API Endpoints):
+
+GET /api/services/categories: Returns a list of all unique service_category values (e.g., ["Legal", "Moving", "Finance"]).
+GET /api/services/:categoryName: Returns all ServiceProviders where service_category matches categoryName.
+GET /api/service-providers/:providerId: Returns the detailed profile for a single service provider.
+Frontend (React-like Components):
+
+ServicesPage.js: Fetches categories from /api/services/categories and displays them.
+CategoryDetail.js: When a user clicks a category, it fetches providers from /api/services/:categoryName and lists them.
+ProviderProfile.js: Displays the full details of a provider, fetched from /api/service-providers/:providerId.
+This part is straightforward – it's a searchable directory.
+
+3. The Contextual Ad Engine - The "Smart" Part
+This engine doesn't need complex AI initially. It's a system of simple "if-then" logic based on user actions.
+
+Framework: Trigger -> Condition -> Action
+
+Trigger: A specific user action on the frontend (e.g., clicking a button, viewing a page).
+Condition: A check to see if an ad should be shown (e.g., is the user a seller? have they seen this ad before?).
+Action: Render the relevant ad component on the frontend.
+Implementation Logic:
+
+A. Backend - Create a "Contextual Ad" Endpoint:
+
+GET /api/ads/contextual/:triggerName
+This endpoint takes a triggerName (e.g., post_photo_upload) from the frontend.
+It looks in the ServiceAds table for an ad where context_trigger matches triggerName.
+It returns the ad content (ad_title, ad_copy, etc.) as a JSON object.
+B. Frontend - Implement Triggers and Render Components:
+
+Let's walk through two specific user journeys.
+
+User Journey 1: A Seller Uploads Photos
+Trigger: The seller successfully completes the photo upload process for their listing.
+
+Frontend Pseudo-code (PhotoUploadSuccessModal.js):
+
+JavaScript
+
+import React, { useState, useEffect } from 'react';
+
+const PhotoUploadSuccessModal = ({ user }) => {
+  const [contextualAd, setContextualAd] = useState(null);
+
+  // 1. useEffect hook runs after the component mounts (i.e., the modal appears)
+  useEffect(() => {
+    // 2. Define the trigger for this specific context
+    const trigger = 'post_photo_upload';
+
+    // 3. Make an API call to our contextual ad endpoint
+    fetch(`/api/ads/contextual/${trigger}`)
+      .then(response => response.json())
+      .then(data => {
+        // 4. Set the ad data in our state
+        setContextualAd(data);
+      })
+      .catch(error => console.error("No contextual ad found for this trigger:", error));
+  }, []); // The empty array [] means this runs only once
+
+  return (
+    <div className="modal">
+      <h2>Photos Uploaded Successfully!</h2>
+      <p>Your listing is almost ready to go live.</p>
+
+      {/* 5. Conditional Rendering: If an ad was fetched, display it. */}
+      {contextualAd && (
+        <div className="contextual-ad-container">
+          <img src={contextualAd.ad_image_url} alt="Ad" />
+          <h3>{contextualAd.ad_title}</h3>
+          <p>{contextualAd.ad_copy}</p>
+          <a href={`/services/provider/${contextualAd.provider_id}`} className="cta-button">
+            Learn More
+          </a>
+        </div>
+      )}
+    </div>
+  );
+};
+User Journey 2: A Buyer Uses the Mortgage Calculator
+Trigger: The buyer clicks the "Calculate" button on the mortgage calculator.
+
+Frontend Pseudo-code (MortgageCalculator.js):
+
+JavaScript
+
+import React, { useState } from 'react';
+import ContextualAd from './ContextualAd'; // A reusable component to display the ad
+
+const MortgageCalculator = () => {
+  const [monthlyPayment, setMonthlyPayment] = useState(0);
+  const [showBondAd, setShowBondAd] = useState(false);
+
+  const handleCalculate = () => {
+    // ... logic to calculate the monthly payment ...
+    setMonthlyPayment(calculatedValue);
+
+    // 1. The Trigger: After calculation, set a state variable to true
+    setShowBondAd(true);
+  };
+
+  return (
+    <div className="calculator-widget">
+      {/* ... calculator input fields ... */}
+      <button onClick={handleCalculate}>Calculate</button>
+
+      {monthlyPayment > 0 && (
+        <div className="results">
+          <p>Estimated Monthly Payment: P {monthlyPayment.toLocaleString()}</p>
+        </div>
+      )}
+
+      {/* 2. Conditional Rendering based on the state change */}
+      {/* The ContextualAd component will fetch the ad using the 'after_mortgage_calculation' trigger */}
+      {showBondAd && (
+        <ContextualAd trigger="after_mortgage_calculation" />
+      )}
+    </div>
+  );
+};
+
+// Reusable ContextualAd.js component
+const ContextualAd = ({ trigger }) => {
+    const [ad, setAd] = useState(null);
+
+    useEffect(() => {
+        fetch(`/api/ads/contextual/${trigger}`)
+            .then(res => res.json())
+            .then(data => setAd(data));
+    }, [trigger]);
+
+    if (!ad) return null; // Don't render anything if there's no ad
+
+    return (
+        <div className="contextual-ad-container--small">
+            <h4>{ad.ad_title}</h4>
+            <a href={`/services/provider/${ad.provider_id}`}>Get Pre-Approved</a>
+        </div>
+    );
+};
+This hybrid model gives you a robust system. The Services Directory serves users with clear intent, while the Contextual Ad Engine, driven by simple triggers and API calls, provides highly relevant, value-added prompts at the perfect moment in the user journey.

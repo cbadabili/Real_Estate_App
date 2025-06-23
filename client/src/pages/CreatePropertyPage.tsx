@@ -1,39 +1,49 @@
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useCreateProperty } from '../hooks/useProperties';
+import { 
+  Upload, 
+  Plus, 
+  X, 
+  Check, 
+  ArrowRight, 
+  ArrowLeft, 
+  MapPin, 
+  Home,
+  Camera,
+  FileText,
+  DollarSign
+} from 'lucide-react';
 import { LoadingSpinner } from '../components/ui/LoadingSpinner';
-import { Camera, MapPin, DollarSign, Home, Check, X } from 'lucide-react';
-import toast from 'react-hot-toast';
+import { useCreateProperty } from '../hooks/useProperties';
+import ContextualAd from '../components/services/ContextualAd';
 
 const propertySchema = z.object({
   title: z.string().min(1, 'Title is required'),
-  description: z.string().optional(),
-  price: z.number().min(1, 'Price must be greater than 0'),
+  description: z.string().min(10, 'Description must be at least 10 characters'),
+  price: z.number().min(1, 'Price is required'),
   address: z.string().min(1, 'Address is required'),
   city: z.string().min(1, 'City is required'),
   state: z.string().min(1, 'State is required'),
-  zipCode: z.string().min(5, 'Valid ZIP code required'),
-  propertyType: z.enum(['house', 'condo', 'townhouse', 'apartment', 'commercial', 'land']),
-  listingType: z.enum(['owner', 'agent', 'rental', 'auction']),
-  bedrooms: z.number().min(0).optional(),
-  bathrooms: z.number().min(0).optional(),
-  squareFeet: z.number().min(1).optional(),
-  yearBuilt: z.number().min(1800).max(new Date().getFullYear()).optional(),
-  ownerId: z.number().min(1, 'Owner ID is required'),
-  // Auction-specific fields
+  zipCode: z.string().min(1, 'Zip code is required'),
+  propertyType: z.string().min(1, 'Property type is required'),
+  listingType: z.string().min(1, 'Listing type is required'),
+  bedrooms: z.number().min(0),
+  bathrooms: z.number().min(0),
+  squareFeet: z.number().min(1, 'Square feet is required'),
+  yearBuilt: z.number().optional(),
+  ownerId: z.number(),
+  // Optional auction fields
   auctionDate: z.string().optional(),
   auctionTime: z.string().optional(),
-  startingBid: z.number().min(1).optional(),
-  reservePrice: z.number().min(1).optional(),
+  startingBid: z.number().optional(),
+  reservePrice: z.number().optional(),
   auctionHouse: z.string().optional(),
-  auctioneerName: z.string().optional(),
-  auctioneerContact: z.string().optional(),
-  bidIncrement: z.number().min(1).optional(),
-  depositRequired: z.number().min(0).max(100).optional(),
   lotNumber: z.string().optional(),
+  auctioneerContact: z.string().optional(),
+  depositRequired: z.number().optional(),
 });
 
 type PropertyFormData = z.infer<typeof propertySchema>;
@@ -42,11 +52,12 @@ const CreatePropertyPage = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [features, setFeatures] = useState<string[]>([]);
   const [newFeature, setNewFeature] = useState('');
+  const [showPhotoAd, setShowPhotoAd] = useState(false);
+  const [showListingAd, setShowListingAd] = useState(false);
   const totalSteps = 4;
 
   const createProperty = useCreateProperty();
   
-  // Check for URL parameters to pre-fill listing type
   const urlParams = new URLSearchParams(window.location.search);
   const initialListingType = urlParams.get('listingType') || 'owner';
 
@@ -60,7 +71,7 @@ const CreatePropertyPage = () => {
   } = useForm<PropertyFormData>({
     resolver: zodResolver(propertySchema),
     defaultValues: {
-      ownerId: 1, // Default owner ID - in real app this would come from auth
+      ownerId: 1,
       listingType: initialListingType as 'owner' | 'agent' | 'rental' | 'auction'
     }
   });
@@ -82,16 +93,14 @@ const CreatePropertyPage = () => {
     }
   };
 
-  const getFieldsForStep = (step: number): (keyof PropertyFormData)[] => {
+  const getFieldsForStep = (step: number) => {
     switch (step) {
       case 1:
         return ['title', 'description', 'propertyType', 'listingType'];
       case 2:
-        return ['address', 'city', 'state', 'zipCode'];
+        return ['price', 'address', 'city', 'state', 'zipCode'];
       case 3:
-        return ['price', 'bedrooms', 'bathrooms', 'squareFeet', 'yearBuilt'];
-      case 4:
-        return [];
+        return ['bedrooms', 'bathrooms', 'squareFeet'];
       default:
         return [];
     }
@@ -108,63 +117,90 @@ const CreatePropertyPage = () => {
     setFeatures(features.filter(f => f !== feature));
   };
 
+  const handlePhotoUpload = () => {
+    // Simulate photo upload success
+    setTimeout(() => {
+      setShowPhotoAd(true);
+    }, 1000);
+  };
+
   const onSubmit = (data: PropertyFormData) => {
     const propertyData = {
       ...data,
-      features,
-      images: [], // In real app, this would include uploaded images
-      status: 'active'
+      features: features,
+      images: [],
+      status: 'active' as const
     };
-
+    
     createProperty.mutate(propertyData, {
       onSuccess: () => {
-        toast.success('Property created successfully!');
-        // In real app, redirect to property details or listings
-      },
-      onError: (error: any) => {
-        toast.error(error.message || 'Failed to create property');
+        setShowListingAd(true);
       }
     });
   };
 
   const stepTitles = [
-    'Basic Information',
-    'Location Details',
-    'Property Specifications',
-    'Features & Review'
+    'Property Details',
+    'Location & Pricing',
+    'Property Features',
+    'Review & Submit'
   ];
 
-  const progress = (currentStep / totalSteps) * 100;
+  const stepIcons = [Home, MapPin, FileText, Check];
 
   return (
-    <div className="min-h-screen bg-neutral-50">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-neutral-900 mb-2">Create Property Listing</h1>
-          <p className="text-neutral-600">Share your property details to reach potential buyers</p>
-        </div>
-
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Progress Bar */}
         <div className="mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-sm font-medium text-neutral-700">
-              Step {currentStep} of {totalSteps}: {stepTitles[currentStep - 1]}
-            </span>
-            <span className="text-sm text-neutral-500">{Math.round(progress)}% Complete</span>
-          </div>
-          <div className="w-full bg-neutral-200 rounded-full h-2">
-            <motion.div
-              className="bg-primary-600 h-2 rounded-full"
-              initial={{ width: 0 }}
-              animate={{ width: `${progress}%` }}
-              transition={{ duration: 0.3 }}
-            />
+          <div className="flex items-center justify-between">
+            {stepTitles.map((title, index) => {
+              const stepNumber = index + 1;
+              const isActive = currentStep === stepNumber;
+              const isCompleted = currentStep > stepNumber;
+              const Icon = stepIcons[index];
+
+              return (
+                <div key={stepNumber} className="flex items-center">
+                  <div className="flex flex-col items-center">
+                    <div
+                      className={`w-12 h-12 rounded-full border-2 flex items-center justify-center transition-colors ${
+                        isCompleted
+                          ? 'bg-green-500 border-green-500 text-white'
+                          : isActive
+                          ? 'bg-beedab-blue border-beedab-blue text-white'
+                          : 'bg-white border-gray-300 text-gray-400'
+                      }`}
+                    >
+                      {isCompleted ? (
+                        <Check className="h-6 w-6" />
+                      ) : (
+                        <Icon className="h-6 w-6" />
+                      )}
+                    </div>
+                    <span
+                      className={`mt-2 text-sm font-medium ${
+                        isActive ? 'text-beedab-blue' : 'text-gray-500'
+                      }`}
+                    >
+                      {title}
+                    </span>
+                  </div>
+                  {index < stepTitles.length - 1 && (
+                    <div
+                      className={`w-16 h-0.5 mx-4 ${
+                        currentStep > stepNumber ? 'bg-green-500' : 'bg-gray-300'
+                      }`}
+                    />
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="bg-white rounded-xl shadow-lg p-8">
-          {/* Step 1: Basic Information */}
+        <form onSubmit={handleSubmit(onSubmit)} className="bg-white rounded-lg shadow-sm p-8">
+          {/* Step 1: Property Details */}
           {currentStep === 1 && (
             <motion.div
               initial={{ opacity: 0, x: 20 }}
@@ -173,6 +209,11 @@ const CreatePropertyPage = () => {
               className="space-y-6"
             >
               <div>
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">Property Details</h2>
+                <p className="text-gray-600">Tell us about your property</p>
+              </div>
+
+              <div>
                 <label className="block text-sm font-medium text-neutral-700 mb-2">
                   Property Title *
                 </label>
@@ -180,7 +221,7 @@ const CreatePropertyPage = () => {
                   {...register('title')}
                   type="text"
                   className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                  placeholder="e.g., Beautiful Family Home in Suburbia"
+                  placeholder="Beautiful 3-bedroom house in Gaborone"
                 />
                 {errors.title && (
                   <p className="mt-1 text-sm text-red-600">{errors.title.message}</p>
@@ -189,14 +230,17 @@ const CreatePropertyPage = () => {
 
               <div>
                 <label className="block text-sm font-medium text-neutral-700 mb-2">
-                  Description
+                  Description *
                 </label>
                 <textarea
                   {...register('description')}
                   rows={4}
                   className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                  placeholder="Describe your property's key features and highlights..."
+                  placeholder="Describe your property's key features, location benefits, and what makes it special..."
                 />
+                {errors.description && (
+                  <p className="mt-1 text-sm text-red-600">{errors.description.message}</p>
+                )}
               </div>
 
               <div className="grid grid-cols-2 gap-4">
@@ -208,12 +252,13 @@ const CreatePropertyPage = () => {
                     {...register('propertyType')}
                     className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   >
+                    <option value="">Select type</option>
                     <option value="house">House</option>
                     <option value="apartment">Apartment</option>
                     <option value="townhouse">Townhouse</option>
                     <option value="commercial">Commercial</option>
                     <option value="farm">Farm</option>
-                    <option value="land">Land/Lot</option>
+                    <option value="land">Land</option>
                   </select>
                   {errors.propertyType && (
                     <p className="mt-1 text-sm text-red-600">{errors.propertyType.message}</p>
@@ -233,15 +278,12 @@ const CreatePropertyPage = () => {
                     <option value="rental">Rental Property</option>
                     <option value="auction">Auction Property</option>
                   </select>
-                  {errors.listingType && (
-                    <p className="mt-1 text-sm text-red-600">{errors.listingType.message}</p>
-                  )}
                 </div>
               </div>
             </motion.div>
           )}
 
-          {/* Step 2: Location Details */}
+          {/* Step 2: Location & Pricing */}
           {currentStep === 2 && (
             <motion.div
               initial={{ opacity: 0, x: 20 }}
@@ -250,86 +292,19 @@ const CreatePropertyPage = () => {
               className="space-y-6"
             >
               <div>
-                <label className="block text-sm font-medium text-neutral-700 mb-2">
-                  Street Address *
-                </label>
-                <input
-                  {...register('address')}
-                  type="text"
-                  className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                  placeholder="123 Main Street"
-                />
-                {errors.address && (
-                  <p className="mt-1 text-sm text-red-600">{errors.address.message}</p>
-                )}
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">Location & Pricing</h2>
+                <p className="text-gray-600">Where is your property located and what's the price?</p>
               </div>
 
-              <div className="grid grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-neutral-700 mb-2">
-                    City *
-                  </label>
-                  <input
-                    {...register('city')}
-                    type="text"
-                    className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                    placeholder="Austin"
-                  />
-                  {errors.city && (
-                    <p className="mt-1 text-sm text-red-600">{errors.city.message}</p>
-                  )}
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-neutral-700 mb-2">
-                    State *
-                  </label>
-                  <input
-                    {...register('state')}
-                    type="text"
-                    className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                    placeholder="TX"
-                  />
-                  {errors.state && (
-                    <p className="mt-1 text-sm text-red-600">{errors.state.message}</p>
-                  )}
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-neutral-700 mb-2">
-                    ZIP Code *
-                  </label>
-                  <input
-                    {...register('zipCode')}
-                    type="text"
-                    className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                    placeholder="78701"
-                  />
-                  {errors.zipCode && (
-                    <p className="mt-1 text-sm text-red-600">{errors.zipCode.message}</p>
-                  )}
-                </div>
-              </div>
-            </motion.div>
-          )}
-
-          {/* Step 3: Property Specifications */}
-          {currentStep === 3 && (
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              className="space-y-6"
-            >
               <div>
                 <label className="block text-sm font-medium text-neutral-700 mb-2">
-                  Price *
+                  Price (P) *
                 </label>
                 <input
                   {...register('price', { valueAsNumber: true })}
                   type="number"
                   className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                  placeholder="650000"
+                  placeholder="850000"
                 />
                 {errors.price && (
                   <p className="mt-1 text-sm text-red-600">{errors.price.message}</p>
@@ -400,7 +375,7 @@ const CreatePropertyPage = () => {
                         {...register('auctionHouse')}
                         type="text"
                         className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                        placeholder="First National Bank of Botswana"
+                        placeholder="e.g., First National Bank, Standard Bank, Barclays"
                       />
                     </div>
                     
@@ -448,6 +423,83 @@ const CreatePropertyPage = () => {
                 </div>
               )}
 
+              <div>
+                <label className="block text-sm font-medium text-neutral-700 mb-2">
+                  Address *
+                </label>
+                <input
+                  {...register('address')}
+                  type="text"
+                  className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  placeholder="Plot 123, Block 8"
+                />
+                {errors.address && (
+                  <p className="mt-1 text-sm text-red-600">{errors.address.message}</p>
+                )}
+              </div>
+
+              <div className="grid grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-neutral-700 mb-2">
+                    City *
+                  </label>
+                  <input
+                    {...register('city')}
+                    type="text"
+                    className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    placeholder="Gaborone"
+                  />
+                  {errors.city && (
+                    <p className="mt-1 text-sm text-red-600">{errors.city.message}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-neutral-700 mb-2">
+                    State *
+                  </label>
+                  <input
+                    {...register('state')}
+                    type="text"
+                    className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    placeholder="South-East"
+                  />
+                  {errors.state && (
+                    <p className="mt-1 text-sm text-red-600">{errors.state.message}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-neutral-700 mb-2">
+                    Zip Code *
+                  </label>
+                  <input
+                    {...register('zipCode')}
+                    type="text"
+                    className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    placeholder="0000"
+                  />
+                  {errors.zipCode && (
+                    <p className="mt-1 text-sm text-red-600">{errors.zipCode.message}</p>
+                  )}
+                </div>
+              </div>
+            </motion.div>
+          )}
+
+          {/* Step 3: Property Features */}
+          {currentStep === 3 && (
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              className="space-y-6"
+            >
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">Property Features</h2>
+                <p className="text-gray-600">Specify the details and features of your property</p>
+              </div>
+
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-neutral-700 mb-2">
@@ -480,15 +532,18 @@ const CreatePropertyPage = () => {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-neutral-700 mb-2">
-                    Square Feet
+                    Square Meters *
                   </label>
                   <input
                     {...register('squareFeet', { valueAsNumber: true })}
                     type="number"
                     min="1"
                     className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                    placeholder="2400"
+                    placeholder="150"
                   />
+                  {errors.squareFeet && (
+                    <p className="mt-1 text-sm text-red-600">{errors.squareFeet.message}</p>
+                  )}
                 </div>
 
                 <div>
@@ -498,17 +553,85 @@ const CreatePropertyPage = () => {
                   <input
                     {...register('yearBuilt', { valueAsNumber: true })}
                     type="number"
-                    min="1800"
+                    min="1900"
                     max={new Date().getFullYear()}
                     className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                    placeholder="2010"
+                    placeholder="2020"
                   />
                 </div>
+              </div>
+
+              {/* Features */}
+              <div>
+                <label className="block text-sm font-medium text-neutral-700 mb-2">
+                  Property Features
+                </label>
+                <div className="flex gap-2 mb-3">
+                  <input
+                    type="text"
+                    value={newFeature}
+                    onChange={(e) => setNewFeature(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addFeature())}
+                    className="flex-1 px-4 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    placeholder="e.g., Swimming Pool, Garden, Garage"
+                  />
+                  <button
+                    type="button"
+                    onClick={addFeature}
+                    className="px-4 py-2 bg-beedab-blue text-white rounded-lg hover:bg-beedab-darkblue transition-colors"
+                  >
+                    <Plus className="h-5 w-5" />
+                  </button>
+                </div>
+                
+                <div className="flex flex-wrap gap-2">
+                  {features.map((feature, index) => (
+                    <span
+                      key={index}
+                      className="inline-flex items-center gap-2 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
+                    >
+                      {feature}
+                      <button
+                        type="button"
+                        onClick={() => removeFeature(feature)}
+                        className="text-blue-600 hover:text-blue-800"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              {/* Photo Upload Section */}
+              <div>
+                <label className="block text-sm font-medium text-neutral-700 mb-2">
+                  Property Photos
+                </label>
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                  <Camera className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                  <p className="text-gray-600 mb-4">Upload photos of your property</p>
+                  <button
+                    type="button"
+                    onClick={handlePhotoUpload}
+                    className="bg-beedab-blue text-white px-4 py-2 rounded-lg hover:bg-beedab-darkblue transition-colors"
+                  >
+                    Choose Photos
+                  </button>
+                </div>
+                
+                {showPhotoAd && (
+                  <ContextualAd 
+                    trigger="post_photo_upload" 
+                    className="mt-4"
+                    onClose={() => setShowPhotoAd(false)}
+                  />
+                )}
               </div>
             </motion.div>
           )}
 
-          {/* Step 4: Features & Review */}
+          {/* Step 4: Review & Submit */}
           {currentStep === 4 && (
             <motion.div
               initial={{ opacity: 0, x: 20 }}
@@ -517,62 +640,32 @@ const CreatePropertyPage = () => {
               className="space-y-6"
             >
               <div>
-                <label className="block text-sm font-medium text-neutral-700 mb-2">
-                  Property Features
-                </label>
-                <div className="flex space-x-2 mb-4">
-                  <input
-                    type="text"
-                    value={newFeature}
-                    onChange={(e) => setNewFeature(e.target.value)}
-                    className="flex-1 px-4 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                    placeholder="Add a feature (e.g., Hardwood Floors)"
-                    onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addFeature())}
-                  />
-                  <button
-                    type="button"
-                    onClick={addFeature}
-                    className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
-                  >
-                    Add
-                  </button>
-                </div>
-                
-                {features.length > 0 && (
-                  <div className="flex flex-wrap gap-2">
-                    {features.map((feature, index) => (
-                      <span
-                        key={index}
-                        className="inline-flex items-center px-3 py-1 bg-primary-100 text-primary-800 rounded-full text-sm"
-                      >
-                        {feature}
-                        <button
-                          type="button"
-                          onClick={() => removeFeature(feature)}
-                          className="ml-2 text-primary-600 hover:text-primary-800"
-                        >
-                          <X className="h-4 w-4" />
-                        </button>
-                      </span>
-                    ))}
-                  </div>
-                )}
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">Review & Submit</h2>
+                <p className="text-gray-600">Review your property details before submitting</p>
               </div>
 
-              {/* Review Summary */}
-              <div className="bg-neutral-50 rounded-lg p-6">
-                <h3 className="text-lg font-semibold text-neutral-900 mb-4">Review Your Listing</h3>
+              <div className="bg-gray-50 rounded-lg p-6">
+                <h3 className="text-lg font-semibold mb-4">Property Summary</h3>
                 <div className="space-y-2 text-sm">
                   <p><strong>Title:</strong> {watchedValues.title}</p>
-                  <p><strong>Type:</strong> {watchedValues.propertyType} ({watchedValues.listingType})</p>
-                  <p><strong>Location:</strong> {watchedValues.address}, {watchedValues.city}, {watchedValues.state} {watchedValues.zipCode}</p>
-                  <p><strong>Price:</strong> ${watchedValues.price?.toLocaleString()}</p>
+                  <p><strong>Type:</strong> {watchedValues.propertyType}</p>
+                  <p><strong>Listing Type:</strong> {watchedValues.listingType}</p>
+                  <p><strong>Price:</strong> P {watchedValues.price?.toLocaleString()}</p>
+                  <p><strong>Location:</strong> {watchedValues.address}, {watchedValues.city}</p>
                   {watchedValues.bedrooms && <p><strong>Bedrooms:</strong> {watchedValues.bedrooms}</p>}
                   {watchedValues.bathrooms && <p><strong>Bathrooms:</strong> {watchedValues.bathrooms}</p>}
-                  {watchedValues.squareFeet && <p><strong>Square Feet:</strong> {watchedValues.squareFeet.toLocaleString()}</p>}
+                  {watchedValues.squareFeet && <p><strong>Square Meters:</strong> {watchedValues.squareFeet.toLocaleString()}</p>}
                   {features.length > 0 && <p><strong>Features:</strong> {features.join(', ')}</p>}
                 </div>
               </div>
+
+              {showListingAd && (
+                <ContextualAd 
+                  trigger="property_listing_created" 
+                  className="mt-4"
+                  onClose={() => setShowListingAd(false)}
+                />
+              )}
             </motion.div>
           )}
 

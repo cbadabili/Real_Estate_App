@@ -228,3 +228,6 @@ export type Appointment = typeof appointments.$inferSelect;
 export type InsertAppointment = z.infer<typeof insertAppointmentSchema>;
 export type SavedProperty = typeof savedProperties.$inferSelect;
 export type InsertSavedProperty = z.infer<typeof insertSavedPropertySchema>;
+
+// Re-export services schema types for convenience
+export * from "./services-schema";
