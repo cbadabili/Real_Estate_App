@@ -17,6 +17,8 @@ const CreateListingPage = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
   const { register, handleSubmit, watch, formState: { errors } } = useForm();
+  const watchedListingType = watch('listingType');
+  const watchedPropertyType = watch('propertyType');
 
   const totalSteps = 5;
   const progress = ((currentStep - 1) / (totalSteps - 1)) * 100;
@@ -143,7 +145,11 @@ const CreateListingPage = () => {
                           value={type.value}
                           className="sr-only"
                         />
-                        <div className="border-2 border-neutral-200 rounded-xl p-6 hover:border-beedab-blue/50 transition-colors has-[:checked]:border-beedab-blue has-[:checked]:bg-beedab-blue/10">
+                        <div className={`border-2 rounded-xl p-6 transition-colors ${
+                          watchedListingType === type.value 
+                            ? 'border-beedab-blue bg-beedab-blue/10' 
+                            : 'border-neutral-200 hover:border-beedab-blue/50'
+                        }`}>
                           <div className="flex justify-between items-start mb-4">
                             <h3 className="text-lg font-semibold text-neutral-900">{type.label}</h3>
                             <span className="text-sm font-medium text-primary-600">{type.price}</span>
@@ -175,7 +181,11 @@ const CreateListingPage = () => {
                           value={type.value}
                           className="sr-only"
                         />
-                        <div className="border-2 border-neutral-200 rounded-xl p-4 text-center hover:border-beedab-blue/50 transition-colors has-[:checked]:border-beedab-blue has-[:checked]:bg-beedab-blue/10">
+                        <div className={`border-2 rounded-xl p-4 text-center transition-colors ${
+                          watchedPropertyType === type.value 
+                            ? 'border-beedab-blue bg-beedab-blue/10' 
+                            : 'border-neutral-200 hover:border-beedab-blue/50'
+                        }`}>
                           <div className="text-3xl mb-2">{type.icon}</div>
                           <div className="text-sm font-medium text-neutral-900">{type.label}</div>
                         </div>
