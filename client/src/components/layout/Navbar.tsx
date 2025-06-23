@@ -53,12 +53,12 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-24">
           {/* Logo */}
-          <div className="flex items-center">
+          <div className="flex items-center flex-shrink-0 min-w-0">
             <Link to="/" className="flex items-center space-x-2">
               <img 
                 src="/logo.png" 
                 alt="beedab Real Estate Platform" 
-                className="h-20 w-auto"
+                className="h-10 w-auto sm:h-12 md:h-16 lg:h-20 flex-shrink-0"
               />
             </Link>
           </div>
@@ -608,7 +608,7 @@ const Navbar = () => {
           </div>
 
           {/* User Profile Avatar */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2 md:space-x-4 flex-shrink-0">
             {user ? (
               <div className="relative">
                 <button
