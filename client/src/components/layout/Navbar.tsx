@@ -89,15 +89,43 @@ const Navbar = () => {
                     <div className="p-3">
                       <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide px-2 py-1">Property Types</div>
                       <Link
-                        to="/properties?type=developed"
+                        to="/properties?type=house"
+                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
+                        onClick={() => setSellDropdownOpen(false)}
+                      >
+                        <div className="flex items-center">
+                          <Home className="h-4 w-4 mr-2 text-beedab-blue" />
+                          <div>
+                            <div className="font-medium">Houses</div>
+                            <div className="text-xs text-gray-500">Family homes & residential properties</div>
+                          </div>
+                        </div>
+                      </Link>
+                      
+                      <Link
+                        to="/properties?type=apartment"
+                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
+                        onClick={() => setSellDropdownOpen(false)}
+                      >
+                        <div className="flex items-center">
+                          <Building2 className="h-4 w-4 mr-2 text-beedab-blue" />
+                          <div>
+                            <div className="font-medium">Apartments</div>
+                            <div className="text-xs text-gray-500">Flats & apartment units</div>
+                          </div>
+                        </div>
+                      </Link>
+                      
+                      <Link
+                        to="/properties?type=townhouse"
                         className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
                         onClick={() => setSellDropdownOpen(false)}
                       >
                         <div className="flex items-center">
                           <Building className="h-4 w-4 mr-2 text-beedab-blue" />
                           <div>
-                            <div className="font-medium">Developed Properties</div>
-                            <div className="text-xs text-gray-500">Ready to move in homes & buildings</div>
+                            <div className="font-medium">Townhouses</div>
+                            <div className="text-xs text-gray-500">Multi-level attached homes</div>
                           </div>
                         </div>
                       </Link>
