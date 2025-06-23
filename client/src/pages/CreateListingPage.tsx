@@ -22,11 +22,11 @@ const CreateListingPage = () => {
   const progress = (currentStep / totalSteps) * 100;
 
   const propertyTypes = [
-    { value: 'house', label: 'Single Family House', icon: '🏠' },
-    { value: 'condo', label: 'Condominium', icon: '🏢' },
+    { value: 'house', label: 'House', icon: '🏠' },
+    { value: 'apartment', label: 'Apartment', icon: '🏢' },
     { value: 'townhouse', label: 'Townhouse', icon: '🏘️' },
-    { value: 'apartment', label: 'Apartment', icon: '🏬' },
     { value: 'commercial', label: 'Commercial', icon: '🏪' },
+    { value: 'farm', label: 'Farm', icon: '🚜' },
     { value: 'land', label: 'Land/Lot', icon: '🌳' }
   ];
 

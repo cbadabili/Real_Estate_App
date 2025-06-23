@@ -194,10 +194,10 @@ const CreatePropertyPage = () => {
                     className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   >
                     <option value="house">House</option>
-                    <option value="condo">Condominium</option>
-                    <option value="townhouse">Townhouse</option>
                     <option value="apartment">Apartment</option>
+                    <option value="townhouse">Townhouse</option>
                     <option value="commercial">Commercial</option>
+                    <option value="farm">Farm</option>
                     <option value="land">Land/Lot</option>
                   </select>
                   {errors.propertyType && (
