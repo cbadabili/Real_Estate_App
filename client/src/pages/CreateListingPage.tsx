@@ -83,11 +83,56 @@ const CreateListingPage = () => {
     }
   };
 
-  const onSubmit = (data: any) => {
-    console.log('Form submitted:', data);
-    toast.success('Property listing created successfully!');
-    // Here you would typically send the data to your backend
-    // For now we'll just show success message
+  const onSubmit = async (data: any) => {
+    try {
+      console.log('Form submitted:', data);
+      
+      // Transform form data to match backend schema
+      const propertyData = {
+        title: data.title,
+        description: data.description,
+        price: parseInt(data.price),
+        address: data.address,
+        city: data.city || 'Gaborone',
+        state: data.state || 'South-East',
+        zipCode: data.zipCode || '00000',
+        propertyType: data.propertyType,
+        listingType: data.listingType === 'fsbo' ? 'owner' : 'agent',
+        bedrooms: data.bedrooms ? parseInt(data.bedrooms) : null,
+        bathrooms: data.bathrooms ? parseFloat(data.bathrooms) : null,
+        squareFeet: data.buildingSize ? parseInt(data.buildingSize) : (data.plotSize ? parseInt(data.plotSize) : null),
+        yearBuilt: data.yearBuilt ? parseInt(data.yearBuilt) : null,
+        ownerId: 1, // Default owner ID - in real app this would come from auth
+        features: data.amenities ? JSON.stringify(data.amenities) : null,
+        images: uploadedImages.length > 0 ? JSON.stringify(uploadedImages) : null
+      };
+
+      const response = await fetch('/api/properties', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(propertyData),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create property listing');
+      }
+
+      const createdProperty = await response.json();
+      console.log('Property created:', createdProperty);
+      
+      toast.success('Property listing created successfully!');
+      
+      // Redirect to properties page after successful creation
+      setTimeout(() => {
+        window.location.href = '/properties';
+      }, 2000);
+      
+    } catch (error) {
+      console.error('Error creating property:', error);
+      toast.error('Failed to create property listing. Please try again.');
+    }
   };
 
   const stepTitles = [
