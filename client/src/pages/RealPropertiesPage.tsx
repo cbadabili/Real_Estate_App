@@ -68,7 +68,7 @@ const RealPropertiesPage = () => {
         
         <div className="flex items-center justify-between mb-4">
           <div className="text-2xl font-bold text-beedab-darkblue">
-            ${parseFloat(property.price || '0').toLocaleString()}
+            P{parseFloat(property.price || '0').toLocaleString()}
           </div>
           <div className="flex space-x-4 text-sm text-neutral-600">
             {property.bedrooms && (
@@ -86,7 +86,7 @@ const RealPropertiesPage = () => {
             {property.squareFeet && (
               <span className="flex items-center">
                 <Square className="h-4 w-4 mr-1" />
-                {property.squareFeet.toLocaleString()}sf
+                {property.squareFeet.toLocaleString()}sqm
               </span>
             )}
           </div>

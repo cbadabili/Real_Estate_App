@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useProperties } from '../hooks/useProperties';
 import { AISearchBar } from '../components/search/AISearchBar';
 import { 
   ChevronLeft,
@@ -25,6 +26,7 @@ import {
 const HomePage = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [currentAgency, setCurrentAgency] = useState(0);
+  const { data: apiProperties = [] } = useProperties();
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -388,7 +390,7 @@ const HomePage = () => {
                   <div className="flex justify-between text-sm text-gray-600">
                     <span>{property.bedrooms} Bedrooms</span>
                     <span>{property.bathrooms} Bathrooms</span>
-                    <span>{property.sqft} sqft</span>
+                    <span>{property.sqft} sqm</span>
                   </div>
                 </div>
               </motion.div>
