@@ -1,3 +1,4 @@
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'wouter';
 import { 
@@ -8,7 +9,17 @@ import {
   CheckCircle, 
   ArrowRight,
   Home,
-  DollarSign
+  MessageSquare,
+  Calendar,
+  Video,
+  Handshake,
+  Star,
+  Clock,
+  MapPin,
+  Phone,
+  Mail,
+  Eye,
+  TrendingUp
 } from 'lucide-react';
 
 const BuyerSellerPlatformPage = () => {
@@ -76,20 +87,19 @@ const BuyerSellerPlatformPage = () => {
               Comprehensive For Sale By Owner tools including listing creation, legal documents, and transaction management designed specifically for Batswana.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link
-                to="/create-property"
+              <a
+                href="/create-property"
                 className="inline-flex items-center px-8 py-4 bg-white text-beedab-darkblue font-semibold rounded-xl hover:bg-gray-100 transition-colors"
               >
                 <Home className="mr-2 h-5 w-5" />
                 List Your Property
-              </Link>
-              <Link
-                to="/properties"
+              </a>
+              <a
+                href="/properties"
                 className="inline-flex items-center px-8 py-4 bg-transparent border-2 border-white text-white font-semibold rounded-xl hover:bg-white hover:text-beedab-darkblue transition-colors"
               >
-                <DollarSign className="mr-2 h-5 w-5" />
                 Browse Properties
-              </Link>
+              </a>
             </div>
           </motion.div>
         </div>
