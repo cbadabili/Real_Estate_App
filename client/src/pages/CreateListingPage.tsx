@@ -19,7 +19,7 @@ const CreateListingPage = () => {
   const { register, handleSubmit, watch, formState: { errors } } = useForm();
 
   const totalSteps = 5;
-  const progress = (currentStep / totalSteps) * 100;
+  const progress = ((currentStep - 1) / (totalSteps - 1)) * 100;
 
   const propertyTypes = [
     { value: 'house', label: 'House', icon: '🏠' },
