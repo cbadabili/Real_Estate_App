@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { X, Home, Bed, Bath } from 'lucide-react';
+import { X, Home, Bed, Bath, Building2, Store, Tractor, Mountain } from 'lucide-react';
 
 interface PropertyFiltersProps {
   filters: any;
@@ -28,13 +28,13 @@ const PropertyFilters: React.FC<PropertyFiltersProps> = ({
   };
 
   const propertyTypes = [
-    { value: 'all', label: 'All Types' },
-    { value: 'house', label: 'House' },
-    { value: 'apartment', label: 'Apartment' },
-    { value: 'townhouse', label: 'Townhouse' },
-    { value: 'commercial', label: 'Commercial' },
-    { value: 'farm', label: 'Farm' },
-    { value: 'land', label: 'Land' }
+    { value: 'all', label: 'All Types', icon: null },
+    { value: 'house', label: 'House', icon: Home },
+    { value: 'apartment', label: 'Apartment', icon: Building2 },
+    { value: 'townhouse', label: 'Townhouse', icon: Home },
+    { value: 'commercial', label: 'Commercial', icon: Store },
+    { value: 'farm', label: 'Farm', icon: Tractor },
+    { value: 'land', label: 'Land', icon: Mountain }
   ];
 
   const bedroomOptions = [
@@ -136,12 +136,17 @@ const PropertyFilters: React.FC<PropertyFiltersProps> = ({
               <button
                 key={type.value}
                 onClick={() => updateFilter('propertyType', type.value)}
-                className={`px-3 py-2 text-sm rounded-lg border transition-colors ${
+                className={`flex items-center justify-center px-3 py-2 text-sm rounded-lg border transition-colors ${
                   filters.propertyType === type.value
-                    ? 'bg-beedab-lightblue border-beedab-blue text-beedab-darkblue'
-                    : 'border-neutral-300 text-neutral-700 hover:bg-neutral-50'
+                    ? 'bg-beedab-blue border-beedab-blue text-white'
+                    : 'border-beedab-blue/30 text-neutral-700 hover:border-beedab-blue hover:bg-beedab-blue/5'
                 }`}
               >
+                {type.icon && (
+                  <type.icon className={`w-4 h-4 mr-2 ${
+                    filters.propertyType === type.value ? 'text-white' : 'text-beedab-blue'
+                  }`} />
+                )}
                 {type.label}
               </button>
             ))}
