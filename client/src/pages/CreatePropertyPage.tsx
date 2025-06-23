@@ -592,7 +592,7 @@ const CreatePropertyPage = () => {
                 <button
                   type="button"
                   onClick={nextStep}
-                  className="px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
+                  className="px-6 py-3 bg-beedab-blue text-white rounded-lg hover:bg-beedab-darkblue"
                 >
                   Next Step
                 </button>
