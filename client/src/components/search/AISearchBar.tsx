@@ -55,10 +55,10 @@ export const AISearchBar = ({ onSearch, className = '' }: AISearchBarProps) => {
   };
 
   const exampleQueries = [
-    "3 bedroom house under P2M in Gaborone near good schools",
-    "Modern apartment in CBD with city views",
-    "Family home with large yard in quiet area of Francistown",
-    "Investment property in Maun with rental potential"
+    "3-bedroom house under P1.2M in Block 8 near schools and shopping malls",
+    "Modern apartment in G-West with 24/7 security and covered parking",
+    "Serviced plot in Tlokweng with title deed and paved road access",
+    "Investment house in Mogoditshane with steady rental income"
   ];
 
   return (
@@ -79,7 +79,7 @@ export const AISearchBar = ({ onSearch, className = '' }: AISearchBarProps) => {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onKeyPress={handleKeyPress}
-              placeholder="Describe your dream property... (e.g., '3 bedroom house near schools under P2M')"
+              placeholder="Describe your dream property... (e.g., '3-bedroom house under P1.2M in Block 8')"
               className="flex-1 px-4 py-4 text-lg placeholder-neutral-400 focus:outline-none"
               disabled={isProcessing}
             />
