@@ -57,15 +57,15 @@ const ServicesPage = () => {
     'Cleaning': Home,
     'Construction': Building,
     'Maintenance': Building,
-    'HVAC Services': Building,
-    'Plumbing Services': Building,
-    'Electrical Services': Building,
-    'Garden Maintenance': Building,
-    'Pool Maintenance': Building,
-    'Security Services': Shield,
-    'Roofing Services': Building,
-    'Flooring Services': Building,
-    'Painting Services': Building
+    'HVAC': Building,
+    'Plumbing': Building,
+    'Electrical': Building,
+    'Garden': Building,
+    'Pool': Building,
+    'Security': Shield,
+    'Roofing': Building,
+    'Flooring': Building,
+    'Painting': Building
   };
 
   const categoryStructure = {
@@ -103,24 +103,24 @@ const ServicesPage = () => {
       icon: Building,
       description: 'New construction, renovation, and building services',
       subcategories: [
-        'HVAC Services',
-        'Plumbing Services', 
-        'Electrical Services',
-        'Roofing Services',
-        'Flooring Services',
-        'Painting Services'
+        'HVAC',
+        'Plumbing', 
+        'Electrical',
+        'Roofing',
+        'Flooring',
+        'Painting'
       ]
     },
     'Maintenance': {
       icon: Building,
       description: 'Property maintenance and repair services',
       subcategories: [
-        'HVAC Services',
-        'Plumbing Services', 
-        'Electrical Services',
-        'Garden Maintenance',
-        'Pool Maintenance',
-        'Security Services'
+        'HVAC',
+        'Plumbing', 
+        'Electrical',
+        'Garden',
+        'Pool',
+        'Security'
       ]
     }
   };
@@ -287,12 +287,12 @@ const ServicesPage = () => {
                         : 'border-gray-200 bg-white text-gray-700 hover:border-beedab-blue hover:text-beedab-blue'
                     }`}
                   >
-                    <Icon className="h-6 w-6 mx-auto mb-2" />
+                    <Icon className={`h-6 w-6 mx-auto mb-2 ${isSelected ? 'text-white' : 'text-beedab-blue'}`} />
                     <span className="text-sm font-medium capitalize">
                       {category === 'all' ? 'All Services' : category}
                     </span>
                     {hasSubcategories && (
-                      <div className="text-xs text-gray-500 mt-1">
+                      <div className={`text-xs mt-1 ${isSelected ? 'text-white/80' : 'text-beedab-blue/70'}`}>
                         {categoryData.subcategories.length} specializations
                       </div>
                     )}
@@ -329,7 +329,7 @@ const ServicesPage = () => {
                         : 'bg-white text-beedab-blue border border-beedab-blue hover:bg-beedab-blue hover:text-white'
                     }`}
                   >
-                    {subcat.replace(' Services', '').replace(' Maintenance', '')}
+                    {subcat}
                   </button>
                 ))}
               </div>

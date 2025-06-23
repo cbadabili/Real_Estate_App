@@ -69,15 +69,15 @@ const ServiceProviderRegistration: React.FC<ServiceProviderRegistrationProps> = 
     'Cleaning',
     'Construction',
     'Maintenance',
-    'HVAC Services',
-    'Plumbing Services',
-    'Electrical Services',
-    'Garden Maintenance',
-    'Pool Maintenance',
-    'Security Services',
-    'Roofing Services',
-    'Flooring Services',
-    'Painting Services'
+    'HVAC',
+    'Plumbing',
+    'Electrical',
+    'Garden',
+    'Pool',
+    'Security',
+    'Roofing',
+    'Flooring',
+    'Painting'
   ];
 
   const {
@@ -186,21 +186,14 @@ const ServiceProviderRegistration: React.FC<ServiceProviderRegistrationProps> = 
                 >
                   <option value="">Select a category</option>
                   <optgroup label="Primary Service Categories">
-                    {serviceCategories.filter(cat => !cat.includes(' Services') && !cat.includes(' Maintenance')).map((category) => (
+                    {['Photography', 'Legal', 'Moving', 'Finance', 'Insurance', 'Cleaning', 'Construction', 'Maintenance'].map((category) => (
                       <option key={category} value={category}>
                         {category}
                       </option>
                     ))}
                   </optgroup>
-                  <optgroup label="Technical Services (Construction & Maintenance)">
-                    {serviceCategories.filter(cat => cat.includes(' Services')).map((category) => (
-                      <option key={category} value={category}>
-                        {category}
-                      </option>
-                    ))}
-                  </optgroup>
-                  <optgroup label="Maintenance Specializations">
-                    {serviceCategories.filter(cat => cat.includes(' Maintenance')).map((category) => (
+                  <optgroup label="Technical Specializations">
+                    {['HVAC', 'Plumbing', 'Electrical', 'Roofing', 'Flooring', 'Painting', 'Garden', 'Pool', 'Security'].map((category) => (
                       <option key={category} value={category}>
                         {category}
                       </option>
