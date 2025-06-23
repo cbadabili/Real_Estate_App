@@ -69,11 +69,6 @@ const CreateListingPage = () => {
     setUploadedImages(prev => prev.filter((_, i) => i !== index));
   };
 
-  const onSubmit = (data: any) => {
-    console.log('Form data:', data);
-    toast.success('Property listing created successfully!');
-  };
-
   const nextStep = () => {
     if (currentStep < totalSteps) {
       setCurrentStep(currentStep + 1);
@@ -84,6 +79,13 @@ const CreateListingPage = () => {
     if (currentStep > 1) {
       setCurrentStep(currentStep - 1);
     }
+  };
+
+  const onSubmit = (data: any) => {
+    console.log('Form submitted:', data);
+    toast.success('Property listing created successfully!');
+    // Here you would typically send the data to your backend
+    // For now we'll just show success message
   };
 
   const stepTitles = [
@@ -106,13 +108,14 @@ const CreateListingPage = () => {
         {/* Progress Bar */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
-            <span className="text-sm font-medium text-primary-600">Step {currentStep} of {totalSteps}</span>
+            <span className="text-sm font-medium text-beedab-blue">Step {currentStep} of {totalSteps}</span>
             <span className="text-sm text-neutral-500">{Math.round(progress)}% Complete</span>
           </div>
           <div className="w-full bg-neutral-200 rounded-full h-2">
             <motion.div 
-              className="bg-primary-600 h-2 rounded-full transition-all duration-500"
+              className="bg-beedab-blue h-2 rounded-full transition-all duration-500"
               style={{ width: `${progress}%` }}
+              animate={{ width: `${progress}%` }}
             />
           </div>
           <p className="text-sm text-neutral-600 mt-2 font-medium">{stepTitles[currentStep - 1]}</p>
@@ -140,7 +143,7 @@ const CreateListingPage = () => {
                           value={type.value}
                           className="sr-only"
                         />
-                        <div className="border-2 border-neutral-200 rounded-xl p-6 hover:border-primary-300 transition-colors has-[:checked]:border-primary-500 has-[:checked]:bg-primary-50">
+                        <div className="border-2 border-neutral-200 rounded-xl p-6 hover:border-beedab-blue/50 transition-colors has-[:checked]:border-beedab-blue has-[:checked]:bg-beedab-blue/10">
                           <div className="flex justify-between items-start mb-4">
                             <h3 className="text-lg font-semibold text-neutral-900">{type.label}</h3>
                             <span className="text-sm font-medium text-primary-600">{type.price}</span>
@@ -172,7 +175,7 @@ const CreateListingPage = () => {
                           value={type.value}
                           className="sr-only"
                         />
-                        <div className="border-2 border-neutral-200 rounded-xl p-4 text-center hover:border-primary-300 transition-colors has-[:checked]:border-primary-500 has-[:checked]:bg-primary-50">
+                        <div className="border-2 border-neutral-200 rounded-xl p-4 text-center hover:border-beedab-blue/50 transition-colors has-[:checked]:border-beedab-blue has-[:checked]:bg-beedab-blue/10">
                           <div className="text-3xl mb-2">{type.icon}</div>
                           <div className="text-sm font-medium text-neutral-900">{type.label}</div>
                         </div>
@@ -204,7 +207,7 @@ const CreateListingPage = () => {
                       <input
                         type="text"
                         {...register('title', { required: 'Property title is required' })}
-                        className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
+                        className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent transition-all"
                         placeholder="e.g., Beautiful Family Home in Downtown"
                       />
                       {errors.title && (
@@ -221,7 +224,7 @@ const CreateListingPage = () => {
                         <input
                           type="number"
                           {...register('price', { required: 'Price is required', min: 1 })}
-                          className="w-full pl-10 pr-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
+                          className="w-full pl-10 pr-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent transition-all"
                           placeholder="650000"
                         />
                       </div>
@@ -308,7 +311,7 @@ const CreateListingPage = () => {
                       <input
                         type="number"
                         {...register('yearBuilt', { min: 1800, max: new Date().getFullYear() })}
-                        className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
+                        className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent transition-all"
                         placeholder="2020"
                       />
                     </div>
@@ -335,7 +338,7 @@ const CreateListingPage = () => {
                       <textarea
                         {...register('description', { required: 'Property description is required' })}
                         rows={6}
-                        className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
+                        className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent transition-all"
                         placeholder="Describe your property... Include key features, recent updates, neighborhood highlights, etc."
                       />
                       {errors.description && (
@@ -354,7 +357,7 @@ const CreateListingPage = () => {
                               type="checkbox"
                               {...register('amenities')}
                               value={amenity}
-                              className="rounded border-neutral-300 text-primary-600 focus:ring-primary-500"
+                              className="rounded border-neutral-300 text-beedab-blue focus:ring-beedab-blue"
                             />
                             <span className="text-sm text-neutral-700">{amenity}</span>
                           </label>
@@ -498,14 +501,14 @@ const CreateListingPage = () => {
                 <button
                   type="button"
                   onClick={nextStep}
-                  className="px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-medium transition-colors"
+                  className="px-6 py-3 bg-beedab-blue hover:bg-beedab-darkblue text-white rounded-lg font-medium transition-colors"
                 >
                   Next Step
                 </button>
               ) : (
                 <button
                   type="submit"
-                  className="px-8 py-3 bg-success-600 hover:bg-success-700 text-white rounded-lg font-medium transition-colors flex items-center"
+                  className="px-8 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors flex items-center"
                 >
                   <Check className="mr-2 h-5 w-5" />
                   Publish Listing
