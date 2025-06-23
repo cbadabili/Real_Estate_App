@@ -29,7 +29,7 @@ const CreateListingPage = () => {
     { value: 'townhouse', label: 'Townhouse', icon: '🏘️' },
     { value: 'commercial', label: 'Commercial', icon: '🏪' },
     { value: 'farm', label: 'Farm', icon: '🚜' },
-    { value: 'land', label: 'Land/Lot', icon: '🌳' }
+    { value: 'land', label: 'Land', icon: '🏞️' }
   ];
 
   const listingTypes = [
@@ -607,6 +607,111 @@ const CreateListingPage = () => {
                               </label>
                             ))}
                           </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Land-specific fields */}
+                    {watchedPropertyType === 'land' && (
+                      <div className="space-y-4">
+                        <div>
+                          <label className="block text-sm font-medium text-neutral-700 mb-2">
+                            Zoning/Use Type
+                          </label>
+                          <select
+                            {...register('zoningType')}
+                            className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent transition-all"
+                          >
+                            <option value="">Select zoning type (optional)</option>
+                            <option value="residential">Residential</option>
+                            <option value="commercial">Commercial</option>
+                            <option value="agricultural">Agricultural</option>
+                            <option value="industrial">Industrial</option>
+                            <option value="mixed-use">Mixed-Use</option>
+                          </select>
+                        </div>
+                        
+                        <div>
+                          <label className="block text-sm font-medium text-neutral-700 mb-2">
+                            Fenced
+                          </label>
+                          <div className="flex gap-4">
+                            <label className="flex items-center space-x-2 cursor-pointer">
+                              <input
+                                type="radio"
+                                {...register('fenced')}
+                                value="yes"
+                                className="text-beedab-blue focus:ring-beedab-blue"
+                              />
+                              <span className="text-sm text-neutral-700">Yes</span>
+                            </label>
+                            <label className="flex items-center space-x-2 cursor-pointer">
+                              <input
+                                type="radio"
+                                {...register('fenced')}
+                                value="no"
+                                className="text-beedab-blue focus:ring-beedab-blue"
+                              />
+                              <span className="text-sm text-neutral-700">No</span>
+                            </label>
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-neutral-700 mb-2">
+                            Serviced (Utilities Connected)
+                          </label>
+                          <div className="flex gap-4">
+                            <label className="flex items-center space-x-2 cursor-pointer">
+                              <input
+                                type="radio"
+                                {...register('serviced')}
+                                value="yes"
+                                className="text-beedab-blue focus:ring-beedab-blue"
+                              />
+                              <span className="text-sm text-neutral-700">Yes</span>
+                            </label>
+                            <label className="flex items-center space-x-2 cursor-pointer">
+                              <input
+                                type="radio"
+                                {...register('serviced')}
+                                value="no"
+                                className="text-beedab-blue focus:ring-beedab-blue"
+                              />
+                              <span className="text-sm text-neutral-700">No</span>
+                            </label>
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-neutral-700 mb-2">
+                            Topography
+                          </label>
+                          <select
+                            {...register('topography')}
+                            className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent transition-all"
+                          >
+                            <option value="">Select topography (optional)</option>
+                            <option value="flat">Flat</option>
+                            <option value="sloped">Sloped</option>
+                            <option value="rocky">Rocky</option>
+                            <option value="hilly">Hilly</option>
+                          </select>
+                        </div>
+
+                        <div>
+                          <label className="block text-sm font-medium text-neutral-700 mb-2">
+                            Road Access
+                          </label>
+                          <select
+                            {...register('roadAccess')}
+                            className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent transition-all"
+                          >
+                            <option value="">Select road access (optional)</option>
+                            <option value="tarred">Tarred Road</option>
+                            <option value="gravel">Gravel Road</option>
+                            <option value="none">No Road Access</option>
+                          </select>
                         </div>
                       </div>
                     )}
