@@ -539,12 +539,10 @@ const CreateListingPage = () => {
                             {...register('farmType')}
                             className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent transition-all"
                           >
-                            <option value="">Select farm type</option>
+                            <option value="">Select farm type (optional)</option>
                             <option value="crop">Crop Farm</option>
-                            <option value="livestock">Livestock Farm</option>
-                            <option value="mixed">Mixed Farm</option>
-                            <option value="dairy">Dairy Farm</option>
-                            <option value="poultry">Poultry Farm</option>
+                            <option value="livestock">Livestock</option>
+                            <option value="mixed-use">Mixed-Use</option>
                           </select>
                         </div>
                         
