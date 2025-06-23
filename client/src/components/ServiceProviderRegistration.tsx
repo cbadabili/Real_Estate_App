@@ -69,12 +69,15 @@ const ServiceProviderRegistration: React.FC<ServiceProviderRegistrationProps> = 
     'Cleaning',
     'Construction',
     'Maintenance',
-    'HVAC Maintenance',
-    'Plumbing Maintenance',
-    'Electrical Maintenance',
+    'HVAC Services',
+    'Plumbing Services',
+    'Electrical Services',
     'Garden Maintenance',
     'Pool Maintenance',
-    'Security Maintenance'
+    'Security Services',
+    'Roofing Services',
+    'Flooring Services',
+    'Painting Services'
   ];
 
   const {
@@ -182,8 +185,15 @@ const ServiceProviderRegistration: React.FC<ServiceProviderRegistrationProps> = 
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
                 >
                   <option value="">Select a category</option>
-                  <optgroup label="Main Categories">
-                    {serviceCategories.filter(cat => !cat.includes(' Maintenance')).map((category) => (
+                  <optgroup label="Primary Service Categories">
+                    {serviceCategories.filter(cat => !cat.includes(' Services') && !cat.includes(' Maintenance')).map((category) => (
+                      <option key={category} value={category}>
+                        {category}
+                      </option>
+                    ))}
+                  </optgroup>
+                  <optgroup label="Technical Services (Construction & Maintenance)">
+                    {serviceCategories.filter(cat => cat.includes(' Services')).map((category) => (
                       <option key={category} value={category}>
                         {category}
                       </option>

@@ -57,12 +57,15 @@ const ServicesPage = () => {
     'Cleaning': Home,
     'Construction': Building,
     'Maintenance': Building,
-    'HVAC Maintenance': Building,
-    'Plumbing Maintenance': Building,
-    'Electrical Maintenance': Building,
+    'HVAC Services': Building,
+    'Plumbing Services': Building,
+    'Electrical Services': Building,
     'Garden Maintenance': Building,
     'Pool Maintenance': Building,
-    'Security Maintenance': Shield
+    'Security Services': Shield,
+    'Roofing Services': Building,
+    'Flooring Services': Building,
+    'Painting Services': Building
   };
 
   const categoryStructure = {
@@ -98,19 +101,26 @@ const ServicesPage = () => {
     },
     'Construction': {
       icon: Building,
-      description: 'Home renovation, building, and construction',
-      subcategories: []
+      description: 'New construction, renovation, and building services',
+      subcategories: [
+        'HVAC Services',
+        'Plumbing Services', 
+        'Electrical Services',
+        'Roofing Services',
+        'Flooring Services',
+        'Painting Services'
+      ]
     },
     'Maintenance': {
       icon: Building,
       description: 'Property maintenance and repair services',
       subcategories: [
-        'HVAC Maintenance',
-        'Plumbing Maintenance', 
-        'Electrical Maintenance',
+        'HVAC Services',
+        'Plumbing Services', 
+        'Electrical Services',
         'Garden Maintenance',
         'Pool Maintenance',
-        'Security Maintenance'
+        'Security Services'
       ]
     }
   };
@@ -319,7 +329,7 @@ const ServicesPage = () => {
                         : 'bg-white text-beedab-blue border border-beedab-blue hover:bg-beedab-blue hover:text-white'
                     }`}
                   >
-                    {subcat.replace(' Maintenance', '')}
+                    {subcat.replace(' Services', '').replace(' Maintenance', '')}
                   </button>
                 ))}
               </div>
