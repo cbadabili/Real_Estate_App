@@ -108,11 +108,20 @@ BeeDab is a comprehensive real estate platform for the Botswana market, featurin
 - Static asset caching and CDN integration
 - API rate limiting and authentication middleware
 
+## Recent Changes
+
+- **June 23, 2025**: Fixed critical database connection issues
+  - Resolved WebSocket connection problems with Neon database
+  - Added proper Neon configuration with stability settings
+  - Implemented database connection testing on startup
+  - Improved error handling to prevent server crashes
+  - Application now running successfully on port 5000
+
 ## Changelog
 
 ```
 Changelog:
-- June 23, 2025. Initial setup
+- June 23, 2025. Initial setup and database connection fixes
 ```
 
 ## User Preferences
