@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import beedabLogo from '@assets/image_1750694075395.png';
 import { useProperties } from '../hooks/useProperties';
 import { AISearchBar } from '../components/search/AISearchBar';
 import { 
