@@ -33,6 +33,7 @@ import {
 const serviceProviderSchema = z.object({
   companyName: z.string().min(2, 'Company name must be at least 2 characters'),
   serviceCategory: z.string().min(1, 'Please select a service category'),
+  subCategory: z.string().optional(),
   contactPerson: z.string().min(2, 'Contact person name is required'),
   phoneNumber: z.string().min(8, 'Valid phone number is required'),
   email: z.string().email('Valid email address is required'),
@@ -77,28 +78,25 @@ const ServiceProviderRegistration: React.FC<ServiceProviderRegistrationProps> = 
     'Painting': Paintbrush
   };
 
-  const primaryCategories = [
-    'Photography',
-    'Legal',
-    'Moving',
-    'Finance',
-    'Insurance',
-    'Cleaning',
-    'Construction',
-    'Maintenance'
-  ];
+  const mainCategories = {
+    'Photography': [],
+    'Legal': [],  
+    'Moving': [],
+    'Finance': [],
+    'Insurance': [],
+    'Cleaning': [],
+    'Construction': ['HVAC', 'Plumbing', 'Electrical', 'Roofing', 'Flooring', 'Painting'],
+    'Maintenance': ['Garden', 'Pool', 'Security']
+  };
 
-  const technicalSpecializations = [
-    'HVAC',
-    'Plumbing',
-    'Electrical',
-    'Roofing',
-    'Flooring',
-    'Painting',
-    'Garden',
-    'Pool',
-    'Security'
-  ];
+  const getAllCategories = () => {
+    const allCategories = [];
+    Object.entries(mainCategories).forEach(([main, subs]) => {
+      allCategories.push(main);
+      allCategories.push(...subs);
+    });
+    return allCategories;
+  };
 
   const {
     register,
@@ -115,6 +113,7 @@ const ServiceProviderRegistration: React.FC<ServiceProviderRegistrationProps> = 
   });
 
   const selectedCategory = watch('serviceCategory');
+  const selectedSubCategory = watch('subCategory');
 
   const onSubmit = async (data: ServiceProviderFormData) => {
     setIsSubmitting(true);
@@ -128,6 +127,7 @@ const ServiceProviderRegistration: React.FC<ServiceProviderRegistrationProps> = 
         },
         body: JSON.stringify({
           ...data,
+          serviceCategory: data.subCategory || data.serviceCategory, // Use subcategory if selected, otherwise main category
           logoUrl: '/api/placeholder/100/100', // Default placeholder
           rating: '0.0',
           reviewCount: 0,
@@ -181,7 +181,7 @@ const ServiceProviderRegistration: React.FC<ServiceProviderRegistrationProps> = 
               <span>Company Information</span>
             </h3>
 
-            <div className="grid md:grid-cols-2 gap-4">
+            <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Company Name *
@@ -196,32 +196,48 @@ const ServiceProviderRegistration: React.FC<ServiceProviderRegistrationProps> = 
                 )}
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Service Category *
-                </label>
-                <select
-                  {...register('serviceCategory')}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
-                >
-                  <option value="">Select a category</option>
-                  <optgroup label="Primary Service Categories">
-                    {primaryCategories.map((category) => (
+              <div className="grid md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Main Service Category *
+                  </label>
+                  <select
+                    {...register('serviceCategory')}
+                    onChange={(e) => {
+                      setValue('serviceCategory', e.target.value);
+                      setValue('subCategory', ''); // Reset subcategory when main category changes
+                    }}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
+                  >
+                    <option value="">Select main category</option>
+                    {Object.keys(mainCategories).map((category) => (
                       <option key={category} value={category}>
                         {category}
                       </option>
                     ))}
-                  </optgroup>
-                  <optgroup label="Technical Specializations">
-                    {technicalSpecializations.map((category) => (
-                      <option key={category} value={category}>
-                        {category}
-                      </option>
-                    ))}
-                  </optgroup>
-                </select>
-                {errors.serviceCategory && (
-                  <p className="text-red-600 text-sm mt-1">{errors.serviceCategory.message}</p>
+                  </select>
+                  {errors.serviceCategory && (
+                    <p className="text-red-600 text-sm mt-1">{errors.serviceCategory.message}</p>
+                  )}
+                </div>
+
+                {selectedCategory && mainCategories[selectedCategory as keyof typeof mainCategories]?.length > 0 && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Specialization (Optional)
+                    </label>
+                    <select
+                      {...register('subCategory')}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
+                    >
+                      <option value="">General {selectedCategory}</option>
+                      {mainCategories[selectedCategory as keyof typeof mainCategories].map((subCategory) => (
+                        <option key={subCategory} value={subCategory}>
+                          {subCategory}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                 )}
               </div>
             </div>
