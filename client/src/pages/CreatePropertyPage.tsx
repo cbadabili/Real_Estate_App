@@ -131,10 +131,21 @@ const CreatePropertyPage = () => {
   };
 
   const handlePhotoUpload = () => {
-    // Simulate photo upload success
-    setTimeout(() => {
-      setShowPhotoAd(true);
-    }, 1000);
+    // Create a file input element
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.multiple = true;
+    input.accept = 'image/*';
+    
+    input.onchange = (event) => {
+      const files = (event.target as HTMLInputElement).files;
+      if (files && files.length > 0) {
+        // Only show ad after actual file selection
+        setShowPhotoAd(true);
+      }
+    };
+    
+    input.click();
   };
 
   const onSubmit = (data: PropertyFormData) => {
@@ -539,10 +550,54 @@ const CreatePropertyPage = () => {
                 </div>
               </div>
 
-              {/* Features */}
+              {/* Area Build */}
               <div>
                 <label className="block text-sm font-medium text-neutral-700 mb-2">
-                  Property Features
+                  Area Build (m²)
+                </label>
+                <input
+                  {...register('areaBuild', { valueAsNumber: true })}
+                  type="number"
+                  className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  placeholder="Enter area build in square meters"
+                />
+              </div>
+
+              {/* Property Amenities Checklist */}
+              <div>
+                <label className="block text-sm font-medium text-neutral-700 mb-4">
+                  Property Amenities
+                </label>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                  {[
+                    'Swimming Pool', 'Garden', 'Garage', 'Parking Space', 'Security System',
+                    'Air Conditioning', 'Balcony', 'Terrace', 'Fireplace', 'Study Room',
+                    'Walk-in Closet', 'Laundry Room', 'Storage Room', 'Guest Room', 'Gym',
+                    'Playground', 'BBQ Area', 'Solar Panels', 'Backup Generator', 'Fiber Internet'
+                  ].map((amenity) => (
+                    <label key={amenity} className="flex items-center space-x-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={features.includes(amenity)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setFeatures([...features, amenity]);
+                          } else {
+                            setFeatures(features.filter(f => f !== amenity));
+                          }
+                        }}
+                        className="w-4 h-4 text-beedab-blue bg-gray-100 border-gray-300 rounded focus:ring-beedab-blue focus:ring-2"
+                      />
+                      <span className="text-sm text-gray-700">{amenity}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {/* Custom Property Features */}
+              <div>
+                <label className="block text-sm font-medium text-neutral-700 mb-2">
+                  Additional Features
                 </label>
                 <div className="flex gap-2 mb-3">
                   <input
@@ -551,7 +606,7 @@ const CreatePropertyPage = () => {
                     onChange={(e) => setNewFeature(e.target.value)}
                     onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addFeature())}
                     className="flex-1 px-4 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                    placeholder="e.g., Swimming Pool, Garden, Garage"
+                    placeholder="e.g., Custom feature not listed above"
                   />
                   <button
                     type="button"
@@ -563,7 +618,12 @@ const CreatePropertyPage = () => {
                 </div>
                 
                 <div className="flex flex-wrap gap-2">
-                  {features.map((feature, index) => (
+                  {features.filter(feature => 
+                    !['Swimming Pool', 'Garden', 'Garage', 'Parking Space', 'Security System',
+                     'Air Conditioning', 'Balcony', 'Terrace', 'Fireplace', 'Study Room',
+                     'Walk-in Closet', 'Laundry Room', 'Storage Room', 'Guest Room', 'Gym',
+                     'Playground', 'BBQ Area', 'Solar Panels', 'Backup Generator', 'Fiber Internet'].includes(feature)
+                  ).map((feature, index) => (
                     <span
                       key={index}
                       className="inline-flex items-center gap-2 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
@@ -598,16 +658,17 @@ const CreatePropertyPage = () => {
                   </button>
                 </div>
                 
-                {/* Always show contextual ad for testing */}
-                <ContextualAd 
-                  trigger="post_photo_upload" 
-                  className="mt-4"
-                  onClose={() => setShowPhotoAd(false)}
-                />
-                
+                {/* Show contextual ad only after photos are uploaded */}
                 {showPhotoAd && (
-                  <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                    <p className="text-sm text-blue-800">Photo upload completed! Consider professional photography services.</p>
+                  <div className="mt-4">
+                    <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg mb-4">
+                      <p className="text-sm text-blue-800">Photo upload completed! Consider professional photography services.</p>
+                    </div>
+                    <ContextualAd 
+                      trigger="post_photo_upload" 
+                      className=""
+                      onClose={() => setShowPhotoAd(false)}
+                    />
                   </div>
                 )}
               </div>
@@ -701,6 +762,12 @@ const CreatePropertyPage = () => {
                         <div className="flex justify-between">
                           <span className="text-gray-600">Size:</span>
                           <span className="font-medium">{watchedValues.squareFeet.toLocaleString()} m²</span>
+                        </div>
+                      )}
+                      {watchedValues.areaBuild && (
+                        <div className="flex justify-between">
+                          <span className="text-gray-600">Area Build:</span>
+                          <span className="font-medium">{watchedValues.areaBuild.toLocaleString()} m²</span>
                         </div>
                       )}
                       {watchedValues.yearBuilt && (

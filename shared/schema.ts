@@ -38,6 +38,7 @@ export const properties = pgTable("properties", {
   bedrooms: integer("bedrooms"),
   bathrooms: decimal("bathrooms", { precision: 3, scale: 1 }),
   squareFeet: integer("square_feet"),
+  areaBuild: integer("area_build"),
   lotSize: decimal("lot_size", { precision: 10, scale: 2 }),
   yearBuilt: integer("year_built"),
   status: text("status").notNull().default('active'), // 'active', 'pending', 'sold', 'withdrawn'
