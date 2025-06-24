@@ -41,20 +41,7 @@ export const GeographySelector: React.FC<GeographySelectorProps> = ({
   const [showStateSuggestions, setShowStateSuggestions] = useState(false);
   const [filteredStates, setFilteredStates] = useState<string[]>([]);
 
-  // Sync with initial props when they change
-  useEffect(() => {
-    setSelectedCity(initialCity);
-    setCitySearch(initialCity);
-  }, [initialCity]);
 
-  useEffect(() => {
-    setSelectedState(initialState);
-    setStateSearch(initialState);
-  }, [initialState]);
-
-  useEffect(() => {
-    setSelectedWard(initialWard);
-  }, [initialWard]);
 
   // Filter cities based on search input
   useEffect(() => {
@@ -80,30 +67,32 @@ export const GeographySelector: React.FC<GeographySelectorProps> = ({
     }
   }, [stateSearch]);
 
-  // Update available wards when city is selected
+  // Auto-populate when city is selected
   useEffect(() => {
     if (selectedCity) {
       const cityData = getCityByName(selectedCity);
       if (cityData) {
+        setSelectedState(cityData.district.name);
+        setStateSearch(cityData.district.name);
         setAvailableWards(cityData.city.wards);
-        // Only auto-populate state if it's empty and we have exact match
-        if (!selectedState && cityData.city.name.toLowerCase() === selectedCity.toLowerCase()) {
-          setSelectedState(cityData.district.name);
-          setStateSearch(cityData.district.name);
-        }
       }
     } else {
+      setSelectedState('');
+      setStateSearch('');
       setAvailableWards([]);
+      setSelectedWard('');
     }
   }, [selectedCity]);
 
   // Notify parent component of changes
   useEffect(() => {
-    onLocationChange({
-      city: selectedCity,
-      state: selectedState,
-      ward: selectedWard
-    });
+    if (selectedCity && selectedState) {
+      onLocationChange({
+        city: selectedCity,
+        state: selectedState,
+        ward: selectedWard
+      });
+    }
   }, [selectedCity, selectedState, selectedWard, onLocationChange]);
 
   const handleCitySelect = (city: string) => {
@@ -176,7 +165,7 @@ export const GeographySelector: React.FC<GeographySelectorProps> = ({
         )}
       </div>
 
-      {/* State/District - Now editable */}
+      {/* State/District - Auto-populated but now editable */}
       <div className="relative">
         <label className="block text-sm font-medium text-neutral-700 mb-2">
           District *
@@ -191,7 +180,7 @@ export const GeographySelector: React.FC<GeographySelectorProps> = ({
             setTimeout(() => setShowStateSuggestions(false), 200);
           }}
           className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-          placeholder="Start typing district name..."
+          placeholder="Select city first or type district name..."
         />
         
         {/* State Suggestions Dropdown */}
@@ -210,7 +199,7 @@ export const GeographySelector: React.FC<GeographySelectorProps> = ({
         )}
       </div>
 
-      {/* Ward/Area - Now optional and always visible */}
+      {/* Ward/Area - Enhanced with comprehensive options but optional */}
       <div>
         <label className="block text-sm font-medium text-neutral-700 mb-2">
           Ward/Area

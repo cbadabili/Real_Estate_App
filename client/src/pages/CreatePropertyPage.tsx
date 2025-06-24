@@ -81,15 +81,10 @@ const CreatePropertyPage = () => {
 
   const nextStep = async () => {
     const fieldsToValidate = getFieldsForStep(currentStep);
-    console.log('Validating fields for step', currentStep, fieldsToValidate);
     const isValid = await trigger(fieldsToValidate);
-    console.log('Validation result:', isValid);
-    console.log('Form errors:', errors);
     
     if (isValid && currentStep < totalSteps) {
       setCurrentStep(currentStep + 1);
-    } else if (!isValid) {
-      console.log('Validation failed for fields:', fieldsToValidate);
     }
   };
 
