@@ -36,6 +36,10 @@ export const GeographySelector: React.FC<GeographySelectorProps> = ({
   const [citySearch, setCitySearch] = useState(initialCity);
   const [showCitySuggestions, setShowCitySuggestions] = useState(false);
   const [filteredCities, setFilteredCities] = useState<string[]>([]);
+  
+  const [stateSearch, setStateSearch] = useState(initialState);
+  const [showStateSuggestions, setShowStateSuggestions] = useState(false);
+  const [filteredStates, setFilteredStates] = useState<string[]>([]);
 
   // Filter cities based on search input
   useEffect(() => {
@@ -49,24 +53,38 @@ export const GeographySelector: React.FC<GeographySelectorProps> = ({
     }
   }, [citySearch]);
 
-  // Auto-populate when city is selected
+  // Filter districts based on search input
+  useEffect(() => {
+    if (stateSearch.trim()) {
+      const filtered = getAllDistricts().filter(district =>
+        district.toLowerCase().includes(stateSearch.toLowerCase())
+      );
+      setFilteredStates(filtered.slice(0, 10)); // Limit to 10 suggestions
+    } else {
+      setFilteredStates([]);
+    }
+  }, [stateSearch]);
+
+  // Update available wards when city is selected (but don't force auto-populate)
   useEffect(() => {
     if (selectedCity) {
       const cityData = getCityByName(selectedCity);
       if (cityData) {
-        setSelectedState(cityData.district.name);
         setAvailableWards(cityData.city.wards);
+        // Only auto-populate state if it's empty
+        if (!selectedState) {
+          setSelectedState(cityData.district.name);
+          setStateSearch(cityData.district.name);
+        }
       }
     } else {
-      setSelectedState('');
       setAvailableWards([]);
-      setSelectedWard('');
     }
   }, [selectedCity]);
 
   // Notify parent component of changes
   useEffect(() => {
-    if (selectedCity && selectedState) {
+    if (selectedCity) {
       onLocationChange({
         city: selectedCity,
         state: selectedState,
@@ -85,6 +103,18 @@ export const GeographySelector: React.FC<GeographySelectorProps> = ({
     setCitySearch(value);
     setSelectedCity(value);
     setShowCitySuggestions(true);
+  };
+
+  const handleStateSelect = (state: string) => {
+    setSelectedState(state);
+    setStateSearch(state);
+    setShowStateSuggestions(false);
+  };
+
+  const handleStateInputChange = (value: string) => {
+    setStateSearch(value);
+    setSelectedState(value);
+    setShowStateSuggestions(true);
   };
 
   return (
@@ -133,41 +163,68 @@ export const GeographySelector: React.FC<GeographySelectorProps> = ({
         )}
       </div>
 
-      {/* State/District - Auto-populated */}
-      <div>
+      {/* State/District - Now editable */}
+      <div className="relative">
         <label className="block text-sm font-medium text-neutral-700 mb-2">
           District *
         </label>
         <input
           type="text"
-          value={selectedState}
-          readOnly
-          className="w-full px-4 py-3 border border-neutral-300 rounded-lg bg-gray-50 text-gray-700"
-          placeholder="Select city first"
+          value={stateSearch}
+          onChange={(e) => handleStateInputChange(e.target.value)}
+          onFocus={() => setShowStateSuggestions(true)}
+          onBlur={() => {
+            // Delay hiding to allow click on suggestions
+            setTimeout(() => setShowStateSuggestions(false), 200);
+          }}
+          className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+          placeholder="Start typing district name..."
         />
+        
+        {/* State Suggestions Dropdown */}
+        {showStateSuggestions && filteredStates.length > 0 && (
+          <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+            {filteredStates.map((state) => (
+              <button
+                key={state}
+                onClick={() => handleStateSelect(state)}
+                className="w-full text-left px-4 py-2 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
+              >
+                <span className="font-medium">{state}</span>
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
-      {/* Ward/Area - Enhanced with comprehensive options */}
-      {availableWards.length > 0 && (
-        <div>
-          <label className="block text-sm font-medium text-neutral-700 mb-2">
-            Ward/Area *
-          </label>
+      {/* Ward/Area - Now optional and always visible */}
+      <div>
+        <label className="block text-sm font-medium text-neutral-700 mb-2">
+          Ward/Area
+        </label>
+        {availableWards.length > 0 ? (
           <select
             value={selectedWard}
             onChange={(e) => setSelectedWard(e.target.value)}
             className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-            required
           >
-            <option value="">Select ward/area</option>
+            <option value="">Select ward/area (optional)</option>
             {availableWards.map((ward) => (
               <option key={ward} value={ward}>
                 {ward}
               </option>
             ))}
           </select>
-        </div>
-      )}
+        ) : (
+          <input
+            type="text"
+            value={selectedWard}
+            onChange={(e) => setSelectedWard(e.target.value)}
+            className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            placeholder="Enter ward/area (optional)"
+          />
+        )}
+      </div>
 
       {/* Location Preview */}
       {selectedCity && selectedState && (
@@ -176,6 +233,11 @@ export const GeographySelector: React.FC<GeographySelectorProps> = ({
             <strong>Selected Location:</strong><br />
             {selectedWard && `${selectedWard}, `}{selectedCity}, {selectedState}
           </p>
+          {!selectedCity.trim() || !selectedState.trim() ? (
+            <p className="text-sm text-red-600 mt-1">
+              Please ensure all location fields are properly filled.
+            </p>
+          ) : null}
         </div>
       )}
     </div>
