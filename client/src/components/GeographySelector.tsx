@@ -41,6 +41,21 @@ export const GeographySelector: React.FC<GeographySelectorProps> = ({
   const [showStateSuggestions, setShowStateSuggestions] = useState(false);
   const [filteredStates, setFilteredStates] = useState<string[]>([]);
 
+  // Sync with initial props when they change
+  useEffect(() => {
+    setSelectedCity(initialCity);
+    setCitySearch(initialCity);
+  }, [initialCity]);
+
+  useEffect(() => {
+    setSelectedState(initialState);
+    setStateSearch(initialState);
+  }, [initialState]);
+
+  useEffect(() => {
+    setSelectedWard(initialWard);
+  }, [initialWard]);
+
   // Filter cities based on search input
   useEffect(() => {
     if (citySearch.trim()) {
@@ -65,14 +80,14 @@ export const GeographySelector: React.FC<GeographySelectorProps> = ({
     }
   }, [stateSearch]);
 
-  // Update available wards when city is selected (but don't force auto-populate)
+  // Update available wards when city is selected
   useEffect(() => {
     if (selectedCity) {
       const cityData = getCityByName(selectedCity);
       if (cityData) {
         setAvailableWards(cityData.city.wards);
-        // Only auto-populate state if it's empty
-        if (!selectedState) {
+        // Only auto-populate state if it's empty and we have exact match
+        if (!selectedState && cityData.city.name.toLowerCase() === selectedCity.toLowerCase()) {
           setSelectedState(cityData.district.name);
           setStateSearch(cityData.district.name);
         }
@@ -84,13 +99,11 @@ export const GeographySelector: React.FC<GeographySelectorProps> = ({
 
   // Notify parent component of changes
   useEffect(() => {
-    if (selectedCity) {
-      onLocationChange({
-        city: selectedCity,
-        state: selectedState,
-        ward: selectedWard
-      });
-    }
+    onLocationChange({
+      city: selectedCity,
+      state: selectedState,
+      ward: selectedWard
+    });
   }, [selectedCity, selectedState, selectedWard, onLocationChange]);
 
   const handleCitySelect = (city: string) => {
