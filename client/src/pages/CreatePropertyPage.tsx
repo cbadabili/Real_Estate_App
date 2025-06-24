@@ -81,6 +81,18 @@ const CreatePropertyPage = () => {
   const watchedValues = watch();
 
   const nextStep = () => {
+    // Simple validation check before advancing
+    if (currentStep === 1) {
+      const title = document.querySelector('input[name="title"]') as HTMLInputElement;
+      const description = document.querySelector('textarea[name="description"]') as HTMLTextAreaElement;
+      const propertyType = document.querySelector('select[name="propertyType"]') as HTMLSelectElement;
+      const listingType = document.querySelector('select[name="listingType"]') as HTMLSelectElement;
+      
+      if (!title?.value?.trim() || !description?.value?.trim() || !propertyType?.value || !listingType?.value) {
+        return; // Don't advance if required fields are empty
+      }
+    }
+    
     if (currentStep < totalSteps) {
       setCurrentStep(currentStep + 1);
     }
@@ -220,6 +232,7 @@ const CreatePropertyPage = () => {
                 </label>
                 <input
                   {...register('title')}
+                  name="title"
                   type="text"
                   className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   placeholder="Beautiful 3-bedroom house in Gaborone"
@@ -235,6 +248,7 @@ const CreatePropertyPage = () => {
                 </label>
                 <textarea
                   {...register('description')}
+                  name="description"
                   rows={4}
                   className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   placeholder="Describe your property's key features, location benefits, and what makes it special..."
@@ -251,6 +265,7 @@ const CreatePropertyPage = () => {
                   </label>
                   <select
                     {...register('propertyType')}
+                    name="propertyType"
                     className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   >
                     <option value="">Select type</option>
@@ -272,6 +287,7 @@ const CreatePropertyPage = () => {
                   </label>
                   <select
                     {...register('listingType')}
+                    name="listingType"
                     className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   >
                     <option value="owner">Owner Seller</option>
