@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { useLocation } from 'react-router-dom';
 import { 
   Search, 
   Star, 
@@ -47,51 +48,26 @@ interface ServiceProvider {
 }
 
 const ServicesPage = () => {
+  const location = useLocation();
   const [categories, setCategories] = useState<string[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   
-  // Check URL params for category filter and listen for changes
+  // React to location changes (URL parameter changes)
   useEffect(() => {
-    const checkUrlParams = () => {
-      const urlParams = new URLSearchParams(window.location.search);
-      const category = urlParams.get('category');
-      console.log('Checking URL params:', { 
-        currentUrl: window.location.href, 
-        search: window.location.search, 
-        category 
-      });
-      
-      if (category && category !== selectedCategory) {
-        console.log('Setting category from URL:', category);
-        setSelectedCategory(category);
-      } else if (!category && selectedCategory !== 'all') {
-        console.log('No category in URL, setting to all');
-        setSelectedCategory('all');
-      }
-    };
-
-    // Check immediately
-    checkUrlParams();
-
-    // Listen for URL changes (back/forward)
-    const handlePopState = () => {
-      console.log('Popstate event triggered');
-      checkUrlParams();
-    };
-
-    window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
-  }, [selectedCategory]);
-
-  // Also check for URL changes when the component updates
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const category = urlParams.get('category');
-    if (category && category !== selectedCategory) {
-      console.log('Component update - setting category:', category);
+    const urlParams = new URLSearchParams(location.search);
+    const category = urlParams.get('category') || 'all';
+    console.log('Location changed:', {
+      pathname: location.pathname,
+      search: location.search,
+      category,
+      currentSelected: selectedCategory
+    });
+    
+    if (category !== selectedCategory) {
+      console.log('Setting category from location change:', category);
       setSelectedCategory(category);
     }
-  });
+  }, [location.search, selectedCategory]);
   const [providers, setProviders] = useState<ServiceProvider[]>([]);
   const [filteredProviders, setFilteredProviders] = useState<ServiceProvider[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
