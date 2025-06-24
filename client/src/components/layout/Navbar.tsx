@@ -586,6 +586,140 @@ const Navbar = () => {
               </AnimatePresence>
             </div>
 
+            {/* Services Dropdown */}
+            <div 
+              className="relative"
+              onMouseEnter={() => setServicesDropdownOpen(true)}
+              onMouseLeave={() => setServicesDropdownOpen(false)}
+            >
+              <button className="flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100 transition-colors">
+                <Wrench className="h-4 w-4" />
+                <span>Services</span>
+                <ChevronDown className="h-3 w-3" />
+              </button>
+              
+              <AnimatePresence>
+                {servicesDropdownOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="absolute top-full left-0 mt-2 w-80 bg-white rounded-md shadow-lg border border-neutral-200 z-50"
+                  >
+                    <div className="p-3">
+                      <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide px-2 py-1 mb-2">Service Categories</div>
+                      
+                      <Link
+                        to="/services"
+                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded mb-1"
+                        onClick={() => setServicesDropdownOpen(false)}
+                      >
+                        <div className="flex items-center">
+                          <Wrench className="h-4 w-4 mr-2 text-beedab-blue" />
+                          <div>
+                            <div className="font-medium">All Services</div>
+                            <div className="text-xs text-gray-500">Browse all service providers</div>
+                          </div>
+                        </div>
+                      </Link>
+                      
+                      <div className="border-t border-gray-100 my-2"></div>
+                      
+                      <Link
+                        to="/services/legal"
+                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded mb-1"
+                        onClick={() => setServicesDropdownOpen(false)}
+                      >
+                        <div className="flex items-center">
+                          <FileText className="h-4 w-4 mr-2 text-beedab-blue" />
+                          <div>
+                            <div className="font-medium">Legal Services</div>
+                            <div className="text-xs text-gray-500">Conveyancing & contracts</div>
+                          </div>
+                        </div>
+                      </Link>
+                      
+                      <Link
+                        to="/services/financing"
+                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded mb-1"
+                        onClick={() => setServicesDropdownOpen(false)}
+                      >
+                        <div className="flex items-center">
+                          <TrendingUp className="h-4 w-4 mr-2 text-beedab-blue" />
+                          <div>
+                            <div className="font-medium">Financing & Mortgage</div>
+                            <div className="text-xs text-gray-500">Loan officers & brokers</div>
+                          </div>
+                        </div>
+                      </Link>
+                      
+                      <Link
+                        to="/services?category=construction"
+                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded mb-1"
+                        onClick={() => setServicesDropdownOpen(false)}
+                      >
+                        <div className="flex items-center">
+                          <Building className="h-4 w-4 mr-2 text-beedab-blue" />
+                          <div>
+                            <div className="font-medium">Construction & Building</div>
+                            <div className="text-xs text-gray-500">Contractors & architects</div>
+                          </div>
+                        </div>
+                      </Link>
+                      
+                      <Link
+                        to="/services?category=maintenance"
+                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded mb-1"
+                        onClick={() => setServicesDropdownOpen(false)}
+                      >
+                        <div className="flex items-center">
+                          <Settings className="h-4 w-4 mr-2 text-beedab-blue" />
+                          <div>
+                            <div className="font-medium">Property Maintenance</div>
+                            <div className="text-xs text-gray-500">HVAC, plumbing & electrical</div>
+                          </div>
+                        </div>
+                      </Link>
+                      
+                      <Link
+                        to="/services?category=security"
+                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
+                        onClick={() => setServicesDropdownOpen(false)}
+                      >
+                        <div className="flex items-center">
+                          <Key className="h-4 w-4 mr-2 text-beedab-blue" />
+                          <div>
+                            <div className="font-medium">Security & Safety</div>
+                            <div className="text-xs text-gray-500">Security systems & inspections</div>
+                          </div>
+                        </div>
+                      </Link>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            {/* Map Search Navigation */}
+            {navigation.map((item) => {
+              const Icon = item.icon;
+              const isActive = location.pathname === item.href;
+              return (
+                <Link
+                  key={item.name}
+                  to={item.href}
+                  className={`flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                    isActive
+                      ? 'text-beedab-blue bg-blue-50'
+                      : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100'
+                  }`}
+                >
+                  <Icon className="h-4 w-4" />
+                  <span>{item.name}</span>
+                </Link>
+              );
+            })}
+
             {/* Post-dropdown Navigation */}
             {postDropdownNavigation.map((item) => {
               const Icon = item.icon;
