@@ -606,7 +606,7 @@ const Navbar = () => {
                       <div className="border-t border-gray-100 my-2"></div>
                       
                       <Link
-                        to="/services?category=legal"
+                        to="/services?category=Legal"
                         className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded mb-1"
                         onClick={() => setServicesDropdownOpen(false)}
                       >
@@ -620,7 +620,7 @@ const Navbar = () => {
                       </Link>
                       
                       <Link
-                        to="/services?category=financing"
+                        to="/services?category=Finance"
                         className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded mb-1"
                         onClick={() => setServicesDropdownOpen(false)}
                       >
@@ -634,43 +634,43 @@ const Navbar = () => {
                       </Link>
                       
                       <Link
-                        to="/services?category=construction"
+                        to="/services?category=Plumbing"
                         className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded mb-1"
                         onClick={() => setServicesDropdownOpen(false)}
                       >
                         <div className="flex items-center">
                           <Building className="h-4 w-4 mr-2 text-beedab-blue" />
                           <div>
-                            <div className="font-medium">Construction & Building</div>
-                            <div className="text-xs text-gray-500">Contractors & architects</div>
+                            <div className="font-medium">Plumbing Services</div>
+                            <div className="text-xs text-gray-500">Water systems & repairs</div>
                           </div>
                         </div>
                       </Link>
                       
                       <Link
-                        to="/services?category=maintenance"
+                        to="/services?category=Electrical"
                         className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded mb-1"
                         onClick={() => setServicesDropdownOpen(false)}
                       >
                         <div className="flex items-center">
                           <Settings className="h-4 w-4 mr-2 text-beedab-blue" />
                           <div>
-                            <div className="font-medium">Property Maintenance</div>
-                            <div className="text-xs text-gray-500">HVAC, plumbing & electrical</div>
+                            <div className="font-medium">Electrical Services</div>
+                            <div className="text-xs text-gray-500">Wiring & installations</div>
                           </div>
                         </div>
                       </Link>
                       
                       <Link
-                        to="/services?category=security"
+                        to="/services?category=Security"
                         className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
                         onClick={() => setServicesDropdownOpen(false)}
                       >
                         <div className="flex items-center">
                           <Key className="h-4 w-4 mr-2 text-beedab-blue" />
                           <div>
-                            <div className="font-medium">Security & Safety</div>
-                            <div className="text-xs text-gray-500">Security systems & inspections</div>
+                            <div className="font-medium">Security Services</div>
+                            <div className="text-xs text-gray-500">Security systems & safety</div>
                           </div>
                         </div>
                       </Link>
