@@ -307,7 +307,11 @@ const ServicesPage = () => {
         <div className="mb-8">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Service Categories</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3">
-            {categories.map((category) => {
+            {categories.filter((category) => {
+              // Only show main categories, exclude specializations that are redundant
+              const specializations = ['Plumbing', 'Electrical', 'HVAC', 'Roofing', 'Flooring', 'Painting', 'Garden', 'Pool', 'Security'];
+              return !specializations.includes(category);
+            }).map((category) => {
               const categoryData = categoryStructure[category as keyof typeof categoryStructure];
               const Icon = categoryData?.icon || categoryIcons[category] || Building;
               const isSelected = selectedCategory === category;
