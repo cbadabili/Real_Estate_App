@@ -448,7 +448,6 @@ const CreatePropertyPage = () => {
                   setValue('city', location.city);
                   setValue('state', location.state);
                   setValue('ward', location.ward || '');
-                  trigger(['city', 'state']);
                 }}
                 initialCity={watchedValues.city}
                 initialState={watchedValues.state}

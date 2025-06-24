@@ -84,15 +84,17 @@ export const GeographySelector: React.FC<GeographySelectorProps> = ({
     }
   }, [selectedCity]);
 
-  // Notify parent component of changes
+  // Notify parent component of changes - prevent infinite loops
   useEffect(() => {
-    // Always notify parent of changes, even if fields are empty (for editing)
-    onLocationChange({
-      city: selectedCity,
-      state: selectedState,
-      ward: selectedWard
-    });
-  }, [selectedCity, selectedState, selectedWard, onLocationChange]);
+    // Only notify when we have meaningful data
+    if (selectedCity && selectedState) {
+      onLocationChange({
+        city: selectedCity,
+        state: selectedState,
+        ward: selectedWard
+      });
+    }
+  }, [selectedCity, selectedState, selectedWard]);
 
   const handleCitySelect = (city: string) => {
     setSelectedCity(city);
