@@ -34,6 +34,7 @@ const Navbar = () => {
   const [buyDropdownOpen, setBuyDropdownOpen] = useState(false);
   const [sellDropdownOpen, setSellDropdownOpen] = useState(false);
   const [rentDropdownOpen, setRentDropdownOpen] = useState(false);
+  const [servicesDropdownOpen, setServicesDropdownOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [priceRange, setPriceRange] = useState([100000, 2000000]);
   const location = useLocation();
@@ -45,7 +46,6 @@ const Navbar = () => {
 
   const postDropdownNavigation = [
     { name: 'Auctions', href: '/auctions', icon: Handshake },
-    { name: 'Services', href: '/services', icon: Users },
   ];
 
   return (
