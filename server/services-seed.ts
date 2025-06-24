@@ -6,6 +6,42 @@ export async function seedServices() {
 
   // Sample service providers
   const providers = [
+    // Construction Services
+    {
+      companyName: "Botswana Builders Ltd",
+      serviceCategory: "Construction",
+      contactPerson: "Kabelo Moeng",
+      phoneNumber: "72556677",
+      email: "projects@botswanabuilders.bw",
+      websiteUrl: "https://botswanabuilders.bw",
+      logoUrl: "/api/placeholder/100/100",
+      description: "Leading construction company in Botswana specializing in residential and commercial buildings. REAC certified with 15+ years experience.",
+      reacCertified: true,
+      address: "Plot 50123, Broadhurst Industrial",
+      city: "Gaborone",
+      rating: "4.7",
+      reviewCount: 89,
+      verified: true,
+      featured: true
+    },
+    {
+      companyName: "Heritage Construction",
+      serviceCategory: "Construction",
+      contactPerson: "Thabo Kgathi",
+      phoneNumber: "71445588",
+      email: "info@heritageconst.bw",
+      websiteUrl: "https://heritageconst.bw",
+      logoUrl: "/api/placeholder/100/100",
+      description: "Specializing in luxury residential construction and renovations across Botswana. Award-winning designs and quality craftsmanship.",
+      reacCertified: false,
+      address: "Plot 789, Phakalane",
+      city: "Gaborone",
+      rating: "4.5",
+      reviewCount: 56,
+      verified: true,
+      featured: false
+    },
+
     // Photography Services
     {
       companyName: "Motswana Visuals",

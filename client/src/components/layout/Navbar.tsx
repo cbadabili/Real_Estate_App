@@ -627,8 +627,22 @@ const Navbar = () => {
                         <div className="flex items-center">
                           <TrendingUp className="h-4 w-4 mr-2 text-beedab-blue" />
                           <div>
-                            <div className="font-medium">Financing & Mortgage</div>
-                            <div className="text-xs text-gray-500">Loan officers & brokers</div>
+                            <div className="font-medium">Finance & Insurance</div>
+                            <div className="text-xs text-gray-500">Loans, mortgages & insurance</div>
+                          </div>
+                        </div>
+                      </Link>
+                      
+                      <Link
+                        to="/services?category=Construction"
+                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded mb-1"
+                        onClick={() => setServicesDropdownOpen(false)}
+                      >
+                        <div className="flex items-center">
+                          <Building className="h-4 w-4 mr-2 text-beedab-blue" />
+                          <div>
+                            <div className="font-medium">Construction & Building</div>
+                            <div className="text-xs text-gray-500">Contractors & builders</div>
                           </div>
                         </div>
                       </Link>
@@ -639,7 +653,7 @@ const Navbar = () => {
                         onClick={() => setServicesDropdownOpen(false)}
                       >
                         <div className="flex items-center">
-                          <Building className="h-4 w-4 mr-2 text-beedab-blue" />
+                          <Settings className="h-4 w-4 mr-2 text-beedab-blue" />
                           <div>
                             <div className="font-medium">Plumbing Services</div>
                             <div className="text-xs text-gray-500">Water systems & repairs</div>
@@ -649,28 +663,14 @@ const Navbar = () => {
                       
                       <Link
                         to="/services?category=Electrical"
-                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded mb-1"
-                        onClick={() => setServicesDropdownOpen(false)}
-                      >
-                        <div className="flex items-center">
-                          <Settings className="h-4 w-4 mr-2 text-beedab-blue" />
-                          <div>
-                            <div className="font-medium">Electrical Services</div>
-                            <div className="text-xs text-gray-500">Wiring & installations</div>
-                          </div>
-                        </div>
-                      </Link>
-                      
-                      <Link
-                        to="/services?category=Security"
                         className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
                         onClick={() => setServicesDropdownOpen(false)}
                       >
                         <div className="flex items-center">
                           <Key className="h-4 w-4 mr-2 text-beedab-blue" />
                           <div>
-                            <div className="font-medium">Security Services</div>
-                            <div className="text-xs text-gray-500">Security systems & safety</div>
+                            <div className="font-medium">Electrical Services</div>
+                            <div className="text-xs text-gray-500">Wiring & installations</div>
                           </div>
                         </div>
                       </Link>
