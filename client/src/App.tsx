@@ -4,6 +4,7 @@ import Navbar from './components/layout/Navbar';
 import HomePage from './pages/HomePage';
 import PropertiesPage from './pages/PropertiesPage';
 import RealPropertiesPage from './pages/RealPropertiesPage';
+import { PlotsPage } from './pages/PlotsPage';
 import RentPage from './pages/RentPage';
 import RentOutPage from './pages/RentOutPage';
 import RentalsPage from './pages/RentalsPage';
@@ -43,6 +44,7 @@ function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/properties" element={<RealPropertiesPage />} />
+            <Route path="/plots" element={<PlotsPage />} />
             <Route path="/rent" element={<RentPage />} />
             <Route path="/rent-out" element={<RentOutPage />} />
             <Route path="/buyer-seller-platform" element={<BuyerSellerPlatformPage />} />

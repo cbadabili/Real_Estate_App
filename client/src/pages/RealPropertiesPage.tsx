@@ -3,7 +3,10 @@ import { motion } from 'framer-motion';
 import { Filter, Grid, List as ListIcon, Search, MapPin, Bed, Bath, Square, Heart, Share2 } from 'lucide-react';
 import { useProperties, type PropertyFilters } from '../hooks/useProperties';
 import { LoadingSpinner } from '../components/ui/LoadingSpinner';
-import { useLocation } from 'react-router-dom';
+import { useLocation, Link } from 'react-router-dom';
+import { VerificationBadge } from '../components/VerificationBadge';
+import { TrustSafetyFeatures } from '../components/TrustSafetyFeatures';
+import { MortgageCalculator } from '../components/MortgageCalculator';
 
 const RealPropertiesPage = () => {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');

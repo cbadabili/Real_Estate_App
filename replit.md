@@ -110,16 +110,17 @@ BeeDab is a comprehensive real estate platform for the Botswana market, featurin
 
 ## Recent Changes
 
-- **June 25, 2025**: Enhanced BeeDaB with Botswana-specific plot marketplace features
-  - Added PlotSearchFilters component with location-based filtering for popular areas (Mogoditshane, Manyana, Mahalapye, Pitsane)
-  - Created PlotListingCard component matching Facebook marketplace format with WhatsApp integration
-  - Implemented SellerListingForm for direct seller listings with Botswana-specific validation
-  - Added PlotAlerts component for location-based notifications with email/SMS support
-  - Created bilingual support with English/Setswana translations for common real estate terms
-  - Built InteractiveMap component showing popular plot locations with pricing data
-  - Enhanced property features with amenities checklist and area build field
-  - Fixed photo upload to only show ads after actual file selection
-  - Resolved infinite loop warnings in form navigation and geography selector
+- **June 25, 2025**: Comprehensive platform enhancement with trust & safety focus
+  - Implemented complete trust engineering system with verification badges for agents, landlords, and listings
+  - Added comprehensive plot marketplace with location-based search for Botswana's prime areas
+  - Created advanced mortgage calculator with local bank rates and affordability assessment tools
+  - Built secure communication system with in-app messaging and reporting functionality
+  - Integrated comprehensive testing dashboard for end-to-end validation and persona testing
+  - Enhanced navigation with dedicated plots section and improved property verification display
+  - Added bilingual support (English/Setswana) for inclusive user experience
+  - Implemented WhatsApp integration for seamless seller-buyer communication
+  - Created interactive map showing popular locations with real market data
+  - Enhanced property features with comprehensive amenities checklist and area build tracking
 
 - **June 23, 2025**: Fixed critical database connection issues
   - Resolved WebSocket connection problems with Neon database

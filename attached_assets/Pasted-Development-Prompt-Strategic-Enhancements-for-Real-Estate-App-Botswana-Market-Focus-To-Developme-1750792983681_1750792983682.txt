@@ -1,0 +1,79 @@
+Development Prompt: Strategic Enhancements for Real Estate App (Botswana Market Focus)
+To: Development Team
+From: Product Strategy
+Date: June 24, 2025
+Subject: Feature Enhancement Roadmap for Botswana Market Dominance
+
+1. Overview & Strategic Context
+
+Following a deep analysis of the Botswana property market and user behavior, we have identified critical pain points and opportunities. The current market is defined by a deep user mistrust due to prevalent online scams and a significant gap between user needs and existing digital solutions.   
+
+This development phase is not about minor tweaks. It is a strategic pivot to transform our app from a standard listing portal into the most trusted, comprehensive, and user-centric real estate ecosystem in Botswana. The following enhancements are prioritized to build a powerful competitive moat by directly solving the market's most pressing problems.
+
+2. Core Enhancement Pillars & Feature Requirements
+
+Our development efforts will be organized around four strategic pillars:
+
+Pillar 1: Engineering Trust & Safety (Highest Priority)
+Mandate: The single greatest user pain point is the fear of scams from bogus agents and fraudulent listings, which are rampant on informal platforms. Our app's core value proposition must be security. We will engineer trust into the platform's DNA.   
+
+Required Features:
+
+Agent & Landlord Verification System:
+
+Verified Agent Badge: Implement a mandatory verification process for all listing agents. This requires agents to submit their official registration credentials (e.g., from the Real Estate Institute of Botswana) and a national ID (Omang). Verified agents will have a prominent, non-replicable "Verified Agent" badge on their profile and all listings. This directly counters the "bogus agent" problem.   
+Verified Landlord Badge: Create a verification tier for private landlords, requiring ID and proof of property ownership (e.g., title deed, utility bill). This provides a layer of security currently absent on social media.
+Listing Integrity & Verification:
+
+Verified Listing Badge: Introduce a premium feature where the app (or a partner) verifies a property's key documents (e.g., title deed). These listings receive a top-tier "Verified Listing" badge, signaling maximum trust to users.   
+Community Reporting: Implement a clear and simple "Report Listing" or "Report Agent" button on all listings and profiles. Reports must trigger an immediate internal review process to handle fake or misleading ads.   
+Secure In-App Communication:
+
+Develop a robust, monitored in-app messaging system. All initial contact between users and listers must be initiated through this channel. This is critical to prevent scammers from immediately moving users to unmonitored platforms like WhatsApp.   
+Two-Way Rating & Review System:
+
+After a transaction is marked as complete (e.g., lease signed), prompt both the user (tenant/buyer) and the lister (agent/landlord) to rate and review each other. This builds a public reputation system that incentivizes good behavior.
+Pillar 2: The "Plot Finder & Build Assist" Hub
+Mandate: A significant portion of the market prefers to buy undeveloped land and build their own homes—a rational response to high property prices and market mistrust. We will capture this large, underserved segment by building dedicated tools for their entire journey.   
+
+Required Features:
+
+Dedicated "Plots & Farms" Section:
+
+Create a top-level category in the app for "Plots," "Land," and "Farms," with equal prominence to "Residential" and "Commercial." This includes listings for both freehold and tribal land.   
+Specialized Filters: Develop filters unique to this category, such as:
+Land Tenure: Tribal Land vs. Freehold.   
+Utilities: Water Connection Available, Electricity Available.
+Zoning: Residential, Commercial, Agricultural.
+Verified Service Provider Marketplace:
+
+Build a new section within the app: a directory of professionals required for the building process.
+This marketplace must connect users with verified service providers, including Land Surveyors, Architects, Construction Companies, and Conveyancing Attorneys. Each provider profile should have its own verification badge and user ratings.
+Pillar 3: Integrated Affordability & Finance Centre
+Mandate: Users express significant anxiety about property affordability and the opaqueness of financing. We will empower them with tools that provide financial clarity and confidence.   
+
+Required Features:
+
+Localized Mortgage Calculator:
+Integrate a mortgage calculator that is pre-populated with the current prime lending rate from the Bank of Botswana and standard terms from major local banks (e.g., FNBB, Stanbic, Absa).   
+"What Can I Afford?" Estimator:
+Create a user-friendly tool where users can input their monthly income and key expenses to get a realistic estimate of an affordable property price and monthly bond repayment.
+Bank Pre-Approval Integration:
+Forge partnerships with local banks to include "Contact a Loan Officer" or "Apply for Pre-Approval" CTAs within the finance center, streamlining the path to securing a loan.
+Pillar 4: Core Usability & Advanced Search
+Mandate: Competitor apps suffer from bugs, poor filters, and unreliable listings. We will win on user experience by providing a stable, intuitive platform with highly relevant search functionality.   
+
+Required Features:
+
+Granular & Localized Search Filters:
+
+Location: Allow users to search and filter by specific Gaborone neighborhoods and "Blocks" (e.g., Block 8, Phakalane Golf Estate, Broadhurst) that are commonly used in the market.   
+Listing Status: Add toggles for Verified Listing, Verified Agent, Price Reduced, and Auction.
+User Control: Implement a "Hide this Listing" feature so users can permanently dismiss irrelevant properties from their search results, addressing a key frustration with cluttered interfaces.   
+Performance & Stability:
+
+Prioritize bug fixes to address common issues seen in other apps, such as notifications leading to blank white pages.   
+Ensure user preferences and saved searches are reliably stored and persist between sessions.   
+3. Conclusion
+
+Executing this roadmap will position our app as the definitive market leader in Botswana. Our focus on trust, combined with features tailored to the unique "build-your-own" culture and affordability concerns, will create a product that is not just better, but essential
