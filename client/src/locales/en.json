@@ -1,0 +1,139 @@
+{
+  "common": {
+    "plot": "Plot",
+    "plots": "Plots",
+    "price": "Price",
+    "location": "Location",
+    "size": "Size",
+    "contact": "Contact",
+    "call_seller": "Call Seller",
+    "whatsapp": "WhatsApp",
+    "search": "Search",
+    "filter": "Filter",
+    "clear": "Clear",
+    "apply": "Apply",
+    "save": "Save",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "delete": "Delete",
+    "view": "View",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "warning": "Warning",
+    "info": "Information"
+  },
+  "plot_status": {
+    "serviced": "Serviced",
+    "unserviced": "Unserviced",
+    "available": "Available",
+    "sold": "Sold",
+    "reserved": "Reserved"
+  },
+  "plot_types": {
+    "residential": "Residential",
+    "farm": "Farm Land",
+    "commercial": "Commercial",
+    "industrial": "Industrial"
+  },
+  "amenities": {
+    "water": "Water",
+    "electricity": "Electricity",
+    "road_access": "Road Access",
+    "title_deed": "Title Deed",
+    "survey": "Surveyed",
+    "fenced": "Fenced"
+  },
+  "locations": {
+    "mogoditshane_block_5": "Mogoditshane Block 5",
+    "manyana_plateau": "Manyana Plateau",
+    "mahalapye": "Mahalapye",
+    "pitsane": "Pitsane",
+    "gaborone": "Gaborone",
+    "francistown": "Francistown",
+    "lobatse": "Lobatse",
+    "kanye": "Kanye",
+    "serowe": "Serowe",
+    "maun": "Maun"
+  },
+  "search": {
+    "search_plots": "Search Plots",
+    "location_filter": "Filter by Location",
+    "price_range": "Price Range",
+    "plot_size_range": "Plot Size Range",
+    "min_price": "Minimum Price",
+    "max_price": "Maximum Price",
+    "min_size": "Minimum Size",
+    "max_size": "Maximum Size",
+    "plot_type": "Plot Type",
+    "amenities_available": "Amenities Available",
+    "quick_filters": "Quick Filters",
+    "residential_standard": "Residential 900-1000m²",
+    "farm_land": "Farm Land 4+ hectares",
+    "fully_serviced": "Fully Serviced"
+  },
+  "listing": {
+    "list_your_plot": "List Your Plot",
+    "create_listing": "Create a listing to sell your plot directly to buyers",
+    "plot_title": "Plot Title",
+    "plot_description": "Plot Description",
+    "seller_name": "Your Name",
+    "contact_phone": "Phone Number",
+    "contact_whatsapp": "WhatsApp Number",
+    "plot_photos": "Plot Photos",
+    "upload_photos": "Upload photos of your plot",
+    "choose_photos": "Choose Photos",
+    "publish_listing": "Publish Listing",
+    "publishing": "Publishing...",
+    "required_field": "Required field"
+  },
+  "alerts": {
+    "plot_alerts": "Plot Alerts",
+    "new_alert": "New Alert",
+    "create_new_alert": "Create New Alert",
+    "alert_location": "Alert Location",
+    "max_price": "Maximum Price",
+    "min_size": "Minimum Size",
+    "email_notifications": "Email for Notifications",
+    "phone_optional": "Phone (Optional)",
+    "only_serviced": "Only serviced plots",
+    "create_alert": "Create Alert",
+    "how_it_works": "How it works",
+    "alert_description": "You'll receive email notifications when new plots matching your criteria are listed. SMS notifications are available if you provide a phone number.",
+    "no_alerts": "No active alerts",
+    "create_alert_prompt": "Create an alert to get notified of new plots",
+    "active": "Active",
+    "paused": "Paused"
+  },
+  "contact": {
+    "interested_message": "Hi {sellerName}, I'm interested in your plot: {plotTitle} in {location}. Price: {price}",
+    "contact_seller": "Contact Seller",
+    "call_now": "Call Now",
+    "send_whatsapp": "Send WhatsApp Message",
+    "seller_contact": "Seller Contact Information"
+  },
+  "currency": {
+    "bwp": "BWP (Pula)",
+    "usd": "USD",
+    "price_in_bwp": "Price in BWP",
+    "price_in_usd": "Price in USD"
+  },
+  "units": {
+    "square_meters": "m²",
+    "hectares": "hectares",
+    "size_in_sqm": "Size in m²",
+    "size_in_hectares": "Size in hectares"
+  },
+  "validation": {
+    "required": "This field is required",
+    "invalid_email": "Please enter a valid email address",
+    "invalid_phone": "Please enter a valid phone number",
+    "min_length": "Minimum {min} characters required",
+    "max_length": "Maximum {max} characters allowed",
+    "min_value": "Minimum value is {min}",
+    "max_value": "Maximum value is {max}"
+  }
+}

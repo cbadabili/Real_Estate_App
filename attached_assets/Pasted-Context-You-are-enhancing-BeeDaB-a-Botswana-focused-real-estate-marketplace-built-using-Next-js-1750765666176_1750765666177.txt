@@ -1,0 +1,40 @@
+Context:
+You are enhancing “BeeDaB,” a Botswana-focused real estate marketplace built using Next.js, Tailwind CSS, and TypeScript. The existing codebase already includes core structure, pages, and components. Your task now is to implement additional key features, specifically reflecting real-world insights gathered from analyzing popular Facebook property groups (e.g., "PLOTS FOR SALE IN BOTSWANA" with over 270k members).
+
+---
+
+### Real Insights from Facebook Group Analysis:
+
+- Users primarily post clearly stating **plot location, plot size, price, amenities available (water/electricity), and contact details**.
+- Frequent locations mentioned: Mogoditshane Block 5, Manyana Plateau, Mahalapye, Pitsane.
+- Common plot sizes: approx. 900–1000m² for residential; 4 hectares+ for farming.
+- Price-conscious and direct-seller driven interactions.
+
+---
+
+### Task: 
+Enhance existing “BeeDaB” marketplace by clearly adding and defining the following feature modules/components:
+
+1. **Advanced Search & Filter Component (`PlotSearchFilters.tsx`):**
+   - Fields: Location, Plot Size Range (m²/hectares), Price Range, Amenities (Water/Electricity), Type (Residential/Farm/Commercial).
+   - Tailored specifically for Botswana property characteristics.
+
+2. **Map & Location Component (`InteractiveMap.tsx`):**
+   - Clearly labeled popular locations (Mogoditshane, Manyana, Mahalapye, Pitsane).
+   - Clickable plot pins (dummy data in GeoJSON).
+
+3. **Listing Card Component (`PlotListingCard.tsx`):**
+   - Display key details: Location, Size, Price, Amenities, Contact Phone/WhatsApp Button.
+   - Visual badge/tag: "Serviced" or "Unserviced".
+
+4. **Seller Direct-Listing Form (`SellerListingForm.tsx`):**
+   - Input fields matching common Facebook marketplace formats (Plot Size, Price, Location, Amenities, Description, Contact Number).
+   - Validation stubs clearly defined.
+
+5. **Alerts/Notifications Component (`PlotAlerts.tsx`):**
+   - Users subscribe to plot location alerts (e.g., "New plot available in Mogoditshane").
+   - Stubbed notification API route: `/api/notifications/newPlotAlert`.
+
+6. **Local Language Support (Bilingual Setswana/English):**
+   - JSON stub for translations clearly demonstrating labels common in Botswana (e.g., Plot, Price, Location, Call seller, Serviced, Unserviced).
+   - Files: `/locales

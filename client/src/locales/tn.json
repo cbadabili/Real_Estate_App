@@ -1,0 +1,139 @@
+{
+  "common": {
+    "plot": "Poloto",
+    "plots": "Dipoloto",
+    "price": "Tlhwatlhwa",
+    "location": "Lefelo",
+    "size": "Bogolo",
+    "contact": "Ikgolaganya",
+    "call_seller": "Letsa Morekisi",
+    "whatsapp": "WhatsApp",
+    "search": "Batla",
+    "filter": "Kgetholola",
+    "clear": "Phimola",
+    "apply": "Dirisa",
+    "save": "Boloka",
+    "cancel": "Khansela",
+    "edit": "Baakanya",
+    "delete": "Phimola",
+    "view": "Bona",
+    "back": "Morago",
+    "next": "Latelang",
+    "previous": "Pele",
+    "loading": "E a tsenya...",
+    "error": "Phoso",
+    "success": "Katlego",
+    "warning": "Temoso",
+    "info": "Tshedimosetso"
+  },
+  "plot_status": {
+    "serviced": "E na le ditirelo",
+    "unserviced": "Ga e na ditirelo",
+    "available": "E teng",
+    "sold": "E rekisitswe",
+    "reserved": "E beetswe"
+  },
+  "plot_types": {
+    "residential": "Ya bodulo",
+    "farm": "Ya polasi",
+    "commercial": "Ya kgwebo",
+    "industrial": "Ya madirelo"
+  },
+  "amenities": {
+    "water": "Metsi",
+    "electricity": "Motlakase",
+    "road_access": "Tsela",
+    "title_deed": "Lengolo la tshwanelo",
+    "survey": "E kgaoletswe",
+    "fenced": "E konositswe"
+  },
+  "locations": {
+    "mogoditshane_block_5": "Mogoditshane Block 5",
+    "manyana_plateau": "Manyana Plateau",
+    "mahalapye": "Mahalapye",
+    "pitsane": "Pitsane",
+    "gaborone": "Gaborone",
+    "francistown": "Francistown",
+    "lobatse": "Lobatse",
+    "kanye": "Kanye",
+    "serowe": "Serowe",
+    "maun": "Maun"
+  },
+  "search": {
+    "search_plots": "Batla Dipoloto",
+    "location_filter": "Kgetholola ka Lefelo",
+    "price_range": "Tekano ya Tlhwatlhwa",
+    "plot_size_range": "Tekano ya Bogolo jwa Poloto",
+    "min_price": "Tlhwatlhwa e e Kwa Tlase",
+    "max_price": "Tlhwatlhwa e e Kwa Godimo",
+    "min_size": "Bogolo jo bo Kwa Tlase",
+    "max_size": "Bogolo jo bo Kwa Godimo",
+    "plot_type": "Mofuta wa Poloto",
+    "amenities_available": "Ditirelo tse di Teng",
+    "quick_filters": "Dikgethololo tse di Bonako",
+    "residential_standard": "Ya bodulo 900-1000m²",
+    "farm_land": "Polasi 4+ di-hectare",
+    "fully_serviced": "E na le Ditirelo Tsotlhe"
+  },
+  "listing": {
+    "list_your_plot": "Kwala Poloto ya Gago",
+    "create_listing": "Dira lenaneo la go rekisa poloto ya gago ka tlhamalalo",
+    "plot_title": "Setlhogo sa Poloto",
+    "plot_description": "Tlhaloso ya Poloto",
+    "seller_name": "Leina la Gago",
+    "contact_phone": "Nomoro ya Mogala",
+    "contact_whatsapp": "Nomoro ya WhatsApp",
+    "plot_photos": "Ditshwantsho tsa Poloto",
+    "upload_photos": "Kenya ditshwantsho tsa poloto ya gago",
+    "choose_photos": "Tlhopha Ditshwantsho",
+    "publish_listing": "Phatlalatsa Lenaneo",
+    "publishing": "E a phatlalatsa...",
+    "required_field": "Tshimo e e tlhokegang"
+  },
+  "alerts": {
+    "plot_alerts": "Dikitsiso tsa Dipoloto",
+    "new_alert": "Kitsiso e Ntšha",
+    "create_new_alert": "Dira Kitsiso e Ntšha",
+    "alert_location": "Lefelo la Kitsiso",
+    "max_price": "Tlhwatlhwa e e Kwa Godimo",
+    "min_size": "Bogolo jo bo Kwa Tlase",
+    "email_notifications": "Imeile ya Dikitsiso",
+    "phone_optional": "Mogala (O ka se dirisiwe)",
+    "only_serviced": "Dipoloto tse di nang le ditirelo fela",
+    "create_alert": "Dira Kitsiso",
+    "how_it_works": "E dira jang",
+    "alert_description": "O tla amogela dikitsiso ka imeile fa dipoloto tse di tsamaelanang le dilo tse o di batlang di ngodilwe. Dikitsiso tsa SMS di teng fa o neela nomoro ya mogala.",
+    "no_alerts": "Ga go na dikitsiso tse di šomelang",
+    "create_alert_prompt": "Dira kitsiso gore o itsisiwe ka dipoloto tse dintšha",
+    "active": "E šomela",
+    "paused": "E emetse"
+  },
+  "contact": {
+    "interested_message": "Dumela {sellerName}, ke kgatlhegela poloto ya gago: {plotTitle} ko {location}. Tlhwatlhwa: {price}",
+    "contact_seller": "Ikgolaganya le Morekisi",
+    "call_now": "Letsa Jaanong",
+    "send_whatsapp": "Romela Molaetsa wa WhatsApp",
+    "seller_contact": "Tshedimosetso ya Ikgolagano ya Morekisi"
+  },
+  "currency": {
+    "bwp": "BWP (Pula)",
+    "usd": "USD",
+    "price_in_bwp": "Tlhwatlhwa ka BWP",
+    "price_in_usd": "Tlhwatlhwa ka USD"
+  },
+  "units": {
+    "square_meters": "m²",
+    "hectares": "di-hectare",
+    "size_in_sqm": "Bogolo ka m²",
+    "size_in_hectares": "Bogolo ka di-hectare"
+  },
+  "validation": {
+    "required": "Tshimo e e tlhokega",
+    "invalid_email": "Tsenya aterese ya imeile e e siameng",
+    "invalid_phone": "Tsenya nomoro ya mogala e e siameng",
+    "min_length": "Go tlhokega didirisiwa di le {min} kwa tlase",
+    "max_length": "Didirisiwa di le {max} kwa godimo di a letlelwa",
+    "min_value": "Boleng jo bo kwa tlase ke {min}",
+    "max_value": "Boleng jo bo kwa godimo ke {max}"
+  }
+}

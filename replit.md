@@ -110,12 +110,16 @@ BeeDab is a comprehensive real estate platform for the Botswana market, featurin
 
 ## Recent Changes
 
-- **June 25, 2025**: Enhanced service provider categories and form navigation
-  - Simplified service category names (removed "Services" and "Maintenance" suffixes)
-  - Added distinctive icons for each service category (HVAC, Plumbing, Electrical, etc.)
-  - Made property location fields editable while keeping ward field optional
-  - Fixed form step navigation issues in property creation flow
-  - Updated form validation to handle optional ward field properly
+- **June 25, 2025**: Enhanced BeeDaB with Botswana-specific plot marketplace features
+  - Added PlotSearchFilters component with location-based filtering for popular areas (Mogoditshane, Manyana, Mahalapye, Pitsane)
+  - Created PlotListingCard component matching Facebook marketplace format with WhatsApp integration
+  - Implemented SellerListingForm for direct seller listings with Botswana-specific validation
+  - Added PlotAlerts component for location-based notifications with email/SMS support
+  - Created bilingual support with English/Setswana translations for common real estate terms
+  - Built InteractiveMap component showing popular plot locations with pricing data
+  - Enhanced property features with amenities checklist and area build field
+  - Fixed photo upload to only show ads after actual file selection
+  - Resolved infinite loop warnings in form navigation and geography selector
 
 - **June 23, 2025**: Fixed critical database connection issues
   - Resolved WebSocket connection problems with Neon database
