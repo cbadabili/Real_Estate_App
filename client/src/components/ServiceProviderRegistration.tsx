@@ -77,7 +77,7 @@ const ServiceProviderRegistration: React.FC<ServiceProviderRegistrationProps> = 
     'Painting': Paintbrush
   };
 
-  const serviceCategories = [
+  const primaryCategories = [
     'Photography',
     'Legal',
     'Moving',
@@ -85,16 +85,19 @@ const ServiceProviderRegistration: React.FC<ServiceProviderRegistrationProps> = 
     'Insurance',
     'Cleaning',
     'Construction',
-    'Maintenance',
+    'Maintenance'
+  ];
+
+  const technicalSpecializations = [
     'HVAC',
     'Plumbing',
     'Electrical',
-    'Garden',
-    'Pool',
-    'Security',
     'Roofing',
     'Flooring',
-    'Painting'
+    'Painting',
+    'Garden',
+    'Pool',
+    'Security'
   ];
 
   const {
@@ -203,14 +206,14 @@ const ServiceProviderRegistration: React.FC<ServiceProviderRegistrationProps> = 
                 >
                   <option value="">Select a category</option>
                   <optgroup label="Primary Service Categories">
-                    {['Photography', 'Legal', 'Moving', 'Finance', 'Insurance', 'Cleaning', 'Construction', 'Maintenance'].map((category) => (
+                    {primaryCategories.map((category) => (
                       <option key={category} value={category}>
                         {category}
                       </option>
                     ))}
                   </optgroup>
                   <optgroup label="Technical Specializations">
-                    {['HVAC', 'Plumbing', 'Electrical', 'Roofing', 'Flooring', 'Painting', 'Garden', 'Pool', 'Security'].map((category) => (
+                    {technicalSpecializations.map((category) => (
                       <option key={category} value={category}>
                         {category}
                       </option>
