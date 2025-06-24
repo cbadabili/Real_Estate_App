@@ -86,13 +86,12 @@ export const GeographySelector: React.FC<GeographySelectorProps> = ({
 
   // Notify parent component of changes
   useEffect(() => {
-    if (selectedCity && selectedState) {
-      onLocationChange({
-        city: selectedCity,
-        state: selectedState,
-        ward: selectedWard
-      });
-    }
+    // Always notify parent of changes, even if fields are empty (for editing)
+    onLocationChange({
+      city: selectedCity,
+      state: selectedState,
+      ward: selectedWard
+    });
   }, [selectedCity, selectedState, selectedWard, onLocationChange]);
 
   const handleCitySelect = (city: string) => {

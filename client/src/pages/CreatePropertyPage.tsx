@@ -102,6 +102,8 @@ const CreatePropertyPage = () => {
         return ['price', 'address', 'city', 'state'];
       case 3:
         return ['bedrooms', 'bathrooms', 'squareFeet'];
+      case 4:
+        return []; // Final step - no validation needed
       default:
         return [];
     }
@@ -424,20 +426,7 @@ const CreatePropertyPage = () => {
                 </div>
               )}
 
-              <div>
-                <label className="block text-sm font-medium text-neutral-700 mb-2">
-                  Street Address *
-                </label>
-                <input
-                  {...register('address')}
-                  type="text"
-                  className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                  placeholder="Plot 123, Block 8"
-                />
-                {errors.address && (
-                  <p className="mt-1 text-sm text-red-600">{errors.address.message}</p>
-                )}
-              </div>
+
 
               {/* Enhanced Geography Selector */}
               <GeographySelector
@@ -445,7 +434,7 @@ const CreatePropertyPage = () => {
                   setValue('city', location.city);
                   setValue('state', location.state);
                   setValue('ward', location.ward || '');
-                  trigger(['city', 'state', 'ward']);
+                  trigger(['city', 'state']);
                 }}
                 initialCity={watchedValues.city}
                 initialState={watchedValues.state}
@@ -795,7 +784,7 @@ const CreatePropertyPage = () => {
               type="button"
               onClick={prevStep}
               disabled={currentStep === 1}
-              className="px-6 py-3 border border-neutral-300 text-neutral-700 rounded-lg hover:bg-neutral-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-6 py-3 border border-beedab-blue text-beedab-blue rounded-lg hover:bg-beedab-blue hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               Previous
             </button>
