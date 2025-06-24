@@ -71,45 +71,17 @@ const CreatePropertyPage = () => {
     trigger
   } = useForm<PropertyFormData>({
     resolver: zodResolver(propertySchema),
-    mode: 'onBlur',
+    mode: 'onSubmit',
     defaultValues: {
       ownerId: 1,
-      listingType: initialListingType as 'owner' | 'agent' | 'rental' | 'auction',
-      title: '',
-      description: '',
-      propertyType: '',
-      price: 0,
-      address: '',
-      city: '',
-      state: '',
-      ward: '',
-      bedrooms: 0,
-      bathrooms: 0,
-      squareFeet: 0
+      listingType: initialListingType as 'owner' | 'agent' | 'rental' | 'auction'
     }
   });
 
   const watchedValues = watch();
 
-  const nextStep = async () => {
-    // For step 1, just check if required fields have values
-    if (currentStep === 1) {
-      const title = watchedValues.title?.trim();
-      const description = watchedValues.description?.trim();
-      const propertyType = watchedValues.propertyType;
-      const listingType = watchedValues.listingType;
-      
-      if (title && description && propertyType && listingType) {
-        setCurrentStep(currentStep + 1);
-        return;
-      }
-    }
-    
-    // For other steps, use normal validation
-    const fieldsToValidate = getFieldsForStep(currentStep);
-    const isValid = await trigger(fieldsToValidate);
-    
-    if (isValid && currentStep < totalSteps) {
+  const nextStep = () => {
+    if (currentStep < totalSteps) {
       setCurrentStep(currentStep + 1);
     }
   };
@@ -819,8 +791,11 @@ const CreatePropertyPage = () => {
               {currentStep < totalSteps ? (
                 <button
                   type="button"
-                  onClick={nextStep}
-                  className="px-6 py-3 bg-beedab-blue text-white rounded-lg hover:bg-beedab-darkblue"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    nextStep();
+                  }}
+                  className="px-6 py-3 bg-beedab-blue text-white rounded-lg hover:bg-beedab-darkblue transition-colors"
                 >
                   Next Step
                 </button>
