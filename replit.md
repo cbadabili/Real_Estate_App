@@ -110,6 +110,13 @@ BeeDab is a comprehensive real estate platform for the Botswana market, featurin
 
 ## Recent Changes
 
+- **June 25, 2025**: Enhanced service provider categories and form navigation
+  - Simplified service category names (removed "Services" and "Maintenance" suffixes)
+  - Added distinctive icons for each service category (HVAC, Plumbing, Electrical, etc.)
+  - Made property location fields editable while keeping ward field optional
+  - Fixed form step navigation issues in property creation flow
+  - Updated form validation to handle optional ward field properly
+
 - **June 23, 2025**: Fixed critical database connection issues
   - Resolved WebSocket connection problems with Neon database
   - Added proper Neon configuration with stability settings

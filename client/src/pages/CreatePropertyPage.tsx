@@ -71,9 +71,21 @@ const CreatePropertyPage = () => {
     trigger
   } = useForm<PropertyFormData>({
     resolver: zodResolver(propertySchema),
+    mode: 'onChange',
     defaultValues: {
       ownerId: 1,
-      listingType: initialListingType as 'owner' | 'agent' | 'rental' | 'auction'
+      listingType: initialListingType as 'owner' | 'agent' | 'rental' | 'auction',
+      title: '',
+      description: '',
+      propertyType: '',
+      price: 0,
+      address: '',
+      city: '',
+      state: '',
+      ward: '',
+      bedrooms: 0,
+      bathrooms: 0,
+      squareFeet: 0
     }
   });
 
@@ -231,7 +243,6 @@ const CreatePropertyPage = () => {
                   type="text"
                   className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   placeholder="Beautiful 3-bedroom house in Gaborone"
-                  defaultValue=""
                 />
                 {errors.title && (
                   <p className="mt-1 text-sm text-red-600">{errors.title.message}</p>
