@@ -40,11 +40,8 @@ const Navbar = () => {
   const location = useLocation();
   const { user, logout } = useAuth();
 
-  const navigation = [
-    { name: 'Map Search', href: '/map-search', icon: MapPin },
-  ];
-
   const postDropdownNavigation = [
+    { name: 'Map Search', href: '/map-search', icon: MapPin },
     { name: 'Auctions', href: '/auctions', icon: Handshake },
   ];
 
@@ -289,24 +286,7 @@ const Navbar = () => {
               </AnimatePresence>
             </div>
 
-            {navigation.map((item) => {
-              const Icon = item.icon;
-              const isActive = location.pathname === item.href;
-              return (
-                <Link
-                  key={item.name}
-                  to={item.href}
-                  className={`flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                    isActive
-                      ? 'bg-beedab-blue/10 text-beedab-blue'
-                      : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100'
-                  }`}
-                >
-                  <Icon className="h-4 w-4" />
-                  <span>{item.name}</span>
-                </Link>
-              );
-            })}
+
             
             {/* Sell Dropdown */}
             <div 
@@ -626,7 +606,7 @@ const Navbar = () => {
                       <div className="border-t border-gray-100 my-2"></div>
                       
                       <Link
-                        to="/services/legal"
+                        to="/services?category=legal"
                         className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded mb-1"
                         onClick={() => setServicesDropdownOpen(false)}
                       >
@@ -640,7 +620,7 @@ const Navbar = () => {
                       </Link>
                       
                       <Link
-                        to="/services/financing"
+                        to="/services?category=financing"
                         className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded mb-1"
                         onClick={() => setServicesDropdownOpen(false)}
                       >
@@ -699,26 +679,6 @@ const Navbar = () => {
                 )}
               </AnimatePresence>
             </div>
-
-            {/* Map Search Navigation */}
-            {navigation.map((item) => {
-              const Icon = item.icon;
-              const isActive = location.pathname === item.href;
-              return (
-                <Link
-                  key={item.name}
-                  to={item.href}
-                  className={`flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                    isActive
-                      ? 'text-beedab-blue bg-blue-50'
-                      : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100'
-                  }`}
-                >
-                  <Icon className="h-4 w-4" />
-                  <span>{item.name}</span>
-                </Link>
-              );
-            })}
 
             {/* Post-dropdown Navigation */}
             {postDropdownNavigation.map((item) => {
@@ -834,30 +794,10 @@ const Navbar = () => {
             className="md:hidden bg-white border-t border-neutral-200"
           >
             <div className="px-4 py-2 space-y-1">
-              {navigation.map((item) => {
-                const Icon = item.icon;
-                const isActive = location === item.href;
-                return (
-                  <Link
-                    key={item.name}
-                    to={item.href}
-                    onClick={() => setIsOpen(false)}
-                    className={`flex items-center space-x-3 px-3 py-3 rounded-lg text-sm font-medium transition-colors ${
-                      isActive
-                        ? 'bg-beedab-blue/10 text-beedab-blue'
-                        : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100'
-                    }`}
-                  >
-                    <Icon className="h-5 w-5" />
-                    <span>{item.name}</span>
-                  </Link>
-                );
-              })}
-
               {/* Post-dropdown Navigation for Mobile */}
               {postDropdownNavigation.map((item) => {
                 const Icon = item.icon;
-                const isActive = location === item.href;
+                const isActive = location.pathname === item.href;
                 return (
                   <Link
                     key={item.name}

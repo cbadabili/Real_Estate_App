@@ -110,6 +110,14 @@ BeeDab is a comprehensive real estate platform for the Botswana market, featurin
 
 ## Recent Changes
 
+- **June 25, 2025**: Services navigation enhancement and consistency improvements
+  - Added Services dropdown menu to main navigation matching Buy/Sell/Rent structure
+  - Fixed duplicate Map Search appearing twice in navbar by consolidating navigation arrays
+  - Updated Services dropdown links to use consistent category filtering (?category=legal, ?category=financing, etc.)
+  - Improved mobile navigation organization with proper Services section
+  - Enhanced Services page to handle URL parameters for category filtering
+  - Maintained consistent styling and hover behavior across all navigation dropdowns
+
 - **June 25, 2025**: Comprehensive platform enhancement with trust & safety focus
   - Implemented complete trust engineering system with verification badges for agents, landlords, and listings
   - Added comprehensive plot marketplace with location-based search for Botswana's prime areas
