@@ -81,10 +81,16 @@ const CreatePropertyPage = () => {
 
   const nextStep = async () => {
     const fieldsToValidate = getFieldsForStep(currentStep);
+    console.log('Step:', currentStep, 'Fields to validate:', fieldsToValidate);
+    console.log('Current form values:', watchedValues);
     const isValid = await trigger(fieldsToValidate);
+    console.log('Validation result:', isValid);
+    console.log('Form errors:', errors);
     
     if (isValid && currentStep < totalSteps) {
       setCurrentStep(currentStep + 1);
+    } else {
+      console.log('Validation failed or already at last step');
     }
   };
 
@@ -225,6 +231,7 @@ const CreatePropertyPage = () => {
                   type="text"
                   className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   placeholder="Beautiful 3-bedroom house in Gaborone"
+                  defaultValue=""
                 />
                 {errors.title && (
                   <p className="mt-1 text-sm text-red-600">{errors.title.message}</p>
