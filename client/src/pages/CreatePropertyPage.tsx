@@ -71,7 +71,7 @@ const CreatePropertyPage = () => {
     trigger
   } = useForm<PropertyFormData>({
     resolver: zodResolver(propertySchema),
-    mode: 'onChange',
+    mode: 'onBlur',
     defaultValues: {
       ownerId: 1,
       listingType: initialListingType as 'owner' | 'agent' | 'rental' | 'auction',
@@ -92,17 +92,25 @@ const CreatePropertyPage = () => {
   const watchedValues = watch();
 
   const nextStep = async () => {
+    // For step 1, just check if required fields have values
+    if (currentStep === 1) {
+      const title = watchedValues.title?.trim();
+      const description = watchedValues.description?.trim();
+      const propertyType = watchedValues.propertyType;
+      const listingType = watchedValues.listingType;
+      
+      if (title && description && propertyType && listingType) {
+        setCurrentStep(currentStep + 1);
+        return;
+      }
+    }
+    
+    // For other steps, use normal validation
     const fieldsToValidate = getFieldsForStep(currentStep);
-    console.log('Step:', currentStep, 'Fields to validate:', fieldsToValidate);
-    console.log('Current form values:', watchedValues);
     const isValid = await trigger(fieldsToValidate);
-    console.log('Validation result:', isValid);
-    console.log('Form errors:', errors);
     
     if (isValid && currentStep < totalSteps) {
       setCurrentStep(currentStep + 1);
-    } else {
-      console.log('Validation failed or already at last step');
     }
   };
 
