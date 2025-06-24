@@ -635,7 +635,7 @@ const Navbar = () => {
                       
                       <Link
                         to="/services?category=Construction"
-                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded mb-1"
+                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
                         onClick={() => setServicesDropdownOpen(false)}
                       >
                         <div className="flex items-center">
@@ -643,34 +643,6 @@ const Navbar = () => {
                           <div>
                             <div className="font-medium">Construction & Building</div>
                             <div className="text-xs text-gray-500">Contractors & builders</div>
-                          </div>
-                        </div>
-                      </Link>
-                      
-                      <Link
-                        to="/services?category=Plumbing"
-                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded mb-1"
-                        onClick={() => setServicesDropdownOpen(false)}
-                      >
-                        <div className="flex items-center">
-                          <Settings className="h-4 w-4 mr-2 text-beedab-blue" />
-                          <div>
-                            <div className="font-medium">Plumbing Services</div>
-                            <div className="text-xs text-gray-500">Water systems & repairs</div>
-                          </div>
-                        </div>
-                      </Link>
-                      
-                      <Link
-                        to="/services?category=Electrical"
-                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
-                        onClick={() => setServicesDropdownOpen(false)}
-                      >
-                        <div className="flex items-center">
-                          <Key className="h-4 w-4 mr-2 text-beedab-blue" />
-                          <div>
-                            <div className="font-medium">Electrical Services</div>
-                            <div className="text-xs text-gray-500">Wiring & installations</div>
                           </div>
                         </div>
                       </Link>
