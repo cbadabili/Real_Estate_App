@@ -28,7 +28,7 @@ const propertySchema = z.object({
   address: z.string().min(1, 'Address is required'),
   city: z.string().min(1, 'City is required'),
   state: z.string().min(1, 'State is required'),
-  ward: z.string().min(1, 'Ward is required'),
+  ward: z.string().optional(),
   propertyType: z.string().min(1, 'Property type is required'),
   listingType: z.string().min(1, 'Listing type is required'),
   bedrooms: z.number().min(0),
@@ -99,7 +99,7 @@ const CreatePropertyPage = () => {
       case 1:
         return ['title', 'description', 'propertyType', 'listingType'];
       case 2:
-        return ['price', 'address', 'city', 'state', 'ward'];
+        return ['price', 'address', 'city', 'state'];
       case 3:
         return ['bedrooms', 'bathrooms', 'squareFeet'];
       default:
@@ -453,10 +453,10 @@ const CreatePropertyPage = () => {
               />
 
               {/* Display any validation errors for geography fields */}
-              {(errors.city || errors.state || errors.ward) && (
+              {(errors.city || errors.state) && (
                 <div className="bg-red-50 border border-red-200 rounded-lg p-3">
                   <p className="text-sm text-red-600">
-                    Please ensure all location fields are properly filled.
+                    Please ensure all required location fields are properly filled.
                   </p>
                 </div>
               )}
