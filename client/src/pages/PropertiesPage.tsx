@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Filter, Search, Grid, List as ListIcon, SlidersHorizontal } from 'lucide-react';
+import { Filter, Search, Grid, List as ListIcon, SlidersHorizontal, AlertCircle } from 'lucide-react';
 import PropertyCard from '../components/properties/PropertyCard';
 import PropertyFilters from '../components/properties/PropertyFilters';
 import { useProperties } from '../hooks/useProperties';
+import { EnhancedLoadingSpinner, SearchResultsSkeleton } from '../components/ui/EnhancedLoadingSpinner';
+import { useToastHelpers } from '../components/ui/Toast';
 
 const PropertiesPage = () => {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
@@ -18,7 +20,8 @@ const PropertiesPage = () => {
     listingType: 'all'
   });
 
-  const { data: properties = [], isLoading } = useProperties();
+  const { data: properties = [], isLoading, error, refetch } = useProperties();
+  const { error: showError } = useToastHelpers();
 
   const sortOptions = [
     { value: 'newest', label: 'Newest First' },
@@ -168,21 +171,65 @@ const PropertiesPage = () => {
 
           {/* Properties Grid/List */}
           <div className="flex-1">
-            {isLoading ? (
-              <div className="text-center py-12">
-                <div className="text-neutral-500">Loading properties...</div>
-              </div>
-            ) : sortedProperties.length === 0 ? (
-              <div className="text-center py-12">
-                <div className="text-neutral-400 mb-4">
-                  <Search className="h-16 w-16 mx-auto" />
+            {error ? (
+              <div className="text-center py-16 bg-white rounded-lg shadow-sm">
+                <div className="mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
+                  <AlertCircle className="h-8 w-8 text-red-600" />
                 </div>
-                <h3 className="text-xl font-semibold text-neutral-900 mb-2">
-                  No properties found
-                </h3>
-                <p className="text-neutral-600">
-                  Try adjusting your search criteria or filters
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">Unable to Load Properties</h3>
+                <p className="text-gray-600 mb-6">
+                  {error.message || 'There was a problem loading the properties. Please try again.'}
                 </p>
+                <div className="space-x-3">
+                  <button 
+                    onClick={() => refetch && refetch()}
+                    className="bg-beedab-blue text-white px-6 py-2 rounded-lg hover:bg-beedab-darkblue transition-colors"
+                  >
+                    Try Again
+                  </button>
+                  <button 
+                    onClick={() => {
+                      setFilters({
+                        priceRange: [0, 5000000],
+                        propertyType: 'all',
+                        bedrooms: 'any',
+                        bathrooms: 'any',
+                        listingType: 'all'
+                      });
+                      setSearchTerm('');
+                    }}
+                    className="bg-gray-100 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-200 transition-colors"
+                  >
+                    Clear Filters
+                  </button>
+                </div>
+              </div>
+            ) : isLoading ? (
+              <SearchResultsSkeleton viewMode={viewMode} />
+            ) : sortedProperties.length === 0 ? (
+              <div className="text-center py-16 bg-white rounded-lg shadow-sm">
+                <div className="mx-auto w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                  <Search className="h-8 w-8 text-gray-400" />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">No properties found</h3>
+                <p className="text-gray-600 mb-6">
+                  Try adjusting your search criteria or filters to see more results.
+                </p>
+                <button
+                  onClick={() => {
+                    setFilters({
+                      priceRange: [0, 5000000],
+                      propertyType: 'all',
+                      bedrooms: 'any',
+                      bathrooms: 'any',
+                      listingType: 'all'
+                    });
+                    setSearchTerm('');
+                  }}
+                  className="bg-beedab-blue text-white px-6 py-2 rounded-lg hover:bg-beedab-darkblue transition-colors"
+                >
+                  Clear All Filters
+                </button>
               </div>
             ) : (
               <div className={`grid gap-6 ${

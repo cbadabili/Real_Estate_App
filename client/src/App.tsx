@@ -1,5 +1,9 @@
 import { Routes, Route } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ToastProvider } from './components/ui/Toast';
+import { ErrorBoundary } from './components/ui/ErrorBoundary';
+import { OfflineIndicator } from './components/ui/OfflineIndicator';
 import Navbar from './components/layout/Navbar';
 import HomePage from './pages/HomePage';
 import PropertiesPage from './pages/PropertiesPage';
@@ -34,13 +38,32 @@ import AuctionsPage from './pages/AuctionsPage';
 import { AuthProvider } from './contexts/AuthContext';
 import { PropertyProvider } from './contexts/PropertyContext';
 
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 2,
+      retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      refetchOnWindowFocus: false,
+    },
+    mutations: {
+      retry: 1,
+      retryDelay: 1000,
+    },
+  },
+});
+
 function App() {
   return (
-    <AuthProvider>
-      <PropertyProvider>
-        <div className="min-h-screen bg-neutral-50">
-          <Navbar />
-          <Routes>
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <ToastProvider>
+          <AuthProvider>
+            <PropertyProvider>
+              <div className="min-h-screen bg-neutral-50">
+                <OfflineIndicator />
+                <Navbar />
+                <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/properties" element={<RealPropertiesPage />} />
@@ -70,10 +93,13 @@ function App() {
             <Route path="/services" element={<ServicesPage />} />
             <Route path="/documents" element={<DocumentsPage />} />
             <Route path="/test-api" element={<TestAPIPage />} />
-          </Routes>
-        </div>
-      </PropertyProvider>
-    </AuthProvider>
+              </Routes>
+              </div>
+            </PropertyProvider>
+          </AuthProvider>
+        </ToastProvider>
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 }
 
