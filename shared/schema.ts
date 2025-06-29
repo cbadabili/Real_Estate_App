@@ -12,11 +12,15 @@ export const users = pgTable("users", {
   firstName: text("first_name").notNull(),
   lastName: text("last_name").notNull(),
   phone: text("phone"),
-  userType: text("user_type").notNull(), // 'buyer', 'seller', 'agent', 'fsbo'
+  userType: text("user_type").notNull(), // 'buyer', 'seller', 'agent', 'fsbo', 'admin'
+  role: text("role").notNull().default("user"), // 'user', 'moderator', 'admin', 'super_admin'
+  permissions: json("permissions").$type<string[]>().default([]), // array of permission strings
   avatar: text("avatar"),
   bio: text("bio"),
   isVerified: boolean("is_verified").default(false),
+  isActive: boolean("is_active").default(true),
   reacNumber: text("reac_number"), // For certified agents
+  lastLoginAt: timestamp("last_login_at"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -121,6 +125,65 @@ export const agentReviews = pgTable("agent_reviews", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// User reviews and ratings (for all user types)
+export const userReviews = pgTable("user_reviews", {
+  id: serial("id").primaryKey(),
+  revieweeId: integer("reviewee_id").references(() => users.id).notNull(), // User being reviewed
+  reviewerId: integer("reviewer_id").references(() => users.id).notNull(), // User writing review
+  rating: integer("rating").notNull(), // 1-5 stars
+  review: text("review"),
+  reviewType: text("review_type").notNull(), // 'buyer', 'seller', 'agent', 'service_provider'
+  transactionId: integer("transaction_id"), // Reference to property transaction if applicable
+  isVerified: boolean("is_verified").default(false), // Verified by transaction
+  isPublic: boolean("is_public").default(true),
+  status: text("status").notNull().default("active"), // 'active', 'hidden', 'flagged', 'removed'
+  moderatorNotes: text("moderator_notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Review responses (for business replies)
+export const reviewResponses = pgTable("review_responses", {
+  id: serial("id").primaryKey(),
+  reviewId: integer("review_id").references(() => userReviews.id).notNull(),
+  responderId: integer("responder_id").references(() => users.id).notNull(),
+  response: text("response").notNull(),
+  isOfficial: boolean("is_official").default(false), // Official business response
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Review helpful votes
+export const reviewHelpful = pgTable("review_helpful", {
+  id: serial("id").primaryKey(),
+  reviewId: integer("review_id").references(() => userReviews.id).notNull(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  isHelpful: boolean("is_helpful").notNull(), // true for helpful, false for not helpful
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// User permissions and roles
+export const userPermissions = pgTable("user_permissions", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  permission: text("permission").notNull(),
+  grantedBy: integer("granted_by").references(() => users.id),
+  expiresAt: timestamp("expires_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Admin audit log
+export const adminAuditLog = pgTable("admin_audit_log", {
+  id: serial("id").primaryKey(),
+  adminId: integer("admin_id").references(() => users.id).notNull(),
+  action: text("action").notNull(), // 'user_ban', 'review_moderate', 'property_approve', etc.
+  targetType: text("target_type").notNull(), // 'user', 'property', 'review', etc.
+  targetId: integer("target_id").notNull(),
+  details: json("details").$type<Record<string, any>>(),
+  ipAddress: text("ip_address"),
+  userAgent: text("user_agent"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
   ownedProperties: many(properties, { relationName: "propertyOwner" }),
@@ -130,6 +193,12 @@ export const usersRelations = relations(users, ({ many }) => ({
   savedProperties: many(savedProperties),
   propertyReviews: many(propertyReviews),
   agentReviews: many(agentReviews),
+  writtenUserReviews: many(userReviews, { relationName: "reviewer" }),
+  receivedUserReviews: many(userReviews, { relationName: "reviewee" }),
+  reviewResponses: many(reviewResponses),
+  reviewHelpfulVotes: many(reviewHelpful),
+  permissions: many(userPermissions),
+  auditActions: many(adminAuditLog),
 }));
 
 export const propertiesRelations = relations(properties, ({ one, many }) => ({
@@ -186,6 +255,62 @@ export const savedPropertiesRelations = relations(savedProperties, ({ one }) => 
   }),
 }));
 
+// User review relations
+export const userReviewsRelations = relations(userReviews, ({ one, many }) => ({
+  reviewee: one(users, {
+    fields: [userReviews.revieweeId],
+    references: [users.id],
+    relationName: "reviewee"
+  }),
+  reviewer: one(users, {
+    fields: [userReviews.reviewerId],
+    references: [users.id],
+    relationName: "reviewer"
+  }),
+  responses: many(reviewResponses),
+  helpfulVotes: many(reviewHelpful),
+}));
+
+export const reviewResponsesRelations = relations(reviewResponses, ({ one }) => ({
+  review: one(userReviews, {
+    fields: [reviewResponses.reviewId],
+    references: [userReviews.id],
+  }),
+  responder: one(users, {
+    fields: [reviewResponses.responderId],
+    references: [users.id],
+  }),
+}));
+
+export const reviewHelpfulRelations = relations(reviewHelpful, ({ one }) => ({
+  review: one(userReviews, {
+    fields: [reviewHelpful.reviewId],
+    references: [userReviews.id],
+  }),
+  user: one(users, {
+    fields: [reviewHelpful.userId],
+    references: [users.id],
+  }),
+}));
+
+export const userPermissionsRelations = relations(userPermissions, ({ one }) => ({
+  user: one(users, {
+    fields: [userPermissions.userId],
+    references: [users.id],
+  }),
+  grantedByUser: one(users, {
+    fields: [userPermissions.grantedBy],
+    references: [users.id],
+  }),
+}));
+
+export const adminAuditLogRelations = relations(adminAuditLog, ({ one }) => ({
+  admin: one(users, {
+    fields: [adminAuditLog.adminId],
+    references: [users.id],
+  }),
+}));
+
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
@@ -229,6 +354,99 @@ export type Appointment = typeof appointments.$inferSelect;
 export type InsertAppointment = z.infer<typeof insertAppointmentSchema>;
 export type SavedProperty = typeof savedProperties.$inferSelect;
 export type InsertSavedProperty = z.infer<typeof insertSavedPropertySchema>;
+
+// Review system insert schemas
+export const insertUserReviewSchema = createInsertSchema(userReviews).omit({
+  id: true,
+  isVerified: true,
+  status: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertReviewResponseSchema = createInsertSchema(reviewResponses).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertReviewHelpfulSchema = createInsertSchema(reviewHelpful).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertUserPermissionSchema = createInsertSchema(userPermissions).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertAdminAuditLogSchema = createInsertSchema(adminAuditLog).omit({
+  id: true,
+  createdAt: true,
+});
+
+// Review system types
+export type UserReview = typeof userReviews.$inferSelect;
+export type InsertUserReview = z.infer<typeof insertUserReviewSchema>;
+export type ReviewResponse = typeof reviewResponses.$inferSelect;
+export type InsertReviewResponse = z.infer<typeof insertReviewResponseSchema>;
+export type ReviewHelpful = typeof reviewHelpful.$inferSelect;
+export type InsertReviewHelpful = z.infer<typeof insertReviewHelpfulSchema>;
+export type UserPermission = typeof userPermissions.$inferSelect;
+export type InsertUserPermission = z.infer<typeof insertUserPermissionSchema>;
+export type AdminAuditLog = typeof adminAuditLog.$inferSelect;
+export type InsertAdminAuditLog = z.infer<typeof insertAdminAuditLogSchema>;
+
+// User roles and permissions
+export enum UserRole {
+  USER = "user",
+  MODERATOR = "moderator", 
+  ADMIN = "admin",
+  SUPER_ADMIN = "super_admin"
+}
+
+export enum UserType {
+  BUYER = "buyer",
+  SELLER = "seller", 
+  AGENT = "agent",
+  FSBO = "fsbo",
+  ADMIN = "admin"
+}
+
+export enum Permission {
+  // User management
+  CREATE_USER = "create_user",
+  UPDATE_USER = "update_user",
+  DELETE_USER = "delete_user",
+  VIEW_USER = "view_user",
+  BAN_USER = "ban_user",
+  VERIFY_USER = "verify_user",
+  
+  // Property management
+  CREATE_PROPERTY = "create_property",
+  UPDATE_PROPERTY = "update_property",
+  DELETE_PROPERTY = "delete_property",
+  VIEW_PROPERTY = "view_property",
+  APPROVE_PROPERTY = "approve_property",
+  FEATURE_PROPERTY = "feature_property",
+  
+  // Review management
+  CREATE_REVIEW = "create_review",
+  UPDATE_REVIEW = "update_review",
+  DELETE_REVIEW = "delete_review",
+  VIEW_REVIEW = "view_review",
+  MODERATE_REVIEW = "moderate_review",
+  RESPOND_TO_REVIEW = "respond_to_review",
+  
+  // Admin operations
+  VIEW_ADMIN_PANEL = "view_admin_panel",
+  MANAGE_PERMISSIONS = "manage_permissions",
+  VIEW_AUDIT_LOG = "view_audit_log",
+  SYSTEM_SETTINGS = "system_settings",
+  
+  // Services
+  MANAGE_SERVICES = "manage_services",
+  APPROVE_SERVICE_PROVIDER = "approve_service_provider",
+}
 
 // Re-export services schema types for convenience
 export * from "./services-schema";
