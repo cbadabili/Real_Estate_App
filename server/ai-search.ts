@@ -83,8 +83,10 @@ Respond with JSON in this exact format:
 }
 
 function parseQueryFallback(query: string): AISearchResult {
-  const lowerQuery = query.toLowerCase();
+  console.log('Using fallback parser for query:', query);
+  
   const filters: SearchFilters = {};
+  const lowerQuery = query.toLowerCase();
 
   // Extract price information (Botswana Pula)
   const priceMatches = lowerQuery.match(/(?:under|below|less than|<)\s*p?(\d+(?:,\d{3})*(?:k|m|000)?)/i);

@@ -1,25 +1,36 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { X, Home, Bed, Bath, Building2, Store, Tractor, Mountain } from 'lucide-react';
+import { SlidersHorizontal, X, Home, Building, MapPin, DollarSign } from 'lucide-react';
 
 interface PropertyFiltersProps {
-  filters: any;
+  filters: {
+    priceRange: [number, number];
+    propertyType: string;
+    bedrooms: string;
+    bathrooms: string;
+    listingType: string;
+  };
   onFiltersChange: (filters: any) => void;
   propertyCount: number;
+  className?: string;
 }
 
-const PropertyFilters: React.FC<PropertyFiltersProps> = ({ 
-  filters, 
+export const PropertyFilters: React.FC<PropertyFiltersProps> = ({
+  filters,
   onFiltersChange,
-  propertyCount 
+  propertyCount,
+  className = ''
 }) => {
   const updateFilter = (key: string, value: any) => {
-    onFiltersChange({ ...filters, [key]: value });
+    onFiltersChange({
+      ...filters,
+      [key]: value
+    });
   };
 
-  const clearFilters = () => {
+  const clearAllFilters = () => {
     onFiltersChange({
-      priceRange: [0, 10000000],
+      priceRange: [0, 5000000],
       propertyType: 'all',
       bedrooms: 'any',
       bathrooms: 'any',
@@ -27,126 +38,104 @@ const PropertyFilters: React.FC<PropertyFiltersProps> = ({
     });
   };
 
-  const propertyTypes = [
-    { value: 'all', label: 'All Types', icon: null },
-    { value: 'house', label: 'House', icon: Home },
-    { value: 'apartment', label: 'Apartment', icon: Building2 },
-    { value: 'townhouse', label: 'Townhouse', icon: Home },
-    { value: 'commercial', label: 'Commercial', icon: Store },
-    { value: 'farm', label: 'Farm', icon: Tractor },
-    { value: 'land', label: 'Land', icon: Mountain }
-  ];
+  const formatPrice = (price: number) => {
+    if (price >= 1000000) {
+      return `P${(price / 1000000).toFixed(1)}M`;
+    }
+    if (price >= 1000) {
+      return `P${(price / 1000).toFixed(0)}K`;
+    }
+    return `P${price.toLocaleString()}`;
+  };
 
-  const bedroomOptions = [
-    { value: 'any', label: 'Any' },
-    { value: '1', label: '1+' },
-    { value: '2', label: '2+' },
-    { value: '3', label: '3+' },
-    { value: '4', label: '4+' },
-    { value: '5', label: '5+' }
-  ];
-
-  const bathroomOptions = [
-    { value: 'any', label: 'Any' },
-    { value: '1', label: '1+' },
-    { value: '2', label: '2+' },
-    { value: '3', label: '3+' },
-    { value: '4', label: '4+' }
-  ];
-
-  const listingTypes = [
-    { value: 'all', label: 'All Listings' },
-    { value: 'agent', label: 'Agent Listings' },
-    { value: 'owner', label: 'Owner Seller' }
+  const botswanaLocations = [
+    'Gaborone', 'Francistown', 'Molepolole', 'Kanye', 'Serowe', 
+    'Mahalapye', 'Mogoditshane', 'Mochudi', 'Maun', 'Lobatse',
+    'Block 8', 'Block 9', 'Block 10', 'G-West', 'Phakalane'
   ];
 
   return (
-    <motion.div
-      initial={{ opacity: 0, x: -20 }}
-      animate={{ opacity: 1, x: 0 }}
-      className="bg-white rounded-xl shadow-lg border border-neutral-200 p-6"
-    >
-      <div className="flex justify-between items-center mb-6">
-        <h3 className="text-lg font-semibold text-neutral-900">Filters</h3>
-        <button
-          onClick={clearFilters}
-          className="text-sm text-beedab-darkblue hover:text-beedab-blue font-medium"
-        >
-          Clear All
-        </button>
+    <div className={`bg-white rounded-lg shadow-sm border border-gray-200 ${className}`}>
+      {/* Header */}
+      <div className="p-4 border-b border-gray-200">
+        <div className="flex items-center justify-between">
+          <h3 className="text-lg font-semibold text-gray-900 flex items-center">
+            <SlidersHorizontal className="h-5 w-5 mr-2 text-beedab-blue" />
+            Filters
+          </h3>
+          <button
+            onClick={clearAllFilters}
+            className="text-sm text-gray-500 hover:text-gray-700 flex items-center"
+          >
+            <X className="h-4 w-4 mr-1" />
+            Clear All
+          </button>
+        </div>
+        <p className="text-sm text-gray-600 mt-1">
+          {propertyCount} properties match your criteria
+        </p>
       </div>
 
-      <div className="space-y-6">
+      <div className="p-4 space-y-6">
         {/* Price Range */}
         <div>
-          <label className="flex items-center text-sm font-medium text-neutral-700 mb-3">
-            <span className="font-bold text-sm mr-2">P</span>
-            Price Range (Pula)
+          <label className="block text-sm font-medium text-gray-700 mb-3 flex items-center">
+            <DollarSign className="h-4 w-4 mr-2 text-beedab-blue" />
+            Price Range
           </label>
           <div className="space-y-3">
             <div className="flex items-center space-x-3">
-              <input
-                type="number"
-                placeholder="Min"
-                value={filters.priceRange[0] || ''}
-                onChange={(e) => updateFilter('priceRange', [parseInt(e.target.value) || 0, filters.priceRange[1]])}
-                className="flex-1 px-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent text-sm"
-              />
-              <span className="text-neutral-400">to</span>
-              <input
-                type="number"
-                placeholder="Max"
-                value={filters.priceRange[1] === 10000000 ? '' : filters.priceRange[1]}
-                onChange={(e) => updateFilter('priceRange', [filters.priceRange[0], parseInt(e.target.value) || 10000000])}
-                className="flex-1 px-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent text-sm"
-              />
+              <div className="flex-1">
+                <label className="block text-xs text-gray-500 mb-1">Minimum</label>
+                <input
+                  type="number"
+                  value={filters.priceRange[0]}
+                  onChange={(e) => updateFilter('priceRange', [parseInt(e.target.value) || 0, filters.priceRange[1]])}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
+                  placeholder="Min price"
+                />
+              </div>
+              <div className="flex-1">
+                <label className="block text-xs text-gray-500 mb-1">Maximum</label>
+                <input
+                  type="number"
+                  value={filters.priceRange[1]}
+                  onChange={(e) => updateFilter('priceRange', [filters.priceRange[0], parseInt(e.target.value) || 5000000])}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
+                  placeholder="Max price"
+                />
+              </div>
             </div>
-            <div className="flex flex-wrap gap-2">
-              {[
-                { label: 'P0-500K', range: [0, 500000] },
-                { label: 'P500K-1M', range: [500000, 1000000] },
-                { label: 'P1M-2M', range: [1000000, 2000000] },
-                { label: 'P2M-5M', range: [2000000, 5000000] },
-                { label: 'P5M+', range: [5000000, 10000000] }
-              ].map((preset) => (
-                <button
-                  key={preset.label}
-                  onClick={() => updateFilter('priceRange', preset.range)}
-                  className={`px-3 py-1 text-xs rounded-full border transition-colors ${
-                    filters.priceRange[0] === preset.range[0] && filters.priceRange[1] === preset.range[1]
-                      ? 'bg-beedab-lightblue border-beedab-blue text-beedab-darkblue'
-                      : 'border-neutral-300 text-neutral-700 hover:bg-neutral-50'
-                  }`}
-                >
-                  {preset.label}
-                </button>
-              ))}
+            <div className="text-xs text-gray-500">
+              {formatPrice(filters.priceRange[0])} - {formatPrice(filters.priceRange[1])}
             </div>
           </div>
         </div>
 
         {/* Property Type */}
         <div>
-          <label className="flex items-center text-sm font-medium text-neutral-700 mb-3">
-            <Home className="h-4 w-4 mr-2" />
+          <label className="block text-sm font-medium text-gray-700 mb-3 flex items-center">
+            <Home className="h-4 w-4 mr-2 text-beedab-blue" />
             Property Type
           </label>
           <div className="grid grid-cols-2 gap-2">
-            {propertyTypes.map((type) => (
+            {[
+              { value: 'all', label: 'All Types' },
+              { value: 'house', label: 'House' },
+              { value: 'apartment', label: 'Apartment' },
+              { value: 'townhouse', label: 'Townhouse' },
+              { value: 'plot', label: 'Plot/Land' },
+              { value: 'commercial', label: 'Commercial' }
+            ].map((type) => (
               <button
                 key={type.value}
                 onClick={() => updateFilter('propertyType', type.value)}
-                className={`flex items-center justify-center px-3 py-2 text-sm rounded-lg border transition-colors ${
+                className={`p-2 text-sm rounded-lg border transition-colors ${
                   filters.propertyType === type.value
-                    ? 'bg-beedab-blue border-beedab-blue text-white'
-                    : 'border-beedab-blue/30 text-neutral-700 hover:border-beedab-blue hover:bg-beedab-blue/5'
+                    ? 'border-beedab-blue bg-beedab-blue text-white'
+                    : 'border-gray-300 text-gray-700 hover:border-beedab-blue hover:text-beedab-blue'
                 }`}
               >
-                {type.icon && (
-                  <type.icon className={`w-4 h-4 mr-2 ${
-                    filters.propertyType === type.value ? 'text-white' : 'text-beedab-blue'
-                  }`} />
-                )}
                 {type.label}
               </button>
             ))}
@@ -155,22 +144,21 @@ const PropertyFilters: React.FC<PropertyFiltersProps> = ({
 
         {/* Bedrooms */}
         <div>
-          <label className="flex items-center text-sm font-medium text-neutral-700 mb-3">
-            <Bed className="h-4 w-4 mr-2" />
+          <label className="block text-sm font-medium text-gray-700 mb-3">
             Bedrooms
           </label>
-          <div className="grid grid-cols-3 gap-2">
-            {bedroomOptions.map((option) => (
+          <div className="flex flex-wrap gap-2">
+            {['any', '1', '2', '3', '4', '5+'].map((bedroom) => (
               <button
-                key={option.value}
-                onClick={() => updateFilter('bedrooms', option.value)}
+                key={bedroom}
+                onClick={() => updateFilter('bedrooms', bedroom)}
                 className={`px-3 py-2 text-sm rounded-lg border transition-colors ${
-                  filters.bedrooms === option.value
-                    ? 'bg-beedab-lightblue border-beedab-blue text-beedab-darkblue'
-                    : 'border-neutral-300 text-neutral-700 hover:bg-neutral-50'
+                  filters.bedrooms === bedroom
+                    ? 'border-beedab-blue bg-beedab-blue text-white'
+                    : 'border-gray-300 text-gray-700 hover:border-beedab-blue hover:text-beedab-blue'
                 }`}
               >
-                {option.label}
+                {bedroom === 'any' ? 'Any' : bedroom}
               </button>
             ))}
           </div>
@@ -178,22 +166,21 @@ const PropertyFilters: React.FC<PropertyFiltersProps> = ({
 
         {/* Bathrooms */}
         <div>
-          <label className="flex items-center text-sm font-medium text-neutral-700 mb-3">
-            <Bath className="h-4 w-4 mr-2" />
+          <label className="block text-sm font-medium text-gray-700 mb-3">
             Bathrooms
           </label>
-          <div className="grid grid-cols-3 gap-2">
-            {bathroomOptions.map((option) => (
+          <div className="flex flex-wrap gap-2">
+            {['any', '1', '2', '3', '4+'].map((bathroom) => (
               <button
-                key={option.value}
-                onClick={() => updateFilter('bathrooms', option.value)}
+                key={bathroom}
+                onClick={() => updateFilter('bathrooms', bathroom)}
                 className={`px-3 py-2 text-sm rounded-lg border transition-colors ${
-                  filters.bathrooms === option.value
-                    ? 'bg-beedab-lightblue border-beedab-blue text-beedab-darkblue'
-                    : 'border-neutral-300 text-neutral-700 hover:bg-neutral-50'
+                  filters.bathrooms === bathroom
+                    ? 'border-beedab-blue bg-beedab-blue text-white'
+                    : 'border-gray-300 text-gray-700 hover:border-beedab-blue hover:text-beedab-blue'
                 }`}
               >
-                {option.label}
+                {bathroom === 'any' ? 'Any' : bathroom}
               </button>
             ))}
           </div>
@@ -201,35 +188,68 @@ const PropertyFilters: React.FC<PropertyFiltersProps> = ({
 
         {/* Listing Type */}
         <div>
-          <label className="text-sm font-medium text-neutral-700 mb-3 block">
+          <label className="block text-sm font-medium text-gray-700 mb-3 flex items-center">
+            <Building className="h-4 w-4 mr-2 text-beedab-blue" />
             Listing Type
           </label>
           <div className="space-y-2">
-            {listingTypes.map((type) => (
+            {[
+              { value: 'all', label: 'All Listings' },
+              { value: 'sale', label: 'For Sale' },
+              { value: 'rent', label: 'For Rent' },
+              { value: 'auction', label: 'Auction' }
+            ].map((type) => (
+              <label key={type.value} className="flex items-center cursor-pointer">
+                <input
+                  type="radio"
+                  name="listingType"
+                  value={type.value}
+                  checked={filters.listingType === type.value}
+                  onChange={(e) => updateFilter('listingType', e.target.value)}
+                  className="h-4 w-4 text-beedab-blue focus:ring-beedab-blue border-gray-300"
+                />
+                <span className="ml-2 text-sm text-gray-700">{type.label}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+
+        {/* Popular Locations */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-3 flex items-center">
+            <MapPin className="h-4 w-4 mr-2 text-beedab-blue" />
+            Popular Locations
+          </label>
+          <div className="max-h-48 overflow-y-auto space-y-1">
+            {botswanaLocations.map((location) => (
               <button
-                key={type.value}
-                onClick={() => updateFilter('listingType', type.value)}
-                className={`w-full px-3 py-2 text-sm rounded-lg border transition-colors text-left ${
-                  filters.listingType === type.value
-                    ? 'bg-beedab-lightblue border-beedab-blue text-beedab-darkblue'
-                    : 'border-neutral-300 text-neutral-700 hover:bg-neutral-50'
-                }`}
+                key={location}
+                onClick={() => {
+                  // This would trigger a location-based search
+                  console.log('Filter by location:', location);
+                }}
+                className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
               >
-                {type.label}
+                {location}
               </button>
             ))}
           </div>
         </div>
 
-        {/* Results Summary */}
-        <div className="pt-4 border-t border-neutral-200">
-          <div className="bg-neutral-50 rounded-lg p-4 text-center">
-            <div className="text-2xl font-bold text-beedab-darkblue">{propertyCount}</div>
-            <div className="text-sm text-neutral-600">Properties Found</div>
-          </div>
+        {/* Apply Filters Button */}
+        <div className="pt-4 border-t border-gray-200">
+          <button
+            onClick={() => {
+              // Filters are applied in real-time, this could trigger a search
+              console.log('Filters applied:', filters);
+            }}
+            className="w-full bg-beedab-blue text-white py-3 px-4 rounded-lg hover:bg-beedab-darkblue transition-colors font-medium"
+          >
+            Apply Filters ({propertyCount} properties)
+          </button>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 };
 

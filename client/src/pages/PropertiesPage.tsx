@@ -1,37 +1,106 @@
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Filter, Search, Grid, List as ListIcon, SlidersHorizontal, AlertCircle } from 'lucide-react';
-import PropertyCard from '../components/properties/PropertyCard';
-import PropertyFilters from '../components/properties/PropertyFilters';
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Filter, Search, Grid, List as ListIcon, SlidersHorizontal, AlertCircle, MapPin, Map, BarChart3 } from 'lucide-react';
+import { PropertyCard } from '../components/PropertyCard';
+import { PropertyFilters } from '../components/properties/PropertyFilters';
+import { PropertyGrid } from '../components/properties/PropertyGrid';
+import { PropertyMap } from '../components/properties/PropertyMap';
+import { PropertyComparison } from '../components/properties/PropertyComparison';
+import { SavedSearches } from '../components/properties/SavedSearches';
+import { SmartSearchBar } from '../components/search/SmartSearchBar';
+import { SearchResultsHeader } from '../components/search/SearchResultsHeader';
+import { PageHeader } from '../components/layout/PageHeader';
+import { QuickActions } from '../components/ui/QuickActions';
 import { useProperties } from '../hooks/useProperties';
 import { EnhancedLoadingSpinner, SearchResultsSkeleton } from '../components/ui/EnhancedLoadingSpinner';
 import { useToastHelpers } from '../components/ui/Toast';
+import { useUserPreferences } from '../hooks/useLocalStorage';
+import { useSearch } from '../hooks/useSearch';
 
-const PropertiesPage = () => {
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [showFilters, setShowFilters] = useState(false);
+const PropertiesPage: React.FC = () => {
+  const { data: properties = [], isLoading, error, refetch } = useProperties();
+  const { success } = useToastHelpers();
+  const { preferences, updatePreference } = useUserPreferences();
+  const { performSearch, isSearching, searchResult: aiSearchResult, clearSearchResult } = useSearch();
+
+  // State management
   const [searchTerm, setSearchTerm] = useState('');
-  const [sortBy, setSortBy] = useState('newest');
   const [filters, setFilters] = useState({
-    priceRange: [0, 5000000],
+    priceRange: [0, 5000000] as [number, number],
     propertyType: 'all',
     bedrooms: 'any',
     bathrooms: 'any',
     listingType: 'all'
   });
+  const [sortBy, setSortBy] = useState(preferences.searchFilters?.defaultSortBy || 'newest');
+  const [viewMode, setViewMode] = useState<'grid' | 'list' | 'map'>(preferences.searchFilters?.defaultViewMode as 'grid' | 'list' | 'map' || 'grid');
+  const [showFilters, setShowFilters] = useState(false);
+  const [showSavedSearches, setShowSavedSearches] = useState(false);
+  const [showComparison, setShowComparison] = useState(false);
+  const [comparisonProperties, setComparisonProperties] = useState<any[]>([]);
+  const [selectedProperty, setSelectedProperty] = useState<any>(null);
 
-  const { data: properties = [], isLoading, error, refetch } = useProperties();
-  const { error: showError } = useToastHelpers();
+  // Search functionality
+  const handleSmartSearch = async (query: string) => {
+    if (!query.trim()) return;
+    
+    const result = await performSearch(query);
+    if (result && result.filters) {
+      // Apply AI-interpreted filters
+      const newFilters = {
+        priceRange: [
+          result.filters.minPrice || filters.priceRange[0],
+          result.filters.maxPrice || filters.priceRange[1]
+        ] as [number, number],
+        propertyType: result.filters.propertyType || filters.propertyType,
+        bedrooms: result.filters.minBedrooms ? result.filters.minBedrooms.toString() : filters.bedrooms,
+        bathrooms: result.filters.minBathrooms ? result.filters.minBathrooms.toString() : filters.bathrooms,
+        listingType: result.filters.listingType || filters.listingType
+      };
+      setFilters(newFilters);
+      setSearchTerm(query);
+    }
+  };
 
-  const sortOptions = [
-    { value: 'newest', label: 'Newest First' },
-    { value: 'price-low', label: 'Price: Low to High' },
-    { value: 'price-high', label: 'Price: High to Low' },
-    { value: 'sqft-large', label: 'Largest First' },
-    { value: 'bedrooms', label: 'Most Bedrooms' }
-  ];
+  // View mode and sorting handlers
+  const handleViewModeChange = (mode: 'grid' | 'list' | 'map') => {
+    setViewMode(mode);
+    updatePreference('searchFilters', 'defaultViewMode', mode);
+  };
 
-  const filteredProperties = properties.filter(property => {
+  const handleSortChange = (newSortBy: string) => {
+    setSortBy(newSortBy);
+    updatePreference('searchFilters', 'defaultSortBy', newSortBy);
+  };
+
+  // Property comparison functionality
+  const addToComparison = (property: any) => {
+    if (comparisonProperties.length >= 4) {
+      success('Maximum 4 properties can be compared at once');
+      return;
+    }
+    if (comparisonProperties.some(p => p.id === property.id)) {
+      return;
+    }
+    setComparisonProperties(prev => [...prev, property]);
+    success(`Added ${property.title} to comparison`);
+  };
+
+  const removeFromComparison = (propertyId: number) => {
+    setComparisonProperties(prev => prev.filter(p => p.id !== propertyId));
+    success('Property removed from comparison');
+  };
+
+  // Saved searches functionality
+  const handleLoadSavedSearch = (savedSearch: any) => {
+    setSearchTerm(savedSearch.query || '');
+    setFilters(savedSearch.filters || filters);
+    setShowSavedSearches(false);
+    success(`Loaded search: ${savedSearch.name}`);
+  };
+
+  // Property filtering and sorting
+  const filteredProperties = properties.filter((property: any) => {
     if (searchTerm && !property.title.toLowerCase().includes(searchTerm.toLowerCase()) &&
         !property.location.toLowerCase().includes(searchTerm.toLowerCase())) {
       return false;
@@ -45,7 +114,8 @@ const PropertiesPage = () => {
       return false;
     }
     
-    if (parseFloat(property.price) < filters.priceRange[0] || parseFloat(property.price) > filters.priceRange[1]) {
+    const price = typeof property.price === 'number' ? property.price : parseFloat(property.price);
+    if (price < filters.priceRange[0] || price > filters.priceRange[1]) {
       return false;
     }
     
@@ -61,11 +131,14 @@ const PropertiesPage = () => {
   });
 
   const sortedProperties = [...filteredProperties].sort((a, b) => {
+    const priceA = typeof a.price === 'number' ? a.price : parseFloat(a.price);
+    const priceB = typeof b.price === 'number' ? b.price : parseFloat(b.price);
+    
     switch (sortBy) {
       case 'price-low':
-        return parseFloat(a.price) - parseFloat(b.price);
+        return priceA - priceB;
       case 'price-high':
-        return parseFloat(b.price) - parseFloat(a.price);
+        return priceB - priceA;
       case 'sqft-large':
         return (b.squareFeet || 0) - (a.squareFeet || 0);
       case 'bedrooms':
@@ -77,97 +150,112 @@ const PropertiesPage = () => {
 
   return (
     <div className="min-h-screen bg-neutral-50">
-      {/* Header */}
-      <div className="bg-white border-b border-neutral-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between space-y-4 lg:space-y-0">
-            <div>
-              <h1 className="text-3xl font-bold text-neutral-900">Properties</h1>
-              <p className="text-neutral-600 mt-1">
-                {sortedProperties.length} properties found
-              </p>
-            </div>
+      <PageHeader
+        title="Properties"
+        subtitle="Find your perfect property in Botswana"
+        actions={
+          <button
+            onClick={() => setShowSavedSearches(!showSavedSearches)}
+            className="flex items-center space-x-2 px-3 py-2 border border-neutral-300 rounded-lg hover:bg-neutral-50 transition-colors"
+          >
+            <Search className="h-4 w-4" />
+            <span className="text-sm">Saved Searches</span>
+          </button>
+        }
+      />
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="space-y-6">
+          {/* Smart Search Bar */}
+          <div>
+            <SmartSearchBar
+              value={searchTerm}
+              onChange={setSearchTerm}
+              onSearch={handleSmartSearch}
+              placeholder="Search properties in Botswana..."
+              showFilters={true}
+              onFilterClick={() => setShowFilters(!showFilters)}
+            />
             
-            <div className="flex items-center space-x-4">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-neutral-400" />
-                <input
-                  type="text"
-                  placeholder="Search properties..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 pr-4 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all w-64"
-                />
+            {isSearching && (
+              <div className="mt-2 flex items-center text-sm text-gray-600">
+                <EnhancedLoadingSpinner size="sm" type="search" />
+                <span className="ml-2">Processing your search...</span>
               </div>
-              
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                className="px-4 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
-              >
-                {sortOptions.map(option => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-              
-              <button
-                onClick={() => setShowFilters(!showFilters)}
-                className={`flex items-center px-4 py-2 border rounded-lg transition-colors ${
-                  showFilters 
-                    ? 'border-primary-500 bg-primary-50 text-primary-600' 
-                    : 'border-neutral-300 hover:bg-neutral-50'
-                }`}
-              >
-                <SlidersHorizontal className="h-5 w-5 mr-2" />
-                Filters
-              </button>
-              
-              <div className="flex border border-neutral-300 rounded-lg overflow-hidden">
-                <button
-                  onClick={() => setViewMode('grid')}
-                  className={`p-2 transition-colors ${
-                    viewMode === 'grid' 
-                      ? 'bg-primary-600 text-white' 
-                      : 'text-neutral-600 hover:bg-neutral-50'
-                  }`}
-                >
-                  <Grid className="h-5 w-5" />
-                </button>
-                <button
-                  onClick={() => setViewMode('list')}
-                  className={`p-2 transition-colors ${
-                    viewMode === 'list' 
-                      ? 'bg-primary-600 text-white' 
-                      : 'text-neutral-600 hover:bg-neutral-50'
-                  }`}
-                >
-                  <ListIcon className="h-5 w-5" />
-                </button>
-              </div>
-            </div>
+            )}
           </div>
+
+          {/* Search Results Header */}
+          <SearchResultsHeader
+            propertyCount={sortedProperties.length}
+            sortBy={sortBy}
+            onSortChange={handleSortChange}
+            viewMode={viewMode}
+            onViewModeChange={handleViewModeChange}
+            showFilters={showFilters}
+            onToggleFilters={() => setShowFilters(!showFilters)}
+            comparisonCount={comparisonProperties.length}
+            onShowComparison={() => setShowComparison(true)}
+            aiSearchResult={aiSearchResult}
+            onClearAiSearch={clearSearchResult}
+          />
         </div>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex gap-8">
-          {/* Filters Sidebar */}
-          {showFilters && (
-            <motion.div
-              initial={{ x: -300, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              exit={{ x: -300, opacity: 0 }}
-              className="w-80 flex-shrink-0"
-            >
-              <PropertyFilters 
-                filters={filters} 
-                onFiltersChange={setFilters}
-                propertyCount={sortedProperties.length}
-              />
-            </motion.div>
-          )}
+          {/* Sidebar - always show but content varies */}
+          <div className="w-80 flex-shrink-0">
+            {(showFilters || showSavedSearches) ? (
+              <div className="space-y-6">
+                {/* Saved Searches */}
+                {showSavedSearches && (
+                  <motion.div
+                    initial={{ x: -300, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    exit={{ x: -300, opacity: 0 }}
+                  >
+                    <SavedSearches
+                      onLoadSearch={handleLoadSavedSearch}
+                      currentFilters={filters}
+                      currentQuery={searchTerm}
+                    />
+                  </motion.div>
+                )}
+
+                {/* Filters */}
+                {showFilters && (
+                  <motion.div
+                    initial={{ x: -300, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    exit={{ x: -300, opacity: 0 }}
+                  >
+                    <PropertyFilters 
+                      filters={filters} 
+                      onFiltersChange={setFilters}
+                      propertyCount={sortedProperties.length}
+                    />
+                  </motion.div>
+                )}
+              </div>
+            ) : (
+              <motion.div
+                initial={{ x: -300, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                exit={{ x: -300, opacity: 0 }}
+                className="space-y-6"
+              >
+                <QuickActions
+                  onCreateProperty={() => window.location.href = '/create-property'}
+                  onToggleFilters={() => setShowFilters(true)}
+                  onViewSavedSearches={() => setShowSavedSearches(true)}
+                  onShowComparison={() => setShowComparison(true)}
+                  onViewMap={() => handleViewModeChange('map')}
+                  comparisonCount={comparisonProperties.length}
+                />
+              </motion.div>
+            )}
+          </div>
 
           {/* Properties Grid/List */}
           <div className="flex-1">
@@ -190,7 +278,7 @@ const PropertiesPage = () => {
                   <button 
                     onClick={() => {
                       setFilters({
-                        priceRange: [0, 5000000],
+                        priceRange: [0, 5000000] as [number, number],
                         propertyType: 'all',
                         bedrooms: 'any',
                         bathrooms: 'any',
@@ -205,7 +293,7 @@ const PropertiesPage = () => {
                 </div>
               </div>
             ) : isLoading ? (
-              <SearchResultsSkeleton viewMode={viewMode} />
+              <SearchResultsSkeleton viewMode={viewMode === 'map' ? 'grid' : viewMode} />
             ) : sortedProperties.length === 0 ? (
               <div className="text-center py-16 bg-white rounded-lg shadow-sm">
                 <div className="mx-auto w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
@@ -218,7 +306,7 @@ const PropertiesPage = () => {
                 <button
                   onClick={() => {
                     setFilters({
-                      priceRange: [0, 5000000],
+                      priceRange: [0, 5000000] as [number, number],
                       propertyType: 'all',
                       bedrooms: 'any',
                       bathrooms: 'any',
@@ -231,30 +319,37 @@ const PropertiesPage = () => {
                   Clear All Filters
                 </button>
               </div>
+            ) : viewMode === 'map' ? (
+              <PropertyMap
+                properties={sortedProperties}
+                selectedProperty={selectedProperty}
+                onPropertySelect={setSelectedProperty}
+                className="min-h-[600px]"
+              />
             ) : (
-              <div className={`grid gap-6 ${
-                viewMode === 'grid' 
-                  ? 'md:grid-cols-2 lg:grid-cols-3' 
-                  : 'grid-cols-1'
-              }`}>
-                {sortedProperties.map((property, index) => (
-                  <motion.div
-                    key={property.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.05 }}
-                  >
-                    <PropertyCard 
-                      property={property} 
-                      viewMode={viewMode}
-                    />
-                  </motion.div>
-                ))}
-              </div>
+              <PropertyGrid
+                properties={sortedProperties}
+                viewMode={viewMode === 'map' ? 'grid' : viewMode as 'grid' | 'list'}
+                isLoading={isLoading}
+                onAddToComparison={addToComparison}
+                comparisonProperties={comparisonProperties}
+                className="w-full"
+              />
             )}
           </div>
         </div>
       </div>
+
+      {/* Property Comparison Modal */}
+      <AnimatePresence>
+        {showComparison && comparisonProperties.length > 0 && (
+          <PropertyComparison
+            properties={comparisonProperties}
+            onClose={() => setShowComparison(false)}
+            onRemoveProperty={removeFromComparison}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 };

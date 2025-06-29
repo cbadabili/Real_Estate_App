@@ -64,21 +64,36 @@ export function useUserPreferences() {
     }
   });
 
-  const updatePreference = (key: string, value: any) => {
-    setPreferences(prev => ({
-      ...prev,
-      [key]: value
-    }));
+  const updatePreference = (category: string, key: string, value: any) => {
+    setPreferences(prev => {
+      const categoryData = prev[category as keyof typeof prev];
+      if (typeof categoryData === 'object' && categoryData !== null) {
+        return {
+          ...prev,
+          [category]: {
+            ...categoryData,
+            [key]: value
+          }
+        };
+      }
+      return prev;
+    });
   };
 
   const updateNestedPreference = (category: string, key: string, value: any) => {
-    setPreferences(prev => ({
-      ...prev,
-      [category]: {
-        ...prev[category as keyof typeof prev],
-        [key]: value
+    setPreferences(prev => {
+      const categoryData = prev[category as keyof typeof prev];
+      if (typeof categoryData === 'object' && categoryData !== null) {
+        return {
+          ...prev,
+          [category]: {
+            ...categoryData,
+            [key]: value
+          }
+        };
       }
-    }));
+      return prev;
+    });
   };
 
   const resetPreferences = () => {
