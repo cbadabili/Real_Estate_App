@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { NotificationCenter } from '../ui/NotificationCenter';
+import { RoleBasedComponent } from '../auth/ProtectedRoute';
 import { 
   Menu, 
   X, 
@@ -25,7 +26,10 @@ import {
   Handshake,
   FileCheck,
   Key,
-  Users
+  Users,
+  Shield,
+  UserCheck,
+  Gavel
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { AISearchBar } from '../search/AISearchBar';
@@ -39,7 +43,7 @@ const Navbar = () => {
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [priceRange, setPriceRange] = useState([100000, 2000000]);
   const location = useLocation();
-  const { user, logout } = useAuth();
+  const { user, logout, isAdmin, isModerator } = useAuth();
 
   const postDropdownNavigation = [
     { name: 'Map Search', href: '/map-search', icon: MapPin },
@@ -65,7 +69,7 @@ const Navbar = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-10 text-lg">
-            {/* Buy Dropdown */}
+            {/* Buy Dropdown - Available to all users */}
             <div 
               className="relative"
               onMouseEnter={() => setBuyDropdownOpen(true)}
@@ -289,17 +293,18 @@ const Navbar = () => {
 
 
             
-            {/* Sell Dropdown */}
-            <div 
-              className="relative"
-              onMouseEnter={() => setSellDropdownOpen(true)}
-              onMouseLeave={() => setSellDropdownOpen(false)}
-            >
-              <button className="flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100 transition-colors">
-                <span className="text-beedab-blue font-bold text-xs">BWP</span>
-                <span>Sell</span>
-                <ChevronDown className="h-3 w-3" />
-              </button>
+            {/* Sell Dropdown - Only for sellers, agents, and fsbo users */}
+            <RoleBasedComponent allowedRoles={['seller', 'agent', 'fsbo', 'admin', 'super_admin']}>
+              <div 
+                className="relative"
+                onMouseEnter={() => setSellDropdownOpen(true)}
+                onMouseLeave={() => setSellDropdownOpen(false)}
+              >
+                <button className="flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100 transition-colors">
+                  <span className="text-beedab-blue font-bold text-xs">BWP</span>
+                  <span>Sell</span>
+                  <ChevronDown className="h-3 w-3" />
+                </button>
               
               <AnimatePresence>
                 {sellDropdownOpen && (
@@ -483,7 +488,8 @@ const Navbar = () => {
                   </motion.div>
                 )}
               </AnimatePresence>
-            </div>
+              </div>
+            </RoleBasedComponent>
 
             {/* Rent Dropdown */}
             <div 
@@ -682,7 +688,7 @@ const Navbar = () => {
                   onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
                   className="h-10 w-10 bg-beedab-blue rounded-full flex items-center justify-center text-white font-semibold hover:bg-beedab-darkblue transition-colors"
                 >
-                  {user.name.charAt(0).toUpperCase()}
+                  {user.firstName ? user.firstName.charAt(0).toUpperCase() : user.email.charAt(0).toUpperCase()}
                 </button>
                 
                 <AnimatePresence>
@@ -694,17 +700,70 @@ const Navbar = () => {
                       className="absolute top-full right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-neutral-200 z-50"
                     >
                       <div className="px-4 py-3 border-b border-neutral-100">
-                        <p className="text-sm font-medium text-neutral-900">{user.name}</p>
+                        <p className="text-sm font-medium text-neutral-900">
+                          {user.firstName} {user.lastName}
+                        </p>
                         <p className="text-xs text-neutral-500">{user.email}</p>
+                        <p className="text-xs text-neutral-400 capitalize">
+                          {user.userType} • {user.role}
+                        </p>
                       </div>
-                      <Link
-                        to="/dashboard"
-                        className="flex items-center px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100"
-                        onClick={() => setProfileDropdownOpen(false)}
-                      >
-                        <Building className="h-4 w-4 mr-2" />
-                        My Properties
-                      </Link>
+                      {/* Role-based navigation items */}
+                      <RoleBasedComponent allowedRoles={['user', 'moderator', 'admin', 'super_admin']}>
+                        <Link
+                          to="/dashboard"
+                          className="flex items-center px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100"
+                          onClick={() => setProfileDropdownOpen(false)}
+                        >
+                          <Building className="h-4 w-4 mr-2" />
+                          My Dashboard
+                        </Link>
+                      </RoleBasedComponent>
+
+                      <RoleBasedComponent allowedRoles={['seller', 'agent', 'fsbo']}>
+                        <Link
+                          to="/my-properties"
+                          className="flex items-center px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100"
+                          onClick={() => setProfileDropdownOpen(false)}
+                        >
+                          <Building className="h-4 w-4 mr-2" />
+                          My Properties
+                        </Link>
+                      </RoleBasedComponent>
+
+                      <RoleBasedComponent allowedRoles={['agent']}>
+                        <Link
+                          to="/agent-dashboard"
+                          className="flex items-center px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100"
+                          onClick={() => setProfileDropdownOpen(false)}
+                        >
+                          <UserCheck className="h-4 w-4 mr-2" />
+                          Agent Tools
+                        </Link>
+                      </RoleBasedComponent>
+
+                      <RoleBasedComponent requireModerator>
+                        <Link
+                          to="/moderation"
+                          className="flex items-center px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100"
+                          onClick={() => setProfileDropdownOpen(false)}
+                        >
+                          <Shield className="h-4 w-4 mr-2" />
+                          Moderation
+                        </Link>
+                      </RoleBasedComponent>
+
+                      <RoleBasedComponent requireAdmin>
+                        <Link
+                          to="/admin"
+                          className="flex items-center px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100"
+                          onClick={() => setProfileDropdownOpen(false)}
+                        >
+                          <Gavel className="h-4 w-4 mr-2" />
+                          Admin Panel
+                        </Link>
+                      </RoleBasedComponent>
+
                       <Link
                         to="/profile"
                         className="flex items-center px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100"
@@ -788,24 +847,32 @@ const Navbar = () => {
                 );
               })}
               
-              <div className="px-3 py-2 border-t border-neutral-100">
-                <p className="text-xs font-medium text-neutral-500 mb-2">SELL</p>
-                <Link
-                  to="/create-property"
-                  onClick={() => setIsOpen(false)}
-                  className="block px-3 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
-                >
-                  Agent Listing
-                </Link>
-                <Link
-                  to="/create-listing"
-                  onClick={() => setIsOpen(false)}
-                  className="block px-3 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
-                >
-                  Direct Sellers
-                </Link>
-              </div>
+              {/* Mobile Sell Section - Role-based access */}
+              <RoleBasedComponent allowedRoles={['seller', 'agent', 'fsbo', 'admin', 'super_admin']}>
+                <div className="px-3 py-2 border-t border-neutral-100">
+                  <p className="text-xs font-medium text-neutral-500 mb-2">SELL</p>
+                  <RoleBasedComponent allowedRoles={['agent', 'admin', 'super_admin']}>
+                    <Link
+                      to="/create-property"
+                      onClick={() => setIsOpen(false)}
+                      className="block px-3 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
+                    >
+                      Agent Listing
+                    </Link>
+                  </RoleBasedComponent>
+                  <RoleBasedComponent allowedRoles={['seller', 'fsbo', 'admin', 'super_admin']}>
+                    <Link
+                      to="/create-listing"
+                      onClick={() => setIsOpen(false)}
+                      className="block px-3 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
+                    >
+                      Direct Sellers
+                    </Link>
+                  </RoleBasedComponent>
+                </div>
+              </RoleBasedComponent>
               
+              {/* Mobile Rent Section - Available to all authenticated users */}
               <div className="px-3 py-2 border-t border-neutral-100">
                 <p className="text-xs font-medium text-neutral-500 mb-2">RENT</p>
                 <Link
@@ -815,13 +882,15 @@ const Navbar = () => {
                 >
                   Find Rental
                 </Link>
-                <Link
-                  to="/rent-out"
-                  onClick={() => setIsOpen(false)}
-                  className="block px-3 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
-                >
-                  Rent Out Property
-                </Link>
+                <RoleBasedComponent allowedRoles={['seller', 'agent', 'fsbo', 'admin', 'super_admin']}>
+                  <Link
+                    to="/rent-out"
+                    onClick={() => setIsOpen(false)}
+                    className="block px-3 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
+                  >
+                    Rent Out Property
+                  </Link>
+                </RoleBasedComponent>
               </div>
               
               {user ? (
@@ -841,6 +910,18 @@ const Navbar = () => {
                   >
                     Account Settings
                   </Link>
+                  
+                  {/* Admin Panel - Role-based access */}
+                  <RoleBasedComponent allowedRoles={['admin', 'super_admin']}>
+                    <Link
+                      to="/admin"
+                      onClick={() => setIsOpen(false)}
+                      className="block px-3 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
+                    >
+                      Admin Panel
+                    </Link>
+                  </RoleBasedComponent>
+                  
                   <button
                     onClick={() => {
                       logout();
