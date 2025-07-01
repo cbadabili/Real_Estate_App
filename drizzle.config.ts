@@ -6,6 +6,6 @@ export default defineConfig({
   schema: "./shared/schema.ts",
   dialect: "sqlite",
   dbCredentials: {
-    url: join(process.cwd(), 'data', 'beedab.db')
+    url: join(process.cwd(), 'beedab.db')
   },
 });

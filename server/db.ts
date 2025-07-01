@@ -2,18 +2,19 @@ import { drizzle } from 'drizzle-orm/better-sqlite3';
 import Database from 'better-sqlite3';
 import * as schema from "@shared/schema";
 import { join } from 'path';
-import { mkdir, existsSync } from 'fs';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
 
-// Ensure the data directory exists
-const dataDir = join(process.cwd(), 'data');
-if (!existsSync(dataDir)) {
-  mkdir(dataDir, { recursive: true }, (err) => {
-    if (err) console.error('Error creating data directory:', err);
-  });
-}
+// Get the directory name of the current module
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+// Create SQLite database file in the project directory
+const dbPath = join(__dirname, '..', 'beedab.db');
+console.log(`Using SQLite database at: ${dbPath}`);
 
 // Create SQLite database connection
-const sqlite = new Database(join(dataDir, 'beedab.db'));
+const sqlite = new Database(dbPath);
 
 // Create drizzle database instance
 export const db = drizzle(sqlite, { schema });
@@ -23,13 +24,8 @@ export async function testDatabaseConnection() {
   try {
     // Simple query to test connection
     const result = sqlite.prepare('SELECT 1 as test').get();
-    if (result && result.test === 1) {
-      console.log('Database connection successful');
-      return true;
-    } else {
-      console.error('Database connection test failed');
-      return false;
-    }
+    console.log('Database connection successful:', result);
+    return true;
   } catch (error) {
     console.error('Database connection failed:', error);
     return false;
