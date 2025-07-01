@@ -364,6 +364,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // AI Search API
+  app.post("/api/search/ai", async (req, res) => {
+    try {
+      const { query } = req.body;
+      
+      if (!query || typeof query !== 'string') {
+        return res.status(400).json({ message: "Query is required" });
+      }
+      
+      const result = await parseNaturalLanguageSearch(query);
+      res.json(result);
+    } catch (error) {
+      console.error("AI search error:", error);
+      res.status(500).json({ message: "Failed to process search query" });
+    }
+  });
+
   // Neighborhood and Search APIs would integrate with external services
   app.get("/api/neighborhoods/:zipCode", async (req, res) => {
     try {
@@ -398,23 +415,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Get neighborhood data error:", error);
       res.status(500).json({ message: "Failed to fetch neighborhood data" });
-    }
-  });
-
-  // AI Search API
-  app.post("/api/search/ai", async (req, res) => {
-    try {
-      const { query } = req.body;
-      
-      if (!query || typeof query !== 'string') {
-        return res.status(400).json({ message: "Query is required" });
-      }
-      
-      const result = await parseNaturalLanguageSearch(query);
-      res.json(result);
-    } catch (error) {
-      console.error("AI search error:", error);
-      res.status(500).json({ message: "Failed to process search query" });
     }
   });
 
