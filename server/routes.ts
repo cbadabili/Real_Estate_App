@@ -418,6 +418,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Contextual Ads API
+  app.get("/api/ads/contextual/:trigger", async (req, res) => {
+    try {
+      const trigger = req.params.trigger;
+      const ad = await servicesStorage.getContextualAd(trigger);
+      
+      if (!ad) {
+        return res.status(404).json({ message: "No ad found for this trigger" });
+      }
+      
+      // Get provider details to include with ad
+      const provider = await servicesStorage.getServiceProvider(ad.providerId);
+      
+      res.json({
+        ...ad,
+        provider: provider ? {
+          id: provider.id,
+          companyName: provider.companyName,
+          rating: provider.rating,
+          reviewCount: provider.reviewCount,
+          verified: provider.verified,
+          reacCertified: provider.reacCertified
+        } : null
+      });
+    } catch (error) {
+      console.error("Get contextual ad error:", error);
+      res.status(500).json({ message: "Failed to fetch contextual ad" });
+    }
+  });
+
+  app.post("/api/ads/:id/click", async (req, res) => {
+    try {
+      const adId = parseInt(req.params.id);
+      await servicesStorage.incrementAdMetrics(adId, 'clicks');
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Track ad click error:", error);
+      res.status(500).json({ message: "Failed to track ad click" });
+    }
+  });
+
   // Services API endpoints
   app.get("/api/services/providers", async (req, res) => {
     try {
@@ -487,47 +528,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Create service provider error:", error);
       res.status(400).json({ message: "Invalid service provider data" });
-    }
-  });
-
-  // Contextual Ads API
-  app.get("/api/ads/contextual/:trigger", async (req, res) => {
-    try {
-      const trigger = req.params.trigger;
-      const ad = await servicesStorage.getContextualAd(trigger);
-      
-      if (!ad) {
-        return res.status(404).json({ message: "No ad found for this trigger" });
-      }
-      
-      // Get provider details to include with ad
-      const provider = await servicesStorage.getServiceProvider(ad.providerId);
-      
-      res.json({
-        ...ad,
-        provider: provider ? {
-          id: provider.id,
-          companyName: provider.companyName,
-          rating: provider.rating,
-          reviewCount: provider.reviewCount,
-          verified: provider.verified,
-          reacCertified: provider.reacCertified
-        } : null
-      });
-    } catch (error) {
-      console.error("Get contextual ad error:", error);
-      res.status(500).json({ message: "Failed to fetch contextual ad" });
-    }
-  });
-
-  app.post("/api/ads/:id/click", async (req, res) => {
-    try {
-      const adId = parseInt(req.params.id);
-      await servicesStorage.incrementAdMetrics(adId, 'clicks');
-      res.json({ success: true });
-    } catch (error) {
-      console.error("Track ad click error:", error);
-      res.status(500).json({ message: "Failed to track ad click" });
     }
   });
 
