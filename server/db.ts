@@ -1,37 +1,35 @@
-import { Pool, neonConfig } from '@neondatabase/serverless';
-import { drizzle } from 'drizzle-orm/neon-serverless';
-import ws from "ws";
+import { drizzle } from 'drizzle-orm/better-sqlite3';
+import Database from 'better-sqlite3';
 import * as schema from "@shared/schema";
+import { join } from 'path';
+import { mkdir, existsSync } from 'fs';
 
-// Configure Neon with WebSocket constructor and additional settings
-neonConfig.webSocketConstructor = ws;
-neonConfig.useSecureWebSocket = true;
-neonConfig.pipelineConnect = false;
-
-if (!process.env.DATABASE_URL) {
-  throw new Error(
-    "DATABASE_URL must be set. Did you forget to provision a database?",
-  );
+// Ensure the data directory exists
+const dataDir = join(process.cwd(), 'data');
+if (!existsSync(dataDir)) {
+  mkdir(dataDir, { recursive: true }, (err) => {
+    if (err) console.error('Error creating data directory:', err);
+  });
 }
 
-// Create pool with additional configuration for stability
-export const pool = new Pool({ 
-  connectionString: process.env.DATABASE_URL,
-  max: 10,
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 10000,
-});
+// Create SQLite database connection
+const sqlite = new Database(join(dataDir, 'beedab.db'));
 
-export const db = drizzle({ client: pool, schema });
+// Create drizzle database instance
+export const db = drizzle(sqlite, { schema });
 
 // Test database connection on startup
 export async function testDatabaseConnection() {
   try {
-    const client = await pool.connect();
-    await client.query('SELECT 1');
-    client.release();
-    console.log('Database connection successful');
-    return true;
+    // Simple query to test connection
+    const result = sqlite.prepare('SELECT 1 as test').get();
+    if (result && result.test === 1) {
+      console.log('Database connection successful');
+      return true;
+    } else {
+      console.error('Database connection test failed');
+      return false;
+    }
   } catch (error) {
     console.error('Database connection failed:', error);
     return false;
