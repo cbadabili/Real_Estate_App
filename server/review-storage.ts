@@ -18,7 +18,7 @@ import {
   type InsertAdminAuditLog,
   Permission
 } from "@shared/schema";
-import { eq, desc, asc, and, sql, count, avg } from "drizzle-orm";
+import { eq, desc, asc, and, sql } from "drizzle-orm";
 
 export interface ReviewFilters {
   revieweeId?: number;
@@ -473,7 +473,13 @@ export class ReviewStorage implements IReviewStorage {
       query = query.offset(filters.offset);
     }
     
-    return await query;
+    const logs = await query;
+    
+    // Parse JSON strings back to objects
+    return logs.map(log => ({
+      ...log,
+      details: log.details ? JSON.parse(log.details) : null
+    }));
   }
 
   async createAuditLogEntry(entry: InsertAdminAuditLog): Promise<AdminAuditLog> {
