@@ -93,11 +93,13 @@ export interface IReviewStorage {
 export class ReviewStorage implements IReviewStorage {
   // User Reviews
   async getUserReview(id: number): Promise<UserReview | undefined> {
+    if (!db) return undefined;
     const [review] = await db.select().from(userReviews).where(eq(userReviews.id, id));
     return review;
   }
 
   async getUserReviews(filters: ReviewFilters = {}): Promise<UserReview[]> {
+    if (!db) return [];
     let query = db.select().from(userReviews);
     
     const conditions = [];
@@ -167,6 +169,7 @@ export class ReviewStorage implements IReviewStorage {
     helpfulCount?: number;
     notHelpfulCount?: number;
   })[]> {
+    if (!db) return [];
     const reviews = await this.getUserReviews(filters);
     
     const reviewsWithDetails = await Promise.all(
@@ -207,11 +210,13 @@ export class ReviewStorage implements IReviewStorage {
   }
 
   async createUserReview(review: InsertUserReview): Promise<UserReview> {
+    if (!db) throw new Error("Database not initialized");
     const [newReview] = await db.insert(userReviews).values(review).returning();
     return newReview;
   }
 
   async updateUserReview(id: number, updates: Partial<InsertUserReview>): Promise<UserReview | undefined> {
+    if (!db) return undefined;
     const [updatedReview] = await db
       .update(userReviews)
       .set({ ...updates, updatedAt: new Date() })
@@ -222,11 +227,20 @@ export class ReviewStorage implements IReviewStorage {
   }
 
   async deleteUserReview(id: number): Promise<boolean> {
+    if (!db) return false;
     const result = await db.delete(userReviews).where(eq(userReviews.id, id));
     return result.changes > 0;
   }
 
   async getUserReviewStats(userId: number): Promise<ReviewStats> {
+    if (!db) return {
+      totalReviews: 0,
+      averageRating: 0,
+      ratingDistribution: {},
+      verifiedReviews: 0,
+      helpfulVotes: 0,
+    };
+    
     // Get total reviews and average rating
     const [statsResult] = await db
       .select({
@@ -290,11 +304,13 @@ export class ReviewStorage implements IReviewStorage {
 
   // Review Responses
   async getReviewResponse(id: number): Promise<ReviewResponse | undefined> {
+    if (!db) return undefined;
     const [response] = await db.select().from(reviewResponses).where(eq(reviewResponses.id, id));
     return response;
   }
 
   async getReviewResponses(reviewId: number): Promise<ReviewResponse[]> {
+    if (!db) return [];
     return await db
       .select()
       .from(reviewResponses)
@@ -303,11 +319,13 @@ export class ReviewStorage implements IReviewStorage {
   }
 
   async createReviewResponse(response: InsertReviewResponse): Promise<ReviewResponse> {
+    if (!db) throw new Error("Database not initialized");
     const [newResponse] = await db.insert(reviewResponses).values(response).returning();
     return newResponse;
   }
 
   async updateReviewResponse(id: number, updates: Partial<InsertReviewResponse>): Promise<ReviewResponse | undefined> {
+    if (!db) return undefined;
     const [updatedResponse] = await db
       .update(reviewResponses)
       .set(updates)
@@ -318,12 +336,14 @@ export class ReviewStorage implements IReviewStorage {
   }
 
   async deleteReviewResponse(id: number): Promise<boolean> {
+    if (!db) return false;
     const result = await db.delete(reviewResponses).where(eq(reviewResponses.id, id));
     return result.changes > 0;
   }
 
   // Review Helpful Votes
   async getReviewHelpful(reviewId: number, userId: number): Promise<ReviewHelpful | undefined> {
+    if (!db) return undefined;
     const [vote] = await db
       .select()
       .from(reviewHelpful)
@@ -336,6 +356,7 @@ export class ReviewStorage implements IReviewStorage {
   }
 
   async getReviewHelpfulStats(reviewId: number): Promise<{ helpful: number; notHelpful: number }> {
+    if (!db) return { helpful: 0, notHelpful: 0 };
     const [helpfulCount] = await db
       .select({ count: sql`count(*)` })
       .from(reviewHelpful)
@@ -359,6 +380,7 @@ export class ReviewStorage implements IReviewStorage {
   }
 
   async voteReviewHelpful(vote: InsertReviewHelpful): Promise<ReviewHelpful> {
+    if (!db) throw new Error("Database not initialized");
     // First check if vote already exists
     const existingVote = await this.getReviewHelpful(vote.reviewId, vote.userId);
     
@@ -373,6 +395,7 @@ export class ReviewStorage implements IReviewStorage {
   }
 
   async updateReviewHelpful(reviewId: number, userId: number, isHelpful: boolean): Promise<ReviewHelpful | undefined> {
+    if (!db) return undefined;
     const [updatedVote] = await db
       .update(reviewHelpful)
       .set({ isHelpful, createdAt: new Date() })
@@ -386,6 +409,7 @@ export class ReviewStorage implements IReviewStorage {
   }
 
   async deleteReviewHelpful(reviewId: number, userId: number): Promise<boolean> {
+    if (!db) return false;
     const result = await db
       .delete(reviewHelpful)
       .where(and(
@@ -398,11 +422,13 @@ export class ReviewStorage implements IReviewStorage {
 
   // User Permissions
   async getUserPermission(id: number): Promise<UserPermission | undefined> {
+    if (!db) return undefined;
     const [permission] = await db.select().from(userPermissions).where(eq(userPermissions.id, id));
     return permission;
   }
 
   async getUserPermissions(userId: number): Promise<UserPermission[]> {
+    if (!db) return [];
     return await db
       .select()
       .from(userPermissions)
@@ -413,11 +439,13 @@ export class ReviewStorage implements IReviewStorage {
   }
 
   async createUserPermission(permission: InsertUserPermission): Promise<UserPermission> {
+    if (!db) throw new Error("Database not initialized");
     const [newPermission] = await db.insert(userPermissions).values(permission).returning();
     return newPermission;
   }
 
   async revokeUserPermission(userId: number, permission: string): Promise<boolean> {
+    if (!db) return false;
     const result = await db
       .delete(userPermissions)
       .where(and(
@@ -429,6 +457,7 @@ export class ReviewStorage implements IReviewStorage {
   }
 
   async hasUserPermission(userId: number, permission: Permission): Promise<boolean> {
+    if (!db) return false;
     const [result] = await db
       .select({ count: sql`count(*)` })
       .from(userPermissions)
@@ -443,6 +472,7 @@ export class ReviewStorage implements IReviewStorage {
 
   // Admin Audit Log
   async getAuditLog(filters: { adminId?: number; action?: string; targetType?: string; limit?: number; offset?: number } = {}): Promise<AdminAuditLog[]> {
+    if (!db) return [];
     let query = db.select().from(adminAuditLog);
     
     const conditions = [];
@@ -483,6 +513,7 @@ export class ReviewStorage implements IReviewStorage {
   }
 
   async createAuditLogEntry(entry: InsertAdminAuditLog): Promise<AdminAuditLog> {
+    if (!db) throw new Error("Database not initialized");
     // Convert details object to JSON string for SQLite
     const entryData = {
       ...entry,
@@ -500,6 +531,7 @@ export class ReviewStorage implements IReviewStorage {
 
   // Moderation
   async flagReview(reviewId: number, reason?: string): Promise<boolean> {
+    if (!db) return false;
     const result = await db
       .update(userReviews)
       .set({ 
@@ -513,6 +545,7 @@ export class ReviewStorage implements IReviewStorage {
   }
 
   async moderateReview(reviewId: number, status: string, moderatorNotes?: string): Promise<UserReview | undefined> {
+    if (!db) return undefined;
     const [moderatedReview] = await db
       .update(userReviews)
       .set({ 
@@ -527,6 +560,7 @@ export class ReviewStorage implements IReviewStorage {
   }
 
   async getReviewsForModeration(limit: number = 50): Promise<UserReview[]> {
+    if (!db) return [];
     return await db
       .select()
       .from(userReviews)

@@ -79,21 +79,25 @@ export interface PropertyFilters {
 export class DatabaseStorage implements IStorage {
   // User methods
   async getUser(id: number): Promise<User | undefined> {
+    if (!db) return undefined;
     const [user] = await db.select().from(users).where(eq(users.id, id));
     return user || undefined;
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
+    if (!db) return undefined;
     const [user] = await db.select().from(users).where(eq(users.username, username));
     return user || undefined;
   }
 
   async getUserByEmail(email: string): Promise<User | undefined> {
+    if (!db) return undefined;
     const [user] = await db.select().from(users).where(eq(users.email, email));
     return user || undefined;
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
+    if (!db) throw new Error("Database not initialized");
     const [user] = await db
       .insert(users)
       .values(insertUser)
@@ -102,6 +106,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateUser(id: number, updates: Partial<InsertUser>): Promise<User | undefined> {
+    if (!db) return undefined;
     const [user] = await db
       .update(users)
       .set({ ...updates, updatedAt: new Date() })
@@ -111,6 +116,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getUsers(filters: { userType?: string; isActive?: boolean; limit?: number; offset?: number } = {}): Promise<User[]> {
+    if (!db) return [];
     let query = db.select().from(users);
     
     const conditions = [];
@@ -138,11 +144,13 @@ export class DatabaseStorage implements IStorage {
 
   // Property methods
   async getProperty(id: number): Promise<Property | undefined> {
+    if (!db) return undefined;
     const [property] = await db.select().from(properties).where(eq(properties.id, id));
     return property || undefined;
   }
 
   async getProperties(filters: PropertyFilters = {}): Promise<Property[]> {
+    if (!db) return [];
     let query = db.select().from(properties);
     const conditions = [];
 
@@ -216,10 +224,19 @@ export class DatabaseStorage implements IStorage {
       query = query.offset(filters.offset);
     }
 
-    return await query;
+    const result = await query;
+    
+    // Parse JSON strings back to arrays
+    return result.map(prop => ({
+      ...prop,
+      images: prop.images ? JSON.parse(prop.images) : [],
+      features: prop.features ? JSON.parse(prop.features) : [],
+    }));
   }
 
   async createProperty(property: InsertProperty): Promise<Property> {
+    if (!db) throw new Error("Database not initialized");
+    
     // Convert arrays to JSON strings for SQLite
     const propertyData = {
       ...property,
@@ -241,6 +258,8 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateProperty(id: number, updates: Partial<InsertProperty>): Promise<Property | undefined> {
+    if (!db) return undefined;
+    
     // Convert arrays to JSON strings for SQLite
     const updateData = { ...updates };
     if (updates.images) {
@@ -267,11 +286,13 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteProperty(id: number): Promise<boolean> {
+    if (!db) return false;
     const result = await db.delete(properties).where(eq(properties.id, id));
     return result.changes > 0;
   }
 
   async getUserProperties(userId: number): Promise<Property[]> {
+    if (!db) return [];
     const userProps = await db
       .select()
       .from(properties)
@@ -287,6 +308,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async incrementPropertyViews(id: number): Promise<void> {
+    if (!db) return;
     await db
       .update(properties)
       .set({ views: sql`${properties.views} + 1` })
@@ -295,11 +317,13 @@ export class DatabaseStorage implements IStorage {
 
   // Inquiry methods
   async getInquiry(id: number): Promise<Inquiry | undefined> {
+    if (!db) return undefined;
     const [inquiry] = await db.select().from(inquiries).where(eq(inquiries.id, id));
     return inquiry || undefined;
   }
 
   async getPropertyInquiries(propertyId: number): Promise<Inquiry[]> {
+    if (!db) return [];
     return await db
       .select()
       .from(inquiries)
@@ -308,6 +332,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getUserInquiries(userId: number): Promise<Inquiry[]> {
+    if (!db) return [];
     return await db
       .select()
       .from(inquiries)
@@ -316,6 +341,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createInquiry(inquiry: InsertInquiry): Promise<Inquiry> {
+    if (!db) throw new Error("Database not initialized");
     const [newInquiry] = await db
       .insert(inquiries)
       .values(inquiry)
@@ -324,6 +350,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateInquiryStatus(id: number, status: string): Promise<Inquiry | undefined> {
+    if (!db) return undefined;
     const [inquiry] = await db
       .update(inquiries)
       .set({ status })
@@ -334,11 +361,13 @@ export class DatabaseStorage implements IStorage {
 
   // Appointment methods
   async getAppointment(id: number): Promise<Appointment | undefined> {
+    if (!db) return undefined;
     const [appointment] = await db.select().from(appointments).where(eq(appointments.id, id));
     return appointment || undefined;
   }
 
   async getPropertyAppointments(propertyId: number): Promise<Appointment[]> {
+    if (!db) return [];
     return await db
       .select()
       .from(appointments)
@@ -347,6 +376,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getUserAppointments(userId: number): Promise<Appointment[]> {
+    if (!db) return [];
     return await db
       .select()
       .from(appointments)
@@ -355,6 +385,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createAppointment(appointment: InsertAppointment): Promise<Appointment> {
+    if (!db) throw new Error("Database not initialized");
     const [newAppointment] = await db
       .insert(appointments)
       .values(appointment)
@@ -363,6 +394,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateAppointmentStatus(id: number, status: string): Promise<Appointment | undefined> {
+    if (!db) return undefined;
     const [appointment] = await db
       .update(appointments)
       .set({ status })
@@ -373,6 +405,7 @@ export class DatabaseStorage implements IStorage {
 
   // Saved properties methods
   async getSavedProperties(userId: number): Promise<Property[]> {
+    if (!db) return [];
     const savedProps = await db
       .select({
         id: properties.id,
@@ -420,6 +453,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async saveProperty(userId: number, propertyId: number): Promise<SavedProperty> {
+    if (!db) throw new Error("Database not initialized");
     const [saved] = await db
       .insert(savedProperties)
       .values({ userId, propertyId })
@@ -428,6 +462,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async unsaveProperty(userId: number, propertyId: number): Promise<boolean> {
+    if (!db) return false;
     const result = await db
       .delete(savedProperties)
       .where(and(
@@ -438,6 +473,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async isPropertySaved(userId: number, propertyId: number): Promise<boolean> {
+    if (!db) return false;
     const [saved] = await db
       .select()
       .from(savedProperties)
