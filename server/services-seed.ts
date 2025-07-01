@@ -365,12 +365,14 @@ export async function seedServices() {
 }
 
 // Run if called directly
-seedServices()
-  .then(() => {
-    console.log("Seeding completed successfully");
-    process.exit(0);
-  })
-  .catch((error) => {
-    console.error("Seeding failed:", error);
-    process.exit(1);
-  });
+if (import.meta.url === `file://${process.argv[1]}`) {
+  seedServices()
+    .then(() => {
+      console.log("Seeding completed successfully");
+      process.exit(0);
+    })
+    .catch((error) => {
+      console.error("Seeding failed:", error);
+      process.exit(1);
+    });
+}

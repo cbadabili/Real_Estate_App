@@ -65,11 +65,11 @@ async function seed() {
         lotSize: '0.25',
         yearBuilt: 2010,
         status: 'active',
-        images: [
+        images: JSON.stringify([
           'https://images.pexels.com/photos/106399/pexels-photo-106399.jpeg?auto=compress&cs=tinysrgb&w=800',
           'https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=800'
-        ],
-        features: ['Hardwood Floors', 'Updated Kitchen', 'Large Backyard', 'Two-Car Garage'],
+        ]),
+        features: JSON.stringify(['Hardwood Floors', 'Updated Kitchen', 'Large Backyard', 'Two-Car Garage']),
         propertyTaxes: '8500.00',
         hoaFees: '0.00',
         ownerId: createdUsers[2].id, // Mike (FSBO seller)
@@ -91,11 +91,11 @@ async function seed() {
         squareFeet: 1200,
         yearBuilt: 2020,
         status: 'active',
-        images: [
+        images: JSON.stringify([
           'https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=800',
           'https://images.pexels.com/photos/1438832/pexels-photo-1438832.jpeg?auto=compress&cs=tinysrgb&w=800'
-        ],
-        features: ['City Views', 'Concierge', 'Rooftop Pool', 'Fitness Center'],
+        ]),
+        features: JSON.stringify(['City Views', 'Concierge', 'Rooftop Pool', 'Fitness Center']),
         propertyTaxes: '12000.00',
         hoaFees: '450.00',
         agentId: createdUsers[1].id, // Sarah (Agent)
@@ -118,10 +118,10 @@ async function seed() {
         lotSize: '0.1',
         yearBuilt: 2015,
         status: 'active',
-        images: [
+        images: JSON.stringify([
           'https://images.pexels.com/photos/1438832/pexels-photo-1438832.jpeg?auto=compress&cs=tinysrgb&w=800'
-        ],
-        features: ['Attached Garage', 'Patio', 'Master Suite', 'Open Floor Plan'],
+        ]),
+        features: JSON.stringify(['Attached Garage', 'Patio', 'Master Suite', 'Open Floor Plan']),
         propertyTaxes: '6200.00',
         hoaFees: '180.00',
         agentId: createdUsers[1].id, // Sarah (Agent)
@@ -144,10 +144,10 @@ async function seed() {
         lotSize: '0.3',
         yearBuilt: 2005,
         status: 'active',
-        images: [
+        images: JSON.stringify([
           'https://images.pexels.com/photos/2121121/pexels-photo-2121121.jpeg?auto=compress&cs=tinysrgb&w=800'
-        ],
-        features: ['Open Floor Plan', 'Master Suite', 'Landscaping', 'Energy Efficient'],
+        ]),
+        features: JSON.stringify(['Open Floor Plan', 'Master Suite', 'Landscaping', 'Energy Efficient']),
         propertyTaxes: '7200.00',
         hoaFees: '0.00',
         ownerId: createdUsers[0].id, // John (buyer who became seller)
@@ -169,10 +169,10 @@ async function seed() {
         squareFeet: 1100,
         yearBuilt: 2018,
         status: 'active',
-        images: [
+        images: JSON.stringify([
           'https://images.pexels.com/photos/2102587/pexels-photo-2102587.jpeg?auto=compress&cs=tinysrgb&w=800'
-        ],
-        features: ['Exposed Brick', 'High Ceilings', 'Modern Finishes', 'Urban Location'],
+        ]),
+        features: JSON.stringify(['Exposed Brick', 'High Ceilings', 'Modern Finishes', 'Urban Location']),
         propertyTaxes: '9800.00',
         hoaFees: '275.00',
         agentId: createdUsers[1].id, // Sarah (Agent)
