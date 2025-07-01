@@ -1,11 +1,20 @@
 import { 
   users, 
-  properties,
+  properties, 
+  inquiries, 
+  appointments, 
+  savedProperties,
   type User, 
   type InsertUser,
   type Property,
-  type InsertProperty
-} from "../shared/schema";
+  type InsertProperty,
+  type Inquiry,
+  type InsertInquiry,
+  type Appointment,
+  type InsertAppointment,
+  type SavedProperty,
+  type InsertSavedProperty
+} from "@shared/schema";
 import { db } from "./db";
 import { eq, and, desc, asc, gte, lte, like, or, sql } from "drizzle-orm";
 
@@ -26,6 +35,26 @@ export interface IStorage {
   deleteProperty(id: number): Promise<boolean>;
   getUserProperties(userId: number): Promise<Property[]>;
   incrementPropertyViews(id: number): Promise<void>;
+
+  // Inquiry methods
+  getInquiry(id: number): Promise<Inquiry | undefined>;
+  getPropertyInquiries(propertyId: number): Promise<Inquiry[]>;
+  getUserInquiries(userId: number): Promise<Inquiry[]>;
+  createInquiry(inquiry: InsertInquiry): Promise<Inquiry>;
+  updateInquiryStatus(id: number, status: string): Promise<Inquiry | undefined>;
+
+  // Appointment methods
+  getAppointment(id: number): Promise<Appointment | undefined>;
+  getPropertyAppointments(propertyId: number): Promise<Appointment[]>;
+  getUserAppointments(userId: number): Promise<Appointment[]>;
+  createAppointment(appointment: InsertAppointment): Promise<Appointment>;
+  updateAppointmentStatus(id: number, status: string): Promise<Appointment | undefined>;
+
+  // Saved properties methods
+  getSavedProperties(userId: number): Promise<Property[]>;
+  saveProperty(userId: number, propertyId: number): Promise<SavedProperty>;
+  unsaveProperty(userId: number, propertyId: number): Promise<boolean>;
+  isPropertySaved(userId: number, propertyId: number): Promise<boolean>;
 }
 
 export interface PropertyFilters {
@@ -50,25 +79,21 @@ export interface PropertyFilters {
 export class DatabaseStorage implements IStorage {
   // User methods
   async getUser(id: number): Promise<User | undefined> {
-    if (!db) return undefined;
     const [user] = await db.select().from(users).where(eq(users.id, id));
     return user || undefined;
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    if (!db) return undefined;
     const [user] = await db.select().from(users).where(eq(users.username, username));
     return user || undefined;
   }
 
   async getUserByEmail(email: string): Promise<User | undefined> {
-    if (!db) return undefined;
     const [user] = await db.select().from(users).where(eq(users.email, email));
     return user || undefined;
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    if (!db) throw new Error("Database not initialized");
     const [user] = await db
       .insert(users)
       .values(insertUser)
@@ -77,7 +102,6 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateUser(id: number, updates: Partial<InsertUser>): Promise<User | undefined> {
-    if (!db) return undefined;
     const [user] = await db
       .update(users)
       .set({ ...updates, updatedAt: new Date() })
@@ -87,7 +111,6 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getUsers(filters: { userType?: string; isActive?: boolean; limit?: number; offset?: number } = {}): Promise<User[]> {
-    if (!db) return [];
     let query = db.select().from(users);
     
     const conditions = [];
@@ -115,13 +138,11 @@ export class DatabaseStorage implements IStorage {
 
   // Property methods
   async getProperty(id: number): Promise<Property | undefined> {
-    if (!db) return undefined;
     const [property] = await db.select().from(properties).where(eq(properties.id, id));
     return property || undefined;
   }
 
   async getProperties(filters: PropertyFilters = {}): Promise<Property[]> {
-    if (!db) return [];
     let query = db.select().from(properties);
     const conditions = [];
 
@@ -195,19 +216,10 @@ export class DatabaseStorage implements IStorage {
       query = query.offset(filters.offset);
     }
 
-    const result = await query;
-    
-    // Parse JSON strings back to arrays
-    return result.map(prop => ({
-      ...prop,
-      images: prop.images ? JSON.parse(prop.images) : [],
-      features: prop.features ? JSON.parse(prop.features) : [],
-    }));
+    return await query;
   }
 
   async createProperty(property: InsertProperty): Promise<Property> {
-    if (!db) throw new Error("Database not initialized");
-    
     // Convert arrays to JSON strings for SQLite
     const propertyData = {
       ...property,
@@ -229,8 +241,6 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateProperty(id: number, updates: Partial<InsertProperty>): Promise<Property | undefined> {
-    if (!db) return undefined;
-    
     // Convert arrays to JSON strings for SQLite
     const updateData = { ...updates };
     if (updates.images) {
@@ -257,13 +267,11 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteProperty(id: number): Promise<boolean> {
-    if (!db) return false;
     const result = await db.delete(properties).where(eq(properties.id, id));
     return result.changes > 0;
   }
 
   async getUserProperties(userId: number): Promise<Property[]> {
-    if (!db) return [];
     const userProps = await db
       .select()
       .from(properties)
@@ -279,11 +287,166 @@ export class DatabaseStorage implements IStorage {
   }
 
   async incrementPropertyViews(id: number): Promise<void> {
-    if (!db) return;
     await db
       .update(properties)
       .set({ views: sql`${properties.views} + 1` })
       .where(eq(properties.id, id));
+  }
+
+  // Inquiry methods
+  async getInquiry(id: number): Promise<Inquiry | undefined> {
+    const [inquiry] = await db.select().from(inquiries).where(eq(inquiries.id, id));
+    return inquiry || undefined;
+  }
+
+  async getPropertyInquiries(propertyId: number): Promise<Inquiry[]> {
+    return await db
+      .select()
+      .from(inquiries)
+      .where(eq(inquiries.propertyId, propertyId))
+      .orderBy(desc(inquiries.createdAt));
+  }
+
+  async getUserInquiries(userId: number): Promise<Inquiry[]> {
+    return await db
+      .select()
+      .from(inquiries)
+      .where(eq(inquiries.buyerId, userId))
+      .orderBy(desc(inquiries.createdAt));
+  }
+
+  async createInquiry(inquiry: InsertInquiry): Promise<Inquiry> {
+    const [newInquiry] = await db
+      .insert(inquiries)
+      .values(inquiry)
+      .returning();
+    return newInquiry;
+  }
+
+  async updateInquiryStatus(id: number, status: string): Promise<Inquiry | undefined> {
+    const [inquiry] = await db
+      .update(inquiries)
+      .set({ status })
+      .where(eq(inquiries.id, id))
+      .returning();
+    return inquiry || undefined;
+  }
+
+  // Appointment methods
+  async getAppointment(id: number): Promise<Appointment | undefined> {
+    const [appointment] = await db.select().from(appointments).where(eq(appointments.id, id));
+    return appointment || undefined;
+  }
+
+  async getPropertyAppointments(propertyId: number): Promise<Appointment[]> {
+    return await db
+      .select()
+      .from(appointments)
+      .where(eq(appointments.propertyId, propertyId))
+      .orderBy(asc(appointments.appointmentDate));
+  }
+
+  async getUserAppointments(userId: number): Promise<Appointment[]> {
+    return await db
+      .select()
+      .from(appointments)
+      .where(eq(appointments.buyerId, userId))
+      .orderBy(asc(appointments.appointmentDate));
+  }
+
+  async createAppointment(appointment: InsertAppointment): Promise<Appointment> {
+    const [newAppointment] = await db
+      .insert(appointments)
+      .values(appointment)
+      .returning();
+    return newAppointment;
+  }
+
+  async updateAppointmentStatus(id: number, status: string): Promise<Appointment | undefined> {
+    const [appointment] = await db
+      .update(appointments)
+      .set({ status })
+      .where(eq(appointments.id, id))
+      .returning();
+    return appointment || undefined;
+  }
+
+  // Saved properties methods
+  async getSavedProperties(userId: number): Promise<Property[]> {
+    const savedProps = await db
+      .select({
+        id: properties.id,
+        title: properties.title,
+        description: properties.description,
+        price: properties.price,
+        address: properties.address,
+        city: properties.city,
+        state: properties.state,
+        zipCode: properties.zipCode,
+        latitude: properties.latitude,
+        longitude: properties.longitude,
+        propertyType: properties.propertyType,
+        listingType: properties.listingType,
+        bedrooms: properties.bedrooms,
+        bathrooms: properties.bathrooms,
+        squareFeet: properties.squareFeet,
+        lotSize: properties.lotSize,
+        yearBuilt: properties.yearBuilt,
+        status: properties.status,
+        images: properties.images,
+        features: properties.features,
+        virtualTourUrl: properties.virtualTourUrl,
+        videoUrl: properties.videoUrl,
+        propertyTaxes: properties.propertyTaxes,
+        hoaFees: properties.hoaFees,
+        ownerId: properties.ownerId,
+        agentId: properties.agentId,
+        views: properties.views,
+        daysOnMarket: properties.daysOnMarket,
+        createdAt: properties.createdAt,
+        updatedAt: properties.updatedAt,
+      })
+      .from(savedProperties)
+      .innerJoin(properties, eq(savedProperties.propertyId, properties.id))
+      .where(eq(savedProperties.userId, userId))
+      .orderBy(desc(savedProperties.createdAt));
+    
+    // Parse JSON strings back to arrays
+    return savedProps.map(prop => ({
+      ...prop,
+      images: prop.images ? JSON.parse(prop.images) : [],
+      features: prop.features ? JSON.parse(prop.features) : [],
+    }));
+  }
+
+  async saveProperty(userId: number, propertyId: number): Promise<SavedProperty> {
+    const [saved] = await db
+      .insert(savedProperties)
+      .values({ userId, propertyId })
+      .returning();
+    return saved;
+  }
+
+  async unsaveProperty(userId: number, propertyId: number): Promise<boolean> {
+    const result = await db
+      .delete(savedProperties)
+      .where(and(
+        eq(savedProperties.userId, userId),
+        eq(savedProperties.propertyId, propertyId)
+      ));
+    return result.changes > 0;
+  }
+
+  async isPropertySaved(userId: number, propertyId: number): Promise<boolean> {
+    const [saved] = await db
+      .select()
+      .from(savedProperties)
+      .where(and(
+        eq(savedProperties.userId, userId),
+        eq(savedProperties.propertyId, propertyId)
+      ))
+      .limit(1);
+    return !!saved;
   }
 }
 

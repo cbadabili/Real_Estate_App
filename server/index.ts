@@ -1,7 +1,7 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
-import { testDatabaseConnection, initializeDatabase } from "./db";
+import { testDatabaseConnection } from "./db";
 
 const app = express();
 app.use(express.json());
@@ -38,15 +38,7 @@ app.use((req, res, next) => {
 });
 
 (async () => {
-  // Initialize database connection before starting server
-  console.log('Initializing database connection...');
-  const dbInitialized = await initializeDatabase();
-  if (!dbInitialized) {
-    console.error('Failed to initialize database. Server will not start.');
-    process.exit(1);
-  }
-
-  // Test database connection
+  // Test database connection before starting server
   console.log('Testing database connection...');
   const dbConnected = await testDatabaseConnection();
   if (!dbConnected) {

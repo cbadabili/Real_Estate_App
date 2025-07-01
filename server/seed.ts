@@ -1,5 +1,5 @@
 import { db } from './db';
-import { users, properties } from '../shared/schema';
+import { users, properties } from '@shared/schema';
 
 async function seed() {
   console.log('🌱 Starting database seed...');
@@ -13,9 +13,9 @@ async function seed() {
         password: 'password123',
         firstName: 'John',
         lastName: 'Smith',
-        phone: '71234567',
+        phone: '555-0101',
         userType: 'buyer',
-        bio: 'Looking for my first home in Gaborone',
+        bio: 'Looking for my first home in Austin',
       },
       {
         username: 'sarah_agent',
@@ -23,7 +23,7 @@ async function seed() {
         password: 'password123',
         firstName: 'Sarah',
         lastName: 'Johnson',
-        phone: '72345678',
+        phone: '555-0102',
         userType: 'agent',
         bio: 'Licensed real estate agent with 10+ years experience',
         reacNumber: 'REAC-2024-001234',
@@ -35,7 +35,7 @@ async function seed() {
         password: 'password123',
         firstName: 'Mike',
         lastName: 'Chen',
-        phone: '73456789',
+        phone: '555-0103',
         userType: 'fsbo',
         bio: 'Selling my family home by owner',
       },
@@ -48,7 +48,7 @@ async function seed() {
     // Create sample properties
     const sampleProperties = [
       {
-        title: 'Modern Family Home in Gaborone West',
+        title: 'Modern Family Home in Suburbia',
         description: 'Beautiful 4-bedroom home with updated kitchen, hardwood floors, and large backyard. Perfect for families.',
         price: '2500000.00',
         address: '123 Tlokweng Road',
@@ -124,6 +124,57 @@ async function seed() {
         features: JSON.stringify(['Attached Garage', 'Patio', 'Master Suite', 'Open Floor Plan']),
         propertyTaxes: '6200.00',
         hoaFees: '180.00',
+        agentId: createdUsers[1].id, // Sarah (Agent)
+      },
+      {
+        title: 'Spacious Ranch Home',
+        description: 'Single-story ranch home with open floor plan, large master suite, and beautiful landscaping.',
+        price: '2100000.00',
+        address: '321 Phakamisa Street',
+        city: 'Maun',
+        state: 'North West',
+        zipCode: '00267',
+        latitude: '30.5083',
+        longitude: '-97.6789',
+        propertyType: 'house',
+        listingType: 'fsbo',
+        bedrooms: 3,
+        bathrooms: '2.0',
+        squareFeet: 2100,
+        lotSize: '0.3',
+        yearBuilt: 2005,
+        status: 'active',
+        images: JSON.stringify([
+          'https://images.pexels.com/photos/2121121/pexels-photo-2121121.jpeg?auto=compress&cs=tinysrgb&w=800'
+        ]),
+        features: JSON.stringify(['Open Floor Plan', 'Master Suite', 'Landscaping', 'Energy Efficient']),
+        propertyTaxes: '7200.00',
+        hoaFees: '0.00',
+        ownerId: createdUsers[0].id, // John (buyer who became seller)
+      },
+      {
+        title: 'Contemporary Loft',
+        description: 'Industrial-style loft in converted warehouse with exposed brick, high ceilings, and modern finishes.',
+        price: '2800000.00',
+        address: '555 Riverside Drive',
+        city: 'Kasane',
+        state: 'North West',
+        zipCode: '00267',
+        latitude: '30.2515',
+        longitude: '-97.7134',
+        propertyType: 'condo',
+        listingType: 'agent',
+        bedrooms: 1,
+        bathrooms: '1.0',
+        squareFeet: 1100,
+        yearBuilt: 2018,
+        status: 'active',
+        images: JSON.stringify([
+          'https://images.pexels.com/photos/2102587/pexels-photo-2102587.jpeg?auto=compress&cs=tinysrgb&w=800'
+        ]),
+        features: JSON.stringify(['Exposed Brick', 'High Ceilings', 'Modern Finishes', 'Urban Location']),
+        propertyTaxes: '9800.00',
+        hoaFees: '275.00',
         agentId: createdUsers[1].id, // Sarah (Agent)
       }
     ];

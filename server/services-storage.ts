@@ -51,7 +51,6 @@ export interface ServiceProviderFilters {
 export class ServicesStorage implements IServicesStorage {
   // Service Provider methods
   async getServiceProvider(id: number): Promise<ServiceProvider | undefined> {
-    if (!db) return undefined;
     const [provider] = await db
       .select()
       .from(serviceProviders)
@@ -60,7 +59,6 @@ export class ServicesStorage implements IServicesStorage {
   }
 
   async getServiceProviders(filters: ServiceProviderFilters = {}): Promise<ServiceProvider[]> {
-    if (!db) return [];
     let query = db.select().from(serviceProviders);
     const conditions = [];
 
@@ -122,7 +120,6 @@ export class ServicesStorage implements IServicesStorage {
   }
 
   async getServiceProvidersByCategory(category: string): Promise<ServiceProvider[]> {
-    if (!db) return [];
     return await db
       .select()
       .from(serviceProviders)
@@ -131,7 +128,6 @@ export class ServicesStorage implements IServicesStorage {
   }
 
   async getServiceCategories(): Promise<string[]> {
-    if (!db) return [];
     const result = await db
       .select({ category: serviceProviders.serviceCategory })
       .from(serviceProviders)
@@ -140,7 +136,6 @@ export class ServicesStorage implements IServicesStorage {
   }
 
   async createServiceProvider(provider: InsertServiceProvider): Promise<ServiceProvider> {
-    if (!db) throw new Error("Database not initialized");
     const [newProvider] = await db
       .insert(serviceProviders)
       .values(provider)
@@ -149,7 +144,6 @@ export class ServicesStorage implements IServicesStorage {
   }
 
   async updateServiceProvider(id: number, updates: Partial<InsertServiceProvider>): Promise<ServiceProvider | undefined> {
-    if (!db) return undefined;
     const [updatedProvider] = await db
       .update(serviceProviders)
       .set({ ...updates, updatedAt: new Date() })
@@ -159,7 +153,6 @@ export class ServicesStorage implements IServicesStorage {
   }
 
   async deleteServiceProvider(id: number): Promise<boolean> {
-    if (!db) return false;
     const result = await db
       .delete(serviceProviders)
       .where(eq(serviceProviders.id, id));
@@ -168,7 +161,6 @@ export class ServicesStorage implements IServicesStorage {
 
   // Service Ads methods
   async getContextualAd(trigger: string): Promise<ServiceAd | undefined> {
-    if (!db) return undefined;
     const [ad] = await db
       .select()
       .from(serviceAds)
@@ -188,7 +180,6 @@ export class ServicesStorage implements IServicesStorage {
   }
 
   async getServiceAds(providerId?: number): Promise<ServiceAd[]> {
-    if (!db) return [];
     let query = db.select().from(serviceAds);
     
     if (providerId) {
@@ -199,7 +190,6 @@ export class ServicesStorage implements IServicesStorage {
   }
 
   async createServiceAd(ad: InsertServiceAd): Promise<ServiceAd> {
-    if (!db) throw new Error("Database not initialized");
     const [newAd] = await db
       .insert(serviceAds)
       .values(ad)
@@ -208,7 +198,6 @@ export class ServicesStorage implements IServicesStorage {
   }
 
   async updateServiceAd(id: number, updates: Partial<InsertServiceAd>): Promise<ServiceAd | undefined> {
-    if (!db) return undefined;
     const [updatedAd] = await db
       .update(serviceAds)
       .set({ ...updates, updatedAt: new Date() })
@@ -218,7 +207,6 @@ export class ServicesStorage implements IServicesStorage {
   }
 
   async incrementAdMetrics(adId: number, metric: 'impressions' | 'clicks'): Promise<void> {
-    if (!db) return;
     if (metric === 'impressions') {
       await db
         .update(serviceAds)
@@ -234,7 +222,6 @@ export class ServicesStorage implements IServicesStorage {
 
   // Service Reviews methods
   async getServiceReviews(providerId: number): Promise<ServiceReview[]> {
-    if (!db) return [];
     return await db
       .select()
       .from(serviceReviews)
@@ -243,7 +230,6 @@ export class ServicesStorage implements IServicesStorage {
   }
 
   async createServiceReview(review: InsertServiceReview): Promise<ServiceReview> {
-    if (!db) throw new Error("Database not initialized");
     const [newReview] = await db
       .insert(serviceReviews)
       .values(review)
@@ -265,7 +251,6 @@ export class ServicesStorage implements IServicesStorage {
   }
 
   async updateServiceReview(id: number, updates: Partial<InsertServiceReview>): Promise<ServiceReview | undefined> {
-    if (!db) return undefined;
     const [updatedReview] = await db
       .update(serviceReviews)
       .set(updates)
