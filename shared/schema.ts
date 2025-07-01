@@ -1,11 +1,11 @@
-import { pgTable, text, serial, integer, boolean, decimal, timestamp, json, varchar } from "drizzle-orm/pg-core";
+import { sqliteTable, text, integer, real, blob } from "drizzle-orm/sqlite-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 import { relations } from "drizzle-orm";
 
 // Users table
-export const users = pgTable("users", {
-  id: serial("id").primaryKey(),
+export const users = sqliteTable("users", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
   username: text("username").notNull().unique(),
   email: text("email").notNull().unique(),
   password: text("password").notNull(),
@@ -14,174 +14,174 @@ export const users = pgTable("users", {
   phone: text("phone"),
   userType: text("user_type").notNull(), // 'buyer', 'seller', 'agent', 'fsbo', 'admin'
   role: text("role").notNull().default("user"), // 'user', 'moderator', 'admin', 'super_admin'
-  permissions: json("permissions").$type<string[]>().default([]), // array of permission strings
+  permissions: text("permissions"), // JSON string of permission array
   avatar: text("avatar"),
   bio: text("bio"),
-  isVerified: boolean("is_verified").default(false),
-  isActive: boolean("is_active").default(true),
+  isVerified: integer("is_verified", { mode: "boolean" }).default(false),
+  isActive: integer("is_active", { mode: "boolean" }).default(true),
   reacNumber: text("reac_number"), // For certified agents
-  lastLoginAt: timestamp("last_login_at"),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
+  lastLoginAt: integer("last_login_at", { mode: "timestamp" }),
+  createdAt: integer("created_at", { mode: "timestamp" }).defaultNow(),
+  updatedAt: integer("updated_at", { mode: "timestamp" }).defaultNow(),
 });
 
 // Properties table
-export const properties = pgTable("properties", {
-  id: serial("id").primaryKey(),
+export const properties = sqliteTable("properties", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
   title: text("title").notNull(),
   description: text("description"),
-  price: decimal("price", { precision: 12, scale: 2 }).notNull(),
+  price: text("price").notNull(),
   address: text("address").notNull(),
   city: text("city").notNull(),
   state: text("state").notNull(),
   zipCode: text("zip_code").notNull(),
-  latitude: decimal("latitude", { precision: 10, scale: 8 }),
-  longitude: decimal("longitude", { precision: 11, scale: 8 }),
+  latitude: text("latitude"),
+  longitude: text("longitude"),
   propertyType: text("property_type").notNull(), // 'house', 'apartment', 'townhouse', 'commercial', 'farm', 'land'
   listingType: text("listing_type").notNull(), // 'owner', 'agent', 'rental', 'auction'
   bedrooms: integer("bedrooms"),
-  bathrooms: decimal("bathrooms", { precision: 3, scale: 1 }),
+  bathrooms: text("bathrooms"),
   squareFeet: integer("square_feet"),
   areaBuild: integer("area_build"),
-  lotSize: decimal("lot_size", { precision: 10, scale: 2 }),
+  lotSize: text("lot_size"),
   yearBuilt: integer("year_built"),
   status: text("status").notNull().default('active'), // 'active', 'pending', 'sold', 'withdrawn'
-  images: json("images").$type<string[]>().default([]),
-  features: json("features").$type<string[]>().default([]),
+  images: text("images"), // JSON string of image URLs
+  features: text("features"), // JSON string of features
   virtualTourUrl: text("virtual_tour_url"),
   videoUrl: text("video_url"),
-  propertyTaxes: decimal("property_taxes", { precision: 10, scale: 2 }),
-  hoaFees: decimal("hoa_fees", { precision: 8, scale: 2 }),
+  propertyTaxes: text("property_taxes"),
+  hoaFees: text("hoa_fees"),
   ownerId: integer("owner_id").references(() => users.id),
   agentId: integer("agent_id").references(() => users.id),
   views: integer("views").default(0),
   daysOnMarket: integer("days_on_market").default(0),
   // Auction-specific fields
-  auctionDate: timestamp("auction_date"),
+  auctionDate: integer("auction_date", { mode: "timestamp" }),
   auctionTime: text("auction_time"),
-  startingBid: decimal("starting_bid", { precision: 12, scale: 2 }),
-  currentBid: decimal("current_bid", { precision: 12, scale: 2 }),
-  reservePrice: decimal("reserve_price", { precision: 12, scale: 2 }),
+  startingBid: text("starting_bid"),
+  currentBid: text("current_bid"),
+  reservePrice: text("reserve_price"),
   auctionHouse: text("auction_house"), // e.g., "First National Bank of Botswana"
   auctioneerName: text("auctioneer_name"),
   auctioneerContact: text("auctioneer_contact"),
-  bidIncrement: decimal("bid_increment", { precision: 8, scale: 2 }),
-  depositRequired: decimal("deposit_required", { precision: 10, scale: 2 }),
+  bidIncrement: text("bid_increment"),
+  depositRequired: text("deposit_required"),
   auctionTerms: text("auction_terms"),
   lotNumber: text("lot_number"),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
+  createdAt: integer("created_at", { mode: "timestamp" }).defaultNow(),
+  updatedAt: integer("updated_at", { mode: "timestamp" }).defaultNow(),
 });
 
 // Property inquiries
-export const inquiries = pgTable("inquiries", {
-  id: serial("id").primaryKey(),
+export const inquiries = sqliteTable("inquiries", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
   propertyId: integer("property_id").references(() => properties.id).notNull(),
   buyerId: integer("buyer_id").references(() => users.id).notNull(),
   message: text("message").notNull(),
   status: text("status").notNull().default('unread'), // 'unread', 'read', 'replied'
-  createdAt: timestamp("created_at").defaultNow(),
+  createdAt: integer("created_at", { mode: "timestamp" }).defaultNow(),
 });
 
 // Appointments for property viewings
-export const appointments = pgTable("appointments", {
-  id: serial("id").primaryKey(),
+export const appointments = sqliteTable("appointments", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
   propertyId: integer("property_id").references(() => properties.id).notNull(),
   buyerId: integer("buyer_id").references(() => users.id).notNull(),
   agentId: integer("agent_id").references(() => users.id),
-  appointmentDate: timestamp("appointment_date").notNull(),
+  appointmentDate: integer("appointment_date", { mode: "timestamp" }).notNull(),
   type: text("type").notNull(), // 'in-person', 'virtual'
   status: text("status").notNull().default('scheduled'), // 'scheduled', 'confirmed', 'completed', 'cancelled'
   notes: text("notes"),
-  createdAt: timestamp("created_at").defaultNow(),
+  createdAt: integer("created_at", { mode: "timestamp" }).defaultNow(),
 });
 
 // Saved properties (favorites)
-export const savedProperties = pgTable("saved_properties", {
-  id: serial("id").primaryKey(),
+export const savedProperties = sqliteTable("saved_properties", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
   userId: integer("user_id").references(() => users.id).notNull(),
   propertyId: integer("property_id").references(() => properties.id).notNull(),
-  createdAt: timestamp("created_at").defaultNow(),
+  createdAt: integer("created_at", { mode: "timestamp" }).defaultNow(),
 });
 
 // Property reviews and ratings
-export const propertyReviews = pgTable("property_reviews", {
-  id: serial("id").primaryKey(),
+export const propertyReviews = sqliteTable("property_reviews", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
   propertyId: integer("property_id").references(() => properties.id).notNull(),
   reviewerId: integer("reviewer_id").references(() => users.id).notNull(),
   rating: integer("rating").notNull(), // 1-5 stars
   review: text("review"),
-  createdAt: timestamp("created_at").defaultNow(),
+  createdAt: integer("created_at", { mode: "timestamp" }).defaultNow(),
 });
 
 // Agent reviews and ratings
-export const agentReviews = pgTable("agent_reviews", {
-  id: serial("id").primaryKey(),
+export const agentReviews = sqliteTable("agent_reviews", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
   agentId: integer("agent_id").references(() => users.id).notNull(),
   reviewerId: integer("reviewer_id").references(() => users.id).notNull(),
   rating: integer("rating").notNull(), // 1-5 stars
   review: text("review"),
   transactionType: text("transaction_type"), // 'buy', 'sell', 'rent'
-  createdAt: timestamp("created_at").defaultNow(),
+  createdAt: integer("created_at", { mode: "timestamp" }).defaultNow(),
 });
 
 // User reviews and ratings (for all user types)
-export const userReviews = pgTable("user_reviews", {
-  id: serial("id").primaryKey(),
+export const userReviews = sqliteTable("user_reviews", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
   revieweeId: integer("reviewee_id").references(() => users.id).notNull(), // User being reviewed
   reviewerId: integer("reviewer_id").references(() => users.id).notNull(), // User writing review
   rating: integer("rating").notNull(), // 1-5 stars
   review: text("review"),
   reviewType: text("review_type").notNull(), // 'buyer', 'seller', 'agent', 'service_provider'
   transactionId: integer("transaction_id"), // Reference to property transaction if applicable
-  isVerified: boolean("is_verified").default(false), // Verified by transaction
-  isPublic: boolean("is_public").default(true),
+  isVerified: integer("is_verified", { mode: "boolean" }).default(false), // Verified by transaction
+  isPublic: integer("is_public", { mode: "boolean" }).default(true),
   status: text("status").notNull().default("active"), // 'active', 'hidden', 'flagged', 'removed'
   moderatorNotes: text("moderator_notes"),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
+  createdAt: integer("created_at", { mode: "timestamp" }).defaultNow(),
+  updatedAt: integer("updated_at", { mode: "timestamp" }).defaultNow(),
 });
 
 // Review responses (for business replies)
-export const reviewResponses = pgTable("review_responses", {
-  id: serial("id").primaryKey(),
+export const reviewResponses = sqliteTable("review_responses", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
   reviewId: integer("review_id").references(() => userReviews.id).notNull(),
   responderId: integer("responder_id").references(() => users.id).notNull(),
   response: text("response").notNull(),
-  isOfficial: boolean("is_official").default(false), // Official business response
-  createdAt: timestamp("created_at").defaultNow(),
+  isOfficial: integer("is_official", { mode: "boolean" }).default(false), // Official business response
+  createdAt: integer("created_at", { mode: "timestamp" }).defaultNow(),
 });
 
 // Review helpful votes
-export const reviewHelpful = pgTable("review_helpful", {
-  id: serial("id").primaryKey(),
+export const reviewHelpful = sqliteTable("review_helpful", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
   reviewId: integer("review_id").references(() => userReviews.id).notNull(),
   userId: integer("user_id").references(() => users.id).notNull(),
-  isHelpful: boolean("is_helpful").notNull(), // true for helpful, false for not helpful
-  createdAt: timestamp("created_at").defaultNow(),
+  isHelpful: integer("is_helpful", { mode: "boolean" }).notNull(), // true for helpful, false for not helpful
+  createdAt: integer("created_at", { mode: "timestamp" }).defaultNow(),
 });
 
 // User permissions and roles
-export const userPermissions = pgTable("user_permissions", {
-  id: serial("id").primaryKey(),
+export const userPermissions = sqliteTable("user_permissions", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
   userId: integer("user_id").references(() => users.id).notNull(),
   permission: text("permission").notNull(),
   grantedBy: integer("granted_by").references(() => users.id),
-  expiresAt: timestamp("expires_at"),
-  createdAt: timestamp("created_at").defaultNow(),
+  expiresAt: integer("expires_at", { mode: "timestamp" }),
+  createdAt: integer("created_at", { mode: "timestamp" }).defaultNow(),
 });
 
 // Admin audit log
-export const adminAuditLog = pgTable("admin_audit_log", {
-  id: serial("id").primaryKey(),
+export const adminAuditLog = sqliteTable("admin_audit_log", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
   adminId: integer("admin_id").references(() => users.id).notNull(),
   action: text("action").notNull(), // 'user_ban', 'review_moderate', 'property_approve', etc.
   targetType: text("target_type").notNull(), // 'user', 'property', 'review', etc.
   targetId: integer("target_id").notNull(),
-  details: json("details").$type<Record<string, any>>(),
+  details: text("details"), // JSON string of details
   ipAddress: text("ip_address"),
   userAgent: text("user_agent"),
-  createdAt: timestamp("created_at").defaultNow(),
+  createdAt: integer("created_at", { mode: "timestamp" }).defaultNow(),
 });
 
 // Relations

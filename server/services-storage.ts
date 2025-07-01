@@ -10,7 +10,7 @@ import {
   type InsertServiceReview
 } from "@shared/services-schema";
 import { db } from "./db";
-import { eq, and, desc, asc, ilike, inArray, sql } from "drizzle-orm";
+import { eq, and, desc, asc, like, sql } from "drizzle-orm";
 
 export interface IServicesStorage {
   // Service Provider methods
@@ -66,7 +66,7 @@ export class ServicesStorage implements IServicesStorage {
       conditions.push(eq(serviceProviders.serviceCategory, filters.category));
     }
     if (filters.city) {
-      conditions.push(ilike(serviceProviders.city, `%${filters.city}%`));
+      conditions.push(like(serviceProviders.city, `%${filters.city}%`));
     }
     if (filters.verified !== undefined) {
       conditions.push(eq(serviceProviders.verified, filters.verified));
@@ -78,11 +78,12 @@ export class ServicesStorage implements IServicesStorage {
       conditions.push(eq(serviceProviders.reacCertified, filters.reacCertified));
     }
     if (filters.minRating) {
-      conditions.push(sql`CAST(${serviceProviders.rating} AS FLOAT) >= ${filters.minRating}`);
+      // For SQLite, we need to handle string comparison differently
+      conditions.push(sql`CAST(${serviceProviders.rating} AS REAL) >= ${filters.minRating}`);
     }
 
     if (conditions.length > 0) {
-      query = query.where(and(...conditions)) as any;
+      query = query.where(and(...conditions));
     }
 
     // Sorting
@@ -90,29 +91,29 @@ export class ServicesStorage implements IServicesStorage {
       const direction = filters.sortOrder === 'desc' ? desc : asc;
       switch (filters.sortBy) {
         case 'rating':
-          query = query.orderBy(direction(serviceProviders.rating)) as any;
+          query = query.orderBy(direction(serviceProviders.rating));
           break;
         case 'reviewCount':
-          query = query.orderBy(direction(serviceProviders.reviewCount)) as any;
+          query = query.orderBy(direction(serviceProviders.reviewCount));
           break;
         case 'name':
-          query = query.orderBy(direction(serviceProviders.companyName)) as any;
+          query = query.orderBy(direction(serviceProviders.companyName));
           break;
         case 'newest':
-          query = query.orderBy(direction(serviceProviders.dateJoined)) as any;
+          query = query.orderBy(direction(serviceProviders.dateJoined));
           break;
       }
     } else {
       // Default sorting: featured first, then by rating
-      query = query.orderBy(desc(serviceProviders.featured), desc(serviceProviders.rating)) as any;
+      query = query.orderBy(desc(serviceProviders.featured), desc(serviceProviders.rating));
     }
 
     // Pagination
     if (filters.limit) {
-      query = query.limit(filters.limit) as any;
+      query = query.limit(filters.limit);
     }
     if (filters.offset) {
-      query = query.offset(filters.offset) as any;
+      query = query.offset(filters.offset);
     }
 
     return await query;
@@ -128,8 +129,9 @@ export class ServicesStorage implements IServicesStorage {
 
   async getServiceCategories(): Promise<string[]> {
     const result = await db
-      .selectDistinct({ category: serviceProviders.serviceCategory })
-      .from(serviceProviders);
+      .select({ category: serviceProviders.serviceCategory })
+      .from(serviceProviders)
+      .groupBy(serviceProviders.serviceCategory);
     return result.map(r => r.category);
   }
 
@@ -154,7 +156,7 @@ export class ServicesStorage implements IServicesStorage {
     const result = await db
       .delete(serviceProviders)
       .where(eq(serviceProviders.id, id));
-    return result.rowCount > 0;
+    return result.changes > 0;
   }
 
   // Service Ads methods
@@ -181,7 +183,7 @@ export class ServicesStorage implements IServicesStorage {
     let query = db.select().from(serviceAds);
     
     if (providerId) {
-      query = query.where(eq(serviceAds.providerId, providerId)) as any;
+      query = query.where(eq(serviceAds.providerId, providerId));
     }
     
     return await query.orderBy(desc(serviceAds.priority), desc(serviceAds.createdAt));

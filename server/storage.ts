@@ -16,7 +16,7 @@ import {
   type InsertSavedProperty
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, and, desc, asc, gte, lte, like, ilike, or, sql } from "drizzle-orm";
+import { eq, and, desc, asc, gte, lte, like, or, sql } from "drizzle-orm";
 
 export interface IStorage {
   // User methods
@@ -25,6 +25,7 @@ export interface IStorage {
   getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   updateUser(id: number, updates: Partial<InsertUser>): Promise<User | undefined>;
+  getUsers(filters?: { userType?: string; isActive?: boolean; limit?: number; offset?: number }): Promise<User[]>;
 
   // Property methods
   getProperty(id: number): Promise<Property | undefined>;
@@ -109,6 +110,32 @@ export class DatabaseStorage implements IStorage {
     return user || undefined;
   }
 
+  async getUsers(filters: { userType?: string; isActive?: boolean; limit?: number; offset?: number } = {}): Promise<User[]> {
+    let query = db.select().from(users);
+    
+    const conditions = [];
+    if (filters.userType) {
+      conditions.push(eq(users.userType, filters.userType));
+    }
+    if (filters.isActive !== undefined) {
+      conditions.push(eq(users.isActive, filters.isActive));
+    }
+    
+    if (conditions.length > 0) {
+      query = query.where(and(...conditions));
+    }
+    
+    if (filters.limit) {
+      query = query.limit(filters.limit);
+    }
+    
+    if (filters.offset) {
+      query = query.offset(filters.offset);
+    }
+    
+    return await query;
+  }
+
   // Property methods
   async getProperty(id: number): Promise<Property | undefined> {
     const [property] = await db.select().from(properties).where(eq(properties.id, id));
@@ -143,8 +170,8 @@ export class DatabaseStorage implements IStorage {
     if (filters.city) {
       conditions.push(
         or(
-          ilike(properties.city, `%${filters.city}%`),
-          ilike(properties.address, `%${filters.city}%`)
+          like(properties.city, `%${filters.city}%`),
+          like(properties.address, `%${filters.city}%`)
         )
       );
     }
@@ -162,7 +189,7 @@ export class DatabaseStorage implements IStorage {
     }
 
     if (conditions.length > 0) {
-      query = query.where(and(...conditions)) as any;
+      query = query.where(and(...conditions));
     }
 
     // Sorting
@@ -175,69 +202,88 @@ export class DatabaseStorage implements IStorage {
       }[filters.sortBy];
 
       if (sortColumn) {
-        query = query.orderBy(filters.sortOrder === 'asc' ? asc(sortColumn) : desc(sortColumn)) as any;
+        query = filters.sortOrder === 'asc' ? query.orderBy(asc(sortColumn)) : query.orderBy(desc(sortColumn));
       }
     } else {
-      query = query.orderBy(desc(properties.createdAt)) as any;
+      query = query.orderBy(desc(properties.createdAt));
     }
 
     // Pagination
     if (filters.limit) {
-      query = query.limit(filters.limit) as any;
+      query = query.limit(filters.limit);
     }
     if (filters.offset) {
-      query = query.offset(filters.offset) as any;
+      query = query.offset(filters.offset);
     }
 
     return await query;
   }
 
   async createProperty(property: InsertProperty): Promise<Property> {
+    // Convert arrays to JSON strings for SQLite
+    const propertyData = {
+      ...property,
+      images: property.images ? JSON.stringify(property.images) : null,
+      features: property.features ? JSON.stringify(property.features) : null,
+    };
+
     const [newProperty] = await db
       .insert(properties)
-      .values({
-        ...property,
-        price: property.price.toString(),
-        bathrooms: property.bathrooms?.toString(),
-        latitude: property.latitude?.toString(),
-        longitude: property.longitude?.toString(),
-        lotSize: property.lotSize?.toString(),
-        propertyTaxes: property.propertyTaxes?.toString(),
-        hoaFees: property.hoaFees?.toString(),
-      } as any)
+      .values(propertyData)
       .returning();
-    return newProperty;
+    
+    // Parse JSON strings back to arrays
+    return {
+      ...newProperty,
+      images: newProperty.images ? JSON.parse(newProperty.images) : [],
+      features: newProperty.features ? JSON.parse(newProperty.features) : [],
+    };
   }
 
   async updateProperty(id: number, updates: Partial<InsertProperty>): Promise<Property | undefined> {
-    const updateData = { ...updates } as any;
-    if (updates.price !== undefined) updateData.price = updates.price.toString();
-    if (updates.bathrooms !== undefined) updateData.bathrooms = updates.bathrooms?.toString();
-    if (updates.latitude !== undefined) updateData.latitude = updates.latitude?.toString();
-    if (updates.longitude !== undefined) updateData.longitude = updates.longitude?.toString();
-    if (updates.lotSize !== undefined) updateData.lotSize = updates.lotSize?.toString();
-    if (updates.propertyTaxes !== undefined) updateData.propertyTaxes = updates.propertyTaxes?.toString();
-    if (updates.hoaFees !== undefined) updateData.hoaFees = updates.hoaFees?.toString();
+    // Convert arrays to JSON strings for SQLite
+    const updateData = { ...updates };
+    if (updates.images) {
+      updateData.images = JSON.stringify(updates.images);
+    }
+    if (updates.features) {
+      updateData.features = JSON.stringify(updates.features);
+    }
     
     const [property] = await db
       .update(properties)
       .set({ ...updateData, updatedAt: new Date() })
       .where(eq(properties.id, id))
       .returning();
-    return property || undefined;
+    
+    if (!property) return undefined;
+    
+    // Parse JSON strings back to arrays
+    return {
+      ...property,
+      images: property.images ? JSON.parse(property.images) : [],
+      features: property.features ? JSON.parse(property.features) : [],
+    };
   }
 
   async deleteProperty(id: number): Promise<boolean> {
     const result = await db.delete(properties).where(eq(properties.id, id));
-    return (result.rowCount || 0) > 0;
+    return result.changes > 0;
   }
 
   async getUserProperties(userId: number): Promise<Property[]> {
-    return await db
+    const userProps = await db
       .select()
       .from(properties)
       .where(eq(properties.ownerId, userId))
       .orderBy(desc(properties.createdAt));
+    
+    // Parse JSON strings back to arrays
+    return userProps.map(prop => ({
+      ...prop,
+      images: prop.images ? JSON.parse(prop.images) : [],
+      features: prop.features ? JSON.parse(prop.features) : [],
+    }));
   }
 
   async incrementPropertyViews(id: number): Promise<void> {
@@ -327,7 +373,7 @@ export class DatabaseStorage implements IStorage {
 
   // Saved properties methods
   async getSavedProperties(userId: number): Promise<Property[]> {
-    return await db
+    const savedProps = await db
       .select({
         id: properties.id,
         title: properties.title,
@@ -364,6 +410,13 @@ export class DatabaseStorage implements IStorage {
       .innerJoin(properties, eq(savedProperties.propertyId, properties.id))
       .where(eq(savedProperties.userId, userId))
       .orderBy(desc(savedProperties.createdAt));
+    
+    // Parse JSON strings back to arrays
+    return savedProps.map(prop => ({
+      ...prop,
+      images: prop.images ? JSON.parse(prop.images) : [],
+      features: prop.features ? JSON.parse(prop.features) : [],
+    }));
   }
 
   async saveProperty(userId: number, propertyId: number): Promise<SavedProperty> {
@@ -381,7 +434,7 @@ export class DatabaseStorage implements IStorage {
         eq(savedProperties.userId, userId),
         eq(savedProperties.propertyId, propertyId)
       ));
-    return (result.rowCount || 0) > 0;
+    return result.changes > 0;
   }
 
   async isPropertySaved(userId: number, propertyId: number): Promise<boolean> {

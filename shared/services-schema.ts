@@ -1,59 +1,59 @@
-import { pgTable, serial, text, boolean, timestamp, integer, varchar } from "drizzle-orm/pg-core";
+import { sqliteTable, text, integer, real } from "drizzle-orm/sqlite-core";
 import { relations } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-export const serviceProviders = pgTable("service_providers", {
-  id: serial("id").primaryKey(),
-  companyName: varchar("company_name", { length: 255 }).notNull(),
-  serviceCategory: varchar("service_category", { length: 100 }).notNull(), // 'Photography', 'Legal', 'Moving', 'Finance', 'Insurance', 'Cleaning'
-  contactPerson: varchar("contact_person", { length: 255 }),
-  phoneNumber: varchar("phone_number", { length: 20 }),
-  email: varchar("email", { length: 255 }).unique(),
-  websiteUrl: varchar("website_url", { length: 255 }),
-  logoUrl: varchar("logo_url", { length: 255 }),
+export const serviceProviders = sqliteTable("service_providers", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  companyName: text("company_name").notNull(),
+  serviceCategory: text("service_category").notNull(), // 'Photography', 'Legal', 'Moving', 'Finance', 'Insurance', 'Cleaning'
+  contactPerson: text("contact_person"),
+  phoneNumber: text("phone_number"),
+  email: text("email").unique(),
+  websiteUrl: text("website_url"),
+  logoUrl: text("logo_url"),
   description: text("description"),
-  reacCertified: boolean("reac_certified").default(false), // Real Estate Advisory Council certification
+  reacCertified: integer("reac_certified", { mode: "boolean" }).default(false), // Real Estate Advisory Council certification
   address: text("address"),
-  city: varchar("city", { length: 100 }),
-  rating: varchar("rating", { length: 3 }).default("4.5"), // Average rating out of 5
+  city: text("city"),
+  rating: text("rating").default("4.5"), // Average rating out of 5
   reviewCount: integer("review_count").default(0),
-  verified: boolean("verified").default(false),
-  featured: boolean("featured").default(false),
-  dateJoined: timestamp("date_joined").defaultNow(),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow()
+  verified: integer("verified", { mode: "boolean" }).default(false),
+  featured: integer("featured", { mode: "boolean" }).default(false),
+  dateJoined: integer("date_joined", { mode: "timestamp" }).defaultNow(),
+  createdAt: integer("created_at", { mode: "timestamp" }).defaultNow(),
+  updatedAt: integer("updated_at", { mode: "timestamp" }).defaultNow()
 });
 
-export const serviceAds = pgTable("service_ads", {
-  id: serial("id").primaryKey(),
+export const serviceAds = sqliteTable("service_ads", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
   providerId: integer("provider_id").references(() => serviceProviders.id),
-  adTitle: varchar("ad_title", { length: 255 }).notNull(),
+  adTitle: text("ad_title").notNull(),
   adCopy: text("ad_copy"), // e.g., "Make your listing shine. Book a pro photoshoot."
-  adImageUrl: varchar("ad_image_url", { length: 255 }),
-  targetAudience: varchar("target_audience", { length: 50 }).notNull(), // 'Seller', 'Buyer', 'Renter', 'New_Homeowner'
-  contextTrigger: varchar("context_trigger", { length: 100 }).unique().notNull(), // The specific event that shows this ad
-  ctaText: varchar("cta_text", { length: 100 }).default("Learn More"),
-  ctaUrl: varchar("cta_url", { length: 255 }),
-  active: boolean("active").default(true),
+  adImageUrl: text("ad_image_url"),
+  targetAudience: text("target_audience").notNull(), // 'Seller', 'Buyer', 'Renter', 'New_Homeowner'
+  contextTrigger: text("context_trigger").notNull(), // The specific event that shows this ad
+  ctaText: text("cta_text").default("Learn More"),
+  ctaUrl: text("cta_url"),
+  active: integer("active", { mode: "boolean" }).default(true),
   priority: integer("priority").default(1), // Higher numbers = higher priority
   impressions: integer("impressions").default(0),
   clicks: integer("clicks").default(0),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow()
+  createdAt: integer("created_at", { mode: "timestamp" }).defaultNow(),
+  updatedAt: integer("updated_at", { mode: "timestamp" }).defaultNow()
 });
 
-export const serviceReviews = pgTable("service_reviews", {
-  id: serial("id").primaryKey(),
+export const serviceReviews = sqliteTable("service_reviews", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
   providerId: integer("provider_id").references(() => serviceProviders.id),
   userId: integer("user_id"), // Reference to users table
   rating: integer("rating").notNull(), // 1-5 stars
   review: text("review"),
-  reviewerName: varchar("reviewer_name", { length: 255 }),
-  reviewerAvatar: varchar("reviewer_avatar", { length: 255 }),
-  verified: boolean("verified").default(false), // Verified purchase/service
+  reviewerName: text("reviewer_name"),
+  reviewerAvatar: text("reviewer_avatar"),
+  verified: integer("verified", { mode: "boolean" }).default(false), // Verified purchase/service
   helpful: integer("helpful").default(0), // How many found this helpful
-  createdAt: timestamp("created_at").defaultNow()
+  createdAt: integer("created_at", { mode: "timestamp" }).defaultNow()
 });
 
 // Relations

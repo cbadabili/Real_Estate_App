@@ -184,8 +184,8 @@ export class ReviewStorage implements IReviewStorage {
           .where(eq(users.id, review.revieweeId));
         
         // Get response count
-        const [responsesCount] = await db
-          .select({ count: count() })
+        const [responsesResult] = await db
+          .select({ count: sql`count(*)` })
           .from(reviewResponses)
           .where(eq(reviewResponses.reviewId, review.id));
         
@@ -196,7 +196,7 @@ export class ReviewStorage implements IReviewStorage {
           ...review,
           reviewer: reviewer || { firstName: 'Unknown', lastName: 'User', avatar: null },
           reviewee: reviewee || { firstName: 'Unknown', lastName: 'User', avatar: null },
-          responsesCount: responsesCount?.count || 0,
+          responsesCount: responsesResult?.count || 0,
           helpfulCount: helpfulStats.helpful,
           notHelpfulCount: helpfulStats.notHelpful,
         };
@@ -223,15 +223,15 @@ export class ReviewStorage implements IReviewStorage {
 
   async deleteUserReview(id: number): Promise<boolean> {
     const result = await db.delete(userReviews).where(eq(userReviews.id, id));
-    return result.rowCount! > 0;
+    return result.changes > 0;
   }
 
   async getUserReviewStats(userId: number): Promise<ReviewStats> {
     // Get total reviews and average rating
-    const [stats] = await db
+    const [statsResult] = await db
       .select({
-        totalReviews: count(),
-        averageRating: avg(userReviews.rating),
+        totalReviews: sql`count(*)`,
+        averageRating: sql`avg(${userReviews.rating})`,
       })
       .from(userReviews)
       .where(and(
@@ -244,7 +244,7 @@ export class ReviewStorage implements IReviewStorage {
     const ratingDistribution = await db
       .select({
         rating: userReviews.rating,
-        count: count(),
+        count: sql`count(*)`,
       })
       .from(userReviews)
       .where(and(
@@ -256,7 +256,7 @@ export class ReviewStorage implements IReviewStorage {
     
     // Get verified reviews count
     const [verifiedStats] = await db
-      .select({ count: count() })
+      .select({ count: sql`count(*)` })
       .from(userReviews)
       .where(and(
         eq(userReviews.revieweeId, userId),
@@ -266,7 +266,7 @@ export class ReviewStorage implements IReviewStorage {
     
     // Get total helpful votes
     const [helpfulStats] = await db
-      .select({ count: count() })
+      .select({ count: sql`count(*)` })
       .from(reviewHelpful)
       .innerJoin(userReviews, eq(reviewHelpful.reviewId, userReviews.id))
       .where(and(
@@ -280,8 +280,8 @@ export class ReviewStorage implements IReviewStorage {
     });
     
     return {
-      totalReviews: stats?.totalReviews || 0,
-      averageRating: parseFloat(stats?.averageRating?.toString() || '0'),
+      totalReviews: statsResult?.totalReviews || 0,
+      averageRating: parseFloat(statsResult?.averageRating?.toString() || '0'),
       ratingDistribution: distribution,
       verifiedReviews: verifiedStats?.count || 0,
       helpfulVotes: helpfulStats?.count || 0,
@@ -319,7 +319,7 @@ export class ReviewStorage implements IReviewStorage {
 
   async deleteReviewResponse(id: number): Promise<boolean> {
     const result = await db.delete(reviewResponses).where(eq(reviewResponses.id, id));
-    return result.rowCount! > 0;
+    return result.changes > 0;
   }
 
   // Review Helpful Votes
@@ -337,7 +337,7 @@ export class ReviewStorage implements IReviewStorage {
 
   async getReviewHelpfulStats(reviewId: number): Promise<{ helpful: number; notHelpful: number }> {
     const [helpfulCount] = await db
-      .select({ count: count() })
+      .select({ count: sql`count(*)` })
       .from(reviewHelpful)
       .where(and(
         eq(reviewHelpful.reviewId, reviewId),
@@ -345,7 +345,7 @@ export class ReviewStorage implements IReviewStorage {
       ));
     
     const [notHelpfulCount] = await db
-      .select({ count: count() })
+      .select({ count: sql`count(*)` })
       .from(reviewHelpful)
       .where(and(
         eq(reviewHelpful.reviewId, reviewId),
@@ -359,17 +359,17 @@ export class ReviewStorage implements IReviewStorage {
   }
 
   async voteReviewHelpful(vote: InsertReviewHelpful): Promise<ReviewHelpful> {
-    // Use upsert to handle existing votes
-    const [newVote] = await db
-      .insert(reviewHelpful)
-      .values(vote)
-      .onConflictDoUpdate({
-        target: [reviewHelpful.reviewId, reviewHelpful.userId],
-        set: { isHelpful: vote.isHelpful, createdAt: new Date() }
-      })
-      .returning();
+    // First check if vote already exists
+    const existingVote = await this.getReviewHelpful(vote.reviewId, vote.userId);
     
-    return newVote;
+    if (existingVote) {
+      // Update existing vote
+      return await this.updateReviewHelpful(vote.reviewId, vote.userId, vote.isHelpful);
+    } else {
+      // Create new vote
+      const [newVote] = await db.insert(reviewHelpful).values(vote).returning();
+      return newVote;
+    }
   }
 
   async updateReviewHelpful(reviewId: number, userId: number, isHelpful: boolean): Promise<ReviewHelpful | undefined> {
@@ -393,7 +393,7 @@ export class ReviewStorage implements IReviewStorage {
         eq(reviewHelpful.userId, userId)
       ));
     
-    return result.rowCount! > 0;
+    return result.changes > 0;
   }
 
   // User Permissions
@@ -408,7 +408,7 @@ export class ReviewStorage implements IReviewStorage {
       .from(userPermissions)
       .where(and(
         eq(userPermissions.userId, userId),
-        sql`(${userPermissions.expiresAt} IS NULL OR ${userPermissions.expiresAt} > NOW())`
+        sql`(${userPermissions.expiresAt} IS NULL OR ${userPermissions.expiresAt} > datetime('now'))`
       ));
   }
 
@@ -425,17 +425,17 @@ export class ReviewStorage implements IReviewStorage {
         eq(userPermissions.permission, permission)
       ));
     
-    return result.rowCount! > 0;
+    return result.changes > 0;
   }
 
   async hasUserPermission(userId: number, permission: Permission): Promise<boolean> {
     const [result] = await db
-      .select({ count: count() })
+      .select({ count: sql`count(*)` })
       .from(userPermissions)
       .where(and(
         eq(userPermissions.userId, userId),
         eq(userPermissions.permission, permission),
-        sql`(${userPermissions.expiresAt} IS NULL OR ${userPermissions.expiresAt} > NOW())`
+        sql`(${userPermissions.expiresAt} IS NULL OR ${userPermissions.expiresAt} > datetime('now'))`
       ));
     
     return (result?.count || 0) > 0;
@@ -477,8 +477,19 @@ export class ReviewStorage implements IReviewStorage {
   }
 
   async createAuditLogEntry(entry: InsertAdminAuditLog): Promise<AdminAuditLog> {
-    const [newEntry] = await db.insert(adminAuditLog).values(entry).returning();
-    return newEntry;
+    // Convert details object to JSON string for SQLite
+    const entryData = {
+      ...entry,
+      details: entry.details ? JSON.stringify(entry.details) : null
+    };
+    
+    const [newEntry] = await db.insert(adminAuditLog).values(entryData).returning();
+    
+    // Parse JSON string back to object
+    return {
+      ...newEntry,
+      details: newEntry.details ? JSON.parse(newEntry.details) : null
+    };
   }
 
   // Moderation
@@ -492,7 +503,7 @@ export class ReviewStorage implements IReviewStorage {
       })
       .where(eq(userReviews.id, reviewId));
     
-    return result.rowCount! > 0;
+    return result.changes > 0;
   }
 
   async moderateReview(reviewId: number, status: string, moderatorNotes?: string): Promise<UserReview | undefined> {
