@@ -1,20 +1,11 @@
 import { 
   users, 
-  properties, 
-  inquiries, 
-  appointments, 
-  savedProperties,
+  properties,
   type User, 
   type InsertUser,
   type Property,
-  type InsertProperty,
-  type Inquiry,
-  type InsertInquiry,
-  type Appointment,
-  type InsertAppointment,
-  type SavedProperty,
-  type InsertSavedProperty
-} from "@shared/schema";
+  type InsertProperty
+} from "../shared/schema";
 import { db } from "./db";
 import { eq, and, desc, asc, gte, lte, like, or, sql } from "drizzle-orm";
 
@@ -35,26 +26,6 @@ export interface IStorage {
   deleteProperty(id: number): Promise<boolean>;
   getUserProperties(userId: number): Promise<Property[]>;
   incrementPropertyViews(id: number): Promise<void>;
-
-  // Inquiry methods
-  getInquiry(id: number): Promise<Inquiry | undefined>;
-  getPropertyInquiries(propertyId: number): Promise<Inquiry[]>;
-  getUserInquiries(userId: number): Promise<Inquiry[]>;
-  createInquiry(inquiry: InsertInquiry): Promise<Inquiry>;
-  updateInquiryStatus(id: number, status: string): Promise<Inquiry | undefined>;
-
-  // Appointment methods
-  getAppointment(id: number): Promise<Appointment | undefined>;
-  getPropertyAppointments(propertyId: number): Promise<Appointment[]>;
-  getUserAppointments(userId: number): Promise<Appointment[]>;
-  createAppointment(appointment: InsertAppointment): Promise<Appointment>;
-  updateAppointmentStatus(id: number, status: string): Promise<Appointment | undefined>;
-
-  // Saved properties methods
-  getSavedProperties(userId: number): Promise<Property[]>;
-  saveProperty(userId: number, propertyId: number): Promise<SavedProperty>;
-  unsaveProperty(userId: number, propertyId: number): Promise<boolean>;
-  isPropertySaved(userId: number, propertyId: number): Promise<boolean>;
 }
 
 export interface PropertyFilters {
@@ -313,176 +284,6 @@ export class DatabaseStorage implements IStorage {
       .update(properties)
       .set({ views: sql`${properties.views} + 1` })
       .where(eq(properties.id, id));
-  }
-
-  // Inquiry methods
-  async getInquiry(id: number): Promise<Inquiry | undefined> {
-    if (!db) return undefined;
-    const [inquiry] = await db.select().from(inquiries).where(eq(inquiries.id, id));
-    return inquiry || undefined;
-  }
-
-  async getPropertyInquiries(propertyId: number): Promise<Inquiry[]> {
-    if (!db) return [];
-    return await db
-      .select()
-      .from(inquiries)
-      .where(eq(inquiries.propertyId, propertyId))
-      .orderBy(desc(inquiries.createdAt));
-  }
-
-  async getUserInquiries(userId: number): Promise<Inquiry[]> {
-    if (!db) return [];
-    return await db
-      .select()
-      .from(inquiries)
-      .where(eq(inquiries.buyerId, userId))
-      .orderBy(desc(inquiries.createdAt));
-  }
-
-  async createInquiry(inquiry: InsertInquiry): Promise<Inquiry> {
-    if (!db) throw new Error("Database not initialized");
-    const [newInquiry] = await db
-      .insert(inquiries)
-      .values(inquiry)
-      .returning();
-    return newInquiry;
-  }
-
-  async updateInquiryStatus(id: number, status: string): Promise<Inquiry | undefined> {
-    if (!db) return undefined;
-    const [inquiry] = await db
-      .update(inquiries)
-      .set({ status })
-      .where(eq(inquiries.id, id))
-      .returning();
-    return inquiry || undefined;
-  }
-
-  // Appointment methods
-  async getAppointment(id: number): Promise<Appointment | undefined> {
-    if (!db) return undefined;
-    const [appointment] = await db.select().from(appointments).where(eq(appointments.id, id));
-    return appointment || undefined;
-  }
-
-  async getPropertyAppointments(propertyId: number): Promise<Appointment[]> {
-    if (!db) return [];
-    return await db
-      .select()
-      .from(appointments)
-      .where(eq(appointments.propertyId, propertyId))
-      .orderBy(asc(appointments.appointmentDate));
-  }
-
-  async getUserAppointments(userId: number): Promise<Appointment[]> {
-    if (!db) return [];
-    return await db
-      .select()
-      .from(appointments)
-      .where(eq(appointments.buyerId, userId))
-      .orderBy(asc(appointments.appointmentDate));
-  }
-
-  async createAppointment(appointment: InsertAppointment): Promise<Appointment> {
-    if (!db) throw new Error("Database not initialized");
-    const [newAppointment] = await db
-      .insert(appointments)
-      .values(appointment)
-      .returning();
-    return newAppointment;
-  }
-
-  async updateAppointmentStatus(id: number, status: string): Promise<Appointment | undefined> {
-    if (!db) return undefined;
-    const [appointment] = await db
-      .update(appointments)
-      .set({ status })
-      .where(eq(appointments.id, id))
-      .returning();
-    return appointment || undefined;
-  }
-
-  // Saved properties methods
-  async getSavedProperties(userId: number): Promise<Property[]> {
-    if (!db) return [];
-    const savedProps = await db
-      .select({
-        id: properties.id,
-        title: properties.title,
-        description: properties.description,
-        price: properties.price,
-        address: properties.address,
-        city: properties.city,
-        state: properties.state,
-        zipCode: properties.zipCode,
-        latitude: properties.latitude,
-        longitude: properties.longitude,
-        propertyType: properties.propertyType,
-        listingType: properties.listingType,
-        bedrooms: properties.bedrooms,
-        bathrooms: properties.bathrooms,
-        squareFeet: properties.squareFeet,
-        lotSize: properties.lotSize,
-        yearBuilt: properties.yearBuilt,
-        status: properties.status,
-        images: properties.images,
-        features: properties.features,
-        virtualTourUrl: properties.virtualTourUrl,
-        videoUrl: properties.videoUrl,
-        propertyTaxes: properties.propertyTaxes,
-        hoaFees: properties.hoaFees,
-        ownerId: properties.ownerId,
-        agentId: properties.agentId,
-        views: properties.views,
-        daysOnMarket: properties.daysOnMarket,
-        createdAt: properties.createdAt,
-        updatedAt: properties.updatedAt,
-      })
-      .from(savedProperties)
-      .innerJoin(properties, eq(savedProperties.propertyId, properties.id))
-      .where(eq(savedProperties.userId, userId))
-      .orderBy(desc(savedProperties.createdAt));
-    
-    // Parse JSON strings back to arrays
-    return savedProps.map(prop => ({
-      ...prop,
-      images: prop.images ? JSON.parse(prop.images) : [],
-      features: prop.features ? JSON.parse(prop.features) : [],
-    }));
-  }
-
-  async saveProperty(userId: number, propertyId: number): Promise<SavedProperty> {
-    if (!db) throw new Error("Database not initialized");
-    const [saved] = await db
-      .insert(savedProperties)
-      .values({ userId, propertyId })
-      .returning();
-    return saved;
-  }
-
-  async unsaveProperty(userId: number, propertyId: number): Promise<boolean> {
-    if (!db) return false;
-    const result = await db
-      .delete(savedProperties)
-      .where(and(
-        eq(savedProperties.userId, userId),
-        eq(savedProperties.propertyId, propertyId)
-      ));
-    return result.changes > 0;
-  }
-
-  async isPropertySaved(userId: number, propertyId: number): Promise<boolean> {
-    if (!db) return false;
-    const [saved] = await db
-      .select()
-      .from(savedProperties)
-      .where(and(
-        eq(savedProperties.userId, userId),
-        eq(savedProperties.propertyId, propertyId)
-      ))
-      .limit(1);
-    return !!saved;
   }
 }
 

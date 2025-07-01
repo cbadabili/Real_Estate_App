@@ -16,6 +16,7 @@ import {
   ChevronRight,
   Star
 } from 'lucide-react';
+import MortgageCalculator from '../components/MortgageCalculator';
 
 const PropertyDetailsPage = () => {
   const { id } = useParams();
@@ -26,7 +27,7 @@ const PropertyDetailsPage = () => {
   const property = {
     id: 1,
     title: 'Modern Family Home in Gaborone West',
-    price: 'P1,250,000',
+    price: 1250000,
     location: 'Gaborone West',
     description: 'This stunning modern family home offers the perfect blend of comfort and style. Located in a quiet neighborhood with excellent schools nearby, this property features an open-concept design with high ceilings, hardwood floors throughout, and a gourmet kitchen with stainless steel appliances. The master suite includes a walk-in closet and spa-like bathroom. The backyard is perfect for entertaining with a large deck and mature landscaping.',
     bedrooms: 4,
@@ -138,7 +139,7 @@ const PropertyDetailsPage = () => {
                 </div>
                 <div className="text-right">
                   <div className="text-4xl font-bold text-beedab-blue">
-                    {property.price}
+                    P {property.price.toLocaleString()}
                   </div>
                 </div>
               </div>
@@ -279,6 +280,9 @@ const PropertyDetailsPage = () => {
                 </div>
               )}
             </div>
+
+            {/* Mortgage Calculator */}
+            <MortgageCalculator propertyPrice={property.price} />
 
             {/* Schedule Tour */}
             <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6">

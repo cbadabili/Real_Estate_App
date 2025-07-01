@@ -1,10 +1,9 @@
-import { Database } from 'sqlite3';
-import { open } from 'sqlite';
-import * as schema from "@shared/schema";
+import { drizzle } from 'drizzle-orm/better-sqlite3';
+import Database from 'better-sqlite3';
+import * as schema from "../shared/schema";
 import { join } from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
-import { drizzle } from 'drizzle-orm/sqlite';
 
 // Get the directory name of the current module
 const __filename = fileURLToPath(import.meta.url);
@@ -15,19 +14,17 @@ const dbPath = join(__dirname, '..', 'beedab.db');
 console.log(`Using SQLite database at: ${dbPath}`);
 
 // Create SQLite database connection
-let sqliteDB: any = null;
-let db: any = null;
+let sqliteDB = null;
+let db = null;
 
 // Initialize database connection
 export async function initializeDatabase() {
   try {
-    sqliteDB = await open({
-      filename: dbPath,
-      driver: Database
-    });
+    // Create SQLite database connection
+    sqliteDB = new Database(dbPath);
     
     // Create drizzle database instance
-    db = drizzle(sqliteDB);
+    db = drizzle(sqliteDB, { schema });
     
     console.log('Database connection initialized successfully');
     return true;
@@ -45,7 +42,7 @@ export async function testDatabaseConnection() {
     }
     
     // Simple query to test connection
-    const result = await sqliteDB.get('SELECT 1 as test');
+    const result = sqliteDB.prepare('SELECT 1 as test').get();
     console.log('Database connection successful:', result);
     return true;
   } catch (error) {
