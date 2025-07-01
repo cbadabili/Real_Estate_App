@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { MapPin, Navigation, Zoom, ZoomIn, ZoomOut } from 'lucide-react';
+import { MapPin, Navigation, ZoomIn as Zoom, ZoomIn, ZoomOut } from 'lucide-react';
 
 const InteractiveMap = ({ locations, onLocationClick, selectedLocation, className = "" }) => {
   const [zoomLevel, setZoomLevel] = useState(1);
