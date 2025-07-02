@@ -22,7 +22,7 @@ interface ToastContextType {
   clearAll: () => void;
 }
 
-const ToastContext = createContext<ToastContextType | undefined>(undefined);
+export const ToastContext = createContext<ToastContextType | undefined>(undefined);
 
 export const useToast = () => {
   const context = useContext(ToastContext);
@@ -184,18 +184,18 @@ const ToastComponent: React.FC<ToastComponentProps> = ({ toast, onRemove }) => {
         <div className="flex-shrink-0">
           <Icon className={`h-5 w-5 ${colors.icon}`} />
         </div>
-        
+
         <div className="ml-3 flex-1">
           <h4 className={`text-sm font-medium ${colors.title}`}>
             {toast.title}
           </h4>
-          
+
           {toast.message && (
             <p className={`mt-1 text-sm ${colors.message}`}>
               {toast.message}
             </p>
           )}
-          
+
           {toast.action && (
             <div className="mt-3">
               <button
@@ -207,7 +207,7 @@ const ToastComponent: React.FC<ToastComponentProps> = ({ toast, onRemove }) => {
             </div>
           )}
         </div>
-        
+
         <div className="ml-4 flex-shrink-0">
           <button
             onClick={handleRemove}
@@ -228,13 +228,13 @@ export const useToastHelpers = () => {
   return {
     success: (title: string, message?: string, action?: Toast['action']) =>
       addToast({ type: 'success', title, message, action }),
-    
+
     error: (title: string, message?: string, action?: Toast['action']) =>
       addToast({ type: 'error', title, message, action }),
-    
+
     warning: (title: string, message?: string, action?: Toast['action']) =>
       addToast({ type: 'warning', title, message, action }),
-    
+
     info: (title: string, message?: string, action?: Toast['action']) =>
       addToast({ type: 'info', title, message, action }),
   };
