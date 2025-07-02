@@ -142,7 +142,7 @@ const HomePage = () => {
       className="min-h-screen"
     >
       {/* Hero Section with Slideshow */}
-      <section className="relative h-screen overflow-hidden">
+      <section className="relative h-[75vh] overflow-hidden">
         {/* Property Slideshow Background */}
         <div className="absolute inset-0">
           {premiumProperties.map((property, index) => (
