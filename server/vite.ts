@@ -1,15 +1,8 @@
 import express, { type Express } from "express";
-import fs from "fs";
+import fs from "fs/promises";
 import path from "path";
 import { createServer as createViteServer, createLogger } from "vite";
 import { type Server } from "http";
-import viteConfig from "../vite.config";
-// Generate random ID function
-import type { Express } from "express";
-import type { Server } from "http";
-import { createServer as createViteServer, createLogger } from "vite";
-import path from "path";
-import fs from "fs/promises";
 import viteConfig from "../vite.config.js";
 
 const generateId = () => Math.random().toString(36).substring(2, 15);
@@ -59,10 +52,14 @@ export async function setupVite(app: Express, server: Server) {
         "index.html",
       );
 
+      // always reload the index.html file from disk incase it changes
       let template = await fs.readFile(clientTemplate, "utf-8");
-      template = await vite.transformIndexHtml(url, template);
-
-      res.status(200).set({ "Content-Type": "text/html" }).end(template);
+      template = template.replace(
+        `src="/src/main.tsx"`,
+        `src="/src/main.tsx?v=${generateId()}"`,
+      );
+      const page = await vite.transformIndexHtml(url, template);
+      res.status(200).set({ "Content-Type": "text/html" }).end(page);
     } catch (e) {
       if (e instanceof Error) {
         vite.ssrFixStacktrace(e);
@@ -74,38 +71,6 @@ export async function setupVite(app: Express, server: Server) {
 
 export function serveStatic(app: Express) {
   const distPath = path.resolve(import.meta.dirname, "..", "dist", "public");
-  const indexPath = path.join(distPath, "index.html");
-
-  app.use(express.static(distPath));
-  
-  app.get("*", (req, res) => {
-    res.sendFile(indexPath);
-  });
-}
-
-      // always reload the index.html file from disk incase it changes
-      let template = await fs.promises.readFile(clientTemplate, "utf-8");
-      template = template.replace(
-        `src="/src/main.tsx"`,
-        `src="/src/main.tsx?v=${generateId()}"`,
-      );
-      const page = await vite.transformIndexHtml(url, template);
-      res.status(200).set({ "Content-Type": "text/html" }).end(page);
-    } catch (e) {
-      vite.ssrFixStacktrace(e as Error);
-      next(e);
-    }
-  });
-}
-
-export function serveStatic(app: Express) {
-  const distPath = path.resolve(import.meta.dirname, "public");
-
-  if (!fs.existsSync(distPath)) {
-    throw new Error(
-      `Could not find the build directory: ${distPath}, make sure to build the client first`,
-    );
-  }
 
   app.use(express.static(distPath));
 
