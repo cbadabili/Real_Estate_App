@@ -215,6 +215,11 @@ const HomePage = () => {
               className="text-center mb-8"
             >
               <h1 className="text-3xl lg:text-5xl font-bold text-white mb-4 leading-tight">
+                Find Your Perfect Property in
+                <span className="block bg-gradient-to-r from-beedab-lightblue to-beedab-accent bg-clip-text text-transparent">
+                  Beautiful Botswana
+                </span>
+              </h1>
 </old_str>
                 Find Your Perfect Property in
                 <span className="block bg-gradient-to-r from-beedab-lightblue to-beedab-accent bg-clip-text text-transparent">
