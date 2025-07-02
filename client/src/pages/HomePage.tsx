@@ -158,7 +158,7 @@ const HomePage = () => {
                 className="w-full h-full object-cover"
               />
               <div className="absolute inset-0 bg-black/40"></div>
-              
+
               {/* Property Details Overlay */}
               <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur-sm rounded-lg p-3 max-w-xs">
                 <h3 className="text-base font-bold text-gray-900 mb-1">{property.location}</h3>
@@ -170,7 +170,7 @@ const HomePage = () => {
                     </span>
                   ))}
                 </div>
-                
+
                 {/* Agent Info */}
                 <div className="flex items-center space-x-2 pt-2 border-t">
                   <img
@@ -220,14 +220,8 @@ const HomePage = () => {
                   Beautiful Botswana
                 </span>
               </h1>
-</old_str>
-                Find Your Perfect Property in
-                <span className="block bg-gradient-to-r from-beedab-lightblue to-beedab-accent bg-clip-text text-transparent">
-                  Beautiful Botswana
-                </span>
-              </h1>
             </motion.div>
-            
+
             <div className="bg-white rounded-2xl p-2 shadow-2xl">
               <div className="flex items-center space-x-2 sm:space-x-3">
                 <div className="flex items-center text-beedab-blue px-2 sm:px-4">
