@@ -293,13 +293,12 @@ const Navbar = () => {
 
 
             
-            {/* Sell Dropdown - Only for sellers, agents, and fsbo users */}
-            <RoleBasedComponent allowedRoles={['seller', 'agent', 'fsbo', 'admin', 'super_admin']}>
-              <div 
-                className="relative"
-                onMouseEnter={() => setSellDropdownOpen(true)}
-                onMouseLeave={() => setSellDropdownOpen(false)}
-              >
+            {/* Sell Dropdown - Available to all users for testing */}
+            <div 
+              className="relative"
+              onMouseEnter={() => setSellDropdownOpen(true)}
+              onMouseLeave={() => setSellDropdownOpen(false)}
+            >
                 <button className="flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100 transition-colors">
                   <span className="text-beedab-blue font-bold text-xs">BWP</span>
                   <span>Sell</span>
@@ -489,7 +488,6 @@ const Navbar = () => {
                 )}
               </AnimatePresence>
               </div>
-            </RoleBasedComponent>
 
             {/* Rent Dropdown */}
             <div 
@@ -847,30 +845,24 @@ const Navbar = () => {
                 );
               })}
               
-              {/* Mobile Sell Section - Role-based access */}
-              <RoleBasedComponent allowedRoles={['seller', 'agent', 'fsbo', 'admin', 'super_admin']}>
-                <div className="px-3 py-2 border-t border-neutral-100">
-                  <p className="text-xs font-medium text-neutral-500 mb-2">SELL</p>
-                  <RoleBasedComponent allowedRoles={['agent', 'admin', 'super_admin']}>
-                    <Link
-                      to="/create-property"
-                      onClick={() => setIsOpen(false)}
-                      className="block px-3 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
-                    >
-                      Agent Listing
-                    </Link>
-                  </RoleBasedComponent>
-                  <RoleBasedComponent allowedRoles={['seller', 'fsbo', 'admin', 'super_admin']}>
-                    <Link
-                      to="/create-listing"
-                      onClick={() => setIsOpen(false)}
-                      className="block px-3 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
-                    >
-                      Direct Sellers
-                    </Link>
-                  </RoleBasedComponent>
-                </div>
-              </RoleBasedComponent>
+              {/* Mobile Sell Section - Available to all users for testing */}
+              <div className="px-3 py-2 border-t border-neutral-100">
+                <p className="text-xs font-medium text-neutral-500 mb-2">SELL</p>
+                <Link
+                  to="/create-property"
+                  onClick={() => setIsOpen(false)}
+                  className="block px-3 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
+                >
+                  Agent Listing
+                </Link>
+                <Link
+                  to="/create-listing"
+                  onClick={() => setIsOpen(false)}
+                  className="block px-3 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
+                >
+                  Direct Sellers
+                </Link>
+              </div>
               
               {/* Mobile Rent Section - Available to all authenticated users */}
               <div className="px-3 py-2 border-t border-neutral-100">
@@ -882,15 +874,13 @@ const Navbar = () => {
                 >
                   Find Rental
                 </Link>
-                <RoleBasedComponent allowedRoles={['seller', 'agent', 'fsbo', 'admin', 'super_admin']}>
-                  <Link
-                    to="/rent-out"
-                    onClick={() => setIsOpen(false)}
-                    className="block px-3 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
-                  >
-                    Rent Out Property
-                  </Link>
-                </RoleBasedComponent>
+                <Link
+                  to="/rent-out"
+                  onClick={() => setIsOpen(false)}
+                  className="block px-3 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
+                >
+                  Rent Out Property
+                </Link>
               </div>
               
               {user ? (
