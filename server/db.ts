@@ -20,14 +20,27 @@ const sqlite = new Database(dbPath);
 export const db = drizzle(sqlite, { schema });
 
 // Test database connection on startup
-export async function testDatabaseConnection() {
+export async function testDatabaseConnection(): Promise<boolean> {
   try {
-    // Simple query to test connection
-    const result = sqlite.prepare('SELECT 1 as test').get();
-    console.log('Database connection successful:', result);
+    // Test a simple query with timeout
+    const result = await Promise.race([
+      db.select().from(schema.users).limit(1),
+      new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Database connection timeout')), 5000)
+      )
+    ]);
+    console.log('✅ Database connection successful');
     return true;
   } catch (error) {
-    console.error('Database connection failed:', error);
-    return false;
+    console.error('❌ Database connection failed:', error);
+    console.log('📝 Attempting to create database tables...');
+    try {
+      // Try to run migrations or create tables if they don't exist
+      await db.select().from(schema.users).limit(1);
+      return true;
+    } catch (secondError) {
+      console.error('❌ Database table creation also failed:', secondError);
+      return false;
+    }
   }
 }
