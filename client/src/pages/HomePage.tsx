@@ -160,10 +160,10 @@ const HomePage = () => {
               <div className="absolute inset-0 bg-black/40"></div>
               
               {/* Property Details Overlay */}
-              <div className="absolute bottom-8 left-8 bg-white/90 backdrop-blur-sm rounded-lg p-6 max-w-sm">
-                <h3 className="text-xl font-bold text-gray-900 mb-2">{property.location}</h3>
-                <p className="text-2xl font-bold text-beedab-blue mb-3">{property.price}</p>
-                <div className="flex flex-wrap gap-2 mb-4">
+              <div className="absolute bottom-8 left-8 bg-white/90 backdrop-blur-sm rounded-lg p-4 max-w-xs">
+                <h3 className="text-lg font-bold text-gray-900 mb-1">{property.location}</h3>
+                <p className="text-xl font-bold text-beedab-blue mb-2">{property.price}</p>
+                <div className="flex flex-wrap gap-1 mb-3">
                   {property.features.map((feature, idx) => (
                     <span key={idx} className="px-2 py-1 bg-beedab-blue/10 text-beedab-blue text-xs rounded">
                       {feature}
@@ -172,16 +172,16 @@ const HomePage = () => {
                 </div>
                 
                 {/* Agent Info */}
-                <div className="flex items-center space-x-3 pt-3 border-t">
+                <div className="flex items-center space-x-2 pt-2 border-t">
                   <img
                     src={property.agent.photo}
                     alt={property.agent.name}
-                    className="w-10 h-10 rounded-full object-cover"
+                    className="w-8 h-8 rounded-full object-cover"
                   />
                   <div>
-                    <p className="font-semibold text-gray-900 text-sm">{property.agent.name}</p>
-                    <div className="flex items-center space-x-2 text-xs text-gray-600">
-                      <Phone className="h-3 w-3" />
+                    <p className="font-semibold text-gray-900 text-xs">{property.agent.name}</p>
+                    <div className="flex items-center space-x-1 text-xs text-gray-600">
+                      <Phone className="h-2.5 w-2.5" />
                       <span>{property.agent.phone}</span>
                     </div>
                   </div>
@@ -206,15 +206,15 @@ const HomePage = () => {
         </button>
 
         {/* Centered AI Search Bar */}
-        <div className="absolute inset-0 flex items-center justify-center z-20 pb-48">
+        <div className="absolute inset-0 flex items-center justify-center z-20 pb-64">
           <div className="w-full max-w-4xl px-4">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5 }}
-              className="text-center mb-8"
+              className="text-center mb-12"
             >
-              <h1 className="text-4xl lg:text-6xl font-bold text-white mb-4 leading-tight">
+              <h1 className="text-4xl lg:text-6xl font-bold text-white mb-6 leading-tight">
                 Find Your Perfect Property in
                 <span className="block bg-gradient-to-r from-beedab-lightblue to-beedab-accent bg-clip-text text-transparent">
                   Beautiful Botswana
