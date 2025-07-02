@@ -5,7 +5,15 @@ import { createServer as createViteServer, createLogger } from "vite";
 import { type Server } from "http";
 import viteConfig from "../vite.config";
 // Generate random ID function
+import type { Express } from "express";
+import type { Server } from "http";
+import { createServer as createViteServer, createLogger } from "vite";
+import path from "path";
+import fs from "fs/promises";
+import viteConfig from "../vite.config.js";
+
 const generateId = () => Math.random().toString(36).substring(2, 15);
+const viteLogger = createLogger();
 
 export function log(message: string, source = "express") {
   const formattedTime = new Date().toLocaleTimeString("en-US", {
@@ -50,6 +58,30 @@ export async function setupVite(app: Express, server: Server) {
         "client",
         "index.html",
       );
+
+      let template = await fs.readFile(clientTemplate, "utf-8");
+      template = await vite.transformIndexHtml(url, template);
+
+      res.status(200).set({ "Content-Type": "text/html" }).end(template);
+    } catch (e) {
+      if (e instanceof Error) {
+        vite.ssrFixStacktrace(e);
+        next(e);
+      }
+    }
+  });
+}
+
+export function serveStatic(app: Express) {
+  const distPath = path.resolve(import.meta.dirname, "..", "dist", "public");
+  const indexPath = path.join(distPath, "index.html");
+
+  app.use(express.static(distPath));
+  
+  app.get("*", (req, res) => {
+    res.sendFile(indexPath);
+  });
+}
 
       // always reload the index.html file from disk incase it changes
       let template = await fs.promises.readFile(clientTemplate, "utf-8");
