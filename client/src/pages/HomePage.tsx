@@ -142,7 +142,7 @@ const HomePage = () => {
       className="min-h-screen"
     >
       {/* Hero Section with Slideshow */}
-      <section className="relative h-[75vh] overflow-hidden">
+      <section className="relative h-[60vh] overflow-hidden">
         {/* Property Slideshow Background */}
         <div className="absolute inset-0">
           {premiumProperties.map((property, index) => (
@@ -160,9 +160,9 @@ const HomePage = () => {
               <div className="absolute inset-0 bg-black/40"></div>
               
               {/* Property Details Overlay */}
-              <div className="absolute bottom-8 left-8 bg-white/90 backdrop-blur-sm rounded-lg p-4 max-w-xs">
-                <h3 className="text-lg font-bold text-gray-900 mb-1">{property.location}</h3>
-                <p className="text-xl font-bold text-beedab-blue mb-2">{property.price}</p>
+              <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur-sm rounded-lg p-3 max-w-xs">
+                <h3 className="text-base font-bold text-gray-900 mb-1">{property.location}</h3>
+                <p className="text-lg font-bold text-beedab-blue mb-2">{property.price}</p>
                 <div className="flex flex-wrap gap-1 mb-3">
                   {property.features.map((feature, idx) => (
                     <span key={idx} className="px-2 py-1 bg-beedab-blue/10 text-beedab-blue text-xs rounded">
@@ -206,15 +206,16 @@ const HomePage = () => {
         </button>
 
         {/* Centered AI Search Bar */}
-        <div className="absolute inset-0 flex items-center justify-center z-20 pb-64">
+        <div className="absolute inset-0 flex items-center justify-center z-20 pb-32">
           <div className="w-full max-w-4xl px-4">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5 }}
-              className="text-center mb-12"
+              className="text-center mb-8"
             >
-              <h1 className="text-4xl lg:text-6xl font-bold text-white mb-6 leading-tight">
+              <h1 className="text-3xl lg:text-5xl font-bold text-white mb-4 leading-tight">
+</old_str>
                 Find Your Perfect Property in
                 <span className="block bg-gradient-to-r from-beedab-lightblue to-beedab-accent bg-clip-text text-transparent">
                   Beautiful Botswana
