@@ -477,17 +477,17 @@ const HomePage = () => {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <motion.div variants={containerVariants} className="space-y-8">
             <h2 className="text-3xl lg:text-4xl font-bold">
-              Ready to Find Your Dream Property?
+              Ready to Start Your Property Journey?
             </h2>
             <p className="text-xl text-beedab-lightblue max-w-2xl mx-auto">
-              Join thousands of satisfied Batswana who found their perfect home through beedab
+              Join thousands of Batswana who have successfully bought and sold properties using our platform.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 to="/properties"
                 className="inline-flex items-center justify-center px-8 py-4 bg-white text-beedab-darkblue font-semibold rounded-xl hover:bg-gray-100 transition-colors"
               >
-                Start Your Search
+                Get Started Today
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
               <Link
