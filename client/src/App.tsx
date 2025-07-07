@@ -31,13 +31,9 @@ import PropertyDetailsPage from './pages/PropertyDetailsPage';
 import AgentDashboard from './pages/AgentDashboard';
 import MyPropertiesPage from './pages/MyPropertiesPage';
 import TestAPIPage from './pages/TestAPIPage';
-import ServicesPage from './pages/ServicesPage';
-import DocumentsPage from './pages/DocumentsPage';
-import DashboardPage from './pages/DashboardPage';
-import AuctionsPage from './pages/AuctionsPage';
 import AuthTestPage from './pages/AuthTestPage';
-import LoginPage from './pages/LoginPage';
-import AdminPage from './pages/AdminPage';
+import AgentProfilePage from './pages/AgentProfilePage';
+import ContactAgentPage from './pages/ContactAgentPage';
 import { AuthProvider } from './contexts/AuthContext';
 import { PropertyProvider } from './contexts/PropertyContext';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
@@ -99,6 +95,8 @@ function App() {
             <Route path="/test-api" element={<TestAPIPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/auth-test" element={<AuthTestPage />} />
+            <Route path="/agent-profile/:id" element={<AgentProfilePage />} />
+            <Route path="/contact-agent/:id" element={<ContactAgentPage />} />
             <Route 
               path="/admin" 
               element={

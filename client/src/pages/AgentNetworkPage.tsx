@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Link } from 'wouter';
+import { Link } from 'react-router-dom';
 import { 
   Users, 
   Award, 
@@ -33,6 +33,7 @@ const AgentNetworkPage = () => {
 
   const agents = [
     {
+      id: 1,
       name: 'Thabo Mogami',
       location: 'Gaborone',
       specialization: 'Residential Properties',
@@ -43,6 +44,7 @@ const AgentNetworkPage = () => {
       email: 'thabo@beedab.com'
     },
     {
+      id: 2,
       name: 'Neo Kgosana',
       location: 'Francistown',
       specialization: 'Commercial Properties',
@@ -53,6 +55,7 @@ const AgentNetworkPage = () => {
       email: 'neo@beedab.com'
     },
     {
+      id: 3,
       name: 'Mpho Setlhare',
       location: 'Maun',
       specialization: 'Luxury Properties',
@@ -83,14 +86,14 @@ const AgentNetworkPage = () => {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
-                to="/find-agent"
+                to="/agent-dashboard"
                 className="inline-flex items-center px-8 py-4 bg-white text-beedab-darkblue font-semibold rounded-xl hover:bg-gray-100 transition-colors"
               >
                 <Users className="mr-2 h-5 w-5" />
                 Find an Agent
               </Link>
               <Link
-                to="/agent-registration"
+                to="/register"
                 className="inline-flex items-center px-8 py-4 bg-transparent border-2 border-white text-white font-semibold rounded-xl hover:bg-white hover:text-beedab-darkblue transition-colors"
               >
                 <Award className="mr-2 h-5 w-5" />
@@ -140,29 +143,29 @@ const AgentNetworkPage = () => {
                       </div>
                     </div>
                   </div>
-                  
+
                   <div className="mb-4">
                     <span className="inline-block px-3 py-1 bg-beedab-blue/10 text-beedab-blue text-sm rounded-full">
                       {agent.specialization}
                     </span>
                   </div>
-                  
+
                   <div className="flex items-center space-x-4 mb-4">
                     <div className="flex items-center space-x-1 text-sm text-gray-600">
                       <Phone className="h-4 w-4" />
                       <span>{agent.phone}</span>
                     </div>
                   </div>
-                  
+
                   <div className="flex space-x-2">
                     <Link
-                      to={`/agent/${agent.name.toLowerCase().replace(' ', '-')}`}
+                      to={`/agent-profile/${agent.id}`}
                       className="flex-1 bg-beedab-blue text-white text-center py-2 rounded-lg text-sm font-medium hover:bg-beedab-darkblue transition-colors"
                     >
                       View Profile
                     </Link>
                     <Link
-                      to={`/contact-agent/${agent.name.toLowerCase().replace(' ', '-')}`}
+                      to={`/contact-agent/${agent.id}`}
                       className="flex-1 border border-beedab-blue text-beedab-blue text-center py-2 rounded-lg text-sm font-medium hover:bg-beedab-blue hover:text-white transition-colors"
                     >
                       Contact

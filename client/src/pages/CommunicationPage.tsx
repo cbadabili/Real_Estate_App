@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Link } from 'wouter';
+import { Link } from 'react-router-dom';
 import { 
   MessageCircle, 
   Video, 
@@ -218,7 +218,7 @@ const CommunicationPage = () => {
               to="/register"
               className="inline-flex items-center justify-center px-8 py-4 bg-white text-beedab-darkblue font-semibold rounded-xl hover:bg-gray-100 transition-colors"
             >
-              Get Started
+              Start Communicating
               <ArrowRight className="ml-2 h-5 w-5" />
             </Link>
           </motion.div>

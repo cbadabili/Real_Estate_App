@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Link } from 'wouter';
+import { Link } from 'react-router-dom';
 import { 
   Shield, 
   Lock, 
@@ -77,7 +77,7 @@ const SecureTransactionsPage = () => {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
-                to="/escrow-services"
+                to="/create-property"
                 className="inline-flex items-center px-8 py-4 bg-white text-beedab-darkblue font-semibold rounded-xl hover:bg-gray-100 transition-colors"
               >
                 <Shield className="mr-2 h-5 w-5" />

@@ -35,7 +35,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/users/register", async (req, res) => {
     try {
       const userData = insertUserSchema.parse(req.body);
-      
+
       // Check if user already exists
       const existingUser = await storage.getUserByEmail(userData.email);
       if (existingUser) {
@@ -55,7 +55,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { email, password } = req.body;
       const user = await storage.getUserByEmail(email);
-      
+
       if (!user || user.password !== password) {
         return res.status(401).json({ message: "Invalid credentials" });
       }
@@ -72,7 +72,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = parseInt(req.params.id);
       const user = await storage.getUser(userId);
-      
+
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
@@ -89,7 +89,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = parseInt(req.params.id);
       const updates = req.body;
-      
+
       const user = await storage.updateUser(userId, updates);
       if (!user) {
         return res.status(404).json({ message: "User not found" });
@@ -125,7 +125,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         sortOrder: req.query.sortOrder as 'asc' | 'desc'
       };
 
+      console.log('Fetching properties...');
       const properties = await storage.getProperties(filters);
+      console.log('Properties fetched:', properties.length);
       res.json(properties);
     } catch (error) {
       console.error("Get properties error:", error);
@@ -137,14 +139,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const propertyId = parseInt(req.params.id);
       const property = await storage.getProperty(propertyId);
-      
+
       if (!property) {
         return res.status(404).json({ message: "Property not found" });
       }
 
       // Increment view count
       await storage.incrementPropertyViews(propertyId);
-      
+
       res.json(property);
     } catch (error) {
       console.error("Get property error:", error);
@@ -167,7 +169,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const propertyId = parseInt(req.params.id);
       const updates = req.body;
-      
+
       const property = await storage.updateProperty(propertyId, updates);
       if (!property) {
         return res.status(404).json({ message: "Property not found" });
@@ -184,7 +186,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const propertyId = parseInt(req.params.id);
       const deleted = await storage.deleteProperty(propertyId);
-      
+
       if (!deleted) {
         return res.status(404).json({ message: "Property not found" });
       }
@@ -245,7 +247,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const inquiryId = parseInt(req.params.id);
       const { status } = req.body;
-      
+
       const inquiry = await storage.updateInquiryStatus(inquiryId, status);
       if (!inquiry) {
         return res.status(404).json({ message: "Inquiry not found" });
@@ -296,7 +298,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const appointmentId = parseInt(req.params.id);
       const { status } = req.body;
-      
+
       const appointment = await storage.updateAppointmentStatus(appointmentId, status);
       if (!appointment) {
         return res.status(404).json({ message: "Appointment not found" });
@@ -325,7 +327,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = parseInt(req.params.userId);
       const propertyId = parseInt(req.params.propertyId);
-      
+
       const saved = await storage.saveProperty(userId, propertyId);
       res.status(201).json(saved);
     } catch (error) {
@@ -338,7 +340,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = parseInt(req.params.userId);
       const propertyId = parseInt(req.params.propertyId);
-      
+
       const unsaved = await storage.unsaveProperty(userId, propertyId);
       if (!unsaved) {
         return res.status(404).json({ message: "Saved property not found" });
@@ -355,7 +357,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = parseInt(req.params.userId);
       const propertyId = parseInt(req.params.propertyId);
-      
+
       const isSaved = await storage.isPropertySaved(userId, propertyId);
       res.json({ isSaved });
     } catch (error) {
@@ -368,12 +370,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/neighborhoods/:zipCode", async (req, res) => {
     try {
       const zipCode = req.params.zipCode;
-      
+
       // This would typically integrate with external APIs like:
       // - ATTOM Data API for demographics, crime data, school ratings
       // - Google Places API for nearby amenities
       // - Walk Score API for walkability
-      
+
       // For now, return mock neighborhood data structure
       const neighborhoodData = {
         zipCode,
@@ -393,7 +395,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         walkScore: 78,
         crimeIndex: 3.2
       };
-      
+
       res.json(neighborhoodData);
     } catch (error) {
       console.error("Get neighborhood data error:", error);
@@ -439,7 +441,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const providerId = parseInt(req.params.id);
       const provider = await servicesStorage.getServiceProvider(providerId);
-      
+
       if (!provider) {
         return res.status(404).json({ message: "Service provider not found" });
       }
@@ -477,18 +479,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/mortgage/calculate", async (req, res) => {
     try {
       const { loanAmount, interestRate, loanTermYears, downPayment } = req.body;
-      
+
       const principal = loanAmount - (downPayment || 0);
       const monthlyRate = interestRate / 100 / 12;
       const numberOfPayments = loanTermYears * 12;
-      
+
       const monthlyPayment = principal * 
         (monthlyRate * Math.pow(1 + monthlyRate, numberOfPayments)) /
         (Math.pow(1 + monthlyRate, numberOfPayments) - 1);
-      
+
       const totalInterest = (monthlyPayment * numberOfPayments) - principal;
       const totalPayment = principal + totalInterest;
-      
+
       res.json({
         monthlyPayment: Math.round(monthlyPayment * 100) / 100,
         totalInterest: Math.round(totalInterest * 100) / 100,
@@ -532,7 +534,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const reviewId = parseInt(req.params.id);
       const review = await reviewStorage.getUserReview(reviewId);
-      
+
       if (!review || (review.status !== 'active' && !review.isPublic)) {
         return res.status(404).json({ message: "Review not found" });
       }
@@ -594,7 +596,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const reviewId = parseInt(req.params.id);
       const existingReview = await reviewStorage.getUserReview(reviewId);
-      
+
       if (!existingReview) {
         return res.status(404).json({ message: "Review not found" });
       }
@@ -602,7 +604,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Check ownership or admin permissions
       const isOwner = existingReview.reviewerId === req.user!.id;
       const canModerate = AuthService.hasPermission(req.user!, Permission.MODERATE_REVIEW);
-      
+
       if (!isOwner && !canModerate) {
         return res.status(403).json({ message: "Not authorized to edit this review" });
       }
@@ -632,7 +634,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const reviewId = parseInt(req.params.id);
       const existingReview = await reviewStorage.getUserReview(reviewId);
-      
+
       if (!existingReview) {
         return res.status(404).json({ message: "Review not found" });
       }
@@ -640,13 +642,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Check ownership or admin permissions
       const isOwner = existingReview.reviewerId === req.user!.id;
       const canDelete = AuthService.hasPermission(req.user!, Permission.DELETE_REVIEW);
-      
+
       if (!isOwner && !canDelete) {
         return res.status(403).json({ message: "Not authorized to delete this review" });
       }
 
       const deleted = await reviewStorage.deleteUserReview(reviewId);
-      
+
       if (!deleted) {
         return res.status(404).json({ message: "Review not found" });
       }
@@ -697,7 +699,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const reviewId = parseInt(req.params.id);
       const review = await reviewStorage.getUserReview(reviewId);
-      
+
       if (!review) {
         return res.status(404).json({ message: "Review not found" });
       }
@@ -721,7 +723,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const reviewId = parseInt(req.params.id);
       const { isHelpful } = req.body;
-      
+
       if (typeof isHelpful !== 'boolean') {
         return res.status(400).json({ message: "isHelpful must be a boolean" });
       }
@@ -793,9 +795,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const reviewId = parseInt(req.params.id);
       const { reason } = req.body;
-      
+
       const success = await reviewStorage.flagReview(reviewId, reason);
-      
+
       if (!success) {
         return res.status(404).json({ message: "Review not found" });
       }
@@ -822,9 +824,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const reviewId = parseInt(req.params.id);
       const { status, moderatorNotes } = req.body;
-      
+
       const moderatedReview = await reviewStorage.moderateReview(reviewId, status, moderatorNotes);
-      
+
       if (!moderatedReview) {
         return res.status(404).json({ message: "Review not found" });
       }
@@ -859,7 +861,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       };
 
       let users = await storage.getUsers(filters);
-      
+
       // Apply search filter if provided
       if (search) {
         const searchLower = search.toLowerCase();
@@ -870,7 +872,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           user.username.toLowerCase().includes(searchLower)
         );
       }
-      
+
       // Remove sensitive data
       const safeUsers = users.map(user => {
         const { password, ...safeUser } = user;
@@ -907,9 +909,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = parseInt(req.params.id);
       const updates = req.body;
-      
+
       const updatedUser = await storage.updateUser(userId, updates);
-      
+
       if (!updatedUser) {
         return res.status(404).json({ message: "User not found" });
       }
@@ -937,9 +939,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const reviewId = parseInt(req.params.id);
       const { status, moderatorNotes } = req.body;
-      
+
       const moderatedReview = await reviewStorage.moderateReview(reviewId, status, moderatorNotes);
-      
+
       if (!moderatedReview) {
         return res.status(404).json({ message: "Review not found" });
       }
@@ -984,9 +986,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = parseInt(req.params.id);
       const { isActive, reason } = req.body;
-      
+
       const updatedUser = await storage.updateUser(userId, { isActive });
-      
+
       if (!updatedUser) {
         return res.status(404).json({ message: "User not found" });
       }
@@ -1074,9 +1076,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = parseInt(req.params.id);
       const permissionName = req.params.permission;
-      
+
       const revoked = await reviewStorage.revokeUserPermission(userId, permissionName);
-      
+
       if (!revoked) {
         return res.status(404).json({ message: "Permission not found" });
       }
