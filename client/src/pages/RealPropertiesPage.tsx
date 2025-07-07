@@ -123,16 +123,16 @@ const RealPropertiesPage = () => {
           </div>
         </div>
         
-        {property.features && property.features.length > 0 && (
+        {property.features && (
           <div className="flex flex-wrap gap-2 mb-4">
-            {property.features.slice(0, 3).map((feature: string, index: number) => (
+            {(typeof property.features === 'string' ? JSON.parse(property.features) : property.features).slice(0, 3).map((feature: string, index: number) => (
               <span key={index} className="px-2 py-1 bg-neutral-100 text-neutral-700 text-xs rounded-full">
                 {feature}
               </span>
             ))}
-            {property.features.length > 3 && (
+            {(typeof property.features === 'string' ? JSON.parse(property.features) : property.features).length > 3 && (
               <span className="px-2 py-1 bg-neutral-100 text-neutral-700 text-xs rounded-full">
-                +{property.features.length - 3} more
+                +{(typeof property.features === 'string' ? JSON.parse(property.features) : property.features).length - 3} more
               </span>
             )}
           </div>
