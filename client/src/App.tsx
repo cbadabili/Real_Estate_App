@@ -6,6 +6,7 @@ import { ErrorBoundary } from './components/ui/ErrorBoundary';
 import { OfflineIndicator } from './components/ui/OfflineIndicator';
 import Navbar from './components/layout/Navbar';
 import HomePage from './pages/HomePage';
+import DashboardPage from './pages/DashboardPage';
 import PropertiesPage from './pages/PropertiesPage';
 import RealPropertiesPage from './pages/RealPropertiesPage';
 import { PlotsPage } from './pages/PlotsPage';
