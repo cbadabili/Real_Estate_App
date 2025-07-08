@@ -8,7 +8,7 @@ import {
   Gavel, ShoppingCart, AlertCircle, Calculator
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import MortgageCalculator from '../components/MortgageCalculator';
+import { MortgageCalculator } from '../components/MortgageCalculator';
 
 const PropertyDetailsPage = () => {
   const { id } = useParams();
