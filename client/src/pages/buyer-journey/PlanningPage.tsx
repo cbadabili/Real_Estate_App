@@ -191,6 +191,66 @@ const PlanningPage = () => {
           </motion.div>
         </div>
       </section>
+      {/* Legal Requirements Section */}
+            <div className="bg-white rounded-lg shadow-sm border border-neutral-200 p-6 mb-8">
+              <h2 className="text-2xl font-bold text-neutral-900 mb-6">Legal Requirements & Documentation</h2>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="border border-neutral-200 rounded-lg p-4">
+                  <h3 className="font-semibold text-neutral-900 mb-3">Title Deeds</h3>
+                  <p className="text-sm text-neutral-600 mb-3">
+                    Verify property ownership and ensure clean title transfer through the Deeds Registry.
+                  </p>
+                  <ul className="text-sm text-neutral-600 space-y-1">
+                    <li>• Certificate of ownership</li>
+                    <li>• Encumbrance verification</li>
+                    <li>• Transfer documentation</li>
+                  </ul>
+                </div>
+
+                <div className="border border-neutral-200 rounded-lg p-4">
+                  <h3 className="font-semibold text-neutral-900 mb-3">BURS Clearance</h3>
+                  <p className="text-sm text-neutral-600 mb-3">
+                    Botswana Unified Revenue Service clearance for tax compliance.
+                  </p>
+                  <ul className="text-sm text-neutral-600 space-y-1">
+                    <li>• Tax clearance certificate</li>
+                    <li>• Property tax assessment</li>
+                    <li>• Transfer duty payment</li>
+                  </ul>
+                </div>
+
+                <div className="border border-neutral-200 rounded-lg p-4">
+                  <h3 className="font-semibold text-neutral-900 mb-3">Council Approval</h3>
+                  <p className="text-sm text-neutral-600 mb-3">
+                    Local council verification and compliance certificates.
+                  </p>
+                  <ul className="text-sm text-neutral-600 space-y-1">
+                    <li>• Building plan approval</li>
+                    <li>• Occupancy certificate</li>
+                    <li>• Rates clearance</li>
+                  </ul>
+                </div>
+              </div>
+
+              <div className="mt-6 p-4 bg-yellow-50 rounded-lg">
+                <h4 className="font-semibold text-yellow-800 mb-2">Important Note:</h4>
+                <p className="text-sm text-yellow-700">
+                  All property transactions in Botswana require legal representation. Ensure you engage a qualified conveyancer or property lawyer to handle documentation and registration processes.
+                </p>
+              </div>
+            </div>
+
+            {/* Call to Action */}
+            <div className="bg-gradient-to-r from-beedab-blue to-beedab-darkblue rounded-2xl p-8 text-center text-white">
+              <h2 className="text-2xl font-bold mb-4">Ready to Start Your Journey?</h2>
+              <p className="text-blue-100 mb-6">
+                Get personalized recommendations and connect with trusted professionals
+              </p>
+              <button className="bg-white text-beedab-blue px-8 py-3 rounded-lg font-medium hover:bg-neutral-100 transition-colors">
+                Start Planning Now
+              </button>
+            </div>
       {/* Calculator Sections */}
       {activeSection === 'budget' && (
         <motion.div

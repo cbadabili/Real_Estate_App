@@ -125,7 +125,9 @@ export const PropertyFilters: React.FC<PropertyFiltersProps> = ({
               { value: 'apartment', label: 'Apartment' },
               { value: 'townhouse', label: 'Townhouse' },
               { value: 'plot', label: 'Plot/Land' },
-              { value: 'commercial', label: 'Commercial' }
+              { value: 'commercial', label: 'Commercial' },
+              { value: 'farm', label: 'Farm' },
+              { value: 'land', label: 'Land' }
             ].map((type) => (
               <button
                 key={type.value}

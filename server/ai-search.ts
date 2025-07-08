@@ -122,13 +122,32 @@ function parseQueryFallback(query: string): AISearchResult {
 
   // Extract features
   const features: string[] = [];
-  if (lowerQuery.includes('pool')) features.push('Pool');
-  if (lowerQuery.includes('garage')) features.push('Garage');
-  if (lowerQuery.includes('backyard') || lowerQuery.includes('yard')) features.push('Large Backyard');
+  if (lowerQuery.includes('pool') || lowerQuery.includes('swimming')) features.push('Pool');
+  if (lowerQuery.includes('garage') || lowerQuery.includes('parking')) features.push('Garage');
+  if (lowerQuery.includes('backyard') || lowerQuery.includes('yard') || lowerQuery.includes('garden')) features.push('Large Backyard');
   if (lowerQuery.includes('cbd') || lowerQuery.includes('city view') || lowerQuery.includes('downtown')) features.push('City Views');
-  if (lowerQuery.includes('security') || lowerQuery.includes('gated')) features.push('Security');
-  if (lowerQuery.includes('borehole') || lowerQuery.includes('water')) features.push('Borehole');
+  if (lowerQuery.includes('security') || lowerQuery.includes('gated') || lowerQuery.includes('safe')) features.push('Security');
+  if (lowerQuery.includes('borehole') || lowerQuery.includes('water') || lowerQuery.includes('well')) features.push('Borehole');
+  if (lowerQuery.includes('solar') || lowerQuery.includes('backup power')) features.push('Solar Power');
+  if (lowerQuery.includes('fence') || lowerQuery.includes('walled')) features.push('Walled');
+  if (lowerQuery.includes('modern') || lowerQuery.includes('contemporary')) features.push('Modern Finishes');
+  if (lowerQuery.includes('air con') || lowerQuery.includes('aircon') || lowerQuery.includes('cooling')) features.push('Air Conditioning');
   if (features.length > 0) filters.features = features;
+
+  // Extract location more intelligently
+  const botswanaLocations = [
+    'gaborone', 'francistown', 'maun', 'kasane', 'serowe', 'molepolole',
+    'kanye', 'mahalapye', 'palapye', 'lobatse', 'jwaneng', 'orapa',
+    'phakalane', 'broadhurst', 'extension', 'mogoditshane', 'tlokweng',
+    'gabane', 'mochudi', 'ramotswa', 'block'
+  ];
+  
+  for (const location of botswanaLocations) {
+    if (lowerQuery.includes(location)) {
+      filters.city = location.charAt(0).toUpperCase() + location.slice(1);
+      break;
+    }
+  }
 
   // Extract listing type
   if (lowerQuery.includes('fsbo') || lowerQuery.includes('by owner')) {

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -6,9 +5,10 @@ import {
   MapPin, Bed, Bath, Square, Heart, Share2, Phone, MessageCircle, 
   Calendar, Eye, Camera, Car, Shield, Wifi, Wind, Zap, 
   ChevronLeft, ChevronRight, User, Star, Clock, DollarSign,
-  Gavel, ShoppingCart, AlertCircle
+  Gavel, ShoppingCart, AlertCircle, Calculator
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import MortgageCalculator from '../components/MortgageCalculator';
 
 const PropertyDetailsPage = () => {
   const { id } = useParams();
@@ -18,6 +18,9 @@ const PropertyDetailsPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [showContactForm, setShowContactForm] = useState(false);
+  const [showImageModal, setShowImageModal] = useState(false);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [showMortgageCalculator, setShowMortgageCalculator] = useState(false);
   const [showBidForm, setShowBidForm] = useState(false);
   const [bidAmount, setBidAmount] = useState('');
 
@@ -130,7 +133,7 @@ const PropertyDetailsPage = () => {
           alt={property.title}
           className="w-full h-full object-cover"
         />
-        
+
         {/* Navigation arrows */}
         {images.length > 1 && (
           <>
@@ -245,7 +248,7 @@ const PropertyDetailsPage = () => {
                 }`}>
                   {property.listingType?.toUpperCase()}
                 </span>
-                
+
                 {property.isAuction && (
                   <span className="px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800 flex items-center">
                     <Gavel className="h-4 w-4 mr-1" />
@@ -289,7 +292,7 @@ const PropertyDetailsPage = () => {
             {/* Action Buttons */}
             <div className="bg-white rounded-lg shadow-sm border border-neutral-200 p-6 mb-6">
               <h3 className="text-lg font-semibold text-neutral-900 mb-4">Interested in this property?</h3>
-              
+
               {!isAuthenticated && (
                 <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
                   <div className="flex items-center">
@@ -349,7 +352,7 @@ const PropertyDetailsPage = () => {
                 <h3 className="text-lg font-semibold text-neutral-900 mb-4">
                   {property.listingType === 'agent' ? 'Listing Agent' : 'Property Owner'}
                 </h3>
-                
+
                 <div className="flex items-center space-x-3 mb-4">
                   <div className="w-12 h-12 bg-neutral-200 rounded-full flex items-center justify-center">
                     <User className="h-6 w-6 text-neutral-600" />
@@ -396,9 +399,13 @@ const PropertyDetailsPage = () => {
                     className="w-full px-3 py-2 border border-neutral-300 rounded-md bg-neutral-50"
                   />
                 </div>
-                <button className="w-full bg-beedab-lightblue text-beedab-darkblue py-2 px-4 rounded-lg font-medium hover:bg-blue-100 transition-colors">
-                  Calculate Monthly Payment
-                </button>
+                <button 
+                onClick={() => setShowMortgageCalculator(true)}
+                className="w-full bg-green-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-green-700 transition-colors flex items-center justify-center"
+              >
+                <Calculator className="h-5 w-5 mr-2" />
+                Calculate Monthly Payment
+              </button>
               </div>
             </div>
           </div>
@@ -444,6 +451,24 @@ const PropertyDetailsPage = () => {
               </div>
             </div>
           </motion.div>
+        </div>
+      )}
+
+      {/* Mortgage Calculator Modal */}
+      {showMortgageCalculator && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold">Monthly Payment Calculator</h3>
+              <button 
+                onClick={() => setShowMortgageCalculator(false)}
+                className="text-neutral-500 hover:text-neutral-700"
+              >
+                ×
+              </button>
+            </div>
+            <MortgageCalculator propertyPrice={property.price} />
+          </div>
         </div>
       )}
     </div>

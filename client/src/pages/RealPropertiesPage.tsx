@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Filter, Grid, List as ListIcon, Search, MapPin, Bed, Bath, Square, Heart, Share2, Eye } from 'lucide-react';
@@ -18,10 +17,10 @@ const RealPropertiesPage = () => {
     limit: 20
   });
   const [selectedProperty, setSelectedProperty] = useState<any>(null);
-  
+
   const location = useLocation();
   const navigate = useNavigate();
-  
+
   // Parse URL parameters and set initial filters
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
@@ -31,7 +30,7 @@ const RealPropertiesPage = () => {
     const bedrooms = searchParams.get('bedrooms');
     const bathrooms = searchParams.get('bathrooms');
     const city = searchParams.get('city');
-    
+
     setFilters(prev => ({
       ...prev,
       ...(propertyType && { propertyType }),
@@ -41,7 +40,7 @@ const RealPropertiesPage = () => {
       ...(bathrooms && { minBathrooms: parseInt(bathrooms) }),
       ...(city && { city })
     }));
-    
+
     if (searchParams.get('city')) {
       setSearchTerm(searchParams.get('city') || '');
     }
@@ -72,11 +71,11 @@ const RealPropertiesPage = () => {
           <MapPin className="h-5 w-5 mr-2 text-beedab-blue" />
           Properties Map
         </h3>
-        
+
         {/* Map placeholder with property markers */}
         <div className="relative bg-gradient-to-br from-green-50 to-blue-50 rounded-lg h-96 overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-green-100 via-yellow-50 to-blue-100 opacity-30"></div>
-          
+
           {/* Property markers */}
           {properties && properties.slice(0, 8).map((property: any, index: number) => (
             <div
@@ -98,14 +97,14 @@ const RealPropertiesPage = () => {
                 <div className="text-sm font-bold">
                   P{parseFloat(property.price || '0').toLocaleString()}
                 </div>
-                
+
                 {/* Arrow pointer */}
                 <div className={`
                   absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 
                   border-l-4 border-r-4 border-t-4 border-transparent
                   ${selectedProperty?.id === property.id ? 'border-t-beedab-blue' : 'border-t-white'}
                 `}></div>
-                
+
                 {/* Tooltip with property details */}
                 <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
                   <div className="font-semibold">{property.title}</div>
@@ -114,7 +113,7 @@ const RealPropertiesPage = () => {
               </div>
             </div>
           ))}
-          
+
           {/* Selected property popup */}
           {selectedProperty && (
             <motion.div
@@ -221,7 +220,7 @@ const RealPropertiesPage = () => {
           </button>
         </div>
       </div>
-      
+
       <div className="p-6">
         <div className="flex justify-between items-start mb-4">
           <div>
@@ -232,7 +231,7 @@ const RealPropertiesPage = () => {
             </p>
           </div>
         </div>
-        
+
         <div className="flex items-center justify-between mb-4">
           <div className="text-2xl font-bold text-beedab-darkblue">
             P{parseFloat(property.price || '0').toLocaleString()}
@@ -258,7 +257,7 @@ const RealPropertiesPage = () => {
             )}
           </div>
         </div>
-        
+
         {property.features && (
           <div className="flex flex-wrap gap-2 mb-4">
             {(typeof property.features === 'string' ? JSON.parse(property.features) : property.features).slice(0, 3).map((feature: string, index: number) => (
@@ -273,7 +272,7 @@ const RealPropertiesPage = () => {
             )}
           </div>
         )}
-        
+
         <div className="flex justify-between items-center text-sm text-neutral-500">
           <span className="flex items-center">
             <Eye className="h-4 w-4 mr-1" />
@@ -294,7 +293,7 @@ const RealPropertiesPage = () => {
             <h1 className="text-3xl font-bold text-neutral-900 mb-2">Properties</h1>
             <AISearchBar onSearch={handleAISearch} />
           </div>
-          
+
           <div className="flex items-center justify-between">
             <div>
               {filters.propertyType && (
@@ -306,7 +305,7 @@ const RealPropertiesPage = () => {
                 {properties ? `${properties.length} properties found` : 'Loading properties...'}
               </span>
             </div>
-            
+
             <div className="flex items-center space-x-4">
               <div className="flex rounded-lg border border-neutral-300 overflow-hidden">
                 <button
@@ -353,7 +352,7 @@ const RealPropertiesPage = () => {
                   <option value="1000000-">Over P1M</option>
                 </select>
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-neutral-700 mb-2">Property Type</label>
                 <select 
@@ -369,7 +368,7 @@ const RealPropertiesPage = () => {
                   <option value="land">Land</option>
                 </select>
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-neutral-700 mb-2">Bedrooms</label>
                 <select 
@@ -384,7 +383,7 @@ const RealPropertiesPage = () => {
                   <option value="5">5+</option>
                 </select>
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-neutral-700 mb-2">Listing Type</label>
                 <select 
@@ -421,19 +420,19 @@ const RealPropertiesPage = () => {
             <LoadingSpinner size="lg" />
           </div>
         )}
-        
+
         {error && (
           <div className="text-center py-12">
             <p className="text-red-600">Error loading properties: {error.message}</p>
           </div>
         )}
-        
+
         {properties && properties.length === 0 && !isLoading && (
           <div className="text-center py-12">
             <p className="text-neutral-600">No properties found matching your criteria.</p>
           </div>
         )}
-        
+
         {properties && properties.length > 0 && (
           <div className={`grid gap-6 ${
             viewMode === 'grid' 
