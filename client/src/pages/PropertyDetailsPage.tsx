@@ -1,406 +1,451 @@
-import React, { useState } from 'react';
-import { useParams } from 'wouter';
+
+import { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
-  Heart, 
-  Share2, 
-  MapPin, 
-  Bed, 
-  Bath, 
-  Square, 
-  Calendar,
-  Eye,
-  Phone,
-  Mail,
-  MessageSquare,
-  ChevronLeft,
-  ChevronRight,
-  Star,
-  TrendingUp,
-  Shield,
-  Car,
-  Wifi,
-  TreePine,
-  Zap,
-  CheckCircle
+  MapPin, Bed, Bath, Square, Heart, Share2, Phone, MessageCircle, 
+  Calendar, Eye, Camera, Car, Shield, Wifi, Wind, Zap, 
+  ChevronLeft, ChevronRight, User, Star, Clock, DollarSign,
+  Gavel, ShoppingCart, AlertCircle
 } from 'lucide-react';
-import { sampleProperties } from '../data/sampleData';
+import { useAuth } from '../contexts/AuthContext';
 
 const PropertyDetailsPage = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
+  const { isAuthenticated, user } = useAuth();
+  const [property, setProperty] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [showContactForm, setShowContactForm] = useState(false);
-  
-  // In a real app, this would fetch the property by ID
-  const property = sampleProperties[0];
+  const [showBidForm, setShowBidForm] = useState(false);
+  const [bidAmount, setBidAmount] = useState('');
 
-  const nextImage = () => {
-    setCurrentImageIndex((prev) => 
-      prev === property.images.length - 1 ? 0 : prev + 1
+  useEffect(() => {
+    // Fetch property details
+    const fetchProperty = async () => {
+      try {
+        const response = await fetch(`/api/properties/${id}`);
+        if (response.ok) {
+          const data = await response.json();
+          setProperty(data);
+        }
+      } catch (error) {
+        console.error('Error fetching property:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (id) {
+      fetchProperty();
+    }
+  }, [id]);
+
+  const handleContactSeller = () => {
+    if (!isAuthenticated) {
+      navigate('/login?redirect=' + encodeURIComponent(window.location.pathname));
+      return;
+    }
+    setShowContactForm(true);
+  };
+
+  const handleBuyNow = () => {
+    if (!isAuthenticated) {
+      navigate('/login?redirect=' + encodeURIComponent(window.location.pathname));
+      return;
+    }
+    // Navigate to purchase flow
+    navigate(`/purchase/${id}`);
+  };
+
+  const handlePlaceBid = () => {
+    if (!isAuthenticated) {
+      navigate('/login?redirect=' + encodeURIComponent(window.location.pathname));
+      return;
+    }
+    setShowBidForm(true);
+  };
+
+  const submitBid = async () => {
+    try {
+      const response = await fetch(`/api/properties/${id}/bid`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          amount: parseFloat(bidAmount),
+          userId: user?.id
+        }),
+      });
+
+      if (response.ok) {
+        alert('Bid placed successfully!');
+        setShowBidForm(false);
+        setBidAmount('');
+      }
+    } catch (error) {
+      console.error('Error placing bid:', error);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-neutral-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-beedab-blue"></div>
+          <p className="mt-4 text-neutral-600">Loading property details...</p>
+        </div>
+      </div>
     );
-  };
+  }
 
-  const prevImage = () => {
-    setCurrentImageIndex((prev) => 
-      prev === 0 ? property.images.length - 1 : prev - 1
+  if (!property) {
+    return (
+      <div className="min-h-screen bg-neutral-50 flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-neutral-900 mb-2">Property Not Found</h2>
+          <p className="text-neutral-600 mb-4">The property you're looking for doesn't exist.</p>
+          <button 
+            onClick={() => navigate('/properties')}
+            className="bg-beedab-blue text-white px-6 py-2 rounded-lg hover:bg-beedab-darkblue transition-colors"
+          >
+            Back to Properties
+          </button>
+        </div>
+      </div>
     );
-  };
+  }
 
-  const features = [
-    { icon: Car, label: 'Two-Car Garage' },
-    { icon: Wifi, label: 'High-Speed Internet' },
-    { icon: TreePine, label: 'Landscaped Yard' },
-    { icon: Zap, label: 'Solar Panels' },
-    { icon: Shield, label: 'Security System' }
-  ];
-
-  const agent = {
-    name: 'Sarah Johnson',
-    title: 'Licensed Real Estate Agent',
-    rating: 4.9,
-    reviews: 127,
-    phone: '(555) 123-4567',
-    email: 'sarah@propertyhub.com',
-    image: 'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=150'
-  };
+  const images = property.images || ['/api/placeholder/600/400'];
+  const features = typeof property.features === 'string' ? JSON.parse(property.features) : property.features || [];
 
   return (
     <div className="min-h-screen bg-neutral-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid lg:grid-cols-5 gap-8">
-          {/* Main Content */}
-          <div className="lg:col-span-3 space-y-8">
-            {/* Image Gallery */}
-            <div className="relative">
-              <div className="aspect-w-16 aspect-h-10 bg-neutral-200 rounded-xl overflow-hidden">
-                <img
-                  src={property.images[currentImageIndex]}
-                  alt={property.title}
-                  className="w-full h-96 object-cover"
-                />
-                
-                {/* Navigation Arrows */}
-                <button
-                  onClick={prevImage}
-                  className="absolute left-4 top-1/2 transform -translate-y-1/2 p-2 bg-white/90 backdrop-blur-sm rounded-full hover:bg-white transition-all shadow-lg"
-                >
-                  <ChevronLeft className="h-5 w-5 text-neutral-700" />
-                </button>
-                <button
-                  onClick={nextImage}
-                  className="absolute right-4 top-1/2 transform -translate-y-1/2 p-2 bg-white/90 backdrop-blur-sm rounded-full hover:bg-white transition-all shadow-lg"
-                >
-                  <ChevronRight className="h-5 w-5 text-neutral-700" />
-                </button>
-                
-                {/* Image Counter */}
-                <div className="absolute bottom-4 right-4 px-3 py-1 bg-black/70 text-white text-sm rounded-full">
-                  {currentImageIndex + 1} / {property.images.length}
-                </div>
-                
-                {/* Action Buttons */}
-                <div className="absolute top-4 right-4 flex space-x-2">
-                  <button className="p-2 bg-white/90 backdrop-blur-sm rounded-full hover:bg-white transition-all shadow-lg">
-                    <Heart className="h-5 w-5 text-neutral-700" />
-                  </button>
-                  <button className="p-2 bg-white/90 backdrop-blur-sm rounded-full hover:bg-white transition-all shadow-lg">
-                
-                    <Share2 className="h-5 w-5 text-neutral-700" />
-                  </button>
-                </div>
-              </div>
-              
-              {/* Thumbnail Strip */}
-              <div className="flex space-x-2 mt-4 overflow-x-auto">
-                {property.images.map((image, index) => (
-                  <button
-                    key={index}
-                    onClick={() => setCurrentImageIndex(index)}
-                    className={`flex-shrink-0 w-20 h-16 rounded-lg overflow-hidden border-2 transition-all ${
-                      index === currentImageIndex 
-                        ? 'border-primary-500' 
-                        : 'border-transparent hover:border-neutral-300'
-                    }`}
-                  >
-                    <img src={image} alt={`View ${index + 1}`} className="w-full h-full object-cover" />
-                  </button>
-                ))}
-              </div>
-            </div>
+      {/* Image Gallery */}
+      <div className="relative h-96 md:h-[500px] bg-neutral-900">
+        <img
+          src={images[currentImageIndex]}
+          alt={property.title}
+          className="w-full h-full object-cover"
+        />
+        
+        {/* Navigation arrows */}
+        {images.length > 1 && (
+          <>
+            <button
+              onClick={() => setCurrentImageIndex(prev => prev === 0 ? images.length - 1 : prev - 1)}
+              className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/90 p-2 rounded-full hover:bg-white transition-colors"
+            >
+              <ChevronLeft className="h-6 w-6" />
+            </button>
+            <button
+              onClick={() => setCurrentImageIndex(prev => prev === images.length - 1 ? 0 : prev + 1)}
+              className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/90 p-2 rounded-full hover:bg-white transition-colors"
+            >
+              <ChevronRight className="h-6 w-6" />
+            </button>
+          </>
+        )}
 
-            {/* Property Info */}
-            <div className="bg-white rounded-xl shadow-lg border border-neutral-200 p-8">
-              <div className="flex justify-between items-start mb-6">
+        {/* Image counter */}
+        <div className="absolute bottom-4 right-4 bg-black/50 text-white px-3 py-1 rounded-full text-sm flex items-center">
+          <Camera className="h-4 w-4 mr-2" />
+          {currentImageIndex + 1} / {images.length}
+        </div>
+
+        {/* Back button */}
+        <button
+          onClick={() => navigate(-1)}
+          className="absolute top-4 left-4 bg-white/90 p-2 rounded-full hover:bg-white transition-colors"
+        >
+          <ChevronLeft className="h-6 w-6" />
+        </button>
+
+        {/* Action buttons */}
+        <div className="absolute top-4 right-4 flex space-x-2">
+          <button className="bg-white/90 p-2 rounded-full hover:bg-white transition-colors">
+            <Heart className="h-6 w-6" />
+          </button>
+          <button className="bg-white/90 p-2 rounded-full hover:bg-white transition-colors">
+            <Share2 className="h-6 w-6" />
+          </button>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Main Content */}
+          <div className="lg:col-span-2">
+            {/* Property Header */}
+            <div className="bg-white rounded-lg shadow-sm border border-neutral-200 p-6 mb-6">
+              <div className="flex justify-between items-start mb-4">
                 <div>
-                  <div className="flex items-center space-x-3 mb-2">
-                    <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                      property.listingType === 'owner' 
-                        ? 'bg-accent-100 text-accent-800' 
-                        : 'bg-primary-100 text-primary-800'
-                    }`}>
-                      {property.listingType.toUpperCase()}
-                    </span>
-                    <span className="px-3 py-1 bg-success-100 text-success-800 rounded-full text-sm font-medium">
-                      New Listing
-                    </span>
-                  </div>
                   <h1 className="text-3xl font-bold text-neutral-900 mb-2">{property.title}</h1>
                   <p className="text-neutral-600 flex items-center text-lg">
                     <MapPin className="h-5 w-5 mr-2" />
-                    {property.location}
+                    {property.address || `${property.city}, ${property.state}`}
                   </p>
                 </div>
                 <div className="text-right">
-                  <div className="text-4xl font-bold text-primary-600">
-                    P{property.price.toLocaleString()}
+                  <div className="text-3xl font-bold text-beedab-blue mb-1">
+                    P{parseFloat(property.price || '0').toLocaleString()}
                   </div>
-                  <div className="text-neutral-500">
-                    P{Math.round(property.price / (property.sqft || 1))}/sqm • {property.sqft?.toLocaleString()} sqm
-                  </div>
+                  {property.pricePerSqft && (
+                    <div className="text-sm text-neutral-600">
+                      P{property.pricePerSqft}/sqm
+                    </div>
+                  )}
                 </div>
               </div>
 
-              {/* Key Stats */}
-              <div className="grid grid-cols-4 gap-6 py-6 border-y border-neutral-200">
-                <div className="text-center">
-                  <div className="flex items-center justify-center mb-2">
-                    <Bed className="h-6 w-6 text-primary-600 mr-2" />
-                    <span className="text-2xl font-bold text-neutral-900">{property.bedrooms}</span>
+              {/* Property specs */}
+              <div className="flex flex-wrap gap-6 text-neutral-700 mb-4">
+                {property.bedrooms && (
+                  <div className="flex items-center">
+                    <Bed className="h-5 w-5 mr-2 text-beedab-blue" />
+                    <span className="font-medium">{property.bedrooms}</span>
+                    <span className="ml-1">bedrooms</span>
                   </div>
-                  <div className="text-sm text-neutral-600">Bedrooms</div>
-                </div>
-                <div className="text-center">
-                  <div className="flex items-center justify-center mb-2">
-                    <Bath className="h-6 w-6 text-primary-600 mr-2" />
-                    <span className="text-2xl font-bold text-neutral-900">{property.bathrooms}</span>
+                )}
+                {property.bathrooms && (
+                  <div className="flex items-center">
+                    <Bath className="h-5 w-5 mr-2 text-beedab-blue" />
+                    <span className="font-medium">{property.bathrooms}</span>
+                    <span className="ml-1">bathrooms</span>
                   </div>
-                  <div className="text-sm text-neutral-600">Bathrooms</div>
-                </div>
-                <div className="text-center">
-                  <div className="flex items-center justify-center mb-2">
-                    <Square className="h-6 w-6 text-primary-600 mr-2" />
-                    <span className="text-2xl font-bold text-neutral-900">{property.sqft.toLocaleString()}</span>
+                )}
+                {property.squareFeet && (
+                  <div className="flex items-center">
+                    <Square className="h-5 w-5 mr-2 text-beedab-blue" />
+                    <span className="font-medium">{property.squareFeet.toLocaleString()}</span>
+                    <span className="ml-1">sqm</span>
                   </div>
-                  <div className="text-sm text-neutral-600">Sq Meters</div>
-                </div>
-                <div className="text-center">
-                  <div className="flex items-center justify-center mb-2">
-                    <Calendar className="h-6 w-6 text-primary-600 mr-2" />
-                    <span className="text-2xl font-bold text-neutral-900">2020</span>
+                )}
+                {property.lotSize && (
+                  <div className="flex items-center">
+                    <Square className="h-5 w-5 mr-2 text-beedab-blue" />
+                    <span className="font-medium">{property.lotSize}</span>
+                    <span className="ml-1">lot size</span>
                   </div>
-                  <div className="text-sm text-neutral-600">Year Built</div>
+                )}
+                <div className="flex items-center">
+                  <Eye className="h-5 w-5 mr-2 text-beedab-blue" />
+                  <span>{property.views || 0} views</span>
                 </div>
               </div>
 
-              {/* Property Stats */}
-              <div className="flex items-center justify-between pt-6 text-sm text-neutral-500">
-                <div className="flex items-center space-x-6">
-                  <div className="flex items-center">
-                    <Eye className="h-4 w-4 mr-1" />
-                    {property.views} views
-                  </div>
-                  <div className="flex items-center">
-                    <Calendar className="h-4 w-4 mr-1" />
-                    {property.daysOnMarket} days on market
-                  </div>
-                  <div className="flex items-center text-success-600">
-                    <TrendingUp className="h-4 w-4 mr-1" />
-                    Price reduced P 10,000
-                  </div>
-                </div>
+              {/* Listing type and status */}
+              <div className="flex items-center space-x-4 mb-4">
+                <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                  property.listingType === 'fsbo' 
+                    ? 'bg-green-100 text-green-800' 
+                    : 'bg-blue-100 text-blue-800'
+                }`}>
+                  {property.listingType?.toUpperCase()}
+                </span>
+                
+                {property.isAuction && (
+                  <span className="px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800 flex items-center">
+                    <Gavel className="h-4 w-4 mr-1" />
+                    Auction
+                  </span>
+                )}
+
+                <span className="text-sm text-neutral-600 flex items-center">
+                  <Clock className="h-4 w-4 mr-1" />
+                  Listed {new Date(property.createdAt).toLocaleDateString()}
+                </span>
               </div>
             </div>
 
             {/* Description */}
-            <div className="bg-white rounded-xl shadow-lg border border-neutral-200 p-8">
-              <h2 className="text-2xl font-semibold text-neutral-900 mb-4">About This Property</h2>
-              <p className="text-neutral-700 leading-relaxed mb-6">
-                This stunning modern family home offers the perfect blend of comfort and style. Located in a quiet neighborhood with excellent schools nearby, this property features an open-concept design with high ceilings, hardwood floors throughout, and a gourmet kitchen with stainless steel appliances. The master suite includes a walk-in closet and spa-like bathroom. The backyard is perfect for entertaining with a large deck and mature landscaping.
+            <div className="bg-white rounded-lg shadow-sm border border-neutral-200 p-6 mb-6">
+              <h2 className="text-xl font-semibold text-neutral-900 mb-4">Description</h2>
+              <p className="text-neutral-700 leading-relaxed">
+                {property.description || 'No description available.'}
               </p>
-              
-              <h3 className="text-lg font-semibold text-neutral-900 mb-4">Key Features</h3>
-              <div className="grid md:grid-cols-2 gap-4">
-                {features.map((feature, index) => {
-                  const Icon = feature.icon;
-                  return (
-                    <div key={index} className="flex items-center space-x-3">
-                      <div className="w-8 h-8 bg-primary-100 rounded-lg flex items-center justify-center">
-                        <Icon className="h-4 w-4 text-primary-600" />
-                      </div>
-                      <span className="text-neutral-700">{feature.label}</span>
-                    </div>
-                  );
-                })}
-              </div>
             </div>
 
-            {/* Neighborhood Info */}
-            <div className="bg-white rounded-xl shadow-lg border border-neutral-200 p-8">
-              <h2 className="text-2xl font-semibold text-neutral-900 mb-6">Neighborhood</h2>
-              <div className="grid md:grid-cols-3 gap-6">
-                <div className="text-center p-4 bg-neutral-50 rounded-lg">
-                  <div className="text-2xl font-bold text-primary-600 mb-1">9.2</div>
-                  <div className="text-sm text-neutral-600">Walk Score</div>
-                </div>
-                <div className="text-center p-4 bg-neutral-50 rounded-lg">
-                  <div className="text-2xl font-bold text-success-600 mb-1">A+</div>
-                  <div className="text-sm text-neutral-600">School Rating</div>
-                </div>
-                <div className="text-center p-4 bg-neutral-50 rounded-lg">
-                  <div className="text-2xl font-bold text-secondary-600 mb-1">8.5</div>
-                  <div className="text-sm text-neutral-600">Transit Score</div>
+            {/* Features */}
+            {features.length > 0 && (
+              <div className="bg-white rounded-lg shadow-sm border border-neutral-200 p-6 mb-6">
+                <h2 className="text-xl font-semibold text-neutral-900 mb-4">Features & Amenities</h2>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                  {features.map((feature: string, index: number) => (
+                    <div key={index} className="flex items-center text-neutral-700">
+                      <div className="w-2 h-2 bg-beedab-blue rounded-full mr-3"></div>
+                      <span>{feature}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
-            </div>
+            )}
           </div>
 
           {/* Sidebar */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Contact Agent */}
-            <div className="bg-white rounded-xl shadow-lg border border-neutral-200 p-6 sticky top-24">
-              <div className="flex items-center space-x-4 mb-6">
-                <img
-                  src={agent.image}
-                  alt={agent.name}
-                  className="w-16 h-16 rounded-full object-cover"
-                />
-                <div>
-                  <h3 className="text-lg font-semibold text-neutral-900">{agent.name}</h3>
-                  <p className="text-neutral-600 text-sm">{agent.title}</p>
-                  <div className="flex items-center mt-1">
-                    <Star className="h-4 w-4 text-warning-500 fill-current" />
-                    <span className="text-sm text-neutral-600 ml-1">
-                      {agent.rating} ({agent.reviews} reviews)
+          <div className="lg:col-span-1">
+            {/* Action Buttons */}
+            <div className="bg-white rounded-lg shadow-sm border border-neutral-200 p-6 mb-6">
+              <h3 className="text-lg font-semibold text-neutral-900 mb-4">Interested in this property?</h3>
+              
+              {!isAuthenticated && (
+                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
+                  <div className="flex items-center">
+                    <AlertCircle className="h-5 w-5 text-yellow-600 mr-2" />
+                    <span className="text-sm text-yellow-800">
+                      Please register to view seller details and contact options
                     </span>
                   </div>
                 </div>
-              </div>
-
-              <div className="space-y-3">
-                <button className="w-full py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-medium transition-colors flex items-center justify-center">
-                  <Phone className="mr-2 h-4 w-4" />
-                  Call {agent.phone}
-                </button>
-                <button className="w-full py-3 border border-neutral-300 hover:bg-neutral-50 text-neutral-700 rounded-lg font-medium transition-colors flex items-center justify-center">
-                  <Mail className="mr-2 h-4 w-4" />
-                  Email Agent
-                </button>
-                <button 
-                  onClick={() => setShowContactForm(!showContactForm)}
-                  className="w-full py-3 bg-secondary-600 hover:bg-secondary-700 text-white rounded-lg font-medium transition-colors flex items-center justify-center"
-                >
-                  <MessageSquare className="mr-2 h-4 w-4" />
-                  Send Message
-                </button>
-              </div>
-
-              {/* Contact Form */}
-              {showContactForm && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  exit={{ opacity: 0, height: 0 }}
-                  className="mt-6 pt-6 border-t border-neutral-200"
-                >
-                  <form className="space-y-4">
-                    <div>
-                      <input
-                        type="text"
-                        placeholder="Your Name"
-                        className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                      />
-                    </div>
-                    <div>
-                      <input
-                        type="email"
-                        placeholder="Your Email"
-                        className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                      />
-                    </div>
-                    <div>
-                      <input
-                        type="tel"
-                        placeholder="Your Phone"
-                        className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                      />
-                    </div>
-                    <div>
-                      <textarea
-                        rows={3}
-                        placeholder="I'm interested in this property..."
-                        className="w-full px-4 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                      />
-                    </div>
-                    <button
-                      type="submit"
-                      className="w-full py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-medium transition-colors"
-                    >
-                      Send Message
-                    </button>
-                  </form>
-                </motion.div>
               )}
-            </div>
 
-            {/* Schedule Tour */}
-            <div className="bg-white rounded-xl shadow-lg border border-neutral-200 p-6">
-              <h3 className="text-lg font-semibold text-neutral-900 mb-4">Schedule a Tour</h3>
               <div className="space-y-3">
-                <button className="w-full py-3 bg-accent-600 hover:bg-accent-700 text-white rounded-lg font-medium transition-colors">
-                  Schedule In-Person Tour
+                {/* Buy Now Button */}
+                <button
+                  onClick={handleBuyNow}
+                  className="w-full bg-beedab-blue text-white py-3 px-4 rounded-lg font-medium hover:bg-beedab-darkblue transition-colors flex items-center justify-center"
+                >
+                  <ShoppingCart className="h-5 w-5 mr-2" />
+                  Buy Now
                 </button>
-                <button className="w-full py-3 border border-neutral-300 hover:bg-neutral-50 text-neutral-700 rounded-lg font-medium transition-colors">
-                  Virtual Tour Available
+
+                {/* Bid Button (if auction) */}
+                {property.isAuction && (
+                  <button
+                    onClick={handlePlaceBid}
+                    className="w-full bg-yellow-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-yellow-700 transition-colors flex items-center justify-center"
+                  >
+                    <Gavel className="h-5 w-5 mr-2" />
+                    Place Bid
+                  </button>
+                )}
+
+                {/* Contact Buttons */}
+                <button
+                  onClick={handleContactSeller}
+                  className="w-full bg-green-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-green-700 transition-colors flex items-center justify-center"
+                >
+                  <MessageCircle className="h-5 w-5 mr-2" />
+                  Chat with {property.listingType === 'agent' ? 'Agent' : 'Owner'}
                 </button>
+
+                {isAuthenticated && (
+                  <button
+                    onClick={() => window.open(`tel:${property.sellerPhone || '+267 12345678'}`, '_self')}
+                    className="w-full bg-neutral-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-neutral-700 transition-colors flex items-center justify-center"
+                  >
+                    <Phone className="h-5 w-5 mr-2" />
+                    Call {property.listingType === 'agent' ? 'Agent' : 'Owner'}
+                  </button>
+                )}
               </div>
             </div>
+
+            {/* Seller/Agent Info (Only for authenticated users) */}
+            {isAuthenticated && (
+              <div className="bg-white rounded-lg shadow-sm border border-neutral-200 p-6 mb-6">
+                <h3 className="text-lg font-semibold text-neutral-900 mb-4">
+                  {property.listingType === 'agent' ? 'Listing Agent' : 'Property Owner'}
+                </h3>
+                
+                <div className="flex items-center space-x-3 mb-4">
+                  <div className="w-12 h-12 bg-neutral-200 rounded-full flex items-center justify-center">
+                    <User className="h-6 w-6 text-neutral-600" />
+                  </div>
+                  <div>
+                    <h4 className="font-medium text-neutral-900">
+                      {property.sellerName || 'John Doe'}
+                    </h4>
+                    <div className="flex items-center">
+                      {[...Array(5)].map((_, i) => (
+                        <Star
+                          key={i}
+                          className={`h-4 w-4 ${i < 4 ? 'text-yellow-400 fill-current' : 'text-neutral-300'}`}
+                        />
+                      ))}
+                      <span className="text-sm text-neutral-600 ml-2">4.8 (23 reviews)</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-2 text-sm text-neutral-600">
+                  <div className="flex items-center">
+                    <Phone className="h-4 w-4 mr-2" />
+                    <span>{property.sellerPhone || '+267 1234 5678'}</span>
+                  </div>
+                  <div className="flex items-center">
+                    <MessageCircle className="h-4 w-4 mr-2" />
+                    <span>{property.sellerEmail || 'agent@beedab.com'}</span>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Mortgage Calculator */}
-            <div className="bg-white rounded-xl shadow-lg border border-neutral-200 p-6">
+            <div className="bg-white rounded-lg shadow-sm border border-neutral-200 p-6">
               <h3 className="text-lg font-semibold text-neutral-900 mb-4">Mortgage Calculator</h3>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-neutral-700 mb-1">
-                    Down Payment
-                  </label>
+                  <label className="block text-sm font-medium text-neutral-700 mb-1">Loan Amount</label>
                   <input
-                    type="number"
-                    placeholder="65000"
-                    className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
+                    type="text"
+                    value={`P${parseFloat(property.price || '0').toLocaleString()}`}
+                    readOnly
+                    className="w-full px-3 py-2 border border-neutral-300 rounded-md bg-neutral-50"
                   />
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-neutral-700 mb-1">
-                    Interest Rate (%)
-                  </label>
-                  <input
-                    type="number"
-                    placeholder="6.5"
-                    step="0.1"
-                    className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-neutral-700 mb-1">
-                    Loan Term (years)
-                  </label>
-                  <select className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm">
-                    <option>30</option>
-                    <option>15</option>
-                    <option>20</option>
-                  </select>
-                </div>
-                <div className="pt-4 border-t border-neutral-200">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-neutral-600">Monthly Payment:</span>
-                    <span className="text-lg font-bold text-primary-600">P 3,247</span>
-                  </div>
-                </div>
+                <button className="w-full bg-beedab-lightblue text-beedab-darkblue py-2 px-4 rounded-lg font-medium hover:bg-blue-100 transition-colors">
+                  Calculate Monthly Payment
+                </button>
               </div>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Bid Modal */}
+      {showBidForm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-white rounded-lg p-6 max-w-md w-full mx-4"
+          >
+            <h3 className="text-xl font-semibold text-neutral-900 mb-4">Place Your Bid</h3>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-neutral-700 mb-1">
+                  Bid Amount (minimum: P{parseFloat(property.price || '0').toLocaleString()})
+                </label>
+                <input
+                  type="number"
+                  value={bidAmount}
+                  onChange={(e) => setBidAmount(e.target.value)}
+                  className="w-full px-3 py-2 border border-neutral-300 rounded-md focus:ring-2 focus:ring-beedab-blue"
+                  placeholder="Enter your bid amount"
+                />
+              </div>
+              <div className="flex space-x-3">
+                <button
+                  onClick={() => setShowBidForm(false)}
+                  className="flex-1 py-2 px-4 border border-neutral-300 rounded-lg text-neutral-700 hover:bg-neutral-50 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={submitBid}
+                  disabled={!bidAmount || parseFloat(bidAmount) < parseFloat(property.price)}
+                  className="flex-1 py-2 px-4 bg-beedab-blue text-white rounded-lg hover:bg-beedab-darkblue transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Place Bid
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 };

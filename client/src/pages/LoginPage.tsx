@@ -1,363 +1,343 @@
-import React, { useState } from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
-import { useToast } from '@/hooks/use-toast';
-import { Eye, EyeOff, UserIcon, MailIcon, PhoneIcon, BuildingIcon } from 'lucide-react';
 
-export default function LoginPage() {
-  const { user, login, register, isLoading } = useAuth();
-  const { toast } = useToast();
-  const location = useLocation();
-  
-  const [loginData, setLoginData] = useState({
-    email: '',
-    password: ''
-  });
-  
-  const [registerData, setRegisterData] = useState({
-    username: '',
+import { useState } from 'react';
+import { motion } from 'framer-motion';
+import { Mail, Lock, User, Phone, MapPin, Eye, EyeOff, CheckCircle } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+
+const LoginPage = () => {
+  const [isLogin, setIsLogin] = useState(true);
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [emailSent, setEmailSent] = useState(false);
+  const [formData, setFormData] = useState({
     email: '',
     password: '',
     confirmPassword: '',
     firstName: '',
     lastName: '',
     phone: '',
-    userType: 'buyer' as 'buyer' | 'seller' | 'agent' | 'fsbo',
-    bio: '',
-    reacNumber: ''
+    location: ''
   });
-  
-  const [showPassword, setShowPassword] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [activeTab, setActiveTab] = useState('login');
 
-  // Redirect if already logged in
-  if (user) {
-    const from = location.state?.from?.pathname || '/';
-    return <Navigate to={from} replace />;
-  }
+  const { login } = useAuth();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const redirectTo = searchParams.get('redirect') || '/dashboard';
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
-    
+    setIsLoading(true);
+
     try {
-      await login(loginData.email, loginData.password);
-      toast({
-        title: 'Welcome back!',
-        description: 'You have been logged in successfully.',
-      });
-    } catch (error: any) {
-      toast({
-        title: 'Login Failed',
-        description: error.message || 'Invalid email or password.',
-        variant: 'destructive',
-      });
+      if (isLogin) {
+        // Login logic
+        const response = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email: formData.email,
+            password: formData.password,
+          }),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          login(data.user, data.token);
+          navigate(redirectTo);
+        } else {
+          alert('Invalid credentials');
+        }
+      } else {
+        // Registration logic
+        if (formData.password !== formData.confirmPassword) {
+          alert('Passwords do not match');
+          return;
+        }
+
+        const response = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email: formData.email,
+            password: formData.password,
+            firstName: formData.firstName,
+            lastName: formData.lastName,
+            phone: formData.phone,
+            location: formData.location,
+          }),
+        });
+
+        if (response.ok) {
+          setEmailSent(true);
+        } else {
+          const error = await response.json();
+          alert(error.message || 'Registration failed');
+        }
+      }
+    } catch (error) {
+      console.error('Auth error:', error);
+      alert('An error occurred. Please try again.');
     } finally {
-      setIsSubmitting(false);
+      setIsLoading(false);
     }
   };
 
-  const handleRegister = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (registerData.password !== registerData.confirmPassword) {
-      toast({
-        title: 'Password Mismatch',
-        description: 'Passwords do not match.',
-        variant: 'destructive',
-      });
-      return;
-    }
-    
-    if (registerData.password.length < 6) {
-      toast({
-        title: 'Weak Password',
-        description: 'Password must be at least 6 characters long.',
-        variant: 'destructive',
-      });
-      return;
-    }
-    
-    setIsSubmitting(true);
-    
-    try {
-      const { confirmPassword, ...registrationData } = registerData;
-      await register(registrationData);
-      toast({
-        title: 'Account Created!',
-        description: 'Your account has been created successfully.',
-      });
-    } catch (error: any) {
-      toast({
-        title: 'Registration Failed',
-        description: error.message || 'Failed to create account.',
-        variant: 'destructive',
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
+  const updateFormData = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const getUserTypeDescription = (type: string) => {
-    const descriptions = {
-      buyer: 'Looking to purchase property',
-      seller: 'Selling property directly',
-      agent: 'Licensed real estate agent',
-      fsbo: 'For Sale By Owner seller'
-    };
-    return descriptions[type as keyof typeof descriptions] || '';
-  };
-
-  if (isLoading) {
+  if (emailSent) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <LoadingSpinner />
+      <div className="min-h-screen bg-gradient-to-br from-beedab-lightblue via-white to-blue-50 flex items-center justify-center px-4">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full text-center"
+        >
+          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <CheckCircle className="h-8 w-8 text-green-600" />
+          </div>
+          <h2 className="text-2xl font-bold text-neutral-900 mb-2">Check Your Email</h2>
+          <p className="text-neutral-600 mb-6">
+            We've sent a confirmation link to <strong>{formData.email}</strong>. 
+            Please click the link to activate your account.
+          </p>
+          <button
+            onClick={() => setIsLogin(true)}
+            className="w-full bg-beedab-blue text-white py-3 px-4 rounded-lg font-medium hover:bg-beedab-darkblue transition-colors"
+          >
+            Back to Login
+          </button>
+        </motion.div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-orange-50 p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold text-gray-900">
-            Welcome to BeeDab
-          </CardTitle>
-          <CardDescription>
-            Botswana's premier real estate marketplace
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="login">Login</TabsTrigger>
-              <TabsTrigger value="register">Register</TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="login" className="space-y-4">
-              <form onSubmit={handleLogin} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <div className="relative">
-                    <MailIcon className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder="your@email.com"
-                      value={loginData.email}
-                      onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
-                      className="pl-10"
-                      required
-                    />
+    <div className="min-h-screen bg-gradient-to-br from-beedab-lightblue via-white to-blue-50 flex items-center justify-center px-4">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="bg-white rounded-2xl shadow-xl overflow-hidden max-w-4xl w-full"
+      >
+        <div className="flex flex-col lg:flex-row">
+          {/* Left side - Form */}
+          <div className="flex-1 p-8">
+            <div className="mb-8">
+              <h2 className="text-3xl font-bold text-neutral-900 mb-2">
+                {isLogin ? 'Welcome Back' : 'Create Account'}
+              </h2>
+              <p className="text-neutral-600">
+                {isLogin 
+                  ? 'Sign in to access your BeeDaB account' 
+                  : 'Join thousands of Batswana finding their dream properties'
+                }
+              </p>
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {!isLogin && (
+                <>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-neutral-700 mb-2">
+                        First Name
+                      </label>
+                      <div className="relative">
+                        <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-neutral-400" />
+                        <input
+                          type="text"
+                          required
+                          value={formData.firstName}
+                          onChange={(e) => updateFormData('firstName', e.target.value)}
+                          className="w-full pl-10 pr-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
+                          placeholder="John"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-neutral-700 mb-2">
+                        Last Name
+                      </label>
+                      <div className="relative">
+                        <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-neutral-400" />
+                        <input
+                          type="text"
+                          required
+                          value={formData.lastName}
+                          onChange={(e) => updateFormData('lastName', e.target.value)}
+                          className="w-full pl-10 pr-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
+                          placeholder="Doe"
+                        />
+                      </div>
+                    </div>
                   </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="password">Password</Label>
-                  <div className="relative">
-                    <Input
-                      id="password"
-                      type={showPassword ? 'text' : 'password'}
-                      placeholder="Your password"
-                      value={loginData.password}
-                      onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
-                      className="pr-10"
-                      required
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
-                    >
-                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                    </button>
-                  </div>
-                </div>
-                
-                <Button 
-                  type="submit" 
-                  className="w-full" 
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? <LoadingSpinner /> : 'Login'}
-                </Button>
-              </form>
-            </TabsContent>
-            
-            <TabsContent value="register" className="space-y-4">
-              <form onSubmit={handleRegister} className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="firstName">First Name</Label>
-                    <Input
-                      id="firstName"
-                      placeholder="John"
-                      value={registerData.firstName}
-                      onChange={(e) => setRegisterData({ ...registerData, firstName: e.target.value })}
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="lastName">Last Name</Label>
-                    <Input
-                      id="lastName"
-                      placeholder="Doe"
-                      value={registerData.lastName}
-                      onChange={(e) => setRegisterData({ ...registerData, lastName: e.target.value })}
-                      required
-                    />
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="username">Username</Label>
-                  <div className="relative">
-                    <UserIcon className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                    <Input
-                      id="username"
-                      placeholder="johndoe"
-                      value={registerData.username}
-                      onChange={(e) => setRegisterData({ ...registerData, username: e.target.value })}
-                      className="pl-10"
-                      required
-                    />
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="registerEmail">Email</Label>
-                  <div className="relative">
-                    <MailIcon className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                    <Input
-                      id="registerEmail"
-                      type="email"
-                      placeholder="john@example.com"
-                      value={registerData.email}
-                      onChange={(e) => setRegisterData({ ...registerData, email: e.target.value })}
-                      className="pl-10"
-                      required
-                    />
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="phone">Phone (Optional)</Label>
-                  <div className="relative">
-                    <PhoneIcon className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                    <Input
-                      id="phone"
-                      placeholder="+267 1234 5678"
-                      value={registerData.phone}
-                      onChange={(e) => setRegisterData({ ...registerData, phone: e.target.value })}
-                      className="pl-10"
-                    />
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="userType">Account Type</Label>
-                  <Select
-                    value={registerData.userType}
-                    onValueChange={(value: 'buyer' | 'seller' | 'agent' | 'fsbo') => 
-                      setRegisterData({ ...registerData, userType: value })
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="buyer">
-                        <div className="flex flex-col text-left">
-                          <span>Buyer</span>
-                          <span className="text-xs text-gray-500">Looking to purchase property</span>
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="seller">
-                        <div className="flex flex-col text-left">
-                          <span>Seller</span>
-                          <span className="text-xs text-gray-500">Selling property directly</span>
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="agent">
-                        <div className="flex flex-col text-left">
-                          <span>Agent</span>
-                          <span className="text-xs text-gray-500">Licensed real estate agent</span>
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="fsbo">
-                        <div className="flex flex-col text-left">
-                          <span>FSBO</span>
-                          <span className="text-xs text-gray-500">For Sale By Owner seller</span>
-                        </div>
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <p className="text-xs text-gray-500">
-                    {getUserTypeDescription(registerData.userType)}
-                  </p>
-                </div>
-                
-                {registerData.userType === 'agent' && (
-                  <div className="space-y-2">
-                    <Label htmlFor="reacNumber">REAC License Number</Label>
+
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-700 mb-2">
+                      Phone Number
+                    </label>
                     <div className="relative">
-                      <BuildingIcon className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                      <Input
-                        id="reacNumber"
-                        placeholder="REAC-12345"
-                        value={registerData.reacNumber}
-                        onChange={(e) => setRegisterData({ ...registerData, reacNumber: e.target.value })}
-                        className="pl-10"
+                      <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-neutral-400" />
+                      <input
+                        type="tel"
+                        required
+                        value={formData.phone}
+                        onChange={(e) => updateFormData('phone', e.target.value)}
+                        className="w-full pl-10 pr-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
+                        placeholder="+267 1234 5678"
                       />
                     </div>
                   </div>
-                )}
-                
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="registerPassword">Password</Label>
-                    <Input
-                      id="registerPassword"
-                      type={showPassword ? 'text' : 'password'}
-                      placeholder="Password"
-                      value={registerData.password}
-                      onChange={(e) => setRegisterData({ ...registerData, password: e.target.value })}
-                      required
-                    />
+
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-700 mb-2">
+                      Location
+                    </label>
+                    <div className="relative">
+                      <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-neutral-400" />
+                      <select
+                        required
+                        value={formData.location}
+                        onChange={(e) => updateFormData('location', e.target.value)}
+                        className="w-full pl-10 pr-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
+                      >
+                        <option value="">Select your location</option>
+                        <option value="gaborone">Gaborone</option>
+                        <option value="francistown">Francistown</option>
+                        <option value="molepolole">Molepolole</option>
+                        <option value="kanye">Kanye</option>
+                        <option value="serowe">Serowe</option>
+                        <option value="mahalapye">Mahalapye</option>
+                        <option value="mogoditshane">Mogoditshane</option>
+                        <option value="mochudi">Mochudi</option>
+                        <option value="maun">Maun</option>
+                        <option value="lobatse">Lobatse</option>
+                      </select>
+                    </div>
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="confirmPassword">Confirm Password</Label>
-                    <Input
-                      id="confirmPassword"
+                </>
+              )}
+
+              <div>
+                <label className="block text-sm font-medium text-neutral-700 mb-2">
+                  Email Address
+                </label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-neutral-400" />
+                  <input
+                    type="email"
+                    required
+                    value={formData.email}
+                    onChange={(e) => updateFormData('email', e.target.value)}
+                    className="w-full pl-10 pr-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
+                    placeholder="your@email.com"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-neutral-700 mb-2">
+                  Password
+                </label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-neutral-400" />
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    required
+                    value={formData.password}
+                    onChange={(e) => updateFormData('password', e.target.value)}
+                    className="w-full pl-10 pr-12 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
+                    placeholder="••••••••"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-neutral-400 hover:text-neutral-600"
+                  >
+                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  </button>
+                </div>
+              </div>
+
+              {!isLogin && (
+                <div>
+                  <label className="block text-sm font-medium text-neutral-700 mb-2">
+                    Confirm Password
+                  </label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-neutral-400" />
+                    <input
                       type={showPassword ? 'text' : 'password'}
-                      placeholder="Confirm"
-                      value={registerData.confirmPassword}
-                      onChange={(e) => setRegisterData({ ...registerData, confirmPassword: e.target.value })}
                       required
+                      value={formData.confirmPassword}
+                      onChange={(e) => updateFormData('confirmPassword', e.target.value)}
+                      className="w-full pl-10 pr-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
+                      placeholder="••••••••"
                     />
                   </div>
                 </div>
-                
-                <Button 
-                  type="submit" 
-                  className="w-full" 
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? <LoadingSpinner /> : 'Create Account'}
-                </Button>
-              </form>
-            </TabsContent>
-          </Tabs>
-        </CardContent>
-      </Card>
+              )}
+
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full bg-beedab-blue text-white py-3 px-4 rounded-lg font-medium hover:bg-beedab-darkblue transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isLoading ? 'Please wait...' : (isLogin ? 'Sign In' : 'Create Account')}
+              </button>
+            </form>
+
+            <div className="mt-6 text-center">
+              <button
+                onClick={() => setIsLogin(!isLogin)}
+                className="text-beedab-blue hover:text-beedab-darkblue transition-colors"
+              >
+                {isLogin 
+                  ? "Don't have an account? Sign up" 
+                  : 'Already have an account? Sign in'
+                }
+              </button>
+            </div>
+          </div>
+
+          {/* Right side - Image/Info */}
+          <div className="flex-1 bg-gradient-to-br from-beedab-blue to-beedab-darkblue p-8 text-white flex items-center">
+            <div>
+              <h3 className="text-2xl font-bold mb-4">
+                {isLogin ? 'Your Property Journey Awaits' : 'Join BeeDaB Today'}
+              </h3>
+              <p className="text-blue-100 mb-6">
+                {isLogin 
+                  ? 'Access exclusive property listings, connect with verified agents, and find your dream home in Botswana.'
+                  : 'Get verified access to seller contacts, exclusive listings, and personalized property recommendations.'
+                }
+              </p>
+              <div className="space-y-3">
+                <div className="flex items-center">
+                  <CheckCircle className="h-5 w-5 mr-3" />
+                  <span>Verified property listings</span>
+                </div>
+                <div className="flex items-center">
+                  <CheckCircle className="h-5 w-5 mr-3" />
+                  <span>Direct agent/seller communication</span>
+                </div>
+                <div className="flex items-center">
+                  <CheckCircle className="h-5 w-5 mr-3" />
+                  <span>Secure transaction platform</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </motion.div>
     </div>
   );
-}
+};
+
+export default LoginPage;

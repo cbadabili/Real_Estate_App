@@ -1,23 +1,26 @@
+
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Filter, Grid, List as ListIcon, Search, MapPin, Bed, Bath, Square, Heart, Share2 } from 'lucide-react';
+import { Filter, Grid, List as ListIcon, Search, MapPin, Bed, Bath, Square, Heart, Share2, Eye } from 'lucide-react';
 import { useProperties, type PropertyFilters } from '../hooks/useProperties';
 import { LoadingSpinner } from '../components/ui/LoadingSpinner';
-import { useLocation, Link } from 'react-router-dom';
+import { useLocation, Link, useNavigate } from 'react-router-dom';
 import { VerificationBadge } from '../components/VerificationBadge';
 import { TrustSafetyFeatures } from '../components/TrustSafetyFeatures';
 import { MortgageCalculator } from '../components/MortgageCalculator';
+import { AISearchBar } from '../components/search/AISearchBar';
 
 const RealPropertiesPage = () => {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [showFilters, setShowFilters] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [filters, setFilters] = useState<PropertyFilters>({
     status: 'active',
     limit: 20
   });
+  const [selectedProperty, setSelectedProperty] = useState<any>(null);
   
   const location = useLocation();
+  const navigate = useNavigate();
   
   // Parse URL parameters and set initial filters
   useEffect(() => {
@@ -49,11 +52,138 @@ const RealPropertiesPage = () => {
     ...(searchTerm && { city: searchTerm })
   });
 
+  const handlePropertyClick = (property: any) => {
+    navigate(`/property/${property.id}`);
+  };
+
+  const handleAISearch = (query: string, aiFilters?: any) => {
+    if (aiFilters) {
+      setFilters(prev => ({ ...prev, ...aiFilters }));
+    }
+    if (query) {
+      setSearchTerm(query);
+    }
+  };
+
+  const MapSection = () => (
+    <div className="bg-white rounded-lg shadow-sm border border-neutral-200 mb-6">
+      <div className="p-4">
+        <h3 className="text-lg font-semibold text-neutral-900 mb-4 flex items-center">
+          <MapPin className="h-5 w-5 mr-2 text-beedab-blue" />
+          Properties Map
+        </h3>
+        
+        {/* Map placeholder with property markers */}
+        <div className="relative bg-gradient-to-br from-green-50 to-blue-50 rounded-lg h-96 overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-green-100 via-yellow-50 to-blue-100 opacity-30"></div>
+          
+          {/* Property markers */}
+          {properties && properties.slice(0, 8).map((property: any, index: number) => (
+            <div
+              key={property.id}
+              className="absolute cursor-pointer group"
+              style={{
+                left: `${15 + (index % 4) * 20}%`,
+                top: `${20 + Math.floor(index / 4) * 30}%`,
+                transform: 'translate(-50%, -50%)'
+              }}
+              onClick={() => setSelectedProperty(property)}
+            >
+              {/* Price marker */}
+              <div className={`
+                relative bg-white border-2 border-beedab-blue rounded-lg px-3 py-2 shadow-lg
+                hover:bg-beedab-blue hover:text-white transition-all
+                ${selectedProperty?.id === property.id ? 'bg-beedab-blue text-white' : ''}
+              `}>
+                <div className="text-sm font-bold">
+                  P{parseFloat(property.price || '0').toLocaleString()}
+                </div>
+                
+                {/* Arrow pointer */}
+                <div className={`
+                  absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 
+                  border-l-4 border-r-4 border-t-4 border-transparent
+                  ${selectedProperty?.id === property.id ? 'border-t-beedab-blue' : 'border-t-white'}
+                `}></div>
+                
+                {/* Tooltip with property details */}
+                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
+                  <div className="font-semibold">{property.title}</div>
+                  <div className="text-xs">{property.bedrooms}bd • {property.bathrooms}ba</div>
+                </div>
+              </div>
+            </div>
+          ))}
+          
+          {/* Selected property popup */}
+          {selectedProperty && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="absolute bottom-4 left-4 bg-white rounded-lg shadow-xl p-4 max-w-sm border border-neutral-200"
+            >
+              <div className="flex space-x-3">
+                {selectedProperty.images?.[0] ? (
+                  <img 
+                    src={selectedProperty.images[0]} 
+                    alt={selectedProperty.title}
+                    className="w-20 h-20 object-cover rounded-lg"
+                  />
+                ) : (
+                  <div className="w-20 h-20 bg-neutral-200 rounded-lg flex items-center justify-center">
+                    <span className="text-xs text-neutral-500">No Image</span>
+                  </div>
+                )}
+                <div className="flex-1">
+                  <h4 className="font-semibold text-neutral-900 text-sm mb-1">{selectedProperty.title}</h4>
+                  <p className="text-lg font-bold text-beedab-blue mb-1">
+                    P{parseFloat(selectedProperty.price || '0').toLocaleString()}
+                  </p>
+                  <div className="flex items-center space-x-1 text-xs text-neutral-600 mb-2">
+                    <MapPin className="h-3 w-3" />
+                    <span>{selectedProperty.city}</span>
+                  </div>
+                  <div className="flex items-center space-x-3 text-xs text-neutral-600 mb-3">
+                    {selectedProperty.bedrooms && (
+                      <span className="flex items-center">
+                        <Bed className="h-3 w-3 mr-1" />
+                        {selectedProperty.bedrooms}
+                      </span>
+                    )}
+                    {selectedProperty.bathrooms && (
+                      <span className="flex items-center">
+                        <Bath className="h-3 w-3 mr-1" />
+                        {selectedProperty.bathrooms}
+                      </span>
+                    )}
+                  </div>
+                  <button 
+                    onClick={() => handlePropertyClick(selectedProperty)}
+                    className="w-full bg-beedab-blue text-white py-2 rounded-lg text-xs font-medium hover:bg-beedab-darkblue transition-colors"
+                  >
+                    View Details
+                  </button>
+                </div>
+              </div>
+              <button 
+                onClick={() => setSelectedProperty(null)}
+                className="absolute top-2 right-2 text-neutral-400 hover:text-neutral-600"
+              >
+                ×
+              </button>
+            </motion.div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+
   const PropertyCard = ({ property }: { property: any }) => (
     <motion.div
       layoutId={`property-${property.id}`}
-      className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 border border-neutral-200"
+      className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 border border-neutral-200 cursor-pointer"
       whileHover={{ y: -2 }}
+      onClick={() => handlePropertyClick(property)}
     >
       <div className="relative">
         {property.images?.[0] ? (
@@ -77,10 +207,16 @@ const RealPropertiesPage = () => {
           </span>
         </div>
         <div className="absolute top-3 right-3 flex space-x-2">
-          <button className="p-2 bg-white/90 backdrop-blur-sm rounded-full hover:bg-white transition-colors">
+          <button 
+            onClick={(e) => {e.stopPropagation();}}
+            className="p-2 bg-white/90 backdrop-blur-sm rounded-full hover:bg-white transition-colors"
+          >
             <Heart className="h-4 w-4 text-neutral-600" />
           </button>
-          <button className="p-2 bg-white/90 backdrop-blur-sm rounded-full hover:bg-white transition-colors">
+          <button 
+            onClick={(e) => {e.stopPropagation();}}
+            className="p-2 bg-white/90 backdrop-blur-sm rounded-full hover:bg-white transition-colors"
+          >
             <Share2 className="h-4 w-4 text-neutral-600" />
           </button>
         </div>
@@ -139,7 +275,10 @@ const RealPropertiesPage = () => {
         )}
         
         <div className="flex justify-between items-center text-sm text-neutral-500">
-          <span>{property.views || 0} views</span>
+          <span className="flex items-center">
+            <Eye className="h-4 w-4 mr-1" />
+            {property.views || 0} views
+          </span>
           <span>Listed {new Date(property.createdAt).toLocaleDateString()}</span>
         </div>
       </div>
@@ -148,46 +287,27 @@ const RealPropertiesPage = () => {
 
   return (
     <div className="min-h-screen bg-neutral-50">
-      {/* Header */}
+      {/* Header with AI Search */}
       <div className="bg-white border-b border-neutral-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between space-y-4 lg:space-y-0">
+          <div className="mb-6">
+            <h1 className="text-3xl font-bold text-neutral-900 mb-2">Properties</h1>
+            <AISearchBar onSearch={handleAISearch} />
+          </div>
+          
+          <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-neutral-900">Properties</h1>
-              <p className="text-neutral-600 mt-1">
-                {filters.propertyType && (
-                  <span className="inline-block bg-beedab-blue text-white px-2 py-1 rounded text-sm mr-2 capitalize">
-                    {filters.propertyType}
-                  </span>
-                )}
+              {filters.propertyType && (
+                <span className="inline-block bg-beedab-blue text-white px-2 py-1 rounded text-sm mr-2 capitalize">
+                  {filters.propertyType}
+                </span>
+              )}
+              <span className="text-neutral-600">
                 {properties ? `${properties.length} properties found` : 'Loading properties...'}
-              </p>
+              </span>
             </div>
             
             <div className="flex items-center space-x-4">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-neutral-400" />
-                <input
-                  type="text"
-                  placeholder="Search by city..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 pr-4 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all w-64"
-                />
-              </div>
-              
-              <button
-                onClick={() => setShowFilters(!showFilters)}
-                className={`flex items-center space-x-2 px-4 py-2 rounded-lg border transition-colors ${
-                  showFilters 
-                    ? 'bg-primary-50 border-primary-300 text-primary-700' 
-                    : 'border-neutral-300 hover:border-neutral-400'
-                }`}
-              >
-                <Filter className="h-5 w-5" />
-                <span>Filters</span>
-              </button>
-              
               <div className="flex rounded-lg border border-neutral-300 overflow-hidden">
                 <button
                   onClick={() => setViewMode('grid')}
@@ -207,16 +327,15 @@ const RealPropertiesPage = () => {
         </div>
       </div>
 
-      {/* Filters Panel */}
-      {showFilters && (
-        <motion.div
-          initial={{ height: 0, opacity: 0 }}
-          animate={{ height: 'auto', opacity: 1 }}
-          exit={{ height: 0, opacity: 0 }}
-          className="bg-white border-b border-neutral-200"
-        >
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Always visible filters */}
+        <div className="bg-white rounded-lg shadow-sm border border-neutral-200 mb-6">
+          <div className="p-6">
+            <h3 className="text-lg font-semibold text-neutral-900 mb-4 flex items-center">
+              <Filter className="h-5 w-5 mr-2 text-beedab-blue" />
+              Filters
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
               <div>
                 <label className="block text-sm font-medium text-neutral-700 mb-2">Price Range</label>
                 <select 
@@ -227,11 +346,11 @@ const RealPropertiesPage = () => {
                   }}
                 >
                   <option value="">Any Price</option>
-                  <option value="0-300000">Under $300K</option>
-                  <option value="300000-500000">$300K - $500K</option>
-                  <option value="500000-750000">$500K - $750K</option>
-                  <option value="750000-1000000">$750K - $1M</option>
-                  <option value="1000000-">Over $1M</option>
+                  <option value="0-300000">Under P300K</option>
+                  <option value="300000-500000">P300K - P500K</option>
+                  <option value="500000-750000">P500K - P750K</option>
+                  <option value="750000-1000000">P750K - P1M</option>
+                  <option value="1000000-">Over P1M</option>
                 </select>
               </div>
               
@@ -278,13 +397,25 @@ const RealPropertiesPage = () => {
                   <option value="mls">MLS</option>
                 </select>
               </div>
+
+              <div>
+                <label className="block text-sm font-medium text-neutral-700 mb-2">Location</label>
+                <input
+                  type="text"
+                  placeholder="City or area..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full px-3 py-2 border border-neutral-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                />
+              </div>
             </div>
           </div>
-        </motion.div>
-      )}
+        </div>
 
-      {/* Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Map Section */}
+        <MapSection />
+
+        {/* Content */}
         {isLoading && (
           <div className="flex justify-center py-12">
             <LoadingSpinner size="lg" />
