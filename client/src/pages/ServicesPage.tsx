@@ -1,556 +1,274 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { useLocation } from 'react-router-dom';
 import { 
-  Search, 
-  Star, 
-  MapPin, 
-  Phone, 
-  Mail, 
-  ExternalLink,
-  Shield,
-  Award,
-  Camera,
-  Scale,
-  Truck,
-  Calculator,
-  Home,
-  Building,
-  Plus,
-  Zap,
-  Wrench,
-  Hammer,
-  Paintbrush,
-  Trees,
-  Waves,
-  Lock,
-  Layers
+  Scale, Calculator, Camera, Truck, Hammer, ClipboardCheck,
+  Shield, Users, Award, Star, Phone, MessageCircle, Filter,
+  MapPin, Clock, DollarSign, CheckCircle
 } from 'lucide-react';
-import ServiceProviderRegistration from '../components/ServiceProviderRegistration';
-
-interface ServiceProvider {
-  id: number;
-  companyName: string;
-  serviceCategory: string;
-  contactPerson: string;
-  phoneNumber: string;
-  email: string;
-  websiteUrl: string;
-  logoUrl: string;
-  description: string;
-  reacCertified: boolean;
-  address: string;
-  city: string;
-  rating: string;
-  reviewCount: number;
-  verified: boolean;
-  featured: boolean;
-}
+import { ServicesShowcase } from '../components/ServicesShowcase';
 
 const ServicesPage = () => {
-  const location = useLocation();
-  const [categories, setCategories] = useState<string[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  
-  // React to location changes (URL parameter changes)
-  useEffect(() => {
-    const urlParams = new URLSearchParams(location.search);
-    const category = urlParams.get('category') || 'all';
-    console.log('Location changed:', {
-      pathname: location.pathname,
-      search: location.search,
-      category,
-      currentSelected: selectedCategory
-    });
-    
-    if (category !== selectedCategory) {
-      console.log('Setting category from location change:', category);
-      setSelectedCategory(category);
-    }
-  }, [location.search, selectedCategory]);
-  const [providers, setProviders] = useState<ServiceProvider[]>([]);
-  const [filteredProviders, setFilteredProviders] = useState<ServiceProvider[]>([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [loading, setLoading] = useState(true);
-  const [showRegistration, setShowRegistration] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedLocation, setSelectedLocation] = useState('all');
 
-  // Category icons mapping
-  const categoryIcons: { [key: string]: any } = {
-    'Photography': Camera,
-    'Legal': Scale,
-    'Moving': Truck,
-    'Finance': Calculator,
-    'Insurance': Shield,
-    'Cleaning': Home,
-    'Construction': Building,
-    'Maintenance': Wrench,
-    'HVAC': Zap,
-    'Plumbing': Wrench,
-    'Electrical': Zap,
-    'Garden': Trees,
-    'Pool': Waves,
-    'Security': Lock,
-    'Roofing': Hammer,
-    'Flooring': Layers,
-    'Painting': Paintbrush
-  };
+  const serviceCategories = [
+    { id: 'all', name: 'All Services', icon: Users },
+    { id: 'legal', name: 'Legal Services', icon: Scale },
+    { id: 'finance', name: 'Financial Services', icon: Calculator },
+    { id: 'photography', name: 'Photography', icon: Camera },
+    { id: 'moving', name: 'Moving Services', icon: Truck },
+    { id: 'renovation', name: 'Renovation', icon: Hammer },
+    { id: 'inspection', name: 'Property Inspection', icon: ClipboardCheck },
+    { id: 'insurance', name: 'Insurance', icon: Shield }
+  ];
 
-  const categoryStructure = {
-    'Photography': {
-      icon: Camera,
-      description: 'Professional property and lifestyle photography',
-      subcategories: []
+  const professionals = [
+    {
+      id: 1,
+      name: "Mogapi & Associates",
+      category: "legal",
+      rating: 4.9,
+      reviews: 156,
+      location: "Gaborone",
+      verified: true,
+      reacCertified: true,
+      description: "Leading property law firm specializing in conveyancing and real estate transactions.",
+      services: ["Property Transfer", "Conveyancing", "Contract Review", "Legal Due Diligence"],
+      priceRange: "P2,500 - P15,000",
+      responseTime: "2 hours",
+      image: "/api/placeholder/300/200",
+      buyerJourneySteps: ["planning", "viewing", "negotiating", "closing"]
     },
-    'Legal': {
-      icon: Scale,
-      description: 'Lawyers, conveyancers, and legal advisory services',
-      subcategories: []
+    {
+      id: 2,
+      name: "BotsBond Mortgage Brokers",
+      category: "finance",
+      rating: 4.8,
+      reviews: 234,
+      location: "Gaborone",
+      verified: true,
+      reacCertified: true,
+      description: "Leading mortgage brokers helping secure the best home loan rates.",
+      services: ["Mortgage Brokerage", "Loan Pre-approval", "Financial Planning", "Credit Assessment"],
+      priceRange: "P1,500 - P8,000",
+      responseTime: "1 hour",
+      image: "/api/placeholder/300/200",
+      buyerJourneySteps: ["planning", "financing"]
     },
-    'Moving': {
-      icon: Truck,
-      description: 'Relocation and moving services across Botswana',
-      subcategories: []
+    {
+      id: 3,
+      name: "Motswana Visuals",
+      category: "photography",
+      rating: 4.8,
+      reviews: 47,
+      location: "Gaborone",
+      verified: true,
+      reacCertified: true,
+      description: "Professional property photography and virtual tours across Botswana.",
+      services: ["Property Photography", "Virtual Tours", "Drone Photography", "Floor Plans"],
+      priceRange: "P800 - P3,500",
+      responseTime: "4 hours",
+      image: "/api/placeholder/300/200",
+      buyerJourneySteps: ["viewing", "marketing"]
     },
-    'Finance': {
-      icon: Calculator,
-      description: 'Mortgage brokers, financial advisors, and lending',
-      subcategories: []
-    },
-    'Insurance': {
-      icon: Shield,
-      description: 'Property, life, and comprehensive insurance coverage',
-      subcategories: []
-    },
-    'Cleaning': {
-      icon: Home,
-      description: 'Move-in, move-out, and regular cleaning services',
-      subcategories: []
-    },
-    'Construction': {
-      icon: Building,
-      description: 'New construction, renovation, and building services',
-      subcategories: [
-        'HVAC',
-        'Plumbing', 
-        'Electrical',
-        'Roofing',
-        'Flooring',
-        'Painting'
-      ]
-    },
-    'Maintenance': {
-      icon: Wrench,
-      description: 'Property maintenance and repair services',
-      subcategories: [
-        'HVAC',
-        'Plumbing', 
-        'Electrical',
-        'Garden',
-        'Pool',
-        'Security'
-      ]
+    {
+      id: 4,
+      name: "Diamond Movers",
+      category: "moving",
+      rating: 4.5,
+      reviews: 78,
+      location: "Francistown",
+      verified: true,
+      reacCertified: false,
+      description: "Professional moving services across Botswana with full insurance coverage.",
+      services: ["Local Moving", "Long Distance", "Packing Services", "Storage"],
+      priceRange: "P1,200 - P8,000",
+      responseTime: "6 hours",
+      image: "/api/placeholder/300/200",
+      buyerJourneySteps: ["closing", "moving"]
     }
-  };
+  ];
 
-  useEffect(() => {
-    fetchCategories();
-    fetchProviders();
-  }, []);
-
-  useEffect(() => {
-    filterProviders();
-  }, [providers, selectedCategory, searchTerm]);
-
-  const fetchCategories = async () => {
-    try {
-      const response = await fetch('/api/services/categories');
-      if (response.ok) {
-        const data = await response.json();
-        console.log('Categories fetched:', data);
-        setCategories(['all', ...data]);
-      } else {
-        console.error('Failed to fetch categories:', response.status);
-      }
-    } catch (error) {
-      console.error('Failed to fetch categories:', error);
-    }
-  };
-
-  const fetchProviders = async () => {
-    try {
-      const response = await fetch('/api/services/providers');
-      if (response.ok) {
-        const data = await response.json();
-        console.log('Providers fetched:', data.length, 'providers');
-        setProviders(data);
-      } else {
-        console.error('Failed to fetch providers:', response.status);
-      }
-    } catch (error) {
-      console.error('Failed to fetch providers:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const filterProviders = () => {
-    let filtered = providers;
-    
-    console.log('Filtering providers:', {
-      totalProviders: providers.length,
-      selectedCategory,
-      searchTerm,
-      availableCategories: [...new Set(providers.map(p => p.serviceCategory))]
-    });
-    
-    if (selectedCategory !== 'all') {
-      filtered = filtered.filter(p => p.serviceCategory === selectedCategory);
-      console.log('After category filter:', filtered.length, 'providers');
-    }
-    
-    if (searchTerm) {
-      filtered = filtered.filter(p => 
-        p.companyName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        p.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        p.city.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-      console.log('After search filter:', filtered.length, 'providers');
-    }
-    
-    // Sort: featured first, then by rating
-    filtered.sort((a, b) => {
-      if (a.featured && !b.featured) return -1;
-      if (!a.featured && b.featured) return 1;
-      return parseFloat(b.rating) - parseFloat(a.rating);
-    });
-    
-    setFilteredProviders(filtered);
-  };
-
-  const handleCategorySelect = (category: string) => {
-    setSelectedCategory(category);
-  };
-
-  const handleProviderContact = (provider: ServiceProvider, method: 'phone' | 'email' | 'website') => {
-    switch (method) {
-      case 'phone':
-        window.open(`tel:${provider.phoneNumber}`);
-        break;
-      case 'email':
-        window.open(`mailto:${provider.email}`);
-        break;
-      case 'website':
-        window.open(provider.websiteUrl, '_blank');
-        break;
-    }
-  };
-
-  const handleRegistrationSuccess = () => {
-    // Refresh the providers list
-    setLoading(true);
-    fetchProviders();
-  };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-beedab-blue mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading services...</p>
-        </div>
-      </div>
-    );
-  }
+  const filteredProfessionals = professionals.filter(pro => {
+    const categoryMatch = selectedCategory === 'all' || pro.category === selectedCategory;
+    const locationMatch = selectedLocation === 'all' || pro.location === selectedLocation;
+    return categoryMatch && locationMatch;
+  });
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="text-center">
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">
-              Professional Services Directory
-            </h1>
-            <p className="text-lg text-gray-600 max-w-3xl mx-auto mb-6">
-              Connect with verified service providers across Botswana. 
-              From legal services to photography, find trusted professionals for your property needs.
-            </p>
-
-            {/* Register Button */}
-            <div className="mb-8">
-              <button
-                onClick={() => setShowRegistration(true)}
-                className="bg-beedab-blue text-white px-6 py-3 rounded-lg hover:bg-beedab-darkblue transition-colors flex items-center space-x-2 mx-auto"
-              >
-                <Plus className="h-5 w-5" />
-                <span>Register as Service Provider</span>
-              </button>
-            </div>
-            
-            {/* Search Bar */}
-            <div className="max-w-md mx-auto relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search services or companies..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-
+    <div className="min-h-screen bg-neutral-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Category Filters */}
-        <div className="mb-8">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Service Categories</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3">
-            {categories.filter((category) => {
-              // Only show main categories, exclude specializations that are redundant
-              const specializations = ['Plumbing', 'Electrical', 'HVAC', 'Roofing', 'Flooring', 'Painting', 'Garden', 'Pool', 'Security'];
-              return !specializations.includes(category);
-            }).map((category) => {
-              const categoryData = categoryStructure[category as keyof typeof categoryStructure];
-              const Icon = categoryData?.icon || categoryIcons[category] || Building;
-              const isSelected = selectedCategory === category;
-              const hasSubcategories = categoryData?.subcategories && categoryData.subcategories.length > 0;
-              
-              return (
-                <div key={category} className="relative group">
-                  <button
-                    onClick={() => handleCategorySelect(category)}
-                    className={`w-full p-3 rounded-lg border-2 transition-all text-center ${
-                      isSelected
-                        ? 'border-beedab-blue bg-beedab-blue text-white'
-                        : 'border-gray-200 bg-white text-gray-700 hover:border-beedab-blue hover:text-beedab-blue'
-                    }`}
-                  >
-                    <Icon className={`h-6 w-6 mx-auto mb-2 ${isSelected ? 'text-white' : 'text-beedab-blue'}`} />
-                    <span className="text-sm font-medium capitalize">
-                      {category === 'all' ? 'All Services' : category}
-                    </span>
-                    {hasSubcategories && (
-                      <div className={`text-xs mt-1 ${isSelected ? 'text-white/80' : 'text-beedab-blue/70'}`}>
-                        {categoryData.subcategories.length} specializations
-                      </div>
-                    )}
-                  </button>
-                </div>
-              );
-            })}
+        {/* Header */}
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold text-neutral-900 mb-4">
+            Professional Services
+          </h1>
+          <p className="text-xl text-neutral-600 max-w-3xl mx-auto">
+            Connect with verified professionals for every step of your real estate journey
+          </p>
+        </div>
+
+        {/* Filters */}
+        <div className="bg-white rounded-lg shadow-sm border border-neutral-200 p-6 mb-8">
+          <div className="flex items-center mb-4">
+            <Filter className="h-5 w-5 text-neutral-600 mr-2" />
+            <span className="font-medium text-neutral-900">Filter Services</span>
           </div>
 
-          {/* Subcategory Pills for Selected Category */}
-          {selectedCategory && categoryStructure[selectedCategory as keyof typeof categoryStructure]?.subcategories?.length > 0 && (
-            <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-              <div className="text-sm font-medium text-gray-700 mb-3">
-                {selectedCategory} Specializations:
-              </div>
-              <div className="flex flex-wrap gap-2">
-                <button
-                  onClick={() => handleCategorySelect(selectedCategory)}
-                  className={`px-3 py-2 text-sm rounded-lg transition-colors ${
-                    selectedCategory && !categoryStructure[selectedCategory as keyof typeof categoryStructure].subcategories.includes(selectedCategory)
-                      ? 'bg-beedab-blue text-white'
-                      : 'bg-white text-beedab-blue border border-beedab-blue hover:bg-beedab-blue hover:text-white'
-                  }`}
-                >
-                  All {selectedCategory}
-                </button>
-                {categoryStructure[selectedCategory as keyof typeof categoryStructure].subcategories.map((subcat) => (
-                  <button
-                    key={subcat}
-                    onClick={() => handleCategorySelect(subcat)}
-                    className={`px-3 py-2 text-sm rounded-lg transition-colors ${
-                      selectedCategory === subcat
-                        ? 'bg-beedab-blue text-white'
-                        : 'bg-white text-beedab-blue border border-beedab-blue hover:bg-beedab-blue hover:text-white'
-                    }`}
-                  >
-                    {subcat}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Results Header */}
-        <div className="flex items-center justify-between mb-6">
-          <h3 className="text-lg font-semibold text-gray-900">
-            {selectedCategory === 'all' ? 'All Service Providers' : `${selectedCategory} Services`}
-            <span className="text-gray-500 font-normal ml-2">
-              ({filteredProviders.length} {filteredProviders.length === 1 ? 'provider' : 'providers'})
-            </span>
-          </h3>
-        </div>
-
-        {/* Debug Info */}
-        <div className="mb-4 p-3 bg-gray-100 rounded text-sm">
-          <p>Categories: {categories.length} | Providers: {providers.length} | Filtered: {filteredProviders.length}</p>
-          <p>Selected Category: {selectedCategory} | Search: "{searchTerm}"</p>
-        </div>
-
-        {/* Service Providers Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {!loading && filteredProviders.length === 0 && (
-            <div className="col-span-full text-center py-12">
-              <div className="text-gray-400 mb-4">
-                <Building className="h-16 w-16 mx-auto" />
-              </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No services found</h3>
-              <p className="text-gray-600">
-                {searchTerm || selectedCategory !== 'all' 
-                  ? 'Try adjusting your search or category filter.'
-                  : 'Service providers will appear here once they are added.'}
-              </p>
-              <button 
-                onClick={() => {
-                  setLoading(true);
-                  fetchProviders();
-                }} 
-                className="mt-4 bg-beedab-blue text-white px-4 py-2 rounded-lg"
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-sm font-medium text-neutral-700 mb-2">
+                Service Category
+              </label>
+              <select
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                className="w-full border border-neutral-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-beedab-blue"
               >
-                Reload Services
-              </button>
+                {serviceCategories.map(category => (
+                  <option key={category.id} value={category.id}>
+                    {category.name}
+                  </option>
+                ))}
+              </select>
             </div>
-          )}
-          
-          {filteredProviders.map((provider, index) => (
+
+            <div>
+              <label className="block text-sm font-medium text-neutral-700 mb-2">
+                Location
+              </label>
+              <select
+                value={selectedLocation}
+                onChange={(e) => setSelectedLocation(e.target.value)}
+                className="w-full border border-neutral-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-beedab-blue"
+              >
+                <option value="all">All Locations</option>
+                <option value="Gaborone">Gaborone</option>
+                <option value="Francistown">Francistown</option>
+                <option value="Maun">Maun</option>
+                <option value="Kasane">Kasane</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        {/* Service Categories Grid */}
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4 mb-8">
+          {serviceCategories.map(category => {
+            const Icon = category.icon;
+            const isActive = selectedCategory === category.id;
+
+            return (
+              <button
+                key={category.id}
+                onClick={() => setSelectedCategory(category.id)}
+                className={`p-4 rounded-lg border-2 transition-all duration-200 ${
+                  isActive 
+                    ? 'border-beedab-blue bg-beedab-blue text-white' 
+                    : 'border-neutral-200 bg-white text-neutral-600 hover:border-beedab-blue'
+                }`}
+              >
+                <Icon className="h-6 w-6 mx-auto mb-2" />
+                <span className="text-xs font-medium text-center block">
+                  {category.name}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Professionals Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredProfessionals.map(professional => (
             <motion.div
-              key={provider.id}
+              key={professional.id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-              className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-lg transition-shadow"
+              className="bg-white rounded-lg shadow-sm border border-neutral-200 overflow-hidden hover:shadow-md transition-shadow"
             >
-              {/* Header */}
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex items-center space-x-3">
-                  {provider.logoUrl ? (
-                    <img
-                      src={provider.logoUrl}
-                      alt={provider.companyName}
-                      className="w-12 h-12 rounded-lg object-cover"
-                    />
-                  ) : (
-                    <div className="w-12 h-12 bg-beedab-blue/10 rounded-lg flex items-center justify-center">
-                      <Building className="h-6 w-6 text-beedab-blue" />
-                    </div>
+              <div className="relative">
+                <img 
+                  src={professional.image} 
+                  alt={professional.name}
+                  className="w-full h-48 object-cover"
+                />
+                <div className="absolute top-4 left-4 flex space-x-2">
+                  {professional.verified && (
+                    <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium flex items-center">
+                      <CheckCircle className="h-3 w-3 mr-1" />
+                      Verified
+                    </span>
                   )}
-                  <div>
-                    <h4 className="font-semibold text-gray-900 text-lg">
-                      {provider.companyName}
-                    </h4>
-                    <p className="text-sm text-gray-600">{provider.serviceCategory}</p>
+                  {professional.reacCertified && (
+                    <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium flex items-center">
+                      <Award className="h-3 w-3 mr-1" />
+                      REAC Certified
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              <div className="p-6">
+                <div className="flex items-start justify-between mb-3">
+                  <h3 className="text-lg font-semibold text-neutral-900">
+                    {professional.name}
+                  </h3>
+                  <div className="flex items-center text-yellow-500">
+                    <Star className="h-4 w-4 fill-current" />
+                    <span className="ml-1 text-sm font-medium text-neutral-900">
+                      {professional.rating}
+                    </span>
+                    <span className="text-xs text-neutral-600 ml-1">
+                      ({professional.reviews})
+                    </span>
                   </div>
                 </div>
-                
-                {provider.featured && (
-                  <span className="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full font-medium">
-                    Featured
-                  </span>
-                )}
-              </div>
 
-              {/* Badges */}
-              <div className="flex items-center space-x-2 mb-3">
-                {provider.verified && (
-                  <span className="flex items-center space-x-1 bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">
-                    <Shield className="h-3 w-3" />
-                    <span>Verified</span>
-                  </span>
-                )}
-                {provider.reacCertified && (
-                  <span className="flex items-center space-x-1 bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">
-                    <Award className="h-3 w-3" />
-                    <span>REAC Certified</span>
-                  </span>
-                )}
-              </div>
-
-              {/* Rating */}
-              <div className="flex items-center space-x-2 mb-3">
-                <div className="flex items-center space-x-1">
-                  <Star className="h-4 w-4 text-yellow-400 fill-current" />
-                  <span className="font-medium">{provider.rating}</span>
+                <div className="flex items-center text-neutral-600 mb-3">
+                  <MapPin className="h-4 w-4 mr-1" />
+                  <span className="text-sm">{professional.location}</span>
+                  <span className="mx-2">•</span>
+                  <Clock className="h-4 w-4 mr-1" />
+                  <span className="text-sm">Responds in {professional.responseTime}</span>
                 </div>
-                <span className="text-gray-500 text-sm">
-                  ({provider.reviewCount} {provider.reviewCount === 1 ? 'review' : 'reviews'})
-                </span>
-              </div>
 
-              {/* Description */}
-              <p className="text-gray-600 text-sm mb-4 line-clamp-3">
-                {provider.description}
-              </p>
+                <p className="text-neutral-700 text-sm mb-4 line-clamp-2">
+                  {professional.description}
+                </p>
 
-              {/* Location */}
-              {provider.city && (
-                <div className="flex items-center space-x-2 text-gray-500 text-sm mb-4">
-                  <MapPin className="h-4 w-4" />
-                  <span>{provider.city}</span>
+                <div className="flex items-center justify-between text-sm text-neutral-600 mb-4">
+                  <span className="flex items-center">
+                    <DollarSign className="h-4 w-4 mr-1" />
+                    {professional.priceRange}
+                  </span>
                 </div>
-              )}
 
-              {/* Contact Actions */}
-              <div className="flex items-center space-x-2">
-                {provider.phoneNumber && (
-                  <button
-                    onClick={() => handleProviderContact(provider, 'phone')}
-                    className="flex-1 bg-beedab-blue text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-beedab-darkblue transition-colors flex items-center justify-center space-x-1"
-                  >
-                    <Phone className="h-4 w-4" />
-                    <span>Call</span>
+                <div className="flex space-x-2">
+                  <button className="flex-1 bg-beedab-blue text-white py-2 px-4 rounded-lg hover:bg-beedab-darkblue transition-colors flex items-center justify-center">
+                    <MessageCircle className="h-4 w-4 mr-2" />
+                    Message
                   </button>
-                )}
-                
-                {provider.email && (
-                  <button
-                    onClick={() => handleProviderContact(provider, 'email')}
-                    className="flex-1 bg-gray-100 text-gray-700 px-3 py-2 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors flex items-center justify-center space-x-1"
-                  >
-                    <Mail className="h-4 w-4" />
-                    <span>Email</span>
+                  <button className="flex-1 bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center">
+                    <Phone className="h-4 w-4 mr-2" />
+                    Call
                   </button>
-                )}
-                
-                {provider.websiteUrl && (
-                  <button
-                    onClick={() => handleProviderContact(provider, 'website')}
-                    className="p-2 border border-gray-300 rounded-lg text-gray-600 hover:text-beedab-blue hover:border-beedab-blue transition-colors"
-                  >
-                    <ExternalLink className="h-4 w-4" />
-                  </button>
-                )}
+                </div>
               </div>
             </motion.div>
           ))}
         </div>
 
-        {/* Empty State */}
-        {filteredProviders.length === 0 && (
-          <div className="text-center py-12">
-            <div className="text-gray-400 mb-4">
-              <Building className="h-12 w-12 mx-auto" />
-            </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No services found</h3>
-            <p className="text-gray-600">
-              Try adjusting your search or category filter to find more results.
-            </p>
-          </div>
-        )}
+        {/* Call to Action */}
+        <div className="mt-12 bg-gradient-to-r from-beedab-blue to-beedab-darkblue rounded-2xl p-8 text-center text-white">
+          <h2 className="text-2xl font-bold mb-4">Need Professional Services?</h2>
+          <p className="text-blue-100 mb-6">
+            Join our network of verified professionals and grow your business
+          </p>
+          <button className="bg-white text-beedab-blue px-8 py-3 rounded-lg font-medium hover:bg-neutral-100 transition-colors">
+            Register as Professional
+          </button>
+        </div>
       </div>
-
-      {/* Registration Modal */}
-      {showRegistration && (
-        <ServiceProviderRegistration
-          onClose={() => setShowRegistration(false)}
-          onSuccess={handleRegistrationSuccess}
-        />
-      )}
     </div>
   );
 };
