@@ -43,7 +43,7 @@ import AdminPage from './pages/AdminPage';
 import { AuthProvider } from './contexts/AuthContext';
 import { PropertyProvider } from './contexts/PropertyContext';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
-import { BidPage } from './pages/BidPage';
+import BidPage from './pages/BidPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
