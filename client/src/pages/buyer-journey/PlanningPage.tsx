@@ -1,6 +1,5 @@
-import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
 import { useState } from 'react';
+import { motion } from 'framer-motion';
 import { 
   Calculator, 
   DollarSign, 
@@ -9,8 +8,13 @@ import {
   ArrowRight,
   AlertTriangle
 } from 'lucide-react';
+import { BudgetCalculator } from '../../components/BudgetCalculator';
+import { LoanCalculator } from '../../components/LoanCalculator';
+import { Link } from 'react-router-dom';
 
 const PlanningPage = () => {
+  const [activeStep, setActiveStep] = useState(0);
+  const [activeSection, setActiveSection] = useState<string | null>(null);
   const [budget, setBudget] = useState({
     income: '',
     expenses: '',
@@ -43,11 +47,11 @@ const PlanningPage = () => {
     const monthlyIncome = parseFloat(budget.income) || 0;
     const monthlyExpenses = parseFloat(budget.expenses) || 0;
     const downPayment = parseFloat(budget.downPayment) || 0;
-    
+
     const maxMonthlyPayment = (monthlyIncome - monthlyExpenses) * 0.28;
     const maxLoanAmount = maxMonthlyPayment * 12 * 20;
     const maxPrice = maxLoanAmount + downPayment;
-    
+
     setBudget(prev => ({ ...prev, maxPrice }));
   };
 
@@ -187,6 +191,26 @@ const PlanningPage = () => {
           </motion.div>
         </div>
       </section>
+      {/* Calculator Sections */}
+      {activeSection === 'budget' && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mt-8"
+        >
+          <BudgetCalculator />
+        </motion.div>
+      )}
+
+      {activeSection === 'loan' && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mt-8"
+        >
+          <LoanCalculator />
+        </motion.div>
+      )}
     </motion.div>
   );
 };

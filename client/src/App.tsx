@@ -43,6 +43,7 @@ import AdminPage from './pages/AdminPage';
 import { AuthProvider } from './contexts/AuthContext';
 import { PropertyProvider } from './contexts/PropertyContext';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
+import { BidPage } from './pages/BidPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -96,7 +97,8 @@ function App() {
             <Route path="/buyer-journey/planning" element={<PlanningPage />} />
             <Route path="/buyer-journey/searching" element={<SearchingPage />} />
             <Route path="/auctions" element={<AuctionsPage />} />
-            <Route path="/services" element={<ServicesPage />} />
+              <Route path="/bid/:id" element={<BidPage />} />
+              <Route path="/services" element={<ServicesPage />} />
             <Route path="/documents" element={<DocumentsPage />} />
             <Route path="/test-api" element={<TestAPIPage />} />
             <Route path="/login" element={<LoginPage />} />
