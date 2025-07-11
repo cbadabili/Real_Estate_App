@@ -1,6 +1,3 @@
-Adding new routes and imports for property handover, handle offers, manage showings, and pricing guide features while removing create listing duplication.
-```
-```replit_final_file
 import { Routes, Route } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
