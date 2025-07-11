@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { 
   Scale, Calculator, Camera, Truck, Hammer, ClipboardCheck,
   Shield, Users, Award, Star, Phone, MessageCircle, Filter,
-  MapPin, Clock, DollarSign, CheckCircle
+  MapPin, Clock, DollarSign, CheckCircle, TrendingUp, Calendar, Handshake
 } from 'lucide-react';
 import { ServicesShowcase } from '../components/ServicesShowcase';
 
@@ -45,7 +45,7 @@ const ServicesPage = () => {
       image: "/api/placeholder/300/200",
       buyerJourneySteps: ["planning", "viewing", "negotiating", "closing"]
     },
-    
+
     // Financial Services
     {
       id: 2,
@@ -348,7 +348,7 @@ const ServicesPage = () => {
                   alt={professional.name}
                   className="w-full h-48 object-cover"
                 />
-                <div className="absolute top-4 left-4 flex space-x-2">
+                <div className="absolute top-4 left-4 left-4 flex space-x-2">
                   {professional.verified && (
                     <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium flex items-center">
                       <CheckCircle className="h-3 w-3 mr-1" />
@@ -413,6 +413,38 @@ const ServicesPage = () => {
             </motion.div>
           ))}
         </div>
+
+                {/* Marketing & Sales */}
+        <div className="bg-white rounded-xl shadow-lg border border-neutral-200 p-6">
+            <h3 className="text-xl font-semibold text-neutral-900 mb-6 flex items-center">
+              <TrendingUp className="h-6 w-6 mr-3 text-beedab-blue" />
+              MARKETING & SALES
+            </h3>
+            <div className="space-y-4">
+              
+              <div className="flex items-center p-4 border border-neutral-200 rounded-lg hover:bg-neutral-50 transition-colors cursor-pointer">
+                <DollarSign className="h-5 w-5 text-beedab-blue mr-3" />
+                <div>
+                  <h4 className="font-medium text-neutral-900">Pricing Guide</h4>
+                  <p className="text-sm text-neutral-600">Set competitive prices</p>
+                </div>
+              </div>
+              <div className="flex items-center p-4 border border-neutral-200 rounded-lg hover:bg-neutral-50 transition-colors cursor-pointer">
+                <Calendar className="h-5 w-5 text-beedab-blue mr-3" />
+                <div>
+                  <h4 className="font-medium text-neutral-900">Manage Showings</h4>
+                  <p className="text-sm text-neutral-600">Schedule viewings</p>
+                </div>
+              </div>
+              <div className="flex items-center p-4 border border-neutral-200 rounded-lg hover:bg-neutral-50 transition-colors cursor-pointer">
+                <Handshake className="h-5 w-5 text-beedab-blue mr-3" />
+                <div>
+                  <h4 className="font-medium text-neutral-900">Handle Offers</h4>
+                  <p className="text-sm text-neutral-600">Review and negotiate</p>
+                </div>
+              </div>
+            </div>
+          </div>
 
         {/* Call to Action */}
         <div className="mt-12 bg-gradient-to-r from-beedab-blue to-beedab-darkblue rounded-2xl p-8 text-center text-white">
