@@ -1,21 +1,28 @@
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
 import { 
-  DollarSign, 
   Calculator, 
   TrendingUp, 
-  Building, 
-  Star, 
-  Phone, 
-  Mail,
-  MapPin,
-  ArrowRight,
+  Shield, 
+  Users, 
   CheckCircle,
+  PiggyBank,
   CreditCard,
-  PieChart
+  Home,
+  DollarSign,
+  FileText,
+  Phone,
+  Mail,
+  Star,
+  Award,
+  ArrowLeft
 } from 'lucide-react';
 
 const FinancingPage = () => {
+  const navigate = useNavigate();
+  const [selectedCalculator, setSelectedCalculator] = useState('affordability');
+
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -79,6 +86,17 @@ const FinancingPage = () => {
       <section className="relative py-16 bg-gradient-to-r from-beedab-darkblue to-beedab-blue text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div variants={itemVariants} className="text-center">
+          {/* Header */}
+        <div className="mb-8">
+          <button
+            onClick={() => navigate(-1)}
+            className="flex items-center text-beedab-blue hover:text-beedab-darkblue mb-4"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Previous Page
+          </button>
+        </div>
+
             <h1 className="text-4xl lg:text-5xl font-bold mb-6">
               Property Financing Solutions
             </h1>
@@ -175,7 +193,7 @@ const FinancingPage = () => {
                   <h3 className="text-xl font-semibold text-gray-900">{bank.name}</h3>
                   <p className="text-beedab-blue font-medium">{bank.type}</p>
                 </div>
-                
+
                 <div className="grid grid-cols-2 gap-4 mb-4 p-3 bg-gray-50 rounded-lg">
                   <div className="text-center">
                     <div className="text-lg font-bold text-beedab-blue">{bank.mortgageRate}</div>

@@ -1,4 +1,5 @@
 import OpenAI from "openai";
+import { storage } from './storage';
 
 // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
 const openai = process.env.OPENAI_API_KEY ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY }) : null;
@@ -21,142 +22,248 @@ export interface AISearchResult {
   confidence: number;
 }
 
-export async function parseNaturalLanguageSearch(query: string): Promise<AISearchResult> {
-  if (!openai) {
-    // Fallback parsing without AI
-    return parseQueryFallback(query);
-  }
-
-  try {
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o",
-      messages: [
-        {
-          role: "system",
-          content: `You are a real estate search assistant. Parse natural language property search queries into structured filters.
-
-Extract the following information from the user's query for Botswana real estate:
-- Price range in Botswana Pula (minPrice, maxPrice) - note P for Pula, k for thousands, M for millions
-- Property type (house, apartment, townhouse, plot)
-- Number of bedrooms (minBedrooms)
-- Number of bathrooms (minBathrooms)
-- Location (city like Gaborone, Francistown, Maun, Kasane, etc.)
-- Features (pool, garage, backyard, security, etc.)
-- Listing type (fsbo, agent, mls)
-
-Respond with JSON in this exact format:
-{
-  "filters": {
-    "minPrice": number or null,
-    "maxPrice": number or null,
-    "propertyType": string or null,
-    "minBedrooms": number or null,
-    "minBathrooms": number or null,
-    "city": string or null,
-    "state": string or null,
-    "features": array of strings or null,
-    "listingType": string or null
-  },
-  "explanation": "Brief explanation of what was understood",
-  "confidence": number between 0 and 1
-}`
-        },
-        {
-          role: "user",
-          content: query
-        }
-      ],
-      response_format: { type: "json_object" },
-      temperature: 0.3,
-    });
-
-    const result = JSON.parse(response.choices[0].message.content || '{}');
-    return {
-      filters: result.filters || {},
-      explanation: result.explanation || "Parsed your search query",
-      confidence: Math.max(0, Math.min(1, result.confidence || 0.8))
-    };
-  } catch (error) {
-    console.error('AI search parsing error:', error);
-    return parseQueryFallback(query);
-  }
+interface SearchResult {
+  query: string;
+  filters: any;
+  suggestions: string[];
+  confidence: number;
+  matchedProperties?: any[];
+  autoSuggestions?: string[];
 }
 
-function parseQueryFallback(query: string): AISearchResult {
-  console.log('Using fallback parser for query:', query);
-  
-  const filters: SearchFilters = {};
-  const lowerQuery = query.toLowerCase();
+export async function parseNaturalLanguageSearch(query: string): Promise<SearchResult> {
+  const lowercaseQuery = query.toLowerCase();
 
-  // Extract price information (Botswana Pula)
-  const priceMatches = lowerQuery.match(/(?:under|below|less than|<)\s*p?(\d+(?:,\d{3})*(?:k|m|000)?)/i);
-  if (priceMatches) {
-    let price = priceMatches[1].replace(/,/g, '');
-    if (price.toLowerCase().endsWith('k')) {
-      price = price.slice(0, -1) + '000';
-    } else if (price.toLowerCase().endsWith('m')) {
-      price = price.slice(0, -1) + '000000';
-    }
-    filters.maxPrice = parseInt(price);
-  }
+  // Initialize filters
+  const filters: any = {};
+  const suggestions: string[] = [];
+  const autoSuggestions: string[] = [];
+  let confidence = 0.7;
 
-  // Extract bedroom count
-  const bedroomMatches = lowerQuery.match(/(\d+)\s*(?:bed|bedroom)/);
-  if (bedroomMatches) {
-    filters.minBedrooms = parseInt(bedroomMatches[1]);
-  }
+  // Enhanced property type detection
+  const propertyTypeMap = {
+    'house': ['house', 'home', 'villa', 'mansion', 'bungalow', 'cottage'],
+    'apartment': ['apartment', 'flat', 'unit', 'condo', 'penthouse'],
+    'townhouse': ['townhouse', 'townhome', 'duplex'],
+    'commercial': ['commercial', 'office', 'shop', 'warehouse', 'retail', 'business'],
+    'farm': ['farm', 'ranch', 'agricultural', 'farming'],
+    'land': ['land', 'plot', 'stand', 'site', 'vacant', 'development']
+  };
 
-  // Extract bathroom count
-  const bathroomMatches = lowerQuery.match(/(\d+)\s*(?:bath|bathroom)/);
-  if (bathroomMatches) {
-    filters.minBathrooms = parseInt(bathroomMatches[1]);
-  }
-
-  // Extract property type
-  if (lowerQuery.includes('house')) filters.propertyType = 'house';
-  else if (lowerQuery.includes('apartment') || lowerQuery.includes('flat')) filters.propertyType = 'apartment';
-  else if (lowerQuery.includes('townhouse')) filters.propertyType = 'townhouse';
-  else if (lowerQuery.includes('commercial') || lowerQuery.includes('office') || lowerQuery.includes('retail')) filters.propertyType = 'commercial';
-  else if (lowerQuery.includes('farm') || lowerQuery.includes('agricultural')) filters.propertyType = 'farm';
-  else if (lowerQuery.includes('plot') || lowerQuery.includes('land')) filters.propertyType = 'land';
-
-  // Extract features
-  const features: string[] = [];
-  if (lowerQuery.includes('pool') || lowerQuery.includes('swimming')) features.push('Pool');
-  if (lowerQuery.includes('garage') || lowerQuery.includes('parking')) features.push('Garage');
-  if (lowerQuery.includes('backyard') || lowerQuery.includes('yard') || lowerQuery.includes('garden')) features.push('Large Backyard');
-  if (lowerQuery.includes('cbd') || lowerQuery.includes('city view') || lowerQuery.includes('downtown')) features.push('City Views');
-  if (lowerQuery.includes('security') || lowerQuery.includes('gated') || lowerQuery.includes('safe')) features.push('Security');
-  if (lowerQuery.includes('borehole') || lowerQuery.includes('water') || lowerQuery.includes('well')) features.push('Borehole');
-  if (lowerQuery.includes('solar') || lowerQuery.includes('backup power')) features.push('Solar Power');
-  if (lowerQuery.includes('fence') || lowerQuery.includes('walled')) features.push('Walled');
-  if (lowerQuery.includes('modern') || lowerQuery.includes('contemporary')) features.push('Modern Finishes');
-  if (lowerQuery.includes('air con') || lowerQuery.includes('aircon') || lowerQuery.includes('cooling')) features.push('Air Conditioning');
-  if (features.length > 0) filters.features = features;
-
-  // Extract location more intelligently
-  const botswanaLocations = [
-    'gaborone', 'francistown', 'maun', 'kasane', 'serowe', 'molepolole',
-    'kanye', 'mahalapye', 'palapye', 'lobatse', 'jwaneng', 'orapa',
-    'phakalane', 'broadhurst', 'extension', 'mogoditshane', 'tlokweng',
-    'gabane', 'mochudi', 'ramotswa', 'block'
-  ];
-  
-  for (const location of botswanaLocations) {
-    if (lowerQuery.includes(location)) {
-      filters.city = location.charAt(0).toUpperCase() + location.slice(1);
+  for (const [type, keywords] of Object.entries(propertyTypeMap)) {
+    if (keywords.some(keyword => lowercaseQuery.includes(keyword))) {
+      filters.propertyType = type;
+      confidence += 0.15;
       break;
     }
   }
 
-  // Extract listing type
-  if (lowerQuery.includes('fsbo') || lowerQuery.includes('by owner')) {
+  // Enhanced price detection with Botswana currency
+  const pricePatterns = [
+    /p\s*(\d+(?:,\d{3})*(?:\.\d{2})?)/gi, // P500,000
+    /(\d+(?:,\d{3})*(?:\.\d{2})?)\s*pula/gi, // 500,000 pula
+    /(\d+(?:,\d{3})*(?:\.\d{2})?)/g // Plain numbers
+  ];
+
+  let priceMatches: number[] = [];
+  for (const pattern of pricePatterns) {
+    const matches = lowercaseQuery.match(pattern);
+    if (matches) {
+      priceMatches = matches.map(p => parseFloat(p.replace(/[p,pula\s]/gi, '')));
+      break;
+    }
+  }
+
+  if (priceMatches.length > 0) {
+    if (priceMatches.length === 1) {
+      const price = priceMatches[0];
+      if (lowercaseQuery.includes('under') || lowercaseQuery.includes('below') || lowercaseQuery.includes('max')) {
+        filters.maxPrice = price;
+      } else if (lowercaseQuery.includes('over') || lowercaseQuery.includes('above') || lowercaseQuery.includes('min')) {
+        filters.minPrice = price;
+      } else if (lowercaseQuery.includes('around') || lowercaseQuery.includes('about')) {
+        filters.minPrice = price * 0.85;
+        filters.maxPrice = price * 1.15;
+      } else {
+        filters.maxPrice = price * 1.1;
+        filters.minPrice = price * 0.9;
+      }
+    } else if (priceMatches.length >= 2) {
+      filters.minPrice = Math.min(...priceMatches);
+      filters.maxPrice = Math.max(...priceMatches);
+    }
+    confidence += 0.2;
+  }
+
+  // Enhanced bedroom/bathroom detection
+  const bedroomPatterns = [
+    /(\d+)\s*(?:bed|bedroom|br)/i,
+    /(\d+)\s*(?:b|bd)/i
+  ];
+
+  for (const pattern of bedroomPatterns) {
+    const match = lowercaseQuery.match(pattern);
+    if (match) {
+      filters.minBedrooms = parseInt(match[1]);
+      confidence += 0.15;
+      break;
+    }
+  }
+
+  const bathroomPatterns = [
+    /(\d+(?:\.\d+)?)\s*(?:bath|bathroom|ba)/i,
+    /(\d+(?:\.\d+)?)\s*(?:toilet)/i
+  ];
+
+  for (const pattern of bathroomPatterns) {
+    const match = lowercaseQuery.match(pattern);
+    if (match) {
+      filters.minBathrooms = parseFloat(match[1]);
+      confidence += 0.15;
+      break;
+    }
+  }
+
+  // Enhanced location detection for Botswana
+  const locations = {
+    // Major cities
+    'gaborone': ['gaborone', 'gabs', 'cbd', 'city center'],
+    'francistown': ['francistown', 'francistown city'],
+    'maun': ['maun', 'okavango'],
+    'kasane': ['kasane', 'chobe'],
+    'palapye': ['palapye'],
+    'serowe': ['serowe'],
+    'kanye': ['kanye'],
+    'mochudi': ['mochudi'],
+    'lobatse': ['lobatse'],
+    'jwaneng': ['jwaneng'],
+    'selibe-phikwe': ['selibe-phikwe', 'phikwe'],
+    'mahalapye': ['mahalapye'],
+    'molepolole': ['molepolole'],
+    'sowa': ['sowa'],
+    'orapa': ['orapa'],
+    // Districts/Areas
+    'south-east': ['south east', 'south-east', 'southeast'],
+    'north-east': ['north east', 'north-east', 'northeast'],
+    'north-west': ['north west', 'north-west', 'northwest'],
+    'southern': ['southern district'],
+    'central': ['central district'],
+    'kgatleng': ['kgatleng'],
+    'kweneng': ['kweneng'],
+    'kgalagadi': ['kgalagadi']
+  };
+
+  for (const [location, keywords] of Object.entries(locations)) {
+    if (keywords.some(keyword => lowercaseQuery.includes(keyword))) {
+      if (location.includes('-') || location === 'central' || location === 'southern') {
+        filters.state = location.split('-').map(word => 
+          word.charAt(0).toUpperCase() + word.slice(1)
+        ).join('-');
+      } else {
+        filters.city = location.charAt(0).toUpperCase() + location.slice(1);
+      }
+      confidence += 0.2;
+      break;
+    }
+  }
+
+  // Size/area detection
+  const sizeMatch = lowercaseQuery.match(/(\d+(?:,\d{3})*)\s*(?:sqm|square meters?|m2|sq m)/i);
+  if (sizeMatch) {
+    const size = parseInt(sizeMatch[1].replace(/,/g, ''));
+    if (lowercaseQuery.includes('over') || lowercaseQuery.includes('above')) {
+      filters.minSquareFeet = size;
+    } else if (lowercaseQuery.includes('under') || lowercaseQuery.includes('below')) {
+      filters.maxSquareFeet = size;
+    } else {
+      filters.minSquareFeet = size * 0.9;
+      filters.maxSquareFeet = size * 1.1;
+    }
+    confidence += 0.1;
+  }
+
+  // Listing type detection
+  if (lowercaseQuery.includes('fsbo') || lowercaseQuery.includes('owner') || lowercaseQuery.includes('by owner')) {
     filters.listingType = 'fsbo';
+    confidence += 0.1;
+  } else if (lowercaseQuery.includes('agent') || lowercaseQuery.includes('realtor')) {
+    filters.listingType = 'agent';
+    confidence += 0.1;
+  } else if (lowercaseQuery.includes('auction') || lowercaseQuery.includes('bid')) {
+    filters.listingType = 'auction';
+    confidence += 0.1;
+  }
+
+  // Features detection
+  const features = [
+    'pool', 'swimming pool', 'garage', 'parking', 'garden', 'yard', 'balcony', 
+    'patio', 'fireplace', 'air conditioning', 'security', 'fence', 'borehole'
+  ];
+
+  const foundFeatures = features.filter(feature => lowercaseQuery.includes(feature));
+  if (foundFeatures.length > 0) {
+    confidence += foundFeatures.length * 0.05;
+  }
+
+  // Fetch matching properties
+  let matchedProperties: any[] = [];
+  try {
+    matchedProperties = await storage.getProperties(filters);
+  } catch (error) {
+    console.error('Error fetching properties for AI search:', error);
+  }
+
+  // Generate auto-suggestions based on query and available properties
+  if (matchedProperties.length === 0) {
+    // No matches - suggest broader searches
+    autoSuggestions.push(
+      'houses in gaborone',
+      'apartments under p500000',
+      '3 bedroom houses',
+      'properties in francistown',
+      'land for sale'
+    );
+  } else {
+    // Has matches - suggest refinements
+    const propertyTypes = [...new Set(matchedProperties.map(p => p.propertyType))];
+    const cities = [...new Set(matchedProperties.map(p => p.city))];
+
+    propertyTypes.forEach(type => {
+      if (type !== filters.propertyType) {
+        autoSuggestions.push(`${type}s in ${filters.city || 'gaborone'}`);
+      }
+    });
+
+    cities.forEach(city => {
+      if (city !== filters.city) {
+        autoSuggestions.push(`${filters.propertyType || 'properties'} in ${city.toLowerCase()}`);
+      }
+    });
+  }
+
+  // Generate suggestions for improving search
+  if (!filters.propertyType) {
+    suggestions.push('Try specifying a property type (house, apartment, townhouse, land, commercial, farm)');
+  }
+
+  if (!filters.city && !filters.state) {
+    suggestions.push('Add a location (Gaborone, Francistown, Maun, etc.)');
+  }
+
+  if (!filters.minPrice && !filters.maxPrice) {
+    suggestions.push('Include a price range (e.g., "under P500,000" or "P300,000 to P800,000")');
+  }
+
+  if (matchedProperties.length === 0 && confidence > 0.5) {
+    suggestions.push('Try broadening your search criteria or check spelling');
   }
 
   return {
+    query,
     filters,
-    explanation: "Parsed your search using basic text analysis",
-    confidence: 0.6
+    suggestions,
+    confidence,
+    matchedProperties: matchedProperties.slice(0, 10), // Limit to top 10 matches
+    autoSuggestions: autoSuggestions.slice(0, 5) // Limit to 5 suggestions
   };
 }

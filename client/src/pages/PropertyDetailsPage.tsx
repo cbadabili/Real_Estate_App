@@ -343,6 +343,14 @@ const PropertyDetailsPage = () => {
                     Call {property.listingType === 'agent' ? 'Agent' : 'Owner'}
                   </button>
                 )}
+
+                <button 
+                  onClick={() => navigate(`/properties/${id}/schedule-viewing`)}
+                  className="flex-1 bg-green-600 hover:bg-green-700 text-white py-3 px-6 rounded-lg font-medium transition-colors flex items-center justify-center"
+                >
+                  <Calendar className="mr-2 h-5 w-5" />
+                  Schedule Viewing
+                </button>
               </div>
             </div>
 

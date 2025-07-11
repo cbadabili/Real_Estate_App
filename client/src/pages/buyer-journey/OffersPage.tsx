@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
@@ -91,7 +90,7 @@ const OffersPage = () => {
           <div className="lg:col-span-2">
             <div className="bg-white rounded-lg shadow-sm border border-neutral-200 p-6 mb-8">
               <h2 className="text-2xl font-bold text-neutral-900 mb-6">My Offers</h2>
-              
+
               <div className="space-y-6">
                 {myOffers.map(offer => (
                   <div key={offer.id} className="border border-neutral-200 rounded-lg p-6">
@@ -185,7 +184,7 @@ const OffersPage = () => {
             {/* Make New Offer */}
             <div className="bg-white rounded-lg shadow-sm border border-neutral-200 p-6">
               <h2 className="text-2xl font-bold text-neutral-900 mb-6">Make New Offer</h2>
-              
+
               <div className="space-y-6">
                 <div>
                   <label className="block text-sm font-medium text-neutral-700 mb-2">
@@ -258,9 +257,12 @@ const OffersPage = () => {
                   />
                 </div>
 
-                <button className="w-full bg-beedab-blue text-white py-3 px-4 rounded-lg font-medium hover:bg-beedab-darkblue transition-colors">
-                  Submit Offer
-                </button>
+                <button 
+                      onClick={() => window.open('/services?category=legal', '_blank')}
+                      className="w-full bg-beedab-blue text-white py-3 px-4 rounded-lg font-medium hover:bg-beedab-darkblue transition-colors"
+                    >
+                      Draft Offer
+                    </button>
               </div>
             </div>
           </div>
@@ -331,10 +333,12 @@ const OffersPage = () => {
             <div className="bg-white rounded-lg shadow-sm border border-neutral-200 p-6">
               <h3 className="text-lg font-semibold text-neutral-900 mb-4">Need Help?</h3>
               <div className="space-y-3">
-                <button className="w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center">
-                  <User className="h-4 w-4 mr-2" />
-                  Talk to Agent
-                </button>
+                <button 
+                      onClick={() => window.open('/services?category=legal', '_blank')}
+                      className="w-full bg-green-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-green-700 transition-colors"
+                    >
+                      Get Negotiation Help
+                    </button>
                 <button className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center">
                   <Phone className="h-4 w-4 mr-2" />
                   Legal Consultation

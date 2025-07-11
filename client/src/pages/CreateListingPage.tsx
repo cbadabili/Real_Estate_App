@@ -20,6 +20,7 @@ import toast from 'react-hot-toast';
 const CreateListingPage = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { register, handleSubmit, watch, formState: { errors } } = useForm();
   const watchedListingType = watch('listingType');
   const watchedPropertyType = watch('propertyType');
@@ -48,6 +49,12 @@ const CreateListingPage = () => {
       label: 'List with Agent', 
       description: 'Work with a certified agent',
       price: 'Commission based'
+    },
+    { 
+      value: 'auction', 
+      label: 'Auction Listing', 
+      description: 'List property for auction sale',
+      price: 'Auction fees apply'
     }
   ];
 
@@ -88,6 +95,7 @@ const CreateListingPage = () => {
   };
 
   const onSubmit = async (data: any) => {
+    setIsSubmitting(true);
     try {
       console.log('Form submitted:', data);
       
@@ -136,6 +144,8 @@ const CreateListingPage = () => {
     } catch (error) {
       console.error('Error creating property:', error);
       toast.error('Failed to create property listing. Please try again.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -390,6 +400,32 @@ const CreateListingPage = () => {
                         </div>
                         {errors.buildingSize && (
                           <p className="text-error-600 text-sm mt-1">{errors.buildingSize.message as string}</p>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Auction House - Show for auction listings */}
+                    {watchedListingType === 'auction' && (
+                      <div className="md:col-span-2">
+                        <label className="block text-sm font-medium text-neutral-700 mb-2">
+                          Auction House *
+                        </label>
+                        <select
+                          {...register('auctionHouse', { required: 'Auction house is required for auction listings' })}
+                          className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent transition-all"
+                        >
+                          <option value="">Select auction house</option>
+                          <option value="First National Bank of Botswana Limited">First National Bank of Botswana Limited</option>
+                          <option value="Standard Bank Botswana">Standard Bank Botswana</option>
+                          <option value="Barclays Bank Botswana">Barclays Bank Botswana</option>
+                          <option value="Bank Gaborone">Bank Gaborone</option>
+                          <option value="BancABC Botswana">BancABC Botswana</option>
+                          <option value="African Banking Corporation">African Banking Corporation</option>
+                          <option value="Standard Chartered Bank Botswana">Standard Chartered Bank Botswana</option>
+                          <option value="Independent Auctioneers">Independent Auctioneers</option>
+                        </select>
+                        {errors.auctionHouse && (
+                          <p className="text-error-600 text-sm mt-1">{errors.auctionHouse.message as string}</p>
                         )}
                       </div>
                     )}
@@ -762,6 +798,22 @@ const CreateListingPage = () => {
                   <p className="text-neutral-600 mb-6">Add high-quality photos to showcase your property</p>
                   
                   <div className="space-y-6">
+                    {/* Professional Photography Services */}
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                      <h3 className="text-lg font-semibold text-blue-900 mb-2">Need Professional Photos?</h3>
+                      <p className="text-blue-700 text-sm mb-3">
+                        Professional photography can increase your property's appeal and help it sell faster.
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => window.open('/services?category=photography', '_blank')}
+                        className="bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors flex items-center"
+                      >
+                        <Camera className="mr-2 h-4 w-4" />
+                        Book Professional Photography
+                      </button>
+                    </div>
+
                     {/* Image Upload */}
                     <div>
                       <label className="block text-sm font-medium text-neutral-700 mb-4">
@@ -774,20 +826,38 @@ const CreateListingPage = () => {
                           multiple
                           accept="image/*"
                           onChange={handleImageUpload}
+                          capture="environment"
                           className="hidden"
                           id="image-upload"
                         />
                         <label htmlFor="image-upload" className="cursor-pointer">
                           <Upload className="h-12 w-12 text-neutral-400 mx-auto mb-4" />
                           <h3 className="text-lg font-medium text-neutral-900 mb-2">Upload Photos</h3>
-                          <p className="text-neutral-600 mb-4">Drag and drop images here or click to browse</p>
-                          <button
-                            type="button"
-                            className="inline-flex items-center px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-medium transition-colors"
-                          >
-                            <Camera className="mr-2 h-4 w-4" />
-                            Choose Files
-                          </button>
+                          <p className="text-neutral-600 mb-4">Drag and drop images here, click to browse, or take photos</p>
+                          <div className="flex justify-center space-x-3">
+                            <button
+                              type="button"
+                              className="inline-flex items-center px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-medium transition-colors"
+                            >
+                              <Camera className="mr-2 h-4 w-4" />
+                              Choose Files
+                            </button>
+                            <label
+                              htmlFor="camera-capture"
+                              className="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors cursor-pointer"
+                            >
+                              <Camera className="mr-2 h-4 w-4" />
+                              Take Photo
+                            </label>
+                            <input
+                              type="file"
+                              id="camera-capture"
+                              accept="image/*"
+                              capture="environment"
+                              onChange={handleImageUpload}
+                              className="hidden"
+                            />
+                          </div>
                         </label>
                       </div>
                       
@@ -796,26 +866,57 @@ const CreateListingPage = () => {
                           <h4 className="text-sm font-medium text-neutral-700 mb-3">
                             Uploaded Photos ({uploadedImages.length})
                           </h4>
-                          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                          
+                          {/* Main Image Carousel */}
+                          <div className="relative mb-4">
+                            <div className="aspect-w-16 aspect-h-9 bg-neutral-100 rounded-lg overflow-hidden">
+                              <img
+                                src={uploadedImages[0]}
+                                alt="Main preview"
+                                className="w-full h-64 object-cover"
+                              />
+                            </div>
+                            {uploadedImages.length > 1 && (
+                              <div className="absolute inset-y-0 left-0 flex items-center">
+                                <button
+                                  type="button"
+                                  className="ml-2 p-2 bg-black bg-opacity-50 text-white rounded-full hover:bg-opacity-75 transition-all"
+                                >
+                                  <Plus className="h-4 w-4 rotate-180" />
+                                </button>
+                              </div>
+                            )}
+                            {uploadedImages.length > 1 && (
+                              <div className="absolute inset-y-0 right-0 flex items-center">
+                                <button
+                                  type="button"
+                                  className="mr-2 p-2 bg-black bg-opacity-50 text-white rounded-full hover:bg-opacity-75 transition-all"
+                                >
+                                  <Plus className="h-4 w-4" />
+                                </button>
+                              </div>
+                            )}
+                            <div className="absolute top-2 left-2 px-2 py-1 bg-primary-600 text-white text-xs rounded">
+                              Main Photo
+                            </div>
+                          </div>
+
+                          {/* Thumbnail Grid */}
+                          <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-2">
                             {uploadedImages.map((image, index) => (
                               <div key={index} className="relative group">
                                 <img
                                   src={image}
                                   alt={`Property ${index + 1}`}
-                                  className="w-full h-32 object-cover rounded-lg"
+                                  className="w-full h-16 object-cover rounded cursor-pointer hover:opacity-75 transition-opacity"
                                 />
                                 <button
                                   type="button"
                                   onClick={() => removeImage(index)}
-                                  className="absolute top-2 right-2 p-1 bg-error-600 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                                  className="absolute -top-1 -right-1 p-1 bg-red-600 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
                                 >
-                                  <X className="h-4 w-4" />
+                                  <X className="h-3 w-3" />
                                 </button>
-                                {index === 0 && (
-                                  <div className="absolute bottom-2 left-2 px-2 py-1 bg-primary-600 text-white text-xs rounded">
-                                    Main Photo
-                                  </div>
-                                )}
                               </div>
                             ))}
                           </div>
@@ -943,10 +1044,20 @@ const CreateListingPage = () => {
               ) : (
                 <button
                   type="submit"
-                  className="px-8 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors flex items-center"
+                  disabled={isSubmitting}
+                  className="px-8 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors flex items-center disabled:opacity-50"
                 >
-                  <Check className="mr-2 h-5 w-5" />
-                  Publish Listing
+                  {isSubmitting ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                      Publishing...
+                    </>
+                  ) : (
+                    <>
+                      <Check className="mr-2 h-5 w-5" />
+                      Publish Listing
+                    </>
+                  )}
                 </button>
               )}
             </div>

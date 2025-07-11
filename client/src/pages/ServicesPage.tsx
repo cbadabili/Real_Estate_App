@@ -13,16 +13,22 @@ const ServicesPage = () => {
 
   const serviceCategories = [
     { id: 'all', name: 'All Services', icon: Users },
-    { id: 'legal', name: 'Legal Services', icon: Scale },
+    { id: 'legal', name: 'Legal & Conveyancing', icon: Scale },
     { id: 'finance', name: 'Financial Services', icon: Calculator },
-    { id: 'photography', name: 'Photography', icon: Camera },
-    { id: 'moving', name: 'Moving Services', icon: Truck },
-    { id: 'renovation', name: 'Renovation', icon: Hammer },
-    { id: 'inspection', name: 'Property Inspection', icon: ClipboardCheck },
-    { id: 'insurance', name: 'Insurance', icon: Shield }
+    { id: 'valuation', name: 'Property Valuation', icon: ClipboardCheck },
+    { id: 'insurance', name: 'Insurance', icon: Shield },
+    { id: 'inspection', name: 'Building Inspections', icon: ClipboardCheck },
+    { id: 'architecture', name: 'Architecture & Construction', icon: Hammer },
+    { id: 'utilities', name: 'Utilities Setup', icon: Truck },
+    { id: 'moving', name: 'Moving & Relocation', icon: Truck },
+    { id: 'interior', name: 'Interior Design', icon: Camera },
+    { id: 'management', name: 'Property Management', icon: Users },
+    { id: 'surveying', name: 'Land Surveying', icon: MapPin },
+    { id: 'photography', name: 'Photography', icon: Camera }
   ];
 
   const professionals = [
+    // Legal & Conveyancing
     {
       id: 1,
       name: "Mogapi & Associates",
@@ -33,12 +39,14 @@ const ServicesPage = () => {
       verified: true,
       reacCertified: true,
       description: "Leading property law firm specializing in conveyancing and real estate transactions.",
-      services: ["Property Transfer", "Conveyancing", "Contract Review", "Legal Due Diligence"],
+      services: ["Property Transfer", "Conveyancing", "Contract Review", "Legal Due Diligence", "Title Services"],
       priceRange: "P2,500 - P15,000",
       responseTime: "2 hours",
       image: "/api/placeholder/300/200",
       buyerJourneySteps: ["planning", "viewing", "negotiating", "closing"]
     },
+    
+    // Financial Services
     {
       id: 2,
       name: "BotsBond Mortgage Brokers",
@@ -55,8 +63,172 @@ const ServicesPage = () => {
       image: "/api/placeholder/300/200",
       buyerJourneySteps: ["planning", "financing"]
     },
+
+    // Property Valuation & Appraisal
     {
       id: 3,
+      name: "Botswana Property Valuers",
+      category: "valuation",
+      rating: 4.7,
+      reviews: 89,
+      location: "Gaborone",
+      verified: true,
+      reacCertified: true,
+      description: "Certified property valuers providing accurate market assessments for mortgage approval and investment planning.",
+      services: ["Property Valuation", "Market Appraisal", "Investment Analysis", "Insurance Valuation"],
+      priceRange: "P800 - P3,500",
+      responseTime: "3 hours",
+      image: "/api/placeholder/300/200",
+      buyerJourneySteps: ["planning", "financing", "closing"]
+    },
+
+    // Insurance
+    {
+      id: 4,
+      name: "Sechaba Insurance Brokers",
+      category: "insurance",
+      rating: 4.6,
+      reviews: 112,
+      location: "Gaborone",
+      verified: true,
+      reacCertified: false,
+      description: "Comprehensive insurance solutions for homeowners, contents coverage, and liability policies.",
+      services: ["Homeowner's Insurance", "Contents Coverage", "Liability Insurance", "Building Insurance"],
+      priceRange: "P150 - P800/month",
+      responseTime: "1 hour",
+      image: "/api/placeholder/300/200",
+      buyerJourneySteps: ["closing", "post-purchase"]
+    },
+
+    // Building Inspections
+    {
+      id: 5,
+      name: "Elite Building Inspectors",
+      category: "inspection",
+      rating: 4.8,
+      reviews: 67,
+      location: "Gaborone",
+      verified: true,
+      reacCertified: true,
+      description: "Certified building inspectors identifying structural, electrical, plumbing, and other issues before sale.",
+      services: ["Structural Surveys", "Electrical Inspections", "Plumbing Assessments", "Building Reports"],
+      priceRange: "P1,200 - P4,500",
+      responseTime: "4 hours",
+      image: "/api/placeholder/300/200",
+      buyerJourneySteps: ["viewing", "negotiating"]
+    },
+
+    // Architecture & Construction
+    {
+      id: 6,
+      name: "Kgolo Architects & Builders",
+      category: "architecture",
+      rating: 4.5,
+      reviews: 134,
+      location: "Gaborone",
+      verified: true,
+      reacCertified: true,
+      description: "Professional architects and contractors for renovation, extensions, and custom home construction.",
+      services: ["Architectural Design", "Home Extensions", "Renovations", "Custom Construction"],
+      priceRange: "P5,000 - P50,000+",
+      responseTime: "24 hours",
+      image: "/api/placeholder/300/200",
+      buyerJourneySteps: ["post-purchase"]
+    },
+
+    // Utilities Setup
+    {
+      id: 7,
+      name: "ConnectBots Utilities",
+      category: "utilities",
+      rating: 4.3,
+      reviews: 45,
+      location: "Gaborone",
+      verified: true,
+      reacCertified: false,
+      description: "Assistance connecting essential utilities including electricity, water, telecommunications, and internet.",
+      services: ["Electricity Connection", "Water Setup", "Internet Installation", "Telecom Services"],
+      priceRange: "P200 - P1,500",
+      responseTime: "6 hours",
+      image: "/api/placeholder/300/200",
+      buyerJourneySteps: ["closing", "post-purchase"]
+    },
+
+    // Moving & Relocation
+    {
+      id: 8,
+      name: "Diamond Movers",
+      category: "moving",
+      rating: 4.5,
+      reviews: 78,
+      location: "Francistown",
+      verified: true,
+      reacCertified: false,
+      description: "Professional moving services with packing, transport, and storage solutions.",
+      services: ["Local Moving", "Long Distance", "Packing Services", "Storage Solutions"],
+      priceRange: "P1,200 - P8,000",
+      responseTime: "6 hours",
+      image: "/api/placeholder/300/200",
+      buyerJourneySteps: ["closing", "moving"]
+    },
+
+    // Interior Design
+    {
+      id: 9,
+      name: "Motswana Interiors",
+      category: "interior",
+      rating: 4.7,
+      reviews: 92,
+      location: "Gaborone",
+      verified: true,
+      reacCertified: false,
+      description: "Interior designers and furniture suppliers for turnkey home furnishing solutions.",
+      services: ["Interior Design", "Furniture Supply", "Space Planning", "Decoration Services"],
+      priceRange: "P3,000 - P25,000+",
+      responseTime: "8 hours",
+      image: "/api/placeholder/300/200",
+      buyerJourneySteps: ["post-purchase"]
+    },
+
+    // Property Management
+    {
+      id: 10,
+      name: "Gabs Property Management",
+      category: "management",
+      rating: 4.4,
+      reviews: 156,
+      location: "Gaborone",
+      verified: true,
+      reacCertified: true,
+      description: "Professional property managers for maintenance, rentals, and general upkeep of investment properties.",
+      services: ["Property Management", "Tenant Screening", "Maintenance Services", "Rental Management"],
+      priceRange: "5% - 12% of rental",
+      responseTime: "2 hours",
+      image: "/api/placeholder/300/200",
+      buyerJourneySteps: ["post-purchase", "investment"]
+    },
+
+    // Land Surveying
+    {
+      id: 11,
+      name: "Precision Land Surveyors",
+      category: "surveying",
+      rating: 4.6,
+      reviews: 34,
+      location: "Gaborone",
+      verified: true,
+      reacCertified: true,
+      description: "Licensed land surveyors for boundary clarification and municipal planning compliance.",
+      services: ["Boundary Surveys", "Topographical Surveys", "Site Planning", "Cadastral Surveys"],
+      priceRange: "P2,000 - P8,000",
+      responseTime: "12 hours",
+      image: "/api/placeholder/300/200",
+      buyerJourneySteps: ["planning", "closing"]
+    },
+
+    // Photography
+    {
+      id: 12,
       name: "Motswana Visuals",
       category: "photography",
       rating: 4.8,
@@ -70,22 +242,6 @@ const ServicesPage = () => {
       responseTime: "4 hours",
       image: "/api/placeholder/300/200",
       buyerJourneySteps: ["viewing", "marketing"]
-    },
-    {
-      id: 4,
-      name: "Diamond Movers",
-      category: "moving",
-      rating: 4.5,
-      reviews: 78,
-      location: "Francistown",
-      verified: true,
-      reacCertified: false,
-      description: "Professional moving services across Botswana with full insurance coverage.",
-      services: ["Local Moving", "Long Distance", "Packing Services", "Storage"],
-      priceRange: "P1,200 - P8,000",
-      responseTime: "6 hours",
-      image: "/api/placeholder/300/200",
-      buyerJourneySteps: ["closing", "moving"]
     }
   ];
 

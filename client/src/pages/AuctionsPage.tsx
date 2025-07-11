@@ -19,6 +19,7 @@ const AuctionsPage = () => {
       plotSize: '2542 m²',
       description: 'A one-bedroomed house with two outbuildings, each comprising one room.',
       startingBid: 300000,
+      reservePrice: 450000,
       currentBid: null,
       auctionDate: '2025-07-18',
       auctionTime: '10:00hrs',
@@ -38,6 +39,7 @@ const AuctionsPage = () => {
       plotSize: '945 m²',
       description: 'A two-bedroomed house, sitting room, combined toilet and bathroom, one bedroom and pit latrine toilet.',
       startingBid: 404000,
+      reservePrice: 580000,
       currentBid: null,
       auctionDate: '2025-07-25',
       auctionTime: '10:00hrs',
@@ -57,6 +59,7 @@ const AuctionsPage = () => {
       plotSize: '884 m²',
       description: 'A three-bedroomed house, pit latrine toilet, fenced.',
       startingBid: 368000,
+      reservePrice: 520000,
       currentBid: null,
       auctionDate: '2025-07-25',
       auctionTime: '10:30hrs',
@@ -76,6 +79,7 @@ const AuctionsPage = () => {
       plotSize: '1140 m²',
       description: 'Three-bedroomed house consisting of two bathrooms, ensuite, sitting room, open plan kitchen, paved, electric fence, motorised gate, double garage.',
       startingBid: 1224000,
+      reservePrice: 1750000,
       currentBid: null,
       auctionDate: '2025-07-25',
       auctionTime: '10:30hrs',
@@ -170,10 +174,21 @@ const AuctionsPage = () => {
         </div>
 
         <div className="border-t pt-4">
-          <div className="flex justify-between items-center mb-2">
-            <span className="text-lg font-bold text-beedab-blue">
-              Starting bid: P{auction.startingBid.toLocaleString()}
-            </span>
+          <div className="space-y-2 mb-4">
+            <div className="flex justify-between items-center">
+              <span className="text-sm text-gray-600">Starting Bid:</span>
+              <span className="text-lg font-bold text-beedab-blue">
+                P{auction.startingBid.toLocaleString()}
+              </span>
+            </div>
+            {auction.reservePrice && (
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-gray-600">Reserve Price:</span>
+                <span className="text-sm font-medium text-gray-700">
+                  P{auction.reservePrice.toLocaleString()}
+                </span>
+              </div>
+            )}
           </div>
 
           <div className="grid grid-cols-2 gap-2 text-xs text-gray-500 mb-3">
@@ -200,7 +215,10 @@ const AuctionsPage = () => {
             <span className="text-sm">{auction.depositRequired}% of bid price on sale date</span>
           </div>
 
-          <button className="w-full bg-gradient-to-r from-beedab-blue to-beedab-lightblue text-white py-2 px-4 rounded-lg font-medium hover:from-beedab-lightblue hover:to-beedab-blue transition-colors flex items-center justify-center">
+          <button 
+            onClick={() => window.location.href = `/auctions/${auction.id}/register`}
+            className="w-full bg-gradient-to-r from-beedab-blue to-beedab-lightblue text-white py-2 px-4 rounded-lg font-medium hover:from-beedab-lightblue hover:to-beedab-blue transition-colors flex items-center justify-center"
+          >
             <Gavel className="h-4 w-4 mr-2" />
             Register to Bid
           </button>

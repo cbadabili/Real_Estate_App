@@ -27,6 +27,8 @@ import PlanningPage from './pages/buyer-journey/PlanningPage';
 import SearchingPage from './pages/buyer-journey/SearchingPage';
 import ViewingPage from './pages/buyer-journey/ViewingPage';
 import OffersPage from './pages/buyer-journey/OffersPage';
+import BidRegistrationPage from './pages/BidRegistrationPage';
+import ScheduleViewingPage from './pages/ScheduleViewingPage';
 import FSBODashboard from './pages/FSBODashboard';
 import CreateListingPage from './pages/CreateListingPage';
 import CreatePropertyPage from './pages/CreatePropertyPage';
@@ -97,9 +99,15 @@ function App() {
             <Route path="/services/legal" element={<LegalServicesPage />} />
             <Route path="/services/financing" element={<FinancingPage />} />
             <Route path="/buyer-journey/planning" element={<PlanningPage />} />
-            <Route path="/buyer-journey/searching" element={<SearchingPage />} />
-            <Route path="/buyer-journey/viewing" element={<ViewingPage />} />
-            <Route path="/buyer-journey/offers" element={<OffersPage />} />
+          <Route path="/buyer-journey/searching" element={<SearchingPage />} />
+          <Route path="/buyer-journey/viewing" element={<ViewingPage />} />
+          <Route path="/buyer-journey/offers" element={<OffersPage />} />
+
+          {/* Auction routes */}
+          <Route path="/auctions/:id/register" element={<BidRegistrationPage />} />
+
+          {/* Viewing routes */}
+          <Route path="/properties/:id/schedule-viewing" element={<ScheduleViewingPage />} />
             <Route path="/auctions" element={<AuctionsPage />} />
               <Route path="/bid/:id" element={<BidPage />} />
               <Route path="/services" element={<ServicesPage />} />

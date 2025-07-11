@@ -1,60 +1,101 @@
-import { useState, useRef, useEffect } from 'react';
-import { Search, Sparkles, MapPin, Filter, X } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Search, Sparkles, Loader2, MapPin, Home, DollarSign } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const botswanaLocations = [
-  'Gaborone', 'Francistown', 'Maun', 'Kasane', 'Serowe', 'Molepolole',
-  'Kanye', 'Mahalapye', 'Palapye', 'Lobatse', 'Jwaneng', 'Orapa',
-  'Phakalane', 'Broadhurst', 'Extension 15', 'Mogoditshane', 'Tlokweng',
-  'Gabane', 'Mochudi', 'Ramotswa', 'Block 8', 'Block 9', 'Block 10'
-];
-
 interface AISearchBarProps {
-  onSearch?: (query: string, filters?: any) => void;
+  onSearch?: (query: string, filters: any, properties?: any[]) => void;
+  placeholder?: string;
   className?: string;
 }
 
-export const AISearchBar = ({ onSearch, className = '' }: AISearchBarProps) => {
+export const AISearchBar: React.FC<AISearchBarProps> = ({ 
+  onSearch, 
+  placeholder = "Search for properties using natural language... (e.g., '3 bedroom house in Gaborone under P800,000')",
+  className = ""
+}) => {
   const [query, setQuery] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [showSuggestions, setShowSuggestions] = useState(false);
   const [suggestions, setSuggestions] = useState<string[]>([]);
-  const [locationSuggestions, setLocationSuggestions] = useState<string[]>([]);
-  const [confidence, setConfidence] = useState<number>(0);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const [autoSuggestions, setAutoSuggestions] = useState<string[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [searchResults, setSearchResults] = useState<any>(null);
+  const debounceRef = useRef<NodeJS.Timeout>();
 
-  const handleSearch = async () => {
+  // Auto-search with debounce
+  useEffect(() => {
+    if (query.length > 3) {
+      if (debounceRef.current) {
+        clearTimeout(debounceRef.current);
+      }
+
+      debounceRef.current = setTimeout(() => {
+        handleAutoSearch();
+      }, 500);
+    } else {
+      setAutoSuggestions([]);
+      setShowSuggestions(false);
+    }
+
+    return () => {
+      if (debounceRef.current) {
+        clearTimeout(debounceRef.current);
+      }
+    };
+  }, [query]);
+
+  const handleAutoSearch = async () => {
     if (!query.trim()) return;
-
-    setIsLoading(true);
 
     try {
       const response = await fetch('/api/search/ai', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ query }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query })
       });
 
-      if (response.ok) {
-        const result = await response.json();
-        console.log('AI Search Result:', result);
+      const result = await response.json();
 
-        if (onSearch) {
-          onSearch(query, result.parsedFilters);
-        }
-      } else {
-        console.error('AI search failed:', response.statusText);
-        if (onSearch) {
-          onSearch(query);
-        }
+      if (result.autoSuggestions) {
+        setAutoSuggestions(result.autoSuggestions);
+        setShowSuggestions(true);
+      }
+
+      setSearchResults(result);
+    } catch (error) {
+      console.error('Auto search error:', error);
+    }
+  };
+
+  const handleSearch = async (searchQuery?: string) => {
+    const searchTerm = searchQuery || query;
+    if (!searchTerm.trim()) return;
+
+    setIsLoading(true);
+    setShowSuggestions(false);
+
+    try {
+      const response = await fetch('/api/search/ai', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: searchTerm })
+      });
+
+      const result = await response.json();
+
+      if (result.suggestions) {
+        setSuggestions(result.suggestions);
+      }
+
+      if (onSearch) {
+        onSearch(searchTerm, result.filters, result.matchedProperties);
+      }
+
+      // Update query if different
+      if (searchQuery && searchQuery !== query) {
+        setQuery(searchQuery);
       }
     } catch (error) {
       console.error('AI search error:', error);
-      if (onSearch) {
-        onSearch(query);
-      }
     } finally {
       setIsLoading(false);
     }
@@ -66,171 +107,124 @@ export const AISearchBar = ({ onSearch, className = '' }: AISearchBarProps) => {
     }
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setQuery(value);
-
-    if (value.length > 2) {
-      setShowSuggestions(true);
-
-      // Filter locations
-      const filteredLocations = botswanaLocations.filter(location =>
-        location.toLowerCase().includes(value.toLowerCase())
-      );
-      setLocationSuggestions(filteredLocations);
-
-      // Generate suggestions based on input
-      const commonQueries = [
-        '3 bedroom house in Gaborone',
-        'Apartment for rent in Francistown',
-        'Plot for sale in Maun',
-        'Commercial property in CBD',
-        'House with pool under P2M',
-        'Modern townhouse with garage',
-        'Farm property with borehole'
-      ];
-
-      const filtered = commonQueries.filter(q => 
-        q.toLowerCase().includes(value.toLowerCase())
-      );
-      setSuggestions(filtered);
-    } else {
-      setShowSuggestions(false);
-      setLocationSuggestions([]);
-    }
-  };
-
-  const exampleQueries = [
-    "3-bedroom house under P1.2M in Block 8 near schools and shopping malls",
-    "Modern apartment in G-West with 24/7 security and covered parking",
-    "Serviced plot in Tlokweng with title deed and paved road access",
-    "Investment house in Mogoditshane with steady rental income"
+  const quickSearches = [
+    { text: 'Houses in Gaborone', icon: Home },
+    { text: 'Apartments under P500,000', icon: DollarSign },
+    { text: 'Properties in Francistown', icon: MapPin },
+    { text: '3 bedroom houses', icon: Home },
+    { text: 'Land for sale', icon: MapPin }
   ];
 
   return (
-    <div className={`w-full max-w-5xl mx-auto px-4 ${className}`}>
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="relative flex flex-col items-center"
-      >
-        <div className="relative bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl border-2 border-beedab-blue/20 overflow-hidden">
-          <div className="flex items-center p-2">
-            <div className="flex items-center pl-4 pr-3">
-              <Sparkles className="h-6 w-6 text-beedab-blue mr-2" />
-              <span className="text-sm font-medium text-beedab-black">AI Search</span>
-            </div>
-            <input
-              type="text"
-              value={query}
-              onChange={handleInputChange}
-              onKeyPress={handleKeyPress}
-              placeholder="Describe your dream property... (e.g., '3-bedroom house under P1.2M in Block 8')"
-              className="flex-1 px-4 py-4 text-lg placeholder-neutral-400 focus:outline-none"
-              disabled={isLoading}
-              ref={inputRef}
-            />
-            <button
-              onClick={handleSearch}
-              disabled={isLoading || !query.trim()}
-              className="mr-2 bg-gradient-to-r from-beedab-blue to-beedab-lightblue text-white px-8 py-4 rounded-xl font-semibold hover:from-beedab-lightblue hover:to-beedab-blue transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="h-5 w-5 animate-spin" />
-                  <span>Searching...</span>
-                </>
-              ) : (
-                <>
-                  <Search className="h-5 w-5" />
-                  <span>Search</span>
-                </>
-              )}
-            </button>
-          </div>
+    <div className={`relative ${className}`}>
+      <div className="relative">
+        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <Sparkles className="h-5 w-5 text-purple-500" />
         </div>
-
-        {showSuggestions && (
-          <div className="absolute mt-2 w-full bg-white rounded-md shadow-lg z-10">
-            {locationSuggestions.length > 0 && (
-              <div>
-                <p className="px-4 py-2 text-gray-500 text-sm">Locations:</p>
-                {locationSuggestions.map((location, index) => (
-                  <div
-                    key={index}
-                    className="px-4 py-2 text-gray-800 hover:bg-gray-100 cursor-pointer"
-                    onClick={() => {
-                      setQuery(location);
-                      setLocationSuggestions([]);
-                      setSuggestions([]);
-                      setShowSuggestions(false);
-                      inputRef.current?.focus();
-                    }}
-                  >
-                    {location}
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {suggestions.length > 0 && (
-              <div>
-                <p className="px-4 py-2 text-gray-500 text-sm">Suggestions:</p>
-                {suggestions.map((suggestion, index) => (
-                  <div
-                    key={index}
-                    className="px-4 py-2 text-gray-800 hover:bg-gray-100 cursor-pointer"
-                    onClick={() => {
-                      setQuery(suggestion);
-                      setSuggestions([]);
-                      setLocationSuggestions([]);
-                      setShowSuggestions(false);
-                      inputRef.current?.focus();
-                    }}
-                  >
-                    {suggestion}
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {locationSuggestions.length === 0 && suggestions.length === 0 && (
-              <div className="px-4 py-2 text-gray-500">No suggestions found.</div>
-            )}
-          </div>
-        )}
-
-        <div className="mt-4 flex flex-wrap gap-2 justify-center max-w-4xl">
-          <p className="w-full text-center text-white/80 text-sm mb-2">Try these examples:</p>
-          {exampleQueries.map((example, index) => (
-            <button
-              key={index}
-              onClick={() => {
-                setQuery(example);
-                setSuggestions([]);
-                setLocationSuggestions([]);
-                setShowSuggestions(false);
-              }}
-              className="px-4 py-2 bg-white/90 backdrop-blur-sm text-sm text-beedab-black rounded-full border border-white/50 hover:bg-white hover:border-beedab-blue transition-all shadow-lg"
-            >
-              {example}
-            </button>
-          ))}
-        </div>
-
-        {isLoading && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="mt-4 text-center"
+        <input
+          type="text"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          onKeyPress={handleKeyPress}
+          onFocus={() => {
+            if (autoSuggestions.length > 0 || query.length === 0) {
+              setShowSuggestions(true);
+            }
+          }}
+          onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+          placeholder={placeholder}
+          className="block w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm"
+        />
+        <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
+          <button
+            onClick={() => handleSearch()}
+            disabled={isLoading || !query.trim()}
+            className="p-1 text-gray-400 hover:text-purple-500 focus:outline-none focus:text-purple-500 disabled:opacity-50 transition-colors"
           >
-            <div className="inline-flex items-center space-x-2 bg-white/90 backdrop-blur-sm px-6 py-3 rounded-full border border-beedab-blue/30">
-              <Sparkles className="h-4 w-4 text-beedab-blue animate-pulse" />
-              <span className="text-beedab-black font-medium">AI is analyzing your search...</span>
+            {isLoading ? (
+              <Loader2 className="h-5 w-5 animate-spin" />
+            ) : (
+              <Search className="h-5 w-5" />
+            )}
+          </button>
+        </div>
+      </div>
+
+      <AnimatePresence>
+        {showSuggestions && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-80 overflow-y-auto"
+          >
+            <div className="p-2">
+              {/* Auto-suggestions based on current query */}
+              {autoSuggestions.length > 0 && (
+                <div className="mb-2">
+                  <div className="text-xs font-medium text-gray-500 px-2 py-1">Based on your search</div>
+                  {autoSuggestions.map((suggestion, index) => (
+                    <button
+                      key={index}
+                      className="w-full text-left px-2 py-2 text-sm text-gray-700 hover:bg-purple-50 rounded flex items-center"
+                      onClick={() => handleSearch(suggestion)}
+                    >
+                      <Search className="h-3 w-3 mr-2 text-purple-500" />
+                      {suggestion}
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {/* Quick searches when no query */}
+              {query.length === 0 && (
+                <div>
+                  <div className="text-xs font-medium text-gray-500 px-2 py-1">Quick searches</div>
+                  {quickSearches.map((item, index) => (
+                    <button
+                      key={index}
+                      className="w-full text-left px-2 py-2 text-sm text-gray-700 hover:bg-purple-50 rounded flex items-center"
+                      onClick={() => handleSearch(item.text)}
+                    >
+                      <item.icon className="h-3 w-3 mr-2 text-purple-500" />
+                      {item.text}
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {/* Results summary */}
+              {searchResults && searchResults.matchedProperties && (
+                <div className="border-t pt-2 mt-2">
+                  <div className="text-xs text-gray-500 px-2 py-1">
+                    Found {searchResults.matchedProperties.length} properties
+                    {searchResults.confidence && (
+                      <span className="ml-2 text-purple-600">
+                        ({Math.round(searchResults.confidence * 100)}% match)
+                      </span>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Improvement suggestions */}
+              {suggestions.length > 0 && (
+                <div className="border-t pt-2 mt-2">
+                  <div className="text-xs font-medium text-gray-500 px-2 py-1">Improve your search</div>
+                  {suggestions.map((suggestion, index) => (
+                    <div
+                      key={index}
+                      className="px-2 py-1 text-xs text-gray-600"
+                    >
+                      • {suggestion}
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </motion.div>
         )}
-      </motion.div>
+      </AnimatePresence>
     </div>
   );
 };

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
@@ -103,7 +102,7 @@ const ViewingPage = () => {
           <div className="lg:col-span-2">
             <div className="bg-white rounded-lg shadow-sm border border-neutral-200 p-6 mb-8">
               <h2 className="text-2xl font-bold text-neutral-900 mb-6">Scheduled Viewings</h2>
-              
+
               <div className="space-y-4">
                 {scheduledViewings.map(viewing => (
                   <div key={viewing.id} className="border border-neutral-200 rounded-lg p-4">
@@ -155,7 +154,10 @@ const ViewingPage = () => {
                 ))}
               </div>
 
-              <button className="w-full mt-6 bg-green-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-green-700 transition-colors">
+              <button 
+                onClick={() => window.location.href = '/properties/1/schedule-viewing'}
+                className="w-full mt-6 bg-green-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-green-700 transition-colors"
+              >
                 Schedule New Viewing
               </button>
             </div>
@@ -163,7 +165,7 @@ const ViewingPage = () => {
             {/* Evaluation Checklist */}
             <div className="bg-white rounded-lg shadow-sm border border-neutral-200 p-6">
               <h2 className="text-2xl font-bold text-neutral-900 mb-6">Property Evaluation Checklist</h2>
-              
+
               <div className="space-y-6">
                 {evaluationCriteria.map((category, index) => (
                   <div key={index} className="border border-neutral-200 rounded-lg p-4">
@@ -200,7 +202,10 @@ const ViewingPage = () => {
             <div className="bg-white rounded-lg shadow-sm border border-neutral-200 p-6 mb-6">
               <h3 className="text-lg font-semibold text-neutral-900 mb-4">Quick Actions</h3>
               <div className="space-y-3">
-                <button className="w-full bg-yellow-600 text-white py-2 px-4 rounded-lg hover:bg-yellow-700 transition-colors flex items-center">
+                <button 
+                  onClick={() => window.location.href = '/properties/1/schedule-viewing'}
+                  className="w-full bg-yellow-600 text-white py-2 px-4 rounded-lg hover:bg-yellow-700 transition-colors flex items-center"
+                >
                   <Calendar className="h-4 w-4 mr-2" />
                   Schedule Viewing
                 </button>
@@ -234,7 +239,10 @@ const ViewingPage = () => {
                   <p className="text-sm text-neutral-600 mb-3">
                     Professional property inspection services
                   </p>
-                  <button className="w-full bg-beedab-blue text-white py-2 px-3 rounded text-sm hover:bg-beedab-darkblue transition-colors">
+                  <button 
+                    onClick={() => window.open(`/services?category=Property Inspector`, '_blank')}
+                    className="w-full bg-beedab-blue text-white py-2 px-3 rounded text-sm hover:bg-beedab-darkblue transition-colors"
+                  >
                     Book Inspection
                   </button>
                 </div>
@@ -250,7 +258,10 @@ const ViewingPage = () => {
                   <p className="text-sm text-neutral-600 mb-3">
                     Get accurate property valuation
                   </p>
-                  <button className="w-full bg-green-600 text-white py-2 px-3 rounded text-sm hover:bg-green-700 transition-colors">
+                  <button 
+                    onClick={() => window.open(`/services?category=Property Valuer`, '_blank')}
+                    className="w-full bg-green-600 text-white py-2 px-3 rounded text-sm hover:bg-green-700 transition-colors"
+                  >
                     Book Valuation
                   </button>
                 </div>
