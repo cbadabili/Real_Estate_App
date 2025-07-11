@@ -746,8 +746,7 @@ const CreateListingPage = () => {
                                 value="no"
                                 className="text-beedab-blue focus:ring-beedab-blue"
                               />
-                              <span```python
- className="text-sm text-neutral-700">No</span>
+                              <span className="text-sm text-neutral-700">No</span>
                             </label>
                           </div>
                         </div>
