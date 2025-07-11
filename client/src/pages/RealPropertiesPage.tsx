@@ -258,20 +258,38 @@ const RealPropertiesPage = () => {
           </div>
         </div>
 
-        {property.features && (
-          <div className="flex flex-wrap gap-2 mb-4">
-            {(typeof property.features === 'string' ? JSON.parse(property.features) : property.features).slice(0, 3).map((feature: string, index: number) => (
-              <span key={index} className="px-2 py-1 bg-neutral-100 text-neutral-700 text-xs rounded-full">
-                {feature}
-              </span>
-            ))}
-            {(typeof property.features === 'string' ? JSON.parse(property.features) : property.features).length > 3 && (
-              <span className="px-2 py-1 bg-neutral-100 text-neutral-700 text-xs rounded-full">
-                +{(typeof property.features === 'string' ? JSON.parse(property.features) : property.features).length - 3} more
-              </span>
-            )}
-          </div>
-        )}
+        {property.features && (() => {
+          let featuresArray;
+          try {
+            if (typeof property.features === 'string') {
+              featuresArray = JSON.parse(property.features);
+            } else {
+              featuresArray = property.features;
+            }
+            
+            // Ensure it's an array
+            if (!Array.isArray(featuresArray)) {
+              return null;
+            }
+            
+            return (
+              <div className="flex flex-wrap gap-2 mb-4">
+                {featuresArray.slice(0, 3).map((feature: string, index: number) => (
+                  <span key={index} className="px-2 py-1 bg-neutral-100 text-neutral-700 text-xs rounded-full">
+                    {feature}
+                  </span>
+                ))}
+                {featuresArray.length > 3 && (
+                  <span className="px-2 py-1 bg-neutral-100 text-neutral-700 text-xs rounded-full">
+                    +{featuresArray.length - 3} more
+                  </span>
+                )}
+              </div>
+            );
+          } catch (e) {
+            return null;
+          }
+        })()}
 
         <div className="flex justify-between items-center text-sm text-neutral-500">
           <span className="flex items-center">
