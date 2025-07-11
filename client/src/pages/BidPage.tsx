@@ -136,6 +136,9 @@ const BidPage = () => {
 
   const highestBid = currentBids.length > 0 ? Math.max(...currentBids.map(bid => bid.amount)) : property.startingPrice || property.price;
   const minimumBid = highestBid + (property.bidIncrement || 1000);
+  
+  // Show current highest bid
+  const isNewListing = currentBids.length === 0;
 
   return (
     <div className="min-h-screen bg-neutral-50">
@@ -245,6 +248,17 @@ const BidPage = () => {
               <h3 className="text-lg font-semibold text-neutral-900 mb-4">Place Your Bid</h3>
               
               <div className="space-y-4">
+                {!isNewListing && (
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium text-blue-800">Current Highest Bid:</span>
+                      <span className="text-lg font-bold text-blue-900">P{highestBid.toLocaleString()}</span>
+                    </div>
+                    <div className="text-xs text-blue-600 mt-1">
+                      {currentBids.length} bid{currentBids.length !== 1 ? 's' : ''} placed
+                    </div>
+                  </div>
+                )}
                 <div>
                   <label className="block text-sm font-medium text-neutral-700 mb-2">
                     Bid Amount (minimum: P{minimumBid.toLocaleString()})

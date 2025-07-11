@@ -127,7 +127,7 @@ const LegalServicesPage = () => {
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="space-y-2 mb-4">
                   <div className="flex items-center text-sm text-gray-600">
                     <MapPin className="h-4 w-4 mr-2" />
@@ -155,7 +155,10 @@ const LegalServicesPage = () => {
                 </div>
 
                 <div className="flex space-x-2">
-                  <button className="flex-1 bg-beedab-blue text-white py-2 rounded-lg text-sm font-medium hover:bg-beedab-darkblue transition-colors">
+                  <button 
+                    onClick={() => window.open(`tel:${lawyer.phone}`, '_self')}
+                    className="flex-1 bg-beedab-blue text-white py-2 rounded-lg text-sm font-medium hover:bg-beedab-darkblue transition-colors"
+                  >
                     Contact
                   </button>
                   <button className="flex-1 border border-beedab-blue text-beedab-blue py-2 rounded-lg text-sm font-medium hover:bg-beedab-blue hover:text-white transition-colors">

@@ -1,341 +1,397 @@
 
-import { useState } from 'react';
+import React, { useState } from 'react';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Mail, Lock, User, Phone, MapPin, Eye, EyeOff, CheckCircle } from 'lucide-react';
+import { useForm } from 'react-hook-form';
+import { 
+  Mail, 
+  Lock, 
+  Eye, 
+  EyeOff, 
+  User, 
+  ArrowLeft,
+  AlertCircle,
+  CheckCircle,
+  Building,
+  UserCheck,
+  Users,
+  Briefcase
+} from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import toast from 'react-hot-toast';
 
 const LoginPage = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { login } = useAuth();
+  
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [emailSent, setEmailSent] = useState(false);
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-    confirmPassword: '',
-    firstName: '',
-    lastName: '',
-    phone: '',
-    location: ''
-  });
+  
+  const { register, handleSubmit, watch, formState: { errors } } = useForm();
+  const password = watch('password');
 
-  const { login } = useAuth();
-  const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const redirectTo = searchParams.get('redirect') || '/dashboard';
+  const redirectPath = new URLSearchParams(location.search).get('redirect') || '/dashboard';
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit = async (data: any) => {
     setIsLoading(true);
-
     try {
       if (isLogin) {
-        // Login logic
-        const response = await fetch('/api/auth/login', {
+        // Login
+        const response = await fetch('/api/users/login', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            email: formData.email,
-            password: formData.password,
+            email: data.email,
+            password: data.password,
           }),
         });
 
+        const result = await response.json();
+
         if (response.ok) {
-          const data = await response.json();
-          login(data.user, data.token);
-          navigate(redirectTo);
+          login(result);
+          toast.success('Login successful!');
+          navigate(redirectPath);
         } else {
-          alert('Invalid credentials');
+          toast.error(result.message || 'Login failed. Please check your credentials.');
         }
       } else {
-        // Registration logic
-        if (formData.password !== formData.confirmPassword) {
-          alert('Passwords do not match');
-          return;
-        }
-
-        const response = await fetch('/api/auth/register', {
+        // Registration
+        const response = await fetch('/api/users/register', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            email: formData.email,
-            password: formData.password,
-            firstName: formData.firstName,
-            lastName: formData.lastName,
-            phone: formData.phone,
-            location: formData.location,
+            firstName: data.firstName,
+            lastName: data.lastName,
+            email: data.email,
+            username: data.username,
+            password: data.password,
+            userType: data.userType,
+            phone: data.phone,
+            dateOfBirth: data.dateOfBirth,
+            address: data.address,
+            city: data.city,
+            state: data.state,
+            zipCode: data.zipCode,
+            isActive: true,
           }),
         });
 
+        const result = await response.json();
+
         if (response.ok) {
-          setEmailSent(true);
+          toast.success('Registration successful! Please login.');
+          setIsLogin(true);
         } else {
-          const error = await response.json();
-          alert(error.message || 'Registration failed');
+          toast.error(result.message || 'Registration failed. Please try again.');
         }
       }
     } catch (error) {
       console.error('Auth error:', error);
-      alert('An error occurred. Please try again.');
+      toast.error('An error occurred. Please try again.');
     } finally {
       setIsLoading(false);
     }
   };
 
-  const updateFormData = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+  const goBack = () => {
+    if (window.history.length > 1) {
+      navigate(-1);
+    } else {
+      navigate('/');
+    }
   };
 
-  if (emailSent) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-beedab-lightblue via-white to-blue-50 flex items-center justify-center px-4">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full text-center"
-        >
-          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <CheckCircle className="h-8 w-8 text-green-600" />
-          </div>
-          <h2 className="text-2xl font-bold text-neutral-900 mb-2">Check Your Email</h2>
-          <p className="text-neutral-600 mb-6">
-            We've sent a confirmation link to <strong>{formData.email}</strong>. 
-            Please click the link to activate your account.
-          </p>
-          <button
-            onClick={() => setIsLogin(true)}
-            className="w-full bg-beedab-blue text-white py-3 px-4 rounded-lg font-medium hover:bg-beedab-darkblue transition-colors"
-          >
-            Back to Login
-          </button>
-        </motion.div>
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-beedab-lightblue via-white to-blue-50 flex items-center justify-center px-4">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="bg-white rounded-2xl shadow-xl overflow-hidden max-w-4xl w-full"
-      >
-        <div className="flex flex-col lg:flex-row">
-          {/* Left side - Form */}
-          <div className="flex-1 p-8">
-            <div className="mb-8">
-              <h2 className="text-3xl font-bold text-neutral-900 mb-2">
-                {isLogin ? 'Welcome Back' : 'Create Account'}
-              </h2>
+    <div className="min-h-screen bg-gradient-to-br from-beedab-lightblue via-white to-beedab-blue/10">
+      <div className="container mx-auto px-4 py-8">
+        {/* Back Button */}
+        <button
+          onClick={goBack}
+          className="flex items-center text-beedab-blue hover:text-beedab-darkblue transition-colors mb-6"
+        >
+          <ArrowLeft className="h-5 w-5 mr-2" />
+          Back
+        </button>
+
+        <div className="max-w-md mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-white rounded-2xl shadow-xl p-8"
+          >
+            {/* Header */}
+            <div className="text-center mb-8">
+              <div className="flex items-center justify-center mb-4">
+                <Building className="h-8 w-8 text-beedab-blue mr-3" />
+                <h1 className="text-2xl font-bold text-neutral-900">
+                  {isLogin ? 'Welcome Back' : 'Join BeeDaB'}
+                </h1>
+              </div>
               <p className="text-neutral-600">
                 {isLogin 
-                  ? 'Sign in to access your BeeDaB account' 
-                  : 'Join thousands of Batswana finding their dream properties'
+                  ? 'Sign in to your account' 
+                  : 'Create your account to get started'
                 }
               </p>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Toggle Buttons */}
+            <div className="flex mb-6 bg-neutral-100 rounded-lg p-1">
+              <button
+                onClick={() => setIsLogin(true)}
+                className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+                  isLogin 
+                    ? 'bg-white text-beedab-blue shadow-sm' 
+                    : 'text-neutral-600 hover:text-neutral-900'
+                }`}
+              >
+                Login
+              </button>
+              <button
+                onClick={() => setIsLogin(false)}
+                className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+                  !isLogin 
+                    ? 'bg-white text-beedab-blue shadow-sm' 
+                    : 'text-neutral-600 hover:text-neutral-900'
+                }`}
+              >
+                Register
+              </button>
+            </div>
+
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+              {/* Registration Fields */}
               {!isLogin && (
                 <>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-neutral-700 mb-2">
-                        First Name
+                      <label className="block text-sm font-medium text-neutral-700 mb-1">
+                        First Name *
                       </label>
-                      <div className="relative">
-                        <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-neutral-400" />
-                        <input
-                          type="text"
-                          required
-                          value={formData.firstName}
-                          onChange={(e) => updateFormData('firstName', e.target.value)}
-                          className="w-full pl-10 pr-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
-                          placeholder="John"
-                        />
-                      </div>
+                      <input
+                        type="text"
+                        {...register('firstName', { required: 'First name is required' })}
+                        className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
+                        placeholder="John"
+                      />
+                      {errors.firstName && (
+                        <p className="text-red-600 text-sm mt-1">{errors.firstName.message as string}</p>
+                      )}
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-neutral-700 mb-2">
-                        Last Name
+                      <label className="block text-sm font-medium text-neutral-700 mb-1">
+                        Last Name *
                       </label>
-                      <div className="relative">
-                        <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-neutral-400" />
-                        <input
-                          type="text"
-                          required
-                          value={formData.lastName}
-                          onChange={(e) => updateFormData('lastName', e.target.value)}
-                          className="w-full pl-10 pr-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
-                          placeholder="Doe"
-                        />
-                      </div>
+                      <input
+                        type="text"
+                        {...register('lastName', { required: 'Last name is required' })}
+                        className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
+                        placeholder="Doe"
+                      />
+                      {errors.lastName && (
+                        <p className="text-red-600 text-sm mt-1">{errors.lastName.message as string}</p>
+                      )}
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-neutral-700 mb-2">
-                      Phone Number
+                    <label className="block text-sm font-medium text-neutral-700 mb-1">
+                      Username *
                     </label>
                     <div className="relative">
-                      <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-neutral-400" />
+                      <User className="absolute left-3 top-2.5 h-5 w-5 text-neutral-400" />
                       <input
-                        type="tel"
-                        required
-                        value={formData.phone}
-                        onChange={(e) => updateFormData('phone', e.target.value)}
-                        className="w-full pl-10 pr-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
-                        placeholder="+267 1234 5678"
+                        type="text"
+                        {...register('username', { required: 'Username is required' })}
+                        className="w-full pl-10 pr-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
+                        placeholder="johndoe"
                       />
                     </div>
+                    {errors.username && (
+                      <p className="text-red-600 text-sm mt-1">{errors.username.message as string}</p>
+                    )}
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-neutral-700 mb-2">
-                      Location
+                    <label className="block text-sm font-medium text-neutral-700 mb-1">
+                      Account Type *
                     </label>
-                    <div className="relative">
-                      <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-neutral-400" />
-                      <select
-                        required
-                        value={formData.location}
-                        onChange={(e) => updateFormData('location', e.target.value)}
-                        className="w-full pl-10 pr-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
-                      >
-                        <option value="">Select your location</option>
-                        <option value="gaborone">Gaborone</option>
-                        <option value="francistown">Francistown</option>
-                        <option value="molepolole">Molepolole</option>
-                        <option value="kanye">Kanye</option>
-                        <option value="serowe">Serowe</option>
-                        <option value="mahalapye">Mahalapye</option>
-                        <option value="mogoditshane">Mogoditshane</option>
-                        <option value="mochudi">Mochudi</option>
-                        <option value="maun">Maun</option>
-                        <option value="lobatse">Lobatse</option>
-                      </select>
-                    </div>
+                    <select
+                      {...register('userType', { required: 'Account type is required' })}
+                      className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
+                    >
+                      <option value="">Select account type</option>
+                      <option value="buyer">Buyer</option>
+                      <option value="seller">Seller</option>
+                      <option value="agent">Agent</option>
+                      <option value="fsbo">Owner Seller</option>
+                    </select>
+                    {errors.userType && (
+                      <p className="text-red-600 text-sm mt-1">{errors.userType.message as string}</p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-700 mb-1">
+                      Phone Number
+                    </label>
+                    <input
+                      type="tel"
+                      {...register('phone')}
+                      className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
+                      placeholder="+267 1234 5678"
+                    />
                   </div>
                 </>
               )}
 
+              {/* Email Field */}
               <div>
-                <label className="block text-sm font-medium text-neutral-700 mb-2">
-                  Email Address
+                <label className="block text-sm font-medium text-neutral-700 mb-1">
+                  Email Address *
                 </label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-neutral-400" />
+                  <Mail className="absolute left-3 top-2.5 h-5 w-5 text-neutral-400" />
                   <input
                     type="email"
-                    required
-                    value={formData.email}
-                    onChange={(e) => updateFormData('email', e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
-                    placeholder="your@email.com"
+                    {...register('email', { 
+                      required: 'Email is required',
+                      pattern: {
+                        value: /^\S+@\S+$/i,
+                        message: 'Please enter a valid email'
+                      }
+                    })}
+                    className="w-full pl-10 pr-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
+                    placeholder="john@example.com"
                   />
                 </div>
+                {errors.email && (
+                  <p className="text-red-600 text-sm mt-1">{errors.email.message as string}</p>
+                )}
               </div>
 
+              {/* Password Field */}
               <div>
-                <label className="block text-sm font-medium text-neutral-700 mb-2">
-                  Password
+                <label className="block text-sm font-medium text-neutral-700 mb-1">
+                  Password *
                 </label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-neutral-400" />
+                  <Lock className="absolute left-3 top-2.5 h-5 w-5 text-neutral-400" />
                   <input
                     type={showPassword ? 'text' : 'password'}
-                    required
-                    value={formData.password}
-                    onChange={(e) => updateFormData('password', e.target.value)}
-                    className="w-full pl-10 pr-12 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
-                    placeholder="••••••••"
+                    {...register('password', { 
+                      required: 'Password is required',
+                      minLength: {
+                        value: 6,
+                        message: 'Password must be at least 6 characters'
+                      }
+                    })}
+                    className="w-full pl-10 pr-10 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
+                    placeholder="Enter your password"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-neutral-400 hover:text-neutral-600"
+                    className="absolute right-3 top-2.5 text-neutral-400 hover:text-neutral-600"
                   >
                     {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                   </button>
                 </div>
+                {errors.password && (
+                  <p className="text-red-600 text-sm mt-1">{errors.password.message as string}</p>
+                )}
               </div>
 
+              {/* Confirm Password (Registration only) */}
               {!isLogin && (
                 <div>
-                  <label className="block text-sm font-medium text-neutral-700 mb-2">
-                    Confirm Password
+                  <label className="block text-sm font-medium text-neutral-700 mb-1">
+                    Confirm Password *
                   </label>
                   <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-neutral-400" />
+                    <Lock className="absolute left-3 top-2.5 h-5 w-5 text-neutral-400" />
                     <input
-                      type={showPassword ? 'text' : 'password'}
-                      required
-                      value={formData.confirmPassword}
-                      onChange={(e) => updateFormData('confirmPassword', e.target.value)}
-                      className="w-full pl-10 pr-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
-                      placeholder="••••••••"
+                      type={showConfirmPassword ? 'text' : 'password'}
+                      {...register('confirmPassword', { 
+                        required: 'Please confirm your password',
+                        validate: value => value === password || 'Passwords do not match'
+                      })}
+                      className="w-full pl-10 pr-10 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
+                      placeholder="Confirm your password"
                     />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      className="absolute right-3 top-2.5 text-neutral-400 hover:text-neutral-600"
+                    >
+                      {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                    </button>
                   </div>
+                  {errors.confirmPassword && (
+                    <p className="text-red-600 text-sm mt-1">{errors.confirmPassword.message as string}</p>
+                  )}
                 </div>
               )}
 
+              {/* Submit Button */}
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full bg-beedab-blue text-white py-3 px-4 rounded-lg font-medium hover:bg-beedab-darkblue transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-beedab-blue text-white py-2 px-4 rounded-lg font-medium hover:bg-beedab-darkblue transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
               >
-                {isLoading ? 'Please wait...' : (isLogin ? 'Sign In' : 'Create Account')}
+                {isLoading ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    {isLogin ? 'Signing in...' : 'Creating account...'}
+                  </>
+                ) : (
+                  <>
+                    {isLogin ? (
+                      <CheckCircle className="h-4 w-4 mr-2" />
+                    ) : (
+                      <UserCheck className="h-4 w-4 mr-2" />
+                    )}
+                    {isLogin ? 'Sign In' : 'Create Account'}
+                  </>
+                )}
               </button>
             </form>
 
-            <div className="mt-6 text-center">
-              <button
-                onClick={() => setIsLogin(!isLogin)}
-                className="text-beedab-blue hover:text-beedab-darkblue transition-colors"
-              >
-                {isLogin 
-                  ? "Don't have an account? Sign up" 
-                  : 'Already have an account? Sign in'
-                }
-              </button>
+            {/* Footer */}
+            <div className="mt-6 text-center text-sm text-neutral-600">
+              {isLogin ? (
+                <>
+                  Don't have an account?{' '}
+                  <button
+                    onClick={() => setIsLogin(false)}
+                    className="text-beedab-blue hover:text-beedab-darkblue font-medium"
+                  >
+                    Register here
+                  </button>
+                </>
+              ) : (
+                <>
+                  Already have an account?{' '}
+                  <button
+                    onClick={() => setIsLogin(true)}
+                    className="text-beedab-blue hover:text-beedab-darkblue font-medium"
+                  >
+                    Back to Login
+                  </button>
+                </>
+              )}
             </div>
-          </div>
-
-          {/* Right side - Image/Info */}
-          <div className="flex-1 bg-gradient-to-br from-beedab-blue to-beedab-darkblue p-8 text-white flex items-center">
-            <div>
-              <h3 className="text-2xl font-bold mb-4">
-                {isLogin ? 'Your Property Journey Awaits' : 'Join BeeDaB Today'}
-              </h3>
-              <p className="text-blue-100 mb-6">
-                {isLogin 
-                  ? 'Access exclusive property listings, connect with verified agents, and find your dream home in Botswana.'
-                  : 'Get verified access to seller contacts, exclusive listings, and personalized property recommendations.'
-                }
-              </p>
-              <div className="space-y-3">
-                <div className="flex items-center">
-                  <CheckCircle className="h-5 w-5 mr-3" />
-                  <span>Verified property listings</span>
-                </div>
-                <div className="flex items-center">
-                  <CheckCircle className="h-5 w-5 mr-3" />
-                  <span>Direct agent/seller communication</span>
-                </div>
-                <div className="flex items-center">
-                  <CheckCircle className="h-5 w-5 mr-3" />
-                  <span>Secure transaction platform</span>
-                </div>
-              </div>
-            </div>
-          </div>
+          </motion.div>
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 };

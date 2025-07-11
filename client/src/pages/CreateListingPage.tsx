@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
+import { useNavigate } from 'react-router-dom';
 import { 
   Upload, 
   MapPin, 
@@ -18,6 +19,7 @@ import {
 import toast from 'react-hot-toast';
 
 const CreateListingPage = () => {
+  const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -98,7 +100,7 @@ const CreateListingPage = () => {
     setIsSubmitting(true);
     try {
       console.log('Form submitted:', data);
-      
+
       // Transform form data to match backend schema
       const propertyData = {
         title: data.title,
@@ -133,14 +135,14 @@ const CreateListingPage = () => {
 
       const createdProperty = await response.json();
       console.log('Property created:', createdProperty);
-      
+
       toast.success('Property listing created successfully!');
-      
+
       // Redirect to properties page after successful creation
       setTimeout(() => {
         window.location.href = '/properties';
       }, 2000);
-      
+
     } catch (error) {
       console.error('Error creating property:', error);
       toast.error('Failed to create property listing. Please try again.');
@@ -194,7 +196,7 @@ const CreateListingPage = () => {
                 <div>
                   <h2 className="text-2xl font-semibold text-neutral-900 mb-2">Choose Your Listing Type</h2>
                   <p className="text-neutral-600 mb-6">Select how you'd like to list your property</p>
-                  
+
                   <div className="grid md:grid-cols-2 gap-6">
                     {listingTypes.map((type) => (
                       <label key={type.value} className="relative cursor-pointer">
@@ -248,7 +250,7 @@ const CreateListingPage = () => {
                 <div>
                   <h2 className="text-2xl font-semibold text-neutral-900 mb-2">Property Type</h2>
                   <p className="text-neutral-600 mb-6">What type of property are you listing?</p>
-                  
+
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                     {propertyTypes.map((type) => (
                       <label key={type.value} className="relative cursor-pointer">
@@ -293,7 +295,7 @@ const CreateListingPage = () => {
               >
                 <div>
                   <h2 className="text-2xl font-semibold text-neutral-900 mb-6">Basic Property Information</h2>
-                  
+
                   <div className="grid md:grid-cols-2 gap-6">
                     <div>
                       <label className="block text-sm font-medium text-neutral-700 mb-2">
@@ -501,7 +503,7 @@ const CreateListingPage = () => {
               >
                 <div>
                   <h2 className="text-2xl font-semibold text-neutral-900 mb-6">Property Details & Features</h2>
-                  
+
                   <div className="space-y-6">
                     <div>
                       <label className="block text-sm font-medium text-neutral-700 mb-2">
@@ -559,7 +561,7 @@ const CreateListingPage = () => {
                             <option value="warehouse">Warehouse</option>
                           </select>
                         </div>
-                        
+
                         <div>
                           <label className="block text-sm font-medium text-neutral-700 mb-2">
                             Number of Units
@@ -571,7 +573,7 @@ const CreateListingPage = () => {
                             placeholder="e.g., 10 for shopping complex"
                           />
                         </div>
-                        
+
                         <div>
                           <label className="block text-sm font-medium text-neutral-700 mb-2">
                             Commercial Amenities
@@ -610,7 +612,7 @@ const CreateListingPage = () => {
                             <option value="mixed-use">Mixed-Use</option>
                           </select>
                         </div>
-                        
+
                         <div>
                           <label className="block text-sm font-medium text-neutral-700 mb-2">
                             Water Access
@@ -629,7 +631,7 @@ const CreateListingPage = () => {
                             ))}
                           </div>
                         </div>
-                        
+
                         <div>
                           <label className="block text-sm font-medium text-neutral-700 mb-2">
                             Fencing
@@ -696,7 +698,7 @@ const CreateListingPage = () => {
                             <option value="mixed-use">Mixed-Use</option>
                           </select>
                         </div>
-                        
+
                         <div>
                           <label className="block text-sm font-medium text-neutral-700 mb-2">
                             Fenced
@@ -744,7 +746,8 @@ const CreateListingPage = () => {
                                 value="no"
                                 className="text-beedab-blue focus:ring-beedab-blue"
                               />
-                              <span className="text-sm text-neutral-700">No</span>
+                              <span```python
+ className="text-sm text-neutral-700">No</span>
                             </label>
                           </div>
                         </div>
@@ -796,7 +799,7 @@ const CreateListingPage = () => {
                 <div>
                   <h2 className="text-2xl font-semibold text-neutral-900 mb-2">Photos & Media</h2>
                   <p className="text-neutral-600 mb-6">Add high-quality photos to showcase your property</p>
-                  
+
                   <div className="space-y-6">
                     {/* Professional Photography Services */}
                     <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
@@ -819,7 +822,7 @@ const CreateListingPage = () => {
                       <label className="block text-sm font-medium text-neutral-700 mb-4">
                         Property Photos *
                       </label>
-                      
+
                       <div className="border-2 border-dashed border-neutral-300 rounded-xl p-8 text-center hover:border-primary-400 transition-colors">
                         <input
                           type="file"
@@ -860,13 +863,13 @@ const CreateListingPage = () => {
                           </div>
                         </label>
                       </div>
-                      
+
                       {uploadedImages.length > 0 && (
                         <div className="mt-6">
                           <h4 className="text-sm font-medium text-neutral-700 mb-3">
                             Uploaded Photos ({uploadedImages.length})
                           </h4>
-                          
+
                           {/* Main Image Carousel */}
                           <div className="relative mb-4">
                             <div className="aspect-w-16 aspect-h-9 bg-neutral-100 rounded-lg overflow-hidden">
@@ -938,7 +941,7 @@ const CreateListingPage = () => {
                 <div>
                   <h2 className="text-2xl font-semibold text-neutral-900 mb-2">Review Your Listing</h2>
                   <p className="text-neutral-600 mb-6">Please review all information before publishing</p>
-                  
+
                   <div className="bg-neutral-50 rounded-lg p-6">
                     <h3 className="text-lg font-semibold text-neutral-900 mb-4">Listing Summary</h3>
                     <div className="grid md:grid-cols-2 gap-6">
@@ -949,17 +952,17 @@ const CreateListingPage = () => {
                           <li>Title: {watch('title')}</li>
                           <li>Price: P{parseInt(watch('price') || '0').toLocaleString()}</li>
                           <li>Address: {watch('address')}</li>
-                          
+
                           {/* Plot Size - Show for Farm, House, Commercial and Land */}
                           {(watchedPropertyType === 'farm' || watchedPropertyType === 'house' || watchedPropertyType === 'commercial' || watchedPropertyType === 'land') && watch('plotSize') && (
                             <li>{(watchedPropertyType === 'farm' || watchedPropertyType === 'land') ? 'Land Size' : 'Plot Size'}: {parseInt(watch('plotSize') || '0').toLocaleString()} {(watchedPropertyType === 'farm' || watchedPropertyType === 'land') ? watch('plotUnit') : 'sqm'}</li>
                           )}
-                          
+
                           {/* Building Size - Show for House, Apartment, Townhouse and Commercial */}
                           {(watchedPropertyType === 'house' || watchedPropertyType === 'apartment' || watchedPropertyType === 'townhouse' || watchedPropertyType === 'commercial') && watch('buildingSize') && (
                             <li>Building Size: {parseInt(watch('buildingSize') || '0').toLocaleString()} sqm</li>
                           )}
-                          
+
                           {/* Bedrooms and Bathrooms - Show for House, Apartment and Townhouse */}
                           {(watchedPropertyType === 'house' || watchedPropertyType === 'apartment' || watchedPropertyType === 'townhouse') && watch('bedrooms') && (
                             <li>Bedrooms: {watch('bedrooms')}</li>
@@ -967,7 +970,7 @@ const CreateListingPage = () => {
                           {(watchedPropertyType === 'house' || watchedPropertyType === 'apartment' || watchedPropertyType === 'townhouse') && watch('bathrooms') && (
                             <li>Bathrooms: {watch('bathrooms')}</li>
                           )}
-                          
+
                           {/* Commercial specific fields */}
                           {watchedPropertyType === 'commercial' && watch('zoningType') && (
                             <li>Zoning: {watch('zoningType')}</li>
@@ -975,7 +978,7 @@ const CreateListingPage = () => {
                           {watchedPropertyType === 'commercial' && watch('numberOfUnits') && (
                             <li>Units: {watch('numberOfUnits')}</li>
                           )}
-                          
+
                           {/* Farm specific fields */}
                           {watchedPropertyType === 'farm' && watch('farmType') && (
                             <li>Farm Type: {watch('farmType')}</li>
@@ -989,7 +992,7 @@ const CreateListingPage = () => {
                           {watchedPropertyType === 'farm' && watch('farmBuildings') && Array.isArray(watch('farmBuildings')) && watch('farmBuildings').length > 0 && (
                             <li>Buildings: {watch('farmBuildings').join(', ')}</li>
                           )}
-                          
+
                           {/* Land specific fields */}
                           {watchedPropertyType === 'land' && watch('zoningType') && (
                             <li>Zoning: {watch('zoningType')}</li>
@@ -1032,7 +1035,7 @@ const CreateListingPage = () => {
               >
                 Previous
               </button>
-              
+
               {currentStep < totalSteps ? (
                 <button
                   type="button"

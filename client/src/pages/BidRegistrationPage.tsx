@@ -45,7 +45,7 @@ const BidRegistrationPage = () => {
       await new Promise(resolve => setTimeout(resolve, 2000));
       
       toast.success('Registration successful! You can now bid on this auction.');
-      navigate(`/auctions/${id}/bid`);
+      navigate(`/bid/${id}`);
     } catch (error) {
       toast.error('Registration failed. Please try again.');
     } finally {

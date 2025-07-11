@@ -80,7 +80,7 @@ const Navbar = () => {
                 <span>Buy</span>
                 <ChevronDown className="h-3 w-3" />
               </button>
-              
+
               <AnimatePresence>
                 {buyDropdownOpen && (
                   <motion.div
@@ -106,7 +106,7 @@ const Navbar = () => {
                             </div>
                           </div>
                         </Link>
-                        
+
                         <Link
                           to="/properties?type=apartment"
                           className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
@@ -120,7 +120,7 @@ const Navbar = () => {
                             </div>
                           </div>
                         </Link>
-                        
+
                         <Link
                           to="/properties?type=townhouse"
                           className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
@@ -134,7 +134,7 @@ const Navbar = () => {
                             </div>
                           </div>
                         </Link>
-                        
+
                         <Link
                           to="/properties?type=commercial"
                           className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
@@ -148,7 +148,7 @@ const Navbar = () => {
                             </div>
                           </div>
                         </Link>
-                        
+
                         <Link
                           to="/properties?type=farm"
                           className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
@@ -162,7 +162,7 @@ const Navbar = () => {
                             </div>
                           </div>
                         </Link>
-                        
+
                         <Link
                           to="/properties?type=land"
                           className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
@@ -176,9 +176,9 @@ const Navbar = () => {
                             </div>
                           </div>
                         </Link>
-                        
+
                         <div className="border-t border-gray-100 my-2"></div>
-                        
+
                         <Link
                           to="/auctions"
                           className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
@@ -193,11 +193,11 @@ const Navbar = () => {
                           </div>
                         </Link>
                       </div>
-                      
+
                       {/* Right Column - Buyer Journey & Professional Services */}
                       <div className="w-1/2 pl-3 border-l border-gray-100">
                         <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide px-2 py-1">Buyer Journey</div>
-                        
+
                         <Link
                           to="/buyer-journey/planning"
                           className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
@@ -211,7 +211,7 @@ const Navbar = () => {
                             </div>
                           </div>
                         </Link>
-                        
+
                         <Link
                           to="/buyer-journey/searching"
                           className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
@@ -225,7 +225,7 @@ const Navbar = () => {
                             </div>
                           </div>
                         </Link>
-                        
+
                         <Link
                           to="/buyer-journey/viewing"
                           className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
@@ -239,7 +239,7 @@ const Navbar = () => {
                             </div>
                           </div>
                         </Link>
-                        
+
                         <Link
                           to="/buyer-journey/offers"
                           className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
@@ -253,10 +253,10 @@ const Navbar = () => {
                             </div>
                           </div>
                         </Link>
-                        
+
                         <div className="border-t border-gray-100 my-2"></div>
                         <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide px-2 py-1">Professional Services</div>
-                        
+
                         <Link
                           to="/services/legal"
                           className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
@@ -270,7 +270,7 @@ const Navbar = () => {
                             </div>
                           </div>
                         </Link>
-                        
+
                         <Link
                           to="/services/financing"
                           className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
@@ -292,7 +292,7 @@ const Navbar = () => {
             </div>
 
 
-            
+
             {/* Sell Dropdown - Available to all users for testing */}
             <div 
               className="relative"
@@ -304,7 +304,7 @@ const Navbar = () => {
                   <span>Sell</span>
                   <ChevronDown className="h-3 w-3" />
                 </button>
-              
+
               <AnimatePresence>
                 {sellDropdownOpen && (
                   <motion.div
@@ -317,7 +317,7 @@ const Navbar = () => {
                       {/* Left Column - Selling Options */}
                       <div className="w-1/2 pr-3">
                         <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide px-2 py-1">Selling Options</div>
-                        
+
                         <Link
                           to="/create-property?listingType=owner"
                           className="block px-4 py-3 text-sm text-neutral-700 hover:bg-beedab-blue/5 rounded border border-beedab-blue/20 mb-2"
@@ -331,7 +331,7 @@ const Navbar = () => {
                             </div>
                           </div>
                         </Link>
-                        
+
                         <Link
                           to="/agent-network"
                           className="block px-4 py-3 text-sm text-neutral-700 hover:bg-gray-50 rounded border border-gray-200 mb-3"
@@ -346,11 +346,11 @@ const Navbar = () => {
                           </div>
                         </Link>
                       </div>
-                      
+
                       {/* Right Column - Seller Journey & Tools */}
                       <div className="w-1/2 pl-3 border-l border-gray-100">
                         <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide px-2 py-1">Preparation Tools</div>
-                      
+
                       <Link
                         to="/seller-journey/valuation"
                         className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
@@ -364,7 +364,7 @@ const Navbar = () => {
                           </div>
                         </div>
                       </Link>
-                      
+
                       <Link
                         to="/seller-journey/preparation"
                         className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
@@ -378,7 +378,7 @@ const Navbar = () => {
                           </div>
                         </div>
                       </Link>
-                      
+
                       <Link
                         to="/services/legal"
                         className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
@@ -392,10 +392,10 @@ const Navbar = () => {
                           </div>
                         </div>
                         </Link>
-                        
+
                         <div className="border-t border-gray-100 my-2"></div>
                         <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide px-2 py-1">Marketing & Sales</div>
-                      
+
                       <Link
                         to="/create-listing"
                         className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
@@ -409,7 +409,7 @@ const Navbar = () => {
                           </div>
                         </div>
                       </Link>
-                      
+
                       <Link
                         to="/seller-journey/pricing"
                         className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
@@ -423,7 +423,7 @@ const Navbar = () => {
                           </div>
                         </div>
                       </Link>
-                      
+
                       <Link
                         to="/seller-journey/showings"
                         className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
@@ -437,7 +437,7 @@ const Navbar = () => {
                           </div>
                         </div>
                       </Link>
-                      
+
                       <Link
                         to="/seller-journey/offers"
                         className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
@@ -451,10 +451,10 @@ const Navbar = () => {
                           </div>
                         </div>
                       </Link>
-                      
+
                       <div className="border-t border-gray-100 my-2"></div>
                       <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide px-2 py-1">Closing Process</div>
-                      
+
                       <Link
                         to="/services/legal"
                         className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
@@ -468,7 +468,7 @@ const Navbar = () => {
                           </div>
                         </div>
                       </Link>
-                      
+
                       <Link
                         to="/seller-journey/handover"
                         className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
@@ -500,7 +500,7 @@ const Navbar = () => {
                 <span>Rent</span>
                 <ChevronDown className="h-3 w-3" />
               </button>
-              
+
               <AnimatePresence>
                 {rentDropdownOpen && (
                   <motion.div
@@ -582,7 +582,7 @@ const Navbar = () => {
                 <span>Services</span>
                 <ChevronDown className="h-3 w-3" />
               </button>
-              
+
               <AnimatePresence>
                 {servicesDropdownOpen && (
                   <motion.div
@@ -593,7 +593,7 @@ const Navbar = () => {
                   >
                     <div className="p-3">
                       <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide px-2 py-1 mb-2">Service Categories</div>
-                      
+
                       <Link
                         to="/services"
                         className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded mb-1"
@@ -607,9 +607,9 @@ const Navbar = () => {
                           </div>
                         </div>
                       </Link>
-                      
+
                       <div className="border-t border-gray-100 my-2"></div>
-                      
+
                       <Link
                         to="/services?category=Legal"
                         className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded mb-1"
@@ -623,7 +623,7 @@ const Navbar = () => {
                           </div>
                         </div>
                       </Link>
-                      
+
                       <Link
                         to="/services?category=Finance"
                         className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded mb-1"
@@ -637,7 +637,7 @@ const Navbar = () => {
                           </div>
                         </div>
                       </Link>
-                      
+
                       <Link
                         to="/services?category=Construction"
                         className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
@@ -688,7 +688,7 @@ const Navbar = () => {
                 >
                   {user.firstName ? user.firstName.charAt(0).toUpperCase() : user.email.charAt(0).toUpperCase()}
                 </button>
-                
+
                 <AnimatePresence>
                   {profileDropdownOpen && (
                     <motion.div
@@ -744,7 +744,8 @@ const Navbar = () => {
                         <Link
                           to="/moderation"
                           className="flex items-center px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100"
-                          onClick={() => setProfileDropdownOpen(false)}
+                          ```text
+onClick={() => setProfileDropdownOpen(false)}
                         >
                           <Shield className="h-4 w-4 mr-2" />
                           Moderation
@@ -844,7 +845,7 @@ const Navbar = () => {
                   </Link>
                 );
               })}
-              
+
               {/* Mobile Sell Section - Available to all users for testing */}
               <div className="px-3 py-2 border-t border-neutral-100">
                 <p className="text-xs font-medium text-neutral-500 mb-2">SELL</p>
@@ -863,7 +864,7 @@ const Navbar = () => {
                   Direct Sellers
                 </Link>
               </div>
-              
+
               {/* Mobile Rent Section - Available to all authenticated users */}
               <div className="px-3 py-2 border-t border-neutral-100">
                 <p className="text-xs font-medium text-neutral-500 mb-2">RENT</p>
@@ -882,7 +883,7 @@ const Navbar = () => {
                   Rent Out Property
                 </Link>
               </div>
-              
+
               {user ? (
                 <div className="px-3 py-2 border-t border-neutral-100">
                   <p className="text-xs font-medium text-neutral-500 mb-2">ACCOUNT</p>
@@ -900,7 +901,7 @@ const Navbar = () => {
                   >
                     Account Settings
                   </Link>
-                  
+
                   {/* Admin Panel - Role-based access */}
                   <RoleBasedComponent allowedRoles={['admin', 'super_admin']}>
                     <Link
@@ -911,7 +912,7 @@ const Navbar = () => {
                       Admin Panel
                     </Link>
                   </RoleBasedComponent>
-                  
+
                   <button
                     onClick={() => {
                       logout();

@@ -247,9 +247,12 @@ const PlanningPage = () => {
               <p className="text-blue-100 mb-6">
                 Get personalized recommendations and connect with trusted professionals
               </p>
-              <button className="bg-white text-beedab-blue px-8 py-3 rounded-lg font-medium hover:bg-neutral-100 transition-colors">
-                Start Planning Now
-              </button>
+              <button 
+                    onClick={() => navigate('/buyer-journey/planning')}
+                    className="bg-beedab-blue text-white px-8 py-3 rounded-lg font-medium hover:bg-beedab-darkblue transition-colors"
+                  >
+                    Start Planning Now
+                  </button>
             </div>
       {/* Calculator Sections */}
       {activeSection === 'budget' && (

@@ -355,7 +355,7 @@ const PropertyDetailsPage = () => {
             </div>
 
             {/* Seller/Agent Info (Only for authenticated users) */}
-            {isAuthenticated && (
+            {isAuthenticated ? (
               <div className="bg-white rounded-lg shadow-sm border border-neutral-200 p-6 mb-6">
                 <h3 className="text-lg font-semibold text-neutral-900 mb-4">
                   {property.listingType === 'agent' ? 'Listing Agent' : 'Property Owner'}
@@ -389,6 +389,18 @@ const PropertyDetailsPage = () => {
                   <div className="flex items-center">
                     <MessageCircle className="h-4 w-4 mr-2" />
                     <span>{property.sellerEmail || 'agent@beedab.com'}</span>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="bg-white rounded-lg shadow-sm border border-neutral-200 p-6 mb-6">
+                <h3 className="text-lg font-semibold text-neutral-900 mb-4">Contact Information</h3>
+                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                  <div className="flex items-center">
+                    <AlertCircle className="h-5 w-5 text-yellow-600 mr-2" />
+                    <span className="text-sm text-yellow-800">
+                      Please <button onClick={() => navigate('/login')} className="underline font-medium">register or login</button> to view contact details
+                    </span>
                   </div>
                 </div>
               </div>
