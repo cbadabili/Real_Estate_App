@@ -3,7 +3,8 @@ import { motion } from 'framer-motion';
 import { 
   Scale, Calculator, Camera, Truck, Hammer, ClipboardCheck,
   Shield, Users, Award, Star, Phone, MessageCircle, Filter,
-  MapPin, Clock, DollarSign, CheckCircle, TrendingUp, Calendar, Handshake
+  MapPin, Clock, DollarSign, CheckCircle, TrendingUp, Calendar, Handshake,
+  Home, MessageSquare, FileText
 } from 'lucide-react';
 import { ServicesShowcase } from '../components/ServicesShowcase';
 
@@ -414,19 +415,47 @@ const ServicesPage = () => {
           ))}
         </div>
 
-                {/* Marketing & Sales */}
+        {/* Marketing & Sales */}
         <div className="bg-white rounded-xl shadow-lg border border-neutral-200 p-6">
             <h3 className="text-xl font-semibold text-neutral-900 mb-6 flex items-center">
               <TrendingUp className="h-6 w-6 mr-3 text-beedab-blue" />
               MARKETING & SALES
             </h3>
             <div className="space-y-4">
-              
-              <div className="flex items-center p-4 border border-neutral-200 rounded-lg hover:bg-neutral-50 transition-colors cursor-pointer">
-                <DollarSign className="h-5 w-5 text-beedab-blue mr-3" />
-                <div>
-                  <h4 className="font-medium text-neutral-900">Pricing Guide</h4>
-                  <p className="text-sm text-neutral-600">Set competitive prices</p>
+
+              <div className="bg-white rounded-lg shadow-sm border border-neutral-200 p-6">
+                <div className="flex items-start space-x-4">
+                  <div className="w-10 h-10 bg-beedab-blue rounded-lg flex items-center justify-center">
+                    <FileText className="h-5 w-5 text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-lg font-semibold text-neutral-900 mb-2">Transfer Process</h3>
+                    <p className="text-neutral-600 mb-3">Complete the sale</p>
+                    <button 
+                      onClick={() => window.open('/property-handover', '_blank')}
+                      className="bg-beedab-blue text-white px-4 py-2 rounded-lg hover:bg-beedab-darkblue transition-colors"
+                    >
+                      Get Started
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-lg shadow-sm border border-neutral-200 p-6">
+                <div className="flex items-start space-x-4">
+                  <div className="w-10 h-10 bg-green-600 rounded-lg flex items-center justify-center">
+                    <Home className="h-5 w-5 text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-lg font-semibold text-neutral-900 mb-2">Property Handover</h3>
+                    <p className="text-neutral-600 mb-3">Transfer ownership</p>
+                    <button 
+                      onClick={() => window.open('/property-handover', '_blank')}
+                      className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
+                    >
+                      Get Started
+                    </button>
+                  </div>
                 </div>
               </div>
               <div className="flex items-center p-4 border border-neutral-200 rounded-lg hover:bg-neutral-50 transition-colors cursor-pointer">

@@ -1,3 +1,6 @@
+Adding new routes and imports for property handover, handle offers, manage showings, and pricing guide features while removing create listing duplication.
+```
+```replit_final_file
 import { Routes, Route } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -48,6 +51,10 @@ import { AuthProvider } from './contexts/AuthContext';
 import { PropertyProvider } from './contexts/PropertyContext';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import BidPage from './pages/BidPage';
+import PricingGuidePage from './pages/PricingGuidePage';
+import ManageShowingsPage from './pages/ManageShowingsPage';
+import HandleOffersPage from './pages/HandleOffersPage';
+import PropertyHandoverPage from './pages/PropertyHandoverPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -125,6 +132,11 @@ function App() {
                 </ProtectedRoute>
               } 
             />
+          <Route path="/pricing-guide" element={<PricingGuidePage />} />
+          <Route path="/manage-showings" element={<ManageShowingsPage />} />
+          <Route path="/handle-offers" element={<HandleOffersPage />} />
+          <Route path="/property-handover" element={<PropertyHandoverPage />} />
+          <Route path="/transfer-process" element={<PropertyHandoverPage />} />
               </Routes>
               </div>
             </PropertyProvider>
