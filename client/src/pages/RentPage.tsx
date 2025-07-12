@@ -21,7 +21,7 @@ import {
   Clock
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { useAuthContext } from '../contexts/AuthContext';
+import { useAuth } from '../contexts/AuthContext';
 
 interface RentalProperty {
   id: number;
@@ -60,7 +60,7 @@ interface RentalApplication {
 }
 
 const RentPage = () => {
-  const { user } = useAuthContext();
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<'search' | 'applications' | 'listings'>('search');
   const [rentals, setRentals] = useState<RentalProperty[]>([]);
   const [applications, setApplications] = useState<RentalApplication[]>([]);
