@@ -12,7 +12,7 @@ import {
   ArrowLeft,
   ArrowRight
 } from 'lucide-react';
-import { botswanaGeography } from '../data/botswanaGeography';
+import { botswanaDistricts, getAllCities } from '../data/botswanaGeography';
 
 const RentalListingWizard = () => {
   const navigate = useNavigate();
@@ -261,8 +261,8 @@ const RentalListingWizard = () => {
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-beedab-blue focus:border-beedab-blue"
                 >
                   <option value="">Select city</option>
-                  {botswanaGeography.map(city => (
-                    <option key={city.name} value={city.name}>{city.name}</option>
+                  {getAllCities().map(city => (
+                    <option key={city} value={city}>{city}</option>
                   ))}
                 </select>
               </div>
