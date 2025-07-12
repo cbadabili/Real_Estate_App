@@ -2,10 +2,7 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { testDatabaseConnection } from "./db";
-import { registerRoutes } from './routes';
 import rentalRoutes from './rental-routes';
-import { db } from './db';
-import { authenticateToken } from './auth-middleware';
 import { aiSearchRoutes } from './ai-search';
 
 const app = express();
@@ -53,7 +50,6 @@ app.use((req, res, next) => {
 
   const server = await registerRoutes(app);
 
-  app.use('/api', propertyRoutes);
   app.use('/api', rentalRoutes);
   app.use('/api', aiSearchRoutes);
 
