@@ -184,6 +184,72 @@ export const adminAuditLog = sqliteTable("admin_audit_log", {
   createdAt: integer("created_at", { mode: "timestamp" }).defaultNow(),
 });
 
+export const saved_searches = sqliteTable('saved_searches', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  user_id: integer('user_id').references(() => users.id, { onDelete: 'cascade' }),
+  search_criteria: text('search_criteria', { mode: 'json' }),
+  name: text('name'),
+  email_alerts: integer('email_alerts', { mode: 'boolean' }).default(false),
+  created_at: text('created_at').default(sql`(datetime('now'))`),
+});
+
+export const rental_listings = sqliteTable('rental_listings', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  landlord_id: integer('landlord_id').references(() => users.id, { onDelete: 'cascade' }),
+  title: text('title').notNull(),
+  description: text('description').notNull(),
+  address: text('address').notNull(),
+  city: text('city').notNull(),
+  district: text('district').notNull(),
+  property_type: text('property_type').notNull(),
+  bedrooms: integer('bedrooms').notNull(),
+  bathrooms: integer('bathrooms').notNull(),
+  square_meters: integer('square_meters').notNull(),
+  monthly_rent: integer('monthly_rent').notNull(),
+  deposit_amount: integer('deposit_amount').notNull(),
+  lease_duration: integer('lease_duration').notNull(),
+  available_from: text('available_from').notNull(),
+  furnished: integer('furnished', { mode: 'boolean' }).default(false),
+  pets_allowed: integer('pets_allowed', { mode: 'boolean' }).default(false),
+  parking_spaces: integer('parking_spaces').default(0),
+  photos: text('photos', { mode: 'json' }).default('[]'),
+  amenities: text('amenities', { mode: 'json' }).default('[]'),
+  utilities_included: text('utilities_included', { mode: 'json' }).default('[]'),
+  status: text('status').default('active'),
+  created_at: text('created_at').default(sql`(datetime('now'))`),
+  updated_at: text('updated_at').default(sql`(datetime('now'))`),
+});
+
+export const rental_applications = sqliteTable('rental_applications', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  rental_id: integer('rental_id').references(() => rental_listings.id, { onDelete: 'cascade' }),
+  renter_id: integer('renter_id').references(() => users.id, { onDelete: 'cascade' }),
+  application_data: text('application_data', { mode: 'json' }).notNull(),
+  status: text('status').default('pending'),
+  background_check_status: text('background_check_status').default('pending'),
+  credit_report_status: text('credit_report_status').default('pending'),
+  created_at: text('created_at').default(sql`(datetime('now'))`),
+  updated_at: text('updated_at').default(sql`(datetime('now'))`),
+});
+
+export const lease_agreements = sqliteTable('lease_agreements', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  application_id: integer('application_id').references(() => rental_applications.id, { onDelete: 'cascade' }),
+  rental_id: integer('rental_id').references(() => rental_listings.id, { onDelete: 'cascade' }),
+  landlord_id: integer('landlord_id').references(() => users.id, { onDelete: 'cascade' }),
+  renter_id: integer('renter_id').references(() => users.id, { onDelete: 'cascade' }),
+  lease_start_date: text('lease_start_date').notNull(),
+  lease_end_date: text('lease_end_date').notNull(),
+  monthly_rent: integer('monthly_rent').notNull(),
+  deposit_amount: integer('deposit_amount').notNull(),
+  lease_terms: text('lease_terms', { mode: 'json' }),
+  landlord_signature_status: text('landlord_signature_status').default('pending'),
+  renter_signature_status: text('renter_signature_status').default('pending'),
+  e_signature_status: text('e_signature_status').default('pending'),
+  created_at: text('created_at').default(sql`(datetime('now'))`),
+  updated_at: text('updated_at').default(sql`(datetime('now'))`),
+});
+
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
   ownedProperties: many(properties, { relationName: "propertyOwner" }),
@@ -420,7 +486,7 @@ export enum Permission {
   VIEW_USER = "view_user",
   BAN_USER = "ban_user",
   VERIFY_USER = "verify_user",
-  
+
   // Property management
   CREATE_PROPERTY = "create_property",
   UPDATE_PROPERTY = "update_property",
@@ -428,7 +494,7 @@ export enum Permission {
   VIEW_PROPERTY = "view_property",
   APPROVE_PROPERTY = "approve_property",
   FEATURE_PROPERTY = "feature_property",
-  
+
   // Review management
   CREATE_REVIEW = "create_review",
   UPDATE_REVIEW = "update_review",
@@ -436,13 +502,13 @@ export enum Permission {
   VIEW_REVIEW = "view_review",
   MODERATE_REVIEW = "moderate_review",
   RESPOND_TO_REVIEW = "respond_to_review",
-  
+
   // Admin operations
   VIEW_ADMIN_PANEL = "view_admin_panel",
   MANAGE_PERMISSIONS = "manage_permissions",
   VIEW_AUDIT_LOG = "view_audit_log",
   SYSTEM_SETTINGS = "system_settings",
-  
+
   // Services
   MANAGE_SERVICES = "manage_services",
   APPROVE_SERVICE_PROVIDER = "approve_service_provider",

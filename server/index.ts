@@ -2,6 +2,11 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { testDatabaseConnection } from "./db";
+import propertyRoutes from './routes';
+import rentalRoutes from './rental-routes';
+import { db } from './db';
+import { authenticateToken } from './auth-middleware';
+import { aiSearchRoutes } from './ai-search';
 
 const app = express();
 app.use(express.json());
@@ -48,6 +53,10 @@ app.use((req, res, next) => {
 
   const server = await registerRoutes(app);
 
+  app.use('/api', propertyRoutes);
+  app.use('/api', rentalRoutes);
+  app.use('/api', aiSearchRoutes);
+
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
     const message = err.message || "Internal Server Error";
@@ -61,7 +70,7 @@ app.use((req, res, next) => {
   if (!process.env.NODE_ENV) {
     process.env.NODE_ENV = 'development';
   }
-  
+
   // importantly only setup vite in development and after
   // setting up all the other routes so the catch-all route
   // doesn't interfere with the other routes
