@@ -136,12 +136,15 @@ const CreateListingPage = () => {
       const createdProperty = await response.json();
       console.log('Property created:', createdProperty);
 
-      toast.success('Property listing created successfully!');
+      // Show success message and redirect
+      alert('Property listing created successfully!');
 
-      // Redirect to properties page after successful creation
-      setTimeout(() => {
-        window.location.href = '/properties';
-      }, 2000);
+      // Navigate to the created property or my properties page
+      if (createdProperty.id) {
+        navigate(`/properties/${createdProperty.id}`);
+      } else {
+        navigate('/my-properties');
+      }
 
     } catch (error) {
       console.error('Error creating property:', error);

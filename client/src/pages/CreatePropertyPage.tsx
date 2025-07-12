@@ -58,7 +58,7 @@ const CreatePropertyPage = () => {
   const totalSteps = 4;
 
   const createProperty = useCreateProperty();
-  
+
   const urlParams = new URLSearchParams(window.location.search);
   const initialListingType = urlParams.get('listingType') || 'owner';
 
@@ -87,12 +87,12 @@ const CreatePropertyPage = () => {
       const description = document.querySelector('textarea[name="description"]') as HTMLTextAreaElement;
       const propertyType = document.querySelector('select[name="propertyType"]') as HTMLSelectElement;
       const listingType = document.querySelector('select[name="listingType"]') as HTMLSelectElement;
-      
+
       if (!title?.value?.trim() || !description?.value?.trim() || !propertyType?.value || !listingType?.value) {
         return; // Don't advance if required fields are empty
       }
     }
-    
+
     if (currentStep < totalSteps) {
       setCurrentStep(currentStep + 1);
     }
@@ -136,7 +136,7 @@ const CreatePropertyPage = () => {
     input.type = 'file';
     input.multiple = true;
     input.accept = 'image/*';
-    
+
     input.onchange = (event) => {
       const files = (event.target as HTMLInputElement).files;
       if (files && files.length > 0) {
@@ -144,8 +144,13 @@ const CreatePropertyPage = () => {
         setShowPhotoAd(true);
       }
     };
-    
+
     input.click();
+  };
+
+  const handleProfessionalPhotography = () => {
+    // Handle booking professional photography (implementation needed)
+    alert('Booking professional photography - Implementation needed!');
   };
 
   const onSubmit = (data: PropertyFormData) => {
@@ -155,7 +160,7 @@ const CreatePropertyPage = () => {
       images: [],
       status: 'active' as const
     };
-    
+
     createProperty.mutate(propertyData, {
       onSuccess: () => {
         setShowListingAd(true);
@@ -343,7 +348,7 @@ const CreatePropertyPage = () => {
               {watchedValues.listingType === 'auction' && (
                 <div className="bg-blue-50 p-6 rounded-lg space-y-4">
                   <h3 className="text-lg font-semibold text-beedab-blue mb-4">Auction Details</h3>
-                  
+
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-neutral-700 mb-2">
@@ -355,7 +360,7 @@ const CreatePropertyPage = () => {
                         className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                       />
                     </div>
-                    
+
                     <div>
                       <label className="block text-sm font-medium text-neutral-700 mb-2">
                         Auction Time *
@@ -380,7 +385,7 @@ const CreatePropertyPage = () => {
                         placeholder="300000"
                       />
                     </div>
-                    
+
                     <div>
                       <label className="block text-sm font-medium text-neutral-700 mb-2">
                         Reserve Price (P)
@@ -406,7 +411,7 @@ const CreatePropertyPage = () => {
                         placeholder="e.g., First National Bank, Standard Bank, Barclays"
                       />
                     </div>
-                    
+
                     <div>
                       <label className="block text-sm font-medium text-neutral-700 mb-2">
                         Lot Number
@@ -432,7 +437,7 @@ const CreatePropertyPage = () => {
                         placeholder="72192666 / 300 8293"
                       />
                     </div>
-                    
+
                     <div>
                       <label className="block text-sm font-medium text-neutral-700 mb-2">
                         Deposit Required (%)
@@ -616,7 +621,7 @@ const CreatePropertyPage = () => {
                     <Plus className="h-5 w-5" />
                   </button>
                 </div>
-                
+
                 <div className="flex flex-wrap gap-2">
                   {features.filter(feature => 
                     !['Swimming Pool', 'Garden', 'Garage', 'Parking Space', 'Security System',
@@ -641,36 +646,48 @@ const CreatePropertyPage = () => {
                 </div>
               </div>
 
-              {/* Photo Upload Section */}
+              {/* Photography Options */}
               <div>
-                <label className="block text-sm font-medium text-neutral-700 mb-2">
+                <label className="block text-sm font-medium text-neutral-700 mb-4">
                   Property Photos
                 </label>
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-                  <Camera className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-600 mb-4">Upload photos of your property</p>
-                  <button
-                    type="button"
-                    onClick={handlePhotoUpload}
-                    className="bg-beedab-blue text-white px-4 py-2 rounded-lg hover:bg-beedab-darkblue transition-colors"
-                  >
-                    Choose Photos
-                  </button>
-                </div>
-                
-                {/* Show contextual ad only after photos are uploaded */}
-                {showPhotoAd && (
-                  <div className="mt-4">
-                    <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg mb-4">
-                      <p className="text-sm text-blue-800">Photo upload completed! Consider professional photography services.</p>
-                    </div>
-                    <ContextualAd 
-                      trigger="post_photo_upload" 
-                      className=""
-                      onClose={() => setShowPhotoAd(false)}
-                    />
+
+                {/* Photography Options */}
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                  <h3 className="text-lg font-semibold text-blue-900 mb-3">Photography Options</h3>
+                  <p className="text-blue-700 text-sm mb-4">
+                    Professional photography can increase viewing interest by up to 40%. Choose your preferred option:
+                  </p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <button
+                      type="button"
+                      onClick={handlePhotoUpload}
+                      className="bg-green-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-green-700 transition-colors flex items-center justify-center"
+                    >
+                      <Camera className="mr-2 h-4 w-4" />
+                      Upload My Own Photos
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleProfessionalPhotography}
+                      className="bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors flex items-center justify-center"
+                    >
+                      <Camera className="mr-2 h-4 w-4" />
+                      Book Professional Photography
+                    </button>
                   </div>
-                )}
+                </div>
+
+                {/* Photo Upload Area */}
+                <div 
+                  className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-gray-400 transition-colors"
+                  onClick={handlePhotoUpload}
+                >
+                  <Upload className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                  <p className="text-lg font-medium text-gray-900 mb-2">Upload Property Photos</p>
+                  <p className="text-gray-500">Click to select photos or drag and drop</p>
+                  <p className="text-sm text-gray-400 mt-2">PNG, JPG, JPEG up to 10MB each</p>
+                </div>
               </div>
             </motion.div>
           )}
@@ -694,7 +711,7 @@ const CreatePropertyPage = () => {
                   <Home className="h-5 w-5 mr-2 text-beedab-blue" />
                   Property Summary
                 </h3>
-                
+
                 <div className="grid md:grid-cols-2 gap-6">
                   {/* Basic Information */}
                   <div>
@@ -849,7 +866,7 @@ const CreatePropertyPage = () => {
                 className="mt-4"
                 onClose={() => setShowListingAd(false)}
               />
-              
+
               {showListingAd && (
                 <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
                   <p className="text-sm text-green-800">Listing created successfully! Consider legal review services.</p>

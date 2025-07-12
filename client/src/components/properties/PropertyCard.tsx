@@ -10,7 +10,8 @@ import {
   Square, 
   Eye,
   Calendar,
-  TrendingUp
+  TrendingUp,
+  Camera
 } from 'lucide-react';
 
 interface PropertyCardProps {
@@ -34,7 +35,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, viewMode = 'grid'
           alt={property.title}
           className={`object-cover ${isListView ? 'w-full h-full' : 'w-full h-48'}`}
         />
-        
+
         {/* Status Badge */}
         <div className="absolute top-3 left-3">
           <span className={`px-2 py-1 rounded-full text-xs font-medium ${
@@ -47,7 +48,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, viewMode = 'grid'
             {property.status === 'new' ? 'New Listing' : (property.listingType === 'owner' ? 'OWNER' : 'AGENT')}
           </span>
         </div>
-        
+
         {/* Action Buttons */}
         <div className="absolute top-3 right-3 flex space-x-2">
           <motion.button 
@@ -64,14 +65,25 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, viewMode = 'grid'
           >
             <Share2 className="h-4 w-4 text-neutral-600" />
           </motion.button>
+          {/* Professional Photography Option for Property Owners */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              window.open('/services?category=photography', '_blank');
+            }}
+            className="p-2 bg-blue-500/90 backdrop-blur-sm rounded-full hover:bg-blue-600 transition-colors"
+            title="Book Professional Photography"
+          >
+            <Camera className="h-4 w-4 text-white" />
+          </button>
         </div>
-        
+
         {/* Image Count Indicator */}
         <div className="absolute bottom-3 right-3 bg-black/70 text-white text-xs px-2 py-1 rounded-full">
           {property.images ? (typeof property.images === 'string' ? JSON.parse(property.images).length : property.images.length) : 1} photos
         </div>
       </div>
-      
+
       <div className={`p-6 ${isListView ? 'flex-1' : ''}`}>
         <div className={`${isListView ? 'flex justify-between h-full' : ''}`}>
           <div className={`${isListView ? 'flex-1 pr-6' : ''}`}>
@@ -102,7 +114,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, viewMode = 'grid'
                 </div>
               )}
             </div>
-            
+
             {/* Property Details */}
             <div className="flex items-center space-x-4 text-neutral-600 mb-4">
               <div className="flex items-center">
@@ -118,7 +130,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, viewMode = 'grid'
                 <span className="text-sm">{(property.squareFeet || 0).toLocaleString()} sqm</span>
               </div>
             </div>
-            
+
             {/* Features */}
             {property.features && (
               <div className="mb-4">
@@ -139,7 +151,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, viewMode = 'grid'
                 </div>
               </div>
             )}
-            
+
             {/* Bottom Row */}
             <div className="flex justify-between items-center">
               <div className="flex items-center space-x-4 text-sm text-neutral-500">
@@ -152,7 +164,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, viewMode = 'grid'
                   Listed {new Date(property.createdAt || Date.now()).toLocaleDateString()}
                 </div>
               </div>
-              
+
               {!isListView && (
                 <Link
                   to={`/property/${property.id}`}
@@ -163,7 +175,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, viewMode = 'grid'
               )}
             </div>
           </div>
-          
+
           {/* List View Price */}
           {isListView && (
             <div className="text-right flex flex-col justify-between">
@@ -175,7 +187,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, viewMode = 'grid'
                   P{Math.round(parseFloat(property.price || 0) / (property.squareFeet || 1))}/sqm
                 </div>
               </div>
-              
+
               <div className="space-y-2">
                 <Link
                   to={`/property/${property.id}`}

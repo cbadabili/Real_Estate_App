@@ -9,6 +9,7 @@ import {
   DollarSign,
   BarChart3,
   ArrowRight,
+  ArrowLeft,
   Calculator,
   Users,
   CheckCircle
