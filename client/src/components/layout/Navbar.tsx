@@ -512,7 +512,7 @@ const Navbar = () => {
                     <div className="p-2">
                       <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide px-2 py-1">For Landlords</div>
                       <Link
-                        to="/rent/list-property"
+                        to="/rental-listing-wizard"
                         className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
                         onClick={() => setRentDropdownOpen(false)}
                       >
@@ -540,7 +540,7 @@ const Navbar = () => {
                       <div className="border-t border-gray-100 my-2"></div>
                       <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide px-2 py-1">For Tenants</div>
                       <Link
-                        to="/rent/search"
+                        to="/rent"
                         className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
                         onClick={() => setRentDropdownOpen(false)}
                       >
@@ -875,7 +875,7 @@ const Navbar = () => {
                   Find Rental
                 </Link>
                 <Link
-                  to="/rent-out"
+                  to="/rental-listing-wizard"
                   onClick={() => setIsOpen(false)}
                   className="block px-3 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
                 >

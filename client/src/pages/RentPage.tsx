@@ -484,7 +484,7 @@ const RentPage = () => {
                 <div className="flex justify-between items-center mb-6">
                   <h2 className="text-xl font-semibold text-gray-900">My Rental Listings</h2>
                   <Link
-                    to="/rent/create-listing"
+                    to="/rental-listing-wizard"
                     className="bg-beedab-blue text-white px-4 py-2 rounded-lg hover:bg-beedab-darkblue transition-colors"
                   >
                     Create New Listing
