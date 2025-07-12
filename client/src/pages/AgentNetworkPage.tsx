@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { 
@@ -12,6 +13,9 @@ import {
 } from 'lucide-react';
 
 const AgentNetworkPage = () => {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filteredAgents, setFilteredAgents] = useState<any[]>([]);
+
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -67,6 +71,24 @@ const AgentNetworkPage = () => {
     }
   ];
 
+  // Filter agents based on search query
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      setFilteredAgents(agents);
+    } else {
+      const filtered = agents.filter(agent => 
+        agent.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        agent.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        agent.specialization.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      setFilteredAgents(filtered);
+    }
+  }, [searchQuery]);
+
+  useEffect(() => {
+    setFilteredAgents(agents);
+  }, []);
+
   return (
     <motion.div
       variants={containerVariants}
@@ -89,6 +111,8 @@ const AgentNetworkPage = () => {
                 <input
                   type="text"
                   placeholder="Search agents by name, location, or specialization..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-xl focus:ring-2 focus:ring-beedab-blue focus:border-transparent bg-white text-gray-900"
                 />
                 <button className="absolute right-2 top-2 p-2 text-gray-500 hover:text-beedab-blue">
@@ -120,7 +144,7 @@ const AgentNetworkPage = () => {
           </motion.div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            {agents.map((agent, index) => (
+            {filteredAgents.map((agent, index) => (
               <motion.div
                 key={agent.name}
                 variants={itemVariants}

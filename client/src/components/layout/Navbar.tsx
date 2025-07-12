@@ -352,7 +352,7 @@ const Navbar = () => {
                         <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide px-2 py-1">Preparation Tools</div>
 
                       <Link
-                        to="/seller-journey/valuation"
+                        to="/home-value-assessment"
                         className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
                         onClick={() => setSellDropdownOpen(false)}
                       >
@@ -366,7 +366,7 @@ const Navbar = () => {
                       </Link>
 
                       <Link
-                        to="/seller-journey/preparation"
+                        to="/prepare-home"
                         className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
                         onClick={() => setSellDropdownOpen(false)}
                       >
@@ -380,7 +380,7 @@ const Navbar = () => {
                       </Link>
 
                       <Link
-                        to="/services/legal"
+                        to="/legal-requirements"
                         className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
                         onClick={() => setSellDropdownOpen(false)}
                       >
@@ -411,7 +411,7 @@ const Navbar = () => {
                       </Link>
 
                       <Link
-                        to="/seller-journey/pricing"
+                        to="/pricing-guide"
                         className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
                         onClick={() => setSellDropdownOpen(false)}
                       >
@@ -425,7 +425,7 @@ const Navbar = () => {
                       </Link>
 
                       <Link
-                        to="/seller-journey/showings"
+                        to="/manage-showings"
                         className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
                         onClick={() => setSellDropdownOpen(false)}
                       >
@@ -439,7 +439,7 @@ const Navbar = () => {
                       </Link>
 
                       <Link
-                        to="/seller-journey/offers"
+                        to="/handle-offers"
                         className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
                         onClick={() => setSellDropdownOpen(false)}
                       >
@@ -456,7 +456,7 @@ const Navbar = () => {
                       <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide px-2 py-1">Closing Process</div>
 
                       <Link
-                        to="/services/legal"
+                        to="/transfer-process"
                         className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
                         onClick={() => setSellDropdownOpen(false)}
                       >
@@ -470,7 +470,7 @@ const Navbar = () => {
                       </Link>
 
                       <Link
-                        to="/seller-journey/handover"
+                        to="/property-handover"
                         className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
                         onClick={() => setSellDropdownOpen(false)}
                       >
@@ -510,34 +510,6 @@ const Navbar = () => {
                     className="absolute top-full left-0 mt-2 w-64 bg-white rounded-md shadow-lg border border-neutral-200 z-50"
                   >
                     <div className="p-2">
-                      <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide px-2 py-1">For Tenants</div>
-                      <Link
-                        to="/rent/search"
-                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
-                        onClick={() => setRentDropdownOpen(false)}
-                      >
-                        <div className="flex items-center">
-                          <Search className="h-4 w-4 mr-2 text-blue-500" />
-                          <div>
-                            <div className="font-medium">Find Rental Property</div>
-                            <div className="text-xs text-gray-500">Browse available rentals</div>
-                          </div>
-                        </div>
-                      </Link>
-                      <Link
-                        to="/services/tenant-support"
-                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
-                        onClick={() => setRentDropdownOpen(false)}
-                      >
-                        <div className="flex items-center">
-                          <User className="h-4 w-4 mr-2 text-green-500" />
-                          <div>
-                            <div className="font-medium">Tenant Support</div>
-                            <div className="text-xs text-gray-500">Rights, agreements & advice</div>
-                          </div>
-                        </div>
-                      </Link>
-                      <div className="border-t border-gray-100 my-2"></div>
                       <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide px-2 py-1">For Landlords</div>
                       <Link
                         to="/rent/list-property"
@@ -562,6 +534,34 @@ const Navbar = () => {
                           <div>
                             <div className="font-medium">Property Management</div>
                             <div className="text-xs text-gray-500">Full-service rental management</div>
+                          </div>
+                        </div>
+                      </Link>
+                      <div className="border-t border-gray-100 my-2"></div>
+                      <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide px-2 py-1">For Tenants</div>
+                      <Link
+                        to="/rent/search"
+                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
+                        onClick={() => setRentDropdownOpen(false)}
+                      >
+                        <div className="flex items-center">
+                          <Search className="h-4 w-4 mr-2 text-blue-500" />
+                          <div>
+                            <div className="font-medium">Find Rental Property</div>
+                            <div className="text-xs text-gray-500">Browse available rentals</div>
+                          </div>
+                        </div>
+                      </Link>
+                      <Link
+                        to="/services/tenant-support"
+                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
+                        onClick={() => setRentDropdownOpen(false)}
+                      >
+                        <div className="flex items-center">
+                          <User className="h-4 w-4 mr-2 text-green-500" />
+                          <div>
+                            <div className="font-medium">Tenant Support</div>
+                            <div className="text-xs text-gray-500">Rights, agreements & advice</div>
                           </div>
                         </div>
                       </Link>
