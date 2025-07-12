@@ -31,6 +31,29 @@ interface SearchResult {
   autoSuggestions?: string[];
 }
 
+import { Router } from 'express';
+
+const router = Router();
+
+// Add the AI search route
+router.post('/search/ai', async (req, res) => {
+  try {
+    const { query } = req.body;
+    
+    if (!query || typeof query !== 'string') {
+      return res.status(400).json({ message: "Query is required" });
+    }
+
+    const result = await parseNaturalLanguageSearch(query);
+    res.json(result);
+  } catch (error) {
+    console.error('AI search error:', error);
+    res.status(500).json({ message: 'Search failed' });
+  }
+});
+
+export const aiSearchRoutes = router;
+
 export async function parseNaturalLanguageSearch(query: string): Promise<SearchResult> {
   const lowercaseQuery = query.toLowerCase();
 

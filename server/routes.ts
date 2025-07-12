@@ -366,22 +366,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // AI Search API
-  app.post("/api/search/ai", async (req, res) => {
-    try {
-      const { query } = req.body;
-      
-      if (!query || typeof query !== 'string') {
-        return res.status(400).json({ message: "Query is required" });
-      }
 
-      const searchResult = await parseNaturalLanguageSearch(query);
-      res.json(searchResult);
-    } catch (error) {
-      console.error("AI search error:", error);
-      res.status(500).json({ message: "AI search failed" });
-    }
-  });
 
   // Neighborhood and Search APIs would integrate with external services
   app.get("/api/neighborhoods/:zipCode", async (req, res) => {
