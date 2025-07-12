@@ -14,7 +14,7 @@ const LandlordDashboard = () => {
       try {
         const response = await fetch('/api/landlord/rentals', {
           headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
+            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
           }
         });
         const data = await response.json();
