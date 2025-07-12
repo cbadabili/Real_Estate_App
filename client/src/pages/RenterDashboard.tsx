@@ -1,4 +1,10 @@
+` tags. I will focus on replacing the incorrect `useAuthContext` import and usage with the correct `useAuth` export.
 
+```python
+# Corrected code based on the provided instructions and code snippets:
+```
+
+<replit_final_file>
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, Heart, FileText, Calendar, MapPin, MessageSquare, Star } from 'lucide-react';
@@ -18,7 +24,7 @@ const RenterDashboard = () => {
           }
         });
         const data = await response.json();
-        
+
         if (data.success) {
           setApplications(data.data);
         }
@@ -36,7 +42,7 @@ const RenterDashboard = () => {
           }
         });
         const data = await response.json();
-        
+
         if (data.success) {
           setSavedProperties(data.data);
         }
