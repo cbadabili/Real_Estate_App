@@ -1,11 +1,6 @@
-
-import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { User, Briefcase, Phone, Mail, MapPin, FileText, X } from 'lucide-react';
-
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { X, Upload, FileText, User, Briefcase, Phone } from 'lucide-react';
+import { X, User, Briefcase, Phone, FileText } from 'lucide-react';
 
 interface RentalApplicationFormProps {
   rentalId: number;
@@ -18,292 +13,6 @@ const RentalApplicationForm: React.FC<RentalApplicationFormProps> = ({
   onClose,
   onSubmit
 }) => {
-  const [formData, setFormData] = useState({
-    employment_info: {
-      employer: '',
-      position: '',
-      monthly_income: 0,
-      employment_duration: ''
-    },
-    references: [
-      { name: '', relationship: '', contact: '' },
-      { name: '', relationship: '', contact: '' }
-    ],
-    personal_info: {
-      emergency_contact: '',
-      preferred_move_in_date: '',
-      reason_for_moving: ''
-    }
-  });
-
-  const [loading, setLoading] = useState(false);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-
-    try {
-      const response = await fetch(`/api/rentals/${rentalId}/apply`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
-        },
-        body: JSON.stringify({
-          application_data: formData
-        })
-      });
-
-      const data = await response.json();
-
-      if (data.success) {
-        onSubmit(data.data);
-        onClose();
-      } else {
-        alert('Failed to submit application');
-      }
-    } catch (error) {
-      console.error('Error submitting application:', error);
-      alert('Failed to submit application');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const updateReference = (index: number, field: string, value: string) => {
-    const newReferences = [...formData.references];
-    newReferences[index] = { ...newReferences[index], [field]: value };
-    setFormData(prev => ({ ...prev, references: newReferences }));
-  };
-
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <motion.div
-        initial={{ scale: 0.95, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
-      >
-        <div className="p-6">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold text-gray-900">Rental Application</h2>
-            <button
-              onClick={onClose}
-              className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-            >
-              <X className="h-5 w-5" />
-            </button>
-          </div>
-
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Employment Information */}
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                <Briefcase className="h-5 w-5 mr-2" />
-                Employment Information
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Current Employer
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={formData.employment_info.employer}
-                    onChange={(e) => setFormData(prev => ({
-                      ...prev,
-                      employment_info: { ...prev.employment_info, employer: e.target.value }
-                    }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-beedab-blue focus:border-beedab-blue"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Position/Job Title
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={formData.employment_info.position}
-                    onChange={(e) => setFormData(prev => ({
-                      ...prev,
-                      employment_info: { ...prev.employment_info, position: e.target.value }
-                    }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-beedab-blue focus:border-beedab-blue"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Monthly Income (P)
-                  </label>
-                  <input
-                    type="number"
-                    required
-                    value={formData.employment_info.monthly_income}
-                    onChange={(e) => setFormData(prev => ({
-                      ...prev,
-                      employment_info: { ...prev.employment_info, monthly_income: parseInt(e.target.value) }
-                    }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-beedab-blue focus:border-beedab-blue"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Employment Duration
-                  </label>
-                  <select
-                    required
-                    value={formData.employment_info.employment_duration}
-                    onChange={(e) => setFormData(prev => ({
-                      ...prev,
-                      employment_info: { ...prev.employment_info, employment_duration: e.target.value }
-                    }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-beedab-blue focus:border-beedab-blue"
-                  >
-                    <option value="">Select duration</option>
-                    <option value="Less than 6 months">Less than 6 months</option>
-                    <option value="6 months to 1 year">6 months to 1 year</option>
-                    <option value="1 to 2 years">1 to 2 years</option>
-                    <option value="2 to 5 years">2 to 5 years</option>
-                    <option value="More than 5 years">More than 5 years</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-
-            {/* References */}
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                <User className="h-5 w-5 mr-2" />
-                References
-              </h3>
-              {formData.references.map((reference, index) => (
-                <div key={index} className="mb-4 p-4 border border-gray-200 rounded-lg">
-                  <h4 className="font-medium text-gray-900 mb-3">Reference {index + 1}</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Full Name
-                      </label>
-                      <input
-                        type="text"
-                        required
-                        value={reference.name}
-                        onChange={(e) => updateReference(index, 'name', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-beedab-blue focus:border-beedab-blue"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Relationship
-                      </label>
-                      <input
-                        type="text"
-                        required
-                        value={reference.relationship}
-                        onChange={(e) => updateReference(index, 'relationship', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-beedab-blue focus:border-beedab-blue"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Contact Number
-                      </label>
-                      <input
-                        type="tel"
-                        required
-                        value={reference.contact}
-                        onChange={(e) => updateReference(index, 'contact', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-beedab-blue focus:border-beedab-blue"
-                      />
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Personal Information */}
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                <Phone className="h-5 w-5 mr-2" />
-                Additional Information
-              </h3>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Emergency Contact
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={formData.personal_info.emergency_contact}
-                    onChange={(e) => setFormData(prev => ({
-                      ...prev,
-                      personal_info: { ...prev.personal_info, emergency_contact: e.target.value }
-                    }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-beedab-blue focus:border-beedab-blue"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Preferred Move-in Date
-                  </label>
-                  <input
-                    type="date"
-                    required
-                    value={formData.personal_info.preferred_move_in_date}
-                    onChange={(e) => setFormData(prev => ({
-                      ...prev,
-                      personal_info: { ...prev.personal_info, preferred_move_in_date: e.target.value }
-                    }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-beedab-blue focus:border-beedab-blue"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Reason for Moving
-                  </label>
-                  <textarea
-                    required
-                    rows={3}
-                    value={formData.personal_info.reason_for_moving}
-                    onChange={(e) => setFormData(prev => ({
-                      ...prev,
-                      personal_info: { ...prev.personal_info, reason_for_moving: e.target.value }
-                    }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-beedab-blue focus:border-beedab-blue"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Submit Button */}
-            <div className="flex gap-4 pt-6">
-              <button
-                type="button"
-                onClick={onClose}
-                className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                disabled={loading}
-                className="flex-1 px-6 py-3 bg-beedab-blue text-white rounded-lg hover:bg-beedab-darkblue transition-colors disabled:opacity-50"
-              >
-                {loading ? 'Submitting...' : 'Submit Application'}
-              </button>
-            </div>
-          </form>
-        </div>
-      </motion.div>
-    </div>
-  );
-};
-
-export default RentalApplicationForm;
-
-const RentalApplicationForm = ({ rentalId, onClose, onSubmit }: RentalApplicationFormProps) => {
   const [formData, setFormData] = useState({
     employment_info: {
       employer: '',
@@ -350,7 +59,7 @@ const RentalApplicationForm = ({ rentalId, onClose, onSubmit }: RentalApplicatio
       });
 
       const data = await response.json();
-      
+
       if (data.success) {
         onSubmit(data.data);
         onClose();
@@ -419,7 +128,7 @@ const RentalApplicationForm = ({ rentalId, onClose, onSubmit }: RentalApplicatio
                 <Briefcase className="h-5 w-5 text-beedab-blue mr-2" />
                 <h3 className="text-lg font-semibold text-gray-900">Employment Information</h3>
               </div>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -436,7 +145,7 @@ const RentalApplicationForm = ({ rentalId, onClose, onSubmit }: RentalApplicatio
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-beedab-blue focus:border-beedab-blue"
                   />
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Position/Job Title
@@ -452,7 +161,7 @@ const RentalApplicationForm = ({ rentalId, onClose, onSubmit }: RentalApplicatio
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-beedab-blue focus:border-beedab-blue"
                   />
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Monthly Income (P)
@@ -468,7 +177,7 @@ const RentalApplicationForm = ({ rentalId, onClose, onSubmit }: RentalApplicatio
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-beedab-blue focus:border-beedab-blue"
                   />
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Employment Duration
@@ -503,7 +212,7 @@ const RentalApplicationForm = ({ rentalId, onClose, onSubmit }: RentalApplicatio
                   Add Reference
                 </button>
               </div>
-              
+
               {formData.references.map((reference, index) => (
                 <div key={index} className="p-4 border border-gray-200 rounded-md">
                   <div className="flex justify-between items-center mb-3">
@@ -518,7 +227,7 @@ const RentalApplicationForm = ({ rentalId, onClose, onSubmit }: RentalApplicatio
                       </button>
                     )}
                   </div>
-                  
+
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -532,7 +241,7 @@ const RentalApplicationForm = ({ rentalId, onClose, onSubmit }: RentalApplicatio
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-beedab-blue focus:border-beedab-blue"
                       />
                     </div>
-                    
+
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         Relationship
@@ -546,7 +255,7 @@ const RentalApplicationForm = ({ rentalId, onClose, onSubmit }: RentalApplicatio
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-beedab-blue focus:border-beedab-blue"
                       />
                     </div>
-                    
+
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         Contact
@@ -571,7 +280,7 @@ const RentalApplicationForm = ({ rentalId, onClose, onSubmit }: RentalApplicatio
                 <FileText className="h-5 w-5 text-beedab-blue mr-2" />
                 <h3 className="text-lg font-semibold text-gray-900">Personal Information</h3>
               </div>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -588,7 +297,7 @@ const RentalApplicationForm = ({ rentalId, onClose, onSubmit }: RentalApplicatio
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-beedab-blue focus:border-beedab-blue"
                   />
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Preferred Move-in Date
@@ -605,7 +314,7 @@ const RentalApplicationForm = ({ rentalId, onClose, onSubmit }: RentalApplicatio
                   />
                 </div>
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Reason for Moving
