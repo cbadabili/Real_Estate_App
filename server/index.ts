@@ -2,7 +2,7 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { testDatabaseConnection } from "./db";
-import propertyRoutes from './routes';
+import { registerRoutes } from './routes';
 import rentalRoutes from './rental-routes';
 import { db } from './db';
 import { authenticateToken } from './auth-middleware';
