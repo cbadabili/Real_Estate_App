@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Plus, Home, Users, TrendingUp, Calendar, DollarSign, Eye, MessageSquare } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext'; // Corrected import
 
 const LandlordDashboard = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const [myRentals, setMyRentals] = useState([]);
+  const { user } = useAuth(); // Using useAuth
 
   useEffect(() => {
     // Fetch landlord's rental listings
