@@ -1,0 +1,84 @@
+Create the following API endpoints. All endpoints must be protected by JWT authentication where appropriate.
+
+2.1. Rental Listing Management (for Landlords)
+
+POST /api/rentals: Creates a new rental listing. Associates it with the authenticated LANDLORD.
+
+PUT /api/rentals/:rentalId: Updates an existing rental listing owned by the LANDLORD.
+
+GET /api/landlord/rentals: Fetches all rental listings owned by the authenticated LANDLORD.
+
+POST /api/rentals/:rentalId/photos: Uploads photos for a rental listing to an S3 bucket and associates the URLs.
+
+2.2. Rental Discovery (for Renters)
+
+
+GET /api/rentals/search: Implements a multi-criteria search for RENTER users. It should filter by location, price range, bedrooms, and property type. It should return a list of properties to be displayed on the interactive map.
+
+
+GET /api/rentals/:rentalId: Fetches detailed public information for a single rental listing, including photos and landlord info.
+
+2.3. Application & Screening Workflow
+
+POST /api/rentals/:rentalId/apply: Allows an authenticated RENTER to submit a Rental_Applications for a specific rental.
+
+GET /api/landlord/applications: Fetches all applications for all properties owned by the authenticated LANDLORD.
+
+PUT /api/applications/:applicationId: Allows a LANDLORD to update the status of an application (e.g., 'approve', 'reject').
+
+POST /api/applications/:applicationId/screen: [API Integration] This is a placeholder endpoint. When called, it should simulate calling a tenant screening API like 
+
+TransUnion SmartMove. For now, it can randomly update the 
+
+background_check_status and credit_report_status in the Rental_Applications table to 'complete' after a short delay.
+
+2.4. Lease & Payment Workflow
+
+POST /api/applications/:applicationId/generate-lease: Creates a new entry in the Lease_Agreements table linked to an approved application.
+
+
+POST /api/leases/:leaseId/sign: [API Integration] This is a placeholder for an e-signature service like DocuSign. It should update the 
+
+e_signature_status based on the user's role.
+
+
+POST /api/leases/:leaseId/pay-rent: [API Integration] Integrates with a payment gateway like Stripe to handle monthly rent collection. This endpoint should create a payment intent.
+
+
+Part 3: Frontend Components (React/TypeScript)
+Develop the following user interfaces and components.
+
+3.1. Renter Experience
+
+Rental Search: The main interactive map should now have a toggle for "For Sale" and "For Rent". When "For Rent" is selected, it should call the GET /api/rentals/search endpoint and display rental properties.
+
+Rental Listing Page: A detailed view page for a single rental property. It must have a prominent "Apply Now" button that opens an application form.
+
+
+Renter Dashboard: A personalized dashboard for the RENTER to track their submitted applications and their statuses.
+
+3.2. Landlord Experience
+
+
+Listing Creator: A simple, elegant, step-by-step wizard for LANDLORD users to create a new rental listing (using the POST /api/rentals endpoint).
+
+Landlord Dashboard: A comprehensive portal for the LANDLORD to:
+
+View and manage all their properties.
+
+View all incoming rental applications in a queue.
+
+Review, approve, or reject applications.
+
+Initiate the "tenant screening" and "generate lease" actions.
+
+Track the status of lease signatures and rent payments.
+
+3.3. Contextual Ad Integration for Renters
+
+Implement the contextual ad logic for the renter's journey.
+
+Trigger (on_lease_signed): After a RENTER and LANDLORD have both e-signed a lease agreement.
+
+
+Contextual Prompt (via email/dashboard notification): Display/send the following message: "Congratulations on your new place! Let's get you moved in. Find trusted Moving Companies and get quotes for Internet & DSTV Installation."  This prompt should link to the relevant categories in the Services Directory.
