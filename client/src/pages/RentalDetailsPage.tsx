@@ -1,24 +1,3 @@
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { 
-  Calendar, 
-  Users, 
-  MapPin, 
-  Star, 
-  Heart, 
-  Share2, 
-  ChevronLeft, 
-  ChevronRight,
-  Wifi,
-  Car,
-  Coffee,
-  Tv,
-  Wind,
-  Shield,
-  CheckCircle
-} from 'lucide-react';
-import { Link } from 'react-router-dom';
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
