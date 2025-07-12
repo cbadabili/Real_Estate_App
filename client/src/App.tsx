@@ -94,9 +94,9 @@ function App() {
             <Route path="/rent" element={<RentPage />} />
             <Route path="/rent-out" element={<RentOutPage />} />
             <Route path="/rentals" element={<RentalsPage />} />
-            <Route path="/rental/:id" element={<RentalDetailsPage />} />
             <Route path="/rent/create-listing" element={<RentalListingWizard />} />
             <Route path="/rent/edit/:id" element={<RentalListingWizard />} />
+            <Route path="/rental/:id" element={<RentalDetailsPage />} />
             <Route path="/landlord/dashboard" element={<LandlordDashboard />} />
             <Route path="/renter/dashboard" element={<RenterDashboard />} />
             <Route path="/buyer-seller-platform" element={<BuyerSellerPlatformPage />} />

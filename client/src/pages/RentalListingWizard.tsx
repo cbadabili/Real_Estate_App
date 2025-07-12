@@ -70,7 +70,7 @@ const RentalListingWizard = () => {
     try {
       const response = await fetch(`/api/rentals/${id}`, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
         }
       });
       const data = await response.json();
@@ -94,7 +94,7 @@ const RentalListingWizard = () => {
         method,
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
         },
         body: JSON.stringify(formData)
       });
@@ -279,11 +279,14 @@ const RentalListingWizard = () => {
                   disabled={!formData.city}
                 >
                   <option value="">Select district</option>
-                  {formData.city && botswanaGeography
-                    .find(city => city.name === formData.city)
-                    ?.districts.map(district => (
-                      <option key={district} value={district}>{district}</option>
-                    ))}
+                  {formData.city && botswanaDistricts
+                    .find(district => district.cities.includes(formData.city))
+                    ?.name && (
+                      <option key={botswanaDistricts.find(district => district.cities.includes(formData.city))?.name} 
+                              value={botswanaDistricts.find(district => district.cities.includes(formData.city))?.name}>
+                        {botswanaDistricts.find(district => district.cities.includes(formData.city))?.name}
+                      </option>
+                    )}
                 </select>
               </div>
             </div>
