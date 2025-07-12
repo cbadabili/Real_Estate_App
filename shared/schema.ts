@@ -201,6 +201,7 @@ export const rental_listings = sqliteTable('rental_listings', {
   address: text('address').notNull(),
   city: text('city').notNull(),
   district: text('district').notNull(),
+  ward: text('ward'),
   property_type: text('property_type').notNull(),
   bedrooms: integer('bedrooms').notNull(),
   bathrooms: integer('bathrooms').notNull(),

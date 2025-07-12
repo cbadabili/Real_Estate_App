@@ -13,6 +13,7 @@ import {
   ArrowRight
 } from 'lucide-react';
 import { botswanaDistricts, getAllCities } from '../data/botswanaGeography';
+import GeographySelector from '../components/GeographySelector';
 
 const RentalListingWizard = () => {
   const navigate = useNavigate();
@@ -27,6 +28,7 @@ const RentalListingWizard = () => {
     address: '',
     city: '',
     district: '',
+    ward: '',
     property_type: '',
     bedrooms: 1,
     bathrooms: 1,
@@ -102,13 +104,16 @@ const RentalListingWizard = () => {
       const data = await response.json();
       
       if (data.success) {
+        // Show success message
+        alert('Rental listing created successfully!');
+        // Navigate to the rental details page
         navigate(`/rental/${data.data.id}`);
       } else {
-        alert('Failed to save rental listing');
+        alert('Failed to save rental listing: ' + (data.error || 'Unknown error'));
       }
     } catch (error) {
       console.error('Error saving rental:', error);
-      alert('Failed to save rental listing');
+      alert('Failed to save rental listing. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -249,47 +254,19 @@ const RentalListingWizard = () => {
               />
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  City
-                </label>
-                <select
-                  required
-                  value={formData.city}
-                  onChange={(e) => setFormData(prev => ({ ...prev, city: e.target.value, district: '' }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-beedab-blue focus:border-beedab-blue"
-                >
-                  <option value="">Select city</option>
-                  {getAllCities().map(city => (
-                    <option key={city} value={city}>{city}</option>
-                  ))}
-                </select>
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  District/Area
-                </label>
-                <select
-                  required
-                  value={formData.district}
-                  onChange={(e) => setFormData(prev => ({ ...prev, district: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-beedab-blue focus:border-beedab-blue"
-                  disabled={!formData.city}
-                >
-                  <option value="">Select district</option>
-                  {formData.city && botswanaDistricts
-                    .find(district => district.cities.includes(formData.city))
-                    ?.name && (
-                      <option key={botswanaDistricts.find(district => district.cities.includes(formData.city))?.name} 
-                              value={botswanaDistricts.find(district => district.cities.includes(formData.city))?.name}>
-                        {botswanaDistricts.find(district => district.cities.includes(formData.city))?.name}
-                      </option>
-                    )}
-                </select>
-              </div>
-            </div>
+            <GeographySelector
+              onLocationChange={(location) => {
+                setFormData(prev => ({
+                  ...prev,
+                  city: location.city,
+                  district: location.state,
+                  ward: location.ward || ''
+                }));
+              }}
+              initialCity={formData.city}
+              initialState={formData.district}
+              initialWard={formData.ward}
+            />
           </div>
         );
         
@@ -407,22 +384,73 @@ const RentalListingWizard = () => {
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Property Photos
               </label>
+              
+              {/* Photography Services Button */}
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <Camera className="h-6 w-6 text-blue-600" />
+                    <div>
+                      <h4 className="font-medium text-blue-900">Professional Photography</h4>
+                      <p className="text-sm text-blue-700">Get high-quality photos that sell faster</p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => window.open('/services?category=photography', '_blank')}
+                    className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                  >
+                    Find Photographers
+                  </button>
+                </div>
+              </div>
+
               <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
                 <Camera className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                 <p className="text-gray-500">Upload property photos</p>
                 <p className="text-sm text-gray-400 mt-2">
                   Include professional photography or take high-quality photos
                 </p>
-                <input
-                  type="file"
-                  multiple
-                  accept="image/*"
-                  className="mt-4"
-                  onChange={(e) => {
-                    const files = Array.from(e.target.files || []);
-                    // Handle file upload logic here
-                  }}
-                />
+                
+                <div className="flex flex-col sm:flex-row gap-3 mt-4 justify-center">
+                  <input
+                    type="file"
+                    multiple
+                    accept="image/*"
+                    className="hidden"
+                    id="photo-upload"
+                    onChange={(e) => {
+                      const files = Array.from(e.target.files || []);
+                      // Handle file upload logic here
+                      console.log('Photos uploaded:', files);
+                    }}
+                  />
+                  <label
+                    htmlFor="photo-upload"
+                    className="bg-beedab-blue text-white px-4 py-2 rounded-lg hover:bg-beedab-darkblue cursor-pointer inline-block"
+                  >
+                    Upload Photos
+                  </label>
+                  
+                  <button
+                    type="button"
+                    onClick={() => {
+                      // Open camera functionality
+                      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                        navigator.mediaDevices.getUserMedia({ video: true })
+                          .then(() => alert('Camera functionality would open here'))
+                          .catch(() => alert('Camera not available'));
+                      }
+                    }}
+                    className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
+                  >
+                    Take Photos
+                  </button>
+                </div>
+                
+                <p className="text-xs text-gray-500 mt-2">
+                  Supported formats: JPG, PNG (Max 10MB each)
+                </p>
               </div>
             </div>
             
