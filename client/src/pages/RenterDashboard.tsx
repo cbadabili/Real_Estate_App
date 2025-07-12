@@ -2,8 +2,10 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, Heart, FileText, Calendar, MapPin, MessageSquare, Star } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 
 const RenterDashboard = () => {
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('search');
   const [applications, setApplications] = useState([]);
   const [savedProperties, setSavedProperties] = useState([]);
@@ -14,7 +16,7 @@ const RenterDashboard = () => {
       try {
         const response = await fetch('/api/renter/applications', {
           headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
+            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
           }
         });
         const data = await response.json();
@@ -32,7 +34,7 @@ const RenterDashboard = () => {
       try {
         const response = await fetch('/api/renter/saved-properties', {
           headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
+            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
           }
         });
         const data = await response.json();
