@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -108,7 +107,7 @@ const RentPage = () => {
 
       const response = await fetch(`/api/rentals/search?${params}`);
       const data = await response.json();
-      
+
       if (data.success) {
         setRentals(data.data);
       }
@@ -122,15 +121,15 @@ const RentPage = () => {
   // Fetch user's applications
   const fetchApplications = async () => {
     if (!user) return;
-    
+
     try {
       const response = await fetch('/api/renter/applications', {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
         }
       });
       const data = await response.json();
-      
+
       if (data.success) {
         setApplications(data.data);
       }
@@ -142,15 +141,15 @@ const RentPage = () => {
   // Fetch landlord's listings
   const fetchMyListings = async () => {
     if (!user) return;
-    
+
     try {
       const response = await fetch('/api/landlord/rentals', {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
         }
       });
       const data = await response.json();
-      
+
       if (data.success) {
         setMyListings(data.data);
       }
@@ -209,7 +208,7 @@ const RentPage = () => {
                 <h1 className="text-3xl font-bold text-gray-900 mb-2">Rental Properties</h1>
                 <p className="text-gray-600">Find your perfect rental home in Botswana</p>
               </div>
-              
+
               {user && (
                 <div className="flex space-x-2">
                   <button
@@ -274,7 +273,7 @@ const RentPage = () => {
                       />
                     </div>
                   </div>
-                  
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Min Price</label>
                     <input
@@ -285,7 +284,7 @@ const RentPage = () => {
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-beedab-blue focus:border-beedab-blue"
                     />
                   </div>
-                  
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Max Price</label>
                     <input
@@ -296,7 +295,7 @@ const RentPage = () => {
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-beedab-blue focus:border-beedab-blue"
                     />
                   </div>
-                  
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Bedrooms</label>
                     <select 
@@ -311,7 +310,7 @@ const RentPage = () => {
                       <option value="4">4+</option>
                     </select>
                   </div>
-                  
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Type</label>
                     <select 
@@ -355,14 +354,14 @@ const RentPage = () => {
                           <Heart className="h-4 w-4 text-gray-600" />
                         </button>
                       </div>
-                      
+
                       <div className="p-6">
                         <h3 className="text-lg font-semibold text-gray-900 mb-2">{property.title}</h3>
                         <div className="flex items-center text-gray-500 mb-3">
                           <MapPin className="h-4 w-4 mr-1" />
                           <span className="text-sm">{property.address}, {property.city}</span>
                         </div>
-                        
+
                         <div className="flex items-center space-x-4 text-sm text-gray-500 mb-4">
                           <div className="flex items-center">
                             <Bed className="h-4 w-4 mr-1" />
@@ -377,7 +376,7 @@ const RentPage = () => {
                             <span>{property.square_meters}m²</span>
                           </div>
                         </div>
-                        
+
                         <div className="flex flex-wrap gap-1 mb-4">
                           {property.furnished && (
                             <span className="px-2 py-1 bg-blue-100 text-blue-600 text-xs rounded">
@@ -395,7 +394,7 @@ const RentPage = () => {
                             </span>
                           )}
                         </div>
-                        
+
                         <div className="flex justify-between items-center">
                           <div>
                             <span className="text-2xl font-bold text-beedab-blue">P{property.monthly_rent.toLocaleString()}</span>
@@ -425,7 +424,7 @@ const RentPage = () => {
             >
               <div className="bg-white rounded-lg shadow-sm p-6">
                 <h2 className="text-xl font-semibold text-gray-900 mb-6">My Applications</h2>
-                
+
                 {applications.length === 0 ? (
                   <div className="text-center py-8">
                     <Building className="h-12 w-12 text-gray-400 mx-auto mb-4" />
@@ -453,7 +452,7 @@ const RentPage = () => {
                               {application.status.charAt(0).toUpperCase() + application.status.slice(1)}
                             </div>
                           </div>
-                          
+
                           <div className="mt-3 flex items-center justify-between">
                             <span className="text-lg font-semibold text-beedab-blue">
                               P{application.rental.monthly_rent.toLocaleString()}/month
@@ -491,7 +490,7 @@ const RentPage = () => {
                     Create New Listing
                   </Link>
                 </div>
-                
+
                 {myListings.length === 0 ? (
                   <div className="text-center py-8">
                     <Home className="h-12 w-12 text-gray-400 mx-auto mb-4" />
