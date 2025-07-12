@@ -2,7 +2,7 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { rentalStorage } from './rental-storage';
-import { authenticateToken } from './auth-middleware';
+import { authenticate } from './auth-middleware';
 
 const router = Router();
 
@@ -53,7 +53,7 @@ const applicationSchema = z.object({
 // 2.1 Rental Listing Management (for Landlords)
 
 // POST /api/rentals
-router.post('/rentals', authenticateToken, async (req, res) => {
+router.post('/rentals', authenticate, async (req, res) => {
   try {
     const validatedData = rentalListingSchema.parse(req.body);
     
@@ -78,7 +78,7 @@ router.post('/rentals', authenticateToken, async (req, res) => {
 });
 
 // PUT /api/rentals/:rentalId
-router.put('/rentals/:rentalId', authenticateToken, async (req, res) => {
+router.put('/rentals/:rentalId', authenticate, async (req, res) => {
   try {
     const rentalId = parseInt(req.params.rentalId);
     const validatedData = rentalListingSchema.partial().parse(req.body);
@@ -107,7 +107,7 @@ router.put('/rentals/:rentalId', authenticateToken, async (req, res) => {
 });
 
 // GET /api/landlord/rentals
-router.get('/landlord/rentals', authenticateToken, async (req, res) => {
+router.get('/landlord/rentals', authenticate, async (req, res) => {
   try {
     const rentals = await rentalStorage.getLandlordRentals(req.user.id);
     
@@ -125,7 +125,7 @@ router.get('/landlord/rentals', authenticateToken, async (req, res) => {
 });
 
 // POST /api/rentals/:rentalId/photos
-router.post('/rentals/:rentalId/photos', authenticateToken, async (req, res) => {
+router.post('/rentals/:rentalId/photos', authenticate, async (req, res) => {
   try {
     const rentalId = parseInt(req.params.rentalId);
     const { photos } = req.body;
@@ -234,7 +234,7 @@ router.get('/rentals/:rentalId', async (req, res) => {
 // 2.3 Application & Screening Workflow
 
 // POST /api/rentals/:rentalId/apply
-router.post('/rentals/:rentalId/apply', authenticateToken, async (req, res) => {
+router.post('/rentals/:rentalId/apply', authenticate, async (req, res) => {
   try {
     const rentalId = parseInt(req.params.rentalId);
     const validatedData = applicationSchema.parse(req.body);
@@ -261,7 +261,7 @@ router.post('/rentals/:rentalId/apply', authenticateToken, async (req, res) => {
 });
 
 // GET /api/landlord/applications
-router.get('/landlord/applications', authenticateToken, async (req, res) => {
+router.get('/landlord/applications', authenticate, async (req, res) => {
   try {
     const applications = await rentalStorage.getLandlordApplications(req.user.id);
     
@@ -279,7 +279,7 @@ router.get('/landlord/applications', authenticateToken, async (req, res) => {
 });
 
 // PUT /api/applications/:applicationId
-router.put('/applications/:applicationId', authenticateToken, async (req, res) => {
+router.put('/applications/:applicationId', authenticate, async (req, res) => {
   try {
     const applicationId = parseInt(req.params.applicationId);
     const { status } = req.body;
@@ -319,7 +319,7 @@ router.put('/applications/:applicationId', authenticateToken, async (req, res) =
 });
 
 // POST /api/applications/:applicationId/screen
-router.post('/applications/:applicationId/screen', authenticateToken, async (req, res) => {
+router.post('/applications/:applicationId/screen', authenticate, async (req, res) => {
   try {
     const applicationId = parseInt(req.params.applicationId);
     
@@ -349,7 +349,7 @@ router.post('/applications/:applicationId/screen', authenticateToken, async (req
 // 2.4 Lease & Payment Workflow
 
 // POST /api/applications/:applicationId/generate-lease
-router.post('/applications/:applicationId/generate-lease', authenticateToken, async (req, res) => {
+router.post('/applications/:applicationId/generate-lease', authenticate, async (req, res) => {
   try {
     const applicationId = parseInt(req.params.applicationId);
     const { lease_start_date, lease_end_date, lease_terms } = req.body;
@@ -395,7 +395,7 @@ router.post('/applications/:applicationId/generate-lease', authenticateToken, as
 });
 
 // POST /api/leases/:leaseId/sign
-router.post('/leases/:leaseId/sign', authenticateToken, async (req, res) => {
+router.post('/leases/:leaseId/sign', authenticate, async (req, res) => {
   try {
     const leaseId = parseInt(req.params.leaseId);
     const { role } = req.body;
@@ -431,7 +431,7 @@ router.post('/leases/:leaseId/sign', authenticateToken, async (req, res) => {
 });
 
 // POST /api/leases/:leaseId/pay-rent
-router.post('/leases/:leaseId/pay-rent', authenticateToken, async (req, res) => {
+router.post('/leases/:leaseId/pay-rent', authenticate, async (req, res) => {
   try {
     const leaseId = parseInt(req.params.leaseId);
     const { amount } = req.body;
@@ -469,7 +469,7 @@ router.post('/leases/:leaseId/pay-rent', authenticateToken, async (req, res) => 
 });
 
 // GET /api/renter/applications
-router.get('/renter/applications', authenticateToken, async (req, res) => {
+router.get('/renter/applications', authenticate, async (req, res) => {
   try {
     const applications = await rentalStorage.getRenterApplications(req.user.id);
     
