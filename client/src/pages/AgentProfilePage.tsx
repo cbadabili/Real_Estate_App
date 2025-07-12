@@ -1,12 +1,12 @@
-
 import React from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Star, MapPin, Phone, Mail, Globe, Calendar, Award, Users, TrendingUp, Home } from 'lucide-react';
 
 const AgentProfilePage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  
+  const navigate = useNavigate();
+
   // This would normally fetch agent data from API
   const agent = {
     id: parseInt(id || '1'),
@@ -60,6 +60,15 @@ const AgentProfilePage: React.FC = () => {
                 </div>
               </div>
             </div>
+            <div className="mt-4">
+              <button
+                onClick={() => navigate(`/rate-agent/${id}`)}
+                className="flex items-center px-4 py-2 bg-yellow-500 text-white font-semibold rounded-lg hover:bg-yellow-600 transition-colors"
+              >
+                <Star className="h-4 w-4 mr-2" />
+                Rate This Agent
+              </button>
+            </div>
           </div>
 
           {/* Content */}
@@ -69,7 +78,7 @@ const AgentProfilePage: React.FC = () => {
               <div>
                 <h2 className="text-2xl font-bold mb-4">About {agent.name}</h2>
                 <p className="text-gray-600 mb-6">{agent.bio}</p>
-                
+
                 <div className="space-y-4">
                   <div>
                     <h3 className="font-semibold mb-2">Specialties</h3>
@@ -81,7 +90,7 @@ const AgentProfilePage: React.FC = () => {
                       ))}
                     </div>
                   </div>
-                  
+
                   <div>
                     <h3 className="font-semibold mb-2">Languages</h3>
                     <div className="flex flex-wrap gap-2">

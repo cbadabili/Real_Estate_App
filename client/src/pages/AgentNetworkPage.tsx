@@ -85,15 +85,18 @@ const AgentNetworkPage = () => {
               Connect with certified REAC agents across Botswana and access professional real estate services from trusted experts in your area.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <div className="relative max-w-md w-full">
+                <input
+                  type="text"
+                  placeholder="Search agents by name, location, or specialization..."
+                  className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-xl focus:ring-2 focus:ring-beedab-blue focus:border-transparent bg-white text-gray-900"
+                />
+                <button className="absolute right-2 top-2 p-2 text-gray-500 hover:text-beedab-blue">
+                  <Users className="h-5 w-5" />
+                </button>
+              </div>
               <Link
-                to="/agent-dashboard"
-                className="inline-flex items-center px-8 py-4 bg-white text-beedab-darkblue font-semibold rounded-xl hover:bg-gray-100 transition-colors"
-              >
-                <Users className="mr-2 h-5 w-5" />
-                Find an Agent
-              </Link>
-              <Link
-                to="/register"
+                to="/agent-registration"
                 className="inline-flex items-center px-8 py-4 bg-transparent border-2 border-white text-white font-semibold rounded-xl hover:bg-white hover:text-beedab-darkblue transition-colors"
               >
                 <Award className="mr-2 h-5 w-5" />

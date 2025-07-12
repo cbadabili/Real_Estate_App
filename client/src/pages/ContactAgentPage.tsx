@@ -1,11 +1,12 @@
 
 import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Phone, Mail, MessageCircle, Calendar, Send } from 'lucide-react';
+import { Phone, Mail, MessageCircle, Calendar, Send, ArrowLeft } from 'lucide-react';
 
 const ContactAgentPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -37,6 +38,22 @@ const ContactAgentPage: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           className="bg-white rounded-xl shadow-sm p-8"
         >
+          <div className="flex items-center justify-between mb-8">
+            <button
+              onClick={() => navigate(-1)}
+              className="flex items-center text-gray-500 hover:text-beedab-blue transition-colors"
+            >
+              <ArrowLeft className="h-5 w-5 mr-2" />
+              Back
+            </button>
+            <button
+              onClick={() => navigate(`/chat/${id}`)}
+              className="flex items-center px-4 py-2 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors"
+            >
+              <MessageCircle className="h-4 w-4 mr-2" />
+              Start Chat
+            </button>
+          </div>
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold text-gray-900 mb-2">Contact Agent</h1>
             <p className="text-gray-600">Get in touch with our professional real estate agent</p>

@@ -415,25 +415,60 @@ const ServicesPage = () => {
           ))}
         </div>
 
-        {/* Marketing & Sales */}
-        <div className="bg-white rounded-xl shadow-lg border border-neutral-200 p-6">
+        {/* Property Selling Tools */}
+        <div className="bg-white rounded-xl shadow-lg border border-neutral-200 p-6 mb-8">
             <h3 className="text-xl font-semibold text-neutral-900 mb-6 flex items-center">
               <TrendingUp className="h-6 w-6 mr-3 text-beedab-blue" />
-              MARKETING & SALES
+              PROPERTY SELLING TOOLS
             </h3>
-            <div className="space-y-4">
-
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="bg-white rounded-lg shadow-sm border border-neutral-200 p-6">
                 <div className="flex items-start space-x-4">
                   <div className="w-10 h-10 bg-beedab-blue rounded-lg flex items-center justify-center">
-                    <FileText className="h-5 w-5 text-white" />
+                    <DollarSign className="h-5 w-5 text-white" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="text-lg font-semibold text-neutral-900 mb-2">Transfer Process</h3>
-                    <p className="text-neutral-600 mb-3">Complete the sale</p>
+                    <h3 className="text-lg font-semibold text-neutral-900 mb-2">Pricing Guide</h3>
+                    <p className="text-neutral-600 mb-3">Set competitive prices</p>
                     <button 
-                      onClick={() => window.open('/property-handover', '_blank')}
+                      onClick={() => window.open('/pricing-guide', '_blank')}
                       className="bg-beedab-blue text-white px-4 py-2 rounded-lg hover:bg-beedab-darkblue transition-colors"
+                    >
+                      Get Started
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-lg shadow-sm border border-neutral-200 p-6">
+                <div className="flex items-start space-x-4">
+                  <div className="w-10 h-10 bg-purple-600 rounded-lg flex items-center justify-center">
+                    <Calendar className="h-5 w-5 text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-lg font-semibold text-neutral-900 mb-2">Manage Showings</h3>
+                    <p className="text-neutral-600 mb-3">Schedule viewings</p>
+                    <button 
+                      onClick={() => window.open('/manage-showings', '_blank')}
+                      className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors"
+                    >
+                      Get Started
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-lg shadow-sm border border-neutral-200 p-6">
+                <div className="flex items-start space-x-4">
+                  <div className="w-10 h-10 bg-orange-600 rounded-lg flex items-center justify-center">
+                    <Handshake className="h-5 w-5 text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-lg font-semibold text-neutral-900 mb-2">Handle Offers</h3>
+                    <p className="text-neutral-600 mb-3">Review and negotiate</p>
+                    <button 
+                      onClick={() => window.open('/handle-offers', '_blank')}
+                      className="bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700 transition-colors"
                     >
                       Get Started
                     </button>
@@ -456,20 +491,6 @@ const ServicesPage = () => {
                       Get Started
                     </button>
                   </div>
-                </div>
-              </div>
-              <div className="flex items-center p-4 border border-neutral-200 rounded-lg hover:bg-neutral-50 transition-colors cursor-pointer">
-                <Calendar className="h-5 w-5 text-beedab-blue mr-3" />
-                <div>
-                  <h4 className="font-medium text-neutral-900">Manage Showings</h4>
-                  <p className="text-sm text-neutral-600">Schedule viewings</p>
-                </div>
-              </div>
-              <div className="flex items-center p-4 border border-neutral-200 rounded-lg hover:bg-neutral-50 transition-colors cursor-pointer">
-                <Handshake className="h-5 w-5 text-beedab-blue mr-3" />
-                <div>
-                  <h4 className="font-medium text-neutral-900">Handle Offers</h4>
-                  <p className="text-sm text-neutral-600">Review and negotiate</p>
                 </div>
               </div>
             </div>

@@ -75,8 +75,20 @@ const RentPage = () => {
       <div className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <motion.div variants={itemVariants}>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Properties for Rent</h1>
-            <p className="text-gray-600">Find your perfect rental property in Botswana</p>
+            <div className="flex justify-between items-center">
+              <div>
+                <h1 className="text-3xl font-bold text-gray-900 mb-2">Properties for Rent</h1>
+                <p className="text-gray-600">Find your perfect rental property in Botswana</p>
+              </div>
+              <div className="flex space-x-4">
+                <button className="bg-beedab-blue text-white px-6 py-2 rounded-lg hover:bg-beedab-darkblue transition-colors">
+                  For Landlords
+                </button>
+                <button className="border border-beedab-blue text-beedab-blue px-6 py-2 rounded-lg hover:bg-beedab-blue hover:text-white transition-colors">
+                  For Tenants
+                </button>
+              </div>
+            </div>
           </motion.div>
         </div>
       </div>

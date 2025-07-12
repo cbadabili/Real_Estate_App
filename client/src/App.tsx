@@ -52,6 +52,11 @@ import PricingGuidePage from './pages/PricingGuidePage';
 import ManageShowingsPage from './pages/ManageShowingsPage';
 import HandleOffersPage from './pages/HandleOffersPage';
 import PropertyHandoverPage from './pages/PropertyHandoverPage';
+import AgentRegistrationPage from './pages/AgentRegistrationPage';
+import AgentRatingPage from './pages/AgentRatingPage';
+import HomeValueAssessmentPage from './pages/HomeValueAssessmentPage';
+import PrepareHomePage from './pages/PrepareHomePage';
+import LegalRequirementsPage from './pages/LegalRequirementsPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -132,7 +137,12 @@ function App() {
           <Route path="/pricing-guide" element={<PricingGuidePage />} />
           <Route path="/manage-showings" element={<ManageShowingsPage />} />
           <Route path="/handle-offers" element={<HandleOffersPage />} />
-          <Route path="/property-handover" element={<PropertyHandoverPage />} />
+              <Route path="/property-handover" element={<PropertyHandoverPage />} />
+              <Route path="/agent-registration" element={<AgentRegistrationPage />} />
+              <Route path="/rate-agent/:agentId" element={<AgentRatingPage />} />
+              <Route path="/home-value-assessment" element={<HomeValueAssessmentPage />} />
+              <Route path="/prepare-home" element={<PrepareHomePage />} />
+              <Route path="/legal-requirements" element={<LegalRequirementsPage />} />
           <Route path="/transfer-process" element={<PropertyHandoverPage />} />
               </Routes>
               </div>
