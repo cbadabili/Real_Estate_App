@@ -317,6 +317,60 @@ export const botswanaDistricts: District[] = [
   }
 ];
 
+// Comprehensive location list for consistent use across the app
+export const allBotswanaLocations = [
+  // Major Cities and Towns
+  'Gaborone', 'Francistown', 'Maun', 'Kasane', 'Palapye', 'Serowe', 'Kanye', 'Mochudi', 
+  'Lobatse', 'Jwaneng', 'Selebi-Phikwe', 'Mahalapye', 'Molepolole', 'Ghanzi', 'Tsabong',
+
+  // Gaborone Areas
+  'Mogoditshane', 'Gabane', 'Tlokweng', 'Mmopane', 'Kumakwane', 'Phakalane', 'Sebele',
+  'Broadhurst', 'Block 3', 'Block 5', 'Block 8', 'Block 9', 'Extension 9', 'Extension 11',
+  'Extension 14', 'Extension 15', 'Phase 1', 'Phase 2', 'Phase 3', 'Phase 4',
+  'Gaborone West', 'CBD', 'Fairgrounds', 'Government Enclave', 'Village', 'Old Naledi',
+  'White City', 'Bontleng', 'Phakalane Estates', 'River Walk', 'Masa Centre', 'Ledumang',
+
+  // Francistown Areas
+  'Area A', 'Area B', 'Area C', 'Area D', 'Monarch', 'Tati Siding', 'Gerald Estate',
+  'Tshesebe', 'Copper Sunrise', 'Donga', 'Kgaphamadi', 'Nyangabgwe', 'Riverside',
+
+  // Other Major Areas
+  'Shakawe', 'Gumare', 'Nokaneng', 'Sepopa', 'Mohembo', 'Etsha', 'Tubu', 'Boro',
+  'Disaneng', 'Mathiba', 'Sexaxa', 'Kang', 'Hukuntsi', 'Lokgwabe', 'Werda', 'Bere',
+  'Oodi', 'Malolwane', 'Sikwane', 'Segwagwa', 'Mmakgodumo', 'Thamaga', 'Ntlhantlhe',
+  'Gakgatla', 'Lentsweletau', 'Kopong', 'Good Hope', 'Sekoma', 'Selokolela',
+  'Mmankgodi', 'Takatokwane', 'Kazungula', 'Pandamatenga', 'Lesoma', 'Kavimba'
+];
+
+// Service categories for comprehensive filtering
+export const serviceCategories = [
+  'Real Estate Agents',
+  'Legal Services',
+  'Financial Services',
+  'Property Photography',
+  'Home Staging',
+  'Repairs & Maintenance',
+  'Painting & Decoration',
+  'Landscaping',
+  'Security Services',
+  'Moving Services',
+  'Insurance Services',
+  'Property Management',
+  'Valuation Services',
+  'Architecture & Design',
+  'Construction',
+  'Interior Design',
+  'Cleaning Services',
+  'Pest Control',
+  'Property Inspection',
+  'Title Services',
+  'Mortgage Brokers',
+  'Property Marketing',
+  'Document Preparation',
+  'Notary Services',
+  'Surveying Services'
+];
+
 // Helper functions for geographical auto-population
 export const getDistrictByName = (name: string): District | undefined => {
   return botswanaDistricts.find(district => 

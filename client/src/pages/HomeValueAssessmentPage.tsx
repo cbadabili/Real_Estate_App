@@ -1,7 +1,18 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Home, MapPin, Calculator, TrendingUp, ArrowLeft } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { 
+  Home, 
+  TrendingUp, 
+  MapPin, 
+  Calendar,
+  DollarSign,
+  BarChart3,
+  ArrowRight,
+  Calculator,
+  Users,
+  CheckCircle
+} from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const HomeValueAssessmentPage: React.FC = () => {
@@ -16,14 +27,53 @@ const HomeValueAssessmentPage: React.FC = () => {
     condition: ''
   });
 
+  const [estimatedValue, setEstimatedValue] = useState<number | null>(null);
+  const [showResults, setShowResults] = useState(false);
+  const [isCalculating, setIsCalculating] = useState(false);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const calculateAutomatedValue = () => {
+    setIsCalculating(true);
+
+    // Automated valuation algorithm based on property data
+    setTimeout(() => {
+      const baseValue = {
+        'house': 800000,
+        'apartment': 500000,
+        'townhouse': 650000,
+        'plot': 150000
+      }[formData.propertyType] || 600000;
+
+      const bedroomMultiplier = parseInt(formData.bedrooms) * 80000;
+      const bathroomMultiplier = parseInt(formData.bathrooms) * 50000;
+      const sizeMultiplier = parseInt(formData.squareMeters) * 2000;
+
+      const ageAdjustment = formData.yearBuilt ? 
+        (2024 - parseInt(formData.yearBuilt)) * -5000 : 0;
+
+      const conditionMultiplier = {
+        'excellent': 1.2,
+        'good': 1.0,
+        'fair': 0.85,
+        'poor': 0.7
+      }[formData.condition] || 1.0;
+
+      const calculatedValue = Math.round(
+        (baseValue + bedroomMultiplier + bathroomMultiplier + sizeMultiplier + ageAdjustment) * conditionMultiplier
+      );
+
+      setEstimatedValue(calculatedValue);
+      setShowResults(true);
+      setIsCalculating(false);
+    }, 3000);
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Home valuation request:', formData);
-    alert('Valuation request submitted! We will contact you with an assessment.');
+    calculateAutomatedValue();
   };
 
   return (
@@ -135,16 +185,72 @@ const HomeValueAssessmentPage: React.FC = () => {
               </div>
             </div>
 
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Year Built
+                </label>
+                <input
+                  type="number"
+                  name="yearBuilt"
+                  value={formData.yearBuilt}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
+                  placeholder="Enter year built"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Condition
+                </label>
+                <select
+                  name="condition"
+                  value={formData.condition}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
+                >
+                  <option value="">Select Condition</option>
+                  <option value="excellent">Excellent</option>
+                  <option value="good">Good</option>
+                  <option value="fair">Fair</option>
+                  <option value="poor">Poor</option>
+                </select>
+              </div>
+            </div>
+
             <div className="flex justify-center">
               <button
                 type="submit"
                 className="flex items-center px-8 py-3 bg-beedab-blue text-white font-semibold rounded-lg hover:bg-beedab-darkblue transition-colors"
+                disabled={isCalculating}
               >
                 <Calculator className="h-5 w-5 mr-2" />
-                Get Valuation
+                {isCalculating ? 'Calculating...' : 'Get Valuation'}
               </button>
             </div>
           </form>
+
+          {showResults && estimatedValue !== null && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="mt-8 p-4 bg-gray-100 rounded-lg"
+            >
+              <h2 className="text-xl font-semibold text-gray-800 mb-4">
+                Estimated Property Value:
+              </h2>
+              <p className="text-2xl font-bold text-beedab-blue">
+                ${estimatedValue.toLocaleString()}
+              </p>
+              <p className="text-gray-600 mt-2">
+                This is an automated estimate. For a precise valuation, contact our service providers.
+              </p>
+              <Link to="/service-providers" className="mt-4 inline-block px-6 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors">
+                  Contact Valuers
+              </Link>
+            </motion.div>
+          )}
         </motion.div>
       </div>
     </div>

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Upload, MapPin, Phone, Mail, Award, User, Building } from 'lucide-react';
@@ -35,6 +34,39 @@ const AgentRegistrationPage: React.FC = () => {
     console.log('Agent registration:', formData);
     alert('Registration submitted successfully! We will review your application.');
   };
+
+  const locations = [
+    // South-East District
+    'Gaborone', 'Lobatse', 'Ramotswa', 'Mogoditshane', 'Gabane', 'Tlokweng', 'Mmopane', 'Kumakwane',
+    'Phakalane', 'Sebele', 'Broadhurst', 'Block 3', 'Block 5', 'Block 8', 'Extension 9',
+
+    // Central District
+    'Serowe', 'Palapye', 'Mahalapye', 'Botswana Central', 'Tutume', 'Nkange', 'Bobonong',
+
+    // North-East District
+    'Francistown', 'Selebi-Phikwe', 'Tonota', 'Tati Siding', 'Nyangabgwe', 'Gerald Estate',
+    'Copper Sunrise', 'Monarch', 'Tshesebe', 'Donga',
+
+    // North-West District
+    'Maun', 'Shakawe', 'Gumare', 'Nokaneng', 'Sepopa', 'Mohembo', 'Etsha', 'Tubu',
+    'Boro', 'Disaneng', 'Mathiba', 'Sexaxa',
+
+    // Kgalagadi District
+    'Ghanzi', 'Tsabong', 'Kang', 'Hukuntsi', 'Lokgwabe', 'Werda', 'Bere',
+
+    // Kgatleng District
+    'Mochudi', 'Oodi', 'Malolwane', 'Sikwane', 'Segwagwa', 'Mmakgodumo',
+
+    // Kweneng District
+    'Molepolole', 'Thamaga', 'Ntlhantlhe', 'Gakgatla', 'Lentsweletau', 'Kopong',
+
+    // Southern District
+    'Kanye', 'Jwaneng', 'Good Hope', 'Tsabong', 'Sekoma', 'Hukuntsi', 'Selokolela',
+    'Mmankgodi', 'Takatokwane',
+
+    // Chobe District
+    'Kasane', 'Kazungula', 'Pandamatenga', 'Lesoma', 'Kavimba'
+  ];
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -119,10 +151,9 @@ const AgentRegistrationPage: React.FC = () => {
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
                 >
                   <option value="">Select Location</option>
-                  <option value="Gaborone">Gaborone</option>
-                  <option value="Francistown">Francistown</option>
-                  <option value="Maun">Maun</option>
-                  <option value="Kasane">Kasane</option>
+                  {locations.map(location => (
+                    <option key={location} value={location}>{location}</option>
+                  ))}
                 </select>
               </div>
 

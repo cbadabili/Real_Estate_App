@@ -302,13 +302,11 @@ const AgentNetworkPage = () => {
             <p className="text-xl text-beedab-lightblue mb-8 max-w-2xl mx-auto">
               Connect with certified REAC agents in your area and get expert assistance with your property needs.
             </p>
-            <Link
-              to="/find-agent"
-              className="inline-flex items-center justify-center px-8 py-4 bg-white text-beedab-darkblue font-semibold rounded-xl hover:bg-gray-100 transition-colors"
-            >
-              Find Your Agent
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Link>
+            <div className="text-center">
+              <p className="text-lg text-beedab-lightblue">
+                Use the search function above to find certified agents in your area
+              </p>
+            </div>
           </motion.div>
         </div>
       </section>
