@@ -1,9 +1,11 @@
-
 import { db } from './db';
 
 export async function createRentalTables() {
   try {
+    console.log('Creating rental tables...');
+
     // Create rental_listings table
+    console.log('Creating rental_listings table...');
     await db.exec(`
       CREATE TABLE IF NOT EXISTS rental_listings (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -35,6 +37,7 @@ export async function createRentalTables() {
     `);
 
     // Create rental_applications table
+    console.log('Creating rental_applications table...');
     await db.exec(`
       CREATE TABLE IF NOT EXISTS rental_applications (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -50,6 +53,7 @@ export async function createRentalTables() {
     `);
 
     // Create lease_agreements table
+    console.log('Creating lease_agreements table...');
     await db.exec(`
       CREATE TABLE IF NOT EXISTS lease_agreements (
         id INTEGER PRIMARY KEY AUTOINCREMENT,

@@ -8,6 +8,8 @@ import rentalRoutes from './rental-routes';
 import { createRentalTables } from './rental-migration';
 import { seedRentalData } from './rental-seed';
 import { aiSearchRoutes } from './ai-search';
+import propertyManagementRoutes from './property-management-routes';
+import tenantSupportRoutes from './tenant-support-routes';
 
 const app = express();
 app.use(express.json());
@@ -56,6 +58,8 @@ app.use((req, res, next) => {
 
   app.use('/api', rentalRoutes);
   app.use('/api', aiSearchRoutes);
+  app.use('/api', propertyManagementRoutes);
+  app.use('/api', tenantSupportRoutes);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
