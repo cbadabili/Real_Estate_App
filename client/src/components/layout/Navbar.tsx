@@ -493,7 +493,7 @@ const Navbar = () => {
               onMouseLeave={() => setRentDropdownOpen(false)}
             >
               <button className="flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100 transition-colors">
-                <HomeIcon className="h-4 w-4" />
+                <Home className="h-4 w-4" />
                 <span>Rent</span>
                 <ChevronDown className="h-3 w-3" />
               </button>
