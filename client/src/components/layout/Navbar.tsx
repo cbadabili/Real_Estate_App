@@ -41,7 +41,10 @@ import {
   MapPin,
   Handshake,
   Building2,
-  FileCheck
+  FileCheck,
+  Key,
+  LogOut,
+  Gavel
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { AISearchBar } from '../search/AISearchBar';
