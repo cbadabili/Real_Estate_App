@@ -108,10 +108,15 @@ export class DatabaseStorage implements IStorage {
 
   async updateUser(id: number, updates: Partial<InsertUser>): Promise<User | undefined> {
     try {
-      // Convert Date objects to timestamps for SQLite
+      // Handle timestamp conversion for any timestamp fields
       const processedUpdates = { ...updates };
+      
+      // Convert Date objects to Unix timestamps
       if (processedUpdates.lastLoginAt instanceof Date) {
         processedUpdates.lastLoginAt = Math.floor(processedUpdates.lastLoginAt.getTime() / 1000);
+      } else if (typeof processedUpdates.lastLoginAt === 'number' && processedUpdates.lastLoginAt > 1000000000000) {
+        // Convert milliseconds to seconds if it's a large timestamp
+        processedUpdates.lastLoginAt = Math.floor(processedUpdates.lastLoginAt / 1000);
       }
 
       const [user] = await db

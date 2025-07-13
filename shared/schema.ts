@@ -20,7 +20,7 @@ export const users = sqliteTable("users", {
   isVerified: integer("is_verified", { mode: "boolean" }).default(false),
   isActive: integer("is_active", { mode: "boolean" }).default(true),
   reacNumber: text("reac_number"), // For certified agents
-  lastLoginAt: integer("last_login_at", { mode: "timestamp" }),
+  lastLoginAt: integer("last_login_at"),
   createdAt: integer("created_at").defaultNow(),
   updatedAt: integer("updated_at").defaultNow(),
 });
@@ -57,7 +57,7 @@ export const properties = sqliteTable("properties", {
   views: integer("views").default(0),
   daysOnMarket: integer("days_on_market").default(0),
   // Auction-specific fields
-  auctionDate: integer("auction_date", { mode: "timestamp" }),
+  auctionDate: integer("auction_date"),
   auctionTime: text("auction_time"),
   startingBid: text("starting_bid"),
   currentBid: text("current_bid"),
@@ -89,7 +89,7 @@ export const appointments = sqliteTable("appointments", {
   propertyId: integer("property_id").references(() => properties.id).notNull(),
   buyerId: integer("buyer_id").references(() => users.id).notNull(),
   agentId: integer("agent_id").references(() => users.id),
-  appointmentDate: integer("appointment_date", { mode: "timestamp" }).notNull(),
+  appointmentDate: integer("appointment_date").notNull(),
   type: text("type").notNull(), // 'in-person', 'virtual'
   status: text("status").notNull().default('scheduled'), // 'scheduled', 'confirmed', 'completed', 'cancelled'
   notes: text("notes"),
@@ -167,7 +167,7 @@ export const userPermissions = sqliteTable("user_permissions", {
   userId: integer("user_id").references(() => users.id).notNull(),
   permission: text("permission").notNull(),
   grantedBy: integer("granted_by").references(() => users.id),
-  expiresAt: integer("expires_at", { mode: "timestamp" }),
+  expiresAt: integer("expires_at"),
   createdAt: integer("created_at").defaultNow(),
 });
 
