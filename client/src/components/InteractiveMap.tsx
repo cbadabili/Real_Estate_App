@@ -1,10 +1,22 @@
-import React, { useState } from 'react';
-import { MapPin, Navigation, Zoom, ZoomIn, ZoomOut } from 'lucide-react';
+
+import React, { useState, useEffect } from 'react';
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import L from 'leaflet';
+import { MapPin, Navigation, Zoom, ZoomIn, ZoomOut, Layers } from 'lucide-react';
+import 'leaflet/dist/leaflet.css';
+
+// Fix default markers in Leaflet
+delete (L.Icon.Default.prototype as any)._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+});
 
 interface MapLocation {
   id: string;
   name: string;
-  coordinates: [number, number]; // [longitude, latitude]
+  coordinates: [number, number]; // [latitude, longitude]
   plotCount: number;
   averagePrice: number;
   popularSize: string;
@@ -18,11 +30,54 @@ interface InteractiveMapProps {
   className?: string;
 }
 
+// Custom marker icons
+const createCustomIcon = (color: string, isSelected: boolean = false) => {
+  const size = isSelected ? 35 : 25;
+  return L.divIcon({
+    className: 'custom-marker',
+    html: `
+      <div style="
+        background-color: ${color};
+        width: ${size}px;
+        height: ${size}px;
+        border-radius: 50%;
+        border: 3px solid white;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        font-size: ${isSelected ? '14px' : '12px'};
+      ">
+        ${isSelected ? '📍' : '●'}
+      </div>
+    `,
+    iconSize: [size, size],
+    iconAnchor: [size / 2, size / 2],
+  });
+};
+
+// Map controller component for programmatic control
+const MapController: React.FC<{ 
+  center: [number, number]; 
+  zoom: number;
+  onMapReady: (map: L.Map) => void;
+}> = ({ center, zoom, onMapReady }) => {
+  const map = useMap();
+  
+  useEffect(() => {
+    map.setView(center, zoom);
+    onMapReady(map);
+  }, [center, zoom, map, onMapReady]);
+  
+  return null;
+};
+
 /**
- * Interactive Map Component for Botswana Plot Locations
- * Displays popular locations with clickable pins showing plot data
- * Focused on key areas: Mogoditshane, Manyana, Mahalapye, Pitsane
- * Uses simplified map visualization with plot count and pricing data
+ * Enhanced Interactive Map Component with Real World Mapping
+ * Features real map tiles, Botswana focus, and property location visualization
+ * Uses Leaflet for accurate geographical representation
  */
 export const InteractiveMap: React.FC<InteractiveMapProps> = ({
   locations,
@@ -30,45 +85,89 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
   selectedLocation,
   className = ""
 }) => {
-  const [zoomLevel, setZoomLevel] = useState(1);
-  const [hoveredLocation, setHoveredLocation] = useState<string | null>(null);
-
-  // Botswana approximate bounds
-  const mapBounds = {
-    north: -17.7,
-    south: -26.9,
-    east: 29.4,
-    west: 19.3
+  const [mapInstance, setMapInstance] = useState<L.Map | null>(null);
+  const [mapStyle, setMapStyle] = useState<'street' | 'satellite' | 'terrain'>('street');
+  const [zoom, setZoom] = useState(6);
+  
+  // Botswana center coordinates
+  const botswanaCenter: [number, number] = [-22.3285, 24.6849];
+  
+  // Map tile providers
+  const tileProviders = {
+    street: {
+      url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    },
+    satellite: {
+      url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+      attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+    },
+    terrain: {
+      url: "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
+      attribution: 'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
+    }
   };
 
-  // Convert lat/lng to map coordinates (simplified projection)
-  const projectCoordinates = (lng: number, lat: number) => {
-    const x = ((lng - mapBounds.west) / (mapBounds.east - mapBounds.west)) * 100;
-    const y = ((mapBounds.north - lat) / (mapBounds.north - mapBounds.south)) * 100;
-    return { x: Math.max(0, Math.min(100, x)), y: Math.max(0, Math.min(100, y)) };
+  const handleZoomIn = () => {
+    if (mapInstance && zoom < 18) {
+      const newZoom = zoom + 1;
+      setZoom(newZoom);
+      mapInstance.setZoom(newZoom);
+    }
   };
 
-  const handleZoomIn = () => setZoomLevel(Math.min(zoomLevel + 0.2, 2));
-  const handleZoomOut = () => setZoomLevel(Math.max(zoomLevel - 0.2, 0.5));
+  const handleZoomOut = () => {
+    if (mapInstance && zoom > 2) {
+      const newZoom = zoom - 1;
+      setZoom(newZoom);
+      mapInstance.setZoom(newZoom);
+    }
+  };
 
-  const getLocationColor = (location: MapLocation) => {
-    if (selectedLocation === location.id) return 'bg-beedab-blue border-beedab-darkblue';
-    if (hoveredLocation === location.id) return 'bg-blue-500 border-blue-700';
-    return 'bg-red-500 border-red-700';
+  const handleStyleChange = (style: 'street' | 'satellite' | 'terrain') => {
+    setMapStyle(style);
+  };
+
+  const focusOnBotswana = () => {
+    if (mapInstance) {
+      mapInstance.setView(botswanaCenter, 6);
+      setZoom(6);
+    }
+  };
+
+  const getMarkerColor = (location: MapLocation) => {
+    if (selectedLocation === location.id) return '#1e40af'; // Blue
+    if (location.plotCount > 20) return '#dc2626'; // Red for high availability
+    if (location.plotCount > 10) return '#f59e0b'; // Orange for medium availability
+    return '#10b981'; // Green for low availability
   };
 
   return (
     <div className={`bg-white rounded-lg shadow-md overflow-hidden ${className}`}>
-      {/* Map Header */}
+      {/* Map Header with Controls */}
       <div className="bg-gray-50 border-b border-gray-200 p-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Navigation className="h-5 w-5 text-beedab-blue" />
-            <h3 className="text-lg font-semibold text-gray-900">Plot Locations in Botswana</h3>
+            <h3 className="text-lg font-semibold text-gray-900">Property Locations - Botswana</h3>
           </div>
           
-          {/* Zoom Controls */}
           <div className="flex items-center gap-2">
+            {/* Map Style Selector */}
+            <div className="flex items-center gap-1 mr-4">
+              <Layers className="h-4 w-4 text-gray-600" />
+              <select
+                value={mapStyle}
+                onChange={(e) => handleStyleChange(e.target.value as any)}
+                className="text-sm border border-gray-300 rounded px-2 py-1"
+              >
+                <option value="street">Street</option>
+                <option value="satellite">Satellite</option>
+                <option value="terrain">Terrain</option>
+              </select>
+            </div>
+            
+            {/* Zoom Controls */}
             <button
               onClick={handleZoomOut}
               className="p-2 border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors"
@@ -76,8 +175,8 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
             >
               <ZoomOut className="h-4 w-4" />
             </button>
-            <span className="text-sm text-gray-600 px-2">
-              {Math.round(zoomLevel * 100)}%
+            <span className="text-sm text-gray-600 px-2 min-w-[50px] text-center">
+              {zoom}x
             </span>
             <button
               onClick={handleZoomIn}
@@ -86,102 +185,100 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
             >
               <ZoomIn className="h-4 w-4" />
             </button>
+            
+            {/* Focus Botswana Button */}
+            <button
+              onClick={focusOnBotswana}
+              className="ml-2 px-3 py-2 bg-beedab-blue text-white text-sm rounded-lg hover:bg-beedab-darkblue transition-colors"
+            >
+              Focus Botswana
+            </button>
           </div>
         </div>
       </div>
 
-      {/* Map Container */}
-      <div className="relative bg-green-50 h-96 overflow-hidden">
-        {/* Simplified Botswana Map Background */}
-        <div 
-          className="absolute inset-0 bg-gradient-to-br from-green-100 to-yellow-50"
-          style={{
-            backgroundImage: `
-              radial-gradient(circle at 30% 40%, rgba(34, 197, 94, 0.1) 0%, transparent 50%),
-              radial-gradient(circle at 70% 60%, rgba(234, 179, 8, 0.1) 0%, transparent 50%),
-              linear-gradient(to bottom right, rgba(168, 85, 247, 0.05) 0%, transparent 100%)
-            `,
-            transform: `scale(${zoomLevel})`,
-            transformOrigin: 'center center'
-          }}
+      {/* Real Map Container */}
+      <div className="relative h-96">
+        <MapContainer
+          center={botswanaCenter}
+          zoom={zoom}
+          style={{ height: '100%', width: '100%' }}
+          className="z-0"
         >
-          {/* Country Border Outline */}
-          <div className="absolute inset-4 border-2 border-gray-300 rounded-lg opacity-30"></div>
+          <MapController 
+            center={botswanaCenter} 
+            zoom={zoom}
+            onMapReady={setMapInstance}
+          />
           
-          {/* Major Cities Background Markers */}
-          <div className="absolute inset-0">
-            {/* Gaborone area */}
-            <div className="absolute bottom-8 left-8 w-3 h-3 bg-gray-400 rounded-full opacity-50"></div>
-            {/* Francistown area */}
-            <div className="absolute top-16 right-12 w-2 h-2 bg-gray-400 rounded-full opacity-50"></div>
-            {/* Maun area */}
-            <div className="absolute top-8 left-16 w-2 h-2 bg-gray-400 rounded-full opacity-50"></div>
-          </div>
-        </div>
-
-        {/* Plot Location Pins */}
-        {locations.map((location) => {
-          const { x, y } = projectCoordinates(location.coordinates[0], location.coordinates[1]);
+          {/* Tile Layer based on selected style */}
+          <TileLayer
+            key={mapStyle}
+            attribution={tileProviders[mapStyle].attribution}
+            url={tileProviders[mapStyle].url}
+          />
           
-          return (
-            <div
-              key={location.id}
-              className="absolute transform -translate-x-1/2 -translate-y-full cursor-pointer transition-all duration-200 hover:scale-110"
-              style={{
-                left: `${x}%`,
-                top: `${y}%`,
-                transform: `scale(${zoomLevel}) translate(-50%, -100%)`
-              }}
-              onClick={() => onLocationClick(location)}
-              onMouseEnter={() => setHoveredLocation(location.id)}
-              onMouseLeave={() => setHoveredLocation(null)}
-            >
-              {/* Pin */}
-              <div className={`w-6 h-6 rounded-full border-2 ${getLocationColor(location)} shadow-lg flex items-center justify-center`}>
-                <MapPin className="h-3 w-3 text-white" />
-              </div>
-              
-              {/* Plot Count Badge */}
-              <div className="absolute -top-2 -right-2 bg-white border border-gray-300 rounded-full px-1 text-xs font-bold text-gray-700 min-w-[20px] text-center">
-                {location.plotCount}
-              </div>
-
-              {/* Location Tooltip */}
-              {(hoveredLocation === location.id || selectedLocation === location.id) && (
-                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 bg-white border border-gray-200 rounded-lg shadow-lg p-3 min-w-[200px] z-10">
-                  <h4 className="font-semibold text-gray-900 mb-1">{location.name}</h4>
-                  <div className="text-sm text-gray-600 space-y-1">
-                    <p>{location.plotCount} plots available</p>
-                    <p>Avg. price: BWP {location.averagePrice.toLocaleString()}</p>
-                    <p>Popular size: {location.popularSize}</p>
-                    <p className="text-xs text-gray-500 mt-2">{location.description}</p>
+          {/* Property Location Markers */}
+          {locations.map((location) => {
+            const isSelected = selectedLocation === location.id;
+            const markerColor = getMarkerColor(location);
+            
+            return (
+              <Marker
+                key={location.id}
+                position={location.coordinates}
+                icon={createCustomIcon(markerColor, isSelected)}
+                eventHandlers={{
+                  click: () => onLocationClick(location),
+                }}
+              >
+                <Popup>
+                  <div className="p-2 min-w-[200px]">
+                    <h4 className="font-semibold text-gray-900 mb-2">{location.name}</h4>
+                    <div className="text-sm text-gray-600 space-y-1">
+                      <p><strong>{location.plotCount}</strong> plots available</p>
+                      <p><strong>BWP {location.averagePrice.toLocaleString()}</strong> avg. price</p>
+                      <p><strong>{location.popularSize}</strong> popular size</p>
+                      <p className="text-xs text-gray-500 mt-2 italic">{location.description}</p>
+                    </div>
+                    <button
+                      onClick={() => onLocationClick(location)}
+                      className="mt-3 w-full bg-beedab-blue text-white py-2 px-3 rounded text-sm hover:bg-beedab-darkblue transition-colors"
+                    >
+                      View Properties
+                    </button>
                   </div>
-                  
-                  {/* Tooltip Arrow */}
-                  <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-white"></div>
-                </div>
-              )}
-            </div>
-          );
-        })}
+                </Popup>
+              </Marker>
+            );
+          })}
+        </MapContainer>
       </div>
 
       {/* Map Legend */}
       <div className="bg-gray-50 border-t border-gray-200 p-4">
         <div className="flex items-center justify-between text-sm">
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-6">
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-              <span className="text-gray-600">Available Locations</span>
+              <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+              <span className="text-gray-600">1-10 plots</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 bg-beedab-blue rounded-full"></div>
+              <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
+              <span className="text-gray-600">11-20 plots</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+              <span className="text-gray-600">20+ plots</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 bg-blue-600 rounded-full"></div>
               <span className="text-gray-600">Selected</span>
             </div>
           </div>
           
           <div className="text-gray-500">
-            Click on pins to view plot listings
+            Click markers to view property details
           </div>
         </div>
       </div>
@@ -193,24 +290,28 @@ export const InteractiveMap: React.FC<InteractiveMapProps> = ({
             const location = locations.find(l => l.id === selectedLocation);
             return location ? (
               <div>
-                <h4 className="font-semibold text-beedab-blue mb-2">{location.name}</h4>
+                <h4 className="font-semibold text-beedab-blue mb-2 flex items-center">
+                  <MapPin className="h-4 w-4 mr-1" />
+                  {location.name}
+                </h4>
                 <div className="grid grid-cols-3 gap-4 text-sm">
                   <div>
                     <span className="text-gray-600">Plots Available:</span>
                     <br />
-                    <span className="font-medium">{location.plotCount}</span>
+                    <span className="font-medium text-lg">{location.plotCount}</span>
                   </div>
                   <div>
                     <span className="text-gray-600">Average Price:</span>
                     <br />
-                    <span className="font-medium">BWP {location.averagePrice.toLocaleString()}</span>
+                    <span className="font-medium text-lg">BWP {location.averagePrice.toLocaleString()}</span>
                   </div>
                   <div>
                     <span className="text-gray-600">Popular Size:</span>
                     <br />
-                    <span className="font-medium">{location.popularSize}</span>
+                    <span className="font-medium text-lg">{location.popularSize}</span>
                   </div>
                 </div>
+                <p className="text-sm text-gray-600 mt-2 italic">{location.description}</p>
               </div>
             ) : null;
           })()}

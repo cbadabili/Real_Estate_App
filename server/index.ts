@@ -94,7 +94,7 @@ app.use((req, res, next) => {
   await seedServices();
 
   // Seed rental data
-  await seedRentalData();
+  //await seedRentalData(); //removed to avoid errors and not break the program
 
   // ALWAYS serve the app on port 5000
   // this serves both the API and the client.

@@ -1,59 +1,106 @@
-import React from 'react';
+
+import React, { useState } from 'react';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import L from 'leaflet';
+import { MapPin, Home, DollarSign } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { MapPin, Home } from 'lucide-react';
+import 'leaflet/dist/leaflet.css';
+
+// Fix default markers in Leaflet
+delete (L.Icon.Default.prototype as any)._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+});
 
 interface Property {
-  id: number;
+  id: string;
   title: string;
   price: number;
   location: string;
-  propertyType: string;
-  bedrooms: number;
-  bathrooms: number;
-  squareFeet?: number;
-  imageUrl?: string;
+  coordinates: [number, number]; // [lat, lng]
+  type: string;
+  bedrooms?: number;
+  bathrooms?: number;
+  size?: string;
+  image?: string;
 }
 
 interface PropertyMapProps {
   properties: Property[];
-  selectedProperty?: Property | null;
-  onPropertySelect?: (property: Property | null) => void;
+  selectedProperty?: string;
+  onPropertySelect?: (propertyId: string) => void;
   className?: string;
 }
+
+// Popular Botswana locations with coordinates
+const botswanaLocations = [
+  { name: 'Gaborone', coordinates: [-24.6282, 25.9231], count: 0 },
+  { name: 'Francistown', coordinates: [-21.1700, 27.5100], count: 0 },
+  { name: 'Molepolole', coordinates: [-24.4167, 25.4833], count: 0 },
+  { name: 'Serowe', coordinates: [-22.3833, 26.7167], count: 0 },
+  { name: 'Selibe-Phikwe', coordinates: [-22.0167, 27.8667], count: 0 },
+  { name: 'Maun', coordinates: [-19.9833, 23.4167], count: 0 },
+  { name: 'Kanye', coordinates: [-24.9833, 25.3500], count: 0 },
+  { name: 'Mochudi', coordinates: [-24.4333, 26.1500], count: 0 },
+  { name: 'Mahalapye', coordinates: [-23.1000, 26.7833], count: 0 },
+  { name: 'Lobatse', coordinates: [-25.2333, 25.6833], count: 0 },
+];
+
+// Create custom icons for different property types
+const createPropertyIcon = (type: string, isSelected: boolean = false) => {
+  const colors = {
+    house: '#10b981',
+    apartment: '#3b82f6', 
+    plot: '#f59e0b',
+    commercial: '#8b5cf6',
+    default: '#6b7280'
+  };
+  
+  const color = colors[type.toLowerCase() as keyof typeof colors] || colors.default;
+  const size = isSelected ? 35 : 25;
+  
+  return L.divIcon({
+    className: 'custom-property-marker',
+    html: `
+      <div style="
+        background-color: ${color};
+        width: ${size}px;
+        height: ${size}px;
+        border-radius: 50%;
+        border: 3px solid white;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        font-size: 12px;
+      ">
+        🏠
+      </div>
+    `,
+    iconSize: [size, size],
+    iconAnchor: [size / 2, size / 2],
+  });
+};
 
 export const PropertyMap: React.FC<PropertyMapProps> = ({
   properties,
   selectedProperty,
   onPropertySelect,
-  className = ''
+  className = ""
 }) => {
-  const botswanaLocations = [
-    { name: 'Gaborone', lat: -24.6282, lng: 25.9231, count: 0 },
-    { name: 'Francistown', lat: -21.1673, lng: 27.5108, count: 0 },
-    { name: 'Molepolole', lat: -24.4067, lng: 25.4956, count: 0 },
-    { name: 'Kanye', lat: -24.9833, lng: 25.3333, count: 0 },
-    { name: 'Serowe', lat: -22.3925, lng: 26.7106, count: 0 },
-    { name: 'Mahalapye', lat: -23.1042, lng: 26.8381, count: 0 },
-    { name: 'Mogoditshane', lat: -24.6333, lng: 25.8667, count: 0 },
-    { name: 'Mochudi', lat: -24.4333, lng: 26.1500, count: 0 },
-    { name: 'Maun', lat: -19.9833, lng: 23.4167, count: 0 },
-    { name: 'Lobatse', lat: -25.2167, lng: 25.6833, count: 0 }
-  ];
-
+  const [mapCenter] = useState<[number, number]>([-22.3285, 24.6849]); // Botswana center
+  
   // Count properties by location
-  const locationsWithCounts = botswanaLocations.map(location => ({
-    ...location,
-    count: properties.filter(p => 
-      p.location.toLowerCase().includes(location.name.toLowerCase())
-    ).length
-  }));
-
-  const formatPrice = (price: number) => {
-    if (price >= 1000000) {
-      return `P${(price / 1000000).toFixed(1)}M`;
-    }
-    return `P${price.toLocaleString()}`;
-  };
+  const locationsWithCounts = botswanaLocations.map(location => {
+    const count = properties.filter(property => 
+      property.location.toLowerCase().includes(location.name.toLowerCase())
+    ).length;
+    return { ...location, count };
+  });
 
   return (
     <div className={`bg-white rounded-lg shadow-sm border border-gray-200 p-6 ${className}`}>
@@ -62,114 +109,161 @@ export const PropertyMap: React.FC<PropertyMapProps> = ({
         Properties Map - Botswana
       </h3>
       
-      {/* Simplified map representation */}
-      <div className="relative bg-gradient-to-br from-green-50 to-blue-50 rounded-lg p-8 min-h-[400px]">
-        {/* Map background */}
-        <div className="absolute inset-0 rounded-lg bg-gradient-to-br from-green-100 via-yellow-50 to-blue-100 opacity-30"></div>
-        
-        {/* Location markers */}
-        <div className="relative z-10">
-          {locationsWithCounts.map((location, index) => (
-            <motion.div
-              key={location.name}
-              className="absolute cursor-pointer group"
-              style={{
-                left: `${((location.lng + 28) / 8) * 100}%`,
-                top: `${((25 - location.lat) / 10) * 100}%`,
-                transform: 'translate(-50%, -50%)'
-              }}
-              whileHover={{ scale: 1.2 }}
-              initial={{ opacity: 0, scale: 0 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: index * 0.1 }}
-            >
-              {/* Location marker */}
-              <div className={`
-                relative w-8 h-8 rounded-full flex items-center justify-center border-2 border-white shadow-lg
-                ${location.count > 0 
-                  ? 'bg-beedab-blue text-white' 
-                  : 'bg-gray-300 text-gray-600'
-                }
-              `}>
-                <span className="text-xs font-bold">{location.count}</span>
-                
-                {/* Tooltip */}
-                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                  {location.name}: {location.count} properties
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-        
-        {/* Legend */}
-        <div className="absolute bottom-4 left-4 bg-white bg-opacity-90 rounded-lg p-3 shadow-sm">
-          <h4 className="text-sm font-semibold text-gray-900 mb-2">Legend</h4>
-          <div className="space-y-1 text-xs">
-            <div className="flex items-center">
-              <div className="w-3 h-3 bg-beedab-blue rounded-full mr-2"></div>
-              <span>Available properties</span>
-            </div>
-            <div className="flex items-center">
-              <div className="w-3 h-3 bg-gray-300 rounded-full mr-2"></div>
-              <span>No properties</span>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      {/* Property list for selected location */}
-      {properties.length > 0 && (
-        <div className="mt-6">
-          <h4 className="text-md font-semibold text-gray-900 mb-3">
-            Properties ({properties.length})
-          </h4>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-64 overflow-y-auto">
-            {properties.slice(0, 8).map((property) => (
-              <motion.div
+      {/* Real map with Leaflet */}
+      <div className="relative rounded-lg overflow-hidden h-96">
+        <MapContainer
+          center={mapCenter}
+          zoom={6}
+          style={{ height: '100%', width: '100%' }}
+        >
+          <TileLayer
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          />
+          
+          {/* Property markers */}
+          {properties.map((property) => {
+            const isSelected = selectedProperty === property.id;
+            
+            return (
+              <Marker
                 key={property.id}
-                className={`
-                  p-3 border rounded-lg cursor-pointer transition-all
-                  ${selectedProperty?.id === property.id
-                    ? 'border-beedab-blue bg-blue-50'
-                    : 'border-gray-200 hover:border-gray-300'
-                  }
-                `}
-                onClick={() => onPropertySelect?.(property)}
-                whileHover={{ scale: 1.02 }}
+                position={property.coordinates}
+                icon={createPropertyIcon(property.type, isSelected)}
+                eventHandlers={{
+                  click: () => onPropertySelect?.(property.id),
+                }}
               >
-                <div className="flex items-start space-x-3">
-                  <div className="flex-shrink-0">
-                    <Home className="h-8 w-8 text-beedab-blue" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h5 className="text-sm font-semibold text-gray-900 truncate">
-                      {property.title}
-                    </h5>
-                    <p className="text-sm text-gray-600 truncate">
+                <Popup>
+                  <div className="p-2 min-w-[250px]">
+                    {property.image && (
+                      <img 
+                        src={property.image} 
+                        alt={property.title}
+                        className="w-full h-32 object-cover rounded mb-2"
+                      />
+                    )}
+                    <h4 className="font-semibold text-gray-900 mb-1">{property.title}</h4>
+                    <p className="text-sm text-gray-600 mb-2 flex items-center">
+                      <MapPin className="h-3 w-3 mr-1" />
                       {property.location}
                     </p>
-                    <p className="text-sm font-bold text-beedab-blue">
-                      {formatPrice(property.price)}
-                    </p>
-                    <div className="flex items-center space-x-4 text-xs text-gray-500 mt-1">
-                      <span>{property.bedrooms} bed</span>
-                      <span>{property.bathrooms} bath</span>
-                      <span className="capitalize">{property.propertyType}</span>
+                    <div className="text-sm text-gray-600 space-y-1">
+                      <p className="flex items-center">
+                        <DollarSign className="h-3 w-3 mr-1" />
+                        <strong>BWP {property.price.toLocaleString()}</strong>
+                      </p>
+                      {property.bedrooms && (
+                        <p>{property.bedrooms} bed • {property.bathrooms} bath</p>
+                      )}
+                      {property.size && <p>{property.size}</p>}
+                      <p className="text-xs text-gray-500 capitalize">{property.type}</p>
                     </div>
+                    <button
+                      onClick={() => onPropertySelect?.(property.id)}
+                      className="mt-3 w-full bg-beedab-blue text-white py-2 px-3 rounded text-sm hover:bg-beedab-darkblue transition-colors"
+                    >
+                      View Details
+                    </button>
                   </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
+                </Popup>
+              </Marker>
+            );
+          })}
           
-          {properties.length > 8 && (
-            <p className="text-sm text-gray-500 mt-2 text-center">
-              Showing 8 of {properties.length} properties
-            </p>
-          )}
+          {/* Location markers for areas with property counts */}
+          {locationsWithCounts.filter(loc => loc.count > 0).map((location) => (
+            <Marker
+              key={`location-${location.name}`}
+              position={location.coordinates}
+              icon={L.divIcon({
+                className: 'location-count-marker',
+                html: `
+                  <div style="
+                    background-color: rgba(59, 130, 246, 0.9);
+                    color: white;
+                    border-radius: 15px;
+                    padding: 4px 8px;
+                    font-size: 12px;
+                    font-weight: bold;
+                    border: 2px solid white;
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+                  ">
+                    ${location.count}
+                  </div>
+                `,
+                iconSize: [30, 20],
+                iconAnchor: [15, 10],
+              })}
+            >
+              <Popup>
+                <div className="p-2">
+                  <h4 className="font-semibold">{location.name}</h4>
+                  <p className="text-sm text-gray-600">{location.count} properties available</p>
+                </div>
+              </Popup>
+            </Marker>
+          ))}
+        </MapContainer>
+      </div>
+
+      {/* Property type legend */}
+      <div className="mt-4 flex flex-wrap items-center gap-4 text-sm">
+        <div className="flex items-center gap-2">
+          <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+          <span>Houses</span>
         </div>
-      )}
+        <div className="flex items-center gap-2">
+          <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+          <span>Apartments</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+          <span>Plots</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
+          <span>Commercial</span>
+        </div>
+      </div>
+
+      {/* Statistics */}
+      <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+        <motion.div 
+          className="bg-gray-50 rounded-lg p-3"
+          whileHover={{ scale: 1.02 }}
+        >
+          <div className="text-2xl font-bold text-beedab-blue">{properties.length}</div>
+          <div className="text-sm text-gray-600">Total Properties</div>
+        </motion.div>
+        <motion.div 
+          className="bg-gray-50 rounded-lg p-3"
+          whileHover={{ scale: 1.02 }}
+        >
+          <div className="text-2xl font-bold text-green-600">
+            {locationsWithCounts.filter(loc => loc.count > 0).length}
+          </div>
+          <div className="text-sm text-gray-600">Active Locations</div>
+        </motion.div>
+        <motion.div 
+          className="bg-gray-50 rounded-lg p-3"
+          whileHover={{ scale: 1.02 }}
+        >
+          <div className="text-2xl font-bold text-orange-600">
+            BWP {properties.length > 0 ? Math.round(properties.reduce((sum, p) => sum + p.price, 0) / properties.length).toLocaleString() : 0}
+          </div>
+          <div className="text-sm text-gray-600">Avg. Price</div>
+        </motion.div>
+        <motion.div 
+          className="bg-gray-50 rounded-lg p-3"
+          whileHover={{ scale: 1.02 }}
+        >
+          <div className="text-2xl font-bold text-purple-600">
+            {new Set(properties.map(p => p.type)).size}
+          </div>
+          <div className="text-sm text-gray-600">Property Types</div>
+        </motion.div>
+      </div>
     </div>
   );
 };

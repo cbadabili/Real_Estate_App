@@ -111,7 +111,10 @@ const MapSearchPage = () => {
               <h3 className="text-xl font-semibold text-gray-900 mb-2">Interactive Map</h3>
               <p className="text-gray-600 mb-4">Explore properties across Botswana</p>
               <div className="text-sm text-gray-500">
-                Map integration coming soon with Google Maps API
+                Real-world mapping with OpenStreetMap integration
+              </div>
+              <div className="text-xs text-gray-400 mt-2">
+                Click on any property listing to see location on map
               </div>
             </div>
           </div>
