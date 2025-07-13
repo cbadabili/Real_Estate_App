@@ -1,16 +1,29 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
-  Scale, Calculator, Camera, Truck, Hammer, ClipboardCheck,
-  Shield, Users, Award, Star, Phone, MessageCircle, Filter,
-  MapPin, Clock, DollarSign, CheckCircle, TrendingUp, Calendar, Handshake,
-  Home, MessageSquare, FileText
+  Users, 
+  Scale, 
+  Calculator, 
+  ClipboardCheck, 
+  Shield, 
+  Hammer, 
+  Truck, 
+  Camera, 
+  MapPin, 
+  Filter,
+  Star,
+  Clock,
+  DollarSign,
+  MessageCircle,
+  Phone
 } from 'lucide-react';
+import ServiceProviderRegistration from '../components/ServiceProviderRegistration';
 import { ServicesShowcase } from '../components/ServicesShowcase';
 
 const ServicesPage = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedLocation, setSelectedLocation] = useState('all');
+  const [showRegistration, setShowRegistration] = useState(false);
 
   const serviceCategories = [
     { id: 'all', name: 'All Services', icon: Users },
@@ -502,10 +515,25 @@ const ServicesPage = () => {
           <p className="text-blue-100 mb-6">
             Join our network of verified professionals and grow your business
           </p>
-          <button className="bg-white text-beedab-blue px-8 py-3 rounded-lg font-medium hover:bg-neutral-100 transition-colors">
+          <button 
+            className="bg-white text-beedab-blue px-8 py-3 rounded-lg font-medium hover:bg-neutral-100 transition-colors"
+            onClick={() => setShowRegistration(true)}
+          >
             Register as Professional
           </button>
         </div>
+
+        {/* Registration Modal */}
+        {showRegistration && (
+          <div className="fixed inset-0 bg-neutral-900 bg-opacity-75 flex items-center justify-center">
+            <div className="bg-white rounded-lg p-8 max-w-md w-full">
+              <h2 className="text-2xl font-bold text-neutral-900 mb-4">
+                Register as a Service Provider
+              </h2>
+              <ServiceProviderRegistration onClose={() => setShowRegistration(false)} />
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
