@@ -1,4 +1,16 @@
 import { db } from './db';
+import Database from 'better-sqlite3';
+import { join } from 'path';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+// Get the directory name of the current module
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+// Create SQLite database file in the project directory
+const dbPath = join(__dirname, '..', 'beedab.db');
+const sqlite = new Database(dbPath);
 
 export async function createRentalTables() {
   try {
@@ -6,7 +18,7 @@ export async function createRentalTables() {
 
     // Create rental_listings table
     console.log('Creating rental_listings table...');
-    await db.exec(`
+    sqlite.exec(`
       CREATE TABLE IF NOT EXISTS rental_listings (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         landlord_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
@@ -38,7 +50,7 @@ export async function createRentalTables() {
 
     // Create rental_applications table
     console.log('Creating rental_applications table...');
-    await db.exec(`
+    sqlite.exec(`
       CREATE TABLE IF NOT EXISTS rental_applications (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         rental_id INTEGER REFERENCES rental_listings(id) ON DELETE CASCADE,
@@ -54,7 +66,7 @@ export async function createRentalTables() {
 
     // Create lease_agreements table
     console.log('Creating lease_agreements table...');
-    await db.exec(`
+    sqlite.exec(`
       CREATE TABLE IF NOT EXISTS lease_agreements (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         application_id INTEGER REFERENCES rental_applications(id) ON DELETE CASCADE,
