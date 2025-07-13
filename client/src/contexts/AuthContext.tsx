@@ -102,8 +102,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         body: JSON.stringify({ email, password })
       });
 
-      const { user: userData, token } = response;
-      setUser(userData);
+      // The server returns user data directly, not wrapped in a token structure
+      setUser(response);
+      // For now, we'll create a simple token from user ID
+      const token = `user_${response.id}_${Date.now()}`;
       setAuthToken(token);
       if (typeof window !== 'undefined') {
         localStorage.setItem('authToken', token);

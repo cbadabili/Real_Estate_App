@@ -89,8 +89,13 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getUserByEmail(email: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.email, email));
-    return user || undefined;
+    try {
+      const [user] = await db.select().from(users).where(eq(users.email, email));
+      return user || undefined;
+    } catch (error) {
+      console.error("Error fetching user by email:", error);
+      throw error;
+    }
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
@@ -112,7 +117,7 @@ export class DatabaseStorage implements IStorage {
 
   async getUsers(filters: { userType?: string; isActive?: boolean; limit?: number; offset?: number } = {}): Promise<User[]> {
     let query = db.select().from(users);
-    
+
     const conditions = [];
     if (filters.userType) {
       conditions.push(eq(users.userType, filters.userType));
@@ -120,19 +125,19 @@ export class DatabaseStorage implements IStorage {
     if (filters.isActive !== undefined) {
       conditions.push(eq(users.isActive, filters.isActive));
     }
-    
+
     if (conditions.length > 0) {
       query = query.where(and(...conditions));
     }
-    
+
     if (filters.limit) {
       query = query.limit(filters.limit);
     }
-    
+
     if (filters.offset) {
       query = query.offset(filters.offset);
     }
-    
+
     return await query;
   }
 
@@ -231,7 +236,7 @@ export class DatabaseStorage implements IStorage {
       .insert(properties)
       .values(propertyData)
       .returning();
-    
+
     // Parse JSON strings back to arrays
     return {
       ...newProperty,
@@ -249,15 +254,15 @@ export class DatabaseStorage implements IStorage {
     if (updates.features) {
       updateData.features = JSON.stringify(updates.features);
     }
-    
+
     const [property] = await db
       .update(properties)
       .set({ ...updateData, updatedAt: new Date() })
       .where(eq(properties.id, id))
       .returning();
-    
+
     if (!property) return undefined;
-    
+
     // Parse JSON strings back to arrays
     return {
       ...property,
@@ -277,7 +282,7 @@ export class DatabaseStorage implements IStorage {
       .from(properties)
       .where(eq(properties.ownerId, userId))
       .orderBy(desc(properties.createdAt));
-    
+
     // Parse JSON strings back to arrays
     return userProps.map(prop => ({
       ...prop,
@@ -410,7 +415,7 @@ export class DatabaseStorage implements IStorage {
       .innerJoin(properties, eq(savedProperties.propertyId, properties.id))
       .where(eq(savedProperties.userId, userId))
       .orderBy(desc(savedProperties.createdAt));
-    
+
     // Parse JSON strings back to arrays
     return savedProps.map(prop => ({
       ...prop,
