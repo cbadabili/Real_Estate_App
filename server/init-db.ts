@@ -134,6 +134,72 @@ async function initializeTables() {
       )
     `);
 
+    console.log('Creating services tables...');
+    
+    console.log('Creating service_providers table...');
+    await db.run(sql`
+      CREATE TABLE service_providers (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        company_name TEXT NOT NULL,
+        service_category TEXT NOT NULL,
+        contact_person TEXT,
+        phone_number TEXT,
+        email TEXT,
+        website_url TEXT,
+        logo_url TEXT,
+        description TEXT,
+        reac_certified INTEGER DEFAULT 0,
+        address TEXT,
+        city TEXT,
+        rating TEXT DEFAULT '4.5',
+        review_count INTEGER DEFAULT 0,
+        verified INTEGER DEFAULT 0,
+        featured INTEGER DEFAULT 0,
+        date_joined INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer)),
+        created_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer)),
+        updated_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer))
+      )
+    `);
+
+    await db.run(sql`CREATE UNIQUE INDEX service_providers_email_unique ON service_providers (email)`);
+
+    console.log('Creating service_ads table...');
+    await db.run(sql`
+      CREATE TABLE service_ads (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        provider_id INTEGER REFERENCES service_providers(id),
+        ad_title TEXT NOT NULL,
+        ad_copy TEXT,
+        ad_image_url TEXT,
+        target_audience TEXT NOT NULL,
+        context_trigger TEXT NOT NULL,
+        cta_text TEXT DEFAULT 'Learn More',
+        cta_url TEXT,
+        active INTEGER DEFAULT 1,
+        priority INTEGER DEFAULT 1,
+        impressions INTEGER DEFAULT 0,
+        clicks INTEGER DEFAULT 0,
+        created_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer)),
+        updated_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer))
+      )
+    `);
+
+    console.log('Creating service_reviews table...');
+    await db.run(sql`
+      CREATE TABLE service_reviews (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        provider_id INTEGER REFERENCES service_providers(id),
+        user_id INTEGER,
+        rating INTEGER NOT NULL,
+        review TEXT,
+        reviewer_name TEXT,
+        reviewer_avatar TEXT,
+        verified INTEGER DEFAULT 0,
+        helpful INTEGER DEFAULT 0,
+        created_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer))
+      )
+    `);
+
     console.log('✅ All tables created successfully');
   } catch (error) {
     console.error('Error initializing tables:', error);
