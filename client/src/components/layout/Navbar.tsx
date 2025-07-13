@@ -4,32 +4,40 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { NotificationCenter } from '../ui/NotificationCenter';
 import { RoleBasedComponent } from '../auth/ProtectedRoute';
 import { 
-  Menu, 
-  X, 
-  Search, 
-  MapPin, 
-  PlusCircle, 
-  User, 
-  Settings,
-  Building2,
-  ChevronDown,
-  LogOut,
-  Home as HomeIcon,
-  Home,
+  Menu,
+  X,
+  User,
   Building,
-  Bell,
-  TrendingUp,
-  Wrench,
-  FileText,
-  Camera,
-  Calendar,
-  Handshake,
-  FileCheck,
-  Key,
+  Calculator,
+  Search,
+  Map,
   Users,
+  DollarSign,
+  Home,
+  Heart,
+  Calendar,
+  FileText,
+  Bell,
+  Settings,
+  ChevronDown,
+  Briefcase,
+  PlusCircle,
+  Star,
+  MessageSquare,
   Shield,
+  Wrench,
+  TrendingUp,
+  CreditCard,
+  Phone,
+  Award,
+  Target,
+  PieChart,
+  Book,
+  Zap,
   UserCheck,
-  Gavel
+  HandHeart,
+  Hammer,
+  Camera
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { AISearchBar } from '../search/AISearchBar';
@@ -746,7 +754,7 @@ const Navbar = () => {
                           <Gavel className="h-4 w-4 mr-2" />
                           Admin Panel
                         </Link>
-                      </RoleBasedComponent>
+</RoleBasedComponent>
 
                       <Link
                         to="/profile"

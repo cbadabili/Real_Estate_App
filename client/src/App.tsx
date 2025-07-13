@@ -60,6 +60,15 @@ import LegalRequirementsPage from './pages/LegalRequirementsPage';
 import RentalListingWizard from './pages/RentalListingWizard';
 import LandlordDashboard from './pages/LandlordDashboard';
 import RenterDashboard from './pages/RenterDashboard';
+import RentalApplicationsPage from './pages/RentalApplicationsPage';
+import TenantScreeningPage from './pages/TenantScreeningPage';
+import MaintenanceManagementPage from './pages/MaintenanceManagementPage';
+import MaintenanceRequestsPage from './pages/MaintenanceRequestsPage';
+import RentCollectionPage from './pages/RentCollectionPage';
+import RentPaymentsPage from './pages/RentPaymentsPage';
+import RentalCalculatorPage from './pages/RentalCalculatorPage';
+import RentalAgreementsPage from './pages/RentalAgreementsPage';
+import RentalMarketInsightsPage from './pages/RentalMarketInsightsPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -101,6 +110,16 @@ function App() {
             <Route path="/rent/edit/:id" element={<RentalListingWizard />} />
             <Route path="/landlord/dashboard" element={<LandlordDashboard />} />
             <Route path="/renter/dashboard" element={<RenterDashboard />} />
+            <Route path="/rental/:id" element={<RentalDetailsPage />} />
+            <Route path="/rental-applications" element={<RentalApplicationsPage />} />
+            <Route path="/tenant-screening" element={<TenantScreeningPage />} />
+            <Route path="/maintenance-management" element={<MaintenanceManagementPage />} />
+            <Route path="/maintenance-requests" element={<MaintenanceRequestsPage />} />
+            <Route path="/rent-collection" element={<RentCollectionPage />} />
+            <Route path="/rent-payments" element={<RentPaymentsPage />} />
+            <Route path="/rental-calculator" element={<RentalCalculatorPage />} />
+            <Route path="/rental-agreements" element={<RentalAgreementsPage />} />
+            <Route path="/rental-market-insights" element={<RentalMarketInsightsPage />} />
             <Route path="/buyer-seller-platform" element={<BuyerSellerPlatformPage />} />
             <Route path="/platform" element={<BuyerSellerPlatformPage />} />
             <Route path="/market-intelligence" element={<MarketIntelligencePage />} />

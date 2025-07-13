@@ -67,8 +67,8 @@ export async function initializeDatabase() {
 }
 
 async function createRentalTables() {
+  // Create rental tables
   try {
-    // Create rental_listings table
     db.exec(`
       CREATE TABLE IF NOT EXISTS rental_listings (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -99,7 +99,6 @@ async function createRentalTables() {
       )
     `);
 
-    // Create rental_applications table
     db.exec(`
       CREATE TABLE IF NOT EXISTS rental_applications (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -116,7 +115,6 @@ async function createRentalTables() {
       )
     `);
 
-    // Create lease_agreements table
     db.exec(`
       CREATE TABLE IF NOT EXISTS lease_agreements (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
