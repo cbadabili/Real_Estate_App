@@ -1,8 +1,7 @@
-The code modifications involve adding a "Property Selling Tools" section to the `BuyerSellerPlatformPage.tsx` component, including necessary imports, and placing it after the features section.
-```
-```replit_final_file
+
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import { 
   Home, 
   Building2, 
