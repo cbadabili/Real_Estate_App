@@ -116,7 +116,7 @@ export class DatabaseStorage implements IStorage {
 
       const [user] = await db
         .update(users)
-        .set({ ...processedUpdates, updatedAt: new Date() })
+        .set({ ...processedUpdates, updatedAt: Math.floor(Date.now() / 1000) })
         .where(eq(users.id, id))
         .returning();
       return user || undefined;
@@ -268,7 +268,7 @@ export class DatabaseStorage implements IStorage {
 
     const [property] = await db
       .update(properties)
-      .set({ ...updateData, updatedAt: new Date() })
+      .set({ ...updateData, updatedAt: Math.floor(Date.now() / 1000) })
       .where(eq(properties.id, id))
       .returning();
 
