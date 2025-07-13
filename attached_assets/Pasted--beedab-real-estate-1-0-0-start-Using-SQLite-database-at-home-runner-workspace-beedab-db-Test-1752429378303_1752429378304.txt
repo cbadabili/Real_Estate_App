@@ -1,0 +1,68 @@
+
+> beedab-real-estate@1.0.0 start
+Using SQLite database at: /home/runner/workspace/beedab.db
+Testing database connection...
+✅ Database connection successful
+Creating users table...
+✅ Users table ready
+Creating properties table...
+✅ Properties table ready
+Creating rental tables...
+Creating rental_listings table...
+Creating rental_applications table...
+Creating lease_agreements table...
+✅ Rental tables created successfully
+Seeding services data...
+✅ Services data already exists, skipping seeding...
+5:53:34 PM [express] serving on port 5000
+Browserslist: browsers data (caniuse-lite) is 9 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+Fetching properties...
+Properties fetched: 5
+5:53:47 PM [express] GET /api/properties 304 in 7ms :: [{"id":1,"title":"Modern Family Home in Subur…
+Fetching properties...
+Properties fetched: 0
+5:54:36 PM [express] GET /api/properties 304 in 8ms :: []
+Login error: TypeError: value.getTime is not a function
+    at SQLiteTimestamp.mapToDriverValue (/home/runner/workspace/node_modules/src/sqlite-core/columns/integer.ts:151:22)
+    at <anonymous> (/home/runner/workspace/node_modules/src/sql/sql.ts:223:69)
+    at Array.map (<anonymous>)
+    at SQL.buildQueryFromSourceParams (/home/runner/workspace/node_modules/src/sql/sql.ts:148:30)
+    at <anonymous> (/home/runner/workspace/node_modules/src/sql/sql.ts:174:17)
+    at Array.map (<anonymous>)
+    at SQL.buildQueryFromSourceParams (/home/runner/workspace/node_modules/src/sql/sql.ts:148:30)
+    at <anonymous> (/home/runner/workspace/node_modules/src/sql/sql.ts:174:17)
+    at Array.map (<anonymous>)
+    at SQL.buildQueryFromSourceParams (/home/runner/workspace/node_modules/src/sql/sql.ts:148:30)
+    at <anonymous> (/home/runner/workspace/node_modules/src/sql/sql.ts:124:23)
+    at Object.startActiveSpan (/home/runner/workspace/node_modules/src/tracing.ts:27:11)
+    at SQL.toQuery (/home/runner/workspace/node_modules/src/sql/sql.ts:123:17)
+    at SQLiteSyncDialect.sqlToQuery (/home/runner/workspace/node_modules/src/sqlite-core/dialect.ts:502:14)
+    at QueryPromise._prepare (/home/runner/workspace/node_modules/src/sqlite-core/query-builders/update.ts:425:17)
+    at QueryPromise.all (/home/runner/workspace/node_modules/src/sqlite-core/query-builders/update.ts:441:15)
+    at QueryPromise.execute (/home/runner/workspace/node_modules/src/sqlite-core/query-builders/update.ts:453:40)
+    at QueryPromise.then (/home/runner/workspace/node_modules/src/query-promise.ts:31:15)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+5:55:51 PM [express] POST /api/users/login 500 in 46ms :: {"message":"Login failed"}
+Login error: TypeError: value.getTime is not a function
+    at SQLiteTimestamp.mapToDriverValue (/home/runner/workspace/node_modules/src/sqlite-core/columns/integer.ts:151:22)
+    at <anonymous> (/home/runner/workspace/node_modules/src/sql/sql.ts:223:69)
+    at Array.map (<anonymous>)
+    at SQL.buildQueryFromSourceParams (/home/runner/workspace/node_modules/src/sql/sql.ts:148:30)
+    at <anonymous> (/home/runner/workspace/node_modules/src/sql/sql.ts:174:17)
+    at Array.map (<anonymous>)
+    at SQL.buildQueryFromSourceParams (/home/runner/workspace/node_modules/src/sql/sql.ts:148:30)
+    at <anonymous> (/home/runner/workspace/node_modules/src/sql/sql.ts:174:17)
+    at Array.map (<anonymous>)
+    at SQL.buildQueryFromSourceParams (/home/runner/workspace/node_modules/src/sql/sql.ts:148:30)
+    at <anonymous> (/home/runner/workspace/node_modules/src/sql/sql.ts:124:23)
+    at Object.startActiveSpan (/home/runner/workspace/node_modules/src/tracing.ts:27:11)
+    at SQL.toQuery (/home/runner/workspace/node_modules/src/sql/sql.ts:123:17)
+    at SQLiteSyncDialect.sqlToQuery (/home/runner/workspace/node_modules/src/sqlite-core/dialect.ts:502:14)
+    at QueryPromise._prepare (/home/runner/workspace/node_modules/src/sqlite-core/query-builders/update.ts:425:17)
+    at QueryPromise.all (/home/runner/workspace/node_modules/src/sqlite-core/query-builders/update.ts:441:15)
+    at QueryPromise.execute (/home/runner/workspace/node_modules/src/sqlite-core/query-builders/update.ts:453:40)
+    at QueryPromise.then (/home/runner/workspace/node_modules/src/query-promise.ts:31:15)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+5:56:00 PM [express] POST /api/users/login 500 in 2ms :: {"message":"Login failed"}
