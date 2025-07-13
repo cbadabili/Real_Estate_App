@@ -210,11 +210,16 @@ export async function seedServices() {
   ];
 
   // Check if services data already exists
-  const existingProviders = await db.select().from(serviceProviders).limit(1);
-  
-  if (existingProviders.length > 0) {
-    console.log("Services data already exists, skipping seeding...");
-    return;
+  try {
+    const existingProviders = await db.select().from(serviceProviders).limit(1);
+    
+    if (existingProviders.length > 0) {
+      console.log("✅ Services data already exists, skipping seeding...");
+      return;
+    }
+  } catch (error) {
+    // Table might not exist yet, continue with seeding
+    console.log("No existing services data found, proceeding with seeding...");
   }
 
   // Insert providers
