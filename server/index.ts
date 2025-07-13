@@ -2,7 +2,11 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { testDatabaseConnection } from "./db";
+import { seedServices } from './services-seed';
+import { createPropertiesTable, createUsersTable } from './seed';
 import rentalRoutes from './rental-routes';
+import { createRentalTables } from './rental-migration';
+import { seedRentalData } from './rental-seed';
 import { aiSearchRoutes } from './ai-search';
 
 const app = express();
@@ -75,6 +79,17 @@ app.use((req, res, next) => {
   } else {
     serveStatic(app);
   }
+
+  // Initialize database
+  await createUsersTable();
+  await createPropertiesTable();
+  await createRentalTables();
+
+  // Seed services data
+  await seedServices();
+
+  // Seed rental data
+  await seedRentalData();
 
   // ALWAYS serve the app on port 5000
   // this serves both the API and the client.
