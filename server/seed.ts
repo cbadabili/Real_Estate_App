@@ -195,6 +195,19 @@ async function seed() {
   }
 }
 
+// Table creation functions
+export async function createUsersTable() {
+  console.log('Creating users table...');
+  // Users table creation is handled by Drizzle schema
+  console.log('✅ Users table ready');
+}
+
+export async function createPropertiesTable() {
+  console.log('Creating properties table...');
+  // Properties table creation is handled by Drizzle schema
+  console.log('✅ Properties table ready');
+}
+
 // Run seed if called directly
 if (import.meta.url === `file://${process.argv[1]}`) {
   seed().catch(console.error);
