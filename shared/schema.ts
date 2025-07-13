@@ -21,8 +21,8 @@ export const users = sqliteTable("users", {
   isActive: integer("is_active", { mode: "boolean" }).default(true),
   reacNumber: text("reac_number"), // For certified agents
   lastLoginAt: integer("last_login_at", { mode: "timestamp" }),
-  createdAt: integer("created_at", { mode: "timestamp" }).defaultNow(),
-  updatedAt: integer("updated_at", { mode: "timestamp" }).defaultNow(),
+  createdAt: integer("created_at").defaultNow(),
+  updatedAt: integer("updated_at").defaultNow(),
 });
 
 // Properties table
@@ -69,8 +69,8 @@ export const properties = sqliteTable("properties", {
   depositRequired: text("deposit_required"),
   auctionTerms: text("auction_terms"),
   lotNumber: text("lot_number"),
-  createdAt: integer("created_at", { mode: "timestamp" }).defaultNow(),
-  updatedAt: integer("updated_at", { mode: "timestamp" }).defaultNow(),
+  createdAt: integer("created_at").defaultNow(),
+  updatedAt: integer("updated_at").defaultNow(),
 });
 
 // Property inquiries
@@ -80,7 +80,7 @@ export const inquiries = sqliteTable("inquiries", {
   buyerId: integer("buyer_id").references(() => users.id).notNull(),
   message: text("message").notNull(),
   status: text("status").notNull().default('unread'), // 'unread', 'read', 'replied'
-  createdAt: integer("created_at", { mode: "timestamp" }).defaultNow(),
+  createdAt: integer("created_at").defaultNow(),
 });
 
 // Appointments for property viewings
@@ -93,7 +93,7 @@ export const appointments = sqliteTable("appointments", {
   type: text("type").notNull(), // 'in-person', 'virtual'
   status: text("status").notNull().default('scheduled'), // 'scheduled', 'confirmed', 'completed', 'cancelled'
   notes: text("notes"),
-  createdAt: integer("created_at", { mode: "timestamp" }).defaultNow(),
+  createdAt: integer("created_at").defaultNow(),
 });
 
 // Saved properties (favorites)
@@ -101,7 +101,7 @@ export const savedProperties = sqliteTable("saved_properties", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   userId: integer("user_id").references(() => users.id).notNull(),
   propertyId: integer("property_id").references(() => properties.id).notNull(),
-  createdAt: integer("created_at", { mode: "timestamp" }).defaultNow(),
+  createdAt: integer("created_at").defaultNow(),
 });
 
 // Property reviews and ratings
@@ -111,7 +111,7 @@ export const propertyReviews = sqliteTable("property_reviews", {
   reviewerId: integer("reviewer_id").references(() => users.id).notNull(),
   rating: integer("rating").notNull(), // 1-5 stars
   review: text("review"),
-  createdAt: integer("created_at", { mode: "timestamp" }).defaultNow(),
+  createdAt: integer("created_at").defaultNow(),
 });
 
 // Agent reviews and ratings
@@ -122,7 +122,7 @@ export const agentReviews = sqliteTable("agent_reviews", {
   rating: integer("rating").notNull(), // 1-5 stars
   review: text("review"),
   transactionType: text("transaction_type"), // 'buy', 'sell', 'rent'
-  createdAt: integer("created_at", { mode: "timestamp" }).defaultNow(),
+  createdAt: integer("created_at").defaultNow(),
 });
 
 // User reviews and ratings (for all user types)
@@ -138,8 +138,8 @@ export const userReviews = sqliteTable("user_reviews", {
   isPublic: integer("is_public", { mode: "boolean" }).default(true),
   status: text("status").notNull().default("active"), // 'active', 'hidden', 'flagged', 'removed'
   moderatorNotes: text("moderator_notes"),
-  createdAt: integer("created_at", { mode: "timestamp" }).defaultNow(),
-  updatedAt: integer("updated_at", { mode: "timestamp" }).defaultNow(),
+  createdAt: integer("created_at").defaultNow(),
+  updatedAt: integer("updated_at").defaultNow(),
 });
 
 // Review responses (for business replies)
@@ -149,7 +149,7 @@ export const reviewResponses = sqliteTable("review_responses", {
   responderId: integer("responder_id").references(() => users.id).notNull(),
   response: text("response").notNull(),
   isOfficial: integer("is_official", { mode: "boolean" }).default(false), // Official business response
-  createdAt: integer("created_at", { mode: "timestamp" }).defaultNow(),
+  createdAt: integer("created_at").defaultNow(),
 });
 
 // Review helpful votes
@@ -158,7 +158,7 @@ export const reviewHelpful = sqliteTable("review_helpful", {
   reviewId: integer("review_id").references(() => userReviews.id).notNull(),
   userId: integer("user_id").references(() => users.id).notNull(),
   isHelpful: integer("is_helpful", { mode: "boolean" }).notNull(), // true for helpful, false for not helpful
-  createdAt: integer("created_at", { mode: "timestamp" }).defaultNow(),
+  createdAt: integer("created_at").defaultNow(),
 });
 
 // User permissions and roles
@@ -168,7 +168,7 @@ export const userPermissions = sqliteTable("user_permissions", {
   permission: text("permission").notNull(),
   grantedBy: integer("granted_by").references(() => users.id),
   expiresAt: integer("expires_at", { mode: "timestamp" }),
-  createdAt: integer("created_at", { mode: "timestamp" }).defaultNow(),
+  createdAt: integer("created_at").defaultNow(),
 });
 
 // Admin audit log
@@ -181,7 +181,7 @@ export const adminAuditLog = sqliteTable("admin_audit_log", {
   details: text("details"), // JSON string of details
   ipAddress: text("ip_address"),
   userAgent: text("user_agent"),
-  createdAt: integer("created_at", { mode: "timestamp" }).defaultNow(),
+  createdAt: integer("created_at").defaultNow(),
 });
 
 export const saved_searches = sqliteTable('saved_searches', {
