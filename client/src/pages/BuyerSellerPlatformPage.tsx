@@ -1,25 +1,24 @@
+The code modifications involve adding a "Property Selling Tools" section to the `BuyerSellerPlatformPage.tsx` component, including necessary imports, and placing it after the features section.
+```
+```replit_final_file
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Link } from 'wouter';
 import { 
+  Home, 
+  Building2, 
+  Search, 
   FileText, 
-  Shield, 
   Calculator, 
-  Users, 
-  CheckCircle, 
-  ArrowRight,
-  Home,
-  MessageSquare,
-  Calendar,
-  Video,
-  Handshake,
+  Shield, 
+  Users,
+  TrendingUp,
+  CheckCircle,
   Star,
-  Clock,
-  MapPin,
-  Phone,
-  Mail,
-  Eye,
-  TrendingUp
+  ArrowRight,
+  Play,
+  DollarSign,
+  Calendar,
+  Handshake
 } from 'lucide-react';
 
 const BuyerSellerPlatformPage = () => {
@@ -145,6 +144,95 @@ const BuyerSellerPlatformPage = () => {
                 </Link>
               );
             })}
+          </div>
+        </div>
+      </section>
+
+      {/* Property Selling Tools Section */}
+      <section className="py-16 bg-neutral-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div variants={itemVariants} className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-neutral-900 mb-4 flex items-center justify-center">
+              <TrendingUp className="h-8 w-8 mr-3 text-beedab-blue" />
+              Property Selling Tools
+            </h2>
+            <p className="text-neutral-600 max-w-2xl mx-auto">
+              Everything you need to successfully sell your property in Botswana
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <motion.div variants={itemVariants} className="bg-white rounded-lg shadow-sm border border-neutral-200 p-6">
+              <div className="flex items-start space-x-4">
+                <div className="w-12 h-12 bg-beedab-blue rounded-lg flex items-center justify-center">
+                  <DollarSign className="h-6 w-6 text-white" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-xl font-semibold text-neutral-900 mb-2">Pricing Guide</h3>
+                  <p className="text-neutral-600 mb-4">Set competitive prices based on market analysis and comparable sales</p>
+                  <button 
+                    onClick={() => window.open('/pricing-guide', '_blank')}
+                    className="bg-beedab-blue text-white px-6 py-2 rounded-lg hover:bg-beedab-darkblue transition-colors"
+                  >
+                    Get Started
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+
+            <motion.div variants={itemVariants} className="bg-white rounded-lg shadow-sm border border-neutral-200 p-6">
+              <div className="flex items-start space-x-4">
+                <div className="w-12 h-12 bg-purple-600 rounded-lg flex items-center justify-center">
+                  <Calendar className="h-6 w-6 text-white" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-xl font-semibold text-neutral-900 mb-2">Manage Showings</h3>
+                  <p className="text-neutral-600 mb-4">Schedule and coordinate property viewings with potential buyers</p>
+                  <button 
+                    onClick={() => window.open('/manage-showings', '_blank')}
+                    className="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700 transition-colors"
+                  >
+                    Get Started
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+
+            <motion.div variants={itemVariants} className="bg-white rounded-lg shadow-sm border border-neutral-200 p-6">
+              <div className="flex items-start space-x-4">
+                <div className="w-12 h-12 bg-orange-600 rounded-lg flex items-center justify-center">
+                  <Handshake className="h-6 w-6 text-white" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-xl font-semibold text-neutral-900 mb-2">Handle Offers</h3>
+                  <p className="text-neutral-600 mb-4">Review, negotiate, and manage purchase offers efficiently</p>
+                  <button 
+                    onClick={() => window.open('/handle-offers', '_blank')}
+                    className="bg-orange-600 text-white px-6 py-2 rounded-lg hover:bg-orange-700 transition-colors"
+                  >
+                    Get Started
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+
+            <motion.div variants={itemVariants} className="bg-white rounded-lg shadow-sm border border-neutral-200 p-6">
+              <div className="flex items-start space-x-4">
+                <div className="w-12 h-12 bg-green-600 rounded-lg flex items-center justify-center">
+                  <Home className="h-6 w-6 text-white" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-xl font-semibold text-neutral-900 mb-2">Property Handover</h3>
+                  <p className="text-neutral-600 mb-4">Complete the legal transfer of ownership to buyers</p>
+                  <button 
+                    onClick={() => window.open('/property-handover', '_blank')}
+                    className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition-colors"
+                  >
+                    Get Started
+                  </button>
+                </div>
+              </div>
+            </motion.div>
           </div>
         </div>
       </section>
