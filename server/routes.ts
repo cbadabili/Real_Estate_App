@@ -66,7 +66,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Update last login
-      await storage.updateUser(user.id, { lastLoginAt: Math.floor(Date.now() / 1000) });
+      try {
+        const loginTimestamp = Math.floor(Date.now() / 1000);
+        console.log('Updating user with timestamp:', loginTimestamp, typeof loginTimestamp);
+        await storage.updateUser(user.id, { lastLoginAt: loginTimestamp });
+      } catch (error) {
+        console.error('Error updating last login:', error);
+        // Don't fail the login if we can't update the timestamp
+      }
 
       const { password: _, ...userResponse } = user;
       res.json(userResponse);

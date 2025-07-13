@@ -111,17 +111,30 @@ export class DatabaseStorage implements IStorage {
       // Handle timestamp conversion for any timestamp fields
       const processedUpdates = { ...updates };
       
-      // Convert Date objects to Unix timestamps
-      if (processedUpdates.lastLoginAt instanceof Date) {
-        processedUpdates.lastLoginAt = Math.floor(processedUpdates.lastLoginAt.getTime() / 1000);
-      } else if (typeof processedUpdates.lastLoginAt === 'number' && processedUpdates.lastLoginAt > 1000000000000) {
-        // Convert milliseconds to seconds if it's a large timestamp
-        processedUpdates.lastLoginAt = Math.floor(processedUpdates.lastLoginAt / 1000);
+      // Handle all timestamp fields properly
+      const timestampFields = ['lastLoginAt', 'createdAt', 'updatedAt'];
+      
+      for (const field of timestampFields) {
+        if (processedUpdates[field] !== undefined) {
+          const value = processedUpdates[field];
+          if (value instanceof Date) {
+            processedUpdates[field] = Math.floor(value.getTime() / 1000);
+          } else if (typeof value === 'number') {
+            // If it's already a number, ensure it's in seconds, not milliseconds
+            if (value > 1000000000000) {
+              processedUpdates[field] = Math.floor(value / 1000);
+            }
+            // If it's already a reasonable timestamp in seconds, leave it as is
+          }
+        }
       }
 
       const [user] = await db
         .update(users)
-        .set({ ...processedUpdates, updatedAt: Math.floor(Date.now() / 1000) })
+        .set({ 
+          ...processedUpdates, 
+          updatedAt: Math.floor(Date.now() / 1000) 
+        })
         .where(eq(users.id, id))
         .returning();
       return user || undefined;
