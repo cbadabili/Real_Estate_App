@@ -66,7 +66,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Update last login
-      await storage.updateUser(user.id, { lastLoginAt: new Date().toISOString() });
+      await storage.updateUser(user.id, { lastLoginAt: Math.floor(Date.now() / 1000) });
 
       const { password: _, ...userResponse } = user;
       res.json(userResponse);

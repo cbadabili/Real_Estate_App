@@ -107,12 +107,23 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateUser(id: number, updates: Partial<InsertUser>): Promise<User | undefined> {
-    const [user] = await db
-      .update(users)
-      .set({ ...updates, updatedAt: new Date() })
-      .where(eq(users.id, id))
-      .returning();
-    return user || undefined;
+    try {
+      // Convert Date objects to timestamps for SQLite
+      const processedUpdates = { ...updates };
+      if (processedUpdates.lastLoginAt instanceof Date) {
+        processedUpdates.lastLoginAt = Math.floor(processedUpdates.lastLoginAt.getTime() / 1000);
+      }
+
+      const [user] = await db
+        .update(users)
+        .set({ ...processedUpdates, updatedAt: new Date() })
+        .where(eq(users.id, id))
+        .returning();
+      return user || undefined;
+    } catch (error) {
+      console.error('Error updating user:', error);
+      throw error;
+    }
   }
 
   async getUsers(filters: { userType?: string; isActive?: boolean; limit?: number; offset?: number } = {}): Promise<User[]> {
