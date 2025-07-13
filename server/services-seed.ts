@@ -1,5 +1,6 @@
 import { db } from "./db";
 import { serviceProviders, serviceAds, serviceReviews } from "@shared/services-schema";
+import { eq } from "drizzle-orm";
 
 export async function seedServices() {
   console.log("Seeding services data...");
@@ -207,6 +208,14 @@ export async function seedServices() {
       featured: false
     }
   ];
+
+  // Check if services data already exists
+  const existingProviders = await db.select().from(serviceProviders).limit(1);
+  
+  if (existingProviders.length > 0) {
+    console.log("Services data already exists, skipping seeding...");
+    return;
+  }
 
   // Insert providers
   const insertedProviders = await db.insert(serviceProviders).values(providers).returning();
