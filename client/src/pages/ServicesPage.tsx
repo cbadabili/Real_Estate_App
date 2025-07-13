@@ -531,14 +531,13 @@ const ServicesPage = () => {
 
         {/* Registration Modal */}
         {showRegistration && (
-          <div className="fixed inset-0 bg-neutral-900 bg-opacity-75 flex items-center justify-center">
-            <div className="bg-white rounded-lg p-8 max-w-md w-full">
-              <h2 className="text-2xl font-bold text-neutral-900 mb-4">
-                Register as a Service Provider
-              </h2>
-              <ServiceProviderRegistration onClose={() => setShowRegistration(false)} />
-            </div>
-          </div>
+          <ServiceProviderRegistration 
+            onClose={() => setShowRegistration(false)}
+            onSuccess={() => {
+              // Optionally refresh the professionals list or show success message
+              console.log('Service provider registered successfully!');
+            }}
+          />
         )}
       </div>
     </div>

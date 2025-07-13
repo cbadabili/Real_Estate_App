@@ -4,6 +4,7 @@ import { setupVite, serveStatic, log } from "./vite";
 import { testDatabaseConnection } from "./db";
 import { seedServices } from './services-seed';
 import { createPropertiesTable, createUsersTable } from './seed';
+import { createRentalTables } from './rental-migration';
 import rentalRoutes from "./rental-routes";
 import { aiSearchRoutes } from './ai-search';
 import propertyManagementRoutes from './property-management-routes';

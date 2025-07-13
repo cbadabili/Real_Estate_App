@@ -48,7 +48,7 @@ type ServiceProviderFormData = z.infer<typeof serviceProviderSchema>;
 
 interface ServiceProviderRegistrationProps {
   onClose: () => void;
-  onSuccess: () => void;
+  onSuccess?: () => void;
 }
 
 const ServiceProviderRegistration: React.FC<ServiceProviderRegistrationProps> = ({ 
@@ -141,7 +141,7 @@ const ServiceProviderRegistration: React.FC<ServiceProviderRegistrationProps> = 
         throw new Error(errorData.message || 'Failed to register service provider');
       }
 
-      onSuccess();
+      if (onSuccess) onSuccess();
       onClose();
     } catch (error) {
       setSubmitError(error instanceof Error ? error.message : 'Failed to register service provider');
