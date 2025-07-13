@@ -15,7 +15,13 @@ import {
   Clock,
   DollarSign,
   MessageCircle,
-  Phone
+  Phone,
+  CheckCircle,
+  Award,
+  TrendingUp,
+  Calendar,
+  Handshake,
+  Home
 } from 'lucide-react';
 import ServiceProviderRegistration from '../components/ServiceProviderRegistration';
 import { ServicesShowcase } from '../components/ServicesShowcase';
