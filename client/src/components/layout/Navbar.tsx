@@ -38,7 +38,8 @@ import {
   HandHeart,
   Hammer,
   Camera,
-  MapPin
+  MapPin,
+  Handshake
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { AISearchBar } from '../search/AISearchBar';
