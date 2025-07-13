@@ -40,7 +40,8 @@ import {
   Camera,
   MapPin,
   Handshake,
-  Building2
+  Building2,
+  FileCheck
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { AISearchBar } from '../search/AISearchBar';
