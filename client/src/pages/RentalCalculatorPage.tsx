@@ -90,9 +90,9 @@ const RentalCalculatorPage = () => {
     }));
   };
 
-  const getYieldColor = (yield: number) => {
-    if (yield >= 8) return 'text-green-600';
-    if (yield >= 6) return 'text-yellow-600';
+  const getYieldColor = (yieldValue: number) => {
+    if (yieldValue >= 8) return 'text-green-600';
+    if (yieldValue >= 6) return 'text-yellow-600';
     return 'text-red-600';
   };
 
