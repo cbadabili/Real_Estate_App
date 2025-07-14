@@ -1,0 +1,32 @@
+Column Name Conflict
+The “near references” syntax error when creating rental_applications comes from using references as a column name. Because REFERENCES is a reserved keyword in SQL, SQLite treats it as part of a foreign-key clause instead of a column name.
+
+Rename that field (e.g., reference_list or application_references).
+
+Alternatively, quote the name using double quotes ("references" TEXT) when defining the table, though renaming is less error‑prone.
+
+Align Schema and Migrations
+Ensure the schema defined in shared/schema.ts matches whatever migration or table creation scripts you’re running. The schema in shared/schema.ts uses a simplified rental_applications table, while the failing migration attempts to create many additional columns. Confirm that your migration script reflects the current schema or update the schema to include those new fields.
+
+Database Setup
+Use the instructions in SETUP.md to initialize the database before running the server:
+
+npm run db:push       # create tables via Drizzle
+npx tsx server/seed.ts
+npx tsx server/services-seed.ts
+Running these steps should ensure all tables exist before npm start.
+
+TypeScript Errors
+npm run check currently fails with many TypeScript errors, which could cause runtime issues. Addressing these will improve stability. Focus on modules missing export types, any usage, and unreachable imports. Consistent adherence to the tsconfig settings will help keep both client and server code aligned.
+
+Authorization Testing
+When testing authorization, continue using the authentication and role helpers (authenticate, authorize, requireRole) as you did. Automated integration tests can confirm behavior:
+
+Check that access to /api/admin/dashboard is blocked for non-admin users (expect 403).
+
+Verify that updating a user’s role to admin then allows access (expect 200).
+
+Ensure application routes enforce authenticate before allowing data changes.
+
+Automated Tests
+Add simple Jest or Vitest tests that hit your API endpoints, seeding the database beforehand and ensuring cleanup. This helps detect regressions without manual curl commands.
