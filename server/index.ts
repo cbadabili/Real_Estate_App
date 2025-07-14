@@ -7,7 +7,7 @@ import { servicesRoutes } from './services-routes';
 import { marketplaceRoutes } from './marketplace-routes';
 import { aiSearchRoutes } from './ai-search';
 import { tenantSupportRoutes } from './tenant-support-routes';
-import { propertyManagementRoutes } from './property-management-routes';
+import propertyManagementRoutes from './property-management-routes';
 
 const app = express();
 app.use(express.json());
