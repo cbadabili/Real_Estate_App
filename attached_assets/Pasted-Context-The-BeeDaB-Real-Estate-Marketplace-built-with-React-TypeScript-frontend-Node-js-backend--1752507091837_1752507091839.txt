@@ -1,0 +1,70 @@
+Context:
+The BeeDaB Real Estate Marketplace built with React (TypeScript) frontend, Node.js backend (Express), and SQLite using Drizzle ORM is facing repetitive import/export syntax errors:
+
+Files (e.g., server/index.ts) repeatedly encounter errors like:
+
+javascript
+Copy
+SyntaxError: The requested module './some-route-file' does not provide an export named 'someRoutes'
+These errors consistently occur due to mismatched import/export types (default vs named exports).
+
+Objective:
+Provide a single, holistic fix addressing all the export/import inconsistencies throughout the backend API routes and frontend component imports.
+
+🛠️ Holistic Implementation Steps
+1. Backend Route Files (Express):
+Review and ensure consistent exporting method (recommend default export):
+
+Example route file (server/marketplace-routes.ts):
+
+typescript
+Copy
+import { Router } from 'express';
+const router = Router();
+
+router.get('/categories', ...);
+router.post('/register-provider', ...);
+
+export default router; // ✅ Default export clearly defined
+2. Server Index Imports (server/index.ts):
+Review and ensure all route imports consistently use default import:
+
+Example:
+
+typescript
+Copy
+import marketplaceRoutes from './marketplace-routes'; // ✅ Correct
+import rentalRoutes from './rental-routes';           // ✅ Correct
+import propertyManagementRoutes from './property-management-routes'; // ✅ Correct
+3. Verify Route Integration (Express app setup):
+Clearly integrate imported routes into your Express server:
+
+typescript
+Copy
+app.use('/api/marketplace', marketplaceRoutes);
+app.use('/api/rentals', rentalRoutes);
+app.use('/api/property-management', propertyManagementRoutes);
+📌 Actionable Deliverables (Clearly define these):
+ Audit all route files in server/ directory for consistent use of default exports.
+
+ Audit all imports in server/index.ts and server/routes.ts for default import syntax.
+
+ Clearly fix existing syntax errors caused by mismatched import/export.
+
+ Verify all API routes (/api/...) are functioning correctly after fixing.
+
+ Ensure server starts without errors (npm run start).
+
+🔍 Testing and Validation (Clearly outlined):
+After implementation:
+
+ Run server (npm run start) without encountering syntax errors.
+
+ Test each backend route (marketplace, rental, property management) via Postman or similar tools to ensure proper integration.
+
+ Verify frontend components clearly fetch data from fixed backend routes without errors.
+
+📝 Documentation & Consistency:
+Update README clearly specifying the project's import/export guidelines.
+
+Clearly state: "All Express router files use default exports; all route imports in server files use default import syntax."
