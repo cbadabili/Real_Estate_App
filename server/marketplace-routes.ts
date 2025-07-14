@@ -1,327 +1,308 @@
 
-import express from 'express';
-import { marketplaceStorage } from './marketplace-storage';
-import { authenticate, authorize } from './auth-middleware';
-import { Permission } from '../shared/schema';
+import { Router } from 'express';
 import { z } from 'zod';
+import { authenticate } from './auth-middleware';
 
-const router = express.Router();
+const router = Router();
 
-// Service Categories
+// Mock data for categories and services
+const categories = {
+  professionals: [
+    { id: 1, name: 'Lawyers', description: 'Property law specialists', icon_url: '/icons/lawyer.svg', service_count: 45 },
+    { id: 2, name: 'Valuers', description: 'Property valuation experts', icon_url: '/icons/valuer.svg', service_count: 23 },
+    { id: 3, name: 'Conveyancers', description: 'Property transfer specialists', icon_url: '/icons/conveyancer.svg', service_count: 34 },
+    { id: 4, name: 'Insurance Providers', description: 'Property insurance services', icon_url: '/icons/insurance.svg', service_count: 18 },
+    { id: 5, name: 'Architects', description: 'Building design professionals', icon_url: '/icons/architect.svg', service_count: 27 }
+  ],
+  suppliers: [
+    { id: 6, name: 'Hardware Stores', description: 'Building materials and tools', icon_url: '/icons/hardware.svg', service_count: 38 },
+    { id: 7, name: 'Concrete Suppliers', description: 'Ready-mix concrete providers', icon_url: '/icons/concrete.svg', service_count: 15 },
+    { id: 8, name: 'Timber Suppliers', description: 'Quality wood and lumber', icon_url: '/icons/timber.svg', service_count: 22 },
+    { id: 9, name: 'Steel Suppliers', description: 'Construction steel and reinforcement', icon_url: '/icons/steel.svg', service_count: 12 },
+    { id: 10, name: 'Paint Suppliers', description: 'Interior and exterior paints', icon_url: '/icons/paint.svg', service_count: 29 }
+  ],
+  trades: [
+    { id: 11, name: 'Builders', description: 'General construction services', icon_url: '/icons/builder.svg', service_count: 56 },
+    { id: 12, name: 'Electricians', description: 'Electrical installation and repair', icon_url: '/icons/electrician.svg', service_count: 41 },
+    { id: 13, name: 'Plumbers', description: 'Plumbing installation and maintenance', icon_url: '/icons/plumber.svg', service_count: 33 },
+    { id: 14, name: 'Landscapers', description: 'Garden and outdoor design', icon_url: '/icons/landscaper.svg', service_count: 28 },
+    { id: 15, name: 'Surveyors', description: 'Land and building surveys', icon_url: '/icons/surveyor.svg', service_count: 19 }
+  ],
+  training: [
+    { id: 16, name: 'Property Valuation', description: 'Learn property assessment skills', icon_url: '/icons/valuation-course.svg', service_count: 8 },
+    { id: 17, name: 'Conveyancing', description: 'Property transfer process training', icon_url: '/icons/conveyancing-course.svg', service_count: 6 },
+    { id: 18, name: 'Construction Skills', description: 'Building and trade skills', icon_url: '/icons/construction-course.svg', service_count: 14 },
+    { id: 19, name: 'Real Estate Sales', description: 'Property sales techniques', icon_url: '/icons/sales-course.svg', service_count: 12 },
+    { id: 20, name: 'Property Management', description: 'Rental property management', icon_url: '/icons/management-course.svg', service_count: 9 }
+  ]
+};
+
+const services = {
+  professionals: [
+    {
+      id: 1, business_name: 'Mogale & Associates', business_description: 'Experienced property lawyers serving Botswana for over 15 years',
+      service_area: 'Gaborone, Francistown', hourly_rate: 850, rating: 4.8, review_count: 127,
+      contact_email: 'info@mogalelaw.bw', contact_phone: '+267 391 2345', category_id: 1, user_id: 101,
+      profile_image: '/avatars/lawyer1.jpg', verified: true, years_experience: 15
+    },
+    {
+      id: 2, business_name: 'Precision Valuers', business_description: 'Certified property valuers with extensive market knowledge',
+      service_area: 'Nationwide', hourly_rate: 650, rating: 4.9, review_count: 89,
+      contact_email: 'valuations@precision.bw', contact_phone: '+267 395 7890', category_id: 2, user_id: 102,
+      profile_image: '/avatars/valuer1.jpg', verified: true, years_experience: 12
+    }
+  ],
+  suppliers: [
+    {
+      id: 3, business_name: 'BuildMax Hardware', business_description: 'Complete range of building materials and tools',
+      service_area: 'Gaborone, Molepolole', hourly_rate: 0, rating: 4.6, review_count: 203,
+      contact_email: 'orders@buildmax.bw', contact_phone: '+267 390 1234', category_id: 6, user_id: 103,
+      profile_image: '/avatars/hardware1.jpg', verified: true, years_experience: 8
+    }
+  ],
+  trades: [
+    {
+      id: 4, business_name: 'Elite Builders', business_description: 'Quality construction services for residential and commercial projects',
+      service_area: 'Greater Gaborone', hourly_rate: 450, rating: 4.7, review_count: 156,
+      contact_email: 'projects@elitebuilders.bw', contact_phone: '+267 392 5678', category_id: 11, user_id: 104,
+      profile_image: '/avatars/builder1.jpg', verified: true, years_experience: 18
+    }
+  ],
+  training: [
+    {
+      id: 5, business_name: 'Property Academy Botswana', business_description: 'Professional development courses for real estate professionals',
+      service_area: 'Online & Gaborone', hourly_rate: 300, rating: 4.5, review_count: 67,
+      contact_email: 'courses@propertyacademy.bw', contact_phone: '+267 393 9012', category_id: 16, user_id: 105,
+      profile_image: '/avatars/training1.jpg', verified: true, years_experience: 6
+    }
+  ]
+};
+
+// Provider registration schema
+const providerRegistrationSchema = z.object({
+  category_id: z.number(),
+  business_name: z.string().min(1),
+  business_description: z.string().min(10),
+  service_area: z.string().min(1),
+  hourly_rate: z.number().min(0),
+  contact_email: z.string().email(),
+  contact_phone: z.string().min(1),
+  profile_image: z.string().optional()
+});
+
+// GET /api/categories?section={section}
 router.get('/categories', async (req, res) => {
   try {
-    const journey_type = req.query.journey_type as string;
-    const categories = await marketplaceStorage.getServiceCategories(journey_type);
-    res.json(categories);
+    const { section } = req.query;
+    
+    if (!section || typeof section !== 'string') {
+      return res.status(400).json({
+        success: false,
+        error: 'Section parameter is required'
+      });
+    }
+
+    const sectionCategories = categories[section as keyof typeof categories];
+    
+    if (!sectionCategories) {
+      return res.status(404).json({
+        success: false,
+        error: 'Section not found'
+      });
+    }
+
+    res.json({
+      success: true,
+      data: sectionCategories
+    });
   } catch (error) {
-    console.error('Error fetching service categories:', error);
-    res.status(500).json({ message: 'Failed to fetch service categories' });
+    console.error('Error fetching categories:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch categories'
+    });
   }
 });
 
-// Marketplace Providers
-router.get('/providers', async (req, res) => {
+// GET /api/services?section={section}&category={category}&limit={limit}
+router.get('/services', async (req, res) => {
   try {
-    const filters = {
-      provider_type: req.query.provider_type as string,
-      category_id: req.query.category_id ? parseInt(req.query.category_id as string) : undefined,
-      service_area: req.query.service_area as string,
-      min_rating: req.query.min_rating ? parseFloat(req.query.min_rating as string) : undefined,
-      is_verified: req.query.is_verified === 'true',
-      is_featured: req.query.is_featured === 'true',
-      availability_status: req.query.availability_status as string,
-      limit: req.query.limit ? parseInt(req.query.limit as string) : 20,
-      offset: req.query.offset ? parseInt(req.query.offset as string) : 0,
-      sort_by: req.query.sort_by as 'rating' | 'price' | 'experience' | 'reviews' | 'name',
-      sort_order: req.query.sort_order as 'asc' | 'desc'
-    };
+    const { section, category, limit = '10' } = req.query;
+    
+    if (!section || typeof section !== 'string') {
+      return res.status(400).json({
+        success: false,
+        error: 'Section parameter is required'
+      });
+    }
 
-    const providers = await marketplaceStorage.getMarketplaceProviders(filters);
-    res.json(providers);
+    const sectionServices = services[section as keyof typeof services] || [];
+    let filteredServices = sectionServices;
+
+    // Filter by category if provided
+    if (category && typeof category === 'string') {
+      const categoryId = parseInt(category);
+      filteredServices = sectionServices.filter(service => service.category_id === categoryId);
+    }
+
+    // Apply limit
+    const limitNum = parseInt(limit as string);
+    if (limitNum > 0) {
+      filteredServices = filteredServices.slice(0, limitNum);
+    }
+
+    res.json({
+      success: true,
+      data: filteredServices,
+      total: filteredServices.length
+    });
   } catch (error) {
-    console.error('Error fetching marketplace providers:', error);
-    res.status(500).json({ message: 'Failed to fetch marketplace providers' });
+    console.error('Error fetching services:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch services'
+    });
   }
 });
 
+// GET /api/providers/{id}
 router.get('/providers/:id', async (req, res) => {
   try {
-    const id = parseInt(req.params.id);
-    const provider = await marketplaceStorage.getMarketplaceProvider(id);
-    
+    const { id } = req.params;
+    const providerId = parseInt(id);
+
+    // Search across all sections for the provider
+    let provider = null;
+    for (const sectionServices of Object.values(services)) {
+      provider = sectionServices.find(service => service.id === providerId);
+      if (provider) break;
+    }
+
     if (!provider) {
-      return res.status(404).json({ message: 'Provider not found' });
+      return res.status(404).json({
+        success: false,
+        error: 'Provider not found'
+      });
     }
-    
-    res.json(provider);
+
+    res.json({
+      success: true,
+      data: provider
+    });
   } catch (error) {
-    console.error('Error fetching marketplace provider:', error);
-    res.status(500).json({ message: 'Failed to fetch marketplace provider' });
+    console.error('Error fetching provider:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch provider details'
+    });
   }
 });
 
-router.post('/providers', authenticate, async (req, res) => {
+// POST /api/providers/register
+router.post('/providers/register', authenticate, async (req, res) => {
   try {
-    const providerData = {
-      ...req.body,
-      user_id: req.user?.id
-    };
-    
-    const provider = await marketplaceStorage.createMarketplaceProvider(providerData);
-    res.status(201).json(provider);
-  } catch (error) {
-    console.error('Error creating marketplace provider:', error);
-    res.status(500).json({ message: 'Failed to create marketplace provider' });
-  }
-});
-
-// Professionals (Professional Services)
-router.get('/professionals', async (req, res) => {
-  try {
-    const filters = {
-      ...req.query,
-      provider_type: 'professional'
-    };
-    
-    const professionals = await marketplaceStorage.getMarketplaceProviders(filters);
-    res.json(professionals);
-  } catch (error) {
-    console.error('Error fetching professionals:', error);
-    res.status(500).json({ message: 'Failed to fetch professionals' });
-  }
-});
-
-// Suppliers (Building Materials)
-router.get('/suppliers', async (req, res) => {
-  try {
-    const filters = {
-      ...req.query,
-      provider_type: 'supplier'
-    };
-    
-    const suppliers = await marketplaceStorage.getMarketplaceProviders(filters);
-    res.json(suppliers);
-  } catch (error) {
-    console.error('Error fetching suppliers:', error);
-    res.status(500).json({ message: 'Failed to fetch suppliers' });
-  }
-});
-
-// Trades (Skilled Labor)
-router.get('/trades', async (req, res) => {
-  try {
-    const filters = {
-      ...req.query,
-      provider_type: 'artisan'
-    };
-    
-    const trades = await marketplaceStorage.getMarketplaceProviders(filters);
-    res.json(trades);
-  } catch (error) {
-    console.error('Error fetching trades:', error);
-    res.status(500).json({ message: 'Failed to fetch trades' });
-  }
-});
-
-// Training Programs
-router.get('/training', async (req, res) => {
-  try {
-    const filters = {
-      category: req.query.category as string,
-      provider_id: req.query.provider_id ? parseInt(req.query.provider_id as string) : undefined,
-      status: req.query.status as string || 'active'
-    };
-    
-    const programs = await marketplaceStorage.getTrainingPrograms(filters);
-    res.json(programs);
-  } catch (error) {
-    console.error('Error fetching training programs:', error);
-    res.status(500).json({ message: 'Failed to fetch training programs' });
-  }
-});
-
-router.post('/training', authenticate, async (req, res) => {
-  try {
-    const program = await marketplaceStorage.createTrainingProgram(req.body);
-    res.status(201).json(program);
-  } catch (error) {
-    console.error('Error creating training program:', error);
-    res.status(500).json({ message: 'Failed to create training program' });
-  }
-});
-
-// Building Materials
-router.get('/materials', async (req, res) => {
-  try {
-    const filters = {
-      category: req.query.category as string,
-      supplier_id: req.query.supplier_id ? parseInt(req.query.supplier_id as string) : undefined,
-      status: req.query.status as string || 'available'
-    };
-    
-    const materials = await marketplaceStorage.getBuildingMaterials(filters);
-    res.json(materials);
-  } catch (error) {
-    console.error('Error fetching building materials:', error);
-    res.status(500).json({ message: 'Failed to fetch building materials' });
-  }
-});
-
-router.post('/materials', authenticate, async (req, res) => {
-  try {
-    const material = await marketplaceStorage.createBuildingMaterial(req.body);
-    res.status(201).json(material);
-  } catch (error) {
-    console.error('Error creating building material:', error);
-    res.status(500).json({ message: 'Failed to create building material' });
-  }
-});
-
-// Project Requests
-router.get('/projects', async (req, res) => {
-  try {
-    const filters = {
-      project_type: req.query.project_type as string,
-      category_id: req.query.category_id ? parseInt(req.query.category_id as string) : undefined,
-      city: req.query.city as string,
-      status: req.query.status as string || 'open',
-      budget_range: req.query.budget_min && req.query.budget_max ? {
-        min: parseInt(req.query.budget_min as string),
-        max: parseInt(req.query.budget_max as string)
-      } : undefined,
-      limit: req.query.limit ? parseInt(req.query.limit as string) : 20,
-      offset: req.query.offset ? parseInt(req.query.offset as string) : 0
-    };
-    
-    const projects = await marketplaceStorage.getProjectRequests(filters);
-    res.json(projects);
-  } catch (error) {
-    console.error('Error fetching project requests:', error);
-    res.status(500).json({ message: 'Failed to fetch project requests' });
-  }
-});
-
-router.post('/projects', authenticate, async (req, res) => {
-  try {
-    const projectData = {
-      ...req.body,
-      client_id: req.user?.id
-    };
-    
-    const project = await marketplaceStorage.createProjectRequest(projectData);
-    res.status(201).json(project);
-  } catch (error) {
-    console.error('Error creating project request:', error);
-    res.status(500).json({ message: 'Failed to create project request' });
-  }
-});
-
-// Project Proposals
-router.get('/projects/:id/proposals', async (req, res) => {
-  try {
-    const project_id = parseInt(req.params.id);
-    const proposals = await marketplaceStorage.getProjectProposals(project_id);
-    res.json(proposals);
-  } catch (error) {
-    console.error('Error fetching project proposals:', error);
-    res.status(500).json({ message: 'Failed to fetch project proposals' });
-  }
-});
-
-router.post('/projects/:id/proposals', authenticate, async (req, res) => {
-  try {
-    const project_id = parseInt(req.params.id);
-    const proposalData = {
-      ...req.body,
-      project_id,
-      provider_id: req.user?.id // Assuming user is a provider
-    };
-    
-    const proposal = await marketplaceStorage.createProjectProposal(proposalData);
-    res.status(201).json(proposal);
-  } catch (error) {
-    console.error('Error creating project proposal:', error);
-    res.status(500).json({ message: 'Failed to create project proposal' });
-  }
-});
-
-// Reviews
-router.get('/providers/:id/reviews', async (req, res) => {
-  try {
-    const provider_id = parseInt(req.params.id);
-    const reviews = await marketplaceStorage.getMarketplaceReviews(provider_id);
-    res.json(reviews);
-  } catch (error) {
-    console.error('Error fetching marketplace reviews:', error);
-    res.status(500).json({ message: 'Failed to fetch marketplace reviews' });
-  }
-});
-
-router.post('/providers/:id/reviews', authenticate, async (req, res) => {
-  try {
-    const provider_id = parseInt(req.params.id);
-    const reviewData = {
-      ...req.body,
-      provider_id,
-      client_id: req.user?.id
-    };
-    
-    const review = await marketplaceStorage.createMarketplaceReview(reviewData);
-    res.status(201).json(review);
-  } catch (error) {
-    console.error('Error creating marketplace review:', error);
-    res.status(500).json({ message: 'Failed to create marketplace review' });
-  }
-});
-
-// Job Opportunities
-router.get('/jobs', async (req, res) => {
-  try {
-    const filters = {
-      category: req.query.category as string,
-      employer_id: req.query.employer_id ? parseInt(req.query.employer_id as string) : undefined,
-      status: req.query.status as string || 'active'
-    };
-    
-    const jobs = await marketplaceStorage.getJobOpportunities(filters);
-    res.json(jobs);
-  } catch (error) {
-    console.error('Error fetching job opportunities:', error);
-    res.status(500).json({ message: 'Failed to fetch job opportunities' });
-  }
-});
-
-router.post('/jobs', authenticate, async (req, res) => {
-  try {
-    const jobData = {
-      ...req.body,
-      employer_id: req.user?.id
-    };
-    
-    const job = await marketplaceStorage.createJobOpportunity(jobData);
-    res.status(201).json(job);
-  } catch (error) {
-    console.error('Error creating job opportunity:', error);
-    res.status(500).json({ message: 'Failed to create job opportunity' });
-  }
-});
-
-// Search
-router.get('/search', async (req, res) => {
-  try {
-    const query = req.query.q as string;
-    const type = req.query.type as string;
-    
-    if (!query) {
-      return res.status(400).json({ message: 'Search query is required' });
+    if (!req.user) {
+      return res.status(401).json({ 
+        success: false,
+        error: 'Authentication required' 
+      });
     }
-    
-    const results = await marketplaceStorage.searchMarketplace(query, type);
-    res.json(results);
+
+    const validatedData = providerRegistrationSchema.parse(req.body);
+
+    // Create new provider
+    const newProvider = {
+      id: Math.floor(Math.random() * 10000),
+      user_id: req.user.id,
+      ...validatedData,
+      rating: 0,
+      review_count: 0,
+      verified: false,
+      years_experience: 0,
+      created_at: new Date().toISOString()
+    };
+
+    // In a real app, you'd save this to the database
+    // For now, we'll just return the created provider
+    res.status(201).json({
+      success: true,
+      data: newProvider,
+      message: 'Provider registration submitted successfully. Your profile will be reviewed and activated within 24 hours.'
+    });
   } catch (error) {
-    console.error('Error searching marketplace:', error);
-    res.status(500).json({ message: 'Failed to search marketplace' });
+    console.error('Error registering provider:', error);
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({
+        success: false,
+        error: 'Invalid input data',
+        details: error.errors
+      });
+    }
+    res.status(500).json({
+      success: false,
+      error: 'Failed to register provider'
+    });
   }
 });
 
-export { router as marketplaceRoutes };
+// GET /api/featured-services
+router.get('/featured-services', async (req, res) => {
+  try {
+    const featuredServices = [
+      ...services.professionals.slice(0, 2),
+      ...services.suppliers.slice(0, 1),
+      ...services.trades.slice(0, 1)
+    ];
+
+    res.json({
+      success: true,
+      data: featuredServices
+    });
+  } catch (error) {
+    console.error('Error fetching featured services:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch featured services'
+    });
+  }
+});
+
+// POST /api/providers/{id}/contact
+router.post('/providers/:id/contact', authenticate, async (req, res) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({ 
+        success: false,
+        error: 'Authentication required' 
+      });
+    }
+
+    const { id } = req.params;
+    const { message, contact_preference } = req.body;
+
+    // In a real app, you'd send an email/SMS or create a lead record
+    const contactRequest = {
+      id: Math.floor(Math.random() * 10000),
+      provider_id: parseInt(id),
+      user_id: req.user.id,
+      message,
+      contact_preference,
+      status: 'pending',
+      created_at: new Date().toISOString()
+    };
+
+    res.status(201).json({
+      success: true,
+      data: contactRequest,
+      message: 'Your message has been sent to the provider. They will contact you soon.'
+    });
+  } catch (error) {
+    console.error('Error sending contact request:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to send contact request'
+    });
+  }
+});
+
+export default router;
