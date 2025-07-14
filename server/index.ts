@@ -158,9 +158,7 @@ async function createRentalTables() {
         views INTEGER DEFAULT 0,
         available_date INTEGER,
         created_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer)),
-        updated_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer)),
-        FOREIGN KEY (landlord_id) REFERENCES users(id),
-        FOREIGN KEY (agent_id) REFERENCES users(id)
+        updated_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer))
       )
     `);
 
@@ -184,10 +182,7 @@ async function createRentalTables() {
         reviewed_by INTEGER,
         reviewed_at INTEGER,
         created_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer)),
-        updated_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer)),
-        FOREIGN KEY (listing_id) REFERENCES rental_listings(id),
-        FOREIGN KEY (tenant_id) REFERENCES users(id),
-        FOREIGN KEY (reviewed_by) REFERENCES users(id)
+        updated_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer))
       )
     `);
 
@@ -216,10 +211,7 @@ async function createRentalTables() {
         tenant_signature_date INTEGER,
         lease_document_url TEXT,
         created_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer)),
-        updated_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer)),
-        FOREIGN KEY (listing_id) REFERENCES rental_listings(id),
-        FOREIGN KEY (landlord_id) REFERENCES users(id),
-        FOREIGN KEY (tenant_id) REFERENCES users(id)
+        updated_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer))
       )
     `);
   } catch (error) {
