@@ -200,6 +200,190 @@ async function initializeTables() {
       )
     `);
 
+    console.log('Creating enhanced ecosystem tables...');
+    
+    console.log('Creating service_categories table...');
+    await db.run(sql`
+      CREATE TABLE service_categories (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        journey_type TEXT NOT NULL,
+        category TEXT NOT NULL,
+        description TEXT,
+        icon TEXT,
+        parent_category_id INTEGER REFERENCES service_categories(id),
+        sort_order INTEGER DEFAULT 0,
+        is_active INTEGER DEFAULT 1,
+        created_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer))
+      )
+    `);
+
+    console.log('Creating certifications table...');
+    await db.run(sql`
+      CREATE TABLE certifications (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER REFERENCES users(id) NOT NULL,
+        certification_type TEXT NOT NULL,
+        certification_name TEXT NOT NULL,
+        issuing_authority TEXT NOT NULL,
+        certification_number TEXT,
+        issue_date INTEGER NOT NULL,
+        expiry_date INTEGER,
+        document_url TEXT,
+        verification_status TEXT DEFAULT 'pending',
+        verified_by INTEGER REFERENCES users(id),
+        verification_date INTEGER,
+        is_active INTEGER DEFAULT 1,
+        created_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer))
+      )
+    `);
+
+    console.log('Creating training_programs table...');
+    await db.run(sql`
+      CREATE TABLE training_programs (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        provider_id INTEGER REFERENCES service_providers(id) NOT NULL,
+        title TEXT NOT NULL,
+        description TEXT NOT NULL,
+        category TEXT NOT NULL,
+        skill_level TEXT NOT NULL,
+        duration TEXT,
+        format TEXT NOT NULL,
+        price TEXT,
+        currency TEXT DEFAULT 'BWP',
+        max_participants INTEGER,
+        current_enrollment INTEGER DEFAULT 0,
+        start_date INTEGER,
+        end_date INTEGER,
+        enrollment_deadline INTEGER,
+        location TEXT,
+        prerequisites TEXT,
+        learning_outcomes TEXT,
+        materials TEXT,
+        certificate_offered INTEGER DEFAULT 0,
+        certification_body TEXT,
+        is_active INTEGER DEFAULT 1,
+        featured INTEGER DEFAULT 0,
+        rating TEXT DEFAULT '0',
+        review_count INTEGER DEFAULT 0,
+        created_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer)),
+        updated_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer))
+      )
+    `);
+
+    console.log('Creating project_requests table...');
+    await db.run(sql`
+      CREATE TABLE project_requests (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        requester_id INTEGER REFERENCES users(id) NOT NULL,
+        project_type TEXT NOT NULL,
+        title TEXT NOT NULL,
+        description TEXT NOT NULL,
+        budget TEXT,
+        currency TEXT DEFAULT 'BWP',
+        timeline TEXT,
+        location TEXT NOT NULL,
+        requirements TEXT,
+        attachments TEXT,
+        skills_required TEXT,
+        status TEXT DEFAULT 'open',
+        urgency TEXT DEFAULT 'medium',
+        contact_preference TEXT DEFAULT 'platform',
+        proposal_count INTEGER DEFAULT 0,
+        view_count INTEGER DEFAULT 0,
+        assigned_provider_id INTEGER REFERENCES service_providers(id),
+        assigned_date INTEGER,
+        completed_date INTEGER,
+        created_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer)),
+        updated_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer))
+      )
+    `);
+
+    console.log('Creating project_proposals table...');
+    await db.run(sql`
+      CREATE TABLE project_proposals (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        project_id INTEGER REFERENCES project_requests(id) NOT NULL,
+        provider_id INTEGER REFERENCES service_providers(id) NOT NULL,
+        proposal_text TEXT NOT NULL,
+        estimated_cost TEXT,
+        estimated_duration TEXT,
+        methodology TEXT,
+        portfolio TEXT,
+        availability TEXT,
+        terms TEXT,
+        status TEXT DEFAULT 'pending',
+        submitted_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer))
+      )
+    `);
+
+    console.log('Creating user_profiles table...');
+    await db.run(sql`
+      CREATE TABLE user_profiles (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER REFERENCES users(id) NOT NULL,
+        profile_type TEXT NOT NULL,
+        business_name TEXT,
+        registration_number TEXT,
+        tax_number TEXT,
+        skills TEXT,
+        specializations TEXT,
+        experience TEXT,
+        education TEXT,
+        languages TEXT,
+        working_areas TEXT,
+        availability_schedule TEXT,
+        hourly_rate TEXT,
+        minimum_project TEXT,
+        tools TEXT,
+        equipment TEXT,
+        insurance TEXT,
+        emergency_contact TEXT,
+        portfolio_urls TEXT,
+        social_media TEXT,
+        achievements TEXT,
+        membership_associations TEXT,
+        background_check_status TEXT DEFAULT 'pending',
+        profile_completeness INTEGER DEFAULT 0,
+        last_active_at INTEGER,
+        created_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer)),
+        updated_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer))
+      )
+    `);
+
+    console.log('Creating enhanced_reviews table...');
+    await db.run(sql`
+      CREATE TABLE enhanced_reviews (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        reviewer_id INTEGER REFERENCES users(id) NOT NULL,
+        reviewee_id INTEGER REFERENCES users(id),
+        service_provider_id INTEGER REFERENCES service_providers(id),
+        project_id INTEGER REFERENCES project_requests(id),
+        training_program_id INTEGER REFERENCES training_programs(id),
+        review_type TEXT NOT NULL,
+        overall_rating INTEGER NOT NULL,
+        quality_rating INTEGER,
+        timeliness_rating INTEGER,
+        communication_rating INTEGER,
+        professionalism_rating INTEGER,
+        value_rating INTEGER,
+        review_title TEXT,
+        review_text TEXT,
+        pros TEXT,
+        cons TEXT,
+        would_recommend INTEGER,
+        photo_urls TEXT,
+        response_from_provider TEXT,
+        response_date INTEGER,
+        verified_purchase INTEGER DEFAULT 0,
+        helpful_votes INTEGER DEFAULT 0,
+        report_count INTEGER DEFAULT 0,
+        status TEXT DEFAULT 'active',
+        created_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer)),
+        updated_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer))
+      )
+    `);
+
     console.log('✅ All tables created successfully');
   } catch (error) {
     console.error('Error initializing tables:', error);
