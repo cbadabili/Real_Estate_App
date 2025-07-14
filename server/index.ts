@@ -127,7 +127,12 @@ app.use((req, res, next) => {
 
 async function createRentalTables() {
   try {
-    console.log('Creating rental_listings table...');
+    // Enable foreign key constraints
+    console.log('Enabling foreign key constraints...');
+    await db.run(sql`PRAGMA foreign_keys = ON`);
+    
+    // Step 1: Create rental_listings table first (no dependencies)
+    console.log('Step 1: Creating rental_listings table...');
     await db.run(sql`
       CREATE TABLE IF NOT EXISTS rental_listings (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -161,8 +166,22 @@ async function createRentalTables() {
         updated_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer))
       )
     `);
+    console.log('✅ rental_listings table created successfully');
 
-    console.log('Creating rental_applications table...');
+    // Step 2: Verify rental_listings table exists
+    console.log('Step 2: Verifying rental_listings table exists...');
+    const tableCheck = await db.all(sql`
+      SELECT name FROM sqlite_master 
+      WHERE type='table' AND name='rental_listings'
+    `);
+    console.log('Table check result:', tableCheck);
+    
+    if (tableCheck.length === 0) {
+      throw new Error('rental_listings table was not created successfully');
+    }
+
+    // Step 3: Create rental_applications table (depends on rental_listings and users)
+    console.log('Step 3: Creating rental_applications table...');
     await db.run(sql`
       CREATE TABLE IF NOT EXISTS rental_applications (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -185,8 +204,10 @@ async function createRentalTables() {
         updated_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer))
       )
     `);
+    console.log('✅ rental_applications table created successfully');
 
-    console.log('Creating lease_agreements table...');
+    // Step 4: Create lease_agreements table (depends on rental_listings and users)
+    console.log('Step 4: Creating lease_agreements table...');
     await db.run(sql`
       CREATE TABLE IF NOT EXISTS lease_agreements (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -214,8 +235,16 @@ async function createRentalTables() {
         updated_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer))
       )
     `);
+    console.log('✅ lease_agreements table created successfully');
+    
+    console.log('✅ All rental tables created successfully');
   } catch (error) {
-    console.error('Error creating rental tables:', error);
+    console.error('❌ Error creating rental tables:', error);
+    console.error('Error details:', {
+      message: error.message,
+      code: error.code,
+      cause: error.cause
+    });
     throw error;
   }
 }
