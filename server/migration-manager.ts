@@ -112,4 +112,16 @@ export class MigrationManager {
   }
 }
 
-export const migrationManager = new MigrationManager();
+let _migrationManager: MigrationManager | null = null;
+
+export const migrationManager = {
+  getInstance(): MigrationManager {
+    if (!_migrationManager) {
+      _migrationManager = new MigrationManager();
+    }
+    return _migrationManager;
+  }
+};
+
+// For backward compatibility, also export the methods directly
+export const getMigrationManager = () => migrationManager.getInstance();

@@ -83,11 +83,12 @@ app.use((req, res, next) => {
   }
 
   // Initialize database with migrations
-  const { migrationManager } = await import('./migration-manager');
+  const { getMigrationManager } = await import('./migration-manager');
   const { seedManager } = await import('./seed-manager');
   
   try {
     console.log('🔄 Running database migrations...');
+    const migrationManager = getMigrationManager();
     await migrationManager.runAllPendingMigrations();
     
     console.log('🌱 Seeding database...');
