@@ -121,13 +121,7 @@ router.get('/tenant-support/agreements', authenticate, async (req, res) => {
   }
 });
 
-export default router;
-import { Router } from 'express';
-import { authenticate } from './auth-middleware';
-
-const router = Router();
-
-// Placeholder routes for tenant support
+// GET /api/support/tickets
 router.get('/support/tickets', authenticate, async (req, res) => {
   try {
     res.json({
@@ -144,6 +138,7 @@ router.get('/support/tickets', authenticate, async (req, res) => {
   }
 });
 
+// POST /api/support/tickets
 router.post('/support/tickets', authenticate, async (req, res) => {
   try {
     const { subject, description, priority } = req.body;
