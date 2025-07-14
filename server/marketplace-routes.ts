@@ -550,4 +550,71 @@ router.get('/marketplace/providers/:id/reviews', async (req, res) => {
   }
 });
 
+// Helper functions for marketplace operations
+async function getCategories() {
+  return Object.values(categories).flat();
+}
+
+async function getProviders(filters: any) {
+  let allProviders = Object.values(services).flat();
+  
+  if (filters.category) {
+    allProviders = allProviders.filter(p => p.category_id.toString() === filters.category);
+  }
+  
+  if (filters.location) {
+    allProviders = allProviders.filter(p => 
+      p.service_area.toLowerCase().includes(filters.location.toLowerCase())
+    );
+  }
+  
+  if (filters.search) {
+    allProviders = allProviders.filter(p => 
+      p.business_name.toLowerCase().includes(filters.search.toLowerCase()) ||
+      p.business_description.toLowerCase().includes(filters.search.toLowerCase())
+    );
+  }
+  
+  return allProviders.slice(0, filters.limit || 12);
+}
+
+async function getProviderById(id: number) {
+  for (const sectionServices of Object.values(services)) {
+    const provider = sectionServices.find(service => service.id === id);
+    if (provider) return provider;
+  }
+  return null;
+}
+
+async function createProvider(data: any) {
+  const newProvider = {
+    id: Math.floor(Math.random() * 10000),
+    ...data,
+    rating: 0,
+    review_count: 0,
+    verified: false,
+    years_experience: 0,
+    created_at: new Date().toISOString()
+  };
+  return newProvider;
+}
+
+async function updateProvider(id: number, data: any) {
+  const provider = await getProviderById(id);
+  if (!provider) return null;
+  return { ...provider, ...data, updated_at: new Date().toISOString() };
+}
+
+async function createProviderReview(data: any) {
+  return {
+    id: Math.floor(Math.random() * 10000),
+    ...data,
+    created_at: new Date().toISOString()
+  };
+}
+
+async function getProviderReviews(providerId: number, options: any) {
+  return [];
+}
+
 export default router;

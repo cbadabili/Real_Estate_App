@@ -52,7 +52,9 @@ router.post('/search/ai', async (req, res) => {
   }
 });
 
-export const aiSearchRoutes = router;
+const aiSearchRoutes = router;
+export { aiSearchRoutes };
+export default router;
 
 export async function parseNaturalLanguageSearch(query: string): Promise<SearchResult> {
   const lowercaseQuery = query.toLowerCase();

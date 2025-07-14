@@ -130,4 +130,4 @@ router.get('/providers/:id/reviews', async (req, res) => {
   }
 });
 
-export { router as servicesRoutes };
+export default router;

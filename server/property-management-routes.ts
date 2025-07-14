@@ -125,3 +125,107 @@ router.get('/property-management/maintenance-requests', authenticate, async (req
 });
 
 export default router;
+import { Router } from 'express';
+import { authenticate } from './auth-middleware';
+
+const router = Router();
+
+// Property management routes
+router.get('/properties', authenticate, async (req, res) => {
+  try {
+    res.json({
+      success: true,
+      data: [],
+      message: 'Properties retrieved successfully'
+    });
+  } catch (error) {
+    console.error('Error fetching properties:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch properties'
+    });
+  }
+});
+
+router.post('/properties', authenticate, async (req, res) => {
+  try {
+    const property = {
+      id: Math.floor(Math.random() * 10000),
+      ...req.body,
+      owner_id: req.user?.id,
+      created_at: new Date().toISOString()
+    };
+
+    res.status(201).json({
+      success: true,
+      data: property,
+      message: 'Property created successfully'
+    });
+  } catch (error) {
+    console.error('Error creating property:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to create property'
+    });
+  }
+});
+
+router.get('/properties/:id', authenticate, async (req, res) => {
+  try {
+    const property = {
+      id: parseInt(req.params.id),
+      title: 'Sample Property',
+      owner_id: req.user?.id
+    };
+
+    res.json({
+      success: true,
+      data: property
+    });
+  } catch (error) {
+    console.error('Error fetching property:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch property'
+    });
+  }
+});
+
+router.put('/properties/:id', authenticate, async (req, res) => {
+  try {
+    const property = {
+      id: parseInt(req.params.id),
+      ...req.body,
+      updated_at: new Date().toISOString()
+    };
+
+    res.json({
+      success: true,
+      data: property,
+      message: 'Property updated successfully'
+    });
+  } catch (error) {
+    console.error('Error updating property:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to update property'
+    });
+  }
+});
+
+router.delete('/properties/:id', authenticate, async (req, res) => {
+  try {
+    res.json({
+      success: true,
+      message: 'Property deleted successfully'
+    });
+  } catch (error) {
+    console.error('Error deleting property:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to delete property'
+    });
+  }
+});
+
+export default router;

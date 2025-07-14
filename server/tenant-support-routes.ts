@@ -122,3 +122,54 @@ router.get('/tenant-support/agreements', authenticate, async (req, res) => {
 });
 
 export default router;
+import { Router } from 'express';
+import { authenticate } from './auth-middleware';
+
+const router = Router();
+
+// Placeholder routes for tenant support
+router.get('/support/tickets', authenticate, async (req, res) => {
+  try {
+    res.json({
+      success: true,
+      data: [],
+      message: 'Support tickets retrieved successfully'
+    });
+  } catch (error) {
+    console.error('Error fetching support tickets:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch support tickets'
+    });
+  }
+});
+
+router.post('/support/tickets', authenticate, async (req, res) => {
+  try {
+    const { subject, description, priority } = req.body;
+    
+    const ticket = {
+      id: Math.floor(Math.random() * 10000),
+      subject,
+      description,
+      priority: priority || 'medium',
+      status: 'open',
+      user_id: req.user?.id,
+      created_at: new Date().toISOString()
+    };
+
+    res.status(201).json({
+      success: true,
+      data: ticket,
+      message: 'Support ticket created successfully'
+    });
+  } catch (error) {
+    console.error('Error creating support ticket:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to create support ticket'
+    });
+  }
+});
+
+export default router;
