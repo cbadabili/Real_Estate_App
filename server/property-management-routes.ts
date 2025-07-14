@@ -1,3 +1,4 @@
+
 import { Router } from 'express';
 import { z } from 'zod';
 import { authenticate } from './auth-middleware';
@@ -124,13 +125,7 @@ router.get('/property-management/maintenance-requests', authenticate, async (req
   }
 });
 
-export default router;
-import { Router } from 'express';
-import { authenticate } from './auth-middleware';
-
-const router = Router();
-
-// Property management routes
+// GET /api/properties
 router.get('/properties', authenticate, async (req, res) => {
   try {
     res.json({
@@ -147,6 +142,7 @@ router.get('/properties', authenticate, async (req, res) => {
   }
 });
 
+// POST /api/properties
 router.post('/properties', authenticate, async (req, res) => {
   try {
     const property = {
@@ -170,6 +166,7 @@ router.post('/properties', authenticate, async (req, res) => {
   }
 });
 
+// GET /api/properties/:id
 router.get('/properties/:id', authenticate, async (req, res) => {
   try {
     const property = {
@@ -191,6 +188,7 @@ router.get('/properties/:id', authenticate, async (req, res) => {
   }
 });
 
+// PUT /api/properties/:id
 router.put('/properties/:id', authenticate, async (req, res) => {
   try {
     const property = {
@@ -213,6 +211,7 @@ router.put('/properties/:id', authenticate, async (req, res) => {
   }
 });
 
+// DELETE /api/properties/:id
 router.delete('/properties/:id', authenticate, async (req, res) => {
   try {
     res.json({
