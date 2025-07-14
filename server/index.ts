@@ -153,12 +153,14 @@ async function createRentalTables() {
         images TEXT,
         features TEXT,
         status TEXT DEFAULT 'available',
-        landlord_id INTEGER REFERENCES users(id),
-        agent_id INTEGER REFERENCES users(id),
+        landlord_id INTEGER,
+        agent_id INTEGER,
         views INTEGER DEFAULT 0,
         available_date INTEGER,
         created_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer)),
-        updated_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer))
+        updated_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer)),
+        FOREIGN KEY (landlord_id) REFERENCES users(id),
+        FOREIGN KEY (agent_id) REFERENCES users(id)
       )
     `);
 
@@ -166,8 +168,8 @@ async function createRentalTables() {
     await db.run(sql`
       CREATE TABLE IF NOT EXISTS rental_applications (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        listing_id INTEGER REFERENCES rental_listings(id),
-        tenant_id INTEGER REFERENCES users(id),
+        listing_id INTEGER,
+        tenant_id INTEGER,
         application_date INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer)),
         status TEXT DEFAULT 'pending',
         personal_info TEXT,
@@ -179,10 +181,13 @@ async function createRentalTables() {
         credit_score INTEGER,
         income_verification TEXT,
         notes TEXT,
-        reviewed_by INTEGER REFERENCES users(id),
+        reviewed_by INTEGER,
         reviewed_at INTEGER,
         created_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer)),
-        updated_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer))
+        updated_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer)),
+        FOREIGN KEY (listing_id) REFERENCES rental_listings(id),
+        FOREIGN KEY (tenant_id) REFERENCES users(id),
+        FOREIGN KEY (reviewed_by) REFERENCES users(id)
       )
     `);
 
@@ -190,9 +195,9 @@ async function createRentalTables() {
     await db.run(sql`
       CREATE TABLE IF NOT EXISTS lease_agreements (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        listing_id INTEGER REFERENCES rental_listings(id),
-        landlord_id INTEGER REFERENCES users(id),
-        tenant_id INTEGER REFERENCES users(id),
+        listing_id INTEGER,
+        landlord_id INTEGER,
+        tenant_id INTEGER,
         start_date INTEGER NOT NULL,
         end_date INTEGER NOT NULL,
         rent_amount INTEGER NOT NULL,
@@ -211,7 +216,10 @@ async function createRentalTables() {
         tenant_signature_date INTEGER,
         lease_document_url TEXT,
         created_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer)),
-        updated_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer))
+        updated_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer)),
+        FOREIGN KEY (listing_id) REFERENCES rental_listings(id),
+        FOREIGN KEY (landlord_id) REFERENCES users(id),
+        FOREIGN KEY (tenant_id) REFERENCES users(id)
       )
     `);
   } catch (error) {
