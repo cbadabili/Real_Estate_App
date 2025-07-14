@@ -502,7 +502,7 @@ export enum Permission {
   DELETE_REVIEW = "delete_review",
   VIEW_REVIEW = "view_review",
   MODERATE_REVIEW = "moderate_review",
-  RESPOND_TO_REVIEW = "respond_to_review",
+  RESPOND_TO_REVIEW = "respond_to_REVIEW",
 
   // Admin operations
   VIEW_ADMIN_PANEL = "view_admin_panel",
@@ -547,7 +547,7 @@ export const marketplace_providers = sqliteTable('marketplace_providers', {
   banner_url: text('banner_url'),
   description: text('description'),
   years_experience: integer('years_experience'),
-  
+
   // Verification & Certifications
   is_verified: integer('is_verified', { mode: 'boolean' }).default(false),
   is_featured: integer('is_featured', { mode: 'boolean' }).default(false),
@@ -555,23 +555,22 @@ export const marketplace_providers = sqliteTable('marketplace_providers', {
   company_registration: text('company_registration'),
   tax_clearance: text('tax_clearance'),
   insurance_details: text('insurance_details'),
-  
+
   // Business Details
   business_address: text('business_address'),
   operating_hours: text('operating_hours'), // JSON
   service_radius: integer('service_radius'), // km
-  minimum_project_size: text('minimum_project_size'),
-  
+
   // Performance Metrics
   rating: real('rating').default(0),
   review_count: integer('review_count').default(0),
   projects_completed: integer('projects_completed').default(0),
   response_time: integer('response_time'), // hours
-  
+
   // Status & Availability
   status: text('status').default('active'), // 'active', 'inactive', 'suspended'
   availability_status: text('availability_status').default('available'), // 'available', 'busy', 'booked'
-  
+
   created_at: integer('created_at').default(sql`(cast((julianday('now') - 2440587.5)*86400000 as integer))`),
   updated_at: integer('updated_at').default(sql`(cast((julianday('now') - 2440587.5)*86400000 as integer))`),
 });
@@ -602,18 +601,18 @@ export const training_programs = sqliteTable('training_programs', {
   duration_weeks: integer('duration_weeks'),
   price: integer('price'), // in thebe
   max_participants: integer('max_participants'),
-  
+
   // Course Details
   prerequisites: text('prerequisites'),
   learning_outcomes: text('learning_outcomes'), // JSON array
   course_outline: text('course_outline'), // JSON
   materials_included: text('materials_included'), // JSON array
-  
+
   // Certification
   provides_certificate: integer('provides_certificate', { mode: 'boolean' }).default(false),
   certificate_type: text('certificate_type'),
   accreditation_body: text('accreditation_body'),
-  
+
   // Scheduling
   schedule_type: text('schedule_type'), // 'fixed', 'flexible', 'on_demand'
   start_date: text('start_date'),
@@ -621,11 +620,11 @@ export const training_programs = sqliteTable('training_programs', {
   class_times: text('class_times'), // JSON
   location: text('location'),
   delivery_method: text('delivery_method'), // 'in_person', 'online', 'hybrid'
-  
+
   // Status
   status: text('status').default('active'), // 'active', 'full', 'cancelled', 'completed'
   enrollment_count: integer('enrollment_count').default(0),
-  
+
   created_at: integer('created_at').default(sql`(cast((julianday('now') - 2440587.5)*86400000 as integer))`),
   updated_at: integer('updated_at').default(sql`(cast((julianday('now') - 2440587.5)*86400000 as integer))`),
 });
@@ -635,56 +634,55 @@ export const project_requests = sqliteTable('project_requests', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   client_id: integer('client_id').references(() => users.id),
   property_id: integer('property_id').references(() => properties.id),
-  
+
   // Project Details
   project_title: text('project_title').notNull(),
   project_description: text('project_description'),
   project_type: text('project_type').notNull(), // 'construction', 'renovation', 'maintenance', 'landscaping'
   category_id: integer('category_id').references(() => service_categories.id),
-  
+
   // Requirements
   budget_min: integer('budget_min'),
   budget_max: integer('budget_max'),
   timeline_weeks: integer('timeline_weeks'),
   preferred_start_date: text('preferred_start_date'),
-  
+
   // Location
   project_address: text('project_address'),
   project_city: text('project_city'),
   project_district: text('project_district'),
-  
+
   // Attachments
   images: text('images'), // JSON array
   documents: text('documents'), // JSON array
-  
+
   // Status
   status: text('status').default('open'), // 'open', 'in_progress', 'completed', 'cancelled'
   proposals_count: integer('proposals_count').default(0),
-  
+
   created_at: integer('created_at').default(sql`(cast((julianday('now') - 2440587.5)*86400000 as integer))`),
   updated_at: integer('updated_at').default(sql`(cast((julianday('now') - 2440587.5)*86400000 as integer))`),
-});
-
+```tool_code
 // Proposals from service providers
 export const project_proposals = sqliteTable('project_proposals', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   project_id: integer('project_id').references(() => project_requests.id),
   provider_id: integer('provider_id').references(() => marketplace_providers.id),
-  
+
   // Proposal Details
   proposal_title: text('proposal_title'),
   proposal_description: text('proposal_description'),
   quoted_price: integer('quoted_price'),
   estimated_timeline: integer('estimated_timeline'), // weeks
-  
+
   // Terms
   payment_terms: text('payment_terms'),
   warranty_period: text('warranty_period'),
   materials_included: integer('materials_included', { mode: 'boolean' }).default(false),
-  
+
   // Status
   status: text('status').default('pending'), // 'pending', 'accepted', 'rejected', 'withdrawn'
-  
+
   created_at: integer('created_at').default(sql`(cast((julianday('now') - 2440587.5)*86400000 as integer))`),
   updated_at: integer('updated_at').default(sql`(cast((julianday('now') - 2440587.5)*86400000 as integer))`),
 });
@@ -695,28 +693,28 @@ export const marketplace_reviews = sqliteTable('marketplace_reviews', {
   provider_id: integer('provider_id').references(() => marketplace_providers.id),
   client_id: integer('client_id').references(() => users.id),
   project_id: integer('project_id').references(() => project_requests.id),
-  
+
   // Review Details
   rating: integer('rating').notNull(), // 1-5 stars
   review_text: text('review_text'),
   review_type: text('review_type'), // 'service', 'product', 'training'
-  
+
   // Detailed Ratings
   quality_rating: integer('quality_rating'), // 1-5
   timeliness_rating: integer('timeliness_rating'), // 1-5
   communication_rating: integer('communication_rating'), // 1-5
   value_rating: integer('value_rating'), // 1-5
-  
+
   // Verification
   is_verified: integer('is_verified', { mode: 'boolean' }).default(false),
   verification_method: text('verification_method'),
-  
+
   // Images
   review_images: text('review_images'), // JSON array
-  
+
   // Status
   status: text('status').default('active'), // 'active', 'hidden', 'flagged'
-  
+
   created_at: integer('created_at').default(sql`(cast((julianday('now') - 2440587.5)*86400000 as integer))`),
 });
 
@@ -724,7 +722,7 @@ export const marketplace_reviews = sqliteTable('marketplace_reviews', {
 export const building_materials = sqliteTable('building_materials', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   supplier_id: integer('supplier_id').references(() => marketplace_providers.id),
-  
+
   // Product Details
   product_name: text('product_name').notNull(),
   product_description: text('product_description'),
@@ -732,30 +730,30 @@ export const building_materials = sqliteTable('building_materials', {
   subcategory: text('subcategory'),
   brand: text('brand'),
   model: text('model'),
-  
+
   // Specifications
   specifications: text('specifications'), // JSON
   dimensions: text('dimensions'),
   weight: text('weight'),
   color: text('color'),
   material: text('material'),
-  
+
   // Pricing
   unit_price: integer('unit_price'), // in thebe
   unit_type: text('unit_type'), // 'piece', 'bag', 'meter', 'square_meter'
   bulk_pricing: text('bulk_pricing'), // JSON for tiered pricing
-  
+
   // Availability
   stock_quantity: integer('stock_quantity'),
   minimum_order: integer('minimum_order'),
   lead_time_days: integer('lead_time_days'),
-  
+
   // Images
   product_images: text('product_images'), // JSON array
-  
+
   // Status
   status: text('status').default('available'), // 'available', 'out_of_stock', 'discontinued'
-  
+
   created_at: integer('created_at').default(sql`(cast((julianday('now') - 2440587.5)*86400000 as integer))`),
   updated_at: integer('updated_at').default(sql`(cast((julianday('now') - 2440587.5)*86400000 as integer))`),
 });
@@ -765,22 +763,22 @@ export const material_orders = sqliteTable('material_orders', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   customer_id: integer('customer_id').references(() => users.id),
   supplier_id: integer('supplier_id').references(() => marketplace_providers.id),
-  
+
   // Order Details
   order_number: text('order_number').notNull(),
   order_items: text('order_items'), // JSON array
   total_amount: integer('total_amount'),
-  
+
   // Delivery
   delivery_address: text('delivery_address'),
   delivery_date: text('delivery_date'),
   delivery_method: text('delivery_method'), // 'pickup', 'delivery', 'courier'
   delivery_cost: integer('delivery_cost'),
-  
+
   // Status
   status: text('status').default('pending'), // 'pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled'
   payment_status: text('payment_status').default('pending'), // 'pending', 'paid', 'partial', 'failed'
-  
+
   created_at: integer('created_at').default(sql`(cast((julianday('now') - 2440587.5)*86400000 as integer))`),
   updated_at: integer('updated_at').default(sql`(cast((julianday('now') - 2440587.5)*86400000 as integer))`),
 });
@@ -789,33 +787,33 @@ export const material_orders = sqliteTable('material_orders', {
 export const job_opportunities = sqliteTable('job_opportunities', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   employer_id: integer('employer_id').references(() => users.id),
-  
+
   // Job Details
   job_title: text('job_title').notNull(),
   job_description: text('job_description'),
   job_type: text('job_type'), // 'full_time', 'part_time', 'contract', 'temporary'
   category: text('category'), // 'construction', 'plumbing', 'electrical', 'real_estate'
-  
+
   // Requirements
   required_skills: text('required_skills'), // JSON array
   experience_years: integer('experience_years'),
   education_level: text('education_level'),
   certifications_required: text('certifications_required'), // JSON array
-  
+
   // Compensation
   salary_min: integer('salary_min'),
   salary_max: integer('salary_max'),
   salary_type: text('salary_type'), // 'monthly', 'daily', 'hourly', 'project'
   benefits: text('benefits'), // JSON array
-  
+
   // Location
   job_location: text('job_location'),
   remote_work: integer('remote_work', { mode: 'boolean' }).default(false),
-  
+
   // Status
   status: text('status').default('active'), // 'active', 'filled', 'cancelled', 'expired'
   applications_count: integer('applications_count').default(0),
-  
+
   created_at: integer('created_at').default(sql`(cast((julianday('now') - 2440587.5)*86400000 as integer))`),
   updated_at: integer('updated_at').default(sql`(cast((julianday('now') - 2440587.5)*86400000 as integer))`),
 });

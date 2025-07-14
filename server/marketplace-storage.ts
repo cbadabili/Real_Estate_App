@@ -33,9 +33,13 @@ export interface MarketplaceFilters {
   is_featured?: boolean;
   availability_status?: string;
   price_range?: { min: number; max: number };
+  project_size_range?: { min: number; max: number };
+  emergency_services?: boolean;
+  team_size_min?: number;
+  languages?: string[];
   limit?: number;
   offset?: number;
-  sort_by?: 'rating' | 'price' | 'experience' | 'reviews' | 'name';
+  sort_by?: 'rating' | 'price' | 'experience' | 'reviews' | 'name' | 'hourly_rate' | 'project_size';
   sort_order?: 'asc' | 'desc';
 }
 
@@ -92,6 +96,26 @@ export class MarketplaceStorage {
     if (filters.service_area) {
       conditions.push(like(marketplace_providers.service_areas, `%${filters.service_area}%`));
     }
+    if (filters.project_size_range) {
+      if (filters.project_size_range.min) {
+        conditions.push(sql`${marketplace_providers.minimum_project_size} <= ${filters.project_size_range.min}`);
+      }
+      if (filters.project_size_range.max) {
+        conditions.push(sql`${marketplace_providers.maximum_project_size} >= ${filters.project_size_range.max}`);
+      }
+    }
+    if (filters.emergency_services !== undefined) {
+      conditions.push(eq(marketplace_providers.emergency_services, filters.emergency_services));
+    }
+    if (filters.team_size_min) {
+      conditions.push(sql`${marketplace_providers.team_size} >= ${filters.team_size_min}`);
+    }
+    if (filters.languages && filters.languages.length > 0) {
+      const languageConditions = filters.languages.map(lang => 
+        like(marketplace_providers.languages_spoken, `%${lang}%`)
+      );
+      conditions.push(or(...languageConditions));
+    }
 
     if (conditions.length > 0) {
       query = query.where(and(...conditions));
@@ -112,6 +136,12 @@ export class MarketplaceStorage {
           break;
         case 'name':
           query = query.orderBy(direction(marketplace_providers.business_name));
+          break;
+        case 'hourly_rate':
+          query = query.orderBy(direction(marketplace_providers.hourly_rate));
+          break;
+        case 'project_size':
+          query = query.orderBy(direction(marketplace_providers.minimum_project_size));
           break;
       }
     } else {

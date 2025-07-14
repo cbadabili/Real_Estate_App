@@ -285,7 +285,20 @@ async function initializeMarketplaceTables() {
       { name: 'banner_url', definition: 'TEXT' },
       { name: 'company_registration', definition: 'TEXT' },
       { name: 'tax_clearance', definition: 'TEXT' },
-      { name: 'insurance_details', definition: 'TEXT' }
+      { name: 'insurance_details', definition: 'TEXT' },
+      { name: 'minimum_project_size', definition: 'INTEGER DEFAULT 0' },
+      { name: 'maximum_project_size', definition: 'INTEGER DEFAULT 0' },
+      { name: 'hourly_rate', definition: 'INTEGER DEFAULT 0' },
+      { name: 'daily_rate', definition: 'INTEGER DEFAULT 0' },
+      { name: 'project_rate', definition: 'INTEGER DEFAULT 0' },
+      { name: 'emergency_services', definition: 'INTEGER DEFAULT 0' },
+      { name: 'warranty_period', definition: 'INTEGER DEFAULT 0' },
+      { name: 'payment_terms', definition: 'TEXT' },
+      { name: 'payment_methods', definition: 'TEXT' },
+      { name: 'portfolio_images', definition: 'TEXT' },
+      { name: 'certifications', definition: 'TEXT' },
+      { name: 'languages_spoken', definition: 'TEXT' },
+      { name: 'team_size', definition: 'INTEGER DEFAULT 1' }
     ];
 
     for (const column of missingColumns) {
@@ -298,52 +311,6 @@ async function initializeMarketplaceTables() {
         } else {
           console.log(`Note: ${column.name} column may already exist or other error:`, error.message);
         }
-      }
-    }
-
-    // Add missing columns if they don't exist
-    try {
-      console.log('Adding logo_url column...');
-      await db.run(sql`ALTER TABLE marketplace_providers ADD COLUMN logo_url TEXT`);
-    } catch (error) {
-      if (!error.message.includes('duplicate column name')) {
-        console.log('logo_url column may already exist or other error:', error.message);
-      }
-    }
-
-    try {
-      console.log('Adding banner_url column...');
-      await db.run(sql`ALTER TABLE marketplace_providers ADD COLUMN banner_url TEXT`);
-    } catch (error) {
-      if (!error.message.includes('duplicate column name')) {
-        console.log('banner_url column may already exist or other error:', error.message);
-      }
-    }
-
-    try {
-      console.log('Adding company_registration column...');
-      await db.run(sql`ALTER TABLE marketplace_providers ADD COLUMN company_registration TEXT`);
-    } catch (error) {
-      if (!error.message.includes('duplicate column name')) {
-        console.log('company_registration column may already exist or other error:', error.message);
-      }
-    }
-
-    try {
-      console.log('Adding tax_clearance column...');
-      await db.run(sql`ALTER TABLE marketplace_providers ADD COLUMN tax_clearance TEXT`);
-    } catch (error) {
-      if (!error.message.includes('duplicate column name')) {
-        console.log('tax_clearance column may already exist or other error:', error.message);
-      }
-    }
-
-    try {
-      console.log('Adding insurance_details column...');
-      await db.run(sql`ALTER TABLE marketplace_providers ADD COLUMN insurance_details TEXT`);
-    } catch (error) {
-      if (!error.message.includes('duplicate column name')) {
-        console.log('insurance_details column may already exist or other error:', error.message);
       }
     }
 

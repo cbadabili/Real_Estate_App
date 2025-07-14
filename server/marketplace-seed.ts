@@ -85,7 +85,18 @@ export async function seedMarketplace() {
       review_count: 127,
       projects_completed: 450,
       response_time: 2,
-      availability_status: "available"
+      availability_status: "available",
+      minimum_project_size: 50000, // 500 BWP
+      maximum_project_size: 5000000, // 50,000 BWP
+      hourly_rate: 15000, // 150 BWP per hour
+      emergency_services: 1,
+      warranty_period: 12,
+      payment_terms: JSON.stringify(["50% upfront", "50% on completion"]),
+      payment_methods: JSON.stringify(["Cash", "Bank Transfer", "Orange Money"]),
+      portfolio_images: JSON.stringify(["/images/portfolio/bw-prime-1.jpg", "/images/portfolio/bw-prime-2.jpg"]),
+      certifications: JSON.stringify(["REAC Certified", "BQA Approved"]),
+      languages_spoken: JSON.stringify(["English", "Setswana"]),
+      team_size: 8
     },
 
     // Supplier
@@ -110,7 +121,18 @@ export async function seedMarketplace() {
       review_count: 89,
       projects_completed: 300,
       response_time: 4,
-      availability_status: "available"
+      availability_status: "available",
+      minimum_project_size: 10000, // 100 BWP
+      maximum_project_size: 2000000, // 20,000 BWP
+      daily_rate: 50000, // 500 BWP per day
+      emergency_services: 1,
+      warranty_period: 6,
+      payment_terms: JSON.stringify(["30% deposit", "70% on delivery"]),
+      payment_methods: JSON.stringify(["Cash", "Bank Transfer", "Credit Card"]),
+      portfolio_images: JSON.stringify(["/images/portfolio/kalahari-1.jpg", "/images/portfolio/kalahari-2.jpg"]),
+      certifications: JSON.stringify(["ISO 9001", "Building Materials Council Certified"]),
+      languages_spoken: JSON.stringify(["English", "Setswana", "Afrikaans"]),
+      team_size: 15
     },
 
     // Artisan/Trade
@@ -134,7 +156,20 @@ export async function seedMarketplace() {
       review_count: 56,
       projects_completed: 180,
       response_time: 3,
-      availability_status: "available"
+      availability_status: "available",
+      minimum_project_size: 25000, // 250 BWP
+      maximum_project_size: 1500000, // 15,000 BWP
+      hourly_rate: 8000, // 80 BWP per hour
+      daily_rate: 60000, // 600 BWP per day
+      project_rate: 300000, // 3000 BWP per project
+      emergency_services: 1,
+      warranty_period: 24,
+      payment_terms: JSON.stringify(["30% upfront", "70% on completion"]),
+      payment_methods: JSON.stringify(["Cash", "Orange Money", "Bank Transfer"]),
+      portfolio_images: JSON.stringify(["/images/portfolio/master-builders-1.jpg", "/images/portfolio/master-builders-2.jpg"]),
+      certifications: JSON.stringify(["Master Builder Certificate", "Safety Training Certificate"]),
+      languages_spoken: JSON.stringify(["English", "Setswana"]),
+      team_size: 6
     },
 
     // Training Provider
@@ -160,7 +195,19 @@ export async function seedMarketplace() {
       review_count: 234,
       projects_completed: 1200,
       response_time: 1,
-      availability_status: "available"
+      availability_status: "available",
+      minimum_project_size: 100000, // 1000 BWP
+      maximum_project_size: 10000000, // 100,000 BWP
+      hourly_rate: 25000, // 250 BWP per hour
+      daily_rate: 180000, // 1800 BWP per day
+      emergency_services: 0,
+      warranty_period: 0,
+      payment_terms: JSON.stringify(["Full payment before course", "Installment plans available"]),
+      payment_methods: JSON.stringify(["Bank Transfer", "Credit Card", "Orange Money", "Cheque"]),
+      portfolio_images: JSON.stringify(["/images/portfolio/skills-academy-1.jpg", "/images/portfolio/skills-academy-2.jpg"]),
+      certifications: JSON.stringify(["BQA Accredited", "SADC Training Provider", "ISO 21001"]),
+      languages_spoken: JSON.stringify(["English", "Setswana", "French"]),
+      team_size: 25
     }
   ];
 
