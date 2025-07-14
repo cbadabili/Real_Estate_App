@@ -11,6 +11,8 @@ import propertyManagementRoutes from './property-management-routes';
 import tenantSupportRoutes from './tenant-support-routes';
 import { servicesRoutes } from "./services-routes";
 import { seedMarketplace } from "./marketplace-seed";
+import { sql } from "drizzle-orm";
+import { db } from "./db";
 
 const app = express();
 app.use(express.json());
@@ -89,15 +91,26 @@ app.use((req, res, next) => {
   // Initialize database
   await createUsersTable();
   await createPropertiesTable();
+
+  // Create rental tables
+  console.log('Creating rental tables...');
   await createRentalTables();
+  console.log('✅ Rental tables created successfully');
+
+  // Initialize marketplace tables
+  console.log('Creating marketplace tables...');
+  await initializeMarketplaceTables();
+  console.log('✅ Marketplace tables created successfully');
 
   // Seed services data
+  console.log('Seeding services data...');
   await seedServices();
 
-  // Seed rental data
-
   // Seed marketplace data
+  console.log('Seeding marketplace data...');
   await seedMarketplace();
+
+  // Seed rental data
 
   // ALWAYS serve the app on port 5000
   // this serves both the API and the client.
@@ -111,3 +124,230 @@ app.use((req, res, next) => {
     log(`serving on port ${port}`);
   });
 })();
+
+async function createRentalTables() {
+  try {
+    console.log('Creating rental_listings table...');
+    await db.run(sql`
+      CREATE TABLE IF NOT EXISTS rental_listings (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        title TEXT NOT NULL,
+        description TEXT,
+        address TEXT NOT NULL,
+        city TEXT NOT NULL,
+        state TEXT NOT NULL,
+        zip_code TEXT,
+        latitude TEXT,
+        longitude TEXT,
+        property_type TEXT NOT NULL,
+        bedrooms INTEGER,
+        bathrooms TEXT,
+        square_feet INTEGER,
+        rent_amount INTEGER NOT NULL,
+        deposit_amount INTEGER,
+        lease_term TEXT,
+        pet_policy TEXT,
+        utilities_included TEXT,
+        parking_included INTEGER DEFAULT 0,
+        furnished INTEGER DEFAULT 0,
+        images TEXT,
+        features TEXT,
+        status TEXT DEFAULT 'available',
+        landlord_id INTEGER REFERENCES users(id),
+        agent_id INTEGER REFERENCES users(id),
+        views INTEGER DEFAULT 0,
+        available_date INTEGER,
+        created_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer)),
+        updated_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer))
+      )
+    `);
+
+    console.log('Creating rental_applications table...');
+    await db.run(sql`
+      CREATE TABLE IF NOT EXISTS rental_applications (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        listing_id INTEGER REFERENCES rental_listings(id),
+        tenant_id INTEGER REFERENCES users(id),
+        application_date INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer)),
+        status TEXT DEFAULT 'pending',
+        personal_info TEXT,
+        employment_info TEXT,
+        references TEXT,
+        documents TEXT,
+        screening_status TEXT,
+        background_check TEXT,
+        credit_score INTEGER,
+        income_verification TEXT,
+        notes TEXT,
+        reviewed_by INTEGER REFERENCES users(id),
+        reviewed_at INTEGER,
+        created_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer)),
+        updated_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer))
+      )
+    `);
+
+    console.log('Creating lease_agreements table...');
+    await db.run(sql`
+      CREATE TABLE IF NOT EXISTS lease_agreements (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        listing_id INTEGER REFERENCES rental_listings(id),
+        landlord_id INTEGER REFERENCES users(id),
+        tenant_id INTEGER REFERENCES users(id),
+        start_date INTEGER NOT NULL,
+        end_date INTEGER NOT NULL,
+        rent_amount INTEGER NOT NULL,
+        deposit_amount INTEGER,
+        lease_terms TEXT,
+        special_conditions TEXT,
+        pet_addendum TEXT,
+        utilities_responsibility TEXT,
+        maintenance_responsibility TEXT,
+        renewal_terms TEXT,
+        termination_conditions TEXT,
+        status TEXT DEFAULT 'draft',
+        signed_by_landlord INTEGER DEFAULT 0,
+        signed_by_tenant INTEGER DEFAULT 0,
+        landlord_signature_date INTEGER,
+        tenant_signature_date INTEGER,
+        lease_document_url TEXT,
+        created_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer)),
+        updated_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer))
+      )
+    `);
+  } catch (error) {
+    console.error('Error creating rental tables:', error);
+    throw error;
+  }
+}
+
+async function initializeMarketplaceTables() {
+  try {
+    console.log('Creating service_categories table...');
+    await db.run(sql`
+      CREATE TABLE IF NOT EXISTS service_categories (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        journey_type TEXT NOT NULL,
+        icon TEXT,
+        description TEXT,
+        sort_order INTEGER DEFAULT 0,
+        is_active INTEGER DEFAULT 1,
+        created_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer))
+      )
+    `);
+
+    console.log('Creating marketplace_providers table...');
+    await db.run(sql`
+      CREATE TABLE IF NOT EXISTS marketplace_providers (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER REFERENCES users(id),
+        provider_type TEXT NOT NULL,
+        business_name TEXT NOT NULL,
+        category_id INTEGER REFERENCES service_categories(id),
+        specializations TEXT,
+        service_areas TEXT,
+        contact_person TEXT,
+        phone TEXT,
+        email TEXT,
+        whatsapp TEXT,
+        website TEXT,
+        description TEXT,
+        years_experience INTEGER DEFAULT 0,
+        is_verified INTEGER DEFAULT 0,
+        is_featured INTEGER DEFAULT 0,
+        reac_certified INTEGER DEFAULT 0,
+        business_address TEXT,
+        operating_hours TEXT,
+        service_radius INTEGER DEFAULT 0,
+        rating REAL DEFAULT 4.5,
+        review_count INTEGER DEFAULT 0,
+        projects_completed INTEGER DEFAULT 0,
+        response_time INTEGER DEFAULT 24,
+        availability_status TEXT DEFAULT 'available',
+        created_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer)),
+        updated_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer))
+      )
+    `);
+
+    console.log('Creating artisan_skills table...');
+    await db.run(sql`
+      CREATE TABLE IF NOT EXISTS artisan_skills (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        provider_id INTEGER REFERENCES marketplace_providers(id),
+        skill_name TEXT NOT NULL,
+        skill_level TEXT NOT NULL,
+        years_experience INTEGER DEFAULT 0,
+        certification_url TEXT,
+        is_primary INTEGER DEFAULT 0,
+        created_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer))
+      )
+    `);
+
+    console.log('Creating training_programs table...');
+    await db.run(sql`
+      CREATE TABLE IF NOT EXISTS training_programs (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        provider_id INTEGER REFERENCES marketplace_providers(id),
+        program_name TEXT NOT NULL,
+        program_type TEXT NOT NULL,
+        duration_weeks INTEGER,
+        price_pula INTEGER,
+        description TEXT,
+        prerequisites TEXT,
+        certification_offered TEXT,
+        schedule TEXT,
+        max_participants INTEGER,
+        current_participants INTEGER DEFAULT 0,
+        start_date INTEGER,
+        end_date INTEGER,
+        is_active INTEGER DEFAULT 1,
+        created_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer))
+      )
+    `);
+
+    console.log('Creating building_materials table...');
+    await db.run(sql`
+      CREATE TABLE IF NOT EXISTS building_materials (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        supplier_id INTEGER REFERENCES marketplace_providers(id),
+        material_name TEXT NOT NULL,
+        category TEXT NOT NULL,
+        subcategory TEXT,
+        description TEXT,
+        unit_type TEXT NOT NULL,
+        price_per_unit INTEGER,
+        minimum_order INTEGER DEFAULT 1,
+        stock_quantity INTEGER DEFAULT 0,
+        lead_time_days INTEGER DEFAULT 0,
+        specifications TEXT,
+        certifications TEXT,
+        images TEXT,
+        status TEXT DEFAULT 'available',
+        created_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer))
+      )
+    `);
+
+    console.log('Creating project_requests table...');
+    await db.run(sql`
+      CREATE TABLE IF NOT EXISTS project_requests (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER REFERENCES users(id),
+        project_title TEXT NOT NULL,
+        project_type TEXT NOT NULL,
+        description TEXT,
+        budget_min INTEGER,
+        budget_max INTEGER,
+        timeline_weeks INTEGER,
+        location TEXT,
+        requirements TEXT,
+        attachments TEXT,
+        status TEXT DEFAULT 'open',
+        created_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer)),
+        updated_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer))
+      )
+    `);
+  } catch (error) {
+    console.error('Error creating marketplace tables:', error);
+    throw error;
+  }
+}
