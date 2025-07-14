@@ -2,7 +2,7 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { testDatabaseConnection } from "./db";
-import { seedServices } from './services-seed';
+import { seedServices } from "./services-seed";
 import { createPropertiesTable, createUsersTable } from './seed';
 import { createRentalTables } from './rental-migration';
 import rentalRoutes from "./rental-routes";
@@ -10,6 +10,7 @@ import { aiSearchRoutes } from './ai-search';
 import propertyManagementRoutes from './property-management-routes';
 import tenantSupportRoutes from './tenant-support-routes';
 import { servicesRoutes } from "./services-routes";
+import { seedMarketplace } from "./marketplace-seed";
 
 const app = express();
 app.use(express.json());
@@ -94,7 +95,9 @@ app.use((req, res, next) => {
   await seedServices();
 
   // Seed rental data
-  //await seedRentalData(); //removed to avoid errors and not break the program
+
+  // Seed marketplace data
+  await seedMarketplace();
 
   // ALWAYS serve the app on port 5000
   // this serves both the API and the client.

@@ -580,7 +580,7 @@ const Navbar = () => {
             >
               <button className="flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100 transition-colors">
                 <Wrench className="h-4 w-4" />
-                <span>Services</span>
+                <span>Marketplace</span>
                 <ChevronDown className="h-3 w-3" />
               </button>
 
@@ -596,14 +596,14 @@ const Navbar = () => {
                       <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide px-2 py-1 mb-2">Service Categories</div>
 
                       <Link
-                        to="/services"
+                        to="/marketplace/professionals"
                         className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded mb-1"
                         onClick={() => setServicesDropdownOpen(false)}
                       >
                         <div className="flex items-center">
                           <Wrench className="h-4 w-4 mr-2 text-beedab-blue" />
                           <div>
-                            <div className="font-medium">All Services</div>
+                            <div className="font-medium">Find a Pro</div>
                             <div className="text-xs text-gray-500">Browse all service providers</div>
                           </div>
                         </div>
@@ -612,7 +612,7 @@ const Navbar = () => {
                       <div className="border-t border-gray-100 my-2"></div>
 
                       <Link
-                        to="/services?category=Legal"
+                        to="/marketplace?category=Legal"
                         className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded mb-1"
                         onClick={() => setServicesDropdownOpen(false)}
                       >
@@ -626,7 +626,7 @@ const Navbar = () => {
                       </Link>
 
                       <Link
-                        to="/services?category=Finance"
+                        to="/marketplace?category=Finance"
                         className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded mb-1"
                         onClick={() => setServicesDropdownOpen(false)}
                       >
@@ -640,7 +640,7 @@ const Navbar = () => {
                       </Link>
 
                       <Link
-                        to="/services?category=Construction"
+                        to="/marketplace?category=Construction"
                         className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
                         onClick={() => setServicesDropdownOpen(false)}
                       >
@@ -755,7 +755,7 @@ const Navbar = () => {
                       <RoleBasedComponent requireAdmin>
                         <Link
                           to="/admin"
-                          className="flex items-center px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100"
+                          className="flex items-center px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100"```text
                           onClick={() => setProfileDropdownOpen(false)}
                         >
                           <Gavel className="h-4 w-4 mr-2" />
@@ -941,6 +941,39 @@ const Navbar = () => {
                   </Link>
                 </div>
               )}
+            </div>
+            <div className="px-3 py-2">
+              <div className="text-sm font-medium text-neutral-900 mb-2">Marketplace</div>
+              <div className="space-y-1 ml-4">
+                <Link
+                  to="/marketplace/professionals"
+                  className="block px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-md text-sm"
+                  onClick={() => setIsOpen(false)}
+                >
+                  🏠 Find a Pro
+                </Link>
+                <Link
+                  to="/marketplace/suppliers"
+                  className="block px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-md text-sm"
+                  onClick={() => setIsOpen(false)}
+                >
+                  🧱 Find a Supplier
+                </Link>
+                <Link
+                  to="/marketplace/trades"
+                  className="block px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-md text-sm"
+                  onClick={() => setIsOpen(false)}
+                >
+                  🔨 Find a Trade
+                </Link>
+                <Link
+                  to="/marketplace/training"
+                  className="block px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-md text-sm"
+                  onClick={() => setIsOpen(false)}
+                >
+                  🎓 Find a Course
+                </Link>
+              </div>
             </div>
           </motion.div>
         )}

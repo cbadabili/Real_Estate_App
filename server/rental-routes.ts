@@ -62,7 +62,7 @@ router.post('/rentals', authenticate, async (req, res) => {
 
     const rental = await rentalStorage.createRental({
       ...validatedData,
-      landlord_id: req.user.id,
+      landlord_id: req.user?.id || 0,
       status: 'active'
     });
 
@@ -378,7 +378,7 @@ router.post('/applications/:applicationId/generate-lease', authenticate, async (
     const lease = await rentalStorage.createLease({
       application_id: applicationId,
       rental_id: application.rental.id,
-      landlord_id: req.user.id,
+      landlord_id: req.user?.id || 0,
       renter_id: application.application.renter_id,
       lease_start_date,
       lease_end_date,

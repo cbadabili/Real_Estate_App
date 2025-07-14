@@ -85,7 +85,7 @@ const USER_TYPE_PERMISSIONS: Record<UserType, Permission[]> = {
 
 export class AuthService {
   // Check if user has specific permission
-  static hasPermission(user: User, permission: Permission): boolean {
+  static hasPermission(user: User, permission: string): boolean {
     if (!user.isActive) return false;
 
     // Check role-based permissions

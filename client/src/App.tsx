@@ -40,7 +40,12 @@ import AuthTestPage from './pages/AuthTestPage';
 import AgentProfilePage from './pages/AgentProfilePage';
 import ContactAgentPage from './pages/ContactAgentPage';
 import AuctionsPage from './pages/AuctionsPage';
-import ServicesPage from './pages/ServicesPage';
+import ServicesPage from "./pages/ServicesPage";
+import MarketplacePage from "./pages/MarketplacePage";
+import ProfessionalsPage from "./pages/marketplace/ProfessionalsPage";
+import SuppliersPage from "./pages/marketplace/SuppliersPage";
+import TradesPage from "./pages/marketplace/TradesPage";
+import TrainingPage from "./pages/marketplace/TrainingPage";
 import DocumentsPage from './pages/DocumentsPage';
 import LoginPage from './pages/LoginPage';
 import AdminPage from './pages/AdminPage';
@@ -135,9 +140,18 @@ function App() {
             <Route path="/create-listing" element={<CreateListingPage />} />
             <Route path="/agent-dashboard" element={<AgentDashboard />} />
         <Route path="/my-properties" element={<MyPropertiesPage />} />
-            <Route path="/services/legal" element={<LegalServicesPage />} />
-            <Route path="/services/financing" element={<FinancingPage />} />
-            <Route path="/buyer-journey/planning" element={<PlanningPage />} />
+            <Route path="/services" element={<ServicesPage />} />
+          <Route path="/services/legal" element={<LegalServicesPage />} />
+          <Route path="/services/financing" element={<FinancingPage />} />
+
+          {/* Marketplace Routes */}
+          <Route path="/marketplace" element={<MarketplacePage />} />
+          <Route path="/marketplace/:segment" element={<MarketplacePage />} />
+          <Route path="/marketplace/professionals" element={<ProfessionalsPage />} />
+          <Route path="/marketplace/suppliers" element={<SuppliersPage />} />
+          <Route path="/marketplace/trades" element={<TradesPage />} />
+          <Route path="/marketplace/training" element={<TrainingPage />} />
+          <Route path="/buyer-journey/planning" element={<PlanningPage />} />
           <Route path="/buyer-journey/searching" element={<SearchingPage />} />
           <Route path="/buyer-journey/viewing" element={<ViewingPage />} />
           <Route path="/buyer-journey/offers" element={<OffersPage />} />
@@ -149,7 +163,6 @@ function App() {
           <Route path="/properties/:id/schedule-viewing" element={<ScheduleViewingPage />} />
             <Route path="/auctions" element={<AuctionsPage />} />
               <Route path="/bid/:id" element={<BidPage />} />
-              <Route path="/services" element={<ServicesPage />} />
             <Route path="/documents" element={<DocumentsPage />} />
             <Route path="/test-api" element={<TestAPIPage />} />
             <Route path="/login" element={<LoginPage />} />

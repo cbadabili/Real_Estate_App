@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { servicesStorage } from "./services-storage";
 import { reviewStorage } from "./review-storage";
+import { marketplaceRoutes } from "./marketplace-routes";
 import { parseNaturalLanguageSearch } from './ai-search';
 import { 
   authenticate, 
@@ -1117,6 +1118,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to revoke permission" });
     }
   });
+
+  // Marketplace routes
+  app.use("/api/marketplace", marketplaceRoutes);
 
   const httpServer = createServer(app);
   return httpServer;
