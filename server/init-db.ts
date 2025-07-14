@@ -135,7 +135,7 @@ async function initializeTables() {
     `);
 
     console.log('Creating services tables...');
-    
+
     console.log('Creating service_providers table...');
     await db.run(sql`
       CREATE TABLE service_providers (
@@ -201,7 +201,7 @@ async function initializeTables() {
     `);
 
     console.log('Creating marketplace tables...');
-    
+
     console.log('Creating service_categories table...');
     await db.run(sql`
       CREATE TABLE service_categories (

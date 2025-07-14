@@ -130,7 +130,7 @@ async function createRentalTables() {
     // Enable foreign key constraints
     console.log('Enabling foreign key constraints...');
     await db.run(sql`PRAGMA foreign_keys = ON`);
-    
+
     // Step 1: Create rental_listings table first (no dependencies)
     console.log('Step 1: Creating rental_listings table...');
     await db.run(sql`
@@ -171,7 +171,7 @@ async function createRentalTables() {
       WHERE type='table' AND name='rental_listings'
     `);
     console.log('Table check result:', tableCheck);
-    
+
     if (tableCheck.length === 0) {
       throw new Error('rental_listings table was not created successfully');
     }
@@ -215,7 +215,7 @@ async function createRentalTables() {
       )
     `);
     console.log('✅ lease_agreements table created successfully');
-    
+
     console.log('✅ All rental tables created successfully');
   } catch (error) {
     console.error('❌ Error creating rental tables:', error);
@@ -279,7 +279,7 @@ async function initializeMarketplaceTables() {
 
     // Add missing columns if they don't exist
     console.log('Adding missing columns to marketplace_providers...');
-    
+
     const missingColumns = [
       { name: 'logo_url', definition: 'TEXT' },
       { name: 'banner_url', definition: 'TEXT' },

@@ -818,5 +818,65 @@ export const job_opportunities = sqliteTable('job_opportunities', {
   updated_at: integer('updated_at').default(sql`(cast((julianday('now') - 2440587.5)*86400000 as integer))`),
 });
 
+// Material orders
+export const material_orders = sqliteTable('material_orders', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  customer_id: integer('customer_id').references(() => users.id),
+  supplier_id: integer('supplier_id').references(() => marketplace_providers.id),
+
+  // Order Details
+  order_number: text('order_number').notNull(),
+  order_items: text('order_items'), // JSON array
+  total_amount: integer('total_amount'),
+
+  // Delivery
+  delivery_address: text('delivery_address'),
+  delivery_date: text('delivery_date'),
+  delivery_method: text('delivery_method'), // 'pickup', 'delivery', 'courier'
+  delivery_cost: integer('delivery_cost'),
+
+  // Status
+  status: text('status').default('pending'), // 'pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled'
+  payment_status: text('payment_status').default('pending'), // 'pending', 'paid', 'partial', 'failed'
+
+  created_at: integer('created_at').default(sql`(cast((julianday('now') - 2440587.5)*86400000 as integer))`),
+  updated_at: integer('updated_at').default(sql`(cast((julianday('now') - 2440587.5)*86400000 as integer))`),
+});
+
+// Job opportunities for skilled workers
+export const job_opportunities = sqliteTable('job_opportunities', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  employer_id: integer('employer_id').references(() => users.id),
+
+  // Job Details
+  job_title: text('job_title').notNull(),
+  job_description: text('job_description'),
+  job_type: text('job_type'), // 'full_time', 'part_time', 'contract', 'temporary'
+  category: text('category'), // 'construction', 'plumbing', 'electrical', 'real_estate'
+
+  // Requirements
+  required_skills: text('required_skills'), // JSON array
+  experience_years: integer('experience_years'),
+  education_level: text('education_level'),
+  certifications_required: text('certifications_required'), // JSON array
+
+  // Compensation
+  salary_min: integer('salary_min'),
+  salary_max: integer('salary_max'),
+  salary_type: text('salary_type'), // 'monthly', 'daily', 'hourly', 'project'
+  benefits: text('benefits'), // JSON array
+
+  // Location
+  job_location: text('job_location'),
+  remote_work: integer('remote_work', { mode: 'boolean' }).default(false),
+
+  // Status
+  status: text('status').default('active'), // 'active', 'filled', 'cancelled', 'expired'
+  applications_count: integer('applications_count').default(0),
+
+  created_at: integer('created_at').default(sql`(cast((julianday('now') - 2440587.5)*86400000 as integer))`),
+  updated_at: integer('updated_at').default(sql`(cast((julianday('now') - 2440587.5)*86400000 as integer))`),
+});
+
 // Re-export services schema types for convenience
 export * from "./services-schema";
