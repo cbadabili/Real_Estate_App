@@ -662,7 +662,8 @@ export const project_requests = sqliteTable('project_requests', {
 
   created_at: integer('created_at').default(sql`(cast((julianday('now') - 2440587.5)*86400000 as integer))`),
   updated_at: integer('updated_at').default(sql`(cast((julianday('now') - 2440587.5)*86400000 as integer))`),
-```tool_code
+});
+
 // Proposals from service providers
 export const project_proposals = sqliteTable('project_proposals', {
   id: integer('id').primaryKey({ autoIncrement: true }),
