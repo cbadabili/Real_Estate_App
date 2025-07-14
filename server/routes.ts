@@ -3,7 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { servicesStorage } from "./services-storage";
 import { reviewStorage } from "./review-storage";
-import { marketplaceRoutes } from "./marketplace-routes";
+import marketplaceRoutes from "./marketplace-routes";
 import { parseNaturalLanguageSearch } from './ai-search';
 import { 
   authenticate, 
