@@ -1,0 +1,68 @@
+root@03201c8c2301:/workspace/Real_Estate_App# cat /tmp/tsbuild.log
+server/auth-middleware.ts(101,39): error TS2345: Argument of type 'import("/work
+space/Real_Estate_App/shared/schema").Permission' is not assignable to parameter
+ of type 'never'.
+server/property-management-routes.ts(65,17): error TS18048: 'req.user' is possib
+ly 'undefined'.
+server/rental-routes.ts(60,53): error TS2345: Argument of type '{ landlord_id: n
+umber; status: "active"; description: string; address: string; city: string; tit
+le: string; property_type: string; bedrooms: number; bathrooms: number; district
+: string; square_meters: number; ... 9 more ...; utilities_included?: string[] |
+ undefined; }' is not assignable to parameter of type 'RentalListing'.
+  Types of property 'photos' are incompatible.
+    Type 'string[] | undefined' is not assignable to type 'string[]'.
+      Type 'undefined' is not assignable to type 'string[]'.
+server/rental-routes.ts(62,20): error TS18048: 'req.user' is possibly 'undefined
+'.
+server/rental-routes.ts(86,78): error TS18048: 'req.user' is possibly 'undefined
+'.
+server/rental-routes.ts(112,60): error TS18048: 'req.user' is possibly 'undefine
+d'.
+server/rental-routes.ts(140,75): error TS18048: 'req.user' is possibly 'undefine
+d'.
+server/rental-routes.ts(244,18): error TS18048: 'req.user' is possibly 'undefine
+d'.
+server/rental-routes.ts(266,70): error TS18048: 'req.user' is possibly 'undefine
+d'.
+server/rental-routes.ts(297,7): error TS18048: 'req.user' is possibly 'undefined
+'.
+server/rental-routes.ts(358,70): error TS18048: 'req.user' is possibly 'undefine
+d'.
+server/rental-routes.ts(371,20): error TS18048: 'req.user' is possibly 'undefine
+d'.
+server/rental-routes.ts(410,75): error TS18048: 'req.user' is possibly 'undefine
+d'.
+server/rental-routes.ts(474,68): error TS18048: 'req.user' is possibly 'undefine
+d'.
+server/rental-seed.ts(2,10): error TS2724: '"../shared/schema"' has no exported
+member named 'rentalListings'. Did you mean 'rental_listings'?
+server/rental-storage.ts(64,21): error TS2339: Property 'prepare' does not exist
+ on type 'BetterSQLite3Database<typeof import("/workspace/Real_Estate_App/shared
+/schema")> & { $client: Database; }'.
+server/rental-storage.ts(82,26): error TS2339: Property 'prepare' does not exist
+ on type 'BetterSQLite3Database<typeof import("/workspace/Real_Estate_App/shared
+/schema")> & { $client: Database; }'.
+server/rental-storage.ts(108,21): error TS2339: Property 'prepare' does not exis
+t on type 'BetterSQLite3Database<typeof import("/workspace/Real_Estate_App/share
+d/schema")> & { $client: Database; }'.
+server/rental-storage.ts(115,30): error TS2339: Property 'prepare' does not exis
+t on type 'BetterSQLite3Database<typeof import("/workspace/Real_Estate_App/share
+d/schema")> & { $client: Database; }'.
+server/rental-storage.ts(120,24): error TS2339: Property 'prepare' does not exis
+t on type 'BetterSQLite3Database<typeof import("/workspace/Real_Estate_App/share
+d/schema")> & { $client: Database; }'.
+server/rental-storage.ts(121,24): error TS7006: Parameter 'rental' implicitly ha
+s an 'any' type.
+server/rental-storage.ts(125,23): error TS2339: Property 'prepare' does not exis
+t on type 'BetterSQLite3Database<typeof import("/workspace/Real_Estate_App/share
+d/schema")> & { $client: Database; }'.
+server/rental-storage.ts(179,24): error TS2339: Property 'prepare' does not exis
+t on type 'BetterSQLite3Database<typeof import("/workspace/Real_Estate_App/share
+d/schema")> & { $client: Database; }'.
+server/rental-storage.ts(180,24): error TS7006: Parameter 'rental' implicitly ha
+s an 'any' type.
+server/rental-storage.ts(197,21): error TS2339: Property 'prepare' does not exis
+t on type 'BetterSQLite3Database<typeof import("/workspace/Real_Estate_App/share
+d/schema")> & { $client: Database; }'.
+server/rental-storage.ts(209,31): error TS2339: Property 'prepare' does not exis
+t on type 'BetterSQLite3Database<typeof import("/workspace/Real_Estate_App/share

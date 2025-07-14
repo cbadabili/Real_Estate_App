@@ -661,7 +661,7 @@ const Navbar = () => {
             {/* Post-dropdown Navigation */}
             {postDropdownNavigation.map((item) => {
               const Icon = item.icon;
-              const isActive = location === item.href;
+              const isActive = location.pathname === item.href;
               return (
                 <Link
                   key={item.name}

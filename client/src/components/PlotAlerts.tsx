@@ -193,7 +193,7 @@ export const PlotAlerts: React.FC<PlotAlertsProps> = ({
                   onChange={(e) => setNewAlert({ ...newAlert, sizeUnit: e.target.value as 'm²' | 'hectares' })}
                   className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-beedab-blue"
                 >
-                  <option value="m²">m²</option>
+                  <option value="m²">Square Meters (m²)</option>
                   <option value="hectares">hectares</option>
                 </select>
               </div>

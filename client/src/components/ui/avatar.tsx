@@ -51,3 +51,44 @@ export const AvatarFallback: React.FC<React.HTMLAttributes<HTMLSpanElement>> = (
     {children}
   </span>
 );
+import React from 'react';
+
+interface AvatarProps {
+  src?: string;
+  alt?: string;
+  size?: 'sm' | 'md' | 'lg';
+  children?: React.ReactNode;
+  className?: string;
+}
+
+export const Avatar: React.FC<AvatarProps> = ({ 
+  src, 
+  alt = '', 
+  size = 'md', 
+  children, 
+  className = '' 
+}) => {
+  const sizeClasses = {
+    sm: 'w-8 h-8',
+    md: 'w-10 h-10',
+    lg: 'w-12 h-12'
+  };
+
+  if (src) {
+    return (
+      <img
+        src={src}
+        alt={alt}
+        className={`rounded-full object-cover ${sizeClasses[size]} ${className}`}
+      />
+    );
+  }
+
+  return (
+    <div className={`rounded-full bg-neutral-300 flex items-center justify-center ${sizeClasses[size]} ${className}`}>
+      {children}
+    </div>
+  );
+};
+
+export default Avatar;

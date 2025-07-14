@@ -81,7 +81,7 @@ export const PropertyComparison: React.FC<PropertyComparisonProps> = ({
           {/* Comparison Content */}
           <div className="p-6 overflow-x-auto">
             <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6 min-w-max">
-              {properties.map((property, index) => (
+              {properties.map((property: any, index: number) => (
                 <motion.div
                   key={property.id}
                   initial={{ opacity: 0, y: 20 }}

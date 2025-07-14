@@ -1,4 +1,3 @@
-
 import { db } from './db';
 
 export interface RentalListing {
@@ -111,7 +110,7 @@ export class RentalStorage {
     `);
 
     stmt.run(...values);
-    
+
     const updatedRental = db.prepare('SELECT * FROM rental_listings WHERE id = ? AND landlord_id = ?').get(rentalId, landlordId);
     return updatedRental ? this.formatRental(updatedRental) : null;
   }
@@ -126,58 +125,50 @@ export class RentalStorage {
     return rental ? this.formatRental(rental) : null;
   }
 
-  async searchRentals(filters: {
-    location?: string;
-    minPrice?: number;
-    maxPrice?: number;
-    bedrooms?: number;
-    propertyType?: string;
-    page?: number;
-    limit?: number;
-  }): Promise<RentalListing[]> {
-    let query = 'SELECT * FROM rental_listings WHERE status = "active"';
-    const params: any[] = [];
+  async searchRentals(filters: any): Promise<any[]> {
+    try {
+      let query = `
+        SELECT r.*, u.name as landlord_name, u.email as landlord_email 
+        FROM rentals r 
+        LEFT JOIN users u ON r.landlord_id = u.id 
+        WHERE 1=1
+      `;
 
-    if (filters.location) {
-      query += ' AND (city LIKE ? OR district LIKE ?)';
-      const locationParam = `%${filters.location}%`;
-      params.push(locationParam, locationParam);
-    }
+      const params: any[] = [];
 
-    if (filters.minPrice) {
-      query += ' AND monthly_rent >= ?';
-      params.push(filters.minPrice);
-    }
-
-    if (filters.maxPrice) {
-      query += ' AND monthly_rent <= ?';
-      params.push(filters.maxPrice);
-    }
-
-    if (filters.bedrooms) {
-      query += ' AND bedrooms >= ?';
-      params.push(filters.bedrooms);
-    }
-
-    if (filters.propertyType) {
-      query += ' AND property_type = ?';
-      params.push(filters.propertyType);
-    }
-
-    query += ' ORDER BY created_at DESC';
-
-    if (filters.limit) {
-      query += ' LIMIT ?';
-      params.push(filters.limit);
-      
-      if (filters.page) {
-        query += ' OFFSET ?';
-        params.push(filters.page * filters.limit);
+      if (filters.city) {
+        query += ` AND r.city LIKE ?`;
+        params.push(`%${filters.city}%`);
       }
-    }
 
-    const rentals = db.prepare(query).all(...params);
-    return rentals.map(rental => this.formatRental(rental));
+      if (filters.minPrice) {
+        query += ` AND r.monthly_rent >= ?`;
+        params.push(filters.minPrice);
+      }
+
+      if (filters.maxPrice) {
+        query += ` AND r.monthly_rent <= ?`;
+        params.push(filters.maxPrice);
+      }
+
+      if (filters.bedrooms) {
+        query += ` AND r.bedrooms >= ?`;
+        params.push(filters.bedrooms);
+      }
+
+      if (filters.propertyType) {
+        query += ` AND r.property_type = ?`;
+        params.push(filters.propertyType);
+      }
+
+      query += ` ORDER BY r.created_at DESC LIMIT 50`;
+
+      const stmt = this.db.prepare(query);
+      return stmt.all(...params);
+    } catch (error) {
+      console.error('Error searching rentals:', error);
+      throw error;
+    }
   }
 
   // Helper method to format rental data
@@ -246,7 +237,7 @@ export class RentalStorage {
     `);
 
     stmt.run(status, applicationId, landlordId);
-    
+
     const updatedApplication = db.prepare('SELECT * FROM rental_applications WHERE id = ?').get(applicationId);
     return updatedApplication ? this.formatApplication(updatedApplication) : null;
   }
@@ -329,7 +320,7 @@ export class RentalStorage {
     }
 
     db.prepare('UPDATE lease_agreements SET e_signature_status = ? WHERE id = ?').run(eSignatureStatus, leaseId);
-    
+
     const finalLease = db.prepare('SELECT * FROM lease_agreements WHERE id = ?').get(leaseId);
     return this.formatLease(finalLease);
   }
@@ -350,7 +341,7 @@ export class RentalStorage {
   async screenTenant(applicationId: number): Promise<RentalApplication | null> {
     // Simulate delay for screening process
     await new Promise(resolve => setTimeout(resolve, 2000));
-    
+
     const stmt = db.prepare(`
       UPDATE rental_applications 
       SET background_check_status = 'complete', credit_report_status = 'complete', updated_at = datetime('now')
@@ -358,7 +349,7 @@ export class RentalStorage {
     `);
 
     stmt.run(applicationId);
-    
+
     const updatedApplication = db.prepare('SELECT * FROM rental_applications WHERE id = ?').get(applicationId);
     return updatedApplication ? this.formatApplication(updatedApplication) : null;
   }

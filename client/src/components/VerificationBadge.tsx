@@ -32,7 +32,7 @@ export const VerificationBadge: React.FC<VerificationBadgeProps> = ({
       };
     }
 
-    const configs = {
+    const verificationConfigs = {
       agent: {
         basic: {
           icon: Shield,
@@ -97,7 +97,9 @@ export const VerificationBadge: React.FC<VerificationBadgeProps> = ({
       }
     };
 
-    return configs[type as keyof typeof configs][level] || configs[type as keyof typeof configs].basic;
+    const config = verificationConfigs[type as keyof typeof verificationConfigs];
+
+    return config[level as keyof typeof config] || config.basic;
   };
 
   const config = getBadgeConfig();
@@ -110,3 +112,7 @@ export const VerificationBadge: React.FC<VerificationBadgeProps> = ({
     </div>
   );
 };
+```
+
+```text
+The code fixes the type indexing issue in the VerificationBadge component by correctly referencing the verificationConfigs object using the type property.
