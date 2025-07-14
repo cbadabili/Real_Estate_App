@@ -1,4 +1,3 @@
-
 import { db } from "./db";
 import { users, service_categories, marketplace_providers } from "@shared/schema";
 import { eq } from "drizzle-orm";
@@ -6,7 +5,7 @@ import { eq } from "drizzle-orm";
 export class SeedManager {
   async seedUsers() {
     console.log('Seeding users...');
-    
+
     // Check if users already exist
     const existingUsers = await db.select().from(users).limit(1);
     if (existingUsers.length > 0) {
@@ -79,7 +78,7 @@ export class SeedManager {
 
   async seedServiceCategories() {
     console.log('Seeding service categories...');
-    
+
     const existingCategories = await db.select().from(service_categories).limit(1);
     if (existingCategories.length > 0) {
       console.log('✅ Service categories already exist, skipping...');
@@ -115,7 +114,7 @@ export class SeedManager {
 
   async seedMarketplaceProviders() {
     console.log('Seeding marketplace providers...');
-    
+
     const existingProviders = await db.select().from(marketplace_providers).limit(1);
     if (existingProviders.length > 0) {
       console.log('✅ Marketplace providers already exist, skipping...');
@@ -214,12 +213,12 @@ export class SeedManager {
 
   async seedAll() {
     console.log('🌱 Starting complete database seeding...');
-    
+
     try {
       await this.seedUsers();
       await this.seedServiceCategories();
       await this.seedMarketplaceProviders();
-      
+
       console.log('✅ All seeding completed successfully');
     } catch (error) {
       console.error('❌ Seeding failed:', error);

@@ -70,6 +70,212 @@ const MarketplacePage: React.FC = () => {
 
   const getPageDescription = (segment: string) => {
     switch (segment) {
+      case 'professionals': return 'Connect with verified real estate professionals';
+      case 'suppliers': return 'Find quality building materials and suppliers';
+      case 'trades': return 'Hire skilled artisans and tradespeople';
+      case 'training': return 'Develop your skills with certified programs';
+      default: return 'Discover services for your property journey';
+    }
+  };
+
+  interface ServiceCategory {
+    id: number;
+    name: string;
+    icon: string;
+    description: string;
+    journey_type: string;
+  }
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        
+        // Fetch categories
+        const categoriesResponse = await fetch('/api/marketplace/categories');
+        const categoriesData = await categoriesResponse.json();
+        setCategories(categoriesData);
+
+        // Fetch providers based on segment
+        const providerType = getProviderType(segment || '');
+        const providersResponse = await fetch(`/api/marketplace/providers?provider_type=${providerType}`);
+        const providersData = await providersResponse.json();
+        setProviders(providersData);
+        
+      } catch (error) {
+        console.error('Error fetching marketplace data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [segment]);
+
+  const filteredProviders = providers.filter(provider => {
+    const matchesSearch = !searchQuery || 
+      provider.business_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      provider.description.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    const matchesCategory = !selectedCategory || provider.category_id === parseInt(selectedCategory);
+    const matchesArea = !selectedArea || provider.service_areas.includes(selectedArea);
+    const matchesRating = provider.rating >= minRating;
+
+    return matchesSearch && matchesCategory && matchesArea && matchesRating;
+  });
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <LoadingSpinner />
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Hero Section */}
+      <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <h1 className="text-4xl font-bold mb-4">{getPageTitle(segment || '')}</h1>
+            <p className="text-xl opacity-90 mb-8">{getPageDescription(segment || '')}</p>
+            
+            {/* Search Bar */}
+            <div className="max-w-2xl mx-auto relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+              <Input
+                placeholder="Search for services..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10 py-3 text-gray-900"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Filters Section */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
+          <div className="flex flex-wrap gap-4 items-center">
+            <Button
+              variant="outline"
+              onClick={() => setShowFilters(!showFilters)}
+              className="flex items-center gap-2"
+            >
+              <Filter className="h-4 w-4" />
+              Filters
+            </Button>
+            
+            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+              <SelectTrigger className="w-48">
+                <SelectValue placeholder="All Categories" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">All Categories</SelectItem>
+                {categories.map(category => (
+                  <SelectItem key={category.id} value={category.id.toString()}>
+                    {category.icon} {category.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <Select value={selectedArea} onValueChange={setSelectedArea}>
+              <SelectTrigger className="w-48">
+                <SelectValue placeholder="All Areas" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">All Areas</SelectItem>
+                <SelectItem value="Gaborone">Gaborone</SelectItem>
+                <SelectItem value="Francistown">Francistown</SelectItem>
+                <SelectItem value="Maun">Maun</SelectItem>
+                <SelectItem value="Kasane">Kasane</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        {/* Results */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredProviders.map(provider => (
+            <Card key={provider.id} className="hover:shadow-lg transition-shadow">
+              <CardHeader>
+                <div className="flex items-start justify-between">
+                  <div>
+                    <CardTitle className="text-lg">{provider.business_name}</CardTitle>
+                    <p className="text-sm text-gray-600 mt-1">{provider.provider_type}</p>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    {provider.is_verified && (
+                      <Badge variant="secondary" className="text-xs">
+                        <Award className="h-3 w-3 mr-1" />
+                        Verified
+                      </Badge>
+                    )}
+                    {provider.is_featured && (
+                      <Badge variant="outline" className="text-xs">
+                        Featured
+                      </Badge>
+                    )}
+                  </div>
+                </div>
+              </CardHeader>
+              
+              <CardContent>
+                <p className="text-gray-600 text-sm mb-4 line-clamp-3">
+                  {provider.description}
+                </p>
+                
+                <div className="space-y-2 mb-4">
+                  <div className="flex items-center gap-2 text-sm">
+                    <Star className="h-4 w-4 text-yellow-500 fill-current" />
+                    <span className="font-medium">{provider.rating}</span>
+                    <span className="text-gray-500">({provider.review_count} reviews)</span>
+                  </div>
+                  
+                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <Clock className="h-4 w-4" />
+                    <span>{provider.years_experience} years experience</span>
+                  </div>
+                  
+                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <MapPin className="h-4 w-4" />
+                    <span>{provider.service_areas.slice(0, 2).join(', ')}</span>
+                  </div>
+                </div>
+
+                <div className="flex gap-2">
+                  <Button className="flex-1" size="sm">
+                    Contact
+                  </Button>
+                  <Button variant="outline" size="sm">
+                    View Details
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        {filteredProviders.length === 0 && (
+          <div className="text-center py-12">
+            <div className="text-gray-400 text-lg mb-2">No providers found</div>
+            <p className="text-gray-600">Try adjusting your search criteria</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default MarketplacePage;;
+    }
+  };
+
+  const getPageDescription = (segment: string) => {
+    switch (segment) {
       case 'professionals': return 'Connect with verified real estate professionals, agents, and service providers';
       case 'suppliers': return 'Source quality building materials and supplies from trusted suppliers';
       case 'trades': return 'Find skilled tradespeople and artisans for your construction projects';

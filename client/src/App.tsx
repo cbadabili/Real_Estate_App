@@ -40,8 +40,8 @@ import AuthTestPage from './pages/AuthTestPage';
 import AgentProfilePage from './pages/AgentProfilePage';
 import ContactAgentPage from './pages/ContactAgentPage';
 import AuctionsPage from './pages/AuctionsPage';
-import ServicesPage from "./pages/ServicesPage";
-import MarketplacePage from "./pages/MarketplacePage";
+import ServicesPage from './pages/ServicesPage';
+import MarketplacePage from './pages/MarketplacePage';
 import ProfessionalsPage from "./pages/marketplace/ProfessionalsPage";
 import SuppliersPage from "./pages/marketplace/SuppliersPage";
 import TradesPage from "./pages/marketplace/TradesPage";
@@ -131,16 +131,10 @@ function App() {
             <Route path="/secure-transactions" element={<SecureTransactionsPage />} />
             <Route path="/communication" element={<CommunicationPage />} />
             <Route path="/agent-network" element={<AgentNetworkPage />} />
-            <Route path="/sample-properties" element={<PropertiesPage />} />
-            <Route path="/map-search" element={<MapSearchPage />} />
-            <Route path="/profile" element={<ProfilePage />} />
-            <Route path="/property/:id" element={<PropertyDetailsPage />} />
-            <Route path="/fsbo-dashboard" element={<FSBODashboard />} />
-            <Route path="/create-property" element={<CreatePropertyPage />} />
             <Route path="/create-listing" element={<CreateListingPage />} />
-            <Route path="/agent-dashboard" element={<AgentDashboard />} />
-        <Route path="/my-properties" element={<MyPropertiesPage />} />
             <Route path="/services" element={<ServicesPage />} />
+            <Route path="/marketplace" element={<MarketplacePage />} />
+            <Route path="/marketplace/:segment" element={<MarketplacePage />} />
           <Route path="/services/legal" element={<LegalServicesPage />} />
           <Route path="/services/financing" element={<FinancingPage />} />
 

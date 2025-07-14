@@ -2,11 +2,12 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { testDatabaseConnection } from "./db";
-import rentalRoutes from "./rental-routes";
+import { rentalRoutes } from './rental-routes';
+import { servicesRoutes } from './services-routes';
+import { marketplaceRoutes } from './marketplace-routes';
 import { aiSearchRoutes } from './ai-search';
-import propertyManagementRoutes from './property-management-routes';
-import tenantSupportRoutes from './tenant-support-routes';
-import { servicesRoutes } from "./services-routes";
+import { tenantSupportRoutes } from './tenant-support-routes';
+import { propertyManagementRoutes } from './property-management-routes';
 
 const app = express();
 app.use(express.json());
@@ -58,6 +59,7 @@ app.use((req, res, next) => {
   app.use('/api', propertyManagementRoutes);
   app.use('/api', tenantSupportRoutes);
   app.use('/api', servicesRoutes);
+  app.use('/api', marketplaceRoutes);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
@@ -85,15 +87,15 @@ app.use((req, res, next) => {
   // Initialize database with migrations
   const { getMigrationManager } = await import('./migration-manager');
   const { seedManager } = await import('./seed-manager');
-  
+
   try {
     console.log('🔄 Running database migrations...');
     const migrationManager = getMigrationManager();
     await migrationManager.runAllPendingMigrations();
-    
+
     console.log('🌱 Seeding database...');
     await seedManager.seedAll();
-    
+
     console.log('✅ Database initialization completed');
   } catch (error) {
     console.error('❌ Database initialization failed:', error);
@@ -114,4 +116,3 @@ app.use((req, res, next) => {
     log(`serving on port ${port}`);
   });
 })();
-
