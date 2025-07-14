@@ -60,7 +60,7 @@ export interface LeaseAgreement {
 export class RentalStorage {
   // Rental Listing Management
   async createRental(rental: RentalListing): Promise<RentalListing> {
-    const stmt = db.prepare(`
+    const stmt = db.$client.prepare(`
       INSERT INTO rental_listings (
         landlord_id, title, description, address, city, district, property_type,
         bedrooms, bathrooms, square_meters, monthly_rent, deposit_amount, lease_duration,
@@ -78,7 +78,7 @@ export class RentalStorage {
       JSON.stringify(rental.utilities_included || [])
     );
 
-    const newRental = db.prepare('SELECT * FROM rental_listings WHERE id = ?').get(result.lastInsertRowid);
+    const newRental = db.$client.prepare('SELECT * FROM rental_listings WHERE id = ?').get(result.lastInsertRowid);
     return this.formatRental(newRental);
   }
 
@@ -104,24 +104,24 @@ export class RentalStorage {
     updates.push('updated_at = datetime("now")');
     values.push(rentalId, landlordId);
 
-    const stmt = db.prepare(`
+    const stmt = db.$client.prepare(`
       UPDATE rental_listings SET ${updates.join(', ')} 
       WHERE id = ? AND landlord_id = ?
     `);
 
     stmt.run(...values);
 
-    const updatedRental = db.prepare('SELECT * FROM rental_listings WHERE id = ? AND landlord_id = ?').get(rentalId, landlordId);
+    const updatedRental = db.$client.prepare('SELECT * FROM rental_listings WHERE id = ? AND landlord_id = ?').get(rentalId, landlordId);
     return updatedRental ? this.formatRental(updatedRental) : null;
   }
 
   async getLandlordRentals(landlordId: number): Promise<RentalListing[]> {
-    const rentals = db.prepare('SELECT * FROM rental_listings WHERE landlord_id = ? ORDER BY created_at DESC').all(landlordId);
+    const rentals = db.$client.prepare('SELECT * FROM rental_listings WHERE landlord_id = ? ORDER BY created_at DESC').all(landlordId);
     return rentals.map(rental => this.formatRental(rental));
   }
 
   async getRentalById(rentalId: number): Promise<RentalListing | null> {
-    const rental = db.prepare('SELECT * FROM rental_listings WHERE id = ?').get(rentalId);
+    const rental = db.$client.prepare('SELECT * FROM rental_listings WHERE id = ?').get(rentalId);
     return rental ? this.formatRental(rental) : null;
   }
 
@@ -163,7 +163,7 @@ export class RentalStorage {
 
       query += ` ORDER BY r.created_at DESC LIMIT 50`;
 
-      const stmt = this.db.prepare(query);
+      const stmt = db.$client.prepare(query);
       return stmt.all(...params);
     } catch (error) {
       console.error('Error searching rentals:', error);
@@ -185,7 +185,7 @@ export class RentalStorage {
 
   // Rental Applications
   async createApplication(application: RentalApplication): Promise<RentalApplication> {
-    const stmt = db.prepare(`
+    const stmt = db.$client.prepare(`
       INSERT INTO rental_applications (rental_id, renter_id, application_data, status)
       VALUES (?, ?, ?, ?)
     `);
@@ -197,12 +197,12 @@ export class RentalStorage {
       application.status || 'pending'
     );
 
-    const newApplication = db.prepare('SELECT * FROM rental_applications WHERE id = ?').get(result.lastInsertRowid);
+    const newApplication = db.$client.prepare('SELECT * FROM rental_applications WHERE id = ?').get(result.lastInsertRowid);
     return this.formatApplication(newApplication);
   }
 
   async getLandlordApplications(landlordId: number): Promise<any[]> {
-    const applications = db.prepare(`
+    const applications = db.$client.prepare(`
       SELECT 
         ra.*,
         rl.title as rental_title,
@@ -228,7 +228,7 @@ export class RentalStorage {
     status: 'pending' | 'approved' | 'rejected',
     landlordId: number
   ): Promise<RentalApplication | null> {
-    const stmt = db.prepare(`
+    const stmt = db.$client.prepare(`
       UPDATE rental_applications 
       SET status = ?, updated_at = datetime('now')
       WHERE id = ? AND rental_id IN (
@@ -238,7 +238,7 @@ export class RentalStorage {
 
     stmt.run(status, applicationId, landlordId);
 
-    const updatedApplication = db.prepare('SELECT * FROM rental_applications WHERE id = ?').get(applicationId);
+    const updatedApplication = db.$client.prepare('SELECT * FROM rental_applications WHERE id = ?').get(applicationId);
     return updatedApplication ? this.formatApplication(updatedApplication) : null;
   }
 
@@ -250,7 +250,7 @@ export class RentalStorage {
   }
 
   async getRenterApplications(renterId: number): Promise<any[]> {
-    const applications = db.prepare(`
+    const applications = db.$client.prepare(`
       SELECT 
         ra.*,
         rl.title as rental_title,
@@ -274,7 +274,7 @@ export class RentalStorage {
 
   // Lease Management
   async createLease(lease: LeaseAgreement): Promise<LeaseAgreement> {
-    const stmt = db.prepare(`
+    const stmt = db.$client.prepare(`
       INSERT INTO lease_agreements (
         application_id, rental_id, landlord_id, renter_id, lease_start_date,
         lease_end_date, monthly_rent, deposit_amount, lease_terms
@@ -287,7 +287,7 @@ export class RentalStorage {
       lease.deposit_amount, JSON.stringify(lease.lease_terms || {})
     );
 
-    const newLease = db.prepare('SELECT * FROM lease_agreements WHERE id = ?').get(result.lastInsertRowid);
+    const newLease = db.$client.prepare('SELECT * FROM lease_agreements WHERE id = ?').get(result.lastInsertRowid);
     return this.formatLease(newLease);
   }
 
@@ -296,7 +296,7 @@ export class RentalStorage {
     userRole: 'landlord' | 'renter',
     userId: number
   ): Promise<LeaseAgreement | null> {
-    const lease = db.prepare('SELECT * FROM lease_agreements WHERE id = ?').get(leaseId);
+    const lease = db.$client.prepare('SELECT * FROM lease_agreements WHERE id = ?').get(leaseId);
     if (!lease) return null;
 
     let updateField = '';
@@ -308,10 +308,10 @@ export class RentalStorage {
       return null;
     }
 
-    db.prepare(`UPDATE lease_agreements SET ${updateField}, updated_at = datetime('now') WHERE id = ?`).run(leaseId);
+    db.$client.prepare(`UPDATE lease_agreements SET ${updateField}, updated_at = datetime('now') WHERE id = ?`).run(leaseId);
 
     // Update e_signature_status
-    const updatedLease = db.prepare('SELECT * FROM lease_agreements WHERE id = ?').get(leaseId);
+    const updatedLease = db.$client.prepare('SELECT * FROM lease_agreements WHERE id = ?').get(leaseId);
     let eSignatureStatus = 'pending';
     if (updatedLease.landlord_signature_status === 'signed' && updatedLease.renter_signature_status === 'signed') {
       eSignatureStatus = 'fully_signed';
@@ -319,14 +319,14 @@ export class RentalStorage {
       eSignatureStatus = 'partially_signed';
     }
 
-    db.prepare('UPDATE lease_agreements SET e_signature_status = ? WHERE id = ?').run(eSignatureStatus, leaseId);
+    db.$client.prepare('UPDATE lease_agreements SET e_signature_status = ? WHERE id = ?').run(eSignatureStatus, leaseId);
 
-    const finalLease = db.prepare('SELECT * FROM lease_agreements WHERE id = ?').get(leaseId);
+    const finalLease = db.$client.prepare('SELECT * FROM lease_agreements WHERE id = ?').get(leaseId);
     return this.formatLease(finalLease);
   }
 
   async getLeaseById(leaseId: number): Promise<LeaseAgreement | null> {
-    const lease = db.prepare('SELECT * FROM lease_agreements WHERE id = ?').get(leaseId);
+    const lease = db.$client.prepare('SELECT * FROM lease_agreements WHERE id = ?').get(leaseId);
     return lease ? this.formatLease(lease) : null;
   }
 
@@ -342,7 +342,7 @@ export class RentalStorage {
     // Simulate delay for screening process
     await new Promise(resolve => setTimeout(resolve, 2000));
 
-    const stmt = db.prepare(`
+    const stmt = db.$client.prepare(`
       UPDATE rental_applications 
       SET background_check_status = 'complete', credit_report_status = 'complete', updated_at = datetime('now')
       WHERE id = ?
@@ -350,7 +350,7 @@ export class RentalStorage {
 
     stmt.run(applicationId);
 
-    const updatedApplication = db.prepare('SELECT * FROM rental_applications WHERE id = ?').get(applicationId);
+    const updatedApplication = db.$client.prepare('SELECT * FROM rental_applications WHERE id = ?').get(applicationId);
     return updatedApplication ? this.formatApplication(updatedApplication) : null;
   }
 }

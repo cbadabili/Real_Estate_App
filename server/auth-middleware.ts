@@ -151,7 +151,7 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
     }
 
     const token = authHeader.substring(7);
-    
+
     // In a real application, you would verify JWT token here
     // For now, we'll simulate by extracting user ID from token
     const userId = parseInt(token);
@@ -182,7 +182,7 @@ export const optionalAuthenticate = async (req: Request, res: Response, next: Ne
     if (authHeader && authHeader.startsWith('Bearer ')) {
       const token = authHeader.substring(7);
       const userId = parseInt(token);
-      
+
       if (!isNaN(userId)) {
         const user = await storage.getUser(userId);
         if (user && user.isActive) {
@@ -288,3 +288,19 @@ export const requireOwnerOrAdmin = (getResourceOwnerId: (req: Request) => Promis
     }
   };
 };
+
+export function requirePermission(permission: Permission) {
+  return (req: Request, res: Response, next: NextFunction) => {
+    if (!req.user) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const userPermissions = req.user.permissions || [];
+
+    if (!userPermissions.includes(permission as string)) {
+      return res.status(403).json({ error: 'Insufficient permissions' });
+    }
+
+    next();
+  };
+}

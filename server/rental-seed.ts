@@ -1,12 +1,12 @@
 import { db } from './db';
-import { rentalListings } from '../shared/schema';
-import { rental_listings } from '@shared/schema';
+import { rental_listings } from '../shared/schema';
+import { rental_listings as rental_listings_alias } from '@shared/schema';
 import { eq } from 'drizzle-orm';
 
 export async function seedRentalData() {
   try {
     // Check if rental data already exists
-    const existingRentals = await db.select().from(rentalListings).limit(1);
+    const existingRentals = await db.select().from(rental_listings).limit(1);
 
     if (existingRentals.length > 0) {
       console.log("✅ Rental data already exists, skipping seeding...");
@@ -69,7 +69,7 @@ export async function seedRentalData() {
       }
     ];
 
-    await db.insert(rentalListings).values(sampleRentals);
+    await db.insert(rental_listings).values(sampleRentals);
 
     console.log('✅ Sample rental data seeded successfully');
   } catch (error) {

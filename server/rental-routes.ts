@@ -1,4 +1,3 @@
-
 import { Router } from 'express';
 import { z } from 'zod';
 import { rentalStorage } from './rental-storage';
@@ -55,14 +54,18 @@ const applicationSchema = z.object({
 // POST /api/rentals
 router.post('/rentals', authenticate, async (req, res) => {
   try {
+    if (!req.user) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
     const validatedData = rentalListingSchema.parse(req.body);
-    
+
     const rental = await rentalStorage.createRental({
       ...validatedData,
       landlord_id: req.user.id,
       status: 'active'
     });
-    
+
     res.status(201).json({
       success: true,
       data: rental,
@@ -82,16 +85,16 @@ router.put('/rentals/:rentalId', authenticate, async (req, res) => {
   try {
     const rentalId = parseInt(req.params.rentalId);
     const validatedData = rentalListingSchema.partial().parse(req.body);
-    
+
     const rental = await rentalStorage.updateRental(rentalId, validatedData, req.user.id);
-    
+
     if (!rental) {
       return res.status(404).json({
         success: false,
         error: 'Rental not found or not authorized'
       });
     }
-    
+
     res.json({
       success: true,
       data: rental,
@@ -110,7 +113,7 @@ router.put('/rentals/:rentalId', authenticate, async (req, res) => {
 router.get('/landlord/rentals', authenticate, async (req, res) => {
   try {
     const rentals = await rentalStorage.getLandlordRentals(req.user.id);
-    
+
     res.json({
       success: true,
       data: rentals
@@ -129,23 +132,23 @@ router.post('/rentals/:rentalId/photos', authenticate, async (req, res) => {
   try {
     const rentalId = parseInt(req.params.rentalId);
     const { photos } = req.body;
-    
+
     if (!Array.isArray(photos)) {
       return res.status(400).json({
         success: false,
         error: 'Photos must be an array'
       });
     }
-    
+
     const rental = await rentalStorage.updateRental(rentalId, { photos }, req.user.id);
-    
+
     if (!rental) {
       return res.status(404).json({
         success: false,
         error: 'Rental not found or not authorized'
       });
     }
-    
+
     res.json({
       success: true,
       data: rental,
@@ -174,7 +177,7 @@ router.get('/rentals/search', async (req, res) => {
       page = 0,
       limit = 20
     } = req.query;
-    
+
     const filters = {
       location: location as string,
       minPrice: minPrice ? parseInt(minPrice as string) : undefined,
@@ -184,9 +187,9 @@ router.get('/rentals/search', async (req, res) => {
       page: parseInt(page as string),
       limit: parseInt(limit as string)
     };
-    
+
     const rentals = await rentalStorage.searchRentals(filters);
-    
+
     res.json({
       success: true,
       data: rentals,
@@ -210,14 +213,14 @@ router.get('/rentals/:rentalId', async (req, res) => {
   try {
     const rentalId = parseInt(req.params.rentalId);
     const rental = await rentalStorage.getRentalById(rentalId);
-    
+
     if (!rental) {
       return res.status(404).json({
         success: false,
         error: 'Rental not found'
       });
     }
-    
+
     res.json({
       success: true,
       data: rental
@@ -236,16 +239,20 @@ router.get('/rentals/:rentalId', async (req, res) => {
 // POST /api/rentals/:rentalId/apply
 router.post('/rentals/:rentalId/apply', authenticate, async (req, res) => {
   try {
+    if (!req.user) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
     const rentalId = parseInt(req.params.rentalId);
     const validatedData = applicationSchema.parse(req.body);
-    
+
     const application = await rentalStorage.createApplication({
       rental_id: rentalId,
       renter_id: req.user.id,
       application_data: validatedData.application_data,
       status: 'pending'
     });
-    
+
     res.status(201).json({
       success: true,
       data: application,
@@ -263,8 +270,11 @@ router.post('/rentals/:rentalId/apply', authenticate, async (req, res) => {
 // GET /api/landlord/applications
 router.get('/landlord/applications', authenticate, async (req, res) => {
   try {
+    if (!req.user) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
     const applications = await rentalStorage.getLandlordApplications(req.user.id);
-    
+
     res.json({
       success: true,
       data: applications
@@ -283,27 +293,27 @@ router.put('/applications/:applicationId', authenticate, async (req, res) => {
   try {
     const applicationId = parseInt(req.params.applicationId);
     const { status } = req.body;
-    
+
     if (!['pending', 'approved', 'rejected'].includes(status)) {
       return res.status(400).json({
         success: false,
         error: 'Invalid status'
       });
     }
-    
+
     const application = await rentalStorage.updateApplicationStatus(
       applicationId,
       status,
       req.user.id
     );
-    
+
     if (!application) {
       return res.status(404).json({
         success: false,
         error: 'Application not found or not authorized'
       });
     }
-    
+
     res.json({
       success: true,
       data: application,
@@ -322,16 +332,16 @@ router.put('/applications/:applicationId', authenticate, async (req, res) => {
 router.post('/applications/:applicationId/screen', authenticate, async (req, res) => {
   try {
     const applicationId = parseInt(req.params.applicationId);
-    
+
     const application = await rentalStorage.screenTenant(applicationId);
-    
+
     if (!application) {
       return res.status(404).json({
         success: false,
         error: 'Application not found'
       });
     }
-    
+
     res.json({
       success: true,
       data: application,
@@ -353,18 +363,18 @@ router.post('/applications/:applicationId/generate-lease', authenticate, async (
   try {
     const applicationId = parseInt(req.params.applicationId);
     const { lease_start_date, lease_end_date, lease_terms } = req.body;
-    
+
     // Get application details
     const applications = await rentalStorage.getLandlordApplications(req.user.id);
     const application = applications.find(app => app.application.id === applicationId);
-    
+
     if (!application) {
       return res.status(404).json({
         success: false,
         error: 'Application not found or not authorized'
       });
     }
-    
+
     const lease = await rentalStorage.createLease({
       application_id: applicationId,
       rental_id: application.rental.id,
@@ -379,7 +389,7 @@ router.post('/applications/:applicationId/generate-lease', authenticate, async (
       renter_signature_status: 'pending',
       e_signature_status: 'pending'
     });
-    
+
     res.status(201).json({
       success: true,
       data: lease,
@@ -399,23 +409,23 @@ router.post('/leases/:leaseId/sign', authenticate, async (req, res) => {
   try {
     const leaseId = parseInt(req.params.leaseId);
     const { role } = req.body;
-    
+
     if (!['landlord', 'renter'].includes(role)) {
       return res.status(400).json({
         success: false,
         error: 'Invalid role'
       });
     }
-    
+
     const lease = await rentalStorage.updateLeaseSignature(leaseId, role, req.user.id);
-    
+
     if (!lease) {
       return res.status(404).json({
         success: false,
         error: 'Lease not found or not authorized'
       });
     }
-    
+
     res.json({
       success: true,
       data: lease,
@@ -435,16 +445,16 @@ router.post('/leases/:leaseId/pay-rent', authenticate, async (req, res) => {
   try {
     const leaseId = parseInt(req.params.leaseId);
     const { amount } = req.body;
-    
+
     const lease = await rentalStorage.getLeaseById(leaseId);
-    
+
     if (!lease) {
       return res.status(404).json({
         success: false,
         error: 'Lease not found'
       });
     }
-    
+
     // Simulate payment processing
     const paymentIntent = {
       id: `pi_${Date.now()}`,
@@ -453,7 +463,7 @@ router.post('/leases/:leaseId/pay-rent', authenticate, async (req, res) => {
       status: 'succeeded',
       created: new Date().toISOString()
     };
-    
+
     res.json({
       success: true,
       data: paymentIntent,
@@ -471,8 +481,11 @@ router.post('/leases/:leaseId/pay-rent', authenticate, async (req, res) => {
 // GET /api/renter/applications
 router.get('/renter/applications', authenticate, async (req, res) => {
   try {
+    if (!req.user) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
     const applications = await rentalStorage.getRenterApplications(req.user.id);
-    
+
     res.json({
       success: true,
       data: applications

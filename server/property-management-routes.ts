@@ -1,4 +1,3 @@
-
 import { Router } from 'express';
 import { z } from 'zod';
 import { authenticate } from './auth-middleware';
@@ -51,8 +50,11 @@ router.get('/property-management/dashboard', authenticate, async (req, res) => {
 // POST /api/property-management/maintenance-request
 router.post('/property-management/maintenance-request', authenticate, async (req, res) => {
   try {
+    if (!req.user) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
     const { propertyId, title, description, priority, category } = req.body;
-    
+
     // Mock maintenance request creation
     const maintenanceRequest = {
       id: Math.floor(Math.random() * 1000),
