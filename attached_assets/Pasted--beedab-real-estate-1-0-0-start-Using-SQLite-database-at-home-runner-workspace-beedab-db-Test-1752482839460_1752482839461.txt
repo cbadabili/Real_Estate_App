@@ -1,0 +1,98 @@
+
+> beedab-real-estate@1.0.0 start
+Using SQLite database at: /home/runner/workspace/beedab.db
+Testing database connection...
+✅ Database connection successful
+Creating users table...
+✅ Users table ready
+Creating properties table...
+✅ Properties table ready
+Creating rental tables...
+Creating rental_listings table...
+Creating rental_applications table...
+Error creating rental tables: DrizzleError: Failed to run the query '
+      CREATE TABLE IF NOT EXISTS rental_applications (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        listing_id INTEGER,
+        tenant_id INTEGER,
+        application_date INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer)),
+        status TEXT DEFAULT 'pending',
+        personal_info TEXT,
+        employment_info TEXT,
+        references TEXT,
+        documents TEXT,
+        screening_status TEXT,
+        background_check TEXT,
+        credit_score INTEGER,
+        income_verification TEXT,
+        notes TEXT,
+        reviewed_by INTEGER,
+        reviewed_at INTEGER,
+        created_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer)),
+        updated_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer)),
+        FOREIGN KEY (listing_id) REFERENCES rental_listings(id),
+        FOREIGN KEY (tenant_id) REFERENCES users(id),
+        FOREIGN KEY (reviewed_by) REFERENCES users(id)
+      )
+    '
+    at BetterSQLiteSession.run (/home/runner/workspace/node_modules/src/sqlite-core/session.ts:148:10)
+    at BetterSQLite3Database.run (/home/runner/workspace/node_modules/src/sqlite-core/db.ts:540:23)
+    at createRentalTables (/home/runner/workspace/server/index.ts:168:14)
+    at async <anonymous> (/home/runner/workspace/server/index.ts:97:3) {
+  cause: SqliteError: near "references": syntax error
+      at Database.prepare (/home/runner/workspace/node_modules/better-sqlite3/lib/methods/wrappers.js:5:21)
+      at BetterSQLiteSession.prepareQuery (/home/runner/workspace/node_modules/src/better-sqlite3/session.ts:50:28)
+      at BetterSQLiteSession.prepareOneTimeQuery (/home/runner/workspace/node_modules/src/sqlite-core/session.ts:135:15)
+      at BetterSQLiteSession.run (/home/runner/workspace/node_modules/src/sqlite-core/session.ts:146:16)
+      at BetterSQLite3Database.run (/home/runner/workspace/node_modules/src/sqlite-core/db.ts:540:23)
+      at createRentalTables (/home/runner/workspace/server/index.ts:168:14)
+      at async <anonymous> (/home/runner/workspace/server/index.ts:97:3) {
+    code: 'SQLITE_ERROR'
+  }
+}
+node:internal/process/promises:391
+    triggerUncaughtException(err, true /* fromPromise */);
+    ^
+
+DrizzleError: Failed to run the query '
+      CREATE TABLE IF NOT EXISTS rental_applications (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        listing_id INTEGER,
+        tenant_id INTEGER,
+        application_date INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer)),
+        status TEXT DEFAULT 'pending',
+        personal_info TEXT,
+        employment_info TEXT,
+        references TEXT,
+        documents TEXT,
+        screening_status TEXT,
+        background_check TEXT,
+        credit_score INTEGER,
+        income_verification TEXT,
+        notes TEXT,
+        reviewed_by INTEGER,
+        reviewed_at INTEGER,
+        created_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer)),
+        updated_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer)),
+        FOREIGN KEY (listing_id) REFERENCES rental_listings(id),
+        FOREIGN KEY (tenant_id) REFERENCES users(id),
+        FOREIGN KEY (reviewed_by) REFERENCES users(id)
+      )
+    '
+    at BetterSQLiteSession.run (/home/runner/workspace/node_modules/src/sqlite-core/session.ts:148:10)
+    at BetterSQLite3Database.run (/home/runner/workspace/node_modules/src/sqlite-core/db.ts:540:23)
+    at createRentalTables (/home/runner/workspace/server/index.ts:168:14)
+    at async <anonymous> (/home/runner/workspace/server/index.ts:97:3) {
+  cause: SqliteError: near "references": syntax error
+      at Database.prepare (/home/runner/workspace/node_modules/better-sqlite3/lib/methods/wrappers.js:5:21)
+      at BetterSQLiteSession.prepareQuery (/home/runner/workspace/node_modules/src/better-sqlite3/session.ts:50:28)
+      at BetterSQLiteSession.prepareOneTimeQuery (/home/runner/workspace/node_modules/src/sqlite-core/session.ts:135:15)
+      at BetterSQLiteSession.run (/home/runner/workspace/node_modules/src/sqlite-core/session.ts:146:16)
+      at BetterSQLite3Database.run (/home/runner/workspace/node_modules/src/sqlite-core/db.ts:540:23)
+      at createRentalTables (/home/runner/workspace/server/index.ts:168:14)
+      at async <anonymous> (/home/runner/workspace/server/index.ts:97:3) {
+    code: 'SQLITE_ERROR'
+  }
+}
+
+Node.js v20.18.1
