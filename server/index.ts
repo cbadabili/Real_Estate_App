@@ -4,7 +4,7 @@ import { setupVite, serveStatic, log } from "./vite";
 import { testDatabaseConnection } from "./db";
 import { rentalRoutes } from './rental-routes';
 import { servicesRoutes } from './services-routes';
-import { marketplaceRoutes } from './marketplace-routes';
+import marketplaceRoutes from './marketplace-routes';
 import { aiSearchRoutes } from './ai-search';
 import { tenantSupportRoutes } from './tenant-support-routes';
 import propertyManagementRoutes from './property-management-routes';
