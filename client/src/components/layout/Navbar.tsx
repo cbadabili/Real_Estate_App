@@ -4,47 +4,95 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { NotificationCenter } from '../ui/NotificationCenter';
 import { RoleBasedComponent } from '../auth/ProtectedRoute';
 import { 
-  Menu,
+  Home, 
+  Search, 
+  MapPin, 
+  Gavel, 
+  User, 
+  ChevronDown, 
+  Menu, 
   X,
-  User,
-  Building,
-  Calculator,
-  Search,
-  Map,
-  Users,
-  DollarSign,
-  Home,
-  Heart,
-  Calendar,
   FileText,
-  Bell,
-  Settings,
-  ChevronDown,
+  TrendingUp,
+  Wrench,
+  Building,
+  Key,
+  Calculator,
+  Users,
+  Mail,
+  Phone,
+  Globe,
+  Shield,
+  Award,
   Briefcase,
   PlusCircle,
   Star,
-  MessageSquare,
-  Shield,
-  Wrench,
-  TrendingUp,
-  CreditCard,
-  Phone,
-  Award,
-  Target,
-  PieChart,
-  Book,
-  Zap,
-  UserCheck,
-  HandHeart,
-  Hammer,
-  Camera,
-  MapPin,
-  Handshake,
-  Building2,
-  FileCheck,
-  Key,
+  Heart,
+  Bell,
+  Settings,
   LogOut,
-  Gavel
+  Camera,
+  Hammer,
+  Sparkles,
+  Filter,
+  SortAsc,
+  Eye,
+  MessageCircle,
+  UserCheck,
+  Clock,
+  DollarSign,
+  CheckCircle,
+  AlertCircle,
+  Info,
+  HelpCircle,
+  Zap,
+  Target,
+  Layers,
+  BarChart3,
+  Calendar,
+  Download,
+  Upload,
+  Share,
+  Bookmark,
+  Flag,
+  Archive,
+  Edit,
+  Trash2,
+  Copy,
+  ExternalLink,
+  RefreshCw,
+  Maximize,
+  Minimize,
+  Volume2,
+  VolumeX,
+  Play,
+  Pause,
+  Skip,
+  Repeat,
+  Shuffle,
+  Save,
+  Loader,
+  CheckSquare,
+  Square,
+  MinusSquare,
+  ChevronLeft,
+  ChevronRight,
+  ChevronUp,
+  ArrowLeft,
+  ArrowRight,
+  ArrowUp,
+  ArrowDown,
+  ArrowUpRight,
+  ArrowDownRight,
+  ArrowUpLeft,
+  ArrowDownLeft,
+  MoreHorizontal,
+  MoreVertical,
+  Plus,
+  Minus,
+  UserPlus,
+  Package,
+  GraduationCap
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { AISearchBar } from '../search/AISearchBar';
@@ -652,6 +700,120 @@ const Navbar = () => {
                           </div>
                         </div>
                       </Link>
+                       {/* Add more service categories here */}
+                       <Link
+                        to="/marketplace?category=HomeImprovement"
+                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
+                        onClick={() => setServicesDropdownOpen(false)}
+                      >
+                        <div className="flex items-center">
+                          <Hammer className="h-4 w-4 mr-2 text-beedab-blue" />
+                          <div>
+                            <div className="font-medium">Home Improvement</div>
+                            <div className="text-xs text-gray-500">Renovations and repairs</div>
+                          </div>
+                        </div>
+                      </Link>
+
+                      <Link
+                        to="/marketplace?category=Design"
+                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
+                        onClick={() => setServicesDropdownOpen(false)}
+                      >
+                        <div className="flex items-center">
+                          <Sparkles className="h-4 w-4 mr-2 text-beedab-blue" />
+                          <div>
+                            <div className="font-medium">Design & Staging</div>
+                            <div className="text-xs text-gray-500">Interior design and staging</div>
+                          </div>
+                        </div>
+                      </Link>
+                      <Link
+                        to="/marketplace?category=Moving"
+                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
+                        onClick={() => setServicesDropdownOpen(false)}
+                      >
+                        <div className="flex items-center">
+                          <Truck className="h-4 w-4 mr-2 text-beedab-blue" />
+                          <div>
+                            <div className="font-medium">Moving Services</div>
+                            <div className="text-xs text-gray-500">Movers and relocation</div>
+                          </div>
+                        </div>
+                      </Link>
+                      <Link
+                        to="/marketplace?category=Photography"
+                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
+                        onClick={() => setServicesDropdownOpen(false)}
+                      >
+                        <div className="flex items-center">
+                          <Camera className="h-4 w-4 mr-2 text-beedab-blue" />
+                          <div>
+                            <div className="font-medium">Photography</div>
+                            <div className="text-xs text-gray-500">Real estate photography</div>
+                          </div>
+                        </div>
+                      </Link>
+
+                      {/* Sign Up as a Pro, Supplier, Artisan, or Course Provider */}
+                      <div className="border-t border-gray-100 my-2"></div>
+                      <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide px-2 py-1">Become a Provider</div>
+
+                      <Link
+                        to="/register?providerType=pro"
+                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded mb-1"
+                        onClick={() => setServicesDropdownOpen(false)}
+                      >
+                        <div className="flex items-center">
+                          <UserPlus className="h-4 w-4 mr-2 text-beedab-blue" />
+                          <div>
+                            <div className="font-medium">Sign Up as a Pro</div>
+                            <div className="text-xs text-gray-500">Offer professional services</div>
+                          </div>
+                        </div>
+                      </Link>
+
+                      <Link
+                        to="/register?providerType=supplier"
+                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded mb-1"
+                        onClick={() => setServicesDropdownOpen(false)}
+                      >
+                        <div className="flex items-center">
+                          <Package className="h-4 w-4 mr-2 text-beedab-blue" />
+                          <div>
+                            <div className="font-medium">Sign Up as a Supplier</div>
+                            <div className="text-xs text-gray-500">Provide materials and supplies</div>
+                          </div>
+                        </div>
+                      </Link>
+
+                      <Link
+                        to="/register?providerType=artisan"
+                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded mb-1"
+                        onClick={() => setServicesDropdownOpen(false)}
+                      >
+                        <div className="flex items-center">
+                          <Hammer className="h-4 w-4 mr-2 text-beedab-blue" />
+                          <div>
+                            <div className="font-medium">Sign Up as an Artisan</div>
+                            <div className="text-xs text-gray-500">Offer handcrafted services</div>
+                          </div>
+                        </div>
+                      </Link>
+
+                      <Link
+                        to="/register?providerType=courseProvider"
+                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
+                        onClick={() => setServicesDropdownOpen(false)}
+                      >
+                        <div className="flex items-center">
+                          <GraduationCap className="h-4 w-4 mr-2 text-beedab-blue" />
+                          <div>
+                            <div className="font-medium">Sign Up as a Course Provider</div>
+                            <div className="text-xs text-gray-500">Offer training and courses</div>
+                          </div>
+                        </div>
+                      </Link>
                     </div>
                   </motion.div>
                 )}
@@ -981,5 +1143,6 @@ const Navbar = () => {
     </nav>
   );
 };
+import { Truck } from 'lucide-react';
 
 export default Navbar;

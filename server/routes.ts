@@ -55,7 +55,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/users/login", async (req, res) => {
     try {
       const { email, password } = req.body;
-      
+
       if (!email || !password) {
         return res.status(400).json({ message: "Email and password are required" });
       }
@@ -1124,13 +1124,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     const { width, height } = req.params;
     const w = parseInt(width) || 64;
     const h = parseInt(height) || 64;
-    
+
     // Generate a simple SVG placeholder
     const svg = `<svg width="${w}" height="${h}" xmlns="http://www.w3.org/2000/svg">
       <rect width="100%" height="100%" fill="#f3f4f6"/>
       <text x="50%" y="50%" text-anchor="middle" dy=".3em" fill="#9ca3af" font-family="Arial, sans-serif" font-size="12">${w}×${h}</text>
     </svg>`;
-    
+
     res.setHeader('Content-Type', 'image/svg+xml');
     res.setHeader('Cache-Control', 'public, max-age=3600'); // Cache for 1 hour
     res.send(svg);
@@ -1138,6 +1138,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Marketplace routes
   app.use("/api/marketplace", marketplaceRoutes);
+
+  // Services routes
+  // Assuming servicesRoutes is defined elsewhere
+  // app.use("/api", servicesRoutes);
+
+  // Add marketplace registration route
+  // Assuming 'path' is a module that needs to be imported
+  // const path = require('path'); // Add this line at the beginning of the file
+  // app.get("/marketplace/register", (req, res) => {
+  //   res.sendFile(path.join(__dirname, "../client/dist/index.html"));
+  // });
 
   const httpServer = createServer(app);
   return httpServer;

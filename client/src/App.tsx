@@ -46,6 +46,7 @@ import ProfessionalsPage from "./pages/marketplace/ProfessionalsPage";
 import SuppliersPage from "./pages/marketplace/SuppliersPage";
 import TradesPage from "./pages/marketplace/TradesPage";
 import TrainingPage from "./pages/marketplace/TrainingPage";
+import RegisterProviderPage from './pages/marketplace/RegisterProviderPage';
 import DocumentsPage from './pages/DocumentsPage';
 import LoginPage from './pages/LoginPage';
 import AdminPage from './pages/AdminPage';
@@ -140,6 +141,7 @@ function App() {
 
           {/* Marketplace Routes */}
           <Route path="/marketplace" element={<MarketplacePage />} />
+          <Route path="/marketplace/register" element={<RegisterProviderPage />} />
           <Route path="/marketplace/:segment" element={<MarketplacePage />} />
           <Route path="/marketplace/professionals" element={<ProfessionalsPage />} />
           <Route path="/marketplace/suppliers" element={<SuppliersPage />} />
