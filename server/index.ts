@@ -286,19 +286,20 @@ async function initializeMarketplaceTables() {
       { name: 'company_registration', definition: 'TEXT' },
       { name: 'tax_clearance', definition: 'TEXT' },
       { name: 'insurance_details', definition: 'TEXT' },
-      { name: 'minimum_project_size', definition: 'INTEGER DEFAULT 0' },
-      { name: 'maximum_project_size', definition: 'INTEGER DEFAULT 0' },
-      { name: 'hourly_rate', definition: 'INTEGER DEFAULT 0' },
-      { name: 'daily_rate', definition: 'INTEGER DEFAULT 0' },
-      { name: 'project_rate', definition: 'INTEGER DEFAULT 0' },
+      { name: 'status', definition: 'TEXT DEFAULT \'active\'' },
+      { name: 'minimum_project_size', definition: 'INTEGER' },
+      { name: 'maximum_project_size', definition: 'INTEGER' },
+      { name: 'hourly_rate', definition: 'INTEGER' },
+      { name: 'daily_rate', definition: 'INTEGER' },
+      { name: 'project_rate', definition: 'INTEGER' },
       { name: 'emergency_services', definition: 'INTEGER DEFAULT 0' },
-      { name: 'warranty_period', definition: 'INTEGER DEFAULT 0' },
+      { name: 'warranty_period', definition: 'INTEGER' },
       { name: 'payment_terms', definition: 'TEXT' },
       { name: 'payment_methods', definition: 'TEXT' },
       { name: 'portfolio_images', definition: 'TEXT' },
       { name: 'certifications', definition: 'TEXT' },
       { name: 'languages_spoken', definition: 'TEXT' },
-      { name: 'team_size', definition: 'INTEGER DEFAULT 1' }
+      { name: 'team_size', definition: 'INTEGER' }
     ];
 
     for (const column of missingColumns) {
