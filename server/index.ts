@@ -278,6 +278,30 @@ async function initializeMarketplaceTables() {
     `);
 
     // Add missing columns if they don't exist
+    console.log('Adding missing columns to marketplace_providers...');
+    
+    const missingColumns = [
+      { name: 'logo_url', definition: 'TEXT' },
+      { name: 'banner_url', definition: 'TEXT' },
+      { name: 'company_registration', definition: 'TEXT' },
+      { name: 'tax_clearance', definition: 'TEXT' },
+      { name: 'insurance_details', definition: 'TEXT' }
+    ];
+
+    for (const column of missingColumns) {
+      try {
+        await db.run(sql.raw(`ALTER TABLE marketplace_providers ADD COLUMN ${column.name} ${column.definition}`));
+        console.log(`✅ Added ${column.name} column`);
+      } catch (error) {
+        if (error.message.includes('duplicate column name')) {
+          console.log(`Column ${column.name} already exists`);
+        } else {
+          console.log(`Note: ${column.name} column may already exist or other error:`, error.message);
+        }
+      }
+    }
+
+    // Add missing columns if they don't exist
     try {
       console.log('Adding logo_url column...');
       await db.run(sql`ALTER TABLE marketplace_providers ADD COLUMN logo_url TEXT`);
