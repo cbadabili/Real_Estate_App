@@ -1,0 +1,63 @@
+root@03201c8c2301:/workspace/Real_Estate_App# cat /tmp/check.log
+
+> beedab-real-estate@1.0.0 check
+> tsc
+
+client/src/components/LoanCalculator.tsx(329,53): error TS7006: Parameter 'offer
+' implicitly has an 'any' type.
+client/src/components/LoanCalculator.tsx(329,60): error TS7006: Parameter 'i' im
+plicitly has an 'any' type.
+client/src/components/PlotAlerts.tsx(193,63): error TS2322: Type '"m²" | "hectar
+es"' is not assignable to type '"m²"'.
+  Type '"hectares"' is not assignable to type '"m²"'.
+client/src/components/ServiceProviderRegistration.tsx(93,11): error TS7034: Vari
+able 'allCategories' implicitly has type 'any[]' in some locations where its typ
+e cannot be determined.
+client/src/components/ServiceProviderRegistration.tsx(98,12): error TS7005: Vari
+able 'allCategories' implicitly has an 'any[]' type.
+client/src/components/VerificationBadge.tsx(100,12): error TS7053: Element impli
+citly has an 'any' type because expression of type '"basic" | "premium" | "insti
+tutional"' can't be used to index type '{ basic: { icon: ForwardRefExoticCompone
+nt<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>; color: string; labe
+l: string; description: string; }; premium: { ...; }; institutional: { ...; }; }
+ | { ...; } | { ...; } | { ...; }'.
+  Property 'institutional' does not exist on type '{ basic: { icon: ForwardRefEx
+oticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>; color: s
+tring; label: string; description: string; }; premium: { ...; }; institutional:
+{ ...; }; } | { ...; } | { ...; } | { ...; }'.
+client/src/components/layout/Navbar.tsx(664,32): error TS2367: This comparison a
+ppears to be unintentional because the types 'Location<any>' and 'string' have n
+o overlap.
+client/src/components/properties/PropertyComparison.tsx(134,43): error TS2345: A
+rgument of type 'any' is not assignable to parameter of type 'never'.
+client/src/components/properties/PropertyGrid.tsx(58,34): error TS2367: This com
+parison appears to be unintentional because the types '"list"' and '"map"' have
+no overlap.
+client/src/components/reviews/ReviewCard.tsx(18,53): error TS2307: Cannot find m
+odule '@/components/ui/avatar' or its corresponding type declarations.
+client/src/components/reviews/ReviewCard.tsx(19,26): error TS2307: Cannot find m
+odule '@/components/ui/textarea' or its corresponding type declarations.
+client/src/components/reviews/ReviewCard.tsx(73,44): error TS2339: Property 'typ
+e' does not exist on type 'User'.
+client/src/components/reviews/ReviewCard.tsx(74,47): error TS2339: Property 'typ
+e' does not exist on type 'User'.
+client/src/components/reviews/ReviewCard.tsx(363,28): error TS7006: Parameter 'e
+' implicitly has an 'any' type.
+client/src/components/reviews/ReviewForm.tsx(6,26): error TS2307: Cannot find mo
+dule '@/components/ui/textarea' or its corresponding type declarations.
+client/src/components/reviews/ReviewForm.tsx(194,28): error TS7006: Parameter 'e
+' implicitly has an 'any' type.
+client/src/components/reviews/UserReviews.tsx(109,36): error TS2339: Property 'f
+ilter' does not exist on type '{}'.
+client/src/components/reviews/UserReviews.tsx(163,25): error TS2322: Type '{ typ
+e: string; }' is not assignable to type 'IntrinsicAttributes & LoadingSpinnerPro
+ps'.
+  Property 'type' does not exist on type 'IntrinsicAttributes & LoadingSpinnerPr
+ops'.
+client/src/components/reviews/UserReviews.tsx(330,29): error TS2339: Property 'l
+ength' does not exist on type '{}'.
+client/src/components/reviews/UserReviews.tsx(333,29): error TS2339: Property 'l
+ength' does not exist on type '{}'.
+client/src/components/services/ContextualAd.tsx(53,39): error TS2304: Cannot fin
+d name 'shownAds'.
+client/src/main.tsx(7,17): error TS5097: An import path can only end with a '.ts
