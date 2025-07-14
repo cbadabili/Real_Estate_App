@@ -2,6 +2,7 @@ import { sqliteTable, text, integer, real, blob } from "drizzle-orm/sqlite-core"
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 import { relations, sql } from "drizzle-orm";
+import { serviceProviders } from "./services-schema";
 
 // Users table
 export const users = sqliteTable("users", {
