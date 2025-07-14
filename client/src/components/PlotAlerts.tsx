@@ -82,7 +82,7 @@ export const PlotAlerts: React.FC<PlotAlertsProps> = ({
     };
 
     onCreateAlert(alertData);
-    
+
     // Reset form
     setNewAlert({
       location: '',
@@ -100,11 +100,11 @@ export const PlotAlerts: React.FC<PlotAlertsProps> = ({
 
   const formatAlertDescription = (alert: PlotAlert) => {
     const parts = [`New plots in ${alert.location}`];
-    
+
     if (alert.maxPrice) {
       parts.push(`under BWP ${alert.maxPrice.toLocaleString()}`);
     }
-    
+
     if (alert.minSize || alert.maxSize) {
       const sizeRange = alert.minSize && alert.maxSize 
         ? `${alert.minSize}-${alert.maxSize} ${alert.sizeUnit}`
@@ -113,15 +113,15 @@ export const PlotAlerts: React.FC<PlotAlertsProps> = ({
           : `up to ${alert.maxSize} ${alert.sizeUnit}`;
       parts.push(sizeRange);
     }
-    
+
     if (alert.plotType) {
       parts.push(alert.plotType);
     }
-    
+
     if (alert.serviced) {
       parts.push('serviced plots only');
     }
-    
+
     return parts.join(', ');
   };
 
@@ -145,7 +145,7 @@ export const PlotAlerts: React.FC<PlotAlertsProps> = ({
       {showCreateForm && (
         <div className="bg-gray-50 rounded-lg p-4 mb-6 space-y-4">
           <h4 className="font-medium text-gray-900">Create New Alert</h4>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -304,7 +304,7 @@ export const PlotAlerts: React.FC<PlotAlertsProps> = ({
                     Created {alert.createdAt}
                   </p>
                 </div>
-                
+
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => onToggleAlert(alert.id, !alert.active)}

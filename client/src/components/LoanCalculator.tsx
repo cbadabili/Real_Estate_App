@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Building2, Percent, Calendar, DollarSign, TrendingUp, ExternalLink, Star } from 'lucide-react';
@@ -96,13 +95,13 @@ export const LoanCalculator = ({ propertyPrice = 0, onCalculationChange }: LoanC
     const results = partnerInstitutions.map(bank => {
       const ltv = (loanAmount / price) * 100;
       const isEligible = ltv <= bank.maxLTV && termYears <= bank.maxLoanTerm;
-      
+
       let interestRate = bank.baseRate;
-      
+
       // Adjust rate based on LTV
       if (ltv > 85) interestRate += 0.5;
       if (ltv > 90) interestRate += 0.25;
-      
+
       // Apply special offers
       if (monthlyIncome > 50000 && bank.specialOffers.includes('Professional rate')) {
         interestRate -= 0.5;
@@ -111,11 +110,11 @@ export const LoanCalculator = ({ propertyPrice = 0, onCalculationChange }: LoanC
       const monthlyRate = interestRate / 100 / 12;
       const totalPayments = termYears * 12;
       const monthlyPayment = loanAmount * (monthlyRate * Math.pow(1 + monthlyRate, totalPayments)) / (Math.pow(1 + monthlyRate, totalPayments) - 1);
-      
+
       const processingFeeAmount = loanAmount * (bank.processingFee / 100);
       const totalInterest = (monthlyPayment * totalPayments) - loanAmount;
       const totalCost = loanAmount + totalInterest + processingFeeAmount;
-      
+
       // Affordability check
       const maxAffordablePayment = monthlyIncome * 0.3;
       const isAffordable = monthlyPayment <= maxAffordablePayment;
@@ -136,7 +135,7 @@ export const LoanCalculator = ({ propertyPrice = 0, onCalculationChange }: LoanC
     }).filter(calc => calc.isEligible).sort((a, b) => a.monthlyPayment - b.monthlyPayment);
 
     setCalculations(results);
-    
+
     if (results.length > 0) {
       setBestRate(results[0].bank);
       onCalculationChange?.(results[0]);
@@ -235,7 +234,7 @@ export const LoanCalculator = ({ propertyPrice = 0, onCalculationChange }: LoanC
       {calculations.length > 0 && (
         <div className="space-y-6">
           <h3 className="text-xl font-semibold text-neutral-900">Loan Comparison</h3>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {calculations.map((calc, index) => (
               <motion.div
@@ -283,22 +282,22 @@ export const LoanCalculator = ({ propertyPrice = 0, onCalculationChange }: LoanC
                     <span className="text-neutral-600">Interest Rate</span>
                     <span className="font-semibold text-beedab-blue">{calc.interestRate.toFixed(2)}%</span>
                   </div>
-                  
+
                   <div className="flex justify-between">
                     <span className="text-neutral-600">Monthly Payment</span>
                     <span className="font-bold text-lg">P{calc.monthlyPayment.toLocaleString(undefined, {maximumFractionDigits: 0})}</span>
                   </div>
-                  
+
                   <div className="flex justify-between">
                     <span className="text-neutral-600">Total Interest</span>
                     <span className="text-neutral-900">P{calc.totalInterest.toLocaleString(undefined, {maximumFractionDigits: 0})}</span>
                   </div>
-                  
+
                   <div className="flex justify-between">
                     <span className="text-neutral-600">Processing Fee</span>
                     <span className="text-neutral-900">P{calc.processingFeeAmount.toLocaleString(undefined, {maximumFractionDigits: 0})}</span>
                   </div>
-                  
+
                   <div className="flex justify-between border-t pt-2">
                     <span className="text-neutral-600">Total Cost</span>
                     <span className="font-bold">P{calc.totalCost.toLocaleString(undefined, {maximumFractionDigits: 0})}</span>
@@ -326,7 +325,7 @@ export const LoanCalculator = ({ propertyPrice = 0, onCalculationChange }: LoanC
                   {calc.bank.specialOffers.length > 0 && (
                     <div className="mt-3">
                       <div className="text-xs text-neutral-600 mb-1">Special Offers:</div>
-                      {calc.bank.specialOffers.map((offer, i) => (
+                      {calc.bank.specialOffers.map((offer: any, i: number) => (
                         <div key={i} className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full inline-block mr-1 mb-1">
                           {offer}
                         </div>

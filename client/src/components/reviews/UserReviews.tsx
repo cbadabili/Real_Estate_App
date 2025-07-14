@@ -38,7 +38,7 @@ export const UserReviews: React.FC<UserReviewsProps> = ({
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  
+
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [filters, setFilters] = useState({
     reviewType: '',
@@ -106,7 +106,7 @@ export const UserReviews: React.FC<UserReviewsProps> = ({
     });
   };
 
-  const filteredReviews = reviews?.filter((review: any) => {
+  const filteredReviews = (reviews as any[]).filter((review: any) => {
     if (!searchQuery) return true;
     const searchLower = searchQuery.toLowerCase();
     return (
@@ -132,13 +132,13 @@ export const UserReviews: React.FC<UserReviewsProps> = ({
     if (!reviewStats?.ratingDistribution) return null;
 
     const maxCount = Math.max(...Object.values(reviewStats.ratingDistribution));
-    
+
     return (
       <div className="space-y-2">
         {[5, 4, 3, 2, 1].map((rating) => {
           const count = reviewStats.ratingDistribution[rating] || 0;
           const percentage = maxCount > 0 ? (count / maxCount) * 100 : 0;
-          
+
           return (
             <div key={rating} className="flex items-center space-x-2 text-sm">
               <span className="w-6 text-right">{rating}</span>
@@ -289,7 +289,7 @@ export const UserReviews: React.FC<UserReviewsProps> = ({
                   <SelectItem value="service_provider">Service Provider</SelectItem>
                 </SelectContent>
               </Select>
-              
+
               <Select value={filters.minRating} onValueChange={(value) => setFilters(prev => ({ ...prev, minRating: value }))}>
                 <SelectTrigger className="w-32">
                   <SelectValue placeholder="All ratings" />
@@ -303,7 +303,7 @@ export const UserReviews: React.FC<UserReviewsProps> = ({
                   <SelectItem value="1">1+ stars</SelectItem>
                 </SelectContent>
               </Select>
-              
+
               <Select value={filters.sortBy} onValueChange={(value) => setFilters(prev => ({ ...prev, sortBy: value }))}>
                 <SelectTrigger className="w-32">
                   <SelectValue />
@@ -327,10 +327,10 @@ export const UserReviews: React.FC<UserReviewsProps> = ({
               <div className="text-center">
                 <Star className="w-12 h-12 text-gray-300 mx-auto mb-4" />
                 <h3 className="text-lg font-medium text-gray-900 mb-2">
-                  {reviews?.length === 0 ? 'No reviews yet' : 'No matching reviews'}
+                  {(reviews as any[]).length === 0 ? 'No reviews yet' : 'No matching reviews'}
                 </h3>
                 <p className="text-gray-500">
-                  {reviews?.length === 0 
+                  {(reviews as any[]).length === 0 
                     ? `${userName} hasn't received any reviews yet.`
                     : 'Try adjusting your filters to see more reviews.'
                   }

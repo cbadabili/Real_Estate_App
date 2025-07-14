@@ -70,8 +70,8 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({
   const isReviewOwner = user?.id === review.reviewerId;
   const isRevieweeOwner = user?.id === review.revieweeId;
   const canEdit = isReviewOwner;
-  const canDelete = isReviewOwner || user?.type === 'admin';
-  const canRespond = isRevieweeOwner || user?.type === 'admin';
+  const canDelete = isReviewOwner || (user as any)?.type === 'admin';
+  const canRespond = isRevieweeOwner || (user as any)?.type === 'admin';
 
   // Vote on review helpfulness
   const voteHelpfulMutation = useMutation({
@@ -248,7 +248,7 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({
             </div>
           </div>
         </CardHeader>
-        
+
         <CardContent className="pt-0">
           {review.review && (
             <p className="text-sm text-gray-700 mb-4">{review.review}</p>
@@ -316,7 +316,7 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => onEdit?.(review.id)}
+                    onClick={(e: React.MouseEvent) => onEdit?.(review.id)}
                   >
                     <Edit className="w-3 h-3" />
                   </Button>
@@ -327,7 +327,7 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => onDelete?.(review.id)}
+                    onClick={(e: React.MouseEvent) => onDelete?.(review.id)}
                     className="text-red-600 hover:text-red-700"
                   >
                     <Trash className="w-3 h-3" />

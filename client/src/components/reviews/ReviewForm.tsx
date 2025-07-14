@@ -29,7 +29,7 @@ export const ReviewForm: React.FC<ReviewFormProps> = ({
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  
+
   const [rating, setRating] = useState(0);
   const [reviewText, setReviewText] = useState('');
   const [reviewType, setReviewType] = useState('');
@@ -62,7 +62,7 @@ export const ReviewForm: React.FC<ReviewFormProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!user) {
       toast({
         title: "Login required",
@@ -105,7 +105,7 @@ export const ReviewForm: React.FC<ReviewFormProps> = ({
     return Array.from({ length: 5 }, (_, i) => {
       const starNumber = i + 1;
       const isActive = starNumber <= (hoveredStar || rating);
-      
+
       return (
         <button
           key={i}
@@ -142,14 +142,16 @@ export const ReviewForm: React.FC<ReviewFormProps> = ({
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={onClose}
+                onClick={(e: React.MouseEvent) => {
+                  onClose();
+                }}
               >
                 <X className="w-4 h-4" />
               </Button>
             )}
           </div>
         </CardHeader>
-        
+
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Star Rating */}
@@ -206,7 +208,9 @@ export const ReviewForm: React.FC<ReviewFormProps> = ({
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={onClose}
+                  onClick={(e: React.MouseEvent) => {
+                    onClose();
+                  }}
                   disabled={submitReviewMutation.isPending}
                 >
                   Cancel

@@ -106,7 +106,7 @@ export const PropertyComparison: React.FC<PropertyComparisonProps> = ({
                         </div>
                       )}
                     </div>
-                    
+
                     {/* Remove button */}
                     <button
                       onClick={() => onRemoveProperty(property.id)}
@@ -121,11 +121,11 @@ export const PropertyComparison: React.FC<PropertyComparisonProps> = ({
                     <h3 className="font-semibold text-gray-900 text-lg line-clamp-2">
                       {property.title}
                     </h3>
-                    
+
                     <p className="text-2xl font-bold text-beedab-blue">
                       {formatPrice(property.price)}
                     </p>
-                    
+
                     {/* Comparison Features */}
                     {comparisonFeatures.map((feature) => (
                       <div key={feature.key} className="flex justify-between items-center py-2 border-b border-gray-200">
@@ -135,7 +135,7 @@ export const PropertyComparison: React.FC<PropertyComparisonProps> = ({
                         </span>
                       </div>
                     ))}
-                    
+
                     {/* Features */}
                     {property.features && property.features.length > 0 && (
                       <div>
@@ -157,7 +157,7 @@ export const PropertyComparison: React.FC<PropertyComparisonProps> = ({
                         </div>
                       </div>
                     )}
-                    
+
                     {/* Action Buttons */}
                     <div className="flex space-x-2 pt-2">
                       <button className="flex-1 bg-beedab-blue text-white py-2 px-3 rounded-lg text-sm hover:bg-beedab-darkblue transition-colors flex items-center justify-center">

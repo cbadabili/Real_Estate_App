@@ -90,7 +90,7 @@ const ServiceProviderRegistration: React.FC<ServiceProviderRegistrationProps> = 
   };
 
   const getAllCategories = () => {
-    const allCategories = [];
+    const allCategories: any[] = [];
     Object.entries(mainCategories).forEach(([main, subs]) => {
       allCategories.push(main);
       allCategories.push(...subs);

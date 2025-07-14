@@ -97,7 +97,7 @@ export const VerificationBadge: React.FC<VerificationBadgeProps> = ({
       }
     };
 
-    return configs[type][level] || configs[type].basic;
+    return configs[type as keyof typeof configs][level] || configs[type as keyof typeof configs].basic;
   };
 
   const config = getBadgeConfig();
