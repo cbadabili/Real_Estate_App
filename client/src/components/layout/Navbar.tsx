@@ -1,312 +1,950 @@
-
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import { NotificationCenter } from '../ui/NotificationCenter';
+import { RoleBasedComponent } from '../auth/ProtectedRoute';
 import { 
-  Home, 
-  Search, 
-  Building2, 
-  MapPin, 
-  Gavel, 
-  User, 
-  Menu, 
+  Menu,
   X,
-  UserCheck,
+  User,
+  Building,
+  Calculator,
+  Search,
+  Map,
+  Users,
+  DollarSign,
+  Home,
+  Heart,
+  Calendar,
+  FileText,
+  Bell,
+  Settings,
+  ChevronDown,
+  Briefcase,
+  PlusCircle,
+  Star,
+  MessageSquare,
+  Shield,
   Wrench,
-  ShoppingBag,
-  GraduationCap,
-  ChevronDown
+  TrendingUp,
+  CreditCard,
+  Phone,
+  Award,
+  Target,
+  PieChart,
+  Book,
+  Zap,
+  UserCheck,
+  HandHeart,
+  Hammer,
+  Camera,
+  MapPin,
+  Handshake,
+  Building2,
+  FileCheck,
+  Key,
+  LogOut,
+  Gavel
 } from 'lucide-react';
+import { useAuth } from '../../contexts/AuthContext';
+import { AISearchBar } from '../search/AISearchBar';
 
-const Navbar: React.FC = () => {
+const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [showMarketplaceDropdown, setShowMarketplaceDropdown] = useState(false);
+  const [buyDropdownOpen, setBuyDropdownOpen] = useState(false);
+  const [sellDropdownOpen, setSellDropdownOpen] = useState(false);
+  const [rentDropdownOpen, setRentDropdownOpen] = useState(false);
+  const [servicesDropdownOpen, setServicesDropdownOpen] = useState(false);
+  const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const [priceRange, setPriceRange] = useState([100000, 2000000]);
   const location = useLocation();
+  const { user, logout, isAdmin, isModerator } = useAuth();
 
-  const isActive = (path: string) => location.pathname === path;
-
-  const marketplaceItems = [
-    { 
-      title: 'Find a Pro', 
-      description: 'Professional Services',
-      path: '/marketplace/professionals',
-      icon: UserCheck 
-    },
-    { 
-      title: 'Find a Supplier', 
-      description: 'Building Materials',
-      path: '/marketplace/suppliers',
-      icon: ShoppingBag 
-    },
-    { 
-      title: 'Find a Trade', 
-      description: 'Skilled Labor',
-      path: '/marketplace/trades',
-      icon: Wrench 
-    },
-    { 
-      title: 'Find a Course', 
-      description: 'Training & Upskilling',
-      path: '/marketplace/courses',
-      icon: GraduationCap 
-    }
+  const postDropdownNavigation = [
+    { name: 'Map Search', href: '/map-search', icon: MapPin },
+    { name: 'Auctions', href: '/auctions', icon: Handshake },
   ];
 
   return (
-    <nav className="bg-white shadow-lg sticky top-0 z-50">
+    <nav className="bg-white shadow-lg border-b border-neutral-200 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
-          <div className="flex items-center">
-            <Link to="/" className="flex-shrink-0 flex items-center">
+        <div className="flex justify-between items-center h-28">
+          {/* Logo */}
+          <div className="flex items-center flex-shrink-0 min-w-0">
+            <Link to="/" className="flex items-center space-x-2">
               <img 
                 src="/logo.png" 
-                alt="BeeDab" 
-                className="h-8 w-auto"
+                alt="beedab Real Estate Platform" 
+                className="h-16 w-auto sm:h-18 md:h-20 lg:h-24 xl:h-26 flex-shrink-0"
               />
-              <span className="ml-2 text-xl font-bold text-beedab-blue">BeeDab</span>
             </Link>
           </div>
 
+
+
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
-            <Link
-              to="/"
-              className={`flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
-                isActive('/') 
-                  ? 'text-beedab-blue bg-beedab-blue/10' 
-                  : 'text-gray-700 hover:text-beedab-blue hover:bg-gray-50'
-              }`}
-            >
-              <Home className="h-4 w-4 mr-1" />
-              Home
-            </Link>
-
-            <Link
-              to="/properties"
-              className={`flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
-                isActive('/properties') 
-                  ? 'text-beedab-blue bg-beedab-blue/10' 
-                  : 'text-gray-700 hover:text-beedab-blue hover:bg-gray-50'
-              }`}
-            >
-              <Building2 className="h-4 w-4 mr-1" />
-              Properties
-            </Link>
-
-            <Link
-              to="/plots"
-              className={`flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
-                isActive('/plots') 
-                  ? 'text-beedab-blue bg-beedab-blue/10' 
-                  : 'text-gray-700 hover:text-beedab-blue hover:bg-gray-50'
-              }`}
-            >
-              <MapPin className="h-4 w-4 mr-1" />
-              Plots
-            </Link>
-
-            <Link
-              to="/rent"
-              className={`flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
-                isActive('/rent') 
-                  ? 'text-beedab-blue bg-beedab-blue/10' 
-                  : 'text-gray-700 hover:text-beedab-blue hover:bg-gray-50'
-              }`}
-            >
-              <Search className="h-4 w-4 mr-1" />
-              Rent
-            </Link>
-
-            {/* Marketplace Dropdown */}
+          <div className="hidden md:flex items-center space-x-10 text-lg">
+            {/* Buy Dropdown - Available to all users */}
             <div 
               className="relative"
-              onMouseEnter={() => setShowMarketplaceDropdown(true)}
-              onMouseLeave={() => setShowMarketplaceDropdown(false)}
+              onMouseEnter={() => setBuyDropdownOpen(true)}
+              onMouseLeave={() => setBuyDropdownOpen(false)}
             >
-              <button
-                className={`flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
-                  location.pathname.startsWith('/marketplace')
-                    ? 'text-beedab-blue bg-beedab-blue/10' 
-                    : 'text-gray-700 hover:text-beedab-blue hover:bg-gray-50'
-                }`}
-              >
-                <ShoppingBag className="h-4 w-4 mr-1" />
-                Marketplace
-                <ChevronDown className="h-3 w-3 ml-1" />
+              <button className="flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100 transition-colors">
+                <Building2 className="h-4 w-4" />
+                <span>Buy</span>
+                <ChevronDown className="h-3 w-3" />
               </button>
 
-              {showMarketplaceDropdown && (
-                <div className="absolute left-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
-                  <div className="px-4 py-2 text-xs text-gray-500 uppercase tracking-wide font-semibold">
-                    Find Services
-                  </div>
-                  {marketplaceItems.map((item) => {
-                    const IconComponent = item.icon;
-                    return (
-                      <Link
-                        key={item.path}
-                        to={item.path}
-                        className="block px-4 py-3 hover:bg-gray-50 transition-colors"
-                      >
-                        <div className="flex items-start">
-                          <div className="flex-shrink-0">
-                            <IconComponent className="h-5 w-5 text-beedab-blue mt-0.5" />
+              <AnimatePresence>
+                {buyDropdownOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="absolute top-full left-0 mt-2 w-[600px] bg-white rounded-md shadow-lg border border-neutral-200 z-50"
+                  >
+                    <div className="p-3 flex">
+                      {/* Left Column - Property Types */}
+                      <div className="w-1/2 pr-3">
+                        <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide px-2 py-1">Property Types</div>
+                        <Link
+                          to="/properties?type=house"
+                          className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
+                          onClick={() => setBuyDropdownOpen(false)}
+                        >
+                          <div className="flex items-center">
+                            <Home className="h-4 w-4 mr-2 text-beedab-blue" />
+                            <div>
+                              <div className="font-medium">Houses</div>
+                              <div className="text-xs text-gray-500">Family homes & residential properties</div>
+                            </div>
                           </div>
-                          <div className="ml-3">
-                            <div className="text-sm font-medium text-gray-900">
-                              {item.title}
+                        </Link>
+
+                        <Link
+                          to="/properties?type=apartment"
+                          className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
+                          onClick={() => setBuyDropdownOpen(false)}
+                        >
+                          <div className="flex items-center">
+                            <Building2 className="h-4 w-4 mr-2 text-beedab-blue" />
+                            <div>
+                              <div className="font-medium">Apartments</div>
+                              <div className="text-xs text-gray-500">Flats & apartment units</div>
                             </div>
-                            <div className="text-sm text-gray-500">
-                              {item.description}
+                          </div>
+                        </Link>
+
+                        <Link
+                          to="/properties?type=townhouse"
+                          className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
+                          onClick={() => setBuyDropdownOpen(false)}
+                        >
+                          <div className="flex items-center">
+                            <Building className="h-4 w-4 mr-2 text-beedab-blue" />
+                            <div>
+                              <div className="font-medium">Townhouses</div>
+                              <div className="text-xs text-gray-500">Multi-level attached homes</div>
                             </div>
+                          </div>
+                        </Link>
+
+                        <Link
+                          to="/properties?type=commercial"
+                          className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
+                          onClick={() => setBuyDropdownOpen(false)}
+                        >
+                          <div className="flex items-center">
+                            <Building2 className="h-4 w-4 mr-2 text-beedab-blue" />
+                            <div>
+                              <div className="font-medium">Commercial</div>
+                              <div className="text-xs text-gray-500">Offices, retail & industrial</div>
+                            </div>
+                          </div>
+                        </Link>
+
+                        <Link
+                          to="/properties?type=farm"
+                          className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
+                          onClick={() => setBuyDropdownOpen(false)}
+                        >
+                          <div className="flex items-center">
+                            <Home className="h-4 w-4 mr-2 text-beedab-blue" />
+                            <div>
+                              <div className="font-medium">Farms</div>
+                              <div className="text-xs text-gray-500">Agricultural & farming properties</div>
+                            </div>
+                          </div>
+                        </Link>
+
+                        <Link
+                          to="/properties?type=land"
+                          className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
+                          onClick={() => setBuyDropdownOpen(false)}
+                        >
+                          <div className="flex items-center">
+                            <MapPin className="h-4 w-4 mr-2 text-beedab-blue" />
+                            <div>
+                              <div className="font-medium">Land for Development</div>
+                              <div className="text-xs text-gray-500">Build your dream property</div>
+                            </div>
+                          </div>
+                        </Link>
+
+                        <div className="border-t border-gray-100 my-2"></div>
+
+                        <Link
+                          to="/auctions"
+                          className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
+                          onClick={() => setBuyDropdownOpen(false)}
+                        >
+                          <div className="flex items-center">
+                            <Handshake className="h-4 w-4 mr-2 text-orange-500" />
+                            <div>
+                              <div className="font-medium">Property Auctions</div>
+                              <div className="text-xs text-gray-500">Bank auctions & foreclosure sales</div>
+                            </div>
+                          </div>
+                        </Link>
+                      </div>
+
+                      {/* Right Column - Buyer Journey & Professional Services */}
+                      <div className="w-1/2 pl-3 border-l border-gray-100">
+                        <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide px-2 py-1">Buyer Journey</div>
+
+                        <Link
+                          to="/buyer-journey/planning"
+                          className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
+                          onClick={() => setBuyDropdownOpen(false)}
+                        >
+                          <div className="flex items-center">
+                            <Building className="h-4 w-4 mr-2 text-green-500" />
+                            <div>
+                              <div className="font-medium">Planning & Budgeting</div>
+                              <div className="text-xs text-gray-500">Calculate affordability & get pre-approved</div>
+                            </div>
+                          </div>
+                        </Link>
+
+                        <Link
+                          to="/buyer-journey/searching"
+                          className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
+                          onClick={() => setBuyDropdownOpen(false)}
+                        >
+                          <div className="flex items-center">
+                            <MapPin className="h-4 w-4 mr-2 text-blue-500" />
+                            <div>
+                              <div className="font-medium">Property Search</div>
+                              <div className="text-xs text-gray-500">Find your perfect home with AI assistance</div>
+                            </div>
+                          </div>
+                        </Link>
+
+                        <Link
+                          to="/buyer-journey/viewing"
+                          className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
+                          onClick={() => setBuyDropdownOpen(false)}
+                        >
+                          <div className="flex items-center">
+                            <Building className="h-4 w-4 mr-2 text-purple-500" />
+                            <div>
+                              <div className="font-medium">Viewing & Evaluation</div>
+                              <div className="text-xs text-gray-500">Schedule viewings & neighborhood insights</div>
+                            </div>
+                          </div>
+                        </Link>
+
+                        <Link
+                          to="/buyer-journey/offers"
+                          className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
+                          onClick={() => setBuyDropdownOpen(false)}
+                        >
+                          <div className="flex items-center">
+                            <Building className="h-4 w-4 mr-2 text-orange-500" />
+                            <div>
+                              <div className="font-medium">Making Offers</div>
+                              <div className="text-xs text-gray-500">Negotiate & secure your property</div>
+                            </div>
+                          </div>
+                        </Link>
+
+                        <div className="border-t border-gray-100 my-2"></div>
+                        <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide px-2 py-1">Professional Services</div>
+
+                        <Link
+                          to="/services/legal"
+                          className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
+                          onClick={() => setBuyDropdownOpen(false)}
+                        >
+                          <div className="flex items-center">
+                            <Building className="h-4 w-4 mr-2 text-beedab-blue" />
+                            <div>
+                              <div className="font-medium">Legal Services</div>
+                              <div className="text-xs text-gray-500">Lawyers & conveyancing experts</div>
+                            </div>
+                          </div>
+                        </Link>
+
+                        <Link
+                          to="/services/financing"
+                          className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
+                          onClick={() => setBuyDropdownOpen(false)}
+                        >
+                          <div className="flex items-center">
+                            <Building className="h-4 w-4 mr-2 text-beedab-blue" />
+                            <div>
+                              <div className="font-medium">Financing Options</div>
+                              <div className="text-xs text-gray-500">Banks & mortgage advisors</div>
+                            </div>
+                          </div>
+                        </Link>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+
+
+            {/* Sell Dropdown - Available to all users for testing */}
+            <div 
+              className="relative"
+              onMouseEnter={() => setSellDropdownOpen(true)}
+              onMouseLeave={() => setSellDropdownOpen(false)}
+            >
+                <button className="flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100 transition-colors">
+                  <span className="text-beedab-blue font-bold text-xs">BWP</span>
+                  <span>Sell</span>
+                  <ChevronDown className="h-3 w-3" />
+                </button>
+
+              <AnimatePresence>
+                {sellDropdownOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="absolute top-full left-0 mt-2 w-[600px] bg-white rounded-md shadow-lg border border-neutral-200 z-50"
+                  >
+                    <div className="p-3 flex">
+                      {/* Left Column - Selling Options */}
+                      <div className="w-1/2 pr-3">
+                        <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide px-2 py-1">Selling Options</div>
+
+                        <Link
+                          to="/create-property?listingType=owner"
+                          className="block px-4 py-3 text-sm text-neutral-700 hover:bg-beedab-blue/5 rounded border border-beedab-blue/20 mb-2"
+                          onClick={() => setSellDropdownOpen(false)}
+                        >
+                          <div className="flex items-center">
+                            <PlusCircle className="h-4 w-4 mr-2 text-beedab-blue" />
+                            <div>
+                              <div className="font-semibold">Create Listing</div>
+                              <div className="text-xs text-gray-500">List your property</div>
+                            </div>
+                          </div>
+                        </Link>
+
+                        <Link
+                          to="/agent-network"
+                          className="block px-4 py-3 text-sm text-neutral-700 hover:bg-gray-50 rounded border border-gray-200 mb-3"
+                          onClick={() => setSellDropdownOpen(false)}
+                        >
+                          <div className="flex items-center">
+                            <Users className="h-4 w-4 mr-2 text-gray-600" />
+                            <div>
+                              <div className="font-semibold">Sell with Agent</div>
+                              <div className="text-xs text-gray-500">Professional assistance</div>
+                            </div>
+                          </div>
+                        </Link>
+                      </div>
+
+                      {/* Right Column - Seller Journey & Tools */}
+                      <div className="w-1/2 pl-3 border-l border-gray-100">
+                        <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide px-2 py-1">Preparation Tools</div>
+
+                      <Link
+                        to="/home-value-assessment"
+                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
+                        onClick={() => setSellDropdownOpen(false)}
+                      >
+                        <div className="flex items-center">
+                          <TrendingUp className="h-4 w-4 mr-2 text-beedab-blue" />
+                          <div>
+                            <div className="font-medium">Home Value Assessment</div>
+                            <div className="text-xs text-gray-500">Get your property valued</div>
                           </div>
                         </div>
                       </Link>
-                    );
-                  })}
-                </div>
-              )}
+
+                      <Link
+                        to="/prepare-home"
+                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
+                        onClick={() => setSellDropdownOpen(false)}
+                      >
+                        <div className="flex items-center">
+                          <Wrench className="h-4 w-4 mr-2 text-beedab-blue" />
+                          <div>
+                            <div className="font-medium">Prepare Your Home</div>
+                            <div className="text-xs text-gray-500">Staging and improvements</div>
+                          </div>
+                        </div>
+                      </Link>
+
+                      <Link
+                        to="/legal-requirements"
+                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
+                        onClick={() => setSellDropdownOpen(false)}
+                      >
+                        <div className="flex items-center">
+                          <FileText className="h-4 w-4 mr-2 text-beedab-blue" />
+                          <div>
+                            <div className="font-medium">Legal Requirements</div>
+                            <div className="text-xs text-gray-500">Documents and compliance</div>
+                          </div>
+                        </div>
+                        </Link>
+
+                        <div className="border-t border-gray-100 my-2"></div>
+                        <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide px-2 py-1">Marketing & Sales</div>
+
+                      <Link
+                        to="/pricing-guide"
+                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
+                        onClick={() => setSellDropdownOpen(false)}
+                      >
+                        <div className="flex items-center">
+                          <span className="font-bold text-base mr-2 text-beedab-blue">P</span>
+                          <div>
+                            <div className="font-medium">Pricing Guide</div>
+                            <div className="text-xs text-gray-500">Set competitive prices</div>
+                          </div>
+                        </div>
+                      </Link>
+
+                      <Link
+                        to="/manage-showings"
+                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
+                        onClick={() => setSellDropdownOpen(false)}
+                      >
+                        <div className="flex items-center">
+                          <Calendar className="h-4 w-4 mr-2 text-beedab-blue" />
+                          <div>
+                            <div className="font-medium">Manage Showings</div>
+                            <div className="text-xs text-gray-500">Schedule viewings</div>
+                          </div>
+                        </div>
+                      </Link>
+
+                      <Link
+                        to="/handle-offers"
+                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
+                        onClick={() => setSellDropdownOpen(false)}
+                      >
+                        <div className="flex items-center">
+                          <Handshake className="h-4 w-4 mr-2 text-beedab-blue" />
+                          <div>
+                            <div className="font-medium">Handle Offers</div>
+                            <div className="text-xs text-gray-500">Review and negotiate</div>
+                          </div>
+                        </div>
+                      </Link>
+
+                      <div className="border-t border-gray-100 my-2"></div>
+                      <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide px-2 py-1">Closing Process</div>
+
+                      <Link
+                        to="/transfer-process"
+                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
+                        onClick={() => setSellDropdownOpen(false)}
+                      >
+                        <div className="flex items-center">
+                          <FileCheck className="h-4 w-4 mr-2 text-beedab-blue" />
+                          <div>
+                            <div className="font-medium">Transfer Process</div>
+                            <div className="text-xs text-gray-500">Complete the sale</div>
+                          </div>
+                        </div>
+                      </Link>
+
+                      <Link
+                        to="/property-handover"
+                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
+                        onClick={() => setSellDropdownOpen(false)}
+                      >
+                        <div className="flex items-center">
+                          <Key className="h-4 w-4 mr-2 text-beedab-blue" />
+                          <div>
+                            <div className="font-medium">Property Handover</div>
+                            <div className="text-xs text-gray-500">Transfer ownership</div>
+                          </div>
+                        </div>
+                        </Link>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+              </div>
+
+            {/* Rent Dropdown */}
+            <div 
+              className="relative"
+              onMouseEnter={() => setRentDropdownOpen(true)}
+              onMouseLeave={() => setRentDropdownOpen(false)}
+            >
+              <button className="flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100 transition-colors">
+                <Home className="h-4 w-4" />
+                <span>Rent</span>
+                <ChevronDown className="h-3 w-3" />
+              </button>
+
+              <AnimatePresence>
+                {rentDropdownOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="absolute top-full left-0 mt-2 w-64 bg-white rounded-md shadow-lg border border-neutral-200 z-50"
+                  >
+                    <div className="p-2">
+                      <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide px-2 py-1">For Landlords</div>
+                      <Link
+                        to="/rental-listing-wizard"
+                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
+                        onClick={() => setRentDropdownOpen(false)}
+                      >
+                        <div className="flex items-center">
+                          <Building className="h-4 w-4 mr-2 text-purple-500" />
+                          <div>
+                            <div className="font-medium">List Your Property</div>
+                            <div className="text-xs text-gray-500">Rent out your property</div>
+                          </div>
+                        </div>
+                      </Link>
+                      <Link
+                        to="/services/property-management"
+                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
+                        onClick={() => setRentDropdownOpen(false)}
+                      >
+                        <div className="flex items-center">
+                          <Building className="h-4 w-4 mr-2 text-orange-500" />
+                          <div>
+                            <div className="font-medium">Property Management</div>
+                            <div className="text-xs text-gray-500">Full-service rental management</div>
+                          </div>
+                        </div>
+                      </Link>
+                      <div className="border-t border-gray-100 my-2"></div>
+                      <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide px-2 py-1">For Tenants</div>
+                      <Link
+                        to="/rent"
+                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
+                        onClick={() => setRentDropdownOpen(false)}
+                      >
+                        <div className="flex items-center">
+                          <Search className="h-4 w-4 mr-2 text-blue-500" />
+                          <div>
+                            <div className="font-medium">Find Rental Property</div>
+                            <div className="text-xs text-gray-500">Browse available rentals</div>
+                          </div>
+                        </div>
+                      </Link>
+                      <Link
+                        to="/services/tenant-support"
+                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
+                        onClick={() => setRentDropdownOpen(false)}
+                      >
+                        <div className="flex items-center">
+                          <User className="h-4 w-4 mr-2 text-green-500" />
+                          <div>
+                            <div className="font-medium">Tenant Support</div>
+                            <div className="text-xs text-gray-500">Rights, agreements & advice</div>
+                          </div>
+                        </div>
+                      </Link>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
 
-            <Link
-              to="/auctions"
-              className={`flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
-                isActive('/auctions') 
-                  ? 'text-beedab-blue bg-beedab-blue/10' 
-                  : 'text-gray-700 hover:text-beedab-blue hover:bg-gray-50'
-              }`}
+            {/* Services Dropdown */}
+            <div 
+              className="relative"
+              onMouseEnter={() => setServicesDropdownOpen(true)}
+              onMouseLeave={() => setServicesDropdownOpen(false)}
             >
-              <Gavel className="h-4 w-4 mr-1" />
-              Auctions
-            </Link>
+              <button className="flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100 transition-colors">
+                <Wrench className="h-4 w-4" />
+                <span>Services</span>
+                <ChevronDown className="h-3 w-3" />
+              </button>
 
-            <Link
-              to="/profile"
-              className={`flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
-                isActive('/profile') 
-                  ? 'text-beedab-blue bg-beedab-blue/10' 
-                  : 'text-gray-700 hover:text-beedab-blue hover:bg-gray-50'
-              }`}
-            >
-              <User className="h-4 w-4 mr-1" />
-              Profile
-            </Link>
+              <AnimatePresence>
+                {servicesDropdownOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    className="absolute top-full left-0 mt-2 w-80 bg-white rounded-md shadow-lg border border-neutral-200 z-50"
+                  >
+                    <div className="p-3">
+                      <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide px-2 py-1 mb-2">Service Categories</div>
+
+                      <Link
+                        to="/services"
+                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded mb-1"
+                        onClick={() => setServicesDropdownOpen(false)}
+                      >
+                        <div className="flex items-center">
+                          <Wrench className="h-4 w-4 mr-2 text-beedab-blue" />
+                          <div>
+                            <div className="font-medium">All Services</div>
+                            <div className="text-xs text-gray-500">Browse all service providers</div>
+                          </div>
+                        </div>
+                      </Link>
+
+                      <div className="border-t border-gray-100 my-2"></div>
+
+                      <Link
+                        to="/services?category=Legal"
+                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded mb-1"
+                        onClick={() => setServicesDropdownOpen(false)}
+                      >
+                        <div className="flex items-center">
+                          <FileText className="h-4 w-4 mr-2 text-beedab-blue" />
+                          <div>
+                            <div className="font-medium">Legal Services</div>
+                            <div className="text-xs text-gray-500">Conveyancing & contracts</div>
+                          </div>
+                        </div>
+                      </Link>
+
+                      <Link
+                        to="/services?category=Finance"
+                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded mb-1"
+                        onClick={() => setServicesDropdownOpen(false)}
+                      >
+                        <div className="flex items-center">
+                          <TrendingUp className="h-4 w-4 mr-2 text-beedab-blue" />
+                          <div>
+                            <div className="font-medium">Finance & Insurance</div>
+                            <div className="text-xs text-gray-500">Loans, mortgages & insurance</div>
+                          </div>
+                        </div>
+                      </Link>
+
+                      <Link
+                        to="/services?category=Construction"
+                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
+                        onClick={() => setServicesDropdownOpen(false)}
+                      >
+                        <div className="flex items-center">
+                          <Building className="h-4 w-4 mr-2 text-beedab-blue" />
+                          <div>
+                            <div className="font-medium">Construction & Building</div>
+                            <div className="text-xs text-gray-500">Contractors & builders</div>
+                          </div>
+                        </div>
+                      </Link>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            {/* Post-dropdown Navigation */}
+            {postDropdownNavigation.map((item) => {
+              const Icon = item.icon;
+              const isActive = location === item.href;
+              return (
+                <Link
+                  key={item.name}
+                  to={item.href}
+                  className={`flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                    isActive
+                      ? 'bg-beedab-blue/10 text-beedab-blue'
+                      : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100'
+                  }`}
+                >
+                  <Icon className="h-4 w-4" />
+                  <span>{item.name}</span>
+                </Link>
+              );
+            })}
+          </div>
+
+          {/* User Profile Avatar */}
+          <div className="flex items-center space-x-2 md:space-x-4 flex-shrink-0">
+            {user ? (
+              <div className="relative">
+                <button
+                  onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
+                  className="h-10 w-10 bg-beedab-blue rounded-full flex items-center justify-center text-white font-semibold hover:bg-beedab-darkblue transition-colors"
+                >
+                  {user.firstName ? user.firstName.charAt(0).toUpperCase() : user.email.charAt(0).toUpperCase()}
+                </button>
+
+                <AnimatePresence>
+                  {profileDropdownOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      className="absolute top-full right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-neutral-200 z-50"
+                    >
+                      <div className="px-4 py-3 border-b border-neutral-100">
+                        <p className="text-sm font-medium text-neutral-900">
+                          {user.firstName} {user.lastName}
+                        </p>
+                        <p className="text-xs text-neutral-500">{user.email}</p>
+                        <p className="text-xs text-neutral-400 capitalize">
+                          {user.userType} • {user.role}
+                        </p>
+                      </div>
+                      {/* Role-based navigation items */}
+                      <RoleBasedComponent allowedRoles={['user', 'moderator', 'admin', 'super_admin']}>
+                        <Link
+                          to="/dashboard"
+                          className="flex items-center px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100"
+                          onClick={() => setProfileDropdownOpen(false)}
+                        >
+                          <Building className="h-4 w-4 mr-2" />
+                          My Dashboard
+                        </Link>
+                      </RoleBasedComponent>
+
+                      <RoleBasedComponent allowedRoles={['seller', 'agent', 'fsbo']}>
+                        <Link
+                          to="/my-properties"
+                          className="flex items-center px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100"
+                          onClick={() => setProfileDropdownOpen(false)}
+                        >
+                          <Building className="h-4 w-4 mr-2" />
+                          My Properties
+                        </Link>
+                      </RoleBasedComponent>
+
+                      <RoleBasedComponent allowedRoles={['agent']}>
+                        <Link
+                          to="/agent-dashboard"
+                          className="flex items-center px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100"
+                          onClick={() => setProfileDropdownOpen(false)}
+                        >
+                          <UserCheck className="h-4 w-4 mr-2" />
+                          Agent Tools
+                        </Link>
+                      </RoleBasedComponent>
+
+                      <RoleBasedComponent requireModerator>
+                        <Link
+                          to="/moderation"
+                          className="flex items-center px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100"
+                          onClick={() => setProfileDropdownOpen(false)}
+                        >
+                          <Shield className="h-4 w-4 mr-2" />
+                          Moderation
+                        </Link>
+                      </RoleBasedComponent>
+
+                      <RoleBasedComponent requireAdmin>
+                        <Link
+                          to="/admin"
+                          className="flex items-center px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100"
+                          onClick={() => setProfileDropdownOpen(false)}
+                        >
+                          <Gavel className="h-4 w-4 mr-2" />
+                          Admin Panel
+                        </Link>
+</RoleBasedComponent>
+
+                      <Link
+                        to="/profile"
+                        className="flex items-center px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100"
+                        onClick={() => setProfileDropdownOpen(false)}
+                      >
+                        <Settings className="h-4 w-4 mr-2" />
+                        Account Settings
+                      </Link>
+                      <button
+                        onClick={() => {
+                          logout();
+                          setProfileDropdownOpen(false);
+                        }}
+                        className="flex items-center w-full px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 border-t border-neutral-100"
+                      >
+                        <LogOut className="h-4 w-4 mr-2" />
+                        Sign Out
+                      </button>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            ) : (
+              <div className="flex items-center space-x-2">
+                <Link
+                  to="/login"
+                  className="text-sm font-medium text-neutral-600 hover:text-neutral-900"
+                >
+                  Sign In
+                </Link>
+                <Link
+                  to="/register"
+                  className="bg-beedab-blue text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-beedab-darkblue transition-colors"
+                >
+                  Sign Up
+                </Link>
+              </div>
+            )}
           </div>
 
           {/* Mobile menu button */}
-          <div className="md:hidden flex items-center">
+          <div className="md:hidden">
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="text-gray-700 hover:text-beedab-blue p-2"
+              className="text-neutral-600 hover:text-neutral-900 p-2"
             >
               {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
           </div>
         </div>
+      </div>
 
-        {/* Mobile Navigation */}
+      {/* Mobile Navigation */}
+      <AnimatePresence>
         {isOpen && (
-          <div className="md:hidden border-t border-gray-200 bg-white">
-            <div className="px-2 pt-2 pb-3 space-y-1">
-              <Link
-                to="/"
-                className={`flex items-center px-3 py-2 text-base font-medium rounded-md ${
-                  isActive('/') 
-                    ? 'text-beedab-blue bg-beedab-blue/10' 
-                    : 'text-gray-700 hover:text-beedab-blue hover:bg-gray-50'
-                }`}
-                onClick={() => setIsOpen(false)}
-              >
-                <Home className="h-5 w-5 mr-2" />
-                Home
-              </Link>
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="md:hidden bg-white border-t border-neutral-200"
+          >
+            <div className="px-4 py-2 space-y-1">
+              {/* Post-dropdown Navigation for Mobile */}
+              {postDropdownNavigation.map((item) => {
+                const Icon = item.icon;
+                const isActive = location.pathname === item.href;
+                return (
+                  <Link
+                    key={item.name}
+                    to={item.href}
+                    onClick={() => setIsOpen(false)}
+                    className={`flex items-center space-x-3 px-3 py-3 rounded-lg text-sm font-medium transition-colors ${
+                      isActive
+                        ? 'bg-beedab-blue/10 text-beedab-blue'
+                        : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100'
+                    }`}
+                  >
+                    <Icon className="h-5 w-5" />
+                    <span>{item.name}</span>
+                  </Link>
+                );
+              })}
 
-              <Link
-                to="/properties"
-                className={`flex items-center px-3 py-2 text-base font-medium rounded-md ${
-                  isActive('/properties') 
-                    ? 'text-beedab-blue bg-beedab-blue/10' 
-                    : 'text-gray-700 hover:text-beedab-blue hover:bg-gray-50'
-                }`}
-                onClick={() => setIsOpen(false)}
-              >
-                <Building2 className="h-5 w-5 mr-2" />
-                Properties
-              </Link>
-
-              <Link
-                to="/plots"
-                className={`flex items-center px-3 py-2 text-base font-medium rounded-md ${
-                  isActive('/plots') 
-                    ? 'text-beedab-blue bg-beedab-blue/10' 
-                    : 'text-gray-700 hover:text-beedab-blue hover:bg-gray-50'
-                }`}
-                onClick={() => setIsOpen(false)}
-              >
-                <MapPin className="h-5 w-5 mr-2" />
-                Plots
-              </Link>
-
-              <Link
-                to="/rent"
-                className={`flex items-center px-3 py-2 text-base font-medium rounded-md ${
-                  isActive('/rent') 
-                    ? 'text-beedab-blue bg-beedab-blue/10' 
-                    : 'text-gray-700 hover:text-beedab-blue hover:bg-gray-50'
-                }`}
-                onClick={() => setIsOpen(false)}
-              >
-                <Search className="h-5 w-5 mr-2" />
-                Rent
-              </Link>
-
-              {/* Mobile Marketplace */}
-              <div className="px-3 py-2">
-                <div className="text-sm font-medium text-gray-900 mb-2">Marketplace</div>
-                {marketplaceItems.map((item) => {
-                  const IconComponent = item.icon;
-                  return (
-                    <Link
-                      key={item.path}
-                      to={item.path}
-                      className="flex items-center px-2 py-2 text-sm text-gray-600 hover:text-beedab-blue hover:bg-gray-50 rounded-md"
-                      onClick={() => setIsOpen(false)}
-                    >
-                      <IconComponent className="h-4 w-4 mr-2" />
-                      {item.title}
-                    </Link>
-                  );
-                })}
+              {/* Mobile Sell Section - Available to all users for testing */}
+              <div className="px-3 py-2 border-t border-neutral-100">
+                <p className="text-xs font-medium text-neutral-500 mb-2">SELL</p>
+                <Link
+                  to="/create-property"
+                  onClick={() => setIsOpen(false)}
+                  className="block px-3 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
+                >
+                  Agent Listing
+                </Link>
+                <Link
+                  to="/create-listing"
+                  onClick={() => setIsOpen(false)}
+                  className="block px-3 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
+                >
+                  Direct Sellers
+                </Link>
               </div>
 
-              <Link
-                to="/auctions"
-                className={`flex items-center px-3 py-2 text-base font-medium rounded-md ${
-                  isActive('/auctions') 
-                    ? 'text-beedab-blue bg-beedab-blue/10' 
-                    : 'text-gray-700 hover:text-beedab-blue hover:bg-gray-50'
-                }`}
-                onClick={() => setIsOpen(false)}
-              >
-                <Gavel className="h-5 w-5 mr-2" />
-                Auctions
-              </Link>
+              {/* Mobile Rent Section - Available to all authenticated users */}
+              <div className="px-3 py-2 border-t border-neutral-100">
+                <p className="text-xs font-medium text-neutral-500 mb-2">RENT</p>
+                <Link
+                  to="/rent"
+                  onClick={() => setIsOpen(false)}
+                  className="block px-3 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
+                >
+                  Find Rental
+                </Link>
+                <Link
+                  to="/rental-listing-wizard"
+                  onClick={() => setIsOpen(false)}
+                  className="block px-3 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
+                >
+                  Rent Out Property
+                </Link>
+              </div>
 
-              <Link
-                to="/profile"
-                className={`flex items-center px-3 py-2 text-base font-medium rounded-md ${
-                  isActive('/profile') 
-                    ? 'text-beedab-blue bg-beedab-blue/10' 
-                    : 'text-gray-700 hover:text-beedab-blue hover:bg-gray-50'
-                }`}
-                onClick={() => setIsOpen(false)}
-              >
-                <User className="h-5 w-5 mr-2" />
-                Profile
-              </Link>
+              {user ? (
+                <div className="px-3 py-2 border-t border-neutral-100">
+                  <p className="text-xs font-medium text-neutral-500 mb-2">ACCOUNT</p>
+                  <Link
+                    to="/dashboard"
+                    onClick={() => setIsOpen(false)}
+                    className="block px-3 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
+                  >
+                    My Properties
+                  </Link>
+                  <Link
+                    to="/profile"
+                    onClick={() => setIsOpen(false)}
+                    className="block px-3 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
+                  >
+                    Account Settings
+                  </Link>
+
+                  {/* Admin Panel - Role-based access */}
+                  <RoleBasedComponent allowedRoles={['admin', 'super_admin']}>
+                    <Link
+                      to="/admin"
+                      onClick={() => setIsOpen(false)}
+                      className="block px-3 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
+                    >
+                      Admin Panel
+                    </Link>
+                  </RoleBasedComponent>
+
+                  <button
+                    onClick={() => {
+                      logout();
+                      setIsOpen(false);
+                    }}
+                    className="block w-full text-left px-3 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
+                  >
+                    Sign Out
+                  </button>
+                </div>
+              ) : (
+                <div className="px-3 py-2 border-t border-neutral-100 space-y-2">
+                  <Link
+                    to="/login"
+                    onClick={() => setIsOpen(false)}
+                    className="block px-3 py-2 text-sm font-medium text-neutral-600 hover:bg-neutral-100 rounded"
+                  >
+                    Sign In
+                  </Link>
+                  <Link
+                    to="/register"
+                    onClick={() => setIsOpen(false)}
+                    className="block px-3 py-2 text-sm font-medium bg-beedab-blue text-white rounded hover:bg-beedab-darkblue"
+                  >
+                    Sign Up
+                  </Link>
+                </div>
+              )}
             </div>
-          </div>
+          </motion.div>
         )}
-      </div>
+      </AnimatePresence>
     </nav>
   );
 };
