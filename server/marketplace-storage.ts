@@ -1,4 +1,3 @@
-
 import { 
   marketplace_providers, 
   service_categories,
@@ -22,7 +21,8 @@ import {
   type JobOpportunity
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, and, desc, asc, like, sql, or } from "drizzle-orm";
+import { eq, and, desc, asc, like, sql, or, ilike } from "drizzle-orm";
+import { marketplaceCategories, users } from "./schema";
 
 export interface MarketplaceFilters {
   provider_type?: string;
@@ -57,11 +57,11 @@ export class MarketplaceStorage {
   // Service Categories
   async getServiceCategories(journey_type?: string) {
     let query = db.select().from(service_categories).where(eq(service_categories.is_active, true));
-    
+
     if (journey_type) {
       query = query.where(eq(service_categories.journey_type, journey_type));
     }
-    
+
     return await query.orderBy(asc(service_categories.sort_order));
   }
 
@@ -277,13 +277,13 @@ export class MarketplaceStorage {
 
   async createProjectProposal(data: Omit<ProjectProposal, 'id' | 'created_at' | 'updated_at'>) {
     const [proposal] = await db.insert(project_proposals).values(data).returning();
-    
+
     // Update project proposals count
     await db
       .update(project_requests)
       .set({ proposals_count: sql`${project_requests.proposals_count} + 1` })
       .where(eq(project_requests.id, data.project_id));
-    
+
     return proposal;
   }
 
@@ -301,11 +301,11 @@ export class MarketplaceStorage {
 
   async createMarketplaceReview(data: Omit<MarketplaceReview, 'id' | 'created_at'>) {
     const [review] = await db.insert(marketplace_reviews).values(data).returning();
-    
+
     // Update provider rating and review count
     const reviews = await this.getMarketplaceReviews(data.provider_id);
     const avgRating = reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length;
-    
+
     await db
       .update(marketplace_providers)
       .set({
@@ -313,7 +313,7 @@ export class MarketplaceStorage {
         review_count: reviews.length
       })
       .where(eq(marketplace_providers.id, data.provider_id));
-    
+
     return review;
   }
 
@@ -401,7 +401,7 @@ export class MarketplaceStorage {
   // Search across all marketplace entities
   async searchMarketplace(query: string, type?: string) {
     const searchTerm = `%${query}%`;
-    
+
     if (type === 'providers' || !type) {
       const providers = await db
         .select()
@@ -417,10 +417,10 @@ export class MarketplaceStorage {
           )
         )
         .limit(10);
-      
+
       if (type === 'providers') return providers;
     }
-    
+
     if (type === 'materials' || !type) {
       const materials = await db
         .select()
@@ -436,10 +436,10 @@ export class MarketplaceStorage {
           )
         )
         .limit(10);
-      
+
       if (type === 'materials') return materials;
     }
-    
+
     if (type === 'training' || !type) {
       const training = await db
         .select()
@@ -455,10 +455,10 @@ export class MarketplaceStorage {
           )
         )
         .limit(10);
-      
+
       if (type === 'training') return training;
     }
-    
+
     // Return combined results if no specific type
     return {
       providers: await this.searchMarketplace(query, 'providers'),
@@ -469,3 +469,192 @@ export class MarketplaceStorage {
 }
 
 export const marketplaceStorage = new MarketplaceStorage();
+
+export async function getCategories() {
+  return db.select().from(marketplaceCategories);
+}
+
+export async function getProviders(filters: {
+  category?: string;
+  location?: string;
+  search?: string;
+  page: number;
+  limit: number;
+}) {
+  let query = db.select({
+    id: marketplace_providers.id,
+    business_name: marketplace_providers.business_name,
+    business_description: marketplace_providers.description,
+    service_area: marketplace_providers.service_areas,
+    hourly_rate: marketplace_providers.hourly_rate,
+    rating: marketplace_providers.rating,
+    review_count: marketplace_providers.review_count,
+    phone: marketplace_providers.phone,
+    email: marketplace_providers.email,
+    website: marketplace_providers.website,
+    specialties: marketplace_providers.specializations,
+    is_verified: marketplace_providers.is_verified,
+    category: marketplaceCategories.name
+  })
+  .from(marketplace_providers)
+  .leftJoin(marketplaceCategories, eq(marketplace_providers.category_id, marketplaceCategories.id));
+
+  if (filters.category) {
+    query = query.where(eq(marketplaceCategories.type, filters.category));
+  }
+
+  if (filters.location) {
+    query = query.where(ilike(marketplace_providers.service_areas, `%${filters.location}%`));
+  }
+
+  if (filters.search) {
+    query = query.where(
+      or(
+        ilike(marketplace_providers.business_name, `%${filters.search}%`),
+        ilike(marketplace_providers.description, `%${filters.search}%`)
+      )
+    );
+  }
+
+  const offset = (filters.page - 1) * filters.limit;
+  return query.limit(filters.limit).offset(offset);
+}
+
+export async function createProvider(data: {
+  user_id: number;
+  business_name: string;
+  business_description: string;
+  category_id: string;
+  service_area: string;
+  hourly_rate: number;
+  phone: string;
+  email: string;
+  website?: string;
+  specialties?: string[];
+}) {
+  const [provider] = await db.insert(marketplace_providers).values({
+    userId: data.user_id,
+    businessName: data.business_name,
+    businessDescription: data.business_description,
+    categoryId: parseInt(data.category_id),
+    serviceArea: data.service_area,
+    hourlyRate: data.hourly_rate,
+    phone: data.phone,
+    email: data.email,
+    website: data.website,
+    specialties: data.specialties,
+    isVerified: false,
+    rating: 0,
+    reviewCount: 0
+  }).returning();
+
+  return provider;
+}
+
+export async function getProviderById(id: number) {
+  const [provider] = await db.select({
+    id: marketplace_providers.id,
+    user_id: marketplace_providers.userId,
+    business_name: marketplace_providers.business_name,
+    business_description: marketplace_providers.description,
+    service_area: marketplace_providers.service_areas,
+    hourly_rate: marketplace_providers.hourly_rate,
+    rating: marketplace_providers.rating,
+    review_count: marketplace_providers.review_count,
+    phone: marketplace_providers.phone,
+    email: marketplace_providers.email,
+    website: marketplace_providers.website,
+    specialties: marketplace_providers.specializations,
+    is_verified: marketplace_providers.is_verified,
+    category: marketplaceCategories.name,
+    category_type: marketplaceCategories.type
+  })
+  .from(marketplace_providers)
+  .leftJoin(marketplaceCategories, eq(marketplace_providers.category_id, marketplaceCategories.id))
+  .where(eq(marketplace_providers.id, id));
+
+  return provider;
+}
+
+export async function updateProvider(id: number, data: Partial<{
+  business_name: string;
+  business_description: string;
+  service_area: string;
+  hourly_rate: number;
+  phone: string;
+  email: string;
+  website: string;
+  specialties: string[];
+}>) {
+  const updateData: any = {};
+
+  if (data.business_name) updateData.businessName = data.business_name;
+  if (data.business_description) updateData.businessDescription = data.business_description;
+  if (data.service_area) updateData.serviceArea = data.service_area;
+  if (data.hourly_rate) updateData.hourlyRate = data.hourly_rate;
+  if (data.phone) updateData.phone = data.phone;
+  if (data.email) updateData.email = data.email;
+  if (data.website) updateData.website = data.website;
+  if (data.specialties) updateData.specialties = data.specialties;
+
+  const [provider] = await db.update(marketplace_providers)
+    .set(updateData)
+    .where(eq(marketplace_providers.id, id))
+    .returning();
+
+  return provider;
+}
+
+export async function createProviderReview(data: {
+  provider_id: number;
+  user_id: number;
+  rating: number;
+  comment: string;
+  service_type?: string;
+}) {
+  const [review] = await db.insert(marketplace_reviews).values({
+    providerId: data.provider_id,
+    userId: data.user_id,
+    rating: data.rating,
+    comment: data.comment,
+    serviceType: data.service_type
+  }).returning();
+
+  // Update provider's average rating
+  const reviews = await db.select({ rating: marketplace_reviews.rating })
+    .from(marketplace_reviews)
+    .where(eq(marketplace_reviews.providerId, data.provider_id));
+
+  const averageRating = reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length;
+
+  await db.update(marketplace_providers)
+    .set({ 
+      rating: parseFloat(averageRating.toFixed(1)),
+      reviewCount: reviews.length
+    })
+    .where(eq(marketplace_providers.id, data.provider_id));
+
+  return review;
+}
+
+export async function getProviderReviews(providerId: number, options: {
+  page: number;
+  limit: number;
+}) {
+  const offset = (options.page - 1) * options.limit;
+
+  return db.select({
+    id: marketplace_reviews.id,
+    rating: marketplace_reviews.rating,
+    comment: marketplace_reviews.comment,
+    service_type: marketplace_reviews.serviceType,
+    created_at: marketplace_reviews.createdAt,
+    user_name: users.username
+  })
+  .from(marketplace_reviews)
+  .leftJoin(users, eq(marketplace_reviews.userId, users.id))
+  .where(eq(marketplace_reviews.providerId, providerId))
+  .orderBy(desc(marketplace_reviews.createdAt))
+  .limit(options.limit)
+  .offset(offset);
+}

@@ -1,4 +1,3 @@
-
 import { Router } from 'express';
 import { z } from 'zod';
 import { authenticate } from './auth-middleware';
@@ -94,7 +93,7 @@ const providerRegistrationSchema = z.object({
 router.get('/categories', async (req, res) => {
   try {
     const { section } = req.query;
-    
+
     if (!section || typeof section !== 'string') {
       return res.status(400).json({
         success: false,
@@ -103,7 +102,7 @@ router.get('/categories', async (req, res) => {
     }
 
     const sectionCategories = categories[section as keyof typeof categories];
-    
+
     if (!sectionCategories) {
       return res.status(404).json({
         success: false,
@@ -128,7 +127,7 @@ router.get('/categories', async (req, res) => {
 router.get('/services', async (req, res) => {
   try {
     const { section, category, limit = '10' } = req.query;
-    
+
     if (!section || typeof section !== 'string') {
       return res.status(400).json({
         success: false,
@@ -301,6 +300,252 @@ router.post('/providers/:id/contact', authenticate, async (req, res) => {
     res.status(500).json({
       success: false,
       error: 'Failed to send contact request'
+    });
+  }
+});
+
+// GET /api/marketplace/categories
+router.get('/marketplace/categories', async (req, res) => {
+  try {
+    const categories = await getCategories();
+    res.json({
+      success: true,
+      data: categories
+    });
+  } catch (error) {
+    console.error('Error fetching categories:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch categories'
+    });
+  }
+});
+
+// GET /api/marketplace/providers
+router.get('/marketplace/providers', async (req, res) => {
+  try {
+    const { category, location, search, page = 1, limit = 12 } = req.query;
+
+    const filters = {
+      category: category as string,
+      location: location as string,
+      search: search as string,
+      page: parseInt(page as string),
+      limit: parseInt(limit as string)
+    };
+
+    const providers = await getProviders(filters);
+    res.json({
+      success: true,
+      data: providers
+    });
+  } catch (error) {
+    console.error('Error fetching providers:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch providers'
+    });
+  }
+});
+
+// POST /api/marketplace/providers
+router.post('/marketplace/providers', authenticate, async (req, res) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const providerSchema = z.object({
+      business_name: z.string().min(1, 'Business name is required'),
+      business_description: z.string().min(1, 'Business description is required'),
+      category_id: z.string().min(1, 'Category is required'),
+      service_area: z.string().min(1, 'Service area is required'),
+      hourly_rate: z.number().positive('Hourly rate must be positive'),
+      phone: z.string().min(1, 'Phone number is required'),
+      email: z.string().email('Valid email is required'),
+      website: z.string().url().optional(),
+      specialties: z.array(z.string()).optional()
+    });
+
+    const validatedData = providerSchema.parse(req.body);
+
+    const provider = await createProvider({
+      ...validatedData,
+      user_id: req.user.id
+    });
+
+    res.status(201).json({
+      success: true,
+      data: provider,
+      message: 'Provider registered successfully'
+    });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({
+        success: false,
+        error: 'Validation failed',
+        details: error.errors
+      });
+    }
+
+    console.error('Error creating provider:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to register provider'
+    });
+  }
+});
+
+// GET /api/marketplace/providers/:id
+router.get('/marketplace/providers/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const provider = await getProviderById(parseInt(id));
+
+    if (!provider) {
+      return res.status(404).json({
+        success: false,
+        error: 'Provider not found'
+      });
+    }
+
+    res.json({
+      success: true,
+      data: provider
+    });
+  } catch (error) {
+    console.error('Error fetching provider:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch provider'
+    });
+  }
+});
+
+// PUT /api/marketplace/providers/:id
+router.put('/marketplace/providers/:id', authenticate, async (req, res) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const { id } = req.params;
+    const provider = await getProviderById(parseInt(id));
+
+    if (!provider) {
+      return res.status(404).json({
+        success: false,
+        error: 'Provider not found'
+      });
+    }
+
+    if (provider.user_id !== req.user.id) {
+      return res.status(403).json({
+        success: false,
+        error: 'Forbidden: You can only update your own provider profile'
+      });
+    }
+
+    const updateSchema = z.object({
+      business_name: z.string().min(1).optional(),
+      business_description: z.string().min(1).optional(),
+      service_area: z.string().min(1).optional(),
+      hourly_rate: z.number().positive().optional(),
+      phone: z.string().min(1).optional(),
+      email: z.string().email().optional(),
+      website: z.string().url().optional(),
+      specialties: z.array(z.string()).optional()
+    });
+
+    const validatedData = updateSchema.parse(req.body);
+    const updatedProvider = await updateProvider(parseInt(id), validatedData);
+
+    res.json({
+      success: true,
+      data: updatedProvider,
+      message: 'Provider updated successfully'
+    });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({
+        success: false,
+        error: 'Validation failed',
+        details: error.errors
+      });
+    }
+
+    console.error('Error updating provider:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to update provider'
+    });
+  }
+});
+
+// POST /api/marketplace/providers/:id/reviews
+router.post('/marketplace/providers/:id/reviews', authenticate, async (req, res) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const { id } = req.params;
+    const reviewSchema = z.object({
+      rating: z.number().min(1).max(5),
+      comment: z.string().min(1, 'Review comment is required'),
+      service_type: z.string().optional()
+    });
+
+    const validatedData = reviewSchema.parse(req.body);
+
+    const review = await createProviderReview({
+      ...validatedData,
+      provider_id: parseInt(id),
+      user_id: req.user.id
+    });
+
+    res.status(201).json({
+      success: true,
+      data: review,
+      message: 'Review submitted successfully'
+    });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({
+        success: false,
+        error: 'Validation failed',
+        details: error.errors
+      });
+    }
+
+    console.error('Error creating review:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to submit review'
+    });
+  }
+});
+
+// GET /api/marketplace/providers/:id/reviews
+router.get('/marketplace/providers/:id/reviews', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { page = 1, limit = 10 } = req.query;
+
+    const reviews = await getProviderReviews(parseInt(id), {
+      page: parseInt(page as string),
+      limit: parseInt(limit as string)
+    });
+
+    res.json({
+      success: true,
+      data: reviews
+    });
+  } catch (error) {
+    console.error('Error fetching reviews:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch reviews'
     });
   }
 });
