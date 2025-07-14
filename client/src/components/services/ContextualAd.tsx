@@ -35,31 +35,48 @@ export const ContextualAd: React.FC<ContextualAdProps> = ({
   const [ad, setAd] = useState<AdData | null>(null);
   const [isVisible, setIsVisible] = useState(false);
   const [hasBeenShown, setHasBeenShown] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    // For testing, don't check session storage initially
-    const fetchAd = async () => {
-      try {
-        console.log('Fetching ad for trigger:', trigger);
-        const response = await fetch(`/api/ads/contextual/${trigger}`);
-        console.log('Ad response status:', response.status);
-        if (response.ok) {
-          const adData = await response.json();
-          console.log('Ad data received:', adData);
-          setAd(adData);
-          setIsVisible(true);
+    let isMounted = true;
 
-          // Mark this ad as shown
-          const updatedShownAds = [...shownAds, trigger];
-          sessionStorage.setItem('shownContextualAds', JSON.stringify(updatedShownAds));
-          setHasBeenShown(true);
+    const fetchAdWithCleanup = async () => {
+      if (trigger && isMounted) {
+        try {
+          setLoading(true);
+          console.log('Fetching ad for trigger:', trigger);
+          const response = await fetch(`/api/ads/contextual/${trigger}`);
+          console.log('Ad response status:', response.status);
+          if (response.ok && isMounted) {
+            const adData = await response.json();
+            console.log('Ad data received:', adData);
+            setAd(adData);
+            setIsVisible(true);
+
+            // Mark this ad as shown
+            const updatedShownAds = [...shownAds, trigger];
+            sessionStorage.setItem('shownContextualAds', JSON.stringify(updatedShownAds));
+            setHasBeenShown(true);
+          }
+        } catch (error) {
+          if (isMounted) {
+            console.error('Failed to fetch contextual ad:', error);
+          }
+        } finally {
+          if (isMounted) {
+            setLoading(false);
+          }
         }
-      } catch (error) {
-        console.error('Failed to fetch contextual ad:', error);
       }
     };
 
-    fetchAd();
+    if (trigger) {
+      fetchAdWithCleanup();
+    }
+
+    return () => {
+      isMounted = false;
+    };
   }, [trigger]);
 
   const handleClose = () => {
