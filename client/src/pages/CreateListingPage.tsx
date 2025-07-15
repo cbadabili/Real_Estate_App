@@ -33,6 +33,10 @@ const CreateListingPage = () => {
   const { register, handleSubmit, watch, formState: { errors } } = useForm();
   const watchedListingType = watch('listingType');
   const watchedPropertyType = watch('propertyType');
+  const [formData, setFormData] = useState({
+    city: '',
+    state: '',
+  });
 
   const totalSteps = 5;
   const progress = ((currentStep - 1) / (totalSteps - 1)) * 100;
@@ -81,7 +85,7 @@ const CreateListingPage = () => {
         toast.error('File size must be less than 10MB');
         return;
       }
-      
+
       const reader = new FileReader();
       reader.onload = (event) => {
         if (event.target?.result) {
@@ -95,7 +99,7 @@ const CreateListingPage = () => {
   const startCamera = async () => {
     try {
       setIsCapturingPhoto(true);
-      
+
       // Check if camera is available
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
         throw new Error('Camera not supported on this device');
@@ -108,7 +112,7 @@ const CreateListingPage = () => {
           height: { ideal: 1080, min: 480 }
         } 
       });
-      
+
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
         await videoRef.current.play();
@@ -116,7 +120,7 @@ const CreateListingPage = () => {
     } catch (error) {
       console.error('Error accessing camera:', error);
       let errorMessage = 'Unable to access camera. ';
-      
+
       if (error.name === 'NotAllowedError') {
         errorMessage += 'Please allow camera permissions and try again.';
       } else if (error.name === 'NotFoundError') {
@@ -126,7 +130,7 @@ const CreateListingPage = () => {
       } else {
         errorMessage += 'Please check your camera settings.';
       }
-      
+
       toast.error(errorMessage);
       setIsCapturingPhoto(false);
     }
@@ -137,10 +141,10 @@ const CreateListingPage = () => {
       const video = videoRef.current;
       const canvas = canvasRef.current;
       const context = canvas.getContext('2d');
-      
+
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
-      
+
       if (context) {
         context.drawImage(video, 0, 0);
         const imageData = canvas.toDataURL('image/jpeg', 0.8);
@@ -452,6 +456,133 @@ const CreateListingPage = () => {
                         <p className="text-error-600 text-sm mt-1">{errors.address.message as string}</p>
                       )}
                     </div>
+                     <div>
+                  <label className="block text-sm font-medium text-neutral-700 mb-2">
+                    District
+                  </label>
+                  <select
+                    value={formData.state || ''}
+                    onChange={(e) => {
+                      setFormData({ ...formData, state: e.target.value, city: '' });
+                    }}
+                    className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent transition-all"
+                    required
+                  >
+                    <option value="">Select District</option>
+                    <option value="South-East">South-East</option>
+                    <option value="North-East">North-East</option>
+                    <option value="North-West">North-West</option>
+                    <option value="Central">Central</option>
+                    <option value="Kweneng">Kweneng</option>
+                    <option value="Southern">Southern</option>
+                    <option value="Kgatleng">Kgatleng</option>
+                    <option value="Kgalagadi">Kgalagadi</option>
+                    <option value="Chobe">Chobe</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-neutral-700 mb-2">
+                    City/Town
+                  </label>
+                  <select
+                    value={formData.city || ''}
+                    onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                    className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent transition-all"
+                    required
+                    disabled={!formData.state}
+                  >
+                    <option value="">Select City/Town</option>
+                    {formData.state === 'South-East' && (
+                      <>
+                        <option value="Gaborone">Gaborone</option>
+                        <option value="Lobatse">Lobatse</option>
+                        <option value="Ramotswa">Ramotswa</option>
+                        <option value="Kanye">Kanye</option>
+                        <option value="Molepolole">Molepolole</option>
+                        <option value="Mogoditshane">Mogoditshane</option>
+                        <option value="Tlokweng">Tlokweng</option>
+                        <option value="Gabane">Gabane</option>
+                        <option value="Mmopane">Mmopane</option>
+                        <option value="Kopong">Kopong</option>
+                      </>
+                    )}
+                    {formData.state === 'North-East' && (
+                      <>
+                        <option value="Francistown">Francistown</option>
+                        <option value="Selebi-Phikwe">Selebi-Phikwe</option>
+                        <option value="Tonota">Tonota</option>
+                        <option value="Tutume">Tutume</option>
+                        <option value="Nata">Nata</option>
+                        <option value="Bobonong">Bobonong</option>
+                        <option value="Tati">Tati</option>
+                      </>
+                    )}
+                    {formData.state === 'North-West' && (
+                      <>
+                        <option value="Maun">Maun</option>
+                        <option value="Kasane">Kasane</option>
+                        <option value="Shakawe">Shakawe</option>
+                        <option value="Gumare">Gumare</option>
+                        <option value="Nokaneng">Nokaneng</option>
+                        <option value="Seronga">Seronga</option>
+                        <option value="Tsau">Tsau</option>
+                      </>
+                    )}
+                    {formData.state === 'Central' && (
+                      <>
+                        <option value="Serowe">Serowe</option>
+                        <option value="Palapye">Palapye</option>
+                        <option value="Mahalapye">Mahalapye</option>
+                        <option value="Shoshong">Shoshong</option>
+                        <option value="Boteti">Boteti</option>
+                        <option value="Orapa">Orapa</option>
+                        <option value="Letlhakane">Letlhakane</option>
+                      </>
+                    )}
+                    {formData.state === 'Kweneng' && (
+                      <>
+                        <option value="Molepolole">Molepolole</option>
+                        <option value="Thamaga">Thamaga</option>
+                        <option value="Kumakwane">Kumakwane</option>
+                        <option value="Letlhakeng">Letlhakeng</option>
+                        <option value="Mokatse">Mokatse</option>
+                      </>
+                    )}
+                    {formData.state === 'Southern' && (
+                      <>
+                        <option value="Kanye">Kanye</option>
+                        <option value="Jwaneng">Jwaneng</option>
+                        <option value="Tshabong">Tshabong</option>
+                        <option value="Goodhope">Goodhope</option>
+                        <option value="Kang">Kang</option>
+                        <option value="Hukuntsi">Hukuntsi</option>
+                      </>
+                    )}
+                    {formData.state === 'Kgatleng' && (
+                      <>
+                        <option value="Mochudi">Mochudi</option>
+                        <option value="Artesia">Artesia</option>
+                        <option value="Oodi">Oodi</option>
+                      </>
+                    )}
+                    {formData.state === 'Kgalagadi' && (
+                      <>
+                        <option value="Ghanzi">Ghanzi</option>
+                        <option value="Tsabong">Tsabong</option>
+                        <option value="Hukuntsi">Hukuntsi</option>
+                        <option value="Kang">Kang</option>
+                      </>
+                    )}
+                    {formData.state === 'Chobe' && (
+                      <>
+                        <option value="Kasane">Kasane</option>
+                        <option value="Kazungula">Kazungula</option>
+                        <option value="Pandamatenga">Pandamatenga</option>
+                      </>
+                    )}
+                  </select>
+                </div>
 
                     {/* Plot Size - Show for Farm, House, Commercial and Land */}
                     {(watchedPropertyType === 'farm' || watchedPropertyType === 'house' || watchedPropertyType === 'commercial' || watchedPropertyType === 'land') && (
@@ -1008,7 +1139,7 @@ const CreateListingPage = () => {
                                 className="w-full h-64 object-cover"
                               />
                             </div>
-                            
+
                             {/* Navigation arrows */}
                             {uploadedImages.length > 1 && (
                               <>
@@ -1028,12 +1159,12 @@ const CreateListingPage = () => {
                                 </button>
                               </>
                             )}
-                            
+
                             {/* Image counter */}
                             <div className="absolute top-2 left-2 px-2 py-1 bg-black bg-opacity-70 text-white text-xs rounded">
                               {currentImageIndex + 1} / {uploadedImages.length}
                             </div>
-                            
+
                             {/* Main photo indicator */}
                             {currentImageIndex === 0 && (
                               <div className="absolute top-2 right-2 px-2 py-1 bg-beedab-blue text-white text-xs rounded">

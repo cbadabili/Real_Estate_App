@@ -384,6 +384,7 @@ const RealPropertiesPage = () => {
                   <option value="house">House</option>
                   <option value="apartment">Apartment</option>
                   <option value="townhouse">Townhouse</option>
+                  <option value="condo">Condo</option>
                   <option value="commercial">Commercial</option>
                   <option value="farm">Farm</option>
                   <option value="land">Land</option>
@@ -419,14 +420,23 @@ const RealPropertiesPage = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-neutral-700 mb-2">Location</label>
-                <input
-                  type="text"
-                  placeholder="City or area..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full px-3 py-2 border border-neutral-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                />
+                <label className="block text-sm font-medium text-neutral-700 mb-2">District</label>
+                <select 
+                  className="w-full px-3 py-2 border border-neutral-300 rounded-md"
+                  onChange={(e) => setFilters(prev => ({ ...prev, state: e.target.value || undefined }))}
+                  value={filters.state || ''}
+                >
+                  <option value="">All Districts</option>
+                  <option value="South-East">South-East</option>
+                  <option value="North-East">North-East</option>
+                  <option value="North-West">North-West</option>
+                  <option value="Central">Central</option>
+                  <option value="Kweneng">Kweneng</option>
+                  <option value="Southern">Southern</option>
+                  <option value="Kgatleng">Kgatleng</option>
+                  <option value="Kgalagadi">Kgalagadi</option>
+                  <option value="Chobe">Chobe</option>
+                </select>
               </div>
             </div>
           </div>
