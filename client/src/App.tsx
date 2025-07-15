@@ -11,6 +11,7 @@ import PropertiesPage from './pages/PropertiesPage';
 import RealPropertiesPage from './pages/RealPropertiesPage';
 import { PlotsPage } from './pages/PlotsPage';
 import RentPage from './pages/RentPage';
+import RentalsPage from './pages/RentalsPage';
 import RentOutPage from './pages/RentOutPage';
 import RentalsPage from './pages/RentalsPage';
 import RentalDetailsPage from './pages/RentalDetailsPage';
@@ -108,6 +109,7 @@ function App() {
             <Route path="/properties/:id" element={<PropertyDetailsPage />} />
             <Route path="/plots" element={<PlotsPage />} />
             <Route path="/rent" element={<RentPage />} />
+          <Route path="/rentals" element={<RentalsPage />} />
             <Route path="/rental/:id" element={<RentalDetailsPage />} />
             <Route path="/rental-listing-wizard" element={<RentalListingWizard />} />
             <Route path="/rental-listing-wizard/:id" element={<RentalListingWizard />} />

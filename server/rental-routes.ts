@@ -24,39 +24,7 @@ export function createRentalRoutes(db: Database): express.Router {
     }
   });
 
-  // Get rental by ID
-  router.get('/:id', async (req, res) => {
-    try {
-      const id = parseInt(req.params.id);
-      if (isNaN(id)) {
-        return res.status(400).json({
-          success: false,
-          error: 'Invalid rental ID'
-        });
-      }
-
-      const rental = rentalStorage.getRentalById(id);
-      if (!rental) {
-        return res.status(404).json({
-          success: false,
-          error: 'Rental not found'
-        });
-      }
-
-      res.json({
-        success: true,
-        data: rental
-      });
-    } catch (error) {
-      console.error('Error fetching rental:', error);
-      res.status(500).json({
-        success: false,
-        error: 'Failed to fetch rental'
-      });
-    }
-  });
-
-  // Search rentals
+  // Search rentals (must come before /:id route)
   router.get('/search', async (req, res) => {
     try {
       const filters = {
@@ -102,6 +70,40 @@ export function createRentalRoutes(db: Database): express.Router {
       });
     }
   });
+
+  // Get rental by ID
+  router.get('/:id', async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({
+          success: false,
+          error: 'Invalid rental ID'
+        });
+      }
+
+      const rental = rentalStorage.getRentalById(id);
+      if (!rental) {
+        return res.status(404).json({
+          success: false,
+          error: 'Rental not found'
+        });
+      }
+
+      res.json({
+        success: true,
+        data: rental
+      });
+    } catch (error) {
+      console.error('Error fetching rental:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to fetch rental'
+      });
+    }
+  });
+
+  
 
   // Create new rental
   router.post('/', async (req, res) => {
