@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
@@ -14,7 +14,9 @@ import {
   Building2,
   Store,
   Tractor,
-  Mountain
+  Mountain,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -23,6 +25,11 @@ const CreateListingPage = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isCapturingPhoto, setIsCapturingPhoto] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const { register, handleSubmit, watch, formState: { errors } } = useForm();
   const watchedListingType = watch('listingType');
   const watchedPropertyType = watch('propertyType');
@@ -70,6 +77,11 @@ const CreateListingPage = () => {
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     files.forEach(file => {
+      if (file.size > 10 * 1024 * 1024) { // 10MB limit
+        toast.error('File size must be less than 10MB');
+        return;
+      }
+      
       const reader = new FileReader();
       reader.onload = (event) => {
         if (event.target?.result) {
@@ -80,8 +92,78 @@ const CreateListingPage = () => {
     });
   };
 
+  const startCamera = async () => {
+    try {
+      setIsCapturingPhoto(true);
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        video: { 
+          facingMode: 'environment',
+          width: { ideal: 1920 },
+          height: { ideal: 1080 }
+        } 
+      });
+      
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        videoRef.current.play();
+      }
+    } catch (error) {
+      console.error('Error accessing camera:', error);
+      toast.error('Unable to access camera. Please check permissions.');
+      setIsCapturingPhoto(false);
+    }
+  };
+
+  const capturePhoto = () => {
+    if (videoRef.current && canvasRef.current) {
+      const video = videoRef.current;
+      const canvas = canvasRef.current;
+      const context = canvas.getContext('2d');
+      
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      
+      if (context) {
+        context.drawImage(video, 0, 0);
+        const imageData = canvas.toDataURL('image/jpeg', 0.8);
+        setUploadedImages(prev => [...prev, imageData]);
+        stopCamera();
+        toast.success('Photo captured successfully!');
+      }
+    }
+  };
+
+  const stopCamera = () => {
+    if (videoRef.current && videoRef.current.srcObject) {
+      const stream = videoRef.current.srcObject as MediaStream;
+      stream.getTracks().forEach(track => track.stop());
+      videoRef.current.srcObject = null;
+    }
+    setIsCapturingPhoto(false);
+  };
+
   const removeImage = (index: number) => {
-    setUploadedImages(prev => prev.filter((_, i) => i !== index));
+    setUploadedImages(prev => {
+      const newImages = prev.filter((_, i) => i !== index);
+      if (currentImageIndex >= newImages.length && newImages.length > 0) {
+        setCurrentImageIndex(newImages.length - 1);
+      } else if (newImages.length === 0) {
+        setCurrentImageIndex(0);
+      }
+      return newImages;
+    });
+  };
+
+  const nextImage = () => {
+    if (uploadedImages.length > 0) {
+      setCurrentImageIndex((prev) => (prev + 1) % uploadedImages.length);
+    }
+  };
+
+  const prevImage = () => {
+    if (uploadedImages.length > 0) {
+      setCurrentImageIndex((prev) => (prev - 1 + uploadedImages.length) % uploadedImages.length);
+    }
   };
 
   const nextStep = () => {
@@ -825,46 +907,71 @@ const CreateListingPage = () => {
                         Property Photos *
                       </label>
 
-                      <div className="border-2 border-dashed border-neutral-300 rounded-xl p-8 text-center hover:border-primary-400 transition-colors">
-                        <input
-                          type="file"
-                          multiple
-                          accept="image/*"
-                          onChange={handleImageUpload}
-                          capture="environment"
-                          className="hidden"
-                          id="image-upload"
-                        />
-                        <label htmlFor="image-upload" className="cursor-pointer">
+                      {!isCapturingPhoto ? (
+                        <div className="border-2 border-dashed border-neutral-300 rounded-xl p-8 text-center hover:border-beedab-blue transition-colors">
+                          <input
+                            ref={fileInputRef}
+                            type="file"
+                            multiple
+                            accept="image/*"
+                            onChange={handleImageUpload}
+                            className="hidden"
+                            id="image-upload"
+                          />
                           <Upload className="h-12 w-12 text-neutral-400 mx-auto mb-4" />
                           <h3 className="text-lg font-medium text-neutral-900 mb-2">Upload Photos</h3>
                           <p className="text-neutral-600 mb-4">Drag and drop images here, click to browse, or take photos</p>
-                          <div className="flex justify-center space-x-3">
+                          <div className="flex justify-center space-x-3 flex-wrap gap-2">
                             <button
                               type="button"
-                              className="inline-flex items-center px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-medium transition-colors"
+                              onClick={() => fileInputRef.current?.click()}
+                              className="inline-flex items-center px-4 py-2 bg-beedab-blue hover:bg-beedab-darkblue text-white rounded-lg font-medium transition-colors"
                             >
-                              <Camera className="mr-2 h-4 w-4" />
+                              <Upload className="mr-2 h-4 w-4" />
                               Choose Files
                             </button>
-                            <label
-                              htmlFor="camera-capture"
-                              className="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors cursor-pointer"
+                            <button
+                              type="button"
+                              onClick={startCamera}
+                              className="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors"
                             >
                               <Camera className="mr-2 h-4 w-4" />
                               Take Photo
-                            </label>
-                            <input
-                              type="file"
-                              id="camera-capture"
-                              accept="image/*"
-                              capture="environment"
-                              onChange={handleImageUpload}
-                              className="hidden"
-                            />
+                            </button>
                           </div>
-                        </label>
-                      </div>
+                          <p className="text-xs text-neutral-500 mt-3">
+                            Supported formats: JPG, PNG, WebP (Max 10MB each)
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="bg-black rounded-xl p-4">
+                          <div className="relative">
+                            <video
+                              ref={videoRef}
+                              className="w-full h-64 object-cover rounded-lg"
+                              playsInline
+                              muted
+                            />
+                            <div className="absolute bottom-4 left-0 right-0 flex justify-center space-x-4">
+                              <button
+                                type="button"
+                                onClick={capturePhoto}
+                                className="bg-white text-black p-3 rounded-full hover:bg-gray-100 transition-colors"
+                              >
+                                <Camera className="h-6 w-6" />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={stopCamera}
+                                className="bg-red-600 text-white p-3 rounded-full hover:bg-red-700 transition-colors"
+                              >
+                                <X className="h-6 w-6" />
+                              </button>
+                            </div>
+                          </div>
+                          <canvas ref={canvasRef} className="hidden" />
+                        </div>
+                      )}
 
                       {uploadedImages.length > 0 && (
                         <div className="mt-6">
@@ -876,34 +983,43 @@ const CreateListingPage = () => {
                           <div className="relative mb-4">
                             <div className="aspect-w-16 aspect-h-9 bg-neutral-100 rounded-lg overflow-hidden">
                               <img
-                                src={uploadedImages[0]}
-                                alt="Main preview"
+                                src={uploadedImages[currentImageIndex]}
+                                alt={`Property ${currentImageIndex + 1}`}
                                 className="w-full h-64 object-cover"
                               />
                             </div>
+                            
+                            {/* Navigation arrows */}
                             {uploadedImages.length > 1 && (
-                              <div className="absolute inset-y-0 left-0 flex items-center">
+                              <>
                                 <button
                                   type="button"
-                                  className="ml-2 p-2 bg-black bg-opacity-50 text-white rounded-full hover:bg-opacity-75 transition-all"
+                                  onClick={prevImage}
+                                  className="absolute inset-y-0 left-0 flex items-center justify-center w-12 bg-black bg-opacity-30 hover:bg-opacity-50 text-white transition-all"
                                 >
-                                  <Plus className="h-4 w-4 rotate-180" />
+                                  <ChevronLeft className="h-6 w-6" />
                                 </button>
-                              </div>
-                            )}
-                            {uploadedImages.length > 1 && (
-                              <div className="absolute inset-y-0 right-0 flex items-center">
                                 <button
                                   type="button"
-                                  className="mr-2 p-2 bg-black bg-opacity-50 text-white rounded-full hover:bg-opacity-75 transition-all"
+                                  onClick={nextImage}
+                                  className="absolute inset-y-0 right-0 flex items-center justify-center w-12 bg-black bg-opacity-30 hover:bg-opacity-50 text-white transition-all"
                                 >
-                                  <Plus className="h-4 w-4" />
+                                  <ChevronRight className="h-6 w-6" />
                                 </button>
-                              </div>
+                              </>
                             )}
-                            <div className="absolute top-2 left-2 px-2 py-1 bg-primary-600 text-white text-xs rounded">
-                              Main Photo
+                            
+                            {/* Image counter */}
+                            <div className="absolute top-2 left-2 px-2 py-1 bg-black bg-opacity-70 text-white text-xs rounded">
+                              {currentImageIndex + 1} / {uploadedImages.length}
                             </div>
+                            
+                            {/* Main photo indicator */}
+                            {currentImageIndex === 0 && (
+                              <div className="absolute top-2 right-2 px-2 py-1 bg-beedab-blue text-white text-xs rounded">
+                                Main Photo
+                              </div>
+                            )}
                           </div>
 
                           {/* Thumbnail Grid */}
@@ -913,15 +1029,28 @@ const CreateListingPage = () => {
                                 <img
                                   src={image}
                                   alt={`Property ${index + 1}`}
-                                  className="w-full h-16 object-cover rounded cursor-pointer hover:opacity-75 transition-opacity"
+                                  className={`w-full h-16 object-cover rounded cursor-pointer transition-all ${
+                                    currentImageIndex === index 
+                                      ? 'ring-2 ring-beedab-blue opacity-100' 
+                                      : 'hover:opacity-75'
+                                  }`}
+                                  onClick={() => setCurrentImageIndex(index)}
                                 />
                                 <button
                                   type="button"
-                                  onClick={() => removeImage(index)}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    removeImage(index);
+                                  }}
                                   className="absolute -top-1 -right-1 p-1 bg-red-600 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
                                 >
                                   <X className="h-3 w-3" />
                                 </button>
+                                {index === 0 && (
+                                  <div className="absolute bottom-0 left-0 right-0 bg-beedab-blue text-white text-xs text-center py-1 rounded-b">
+                                    Main
+                                  </div>
+                                )}
                               </div>
                             ))}
                           </div>
