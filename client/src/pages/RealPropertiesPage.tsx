@@ -46,10 +46,13 @@ const RealPropertiesPage = () => {
     }
   }, [location.search]);
 
-  const { data: properties, isLoading, error } = useProperties({
+  const { data: properties = [], isLoading, error } = useProperties({
     ...filters,
     ...(searchTerm && { city: searchTerm })
   });
+
+  // Handle empty or undefined properties
+  const safeProperties = Array.isArray(properties) ? properties : [];
 
   const handlePropertyClick = (property: any) => {
     navigate(`/property/${property.id}`);
@@ -77,7 +80,7 @@ const RealPropertiesPage = () => {
           <div className="absolute inset-0 bg-gradient-to-br from-green-100 via-yellow-50 to-blue-100 opacity-30"></div>
 
           {/* Property markers */}
-          {properties && properties.slice(0, 8).map((property: any, index: number) => (
+          {safeProperties.slice(0, 8).map((property: any, index: number) => (
             <div
               key={property.id}
               className="absolute cursor-pointer group"

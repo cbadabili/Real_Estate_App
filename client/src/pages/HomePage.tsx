@@ -216,7 +216,7 @@ const HomePage = () => {
             >
               <h1 className="text-3xl lg:text-5xl font-bold text-white mb-4 leading-tight">
                 Find Your Perfect Property in
-                <span className="block bg-gradient-to-r from-beedab-lightblue to-beedab-accent bg-clip-text text-transparent">
+                <span className="block text-white">
                   Beautiful Botswana
                 </span>
               </h1>
@@ -491,7 +491,7 @@ const HomePage = () => {
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
               <Link
-                to="/create-property"
+                to="/create-listing"
                 className="inline-flex items-center justify-center px-8 py-4 bg-transparent border-2 border-white text-white font-semibold rounded-xl hover:bg-white hover:text-beedab-darkblue transition-colors"
               >
                 List Your Property

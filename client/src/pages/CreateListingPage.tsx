@@ -95,21 +95,39 @@ const CreateListingPage = () => {
   const startCamera = async () => {
     try {
       setIsCapturingPhoto(true);
+      
+      // Check if camera is available
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        throw new Error('Camera not supported on this device');
+      }
+
       const stream = await navigator.mediaDevices.getUserMedia({ 
         video: { 
           facingMode: 'environment',
-          width: { ideal: 1920 },
-          height: { ideal: 1080 }
+          width: { ideal: 1920, min: 640 },
+          height: { ideal: 1080, min: 480 }
         } 
       });
       
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
-        videoRef.current.play();
+        await videoRef.current.play();
       }
     } catch (error) {
       console.error('Error accessing camera:', error);
-      toast.error('Unable to access camera. Please check permissions.');
+      let errorMessage = 'Unable to access camera. ';
+      
+      if (error.name === 'NotAllowedError') {
+        errorMessage += 'Please allow camera permissions and try again.';
+      } else if (error.name === 'NotFoundError') {
+        errorMessage += 'No camera found on this device.';
+      } else if (error.name === 'NotReadableError') {
+        errorMessage += 'Camera is being used by another application.';
+      } else {
+        errorMessage += 'Please check your camera settings.';
+      }
+      
+      toast.error(errorMessage);
       setIsCapturingPhoto(false);
     }
   };
@@ -155,13 +173,13 @@ const CreateListingPage = () => {
   };
 
   const nextImage = () => {
-    if (uploadedImages.length > 0) {
+    if (uploadedImages.length > 1) {
       setCurrentImageIndex((prev) => (prev + 1) % uploadedImages.length);
     }
   };
 
   const prevImage = () => {
-    if (uploadedImages.length > 0) {
+    if (uploadedImages.length > 1) {
       setCurrentImageIndex((prev) => (prev - 1 + uploadedImages.length) % uploadedImages.length);
     }
   };

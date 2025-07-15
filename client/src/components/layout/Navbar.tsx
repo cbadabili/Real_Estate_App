@@ -644,180 +644,74 @@ const Navbar = () => {
                     exit={{ opacity: 0, y: -10 }}
                     className="absolute top-full left-0 mt-2 w-80 bg-white rounded-md shadow-lg border border-neutral-200 z-50"
                   >
-                    <div className="p-3">
-                      <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide px-2 py-1 mb-2">Service Categories</div>
+                    <div className="p-3 w-72">
+                      <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide px-2 py-1 mb-3">Service Categories</div>
 
                       <Link
                         to="/marketplace/professionals"
-                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded mb-1"
+                        className="block px-4 py-3 text-sm text-neutral-700 hover:bg-neutral-100 rounded mb-2"
                         onClick={() => setServicesDropdownOpen(false)}
                       >
                         <div className="flex items-center">
-                          <Wrench className="h-4 w-4 mr-2 text-beedab-blue" />
+                          <Award className="h-5 w-5 mr-3 text-beedab-blue" />
                           <div>
-                            <div className="font-medium">Find a Pro</div>
-                            <div className="text-xs text-gray-500">Browse all service providers</div>
-                          </div>
-                        </div>
-                      </Link>
-
-                      <div className="border-t border-gray-100 my-2"></div>
-
-                      <Link
-                        to="/marketplace?category=Legal"
-                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded mb-1"
-                        onClick={() => setServicesDropdownOpen(false)}
-                      >
-                        <div className="flex items-center">
-                          <FileText className="h-4 w-4 mr-2 text-beedab-blue" />
-                          <div>
-                            <div className="font-medium">Legal Services</div>
-                            <div className="text-xs text-gray-500">Conveyancing & contracts</div>
+                            <div className="font-semibold">Professional Services</div>
+                            <div className="text-xs text-gray-500">Legal, valuation, and professional services</div>
                           </div>
                         </div>
                       </Link>
 
                       <Link
-                        to="/marketplace?category=Finance"
-                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded mb-1"
+                        to="/marketplace/suppliers"
+                        className="block px-4 py-3 text-sm text-neutral-700 hover:bg-neutral-100 rounded mb-2"
                         onClick={() => setServicesDropdownOpen(false)}
                       >
                         <div className="flex items-center">
-                          <TrendingUp className="h-4 w-4 mr-2 text-beedab-blue" />
+                          <Package className="h-5 w-5 mr-3 text-beedab-blue" />
                           <div>
-                            <div className="font-medium">Finance & Insurance</div>
-                            <div className="text-xs text-gray-500">Loans, mortgages & insurance</div>
+                            <div className="font-semibold">Suppliers</div>
+                            <div className="text-xs text-gray-500">Building materials and supplies</div>
                           </div>
                         </div>
                       </Link>
 
                       <Link
-                        to="/marketplace?category=Construction"
-                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
+                        to="/marketplace/trades"
+                        className="block px-4 py-3 text-sm text-neutral-700 hover:bg-neutral-100 rounded mb-2"
                         onClick={() => setServicesDropdownOpen(false)}
                       >
                         <div className="flex items-center">
-                          <Building className="h-4 w-4 mr-2 text-beedab-blue" />
+                          <Wrench className="h-5 w-5 mr-3 text-beedab-blue" />
                           <div>
-                            <div className="font-medium">Construction & Building</div>
-                            <div className="text-xs text-gray-500">Contractors & builders</div>
-                          </div>
-                        </div>
-                      </Link>
-                       {/* Add more service categories here */}
-                       <Link
-                        to="/marketplace?category=HomeImprovement"
-                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
-                        onClick={() => setServicesDropdownOpen(false)}
-                      >
-                        <div className="flex items-center">
-                          <Hammer className="h-4 w-4 mr-2 text-beedab-blue" />
-                          <div>
-                            <div className="font-medium">Home Improvement</div>
-                            <div className="text-xs text-gray-500">Renovations and repairs</div>
+                            <div className="font-semibold">Artisans</div>
+                            <div className="text-xs text-gray-500">Skilled trades and construction</div>
                           </div>
                         </div>
                       </Link>
 
                       <Link
-                        to="/marketplace?category=Design"
-                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
+                        to="/marketplace/training"
+                        className="block px-4 py-3 text-sm text-neutral-700 hover:bg-neutral-100 rounded mb-3"
                         onClick={() => setServicesDropdownOpen(false)}
                       >
                         <div className="flex items-center">
-                          <Sparkles className="h-4 w-4 mr-2 text-beedab-blue" />
+                          <GraduationCap className="h-5 w-5 mr-3 text-beedab-blue" />
                           <div>
-                            <div className="font-medium">Design & Staging</div>
-                            <div className="text-xs text-gray-500">Interior design and staging</div>
-                          </div>
-                        </div>
-                      </Link>
-                      <Link
-                        to="/marketplace?category=Moving"
-                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
-                        onClick={() => setServicesDropdownOpen(false)}
-                      >
-                        <div className="flex items-center">
-                          <Truck className="h-4 w-4 mr-2 text-beedab-blue" />
-                          <div>
-                            <div className="font-medium">Moving Services</div>
-                            <div className="text-xs text-gray-500">Movers and relocation</div>
-                          </div>
-                        </div>
-                      </Link>
-                      <Link
-                        to="/marketplace?category=Photography"
-                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
-                        onClick={() => setServicesDropdownOpen(false)}
-                      >
-                        <div className="flex items-center">
-                          <Camera className="h-4 w-4 mr-2 text-beedab-blue" />
-                          <div>
-                            <div className="font-medium">Photography</div>
-                            <div className="text-xs text-gray-500">Real estate photography</div>
+                            <div className="font-semibold">Course Providers</div>
+                            <div className="text-xs text-gray-500">Professional development and training</div>
                           </div>
                         </div>
                       </Link>
 
-                      {/* Sign Up as a Pro, Supplier, Artisan, or Course Provider */}
-                      <div className="border-t border-gray-100 my-2"></div>
-                      <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide px-2 py-1">Become a Provider</div>
-
-                      <Link
-                        to="/register?providerType=pro"
-                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded mb-1"
-                        onClick={() => setServicesDropdownOpen(false)}
-                      >
-                        <div className="flex items-center">
-                          <UserPlus className="h-4 w-4 mr-2 text-beedab-blue" />
-                          <div>
-                            <div className="font-medium">Sign Up as a Pro</div>
-                            <div className="text-xs text-gray-500">Offer professional services</div>
-                          </div>
-                        </div>
-                      </Link>
-
-                      <Link
-                        to="/register?providerType=supplier"
-                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded mb-1"
-                        onClick={() => setServicesDropdownOpen(false)}
-                      >
-                        <div className="flex items-center">
-                          <Package className="h-4 w-4 mr-2 text-beedab-blue" />
-                          <div>
-                            <div className="font-medium">Sign Up as a Supplier</div>
-                            <div className="text-xs text-gray-500">Provide materials and supplies</div>
-                          </div>
-                        </div>
-                      </Link>
-
-                      <Link
-                        to="/register?providerType=artisan"
-                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded mb-1"
-                        onClick={() => setServicesDropdownOpen(false)}
-                      >
-                        <div className="flex items-center">
-                          <Hammer className="h-4 w-4 mr-2 text-beedab-blue" />
-                          <div>
-                            <div className="font-medium">Sign Up as an Artisan</div>
-                            <div className="text-xs text-gray-500">Offer handcrafted services</div>
-                          </div>
-                        </div>
-                      </Link>
-
-                      <Link
-                        to="/register?providerType=courseProvider"
-                        className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
-                        onClick={() => setServicesDropdownOpen(false)}
-                      >
-                        <div className="flex items-center">
-                          <GraduationCap className="h-4 w-4 mr-2 text-beedab-blue" />
-                          <div>
-                            <div className="font-medium">Sign Up as a Course Provider</div>
-                            <div className="text-xs text-gray-500">Offer training and courses</div>
-                          </div>
-                        </div>
-                      </Link>
+                      <div className="border-t border-gray-100 pt-3">
+                        <Link
+                          to="/marketplace"
+                          className="block px-4 py-2 text-center bg-beedab-blue text-white rounded-lg font-medium hover:bg-beedab-darkblue transition-colors"
+                          onClick={() => setServicesDropdownOpen(false)}
+                        >
+                          Join as Service Provider
+                        </Link>
+                      </div>
                     </div>
                   </motion.div>
                 )}

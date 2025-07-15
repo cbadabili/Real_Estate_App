@@ -36,39 +36,63 @@ const MapSearchPage = () => {
     }
   };
 
-  // Sample properties for map
-  const properties = [
-    {
-      id: 1,
-      title: 'Modern Family Home',
-      price: 'P2,500,000',
-      location: 'Gaborone West',
-      bedrooms: 3,
-      bathrooms: 2,
-      coordinates: { lat: -24.6282, lng: 25.9231 },
-      image: 'https://images.unsplash.com/photo-1605146769289-440113cc3d00?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'
-    },
-    {
-      id: 2,
-      title: 'Luxury Apartment',
-      price: 'P1,800,000',
-      location: 'Francistown CBD',
-      bedrooms: 2,
-      bathrooms: 2,
-      coordinates: { lat: -21.1699, lng: 27.5084 },
-      image: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'
-    },
-    {
-      id: 3,
-      title: 'Safari Lodge Villa',
-      price: 'P4,500,000',
-      location: 'Maun',
-      bedrooms: 5,
-      bathrooms: 4,
-      coordinates: { lat: -19.9834, lng: 23.4219 },
-      image: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'
-    }
-  ];
+  // Fetch real properties for map
+  const [properties, setProperties] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProperties = async () => {
+      try {
+        const response = await fetch('/api/properties');
+        const data = await response.json();
+        if (data.success && Array.isArray(data.data)) {
+          setProperties(data.data.slice(0, 10)); // Show first 10 properties
+        } else {
+          // Fallback sample data if no properties in database
+          setProperties([
+            {
+              id: 1,
+              title: 'Modern Family Home',
+              price: '2500000',
+              address: 'Gaborone West',
+              bedrooms: 3,
+              bathrooms: 2,
+              propertyType: 'house',
+              images: '["https://images.unsplash.com/photo-1605146769289-440113cc3d00?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80"]'
+            },
+            {
+              id: 2,
+              title: 'Luxury Apartment',
+              price: '1800000',
+              address: 'Francistown CBD',
+              bedrooms: 2,
+              bathrooms: 2,
+              propertyType: 'apartment',
+              images: '["https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80"]'
+            },
+            {
+              id: 3,
+              title: 'Safari Lodge Villa',
+              price: '4500000',
+              address: 'Maun',
+              bedrooms: 5,
+              bathrooms: 4,
+              propertyType: 'house',
+              images: '["https://images.unsplash.com/photo-1564013799919-ab600027ffc6?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80"]'
+            }
+          ]);
+        }
+      } catch (error) {
+        console.error('Error fetching properties:', error);
+        // Use fallback data
+        setProperties([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProperties();
+  }, []);
 
   return (
     <motion.div
@@ -119,24 +143,40 @@ const MapSearchPage = () => {
             </div>
           </div>
 
-          {/* Property markers simulation */}
+          {/* Property markers */}
           <div className="absolute inset-0">
-            {properties.map((property, index) => (
-              <div
-                key={property.id}
-                className={`absolute w-8 h-8 bg-beedab-blue rounded-full flex items-center justify-center text-white text-sm font-bold cursor-pointer hover:bg-beedab-darkblue transition-colors shadow-lg ${
-                  index === 0 ? 'top-1/3 left-1/4' : 
-                  index === 1 ? 'top-1/4 right-1/3' : 
-                  'bottom-1/3 left-1/3'
-                }`}
-                onClick={() => setSelectedProperty(property)}
-                style={{
-                  transform: selectedProperty?.id === property.id ? 'scale(1.2)' : 'scale(1)'
-                }}
-              >
-                {index + 1}
-              </div>
-            ))}
+            {!loading && properties.map((property, index) => {
+              const imageUrl = property.images ? 
+                (typeof property.images === 'string' ? 
+                  JSON.parse(property.images)[0] : 
+                  property.images[0]) : 
+                'https://images.unsplash.com/photo-1605146769289-440113cc3d00?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80';
+              
+              return (
+                <div
+                  key={property.id}
+                  className={`absolute w-10 h-10 bg-beedab-blue rounded-full flex items-center justify-center text-white text-xs font-bold cursor-pointer hover:bg-beedab-darkblue transition-all shadow-lg border-2 border-white ${
+                    index === 0 ? 'top-1/3 left-1/4' : 
+                    index === 1 ? 'top-1/4 right-1/3' : 
+                    index === 2 ? 'bottom-1/3 left-1/3' :
+                    index === 3 ? 'top-1/2 left-1/2' :
+                    `top-${20 + (index % 3) * 20}% left-${15 + (index % 4) * 20}%`
+                  }`}
+                  onClick={() => setSelectedProperty({
+                    ...property,
+                    price: `P${parseInt(property.price || '0').toLocaleString()}`,
+                    location: property.address,
+                    image: imageUrl
+                  })}
+                  style={{
+                    transform: selectedProperty?.id === property.id ? 'scale(1.3)' : 'scale(1)',
+                    zIndex: selectedProperty?.id === property.id ? 10 : 5
+                  }}
+                >
+                  P{Math.round(parseInt(property.price || '0') / 100000)}L
+                </div>
+              );
+            })}
           </div>
 
           {/* Selected Property Popup */}
