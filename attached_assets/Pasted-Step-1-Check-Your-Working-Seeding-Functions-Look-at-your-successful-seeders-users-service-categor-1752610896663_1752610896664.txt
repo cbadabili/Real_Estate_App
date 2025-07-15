@@ -1,0 +1,66 @@
+Step 1: Check Your Working Seeding Functions
+Look at your successful seeders (users, service categories, marketplace providers). They likely use one of these patterns:
+Pattern A: Drizzle ORM Methods
+typescript// This is what your working seeders probably look like
+await db.insert(users).values([
+  { name: 'John', email: 'john@example.com' }
+]);
+
+// Or
+await db.select().from(users).where(eq(users.id, 1));
+Pattern B: Raw SQLite
+typescript// This is what's causing your error
+const stmt = db.prepare('INSERT INTO users (name, email) VALUES (?, ?)');
+stmt.run('John', 'john@example.com');
+Step 2: Check Your Database Connection Setup
+Look for these files in your project:
+
+server/database.ts or server/db.ts
+server/schema.ts or similar
+
+Your setup probably looks like:
+typescript// Database setup (what you're likely using)
+import { drizzle } from 'drizzle-orm/better-sqlite3';
+import Database from 'better-sqlite3';
+
+const sqlite = new Database('beedab.db');
+export const db = drizzle(sqlite); // ← This is Drizzle instance
+
+// NOT this (raw SQLite):
+export const db = new Database('beedab.db'); // ← This has .prepare()
+Step 3: Quick Diagnosis
+Check your working seeders:
+
+Look at server/user-seed.ts or similar working files
+See if they use db.insert() or db.prepare()
+Check what database instance they receive as parameter
+
+Common patterns I expect to find:
+
+Working seeders: Use db.insert(tableName).values(data)
+Broken seeder: Uses db.prepare('INSERT INTO...')
+
+Step 4: Fix Your rental-seed.ts
+Once you confirm the pattern, update rental-seed.ts to match. Most likely:
+typescript// Instead of:
+const stmt = db.prepare('INSERT INTO rental_listings...');
+
+// Use:
+await db.insert(rentalListings).values([
+  {
+    property_id: 1,
+    title: 'Modern Apartment',
+    // ... other fields
+  }
+]);
+Quick Check Commands
+Run these in your project to identify the patterns:
+bash# Check how other seeders work
+grep -r "db\." server/*seed*.ts
+
+# Check your database setup
+cat server/database.ts  # or wherever your DB is configured
+
+# Check your schema definitions
+cat server/schema.ts
+Can you share what you find in your working seeder files (like user-seed.ts or service-seed.ts)? This will help me give you the exact pattern to follow.
