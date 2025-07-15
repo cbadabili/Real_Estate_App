@@ -127,6 +127,9 @@ export const getAllTowns = (): Town[] => {
   return botswanaDistricts.flatMap(district => district.towns);
 };
 
+// Alias for getAllTowns to match expected export name
+export const getAllCities = getAllTowns;
+
 export const getTownsByDistrict = (districtName: string): Town[] => {
   const district = botswanaDistricts.find(d => d.name === districtName);
   return district ? district.towns : [];
@@ -150,6 +153,20 @@ export const getNearbyTowns = (lat: number, lng: number, radiusKm: number = 50):
     const distance = calculateDistance(lat, lng, town.coordinates.lat, town.coordinates.lng);
     return distance <= radiusKm;
   });
+};
+
+export const getAllDistricts = (): District[] => {
+  return botswanaDistricts;
+};
+
+export const getCityByName = (name: string): Town | undefined => {
+  return findTownByName(name);
+};
+
+export const getWardsByCity = (cityName: string): string[] => {
+  // For now, return empty array as wards are not defined in the current data structure
+  // This can be expanded later if ward data is added
+  return [];
 };
 
 // Calculate distance between two coordinates using Haversine formula
