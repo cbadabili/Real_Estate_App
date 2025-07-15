@@ -1,502 +1,323 @@
-import { Router } from 'express';
-import { z } from 'zod';
-import { rentalStorage } from './rental-storage';
-import { authenticate } from './auth-middleware';
+import express from 'express';
+import { RentalStorage } from './rental-storage';
+import { Database } from 'better-sqlite3';
 
-const router = Router();
+export function createRentalRoutes(db: Database): express.Router {
+  const router = express.Router();
+  const rentalStorage = new RentalStorage(db);
 
-// Validation schemas
-const rentalListingSchema = z.object({
-  title: z.string().min(1),
-  description: z.string().min(1),
-  address: z.string().min(1),
-  city: z.string().min(1),
-  district: z.string().min(1),
-  property_type: z.string().min(1),
-  bedrooms: z.number().min(0),
-  bathrooms: z.number().min(0),
-  square_meters: z.number().min(0),
-  monthly_rent: z.number().min(0),
-  deposit_amount: z.number().min(0),
-  lease_duration: z.number().min(1),
-  available_from: z.string(),
-  furnished: z.boolean(),
-  pets_allowed: z.boolean(),
-  parking_spaces: z.number().min(0),
-  photos: z.array(z.string()).optional(),
-  amenities: z.array(z.string()).optional(),
-  utilities_included: z.array(z.string()).optional()
-});
-
-const applicationSchema = z.object({
-  application_data: z.object({
-    employment_info: z.object({
-      employer: z.string(),
-      position: z.string(),
-      monthly_income: z.number(),
-      employment_duration: z.string()
-    }),
-    references: z.array(z.object({
-      name: z.string(),
-      relationship: z.string(),
-      contact: z.string()
-    })),
-    personal_info: z.object({
-      emergency_contact: z.string(),
-      preferred_move_in_date: z.string(),
-      reason_for_moving: z.string()
-    })
-  })
-});
-
-// 2.1 Rental Listing Management (for Landlords)
-
-// POST /api/rentals
-router.post('/rentals', authenticate, async (req, res) => {
-  try {
-    if (!req.user) {
-      return res.status(401).json({ error: 'Unauthorized' });
-    }
-
-    const validatedData = rentalListingSchema.parse(req.body);
-
-    const rental = await rentalStorage.createRental({
-      ...validatedData,
-      landlord_id: req.user?.id || 0,
-      status: 'active'
-    });
-
-    res.status(201).json({
-      success: true,
-      data: rental,
-      message: 'Rental listing created successfully'
-    });
-  } catch (error) {
-    console.error('Error creating rental:', error);
-    res.status(400).json({
-      success: false,
-      error: error instanceof z.ZodError ? error.errors : 'Invalid rental data'
-    });
-  }
-});
-
-// PUT /api/rentals/:rentalId
-router.put('/rentals/:rentalId', authenticate, async (req, res) => {
-  try {
-    const rentalId = parseInt(req.params.rentalId);
-    const validatedData = rentalListingSchema.partial().parse(req.body);
-
-    const rental = await rentalStorage.updateRental(rentalId, validatedData, req.user.id);
-
-    if (!rental) {
-      return res.status(404).json({
+  // Get all rentals
+  router.get('/', async (req, res) => {
+    try {
+      const rentals = rentalStorage.getAllRentals();
+      res.json({
+        success: true,
+        data: rentals,
+        count: rentals.length
+      });
+    } catch (error) {
+      console.error('Error fetching rentals:', error);
+      res.status(500).json({
         success: false,
-        error: 'Rental not found or not authorized'
+        error: 'Failed to fetch rentals'
       });
     }
+  });
 
-    res.json({
-      success: true,
-      data: rental,
-      message: 'Rental updated successfully'
-    });
-  } catch (error) {
-    console.error('Error updating rental:', error);
-    res.status(400).json({
-      success: false,
-      error: error instanceof z.ZodError ? error.errors : 'Invalid rental data'
-    });
-  }
-});
-
-// GET /api/landlord/rentals
-router.get('/landlord/rentals', authenticate, async (req, res) => {
-  try {
-    const rentals = await rentalStorage.getLandlordRentals(req.user.id);
-
-    res.json({
-      success: true,
-      data: rentals
-    });
-  } catch (error) {
-    console.error('Error fetching landlord rentals:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Failed to fetch rentals'
-    });
-  }
-});
-
-// POST /api/rentals/:rentalId/photos
-router.post('/rentals/:rentalId/photos', authenticate, async (req, res) => {
-  try {
-    const rentalId = parseInt(req.params.rentalId);
-    const { photos } = req.body;
-
-    if (!Array.isArray(photos)) {
-      return res.status(400).json({
-        success: false,
-        error: 'Photos must be an array'
-      });
-    }
-
-    const rental = await rentalStorage.updateRental(rentalId, { photos }, req.user.id);
-
-    if (!rental) {
-      return res.status(404).json({
-        success: false,
-        error: 'Rental not found or not authorized'
-      });
-    }
-
-    res.json({
-      success: true,
-      data: rental,
-      message: 'Photos uploaded successfully'
-    });
-  } catch (error) {
-    console.error('Error uploading photos:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Failed to upload photos'
-    });
-  }
-});
-
-// 2.2 Rental Discovery (for Renters)
-
-// GET /api/rentals/search
-router.get('/rentals/search', async (req, res) => {
-  try {
-    const {
-      location,
-      minPrice,
-      maxPrice,
-      bedrooms,
-      propertyType,
-      page = 0,
-      limit = 20
-    } = req.query;
-
-    const filters = {
-      location: location as string,
-      minPrice: minPrice ? parseInt(minPrice as string) : undefined,
-      maxPrice: maxPrice ? parseInt(maxPrice as string) : undefined,
-      bedrooms: bedrooms ? parseInt(bedrooms as string) : undefined,
-      propertyType: propertyType as string,
-      page: parseInt(page as string),
-      limit: parseInt(limit as string)
-    };
-
-    const rentals = await rentalStorage.searchRentals(filters);
-
-    res.json({
-      success: true,
-      data: rentals,
-      pagination: {
-        page: filters.page,
-        limit: filters.limit,
-        total: rentals.length
+  // Get rental by ID
+  router.get('/:id', async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({
+          success: false,
+          error: 'Invalid rental ID'
+        });
       }
-    });
-  } catch (error) {
-    console.error('Error searching rentals:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Failed to search rentals'
-    });
-  }
-});
 
-// GET /api/rentals/:rentalId
-router.get('/rentals/:rentalId', async (req, res) => {
-  try {
-    const rentalId = parseInt(req.params.rentalId);
-    const rental = await rentalStorage.getRentalById(rentalId);
+      const rental = rentalStorage.getRentalById(id);
+      if (!rental) {
+        return res.status(404).json({
+          success: false,
+          error: 'Rental not found'
+        });
+      }
 
-    if (!rental) {
-      return res.status(404).json({
+      res.json({
+        success: true,
+        data: rental
+      });
+    } catch (error) {
+      console.error('Error fetching rental:', error);
+      res.status(500).json({
         success: false,
-        error: 'Rental not found'
+        error: 'Failed to fetch rental'
       });
     }
+  });
 
-    res.json({
-      success: true,
-      data: rental
-    });
-  } catch (error) {
-    console.error('Error fetching rental:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Failed to fetch rental'
-    });
-  }
-});
+  // Search rentals
+  router.get('/search', async (req, res) => {
+    try {
+      const filters = {
+        location: req.query.location as string,
+        city: req.query.city as string,
+        district: req.query.district as string,
+        minPrice: req.query.minPrice ? parseFloat(req.query.minPrice as string) : undefined,
+        maxPrice: req.query.maxPrice ? parseFloat(req.query.maxPrice as string) : undefined,
+        bedrooms: req.query.bedrooms ? parseInt(req.query.bedrooms as string) : undefined,
+        bathrooms: req.query.bathrooms ? parseInt(req.query.bathrooms as string) : undefined,
+        property_type: req.query.property_type as string,
+        furnished: req.query.furnished === 'true',
+        pet_friendly: req.query.pet_friendly === 'true',
+        parking: req.query.parking === 'true',
+        garden: req.query.garden === 'true',
+        security: req.query.security === 'true',
+        air_conditioning: req.query.air_conditioning === 'true',
+        internet: req.query.internet === 'true',
+        utilities_included: req.query.utilities_included === 'true',
+        available_date: req.query.available_date as string,
+        status: req.query.status as string || 'available'
+      };
 
-// 2.3 Application & Screening Workflow
+      // Remove undefined values
+      Object.keys(filters).forEach(key => {
+        if (filters[key as keyof typeof filters] === undefined) {
+          delete filters[key as keyof typeof filters];
+        }
+      });
 
-// POST /api/rentals/:rentalId/apply
-router.post('/rentals/:rentalId/apply', authenticate, async (req, res) => {
-  try {
-    if (!req.user) {
-      return res.status(401).json({ error: 'Unauthorized' });
-    }
-
-    const rentalId = parseInt(req.params.rentalId);
-    const validatedData = applicationSchema.parse(req.body);
-
-    const application = await rentalStorage.createApplication({
-      rental_id: rentalId,
-      renter_id: req.user.id,
-      application_data: validatedData.application_data,
-      status: 'pending'
-    });
-
-    res.status(201).json({
-      success: true,
-      data: application,
-      message: 'Application submitted successfully'
-    });
-  } catch (error) {
-    console.error('Error creating application:', error);
-    res.status(400).json({
-      success: false,
-      error: error instanceof z.ZodError ? error.errors : 'Invalid application data'
-    });
-  }
-});
-
-// GET /api/landlord/applications
-router.get('/landlord/applications', authenticate, async (req, res) => {
-  try {
-    if (!req.user) {
-      return res.status(401).json({ error: 'Unauthorized' });
-    }
-    const applications = await rentalStorage.getLandlordApplications(req.user.id);
-
-    res.json({
-      success: true,
-      data: applications
-    });
-  } catch (error) {
-    console.error('Error fetching applications:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Failed to fetch applications'
-    });
-  }
-});
-
-// PUT /api/applications/:applicationId
-router.put('/applications/:applicationId', authenticate, async (req, res) => {
-  try {
-    const applicationId = parseInt(req.params.applicationId);
-    const { status } = req.body;
-
-    if (!['pending', 'approved', 'rejected'].includes(status)) {
-      return res.status(400).json({
+      const rentals = rentalStorage.searchRentals(filters);
+      res.json({
+        success: true,
+        data: rentals,
+        count: rentals.length,
+        filters: filters
+      });
+    } catch (error) {
+      console.error('Error searching rentals:', error);
+      res.status(500).json({
         success: false,
-        error: 'Invalid status'
+        error: 'Failed to search rentals'
       });
     }
+  });
 
-    const application = await rentalStorage.updateApplicationStatus(
-      applicationId,
-      status,
-      req.user.id
-    );
+  // Create new rental
+  router.post('/', async (req, res) => {
+    try {
+      const rentalData = req.body;
 
-    if (!application) {
-      return res.status(404).json({
+      // Validate required fields
+      if (!rentalData.title || !rentalData.price || !rentalData.location || !rentalData.city) {
+        return res.status(400).json({
+          success: false,
+          error: 'Missing required fields: title, price, location, city'
+        });
+      }
+
+      const rental = rentalStorage.createRental(rentalData);
+      res.status(201).json({
+        success: true,
+        data: rental
+      });
+    } catch (error) {
+      console.error('Error creating rental:', error);
+      res.status(500).json({
         success: false,
-        error: 'Application not found or not authorized'
+        error: 'Failed to create rental'
       });
     }
+  });
 
-    res.json({
-      success: true,
-      data: application,
-      message: 'Application status updated successfully'
-    });
-  } catch (error) {
-    console.error('Error updating application:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Failed to update application'
-    });
-  }
-});
+  // Update rental
+  router.put('/:id', async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({
+          success: false,
+          error: 'Invalid rental ID'
+        });
+      }
 
-// POST /api/applications/:applicationId/screen
-router.post('/applications/:applicationId/screen', authenticate, async (req, res) => {
-  try {
-    const applicationId = parseInt(req.params.applicationId);
+      const updated = rentalStorage.updateRental(id, req.body);
+      if (!updated) {
+        return res.status(404).json({
+          success: false,
+          error: 'Rental not found'
+        });
+      }
 
-    const application = await rentalStorage.screenTenant(applicationId);
-
-    if (!application) {
-      return res.status(404).json({
+      const rental = rentalStorage.getRentalById(id);
+      res.json({
+        success: true,
+        data: rental
+      });
+    } catch (error) {
+      console.error('Error updating rental:', error);
+      res.status(500).json({
         success: false,
-        error: 'Application not found'
+        error: 'Failed to update rental'
       });
     }
+  });
 
-    res.json({
-      success: true,
-      data: application,
-      message: 'Tenant screening initiated successfully'
-    });
-  } catch (error) {
-    console.error('Error screening tenant:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Failed to screen tenant'
-    });
-  }
-});
+  // Delete rental
+  router.delete('/:id', async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({
+          success: false,
+          error: 'Invalid rental ID'
+        });
+      }
 
-// 2.4 Lease & Payment Workflow
+      const deleted = rentalStorage.deleteRental(id);
+      if (!deleted) {
+        return res.status(404).json({
+          success: false,
+          error: 'Rental not found'
+        });
+      }
 
-// POST /api/applications/:applicationId/generate-lease
-router.post('/applications/:applicationId/generate-lease', authenticate, async (req, res) => {
-  try {
-    const applicationId = parseInt(req.params.applicationId);
-    const { lease_start_date, lease_end_date, lease_terms } = req.body;
-
-    // Get application details
-    const applications = await rentalStorage.getLandlordApplications(req.user.id);
-    const application = applications.find(app => app.application.id === applicationId);
-
-    if (!application) {
-      return res.status(404).json({
+      res.json({
+        success: true,
+        message: 'Rental deleted successfully'
+      });
+    } catch (error) {
+      console.error('Error deleting rental:', error);
+      res.status(500).json({
         success: false,
-        error: 'Application not found or not authorized'
+        error: 'Failed to delete rental'
       });
     }
+  });
 
-    const lease = await rentalStorage.createLease({
-      application_id: applicationId,
-      rental_id: application.rental.id,
-      landlord_id: req.user?.id || 0,
-      renter_id: application.application.renter_id,
-      lease_start_date,
-      lease_end_date,
-      monthly_rent: application.rental.monthly_rent,
-      deposit_amount: application.rental.deposit_amount,
-      lease_terms,
-      landlord_signature_status: 'pending',
-      renter_signature_status: 'pending',
-      e_signature_status: 'pending'
-    });
+  // Get rental applications
+  router.get('/:id/applications', async (req, res) => {
+    try {
+      const rentalId = parseInt(req.params.id);
+      if (isNaN(rentalId)) {
+        return res.status(400).json({
+          success: false,
+          error: 'Invalid rental ID'
+        });
+      }
 
-    res.status(201).json({
-      success: true,
-      data: lease,
-      message: 'Lease generated successfully'
-    });
-  } catch (error) {
-    console.error('Error generating lease:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Failed to generate lease'
-    });
-  }
-});
-
-// POST /api/leases/:leaseId/sign
-router.post('/leases/:leaseId/sign', authenticate, async (req, res) => {
-  try {
-    const leaseId = parseInt(req.params.leaseId);
-    const { role } = req.body;
-
-    if (!['landlord', 'renter'].includes(role)) {
-      return res.status(400).json({
+      const applications = rentalStorage.getRentalApplications(rentalId);
+      res.json({
+        success: true,
+        data: applications,
+        count: applications.length
+      });
+    } catch (error) {
+      console.error('Error fetching rental applications:', error);
+      res.status(500).json({
         success: false,
-        error: 'Invalid role'
+        error: 'Failed to fetch rental applications'
       });
     }
+  });
 
-    const lease = await rentalStorage.updateLeaseSignature(leaseId, role, req.user.id);
+  // Create rental application
+  router.post('/:id/applications', async (req, res) => {
+    try {
+      const rentalId = parseInt(req.params.id);
+      if (isNaN(rentalId)) {
+        return res.status(400).json({
+          success: false,
+          error: 'Invalid rental ID'
+        });
+      }
 
-    if (!lease) {
-      return res.status(404).json({
+      // Check if rental exists
+      const rental = rentalStorage.getRentalById(rentalId);
+      if (!rental) {
+        return res.status(404).json({
+          success: false,
+          error: 'Rental not found'
+        });
+      }
+
+      const applicationData = {
+        ...req.body,
+        rental_id: rentalId,
+        application_date: new Date().toISOString(),
+        status: 'pending'
+      };
+
+      const application = rentalStorage.createRentalApplication(applicationData);
+      res.status(201).json({
+        success: true,
+        data: application
+      });
+    } catch (error) {
+      console.error('Error creating rental application:', error);
+      res.status(500).json({
         success: false,
-        error: 'Lease not found or not authorized'
+        error: 'Failed to create rental application'
       });
     }
+  });
 
-    res.json({
-      success: true,
-      data: lease,
-      message: 'Lease signed successfully'
-    });
-  } catch (error) {
-    console.error('Error signing lease:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Failed to sign lease'
-    });
-  }
-});
+  // Update rental application status
+  router.patch('/applications/:id/status', async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({
+          success: false,
+          error: 'Invalid application ID'
+        });
+      }
 
-// POST /api/leases/:leaseId/pay-rent
-router.post('/leases/:leaseId/pay-rent', authenticate, async (req, res) => {
-  try {
-    const leaseId = parseInt(req.params.leaseId);
-    const { amount } = req.body;
+      const { status } = req.body;
+      if (!status || !['pending', 'approved', 'rejected'].includes(status)) {
+        return res.status(400).json({
+          success: false,
+          error: 'Invalid status. Must be: pending, approved, or rejected'
+        });
+      }
 
-    const lease = await rentalStorage.getLeaseById(leaseId);
+      const updated = rentalStorage.updateRentalApplicationStatus(id, status);
+      if (!updated) {
+        return res.status(404).json({
+          success: false,
+          error: 'Application not found'
+        });
+      }
 
-    if (!lease) {
-      return res.status(404).json({
+      res.json({
+        success: true,
+        message: 'Application status updated successfully'
+      });
+    } catch (error) {
+      console.error('Error updating application status:', error);
+      res.status(500).json({
         success: false,
-        error: 'Lease not found'
+        error: 'Failed to update application status'
       });
     }
+  });
 
-    // Simulate payment processing
-    const paymentIntent = {
-      id: `pi_${Date.now()}`,
-      amount: amount,
-      currency: 'BWP',
-      status: 'succeeded',
-      created: new Date().toISOString()
-    };
-
-    res.json({
-      success: true,
-      data: paymentIntent,
-      message: 'Payment processed successfully'
-    });
-  } catch (error) {
-    console.error('Error processing payment:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Failed to process payment'
-    });
-  }
-});
-
-// GET /api/renter/applications
-router.get('/renter/applications', authenticate, async (req, res) => {
-  try {
-    if (!req.user) {
-      return res.status(401).json({ error: 'Unauthorized' });
+  // Get rental statistics
+  router.get('/stats', async (req, res) => {
+    try {
+      const stats = rentalStorage.getRentalStats();
+      res.json({
+        success: true,
+        data: stats
+      });
+    } catch (error) {
+      console.error('Error fetching rental stats:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to fetch rental stats'
+      });
     }
-    const applications = await rentalStorage.getRenterApplications(req.user.id);
+  });
 
-    res.json({
-      success: true,
-      data: applications
-    });
-  } catch (error) {
-    console.error('Error fetching renter applications:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Failed to fetch applications'
-    });
-  }
-});
-
-export default router;
+  return router;
+}

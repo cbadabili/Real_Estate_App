@@ -1,358 +1,346 @@
-import { db } from './db';
 
-export interface RentalListing {
-  id?: number;
-  landlord_id: number;
+import { Database } from 'better-sqlite3';
+import { getAllTowns, findNearbyTowns } from '../client/src/data/botswanaGeography';
+
+export interface Rental {
+  id: number;
   title: string;
-  description: string;
-  address: string;
+  description?: string;
+  price: number;
+  location: string;
   city: string;
-  district: string;
-  property_type: string;
+  district?: string;
   bedrooms: number;
   bathrooms: number;
-  square_meters: number;
-  monthly_rent: number;
-  deposit_amount: number;
-  lease_duration: number;
-  available_from: string;
+  property_type: string;
   furnished: boolean;
-  pets_allowed: boolean;
-  parking_spaces: number;
-  photos: string[];
-  amenities: string[];
-  utilities_included: string[];
-  status: 'active' | 'rented' | 'inactive';
+  pet_friendly: boolean;
+  parking: boolean;
+  garden: boolean;
+  security: boolean;
+  air_conditioning: boolean;
+  internet: boolean;
+  available_date?: string;
+  lease_duration?: number;
+  deposit_amount?: number;
+  utilities_included: boolean;
+  contact_phone?: string;
+  contact_email?: string;
+  landlord_id?: number;
+  agent_id?: number;
+  property_size?: number;
+  floor_level?: number;
+  building_amenities?: string;
+  latitude?: number;
+  longitude?: number;
+  images?: string;
+  status: string;
   created_at?: string;
   updated_at?: string;
 }
 
 export interface RentalApplication {
-  id?: number;
+  id: number;
   rental_id: number;
-  renter_id: number;
-  application_data: any;
-  status: 'pending' | 'approved' | 'rejected';
-  background_check_status?: 'pending' | 'in_progress' | 'complete';
-  credit_report_status?: 'pending' | 'in_progress' | 'complete';
+  applicant_id: number;
+  application_date: string;
+  status: string;
+  move_in_date?: string;
+  employment_status?: string;
+  monthly_income?: number;
+  references?: string;
+  additional_notes?: string;
+  documents?: string;
   created_at?: string;
   updated_at?: string;
 }
 
-export interface LeaseAgreement {
-  id?: number;
-  application_id: number;
-  rental_id: number;
-  landlord_id: number;
-  renter_id: number;
-  lease_start_date: string;
-  lease_end_date: string;
-  monthly_rent: number;
-  deposit_amount: number;
-  lease_terms: any;
-  landlord_signature_status: 'pending' | 'signed';
-  renter_signature_status: 'pending' | 'signed';
-  e_signature_status: 'pending' | 'partially_signed' | 'fully_signed';
-  created_at?: string;
-  updated_at?: string;
+export interface RentalFilters {
+  location?: string;
+  city?: string;
+  district?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  bedrooms?: number;
+  bathrooms?: number;
+  property_type?: string;
+  furnished?: boolean;
+  pet_friendly?: boolean;
+  parking?: boolean;
+  garden?: boolean;
+  security?: boolean;
+  air_conditioning?: boolean;
+  internet?: boolean;
+  utilities_included?: boolean;
+  available_date?: string;
+  status?: string;
 }
 
 export class RentalStorage {
-  // Rental Listing Management
-  async createRental(rental: RentalListing): Promise<RentalListing> {
-    const stmt = db.$client.prepare(`
-      INSERT INTO rental_listings (
-        landlord_id, title, description, address, city, district, property_type,
-        bedrooms, bathrooms, square_meters, monthly_rent, deposit_amount, lease_duration,
-        available_from, furnished, pets_allowed, parking_spaces, photos, amenities, utilities_included
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  constructor(private db: Database) {}
+
+  // Get all rentals
+  getAllRentals(): Rental[] {
+    const stmt = this.db.prepare(`
+      SELECT * FROM rentals 
+      WHERE status = 'available' 
+      ORDER BY created_at DESC
+    `);
+    return stmt.all() as Rental[];
+  }
+
+  // Get rental by ID
+  getRentalById(id: number): Rental | undefined {
+    const stmt = this.db.prepare('SELECT * FROM rentals WHERE id = ?');
+    return stmt.get(id) as Rental | undefined;
+  }
+
+  // Search rentals with filters
+  searchRentals(filters: RentalFilters = {}): Rental[] {
+    let query = `
+      SELECT * FROM rentals 
+      WHERE status = 'available'
+    `;
+    const params: any[] = [];
+
+    if (filters.location) {
+      query += ` AND location LIKE ?`;
+      params.push(`%${filters.location}%`);
+    }
+
+    if (filters.city) {
+      query += ` AND city LIKE ?`;
+      params.push(`%${filters.city}%`);
+    }
+
+    if (filters.district) {
+      query += ` AND district LIKE ?`;
+      params.push(`%${filters.district}%`);
+    }
+
+    if (filters.minPrice !== undefined) {
+      query += ` AND price >= ?`;
+      params.push(filters.minPrice);
+    }
+
+    if (filters.maxPrice !== undefined) {
+      query += ` AND price <= ?`;
+      params.push(filters.maxPrice);
+    }
+
+    if (filters.bedrooms !== undefined) {
+      query += ` AND bedrooms >= ?`;
+      params.push(filters.bedrooms);
+    }
+
+    if (filters.bathrooms !== undefined) {
+      query += ` AND bathrooms >= ?`;
+      params.push(filters.bathrooms);
+    }
+
+    if (filters.property_type) {
+      query += ` AND property_type = ?`;
+      params.push(filters.property_type);
+    }
+
+    if (filters.furnished !== undefined) {
+      query += ` AND furnished = ?`;
+      params.push(filters.furnished);
+    }
+
+    if (filters.pet_friendly !== undefined) {
+      query += ` AND pet_friendly = ?`;
+      params.push(filters.pet_friendly);
+    }
+
+    if (filters.parking !== undefined) {
+      query += ` AND parking = ?`;
+      params.push(filters.parking);
+    }
+
+    if (filters.garden !== undefined) {
+      query += ` AND garden = ?`;
+      params.push(filters.garden);
+    }
+
+    if (filters.security !== undefined) {
+      query += ` AND security = ?`;
+      params.push(filters.security);
+    }
+
+    if (filters.air_conditioning !== undefined) {
+      query += ` AND air_conditioning = ?`;
+      params.push(filters.air_conditioning);
+    }
+
+    if (filters.internet !== undefined) {
+      query += ` AND internet = ?`;
+      params.push(filters.internet);
+    }
+
+    if (filters.utilities_included !== undefined) {
+      query += ` AND utilities_included = ?`;
+      params.push(filters.utilities_included);
+    }
+
+    if (filters.available_date) {
+      query += ` AND available_date <= ?`;
+      params.push(filters.available_date);
+    }
+
+    query += ` ORDER BY created_at DESC`;
+
+    const stmt = this.db.prepare(query);
+    return stmt.all(...params) as Rental[];
+  }
+
+  // Create new rental
+  createRental(rental: Omit<Rental, 'id' | 'created_at' | 'updated_at'>): Rental {
+    const stmt = this.db.prepare(`
+      INSERT INTO rentals (
+        title, description, price, location, city, district, bedrooms, bathrooms,
+        property_type, furnished, pet_friendly, parking, garden, security,
+        air_conditioning, internet, available_date, lease_duration, deposit_amount,
+        utilities_included, contact_phone, contact_email, landlord_id, agent_id,
+        property_size, floor_level, building_amenities, latitude, longitude,
+        images, status
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
 
     const result = stmt.run(
-      rental.landlord_id, rental.title, rental.description, rental.address,
-      rental.city, rental.district, rental.property_type, rental.bedrooms,
-      rental.bathrooms, rental.square_meters, rental.monthly_rent, rental.deposit_amount,
-      rental.lease_duration, rental.available_from, rental.furnished ? 1 : 0,
-      rental.pets_allowed ? 1 : 0, rental.parking_spaces, 
-      JSON.stringify(rental.photos || []), JSON.stringify(rental.amenities || []),
-      JSON.stringify(rental.utilities_included || [])
+      rental.title,
+      rental.description || null,
+      rental.price,
+      rental.location,
+      rental.city,
+      rental.district || null,
+      rental.bedrooms,
+      rental.bathrooms,
+      rental.property_type,
+      rental.furnished,
+      rental.pet_friendly,
+      rental.parking,
+      rental.garden,
+      rental.security,
+      rental.air_conditioning,
+      rental.internet,
+      rental.available_date || null,
+      rental.lease_duration || null,
+      rental.deposit_amount || null,
+      rental.utilities_included,
+      rental.contact_phone || null,
+      rental.contact_email || null,
+      rental.landlord_id || null,
+      rental.agent_id || null,
+      rental.property_size || null,
+      rental.floor_level || null,
+      rental.building_amenities || null,
+      rental.latitude || null,
+      rental.longitude || null,
+      rental.images || null,
+      rental.status || 'available'
     );
 
-    const newRental = db.$client.prepare('SELECT * FROM rental_listings WHERE id = ?').get(result.lastInsertRowid);
-    return this.formatRental(newRental);
+    return this.getRentalById(result.lastInsertRowid as number)!;
   }
 
-  async updateRental(rentalId: number, rental: Partial<RentalListing>, landlordId: number): Promise<RentalListing | null> {
-    const updates = [];
-    const values = [];
+  // Update rental
+  updateRental(id: number, updates: Partial<Rental>): boolean {
+    const fields = Object.keys(updates).filter(key => key !== 'id' && key !== 'created_at');
+    if (fields.length === 0) return false;
 
-    Object.entries(rental).forEach(([key, value]) => {
-      if (value !== undefined && key !== 'id') {
-        updates.push(`${key} = ?`);
-        if (key === 'photos' || key === 'amenities' || key === 'utilities_included') {
-          values.push(JSON.stringify(value));
-        } else if (key === 'furnished' || key === 'pets_allowed') {
-          values.push(value ? 1 : 0);
-        } else {
-          values.push(value);
-        }
-      }
-    });
+    const setClause = fields.map(field => `${field} = ?`).join(', ');
+    const values = fields.map(field => (updates as any)[field]);
 
-    if (updates.length === 0) return null;
-
-    updates.push('updated_at = datetime("now")');
-    values.push(rentalId, landlordId);
-
-    const stmt = db.$client.prepare(`
-      UPDATE rental_listings SET ${updates.join(', ')} 
-      WHERE id = ? AND landlord_id = ?
+    const stmt = this.db.prepare(`
+      UPDATE rentals 
+      SET ${setClause}, updated_at = CURRENT_TIMESTAMP 
+      WHERE id = ?
     `);
 
-    stmt.run(...values);
-
-    const updatedRental = db.$client.prepare('SELECT * FROM rental_listings WHERE id = ? AND landlord_id = ?').get(rentalId, landlordId);
-    return updatedRental ? this.formatRental(updatedRental) : null;
+    const result = stmt.run(...values, id);
+    return result.changes > 0;
   }
 
-  async getLandlordRentals(landlordId: number): Promise<RentalListing[]> {
-    const rentals = db.$client.prepare('SELECT * FROM rental_listings WHERE landlord_id = ? ORDER BY created_at DESC').all(landlordId);
-    return rentals.map(rental => this.formatRental(rental));
+  // Delete rental
+  deleteRental(id: number): boolean {
+    const stmt = this.db.prepare('DELETE FROM rentals WHERE id = ?');
+    const result = stmt.run(id);
+    return result.changes > 0;
   }
 
-  async getRentalById(rentalId: number): Promise<RentalListing | null> {
-    const rental = db.$client.prepare('SELECT * FROM rental_listings WHERE id = ?').get(rentalId);
-    return rental ? this.formatRental(rental) : null;
-  }
+  // Get rental applications
+  getRentalApplications(rentalId?: number): RentalApplication[] {
+    let query = 'SELECT * FROM rental_applications';
+    const params: any[] = [];
 
-  async searchRentals(filters: any): Promise<any[]> {
-    try {
-      let query = `
-        SELECT r.*, u.name as landlord_name, u.email as landlord_email 
-        FROM rentals r 
-        LEFT JOIN users u ON r.landlord_id = u.id 
-        WHERE 1=1
-      `;
-
-      const params: any[] = [];
-
-      if (filters.city) {
-        query += ` AND r.city LIKE ?`;
-        params.push(`%${filters.city}%`);
-      }
-
-      if (filters.minPrice) {
-        query += ` AND r.monthly_rent >= ?`;
-        params.push(filters.minPrice);
-      }
-
-      if (filters.maxPrice) {
-        query += ` AND r.monthly_rent <= ?`;
-        params.push(filters.maxPrice);
-      }
-
-      if (filters.bedrooms) {
-        query += ` AND r.bedrooms >= ?`;
-        params.push(filters.bedrooms);
-      }
-
-      if (filters.propertyType) {
-        query += ` AND r.property_type = ?`;
-        params.push(filters.propertyType);
-      }
-
-      query += ` ORDER BY r.created_at DESC LIMIT 50`;
-
-      const stmt = db.$client.prepare(query);
-      return stmt.all(...params);
-    } catch (error) {
-      console.error('Error searching rentals:', error);
-      throw error;
+    if (rentalId) {
+      query += ' WHERE rental_id = ?';
+      params.push(rentalId);
     }
+
+    query += ' ORDER BY application_date DESC';
+
+    const stmt = this.db.prepare(query);
+    return stmt.all(...params) as RentalApplication[];
   }
 
-  // Helper method to format rental data
-  private formatRental(rental: any): RentalListing {
-    return {
-      ...rental,
-      furnished: Boolean(rental.furnished),
-      pets_allowed: Boolean(rental.pets_allowed),
-      photos: JSON.parse(rental.photos || '[]'),
-      amenities: JSON.parse(rental.amenities || '[]'),
-      utilities_included: JSON.parse(rental.utilities_included || '[]')
-    };
-  }
-
-  // Rental Applications
-  async createApplication(application: RentalApplication): Promise<RentalApplication> {
-    const stmt = db.$client.prepare(`
-      INSERT INTO rental_applications (rental_id, renter_id, application_data, status)
-      VALUES (?, ?, ?, ?)
+  // Create rental application
+  createRentalApplication(application: Omit<RentalApplication, 'id' | 'created_at' | 'updated_at'>): RentalApplication {
+    const stmt = this.db.prepare(`
+      INSERT INTO rental_applications (
+        rental_id, applicant_id, application_date, status, move_in_date,
+        employment_status, monthly_income, references, additional_notes, documents
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
 
     const result = stmt.run(
       application.rental_id,
-      application.renter_id,
-      JSON.stringify(application.application_data),
-      application.status || 'pending'
+      application.applicant_id,
+      application.application_date,
+      application.status,
+      application.move_in_date || null,
+      application.employment_status || null,
+      application.monthly_income || null,
+      application.references || null,
+      application.additional_notes || null,
+      application.documents || null
     );
 
-    const newApplication = db.$client.prepare('SELECT * FROM rental_applications WHERE id = ?').get(result.lastInsertRowid);
-    return this.formatApplication(newApplication);
+    const getStmt = this.db.prepare('SELECT * FROM rental_applications WHERE id = ?');
+    return getStmt.get(result.lastInsertRowid as number) as RentalApplication;
   }
 
-  async getLandlordApplications(landlordId: number): Promise<any[]> {
-    const applications = db.$client.prepare(`
-      SELECT 
-        ra.*,
-        rl.title as rental_title,
-        rl.address as rental_address,
-        u.firstName || ' ' || u.lastName as renter_name,
-        u.email as renter_email
-      FROM rental_applications ra
-      INNER JOIN rental_listings rl ON ra.rental_id = rl.id
-      INNER JOIN users u ON ra.renter_id = u.id
-      WHERE rl.landlord_id = ?
-      ORDER BY ra.created_at DESC
-    `).all(landlordId);
-
-    return applications.map(app => ({
-      application: this.formatApplication(app),
-      rental: { title: app.rental_title, address: app.rental_address },
-      renter: { name: app.renter_name, email: app.renter_email }
-    }));
-  }
-
-  async updateApplicationStatus(
-    applicationId: number, 
-    status: 'pending' | 'approved' | 'rejected',
-    landlordId: number
-  ): Promise<RentalApplication | null> {
-    const stmt = db.$client.prepare(`
+  // Update rental application status
+  updateRentalApplicationStatus(id: number, status: string): boolean {
+    const stmt = this.db.prepare(`
       UPDATE rental_applications 
-      SET status = ?, updated_at = datetime('now')
-      WHERE id = ? AND rental_id IN (
-        SELECT id FROM rental_listings WHERE landlord_id = ?
-      )
-    `);
-
-    stmt.run(status, applicationId, landlordId);
-
-    const updatedApplication = db.$client.prepare('SELECT * FROM rental_applications WHERE id = ?').get(applicationId);
-    return updatedApplication ? this.formatApplication(updatedApplication) : null;
-  }
-
-  private formatApplication(app: any): RentalApplication {
-    return {
-      ...app,
-      application_data: JSON.parse(app.application_data || '{}')
-    };
-  }
-
-  async getRenterApplications(renterId: number): Promise<any[]> {
-    const applications = db.$client.prepare(`
-      SELECT 
-        ra.*,
-        rl.title as rental_title,
-        rl.address as rental_address,
-        rl.monthly_rent
-      FROM rental_applications ra
-      INNER JOIN rental_listings rl ON ra.rental_id = rl.id
-      WHERE ra.renter_id = ?
-      ORDER BY ra.created_at DESC
-    `).all(renterId);
-
-    return applications.map(app => ({
-      application: this.formatApplication(app),
-      rental: { 
-        title: app.rental_title, 
-        address: app.rental_address,
-        monthly_rent: app.monthly_rent
-      }
-    }));
-  }
-
-  // Lease Management
-  async createLease(lease: LeaseAgreement): Promise<LeaseAgreement> {
-    const stmt = db.$client.prepare(`
-      INSERT INTO lease_agreements (
-        application_id, rental_id, landlord_id, renter_id, lease_start_date,
-        lease_end_date, monthly_rent, deposit_amount, lease_terms
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `);
-
-    const result = stmt.run(
-      lease.application_id, lease.rental_id, lease.landlord_id, lease.renter_id,
-      lease.lease_start_date, lease.lease_end_date, lease.monthly_rent,
-      lease.deposit_amount, JSON.stringify(lease.lease_terms || {})
-    );
-
-    const newLease = db.$client.prepare('SELECT * FROM lease_agreements WHERE id = ?').get(result.lastInsertRowid);
-    return this.formatLease(newLease);
-  }
-
-  async updateLeaseSignature(
-    leaseId: number, 
-    userRole: 'landlord' | 'renter',
-    userId: number
-  ): Promise<LeaseAgreement | null> {
-    const lease = db.$client.prepare('SELECT * FROM lease_agreements WHERE id = ?').get(leaseId);
-    if (!lease) return null;
-
-    let updateField = '';
-    if (userRole === 'landlord' && lease.landlord_id === userId) {
-      updateField = 'landlord_signature_status = "signed"';
-    } else if (userRole === 'renter' && lease.renter_id === userId) {
-      updateField = 'renter_signature_status = "signed"';
-    } else {
-      return null;
-    }
-
-    db.$client.prepare(`UPDATE lease_agreements SET ${updateField}, updated_at = datetime('now') WHERE id = ?`).run(leaseId);
-
-    // Update e_signature_status
-    const updatedLease = db.$client.prepare('SELECT * FROM lease_agreements WHERE id = ?').get(leaseId);
-    let eSignatureStatus = 'pending';
-    if (updatedLease.landlord_signature_status === 'signed' && updatedLease.renter_signature_status === 'signed') {
-      eSignatureStatus = 'fully_signed';
-    } else if (updatedLease.landlord_signature_status === 'signed' || updatedLease.renter_signature_status === 'signed') {
-      eSignatureStatus = 'partially_signed';
-    }
-
-    db.$client.prepare('UPDATE lease_agreements SET e_signature_status = ? WHERE id = ?').run(eSignatureStatus, leaseId);
-
-    const finalLease = db.$client.prepare('SELECT * FROM lease_agreements WHERE id = ?').get(leaseId);
-    return this.formatLease(finalLease);
-  }
-
-  async getLeaseById(leaseId: number): Promise<LeaseAgreement | null> {
-    const lease = db.$client.prepare('SELECT * FROM lease_agreements WHERE id = ?').get(leaseId);
-    return lease ? this.formatLease(lease) : null;
-  }
-
-  private formatLease(lease: any): LeaseAgreement {
-    return {
-      ...lease,
-      lease_terms: JSON.parse(lease.lease_terms || '{}')
-    };
-  }
-
-  // Screen tenant (simulate API call)
-  async screenTenant(applicationId: number): Promise<RentalApplication | null> {
-    // Simulate delay for screening process
-    await new Promise(resolve => setTimeout(resolve, 2000));
-
-    const stmt = db.$client.prepare(`
-      UPDATE rental_applications 
-      SET background_check_status = 'complete', credit_report_status = 'complete', updated_at = datetime('now')
+      SET status = ?, updated_at = CURRENT_TIMESTAMP 
       WHERE id = ?
     `);
+    const result = stmt.run(status, id);
+    return result.changes > 0;
+  }
 
-    stmt.run(applicationId);
+  // Get rentals by user
+  getRentalsByUser(userId: number, role: 'landlord' | 'agent' = 'landlord'): Rental[] {
+    const column = role === 'landlord' ? 'landlord_id' : 'agent_id';
+    const stmt = this.db.prepare(`SELECT * FROM rentals WHERE ${column} = ? ORDER BY created_at DESC`);
+    return stmt.all(userId) as Rental[];
+  }
 
-    const updatedApplication = db.$client.prepare('SELECT * FROM rental_applications WHERE id = ?').get(applicationId);
-    return updatedApplication ? this.formatApplication(updatedApplication) : null;
+  // Get rental statistics
+  getRentalStats(): any {
+    const totalStmt = this.db.prepare('SELECT COUNT(*) as total FROM rentals');
+    const availableStmt = this.db.prepare('SELECT COUNT(*) as available FROM rentals WHERE status = "available"');
+    const rentedStmt = this.db.prepare('SELECT COUNT(*) as rented FROM rentals WHERE status = "rented"');
+    const avgPriceStmt = this.db.prepare('SELECT AVG(price) as avg_price FROM rentals WHERE status = "available"');
+
+    return {
+      total: totalStmt.get()?.total || 0,
+      available: availableStmt.get()?.available || 0,
+      rented: rentedStmt.get()?.rented || 0,
+      avgPrice: avgPriceStmt.get()?.avg_price || 0
+    };
   }
 }
-
-export const rentalStorage = new RentalStorage();

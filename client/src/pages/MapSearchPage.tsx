@@ -7,7 +7,7 @@ import { PropertyMap } from '../components/properties/PropertyMap';
 interface Property {
   id: number;
   title: string;
-  price: string;
+  price: string | number;
   location: string;
   bedrooms: number;
   bathrooms: number;
@@ -15,14 +15,20 @@ interface Property {
   image: string;
   address: string;
   propertyType: string;
-  images: string;
+  images: string | string[];
+  latitude?: number;
+  longitude?: number;
+  city?: string;
+  district?: string;
+  property_type?: string;
 }
 
 const MapSearchPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
-  const [properties, setProperties] = useState<any[]>([]);
+  const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -46,97 +52,85 @@ const MapSearchPage = () => {
   useEffect(() => {
     const fetchProperties = async () => {
       try {
-        console.log('Fetching properties from API...');
-        const response = await fetch('/api/properties');
-        const data = await response.json();
-        console.log('API Response:', data);
-        
-        if (Array.isArray(data)) {
-          // Direct array response
-          const propertiesWithCoords = data.map((property: any, index: number) => ({
-            ...property,
-            coordinates: [
-              -24.6282 + (index * 0.05), // Gaborone area with slight offset
-              25.9231 + (index * 0.05)
-            ] as [number, number],
-            location: property.address || property.city || property.location || 'Gaborone',
-            bedrooms: property.bedrooms || 2,
-            bathrooms: property.bathrooms || 1
-          }));
-          setProperties(propertiesWithCoords);
-        } else if (data.success && Array.isArray(data.data)) {
-          // Wrapped response
-          const propertiesWithCoords = data.data.map((property: any, index: number) => ({
-            ...property,
-            coordinates: [
-              -24.6282 + (index * 0.05),
-              25.9231 + (index * 0.05)
-            ] as [number, number],
-            location: property.address || property.city || property.location || 'Gaborone',
-            bedrooms: property.bedrooms || 2,
-            bathrooms: property.bathrooms || 1
-          }));
-          setProperties(propertiesWithCoords);
-        } else {
-          // Always provide sample data for demonstration
-          const sampleProperties = [
-            {
-              id: 1,
-              title: 'Modern Family Home',
-              price: '2500000',
-              address: 'Gaborone West',
-              location: 'Gaborone West',
-              bedrooms: 3,
-              bathrooms: 2,
-              propertyType: 'house',
-              coordinates: [-24.6282, 25.9231] as [number, number],
-              images: '["https://images.unsplash.com/photo-1605146769289-440113cc3d00?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80"]'
-            },
-            {
-              id: 2,
-              title: 'Luxury Apartment',
-              price: '1800000',
-              address: 'Francistown CBD',
-              location: 'Francistown CBD',
-              bedrooms: 2,
-              bathrooms: 2,
-              propertyType: 'apartment',
-              coordinates: [-21.1699, 27.5084] as [number, number],
-              images: '["https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80"]'
-            },
-            {
-              id: 3,
-              title: 'Safari Lodge Villa',
-              price: '4500000',
-              address: 'Maun',
-              location: 'Maun',
-              bedrooms: 5,
-              bathrooms: 4,
-              propertyType: 'house',
-              coordinates: [-19.9837, 23.4167] as [number, number],
-              images: '["https://images.unsplash.com/photo-1564013799919-ab600027ffc6?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80"]'
+        console.log('Fetching properties from multiple sources...');
+        setLoading(true);
+        setError(null);
+
+        // Try multiple endpoints
+        const endpoints = [
+          '/api/properties',
+          '/api/rentals',
+          '/api/services?section=find_pro'
+        ];
+
+        let allProperties: Property[] = [];
+
+        for (const endpoint of endpoints) {
+          try {
+            console.log(`Fetching from ${endpoint}...`);
+            const response = await fetch(endpoint);
+            
+            if (response.ok) {
+              const data = await response.json();
+              console.log(`Response from ${endpoint}:`, data);
+              
+              let fetchedProperties: any[] = [];
+              
+              if (Array.isArray(data)) {
+                fetchedProperties = data;
+              } else if (data.success && Array.isArray(data.data)) {
+                fetchedProperties = data.data;
+              } else if (data.data && Array.isArray(data.data)) {
+                fetchedProperties = data.data;
+              }
+
+              // Convert to consistent format
+              const convertedProperties = fetchedProperties.map((item: any, index: number) => {
+                // Generate coordinates if not present
+                const baseCoords = {
+                  lat: item.latitude || item.lat || (-24.6282 + (index * 0.01)),
+                  lng: item.longitude || item.lng || (25.9231 + (index * 0.01))
+                };
+
+                return {
+                  id: item.id || `${endpoint}-${index}`,
+                  title: item.title || item.name || `Property ${index + 1}`,
+                  price: item.price || item.cost || '0',
+                  location: item.location || item.address || item.city || 'Gaborone',
+                  bedrooms: item.bedrooms || 2,
+                  bathrooms: item.bathrooms || 1,
+                  coordinates: [baseCoords.lat, baseCoords.lng] as [number, number],
+                  image: getImageUrl(item.images || item.image),
+                  address: item.address || item.location || item.city || 'Gaborone',
+                  propertyType: item.property_type || item.propertyType || item.type || 'apartment',
+                  images: item.images || item.image || '[]',
+                  latitude: baseCoords.lat,
+                  longitude: baseCoords.lng,
+                  city: item.city || 'Gaborone',
+                  district: item.district || 'South East'
+                };
+              });
+
+              allProperties = [...allProperties, ...convertedProperties];
             }
-          ];
-          setProperties(sampleProperties);
+          } catch (endpointError) {
+            console.warn(`Failed to fetch from ${endpoint}:`, endpointError);
+          }
         }
+
+        // If no properties found, use sample data
+        if (allProperties.length === 0) {
+          console.log('No properties found, using sample data');
+          allProperties = getSampleProperties();
+        }
+
+        console.log('Final properties:', allProperties);
+        setProperties(allProperties);
       } catch (error) {
         console.error('Error fetching properties:', error);
-        // Always provide fallback sample data
-        const sampleProperties = [
-          {
-            id: 1,
-            title: 'Sample Property',
-            price: '1500000',
-            address: 'Gaborone CBD',
-            location: 'Gaborone CBD',
-            bedrooms: 2,
-            bathrooms: 1,
-            propertyType: 'apartment',
-            coordinates: [-24.6282, 25.9231] as [number, number],
-            images: '["https://images.unsplash.com/photo-1605146769289-440113cc3d00?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80"]'
-          }
-        ];
-        setProperties(sampleProperties);
+        setError('Failed to load properties');
+        // Use sample data as fallback
+        setProperties(getSampleProperties());
       } finally {
         setLoading(false);
       }
@@ -145,32 +139,126 @@ const MapSearchPage = () => {
     fetchProperties();
   }, []);
 
+  const getSampleProperties = (): Property[] => {
+    return [
+      {
+        id: 1,
+        title: 'Modern Family Home',
+        price: '2500000',
+        address: 'Gaborone West',
+        location: 'Gaborone West',
+        bedrooms: 3,
+        bathrooms: 2,
+        propertyType: 'house',
+        coordinates: [-24.6282, 25.9231] as [number, number],
+        images: '["https://images.unsplash.com/photo-1605146769289-440113cc3d00?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80"]',
+        image: 'https://images.unsplash.com/photo-1605146769289-440113cc3d00?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
+        latitude: -24.6282,
+        longitude: 25.9231,
+        city: 'Gaborone',
+        district: 'South East'
+      },
+      {
+        id: 2,
+        title: 'Luxury Apartment',
+        price: '1800000',
+        address: 'Francistown CBD',
+        location: 'Francistown CBD',
+        bedrooms: 2,
+        bathrooms: 2,
+        propertyType: 'apartment',
+        coordinates: [-21.1699, 27.5084] as [number, number],
+        images: '["https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80"]',
+        image: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
+        latitude: -21.1699,
+        longitude: 27.5084,
+        city: 'Francistown',
+        district: 'North East'
+      },
+      {
+        id: 3,
+        title: 'Safari Lodge Villa',
+        price: '4500000',
+        address: 'Maun',
+        location: 'Maun',
+        bedrooms: 5,
+        bathrooms: 4,
+        propertyType: 'house',
+        coordinates: [-19.9837, 23.4167] as [number, number],
+        images: '["https://images.unsplash.com/photo-1564013799919-ab600027ffc6?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80"]',
+        image: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
+        latitude: -19.9837,
+        longitude: 23.4167,
+        city: 'Maun',
+        district: 'North West'
+      }
+    ];
+  };
+
+  const getImageUrl = (images: any): string => {
+    if (typeof images === 'string') {
+      try {
+        const parsed = JSON.parse(images);
+        return Array.isArray(parsed) ? parsed[0] : images;
+      } catch {
+        return images;
+      }
+    }
+    if (Array.isArray(images)) {
+      return images[0] || 'https://images.unsplash.com/photo-1605146769289-440113cc3d00?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80';
+    }
+    return 'https://images.unsplash.com/photo-1605146769289-440113cc3d00?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80';
+  };
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      // Filter properties based on search query
       const filtered = properties.filter(property =>
         property.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         property.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        property.address?.toLowerCase().includes(searchQuery.toLowerCase())
+        property.address?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        property.city?.toLowerCase().includes(searchQuery.toLowerCase())
       );
       setProperties(filtered);
     }
   };
 
-  const handlePropertySelect = (property: any) => {
-    const imageUrl = property.images ? 
-      (typeof property.images === 'string' ? 
-        JSON.parse(property.images)[0] : 
-        property.images[0]) : 
-      'https://images.unsplash.com/photo-1605146769289-440113cc3d00?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80';
+  const handlePropertySelect = (property: Property) => {
+    const imageUrl = getImageUrl(property.images);
     
     setSelectedProperty({
       ...property,
-      price: `P${parseInt(property.price || '0').toLocaleString()}`,
+      price: `P${parseInt(property.price?.toString() || '0').toLocaleString()}`,
       image: imageUrl
     });
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-beedab-blue mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading properties...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-600 mb-4">{error}</p>
+          <button 
+            onClick={() => window.location.reload()}
+            className="px-4 py-2 bg-beedab-blue text-white rounded-lg hover:bg-beedab-darkblue transition-colors"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <motion.div
@@ -207,24 +295,15 @@ const MapSearchPage = () => {
           variants={itemVariants}
           className="flex-1 relative"
         >
-          {loading ? (
-            <div className="flex items-center justify-center h-full bg-gray-100">
-              <div className="text-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-beedab-blue mx-auto mb-4"></div>
-                <p className="text-gray-600">Loading properties...</p>
-              </div>
-            </div>
-          ) : (
-            <PropertyMap 
-              properties={properties.map(prop => ({
-                ...prop,
-                price: parseInt(prop.price || '0')
-              }))}
-              center={[-22.3285, 24.6849]}
-              zoom={6}
-              height="100%"
-            />
-          )}
+          <PropertyMap 
+            properties={properties.map(prop => ({
+              ...prop,
+              price: parseInt(prop.price?.toString() || '0')
+            }))}
+            center={[-22.3285, 24.6849]}
+            zoom={6}
+            height="100%"
+          />
 
           {/* Selected Property Popup */}
           {selectedProperty && (
@@ -279,11 +358,7 @@ const MapSearchPage = () => {
 
           <div className="space-y-4 p-4">
             {properties.map((property) => {
-              const imageUrl = property.images ? 
-                (typeof property.images === 'string' ? 
-                  JSON.parse(property.images)[0] : 
-                  property.images[0]) : 
-                'https://images.unsplash.com/photo-1605146769289-440113cc3d00?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80';
+              const imageUrl = getImageUrl(property.images);
               
               return (
                 <motion.div
@@ -301,7 +376,7 @@ const MapSearchPage = () => {
                   />
                   <h4 className="font-semibold text-gray-900 mb-1">{property.title}</h4>
                   <p className="text-lg font-bold text-beedab-blue mb-2">
-                    P{parseInt(property.price || '0').toLocaleString()}
+                    P{parseInt(property.price?.toString() || '0').toLocaleString()}
                   </p>
                   <div className="flex items-center space-x-1 text-sm text-gray-600 mb-2">
                     <MapPin className="h-4 w-4" />

@@ -1,117 +1,236 @@
 
-import { db } from './db';
+import { Database } from 'better-sqlite3';
+import { getAllTowns } from '../client/src/data/botswanaGeography';
 
-export async function rentalSeed() {
-  try {
-    console.log('🌱 Seeding rental data...');
-    
-    // Check if rental data already exists
-    const existingRentals = db.prepare('SELECT COUNT(*) as count FROM rentals').get() as { count: number };
-    
-    if (existingRentals.count > 0) {
-      console.log('✅ Rental data already exists, skipping...');
-      return;
+export const seedRentals = (db: Database) => {
+  console.log('Seeding rentals...');
+  
+  const towns = getAllTowns();
+  
+  const sampleRentals = [
+    {
+      title: 'Modern 2-Bedroom Apartment',
+      description: 'Beautiful modern apartment in the heart of Gaborone with all amenities',
+      price: 8500,
+      location: 'Gaborone CBD',
+      city: 'Gaborone',
+      district: 'South East',
+      bedrooms: 2,
+      bathrooms: 2,
+      property_type: 'apartment',
+      furnished: true,
+      pet_friendly: false,
+      parking: true,
+      garden: false,
+      security: true,
+      air_conditioning: true,
+      internet: true,
+      available_date: '2024-02-01',
+      lease_duration: 12,
+      deposit_amount: 17000,
+      utilities_included: false,
+      contact_phone: '+267 72 123 456',
+      contact_email: 'landlord1@example.com',
+      property_size: 85,
+      floor_level: 3,
+      building_amenities: 'Gym, Swimming Pool, Security',
+      latitude: -24.6282,
+      longitude: 25.9231,
+      images: JSON.stringify([
+        'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
+        'https://images.unsplash.com/photo-1560448075-bb485b067938?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'
+      ]),
+      status: 'available'
+    },
+    {
+      title: 'Spacious Family House',
+      description: 'Large family house with garden in quiet neighborhood',
+      price: 12000,
+      location: 'Gaborone West',
+      city: 'Gaborone',
+      district: 'South East',
+      bedrooms: 4,
+      bathrooms: 3,
+      property_type: 'house',
+      furnished: false,
+      pet_friendly: true,
+      parking: true,
+      garden: true,
+      security: true,
+      air_conditioning: false,
+      internet: false,
+      available_date: '2024-02-15',
+      lease_duration: 24,
+      deposit_amount: 24000,
+      utilities_included: false,
+      contact_phone: '+267 72 234 567',
+      contact_email: 'landlord2@example.com',
+      property_size: 180,
+      floor_level: 1,
+      building_amenities: 'Garden, Garage, Security',
+      latitude: -24.6400,
+      longitude: 25.9100,
+      images: JSON.stringify([
+        'https://images.unsplash.com/photo-1605146769289-440113cc3d00?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
+        'https://images.unsplash.com/photo-1605146769289-440113cc3d00?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'
+      ]),
+      status: 'available'
+    },
+    {
+      title: 'Luxury Executive Apartment',
+      description: 'High-end apartment with premium finishes and city views',
+      price: 15000,
+      location: 'Francistown CBD',
+      city: 'Francistown',
+      district: 'North East',
+      bedrooms: 3,
+      bathrooms: 2,
+      property_type: 'apartment',
+      furnished: true,
+      pet_friendly: false,
+      parking: true,
+      garden: false,
+      security: true,
+      air_conditioning: true,
+      internet: true,
+      available_date: '2024-03-01',
+      lease_duration: 12,
+      deposit_amount: 30000,
+      utilities_included: true,
+      contact_phone: '+267 72 345 678',
+      contact_email: 'landlord3@example.com',
+      property_size: 120,
+      floor_level: 8,
+      building_amenities: 'Gym, Pool, Concierge, Security',
+      latitude: -21.1699,
+      longitude: 27.5084,
+      images: JSON.stringify([
+        'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
+        'https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'
+      ]),
+      status: 'available'
+    },
+    {
+      title: 'Cozy Studio Apartment',
+      description: 'Perfect for students or young professionals',
+      price: 4500,
+      location: 'Molepolole',
+      city: 'Molepolole',
+      district: 'South East',
+      bedrooms: 1,
+      bathrooms: 1,
+      property_type: 'apartment',
+      furnished: true,
+      pet_friendly: false,
+      parking: false,
+      garden: false,
+      security: false,
+      air_conditioning: false,
+      internet: true,
+      available_date: '2024-02-10',
+      lease_duration: 6,
+      deposit_amount: 9000,
+      utilities_included: true,
+      contact_phone: '+267 72 456 789',
+      contact_email: 'landlord4@example.com',
+      property_size: 35,
+      floor_level: 2,
+      building_amenities: 'Laundry, Wi-Fi',
+      latitude: -24.4031,
+      longitude: 25.4914,
+      images: JSON.stringify([
+        'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'
+      ]),
+      status: 'available'
+    },
+    {
+      title: 'Safari Lodge Style Home',
+      description: 'Unique property with safari theme and amazing views',
+      price: 18000,
+      location: 'Maun',
+      city: 'Maun',
+      district: 'North West',
+      bedrooms: 3,
+      bathrooms: 2,
+      property_type: 'house',
+      furnished: true,
+      pet_friendly: true,
+      parking: true,
+      garden: true,
+      security: true,
+      air_conditioning: true,
+      internet: true,
+      available_date: '2024-04-01',
+      lease_duration: 12,
+      deposit_amount: 36000,
+      utilities_included: false,
+      contact_phone: '+267 72 567 890',
+      contact_email: 'landlord5@example.com',
+      property_size: 200,
+      floor_level: 1,
+      building_amenities: 'Pool, Garden, Game Room',
+      latitude: -19.9837,
+      longitude: 23.4167,
+      images: JSON.stringify([
+        'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
+        'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'
+      ]),
+      status: 'available'
     }
+  ];
 
-    // Insert sample rental properties
-    const insertRental = db.prepare(`
-      INSERT INTO rentals (
-        title, description, address, city, district, ward, property_type,
-        bedrooms, bathrooms, square_meters, monthly_rent, deposit_amount,
-        lease_duration, available_from, furnished, pets_allowed, parking_spaces,
-        photos, amenities, utilities_included, status, landlord_id
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `);
+  const insertRental = db.prepare(`
+    INSERT INTO rentals (
+      title, description, price, location, city, district, bedrooms, bathrooms,
+      property_type, furnished, pet_friendly, parking, garden, security,
+      air_conditioning, internet, available_date, lease_duration, deposit_amount,
+      utilities_included, contact_phone, contact_email, property_size, floor_level,
+      building_amenities, latitude, longitude, images, status
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `);
 
-    const sampleRentals = [
-      {
-        title: 'Modern 2BR Apartment in Gaborone CBD',
-        description: 'Beautiful modern apartment with city views, perfect for professionals',
-        address: 'Plot 1234, Independence Avenue',
-        city: 'Gaborone',
-        district: 'South East',
-        ward: 'Gaborone Central',
-        property_type: 'apartment',
-        bedrooms: 2,
-        bathrooms: 2,
-        square_meters: 85,
-        monthly_rent: 8500,
-        deposit_amount: 8500,
-        lease_duration: 12,
-        available_from: '2024-02-01',
-        furnished: 1,
-        pets_allowed: 0,
-        parking_spaces: 1,
-        photos: JSON.stringify(['https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80']),
-        amenities: JSON.stringify(['WiFi', 'Air Conditioning', 'Security', 'Gym']),
-        utilities_included: JSON.stringify(['Water', 'Electricity']),
-        status: 'active',
-        landlord_id: 1
-      },
-      {
-        title: 'Spacious Family House in Gaborone West',
-        description: 'Large family home with garden, perfect for families',
-        address: 'Plot 5678, Segoditshane Way',
-        city: 'Gaborone',
-        district: 'South East',
-        ward: 'Gaborone West',
-        property_type: 'house',
-        bedrooms: 4,
-        bathrooms: 3,
-        square_meters: 180,
-        monthly_rent: 15000,
-        deposit_amount: 15000,
-        lease_duration: 12,
-        available_from: '2024-01-15',
-        furnished: 0,
-        pets_allowed: 1,
-        parking_spaces: 2,
-        photos: JSON.stringify(['https://images.unsplash.com/photo-1605146769289-440113cc3d00?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80']),
-        amenities: JSON.stringify(['Garden', 'Garage', 'Security', 'Pool']),
-        utilities_included: JSON.stringify(['Water']),
-        status: 'active',
-        landlord_id: 1
-      },
-      {
-        title: 'Cozy Studio in Francistown',
-        description: 'Perfect studio apartment for students or young professionals',
-        address: 'Plot 999, Blue Jacket Street',
-        city: 'Francistown',
-        district: 'North East',
-        ward: 'Francistown Central',
-        property_type: 'studio',
-        bedrooms: 0,
-        bathrooms: 1,
-        square_meters: 35,
-        monthly_rent: 4500,
-        deposit_amount: 4500,
-        lease_duration: 6,
-        available_from: '2024-01-01',
-        furnished: 1,
-        pets_allowed: 0,
-        parking_spaces: 0,
-        photos: JSON.stringify(['https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80']),
-        amenities: JSON.stringify(['WiFi', 'Kitchen']),
-        utilities_included: JSON.stringify(['Water', 'Electricity', 'Internet']),
-        status: 'active',
-        landlord_id: 1
-      }
-    ];
+  const checkRental = db.prepare('SELECT COUNT(*) as count FROM rentals');
+  const existingCount = checkRental.get()?.count || 0;
 
-    for (const rental of sampleRentals) {
+  if (existingCount === 0) {
+    console.log('Adding sample rentals...');
+    
+    sampleRentals.forEach(rental => {
       insertRental.run(
-        rental.title, rental.description, rental.address, rental.city,
-        rental.district, rental.ward, rental.property_type, rental.bedrooms,
-        rental.bathrooms, rental.square_meters, rental.monthly_rent,
-        rental.deposit_amount, rental.lease_duration, rental.available_from,
-        rental.furnished, rental.pets_allowed, rental.parking_spaces,
-        rental.photos, rental.amenities, rental.utilities_included,
-        rental.status, rental.landlord_id
+        rental.title,
+        rental.description,
+        rental.price,
+        rental.location,
+        rental.city,
+        rental.district,
+        rental.bedrooms,
+        rental.bathrooms,
+        rental.property_type,
+        rental.furnished,
+        rental.pet_friendly,
+        rental.parking,
+        rental.garden,
+        rental.security,
+        rental.air_conditioning,
+        rental.internet,
+        rental.available_date,
+        rental.lease_duration,
+        rental.deposit_amount,
+        rental.utilities_included,
+        rental.contact_phone,
+        rental.contact_email,
+        rental.property_size,
+        rental.floor_level,
+        rental.building_amenities,
+        rental.latitude,
+        rental.longitude,
+        rental.images,
+        rental.status
       );
-    }
-
-    console.log('✅ Rental data seeded successfully');
-  } catch (error) {
-    console.error('❌ Error seeding rental data:', error);
+    });
+    
+    console.log(`✅ Added ${sampleRentals.length} sample rentals`);
+  } else {
+    console.log(`✅ Rentals already exist (${existingCount}), skipping...`);
   }
-}
+};
