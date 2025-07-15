@@ -1,6 +1,8 @@
-import { useState } from 'react';
+
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Search, MapPin, Filter, Home, DollarSign, Bed, Bath } from 'lucide-react';
+import { PropertyMap } from '../components/properties/PropertyMap';
 
 interface Property {
   id: number;
@@ -9,13 +11,18 @@ interface Property {
   location: string;
   bedrooms: number;
   bathrooms: number;
-  coordinates: { lat: number; lng: number };
+  coordinates?: [number, number];
   image: string;
+  address: string;
+  propertyType: string;
+  images: string;
 }
 
 const MapSearchPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(null);
+  const [properties, setProperties] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -36,17 +43,22 @@ const MapSearchPage = () => {
     }
   };
 
-  // Fetch real properties for map
-  const [properties, setProperties] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-
   useEffect(() => {
     const fetchProperties = async () => {
       try {
         const response = await fetch('/api/properties');
         const data = await response.json();
         if (data.success && Array.isArray(data.data)) {
-          setProperties(data.data.slice(0, 10)); // Show first 10 properties
+          // Add coordinates to properties for map display
+          const propertiesWithCoords = data.data.map((property: any, index: number) => ({
+            ...property,
+            coordinates: [
+              -24.6282 + (index * 0.1), // Gaborone area with slight offset
+              25.9231 + (index * 0.1)
+            ] as [number, number],
+            location: property.address || property.city || 'Gaborone'
+          }));
+          setProperties(propertiesWithCoords);
         } else {
           // Fallback sample data if no properties in database
           setProperties([
@@ -55,9 +67,11 @@ const MapSearchPage = () => {
               title: 'Modern Family Home',
               price: '2500000',
               address: 'Gaborone West',
+              location: 'Gaborone West',
               bedrooms: 3,
               bathrooms: 2,
               propertyType: 'house',
+              coordinates: [-24.6282, 25.9231],
               images: '["https://images.unsplash.com/photo-1605146769289-440113cc3d00?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80"]'
             },
             {
@@ -65,9 +79,11 @@ const MapSearchPage = () => {
               title: 'Luxury Apartment',
               price: '1800000',
               address: 'Francistown CBD',
+              location: 'Francistown CBD',
               bedrooms: 2,
               bathrooms: 2,
               propertyType: 'apartment',
+              coordinates: [-21.1699, 27.5084],
               images: '["https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80"]'
             },
             {
@@ -75,9 +91,11 @@ const MapSearchPage = () => {
               title: 'Safari Lodge Villa',
               price: '4500000',
               address: 'Maun',
+              location: 'Maun',
               bedrooms: 5,
               bathrooms: 4,
               propertyType: 'house',
+              coordinates: [-19.9837, 23.4167],
               images: '["https://images.unsplash.com/photo-1564013799919-ab600027ffc6?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80"]'
             }
           ]);
@@ -94,6 +112,33 @@ const MapSearchPage = () => {
     fetchProperties();
   }, []);
 
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      // Filter properties based on search query
+      const filtered = properties.filter(property =>
+        property.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        property.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        property.address?.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      setProperties(filtered);
+    }
+  };
+
+  const handlePropertySelect = (property: any) => {
+    const imageUrl = property.images ? 
+      (typeof property.images === 'string' ? 
+        JSON.parse(property.images)[0] : 
+        property.images[0]) : 
+      'https://images.unsplash.com/photo-1605146769289-440113cc3d00?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80';
+    
+    setSelectedProperty({
+      ...property,
+      price: `P${parseInt(property.price || '0').toLocaleString()}`,
+      image: imageUrl
+    });
+  };
+
   return (
     <motion.div
       variants={containerVariants}
@@ -105,7 +150,7 @@ const MapSearchPage = () => {
       <div className="bg-white shadow-sm border-b border-gray-200 p-4">
         <div className="max-w-7xl mx-auto">
           <motion.div variants={itemVariants} className="flex items-center space-x-4">
-            <div className="flex-1 relative">
+            <form onSubmit={handleSearch} className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
               <input
                 type="text"
@@ -114,7 +159,7 @@ const MapSearchPage = () => {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
               />
-            </div>
+            </form>
             <button className="flex items-center space-x-2 px-4 py-3 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">
               <Filter className="h-5 w-5" />
               <span>Filters</span>
@@ -127,64 +172,33 @@ const MapSearchPage = () => {
         {/* Map Area */}
         <motion.div 
           variants={itemVariants}
-          className="flex-1 relative bg-gradient-to-br from-blue-50 to-green-50"
+          className="flex-1 relative"
         >
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="text-center">
-              <MapPin className="h-16 w-16 text-beedab-blue mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Interactive Map</h3>
-              <p className="text-gray-600 mb-4">Explore properties across Botswana</p>
-              <div className="text-sm text-gray-500">
-                Real-world mapping with OpenStreetMap integration
-              </div>
-              <div className="text-xs text-gray-400 mt-2">
-                Click on any property listing to see location on map
+          {loading ? (
+            <div className="flex items-center justify-center h-full bg-gray-100">
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-beedab-blue mx-auto mb-4"></div>
+                <p className="text-gray-600">Loading properties...</p>
               </div>
             </div>
-          </div>
-
-          {/* Property markers */}
-          <div className="absolute inset-0">
-            {!loading && properties.map((property, index) => {
-              const imageUrl = property.images ? 
-                (typeof property.images === 'string' ? 
-                  JSON.parse(property.images)[0] : 
-                  property.images[0]) : 
-                'https://images.unsplash.com/photo-1605146769289-440113cc3d00?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80';
-              
-              return (
-                <div
-                  key={property.id}
-                  className={`absolute w-10 h-10 bg-beedab-blue rounded-full flex items-center justify-center text-white text-xs font-bold cursor-pointer hover:bg-beedab-darkblue transition-all shadow-lg border-2 border-white ${
-                    index === 0 ? 'top-1/3 left-1/4' : 
-                    index === 1 ? 'top-1/4 right-1/3' : 
-                    index === 2 ? 'bottom-1/3 left-1/3' :
-                    index === 3 ? 'top-1/2 left-1/2' :
-                    `top-${20 + (index % 3) * 20}% left-${15 + (index % 4) * 20}%`
-                  }`}
-                  onClick={() => setSelectedProperty({
-                    ...property,
-                    price: `P${parseInt(property.price || '0').toLocaleString()}`,
-                    location: property.address,
-                    image: imageUrl
-                  })}
-                  style={{
-                    transform: selectedProperty?.id === property.id ? 'scale(1.3)' : 'scale(1)',
-                    zIndex: selectedProperty?.id === property.id ? 10 : 5
-                  }}
-                >
-                  P{Math.round(parseInt(property.price || '0') / 100000)}L
-                </div>
-              );
-            })}
-          </div>
+          ) : (
+            <PropertyMap 
+              properties={properties.map(prop => ({
+                ...prop,
+                price: parseInt(prop.price || '0')
+              }))}
+              center={[-22.3285, 24.6849]}
+              zoom={6}
+              height="100%"
+            />
+          )}
 
           {/* Selected Property Popup */}
           {selectedProperty && (
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="absolute bottom-4 left-4 bg-white rounded-lg shadow-lg p-4 max-w-sm"
+              className="absolute bottom-4 left-4 bg-white rounded-lg shadow-lg p-4 max-w-sm z-[1000]"
             >
               <img
                 src={selectedProperty.image}
@@ -231,38 +245,48 @@ const MapSearchPage = () => {
           </div>
 
           <div className="space-y-4 p-4">
-            {properties.map((property) => (
-              <motion.div
-                key={property.id}
-                variants={itemVariants}
-                className={`bg-white border rounded-lg p-4 cursor-pointer hover:shadow-md transition-shadow ${
-                  selectedProperty?.id === property.id ? 'border-beedab-blue shadow-md' : 'border-gray-200'
-                }`}
-                onClick={() => setSelectedProperty(property)}
-              >
-                <img
-                  src={property.image}
-                  alt={property.title}
-                  className="w-full h-32 object-cover rounded-lg mb-3"
-                />
-                <h4 className="font-semibold text-gray-900 mb-1">{property.title}</h4>
-                <p className="text-lg font-bold text-beedab-blue mb-2">{property.price}</p>
-                <div className="flex items-center space-x-1 text-sm text-gray-600 mb-2">
-                  <MapPin className="h-4 w-4" />
-                  <span>{property.location}</span>
-                </div>
-                <div className="flex items-center space-x-4 text-sm text-gray-600">
-                  <div className="flex items-center space-x-1">
-                    <Bed className="h-4 w-4" />
-                    <span>{property.bedrooms} beds</span>
+            {properties.map((property) => {
+              const imageUrl = property.images ? 
+                (typeof property.images === 'string' ? 
+                  JSON.parse(property.images)[0] : 
+                  property.images[0]) : 
+                'https://images.unsplash.com/photo-1605146769289-440113cc3d00?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80';
+              
+              return (
+                <motion.div
+                  key={property.id}
+                  variants={itemVariants}
+                  className={`bg-white border rounded-lg p-4 cursor-pointer hover:shadow-md transition-shadow ${
+                    selectedProperty?.id === property.id ? 'border-beedab-blue shadow-md' : 'border-gray-200'
+                  }`}
+                  onClick={() => handlePropertySelect(property)}
+                >
+                  <img
+                    src={imageUrl}
+                    alt={property.title}
+                    className="w-full h-32 object-cover rounded-lg mb-3"
+                  />
+                  <h4 className="font-semibold text-gray-900 mb-1">{property.title}</h4>
+                  <p className="text-lg font-bold text-beedab-blue mb-2">
+                    P{parseInt(property.price || '0').toLocaleString()}
+                  </p>
+                  <div className="flex items-center space-x-1 text-sm text-gray-600 mb-2">
+                    <MapPin className="h-4 w-4" />
+                    <span>{property.location}</span>
                   </div>
-                  <div className="flex items-center space-x-1">
-                    <Bath className="h-4 w-4" />
-                    <span>{property.bathrooms} baths</span>
+                  <div className="flex items-center space-x-4 text-sm text-gray-600">
+                    <div className="flex items-center space-x-1">
+                      <Bed className="h-4 w-4" />
+                      <span>{property.bedrooms} beds</span>
+                    </div>
+                    <div className="flex items-center space-x-1">
+                      <Bath className="h-4 w-4" />
+                      <span>{property.bathrooms} baths</span>
+                    </div>
                   </div>
-                </div>
-              </motion.div>
-            ))}
+                </motion.div>
+              );
+            })}
           </div>
         </motion.div>
       </div>
