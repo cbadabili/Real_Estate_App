@@ -386,7 +386,7 @@ const Navbar = () => {
                         <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide px-2 py-1">Selling Options</div>
 
                         <Link
-                          to="/create-property?listingType=owner"
+                          to="/create-listing"
                           className="block px-4 py-3 text-sm text-neutral-700 hover:bg-beedab-blue/5 rounded border border-beedab-blue/20 mb-2"
                           onClick={() => setSellDropdownOpen(false)}
                         >
