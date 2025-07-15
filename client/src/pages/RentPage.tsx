@@ -108,11 +108,15 @@ const RentPage = () => {
       const response = await fetch(`/api/rentals/search?${params}`);
       const data = await response.json();
 
-      if (data.success) {
-        setRentals(data.data);
+      if (response.ok && data.success) {
+        setRentals(data.data || []);
+      } else {
+        console.error('Failed to fetch rentals:', data.error);
+        setRentals([]);
       }
     } catch (error) {
       console.error('Error fetching rentals:', error);
+      setRentals([]);
     } finally {
       setLoading(false);
     }
@@ -323,6 +327,7 @@ const RentPage = () => {
                       <option value="house">House</option>
                       <option value="townhouse">Townhouse</option>
                       <option value="studio">Studio</option>
+                      <option value="room">Room</option>
                     </select>
                   </div>
                 </form>

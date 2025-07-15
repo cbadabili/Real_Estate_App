@@ -4,6 +4,7 @@ import { storage } from "./storage";
 import { servicesStorage } from "./services-storage";
 import { reviewStorage } from "./review-storage";
 import marketplaceRoutes from "./marketplace-routes";
+import rentalRoutes from "./rental-routes";
 import { parseNaturalLanguageSearch } from './ai-search';
 import { 
   authenticate, 
@@ -1138,6 +1139,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Marketplace routes
   app.use("/api/marketplace", marketplaceRoutes);
+
+  // Rental routes
+  app.use("/api", rentalRoutes);
 
   // Services routes
   // Assuming servicesRoutes is defined elsewhere

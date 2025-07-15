@@ -8,6 +8,7 @@ import marketplaceRoutes from './marketplace-routes';
 import aiSearchRoutes from './ai-search';
 import tenantSupportRoutes from './tenant-support-routes';
 import propertyManagementRoutes from './property-management-routes';
+import { getMigrationManager } from './migration-manager'; // Import migration manager
 
 const app = express();
 app.use(express.json({ limit: '50mb' }));
@@ -85,13 +86,12 @@ app.use((req, res, next) => {
   }
 
   // Initialize database with migrations
-  const { getMigrationManager } = await import('./migration-manager');
   const { seedManager } = await import('./seed-manager');
 
   try {
     console.log('🔄 Running database migrations...');
     const migrationManager = getMigrationManager();
-    await migrationManager.runAllPendingMigrations();
+    await migrationManager.runAllPendingMigrations(); // Run all migrations, including rental
 
     console.log('🌱 Seeding database...');
     await seedManager.seedAll();
