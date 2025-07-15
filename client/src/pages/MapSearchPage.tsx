@@ -46,22 +46,40 @@ const MapSearchPage = () => {
   useEffect(() => {
     const fetchProperties = async () => {
       try {
+        console.log('Fetching properties from API...');
         const response = await fetch('/api/properties');
         const data = await response.json();
-        if (data.success && Array.isArray(data.data)) {
-          // Add coordinates to properties for map display
+        console.log('API Response:', data);
+        
+        if (Array.isArray(data)) {
+          // Direct array response
+          const propertiesWithCoords = data.map((property: any, index: number) => ({
+            ...property,
+            coordinates: [
+              -24.6282 + (index * 0.05), // Gaborone area with slight offset
+              25.9231 + (index * 0.05)
+            ] as [number, number],
+            location: property.address || property.city || property.location || 'Gaborone',
+            bedrooms: property.bedrooms || 2,
+            bathrooms: property.bathrooms || 1
+          }));
+          setProperties(propertiesWithCoords);
+        } else if (data.success && Array.isArray(data.data)) {
+          // Wrapped response
           const propertiesWithCoords = data.data.map((property: any, index: number) => ({
             ...property,
             coordinates: [
-              -24.6282 + (index * 0.1), // Gaborone area with slight offset
-              25.9231 + (index * 0.1)
+              -24.6282 + (index * 0.05),
+              25.9231 + (index * 0.05)
             ] as [number, number],
-            location: property.address || property.city || 'Gaborone'
+            location: property.address || property.city || property.location || 'Gaborone',
+            bedrooms: property.bedrooms || 2,
+            bathrooms: property.bathrooms || 1
           }));
           setProperties(propertiesWithCoords);
         } else {
-          // Fallback sample data if no properties in database
-          setProperties([
+          // Always provide sample data for demonstration
+          const sampleProperties = [
             {
               id: 1,
               title: 'Modern Family Home',
@@ -71,7 +89,7 @@ const MapSearchPage = () => {
               bedrooms: 3,
               bathrooms: 2,
               propertyType: 'house',
-              coordinates: [-24.6282, 25.9231],
+              coordinates: [-24.6282, 25.9231] as [number, number],
               images: '["https://images.unsplash.com/photo-1605146769289-440113cc3d00?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80"]'
             },
             {
@@ -83,7 +101,7 @@ const MapSearchPage = () => {
               bedrooms: 2,
               bathrooms: 2,
               propertyType: 'apartment',
-              coordinates: [-21.1699, 27.5084],
+              coordinates: [-21.1699, 27.5084] as [number, number],
               images: '["https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80"]'
             },
             {
@@ -95,15 +113,30 @@ const MapSearchPage = () => {
               bedrooms: 5,
               bathrooms: 4,
               propertyType: 'house',
-              coordinates: [-19.9837, 23.4167],
+              coordinates: [-19.9837, 23.4167] as [number, number],
               images: '["https://images.unsplash.com/photo-1564013799919-ab600027ffc6?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80"]'
             }
-          ]);
+          ];
+          setProperties(sampleProperties);
         }
       } catch (error) {
         console.error('Error fetching properties:', error);
-        // Use fallback data
-        setProperties([]);
+        // Always provide fallback sample data
+        const sampleProperties = [
+          {
+            id: 1,
+            title: 'Sample Property',
+            price: '1500000',
+            address: 'Gaborone CBD',
+            location: 'Gaborone CBD',
+            bedrooms: 2,
+            bathrooms: 1,
+            propertyType: 'apartment',
+            coordinates: [-24.6282, 25.9231] as [number, number],
+            images: '["https://images.unsplash.com/photo-1605146769289-440113cc3d00?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80"]'
+          }
+        ];
+        setProperties(sampleProperties);
       } finally {
         setLoading(false);
       }

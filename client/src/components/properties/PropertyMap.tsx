@@ -1,5 +1,4 @@
-
-import React from 'react';
+import React, { useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import { Icon } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -36,78 +35,88 @@ interface PropertyMapProps {
 
 const PropertyMap: React.FC<PropertyMapProps> = ({ 
   properties, 
-  center = [-22.3285, 24.6849], // Center of Botswana
+  center = [-22.3285, 24.6849], // Botswana center
   zoom = 6,
   height = "400px"
 }) => {
-  // Filter properties that have coordinates
-  const mappableProperties = properties.filter(p => p.coordinates);
+  useEffect(() => {
+    console.log('PropertyMap rendered with properties:', properties.length);
+  }, [properties]);
 
-  // If no properties have coordinates, add sample coordinates
-  const propertiesWithCoords = mappableProperties.length > 0 ? mappableProperties : properties.map((property, index) => ({
-    ...property,
-    coordinates: [
-      -24.6282 + (index * 0.1), // Gaborone area with slight offset
-      25.9231 + (index * 0.1)
-    ] as [number, number]
-  }));
-
-  return (
-    <div className="w-full h-full">
-      <MapContainer
-        center={center}
-        zoom={zoom}
-        style={{ height, width: '100%' }}
-        className="rounded-lg"
+  if (!properties || properties.length === 0) {
+    return (
+      <div 
+        style={{ height, width: '100%' }} 
+        className="flex items-center justify-center bg-gray-100 border border-gray-300 rounded"
       >
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
-        {propertiesWithCoords.map((property) => (
-          <Marker
-            key={property.id}
-            position={property.coordinates!}
-            icon={defaultIcon}
-          >
-            <Popup>
-              <div className="p-2 min-w-[200px]">
-                <h3 className="font-bold text-lg mb-2">{property.title}</h3>
-                <p className="text-blue-600 font-semibold mb-1">
-                  P{property.price.toLocaleString()}
-                </p>
-                <p className="text-gray-600 text-sm mb-2">{property.location}</p>
-                {property.bedrooms && property.bathrooms && (
-                  <div className="grid grid-cols-2 gap-2 text-sm">
-                    <div>
-                      <span className="font-medium">Bedrooms:</span> {property.bedrooms}
-                    </div>
-                    <div>
-                      <span className="font-medium">Bathrooms:</span> {property.bathrooms}
-                    </div>
-                    {property.area && (
-                      <div>
-                        <span className="font-medium">Area:</span> {property.area}m²
-                      </div>
-                    )}
-                    {property.type && (
-                      <div>
-                        <span className="font-medium">Type:</span> {property.type}
-                      </div>
+        <div className="text-center">
+          <p className="text-gray-600 mb-2">No properties to display on map</p>
+          <p className="text-sm text-gray-500">Properties will appear here when available</p>
+        </div>
+      </div>
+    );
+  }
+
+  try {
+    return (
+      <div style={{ height, width: '100%' }} className="relative">
+        <MapContainer
+          center={center}
+          zoom={zoom}
+          style={{ height: '100%', width: '100%' }}
+          className="z-0"
+        >
+          <TileLayer
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            maxZoom={19}
+          />
+          {properties.map((property) => {
+            if (!property.coordinates || !Array.isArray(property.coordinates) || property.coordinates.length !== 2) {
+              console.warn('Invalid coordinates for property:', property.id, property.coordinates);
+              return null;
+            }
+
+            return (
+              <Marker
+                key={`property-${property.id}`}
+                position={property.coordinates}
+                icon={defaultIcon}
+              >
+                <Popup>
+                  <div className="p-2 min-w-[200px]">
+                    <h3 className="font-semibold text-sm mb-1">{property.title}</h3>
+                    <p className="text-xs text-gray-600 mb-1">{property.location}</p>
+                    <p className="font-bold text-sm text-blue-600 mb-1">
+                      P{typeof property.price === 'string' ? parseInt(property.price).toLocaleString() : property.price.toLocaleString()}
+                    </p>
+                    {property.bedrooms && property.bathrooms && (
+                      <p className="text-xs text-gray-500">
+                        {property.bedrooms} bed • {property.bathrooms} bath
+                      </p>
                     )}
                   </div>
-                )}
-                <button className="mt-2 w-full bg-blue-500 text-white py-1 px-2 rounded text-sm hover:bg-blue-600">
-                  View Details
-                </button>
-              </div>
-            </Popup>
-          </Marker>
-        ))}
-      </MapContainer>
-    </div>
-  );
+                </Popup>
+              </Marker>
+            );
+          })}
+        </MapContainer>
+      </div>
+    );
+  } catch (error) {
+    console.error('Error rendering map:', error);
+    return (
+      <div 
+        style={{ height, width: '100%' }} 
+        className="flex items-center justify-center bg-red-50 border border-red-300 rounded"
+      >
+        <div className="text-center">
+          <p className="text-red-600 mb-2">Error loading map</p>
+          <p className="text-sm text-red-500">Please try refreshing the page</p>
+        </div>
+      </div>
+    );
+  }
 };
 
-export default PropertyMap;
 export { PropertyMap };

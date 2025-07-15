@@ -1,0 +1,97 @@
+Fix Strategy
+1. ✅ Install Required Packages
+Make sure these are installed:
+
+bash
+Copy
+Edit
+npm install leaflet react-leaflet
+npm install --save-dev @types/leaflet
+If Replit fails to install @types/leaflet, try running it again, or manually add this to your devDependencies in package.json:
+
+json
+Copy
+Edit
+"@types/leaflet": "^1.9.4"
+Then run:
+
+bash
+Copy
+Edit
+npm install
+2. ✅ Fix Leaflet CSS Import
+In your top-level component (MapSearchPage.tsx or PropertyMap.tsx), make sure you import the Leaflet CSS once globally:
+
+ts
+Copy
+Edit
+import 'leaflet/dist/leaflet.css';
+3. ✅ Ensure Map Container Has Height
+Leaflet maps won’t render if their container has height: 0. Make sure you style it like:
+
+tsx
+Copy
+Edit
+<div id="map" style={{ height: "80vh", width: "100%" }}>
+  <MapContainer ... />
+</div>
+4. ✅ Fix /api/services Call
+Ensure section is always passed in the fetch:
+
+ts
+Copy
+Edit
+const response = await fetch('/api/services?section=find_pro');
+Or dynamically:
+
+ts
+Copy
+Edit
+const section = 'find_pro'; // fallback or dynamic logic
+fetch(`/api/services?section=${section}`);
+5. ✅ Update PropertyMap.tsx
+Make sure PropertyMap.tsx uses MapContainer, TileLayer, and Marker from react-leaflet correctly:
+
+tsx
+Copy
+Edit
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+
+const PropertyMap = ({ properties }) => {
+  return (
+    <MapContainer center={[-24.6282, 25.9231]} zoom={13} style={{ height: '80vh', width: '100%' }}>
+      <TileLayer
+        attribution='&copy; OpenStreetMap contributors'
+        url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+      />
+      {properties.map((property) => (
+        <Marker
+          key={property.id}
+          position={[property.latitude, property.longitude]}
+          icon={L.icon({
+            iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+          })}
+        >
+          <Popup>
+            <strong>{property.title}</strong><br />
+            P{property.price}
+          </Popup>
+        </Marker>
+      ))}
+    </MapContainer>
+  );
+};
+✅ Final Validation
+After fixing the above:
+
+ MapSearchPage loads without error
+
+ The map renders and centers correctly
+
+ Markers appear for valid properties
+
+ No CORS or 400 API errors in console
