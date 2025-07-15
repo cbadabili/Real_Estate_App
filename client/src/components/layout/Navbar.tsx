@@ -92,7 +92,8 @@ import {
   Minus,
   UserPlus,
   Package,
-  GraduationCap
+  GraduationCap,
+  Handshake
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { AISearchBar } from '../search/AISearchBar';
