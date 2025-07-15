@@ -2,7 +2,8 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { testDatabaseConnection } from "./db";
-import rentalRoutes from './rental-routes';
+import { createRentalRoutes } from './rental-routes';
+import { db } from './db';
 import servicesRoutes from './services-routes';
 import marketplaceRoutes from './marketplace-routes';
 import aiSearchRoutes from './ai-search';
@@ -55,7 +56,8 @@ app.use((req, res, next) => {
 
   const server = await registerRoutes(app);
 
-  app.use('/api', rentalRoutes);
+  const rentalRoutes = createRentalRoutes(db);
+  app.use('/api/rentals', rentalRoutes);
   app.use('/api', aiSearchRoutes);
   app.use('/api', propertyManagementRoutes);
   app.use('/api', tenantSupportRoutes);
