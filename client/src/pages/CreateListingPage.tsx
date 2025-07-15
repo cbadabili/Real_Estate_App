@@ -236,14 +236,16 @@ const CreateListingPage = () => {
       const createdProperty = await response.json();
       console.log('Property created:', createdProperty);
 
-      // Show success message and redirect
-      alert('Property listing created successfully!');
+      // Show success message using toast instead of alert
+      toast.success('Property listing created successfully!');
 
-      // Navigate to the created property or my properties page
-      if (createdProperty.id) {
-        navigate(`/properties/${createdProperty.id}`);
+      // Navigate to the created property page, fallback to properties list
+      const propertyId = createdProperty.id || createdProperty.data?.id || createdProperty.insertId;
+      if (propertyId) {
+        navigate(`/properties/${propertyId}`);
       } else {
-        navigate('/my-properties');
+        // If no ID is returned, navigate to properties page to see the listing
+        navigate('/properties');
       }
 
     } catch (error) {

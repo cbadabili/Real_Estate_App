@@ -105,6 +105,7 @@ function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/properties" element={<RealPropertiesPage />} />
+            <Route path="/properties/:id" element={<PropertyDetailsPage />} />
             <Route path="/plots" element={<PlotsPage />} />
             <Route path="/rent" element={<RentPage />} />
             <Route path="/rental/:id" element={<RentalDetailsPage />} />
