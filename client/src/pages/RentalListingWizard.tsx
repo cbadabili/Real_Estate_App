@@ -397,7 +397,7 @@ const RentalListingWizard = () => {
                   </div>
                   <button
                     type="button"
-                    onClick={() => window.open('/services?category=photography', '_blank')}
+                    onClick={() => window.location.href = '/services?category=photography'}
                     className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
                   >
                     Find Photographers

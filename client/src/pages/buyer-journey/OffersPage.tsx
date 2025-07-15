@@ -334,7 +334,7 @@ const OffersPage = () => {
               <h3 className="text-lg font-semibold text-neutral-900 mb-4">Need Help?</h3>
               <div className="space-y-3">
                 <button 
-                      onClick={() => window.open('/services?category=legal', '_blank')}
+                      onClick={() => window.location.href = '/services?category=legal'}
                       className="w-full bg-green-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-green-700 transition-colors"
                     >
                       Get Negotiation Help

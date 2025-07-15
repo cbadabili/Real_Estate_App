@@ -240,7 +240,7 @@ const ViewingPage = () => {
                     Professional property inspection services
                   </p>
                   <button 
-                    onClick={() => window.open(`/services?category=Property Inspector`, '_blank')}
+                    onClick={() => window.location.href = '/services?category=Property Inspector'}
                     className="w-full bg-beedab-blue text-white py-2 px-3 rounded text-sm hover:bg-beedab-darkblue transition-colors"
                   >
                     Book Inspection
