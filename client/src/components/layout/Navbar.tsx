@@ -1147,6 +1147,5 @@ const Navbar = () => {
     </nav>
   );
 };
-import { Truck } from 'lucide-react';
 
 export default Navbar;
