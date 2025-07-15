@@ -93,7 +93,10 @@ import {
   UserPlus,
   Package,
   GraduationCap,
-  Handshake
+  Handshake,
+  Building2,
+  FileCheck,
+  Truck
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { AISearchBar } from '../search/AISearchBar';
