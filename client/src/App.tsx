@@ -75,6 +75,8 @@ import RentPaymentsPage from './pages/RentPaymentsPage';
 import RentalCalculatorPage from './pages/RentalCalculatorPage';
 import RentalAgreementsPage from './pages/RentalAgreementsPage';
 import RentalMarketInsightsPage from './pages/RentalMarketInsightsPage';
+import PropertyManagementPage from './pages/services/PropertyManagementPage';
+import TenantSupportPage from './pages/services/TenantSupportPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -138,6 +140,8 @@ function App() {
             <Route path="/marketplace/:segment" element={<MarketplacePage />} />
           <Route path="/services/legal" element={<LegalServicesPage />} />
           <Route path="/services/financing" element={<FinancingPage />} />
+          <Route path="/services/property-management" element={<PropertyManagementPage />} />
+          <Route path="/services/tenant-support" element={<TenantSupportPage />} />
 
           {/* Marketplace Routes */}
           <Route path="/marketplace" element={<MarketplacePage />} />
