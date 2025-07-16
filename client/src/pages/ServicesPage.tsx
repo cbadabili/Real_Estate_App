@@ -67,7 +67,7 @@ const ServicesPage: React.FC = () => {
     {
       id: 3,
       name: "Reliable Property Inspectors",
-      category: "property inspector",
+      category: "property-inspection",
       rating: 4.7,
       reviews: 203,
       location: "Gaborone",
@@ -138,7 +138,7 @@ const ServicesPage: React.FC = () => {
     { id: 'all', name: 'All Services', icon: Home },
     { id: 'legal', name: 'Legal Services', icon: Gavel },
     { id: 'photography', name: 'Photography', icon: Camera },
-    { id: 'property inspector', name: 'Property Inspection', icon: Shield },
+    { id: 'property-inspection', name: 'Property Inspection', icon: Shield },
     { id: 'finance', name: 'Finance & Loans', icon: Calculator },
     { id: 'insurance', name: 'Insurance', icon: Award },
   ];

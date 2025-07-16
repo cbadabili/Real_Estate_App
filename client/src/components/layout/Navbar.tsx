@@ -325,7 +325,7 @@ const Navbar = () => {
                         <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide px-2 py-1">Professional Services</div>
 
                         <Link
-                          to="/services/legal"
+                          to="/services?category=legal"
                           className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
                           onClick={() => setBuyDropdownOpen(false)}
                         >
@@ -648,7 +648,7 @@ const Navbar = () => {
                       <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide px-2 py-1 mb-3">Service Categories</div>
 
                       <Link
-                        to="/marketplace/professionals"
+                        to="/services"
                         className="block px-4 py-3 text-sm text-neutral-700 hover:bg-neutral-100 rounded mb-2"
                         onClick={() => setServicesDropdownOpen(false)}
                       >
@@ -656,7 +656,7 @@ const Navbar = () => {
                           <Award className="h-5 w-5 mr-3 text-beedab-blue" />
                           <div>
                             <div className="font-semibold">Professional Services</div>
-                            <div className="text-xs text-gray-500">Legal, valuation, and professional services</div>
+                            <div className="text-xs text-gray-500">Legal, photography, inspection, finance & insurance</div>
                           </div>
                         </div>
                       </Link>
