@@ -170,22 +170,22 @@ export class ServicesStorage implements IServicesStorage {
       ))
       .orderBy(desc(serviceAds.priority))
       .limit(1);
-
+    
     if (ad) {
       // Increment impressions
       await this.incrementAdMetrics(ad.id, 'impressions');
     }
-
+    
     return ad || undefined;
   }
 
   async getServiceAds(providerId?: number): Promise<ServiceAd[]> {
     let query = db.select().from(serviceAds);
-
+    
     if (providerId) {
       query = query.where(eq(serviceAds.providerId, providerId));
     }
-
+    
     return await query.orderBy(desc(serviceAds.priority), desc(serviceAds.createdAt));
   }
 
@@ -234,11 +234,11 @@ export class ServicesStorage implements IServicesStorage {
       .insert(serviceReviews)
       .values(review)
       .returning();
-
+    
     // Update provider's review count and average rating
     const reviews = await this.getServiceReviews(review.providerId);
     const avgRating = reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length;
-
+    
     await db
       .update(serviceProviders)
       .set({
@@ -246,7 +246,7 @@ export class ServicesStorage implements IServicesStorage {
         rating: avgRating.toFixed(1)
       })
       .where(eq(serviceProviders.id, review.providerId));
-
+    
     return newReview;
   }
 

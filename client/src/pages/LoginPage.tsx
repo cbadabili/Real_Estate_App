@@ -1,186 +1,395 @@
+
 import React, { useState } from 'react';
-import { Link, useLocation } from 'wouter';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { useForm } from 'react-hook-form';
+import { 
+  Mail, 
+  Lock, 
+  Eye, 
+  EyeOff, 
+  User, 
+  ArrowLeft,
+  AlertCircle,
+  CheckCircle,
+  Building,
+  UserCheck,
+  Users,
+  Briefcase
+} from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import { Button } from '../components/ui/button';
-import { Input } from '../components/ui/input';
-import { Label } from '../components/ui/label';
+import toast from 'react-hot-toast';
 
-const LoginPage: React.FC = () => {
-  const [, setLocation] = useLocation();
-  const { login, register } = useAuth();
+const LoginPage = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { login } = useAuth();
+  
   const [isLogin, setIsLogin] = useState(true);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
+  
+  const { register, handleSubmit, watch, formState: { errors } } = useForm();
+  const password = watch('password');
 
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-    name: '',
-    confirmPassword: ''
-  });
+  const redirectPath = new URLSearchParams(location.search).get('redirect') || '/dashboard';
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData(prev => ({
-      ...prev,
-      [e.target.name]: e.target.value
-    }));
-    setError(''); // Clear error when user types
-  };
-
-  const validateForm = () => {
-    if (!formData.email || !formData.password) {
-      setError('Email and password are required');
-      return false;
-    }
-
-    if (!isLogin) {
-      if (!formData.name) {
-        setError('Name is required');
-        return false;
-      }
-      if (formData.password !== formData.confirmPassword) {
-        setError('Passwords do not match');
-        return false;
-      }
-      if (formData.password.length < 6) {
-        setError('Password must be at least 6 characters');
-        return false;
-      }
-    }
-
-    return true;
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!validateForm()) {
-      return;
-    }
-
+  const onSubmit = async (data: any) => {
     setIsLoading(true);
-    setError('');
-
     try {
       if (isLogin) {
-        await login(formData.email, formData.password);
+        // Login
+        const response = await fetch('/api/users/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email: data.email,
+            password: data.password,
+          }),
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+          login(result);
+          toast.success('Login successful!');
+          navigate(redirectPath);
+        } else {
+          toast.error(result.message || 'Login failed. Please check your credentials.');
+        }
       } else {
-        await register(formData.email, formData.password, formData.name);
+        // Registration
+        const response = await fetch('/api/users/register', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            firstName: data.firstName,
+            lastName: data.lastName,
+            email: data.email,
+            username: data.username,
+            password: data.password,
+            userType: data.userType,
+            phone: data.phone,
+            dateOfBirth: data.dateOfBirth,
+            address: data.address,
+            city: data.city,
+            state: data.state,
+            zipCode: data.zipCode,
+            isActive: true,
+          }),
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+          toast.success('Registration successful! Please login.');
+          setIsLogin(true);
+        } else {
+          toast.error(result.message || 'Registration failed. Please try again.');
+        }
       }
-      setLocation('/dashboard');
-    } catch (error: any) {
-      setError(error.message || 'An error occurred');
+    } catch (error) {
+      console.error('Auth error:', error);
+      toast.error('An error occurred. Please try again.');
     } finally {
       setIsLoading(false);
     }
   };
 
+  const goBack = () => {
+    if (window.history.length > 1) {
+      navigate(-1);
+    } else {
+      navigate('/');
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <Link to="/">
-          <img 
-            className="mx-auto h-12 w-auto" 
-            src="/logo.png" 
-            alt="BeeDaB" 
-          />
-        </Link>
-        <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-          {isLogin ? 'Sign in to your account' : 'Create your account'}
-        </h2>
-        <p className="mt-2 text-center text-sm text-gray-600">
-          {isLogin ? "Don't have an account? " : "Already have an account? "}
-          <button
-            type="button"
-            onClick={() => {
-              setIsLogin(!isLogin);
-              setError('');
-              setFormData({ email: '', password: '', name: '', confirmPassword: '' });
-            }}
-            className="font-medium text-blue-600 hover:text-blue-500"
+    <div className="min-h-screen bg-gradient-to-br from-beedab-lightblue via-white to-beedab-blue/10">
+      <div className="container mx-auto px-4 py-8">
+        {/* Back Button */}
+        <button
+          onClick={goBack}
+          className="flex items-center text-beedab-blue hover:text-beedab-darkblue transition-colors mb-6"
+        >
+          <ArrowLeft className="h-5 w-5 mr-2" />
+          Back
+        </button>
+
+        <div className="max-w-md mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-white rounded-2xl shadow-xl p-8"
           >
-            {isLogin ? 'Sign up' : 'Sign in'}
-          </button>
-        </p>
-      </div>
-
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
-          <form className="space-y-6" onSubmit={handleSubmit}>
-            {!isLogin && (
-              <div>
-                <Label htmlFor="name">Full Name</Label>
-                <Input
-                  id="name"
-                  name="name"
-                  type="text"
-                  required={!isLogin}
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  className="mt-1"
-                  placeholder="Enter your full name"
-                />
+            {/* Header */}
+            <div className="text-center mb-8">
+              <div className="flex items-center justify-center mb-4">
+                <Building className="h-8 w-8 text-beedab-blue mr-3" />
+                <h1 className="text-2xl font-bold text-neutral-900">
+                  {isLogin ? 'Welcome Back' : 'Join BeeDaB'}
+                </h1>
               </div>
-            )}
-
-            <div>
-              <Label htmlFor="email">Email address</Label>
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                required
-                value={formData.email}
-                onChange={handleInputChange}
-                className="mt-1"
-                placeholder="Enter your email"
-              />
+              <p className="text-neutral-600">
+                {isLogin 
+                  ? 'Sign in to your account' 
+                  : 'Create your account to get started'
+                }
+              </p>
             </div>
 
-            <div>
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                name="password"
-                type="password"
-                required
-                value={formData.password}
-                onChange={handleInputChange}
-                className="mt-1"
-                placeholder="Enter your password"
-              />
+            {/* Toggle Buttons */}
+            <div className="flex mb-6 bg-neutral-100 rounded-lg p-1">
+              <button
+                onClick={() => setIsLogin(true)}
+                className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+                  isLogin 
+                    ? 'bg-white text-beedab-blue shadow-sm' 
+                    : 'text-neutral-600 hover:text-neutral-900'
+                }`}
+              >
+                Login
+              </button>
+              <button
+                onClick={() => setIsLogin(false)}
+                className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
+                  !isLogin 
+                    ? 'bg-white text-beedab-blue shadow-sm' 
+                    : 'text-neutral-600 hover:text-neutral-900'
+                }`}
+              >
+                Register
+              </button>
             </div>
 
-            {!isLogin && (
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+              {/* Registration Fields */}
+              {!isLogin && (
+                <>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-neutral-700 mb-1">
+                        First Name *
+                      </label>
+                      <input
+                        type="text"
+                        {...register('firstName', { required: 'First name is required' })}
+                        className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
+                        placeholder="John"
+                      />
+                      {errors.firstName && (
+                        <p className="text-red-600 text-sm mt-1">{errors.firstName.message as string}</p>
+                      )}
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-neutral-700 mb-1">
+                        Last Name *
+                      </label>
+                      <input
+                        type="text"
+                        {...register('lastName', { required: 'Last name is required' })}
+                        className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
+                        placeholder="Doe"
+                      />
+                      {errors.lastName && (
+                        <p className="text-red-600 text-sm mt-1">{errors.lastName.message as string}</p>
+                      )}
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-700 mb-1">
+                      Username *
+                    </label>
+                    <div className="relative">
+                      <User className="absolute left-3 top-2.5 h-5 w-5 text-neutral-400" />
+                      <input
+                        type="text"
+                        {...register('username', { required: 'Username is required' })}
+                        className="w-full pl-10 pr-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
+                        placeholder="johndoe"
+                      />
+                    </div>
+                    {errors.username && (
+                      <p className="text-red-600 text-sm mt-1">{errors.username.message as string}</p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-700 mb-1">
+                      Account Type *
+                    </label>
+                    <select
+                      {...register('userType', { required: 'Account type is required' })}
+                      className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
+                    >
+                      <option value="">Select account type</option>
+                      <option value="buyer">Buyer</option>
+                      <option value="seller">Seller</option>
+                      <option value="agent">Agent</option>
+                      <option value="fsbo">Owner Seller</option>
+                    </select>
+                    {errors.userType && (
+                      <p className="text-red-600 text-sm mt-1">{errors.userType.message as string}</p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-700 mb-1">
+                      Phone Number
+                    </label>
+                    <input
+                      type="tel"
+                      {...register('phone')}
+                      className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
+                      placeholder="+267 1234 5678"
+                    />
+                  </div>
+                </>
+              )}
+
+              {/* Email Field */}
               <div>
-                <Label htmlFor="confirmPassword">Confirm Password</Label>
-                <Input
-                  id="confirmPassword"
-                  name="confirmPassword"
-                  type="password"
-                  required={!isLogin}
-                  value={formData.confirmPassword}
-                  onChange={handleInputChange}
-                  className="mt-1"
-                  placeholder="Confirm your password"
-                />
+                <label className="block text-sm font-medium text-neutral-700 mb-1">
+                  Email Address *
+                </label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-2.5 h-5 w-5 text-neutral-400" />
+                  <input
+                    type="email"
+                    {...register('email', { 
+                      required: 'Email is required',
+                      pattern: {
+                        value: /^\S+@\S+$/i,
+                        message: 'Please enter a valid email'
+                      }
+                    })}
+                    className="w-full pl-10 pr-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
+                    placeholder="john@example.com"
+                  />
+                </div>
+                {errors.email && (
+                  <p className="text-red-600 text-sm mt-1">{errors.email.message as string}</p>
+                )}
               </div>
-            )}
 
-            {error && (
-              <div className="text-red-600 text-sm text-center bg-red-50 p-3 rounded-md">
-                {error}
+              {/* Password Field */}
+              <div>
+                <label className="block text-sm font-medium text-neutral-700 mb-1">
+                  Password *
+                </label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-2.5 h-5 w-5 text-neutral-400" />
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    {...register('password', { 
+                      required: 'Password is required',
+                      minLength: {
+                        value: 6,
+                        message: 'Password must be at least 6 characters'
+                      }
+                    })}
+                    className="w-full pl-10 pr-10 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
+                    placeholder="Enter your password"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-2.5 text-neutral-400 hover:text-neutral-600"
+                  >
+                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  </button>
+                </div>
+                {errors.password && (
+                  <p className="text-red-600 text-sm mt-1">{errors.password.message as string}</p>
+                )}
               </div>
-            )}
 
-            <Button
-              type="submit"
-              disabled={isLoading}
-              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
-            >
-              {isLoading ? 'Please wait...' : (isLogin ? 'Sign in' : 'Sign up')}
-            </Button>
-          </form>
+              {/* Confirm Password (Registration only) */}
+              {!isLogin && (
+                <div>
+                  <label className="block text-sm font-medium text-neutral-700 mb-1">
+                    Confirm Password *
+                  </label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-2.5 h-5 w-5 text-neutral-400" />
+                    <input
+                      type={showConfirmPassword ? 'text' : 'password'}
+                      {...register('confirmPassword', { 
+                        required: 'Please confirm your password',
+                        validate: value => value === password || 'Passwords do not match'
+                      })}
+                      className="w-full pl-10 pr-10 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
+                      placeholder="Confirm your password"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      className="absolute right-3 top-2.5 text-neutral-400 hover:text-neutral-600"
+                    >
+                      {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                    </button>
+                  </div>
+                  {errors.confirmPassword && (
+                    <p className="text-red-600 text-sm mt-1">{errors.confirmPassword.message as string}</p>
+                  )}
+                </div>
+              )}
+
+              {/* Submit Button */}
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full bg-beedab-blue text-white py-2 px-4 rounded-lg font-medium hover:bg-beedab-darkblue transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+              >
+                {isLoading ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    {isLogin ? 'Signing in...' : 'Creating account...'}
+                  </>
+                ) : (
+                  <>
+                    {isLogin ? (
+                      <CheckCircle className="h-4 w-4 mr-2" />
+                    ) : (
+                      <UserCheck className="h-4 w-4 mr-2" />
+                    )}
+                    {isLogin ? 'Sign In' : 'Create Account'}
+                  </>
+                )}
+              </button>
+            </form>
+
+            {/* Footer */}
+            <div className="mt-6 text-center text-sm text-neutral-600">
+              {isLogin ? (
+                <>
+                  Don't have an account?{' '}
+                  <button
+                    onClick={() => setIsLogin(false)}
+                    className="text-beedab-blue hover:text-beedab-darkblue font-medium"
+                  >
+                    Register here
+                  </button>
+                </>
+              ) : (
+                <>
+                  Already have an account?{' '}
+                  <button
+                    onClick={() => setIsLogin(true)}
+                    className="text-beedab-blue hover:text-beedab-darkblue font-medium"
+                  >
+                    Back to Login
+                  </button>
+                </>
+              )}
+            </div>
+          </motion.div>
         </div>
       </div>
     </div>

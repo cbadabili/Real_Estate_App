@@ -18,7 +18,6 @@ interface User {
   reacNumber?: string;
   lastLoginAt?: string;
   createdAt: string;
-  profilePicture?: string;
 }
 
 interface AuthContextType {
