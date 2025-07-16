@@ -228,3 +228,144 @@ router.delete('/properties/:id', authenticate, async (req, res) => {
 });
 
 export default router;
+import express from 'express';
+import { RentalStorage } from './rental-storage';
+
+export function createPropertyManagementRoutes(): express.Router {
+  const router = express.Router();
+  const rentalStorage = new RentalStorage();
+
+  // Get dashboard data
+  router.get('/dashboard', async (req, res) => {
+    try {
+      const stats = await rentalStorage.getRentalStats();
+      const recentActivity = [
+        {
+          id: 1,
+          type: 'maintenance',
+          description: 'Plumbing repair completed at Gaborone Apartment',
+          date: new Date().toISOString(),
+          status: 'completed'
+        },
+        {
+          id: 2,
+          type: 'rental',
+          description: 'New tenant application for CBD Office Space',
+          date: new Date(Date.now() - 86400000).toISOString(),
+          status: 'pending'
+        },
+        {
+          id: 3,
+          type: 'payment',
+          description: 'Rent payment received for Francistown House',
+          date: new Date(Date.now() - 172800000).toISOString(),
+          status: 'completed'
+        }
+      ];
+
+      const dashboardData = {
+        totalProperties: stats.total,
+        activeRentals: stats.available,
+        maintenanceRequests: 5,
+        monthlyRevenue: stats.avgPrice * stats.available,
+        occupancyRate: stats.rented > 0 ? (stats.rented / stats.total) * 100 : 0,
+        recentActivity
+      };
+
+      res.json({
+        success: true,
+        data: dashboardData
+      });
+    } catch (error) {
+      console.error('Error fetching property management dashboard:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to fetch dashboard data'
+      });
+    }
+  });
+
+  // Get all managed properties
+  router.get('/properties', async (req, res) => {
+    try {
+      const properties = await rentalStorage.getAllRentals();
+      res.json({
+        success: true,
+        data: properties
+      });
+    } catch (error) {
+      console.error('Error fetching managed properties:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to fetch properties'
+      });
+    }
+  });
+
+  // Get maintenance requests
+  router.get('/maintenance', async (req, res) => {
+    try {
+      const maintenanceRequests = [
+        {
+          id: 1,
+          propertyId: 1,
+          description: 'Leaking faucet in kitchen',
+          priority: 'medium',
+          status: 'pending',
+          reportedDate: new Date().toISOString(),
+          tenantName: 'John Doe'
+        },
+        {
+          id: 2,
+          propertyId: 2,
+          description: 'Air conditioning not working',
+          priority: 'high',
+          status: 'in_progress',
+          reportedDate: new Date(Date.now() - 86400000).toISOString(),
+          tenantName: 'Jane Smith'
+        }
+      ];
+
+      res.json({
+        success: true,
+        data: maintenanceRequests
+      });
+    } catch (error) {
+      console.error('Error fetching maintenance requests:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to fetch maintenance requests'
+      });
+    }
+  });
+
+  // Create maintenance request
+  router.post('/maintenance', async (req, res) => {
+    try {
+      const { propertyId, description, priority } = req.body;
+      
+      const newRequest = {
+        id: Date.now(),
+        propertyId,
+        description,
+        priority: priority || 'medium',
+        status: 'pending',
+        reportedDate: new Date().toISOString(),
+        tenantName: 'System Generated'
+      };
+
+      res.status(201).json({
+        success: true,
+        data: newRequest
+      });
+    } catch (error) {
+      console.error('Error creating maintenance request:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to create maintenance request'
+      });
+    }
+  });
+
+  return router;
+}

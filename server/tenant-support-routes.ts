@@ -168,3 +168,125 @@ router.post('/support/tickets', authenticate, async (req, res) => {
 });
 
 export default router;
+import express from 'express';
+
+export function createTenantSupportRoutes(): express.Router {
+  const router = express.Router();
+
+  // Get support resources
+  router.get('/resources', async (req, res) => {
+    try {
+      const resources = {
+        tenantRights: [
+          {
+            title: 'Right to Peaceful Enjoyment',
+            description: 'You have the right to use your rental property without unreasonable interference from your landlord.',
+            details: 'Landlords cannot enter without proper notice (typically 24-48 hours) except in emergencies.'
+          },
+          {
+            title: 'Right to Habitable Housing',
+            description: 'Your rental property must meet basic health and safety standards.',
+            details: 'This includes proper plumbing, heating, electrical systems, and structural integrity.'
+          },
+          {
+            title: 'Right to Security Deposit Return',
+            description: 'You are entitled to the return of your security deposit minus legitimate deductions.',
+            details: 'Landlords must provide itemized list of deductions and return deposits within 30 days of lease termination.'
+          }
+        ],
+        legalRequirements: [
+          {
+            title: 'Rental Agreement Requirements',
+            description: 'All rental agreements must be in writing and include specific terms.',
+            details: 'Must include rent amount, payment schedule, lease duration, and property condition.'
+          },
+          {
+            title: 'Notice Requirements',
+            description: 'Proper notice must be given for lease termination and rent increases.',
+            details: 'Typically 30 days notice for month-to-month tenancies, 60 days for rent increases.'
+          },
+          {
+            title: 'Landlord Obligations',
+            description: 'Landlords must maintain the property and address health/safety issues.',
+            details: 'Includes repairs, pest control, and ensuring compliance with building codes.'
+          }
+        ],
+        contactInfo: {
+          helpline: '+267 123 4567',
+          email: 'support@beedab.com',
+          officeHours: 'Monday - Friday: 8:00 AM - 6:00 PM'
+        }
+      };
+
+      res.json({
+        success: true,
+        data: resources
+      });
+    } catch (error) {
+      console.error('Error fetching support resources:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to fetch support resources'
+      });
+    }
+  });
+
+  // Submit a complaint
+  router.post('/complaint', async (req, res) => {
+    try {
+      const { subject, description, category, propertyId } = req.body;
+      
+      const complaint = {
+        id: Date.now(),
+        referenceNumber: `TN-${Date.now().toString().slice(-6)}`,
+        subject,
+        description,
+        category,
+        propertyId,
+        status: 'submitted',
+        submittedDate: new Date().toISOString()
+      };
+
+      res.status(201).json({
+        success: true,
+        data: complaint,
+        message: 'Complaint submitted successfully'
+      });
+    } catch (error) {
+      console.error('Error submitting complaint:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to submit complaint'
+      });
+    }
+  });
+
+  // Get tenant complaints
+  router.get('/complaints', async (req, res) => {
+    try {
+      const complaints = [
+        {
+          id: 1,
+          referenceNumber: 'TN-123456',
+          subject: 'Heating system not working',
+          category: 'maintenance',
+          status: 'in_progress',
+          submittedDate: new Date().toISOString()
+        }
+      ];
+
+      res.json({
+        success: true,
+        data: complaints
+      });
+    } catch (error) {
+      console.error('Error fetching complaints:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to fetch complaints'
+      });
+    }
+  });
+
+  return router;
+}

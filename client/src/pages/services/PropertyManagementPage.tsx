@@ -158,7 +158,10 @@ const PropertyManagementPage: React.FC = () => {
               <h3 className="text-lg font-semibold text-neutral-900">Property Listings</h3>
             </div>
             <p className="text-neutral-600 mb-4">Manage your rental property listings and availability</p>
-            <button className="w-full bg-beedab-blue text-white py-2 px-4 rounded-lg hover:bg-beedab-darkblue transition-colors">
+            <button 
+              onClick={() => window.location.href = '/rent?tab=listings'}
+              className="w-full bg-beedab-blue text-white py-2 px-4 rounded-lg hover:bg-beedab-darkblue transition-colors"
+            >
               Manage Listings
             </button>
           </motion.div>
@@ -174,7 +177,10 @@ const PropertyManagementPage: React.FC = () => {
               <h3 className="text-lg font-semibold text-neutral-900">Tenant Management</h3>
             </div>
             <p className="text-neutral-600 mb-4">Screen tenants, manage applications and lease agreements</p>
-            <button className="w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors">
+            <button 
+              onClick={() => window.location.href = '/rent?tab=applications'}
+              className="w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors"
+            >
               Manage Tenants
             </button>
           </motion.div>
@@ -190,7 +196,10 @@ const PropertyManagementPage: React.FC = () => {
               <h3 className="text-lg font-semibold text-neutral-900">Rent Collection</h3>
             </div>
             <p className="text-neutral-600 mb-4">Track payments, send reminders and manage finances</p>
-            <button className="w-full bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700 transition-colors">
+            <button 
+              onClick={() => window.location.href = '/rent-collection'}
+              className="w-full bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700 transition-colors"
+            >
               View Payments
             </button>
           </motion.div>
@@ -273,7 +282,10 @@ const PropertyManagementPage: React.FC = () => {
               <p className="text-sm text-blue-100">Market analysis and rent optimization</p>
             </div>
           </div>
-          <button className="bg-white text-beedab-blue px-8 py-3 rounded-lg font-medium hover:bg-neutral-100 transition-colors mt-6">
+          <button 
+            onClick={() => window.location.href = '/contact-agent'}
+            className="bg-white text-beedab-blue px-8 py-3 rounded-lg font-medium hover:bg-neutral-100 transition-colors mt-6"
+          >
             Get Professional Management
           </button>
         </motion.div>

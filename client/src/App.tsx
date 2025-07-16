@@ -141,8 +141,8 @@ function App() {
           <Route path="/services/legal" element={<LegalServicesPage />} />
           <Route path="/services/financing" element={<FinancingPage />} />
           <Route path="/services/property-management" element={<PropertyManagementPage />} />
-          <Route path="/services/tenant-support" element={<TenantSupportPage />} />
-
+        <Route path="/services/tenant-support" element={<TenantSupportPage />} />
+        <Route path="/rent-collection" element={<RentCollectionPage />} />
           {/* Marketplace Routes */}
           <Route path="/marketplace" element={<MarketplacePage />} />
           <Route path="/marketplace/register" element={<RegisterProviderPage />} />

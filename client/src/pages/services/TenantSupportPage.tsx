@@ -153,7 +153,10 @@ const TenantSupportPage: React.FC = () => {
             </div>
             <h3 className="text-lg font-semibold text-neutral-900 mb-2">Live Chat</h3>
             <p className="text-neutral-600 mb-4 text-sm">Get instant help from our support team</p>
-            <button className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors">
+            <button 
+              onClick={() => alert('Live chat feature will be available soon!')}
+              className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
+            >
               Start Chat
             </button>
           </motion.div>
@@ -169,7 +172,10 @@ const TenantSupportPage: React.FC = () => {
             </div>
             <h3 className="text-lg font-semibold text-neutral-900 mb-2">Emergency Line</h3>
             <p className="text-neutral-600 mb-4 text-sm">24/7 emergency support hotline</p>
-            <button className="w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors">
+            <button 
+              onClick={() => window.open('tel:+26712345678')}
+              className="w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors"
+            >
               Call Now
             </button>
           </motion.div>
