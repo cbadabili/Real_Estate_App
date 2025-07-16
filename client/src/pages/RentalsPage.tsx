@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Card } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { LoadingSpinner } from '../components/ui/LoadingSpinner';
+import { PropertyMap } from '../components/properties/PropertyMap';
+import { Grid, Map } from 'lucide-react';
 
 interface Rental {
   id: number;
@@ -34,6 +36,7 @@ export default function RentalsPage() {
   const [rentals, setRentals] = useState<Rental[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<'grid' | 'map'>('grid');
 
   useEffect(() => {
     fetchRentals();
@@ -73,6 +76,23 @@ export default function RentalsPage() {
     }).format(price);
   };
 
+  // Transform rentals for map display
+  const transformRentalsForMap = (rentals: Rental[]) => {
+    return rentals.map((rental, index) => ({
+      id: rental.id,
+      title: rental.title,
+      price: rental.price,
+      latitude: -24.6282 + (index * 0.01), // Sample coordinates around Gaborone
+      longitude: 25.9231 + (index * 0.01),
+      bedrooms: rental.bedrooms,
+      bathrooms: rental.bathrooms,
+      location: rental.location,
+      city: rental.city,
+      propertyType: rental.property_type,
+      description: rental.description || `${rental.bedrooms} bed, ${rental.bathrooms} bath ${rental.property_type}`
+    }));
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -98,15 +118,53 @@ export default function RentalsPage() {
       <div className="container mx-auto px-4 py-6">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold text-gray-900">Rental Properties</h1>
-          <Button onClick={() => window.location.href = '/rental-listing-wizard'}>
-            List Your Property
-          </Button>
+          <div className="flex items-center gap-4">
+            {/* View Mode Toggle */}
+            <div className="flex items-center bg-gray-100 rounded-lg p-1">
+              <button
+                onClick={() => setViewMode('grid')}
+                className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  viewMode === 'grid'
+                    ? 'bg-white text-gray-900 shadow-sm'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                <Grid className="h-4 w-4" />
+                Grid
+              </button>
+              <button
+                onClick={() => setViewMode('map')}
+                className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  viewMode === 'map'
+                    ? 'bg-white text-gray-900 shadow-sm'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                <Map className="h-4 w-4" />
+                Map
+              </button>
+            </div>
+            <Button onClick={() => window.location.href = '/rental-listing-wizard'}>
+              List Your Property
+            </Button>
+          </div>
         </div>
 
         {rentals.length === 0 ? (
           <div className="text-center py-12">
             <h2 className="text-xl text-gray-600">No rental properties available</h2>
             <p className="text-gray-500 mt-2">Check back later for new listings.</p>
+          </div>
+        ) : viewMode === 'map' ? (
+          <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+            <PropertyMap
+              properties={transformRentalsForMap(rentals)}
+              selectedProperty={null}
+              onPropertySelect={(property) => {
+                window.location.href = `/rental/${property.id}`;
+              }}
+              className="h-[600px] rounded-lg overflow-hidden"
+            />
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
