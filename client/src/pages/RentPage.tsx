@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { SmartSearchBar } from '../components/search/SmartSearchBar';
 
 interface RentalProperty {
   id: number;
@@ -276,16 +277,13 @@ const RentPage = () => {
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
                     <div className="lg:col-span-2">
                       <label className="block text-sm font-medium text-gray-700 mb-2">Location</label>
-                      <div className="relative">
-                        <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                        <input
-                          type="text"
-                          placeholder="Search by city or area..."
-                          value={searchQuery}
-                          onChange={(e) => setSearchQuery(e.target.value)}
-                          className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-beedab-blue focus:border-beedab-blue"
-                        />
-                      </div>
+                      <SmartSearchBar
+                        value={searchQuery}
+                        onChange={setSearchQuery}
+                        onSearch={(query) => setSearchQuery(query)}
+                        placeholder="Search by city, district, or area in Botswana..."
+                        className="w-full"
+                      />
                     </div>
 
                   <div>

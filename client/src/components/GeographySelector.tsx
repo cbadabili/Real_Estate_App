@@ -10,37 +10,40 @@ import {
 
 interface GeographySelectorProps {
   onLocationChange: (location: {
-    city: string;
     state: string;
-    ward?: string;
+    city: string;
+    ward: string;
   }) => void;
-  initialCity?: string;
-  initialState?: string;
-  initialWard?: string;
   className?: string;
+  placeholder?: {
+    state?: string;
+    city?: string;
+    ward?: string;
+  };
+  showWards?: boolean;
 }
 
-export const GeographySelector: React.FC<GeographySelectorProps> = ({
-  onLocationChange,
-  initialCity = '',
-  initialState = '',
-  initialWard = '',
-  className = ''
+const GeographySelector: React.FC<GeographySelectorProps> = ({ 
+  onLocationChange, 
+  className = '',
+  placeholder = {},
+  showWards = true
 }) => {
-  const [selectedCity, setSelectedCity] = useState(initialCity);
-  const [selectedState, setSelectedState] = useState(initialState);
-  const [selectedWard, setSelectedWard] = useState(initialWard);
-  
+  const [selectedCity, setSelectedCity] = useState('');
+  const [selectedState, setSelectedState] = useState('');
+  const [selectedWard, setSelectedWard] = useState('');
+
   const [availableWards, setAvailableWards] = useState<string[]>([]);
-  
-  const [citySearch, setCitySearch] = useState(initialCity);
+
+  const [citySearch, setCitySearch] = useState('');
   const [showCitySuggestions, setShowCitySuggestions] = useState(false);
   const [filteredCities, setFilteredCities] = useState<string[]>([]);
-  
-  const [stateSearch, setStateSearch] = useState(initialState);
+
+  const [stateSearch, setStateSearch] = useState('');
   const [showStateSuggestions, setShowStateSuggestions] = useState(false);
   const [filteredStates, setFilteredStates] = useState<string[]>([]);
 
+  const [wardSearch, setWardSearch] = useState('');
 
 
   // Filter cities based on search input
@@ -142,9 +145,9 @@ export const GeographySelector: React.FC<GeographySelectorProps> = ({
             setTimeout(() => setShowCitySuggestions(false), 200);
           }}
           className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-          placeholder="Start typing city name..."
+          placeholder={placeholder.city || "Search cities..."}
         />
-        
+
         {/* City Suggestions Dropdown */}
         {showCitySuggestions && filteredCities.length > 0 && (
           <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
@@ -181,9 +184,9 @@ export const GeographySelector: React.FC<GeographySelectorProps> = ({
             setTimeout(() => setShowStateSuggestions(false), 200);
           }}
           className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-          placeholder="Select city first or type district name..."
+          placeholder={placeholder.state || "Search districts..."}
         />
-        
+
         {/* State Suggestions Dropdown */}
         {showStateSuggestions && filteredStates.length > 0 && (
           <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
@@ -200,34 +203,42 @@ export const GeographySelector: React.FC<GeographySelectorProps> = ({
         )}
       </div>
 
-      {/* Ward/Area - Enhanced with comprehensive options but optional */}
-      <div>
-        <label className="block text-sm font-medium text-neutral-700 mb-2">
-          Ward/Area
-        </label>
-        {availableWards.length > 0 ? (
-          <select
-            value={selectedWard}
-            onChange={(e) => setSelectedWard(e.target.value)}
-            className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-          >
-            <option value="">Select ward/area (optional)</option>
-            {availableWards.map((ward) => (
-              <option key={ward} value={ward}>
-                {ward}
-              </option>
-            ))}
-          </select>
-        ) : (
-          <input
-            type="text"
-            value={selectedWard}
-            onChange={(e) => setSelectedWard(e.target.value)}
-            className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-            placeholder="Enter ward/area (optional)"
-          />
+      {/* Ward/Suburb Selection */}
+        {showWards && (
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Ward/Suburb
+            </label>
+            <div className="relative">
+              <input
+                type="text"
+                value={wardSearch}
+                onChange={(e) => setWardSearch(e.target.value)}
+                placeholder={placeholder.ward || "Search wards..."}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+              {wardSearch && availableWards.length > 0 && (
+                <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-40 overflow-y-auto">
+                  {availableWards
+                    .filter(ward => ward.toLowerCase().includes(wardSearch.toLowerCase()))
+                    .slice(0, 5)
+                    .map((ward) => (
+                      <button
+                        key={ward}
+                        onClick={() => {
+                          setSelectedWard(ward);
+                          setWardSearch(ward);
+                        }}
+                        className="w-full px-4 py-2 text-left hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
+                      >
+                        {ward}
+                      </button>
+                    ))}
+                </div>
+              )}
+            </div>
+          </div>
         )}
-      </div>
 
       {/* Location Preview */}
       {selectedCity && selectedState && (

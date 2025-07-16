@@ -134,6 +134,7 @@ function App() {
             <Route path="/secure-transactions" element={<SecureTransactionsPage />} />
             <Route path="/communication" element={<CommunicationPage />} />
             <Route path="/agent-network" element={<AgentNetworkPage />} />
+            <Route path="/map-search" element={<MapSearchPage />} />
             <Route path="/create-listing" element={<CreateListingPage />} />
             <Route path="/services" element={<ServicesPage />} />
             <Route path="/marketplace" element={<MarketplacePage />} />
