@@ -217,9 +217,9 @@ export class RentalStorage {
       const result = this.database.update(rental_listings)
         .set(updateData)
         .where(eq(rental_listings.id, id))
-        .run();
+        .returning();
 
-      return result.changes > 0;
+      return result.length > 0;
     } catch (error) {
       console.error('Error updating rental:', error);
       return false;
@@ -231,9 +231,9 @@ export class RentalStorage {
     try {
       const result = this.database.delete(rental_listings)
         .where(eq(rental_listings.id, id))
-        .run();
+        .returning();
 
-      return result.changes > 0;
+      return result.length > 0;
     } catch (error) {
       console.error('Error deleting rental:', error);
       return false;
@@ -278,27 +278,27 @@ export class RentalStorage {
   }
 
   // Get rental statistics
-  async getRentalStats(): Promise<any> {
+  getRentalStats(): Promise<any> {
     try {
-      const [totalResult] = await this.database.select({ total: count() }).from(rental_listings);
-      const [availableResult] = await this.database.select({ available: count() }).from(rental_listings).where(eq(rental_listings.status, 'active'));
-      const [rentedResult] = await this.database.select({ rented: count() }).from(rental_listings).where(eq(rental_listings.status, 'rented'));
-      const [avgPriceResult] = await this.database.select({ avg_price: avg(rental_listings.monthly_rent) }).from(rental_listings).where(eq(rental_listings.status, 'active'));
+      const totalResult = this.database.select({ total: count() }).from(rental_listings).all();
+      const availableResult = this.database.select({ available: count() }).from(rental_listings).where(eq(rental_listings.status, 'active')).all();
+      const rentedResult = this.database.select({ rented: count() }).from(rental_listings).where(eq(rental_listings.status, 'rented')).all();
+      const avgPriceResult = this.database.select({ avg_price: avg(rental_listings.monthly_rent) }).from(rental_listings).where(eq(rental_listings.status, 'active')).all();
 
-      return {
-        total: totalResult?.total || 0,
-        available: availableResult?.available || 0,
-        rented: rentedResult?.rented || 0,
-        avgPrice: avgPriceResult?.avg_price || 0
-      };
+      return Promise.resolve({
+        total: totalResult[0]?.total || 0,
+        available: availableResult[0]?.available || 0,
+        rented: rentedResult[0]?.rented || 0,
+        avgPrice: avgPriceResult[0]?.avg_price || 0
+      });
     } catch (error) {
       console.error('Error getting rental stats:', error);
-      return {
+      return Promise.resolve({
         total: 0,
         available: 0,
         rented: 0,
         avgPrice: 0
-      };
+      });
     }
   }
 }
