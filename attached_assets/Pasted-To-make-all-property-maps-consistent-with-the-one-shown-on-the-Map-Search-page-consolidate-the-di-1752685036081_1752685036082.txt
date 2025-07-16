@@ -1,0 +1,78 @@
+To make all property maps consistent with the one shown on the “Map Search” page, consolidate the different map implementations into the single PropertyMap component used in MapSearchPage.tsx. This component relies on react-leaflet to render markers and popups:
+
+140  <div className="lg:col-span-3">
+150    <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+151      <PropertyMap
+152        properties={properties}
+153        selectedProperty={null}
+154        onPropertySelect={() => {}}
+155        className="min-h-[600px]"
+156      />
+157    </div>
+158  </div>
+
+PropertyMap.tsx shows how the map is configured:
+
+44  return (
+47    <div style={{ height: "80vh", width: "100%" }}>
+48      <MapContainer
+49        center={center}
+50        zoom={zoom}
+51        style={{ height: "100%", width: "100%" }}
+52        scrollWheelZoom={true}
+53      >
+54        <TileLayer
+55          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+56          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+57        />
+59        {properties.map((property) => (
+60          <Marker
+61            key={property.id}
+62            position={[property.latitude, property.longitude]}
+63          >
+64            <Popup maxWidth={300}>
+65              <div className="p-2">
+66                <h3 className="font-semibold text-lg mb-2">{property.title}</h3>
+67                <p className="text-blue-600 font-bold text-xl mb-2">
+68                  {formatPrice(property.price)}
+
+Other pages implement maps differently. For example, RealPropertiesPage.tsx uses a static placeholder with absolute‑positioned markers:
+
+70  const MapSection = () => (
+71    <div className="bg-white rounded-lg shadow-sm border border-neutral-200 mb-6">
+72      <div className="p-4">
+73        <h3 className="text-lg font-semibold text-neutral-900 mb-4 flex items-center">
+74          <MapPin className="h-5 w-5 mr-2 text-beedab-blue" />
+75          Properties Map
+76        </h3>
+
+78        {/* Map placeholder with property markers */}
+79        <div className="relative bg-gradient-to-br from-green-50 to-blue-50 rounded-lg h-96 overflow-hidden">
+80          <div className="absolute inset-0 bg-gradient-to-br from-green-100 via-yellow-50 to-blue-100 opacity-30"></div>
+
+Holistic steps to unify the maps
+Reuse PropertyMap everywhere
+
+Import PropertyMap into pages such as RealPropertiesPage.tsx and PlotsPage.tsx.
+
+Replace custom map sections or placeholders with <PropertyMap properties={...} /> passing the same property data that other views use.
+
+Standardize property data
+
+Ensure each page provides an array of properties including latitude, longitude, title, and price so PropertyMap can display markers and popups consistently.
+
+Remove old or redundant map components
+
+If InteractiveMap or any static map placeholders aren’t required, retire them to avoid code duplication. This keeps styling and functionality uniform.
+
+Centralize map styles and configuration
+
+Keep marker icons, popups, and default center/zoom settings within PropertyMap so all pages share identical behavior and look.
+
+Optional enhancements
+
+Expose callbacks such as onPropertySelect if pages need custom interactions when a marker is clicked.
+
+If filtering logic differs by page, fetch or filter data before passing it to PropertyMap.
+
+By replacing the various map implementations with the single PropertyMap component, all property-related pages will share the same mapping behavior and appearance as the map shown from the navigation dropdown. This approach ensures consistency while reducing duplicated code.
