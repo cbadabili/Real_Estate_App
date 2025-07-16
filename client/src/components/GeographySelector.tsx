@@ -72,9 +72,9 @@ export const GeographySelector: React.FC<GeographySelectorProps> = ({
     if (selectedCity) {
       const cityData = getCityByName(selectedCity);
       if (cityData) {
-        setSelectedState(cityData.district.name);
-        setStateSearch(cityData.district.name);
-        setAvailableWards(cityData.city.wards);
+        setSelectedState(cityData.district);
+        setStateSearch(cityData.district);
+        setAvailableWards(getWardsByCity(selectedCity));
       }
     } else {
       setSelectedState('');
@@ -157,7 +157,7 @@ export const GeographySelector: React.FC<GeographySelectorProps> = ({
                 <div className="flex items-center justify-between">
                   <span className="font-medium">{city}</span>
                   <span className="text-sm text-gray-500">
-                    {getCityByName(city)?.district.name}
+                    {getCityByName(city)?.district}
                   </span>
                 </div>
               </button>
