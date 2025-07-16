@@ -1,0 +1,237 @@
+// server/database.ts - Single source of truth for database operations
+import Database from 'better-sqlite3';
+import { readFileSync } from 'fs';
+import { join } from 'path';
+
+export class DatabaseManager {
+  private db: Database.Database;
+  
+  constructor(dbPath: string) {
+    this.db = new Database(dbPath);
+    this.db.pragma('journal_mode = WAL'); // Better performance
+    this.initialize();
+  }
+
+  private initialize() {
+    console.log('Testing database connection...');
+    
+    // Test connection
+    try {
+      this.db.prepare('SELECT 1').get();
+      console.log('✅ Database connection successful');
+    } catch (error) {
+      console.error('❌ Database connection failed:', error);
+      process.exit(1);
+    }
+
+    // Run migrations
+    this.runMigrations();
+    
+    // Seed data
+    this.seedDatabase();
+  }
+
+  private runMigrations() {
+    console.log('🔄 Running database migrations...');
+    
+    // Create tables if they don't exist
+    this.db.exec(`
+      CREATE TABLE IF NOT EXISTS rentals (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        title TEXT NOT NULL,
+        description TEXT,
+        price REAL NOT NULL,
+        location TEXT,
+        bedrooms INTEGER,
+        bathrooms INTEGER,
+        garden BOOLEAN DEFAULT 0,
+        air_conditioning BOOLEAN DEFAULT 0,
+        status TEXT DEFAULT 'available',
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      );
+
+      CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        email TEXT UNIQUE NOT NULL,
+        name TEXT NOT NULL,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      );
+
+      CREATE TABLE IF NOT EXISTS service_categories (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        description TEXT
+      );
+
+      CREATE TABLE IF NOT EXISTS marketplace_providers (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        category_id INTEGER,
+        FOREIGN KEY (category_id) REFERENCES service_categories(id)
+      );
+    `);
+    
+    console.log('✅ Migrations completed');
+  }
+
+  private seedDatabase() {
+    console.log('🌱 Seeding database...');
+    
+    // Check if we already have data
+    const rentalCount = this.db.prepare('SELECT COUNT(*) as count FROM rentals').get() as { count: number };
+    
+    if (rentalCount.count === 0) {
+      // Insert sample data
+      const insertRental = this.db.prepare(`
+        INSERT INTO rentals (title, description, price, location, bedrooms, bathrooms, garden, air_conditioning)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      `);
+
+      const rentals = [
+        ['Modern Apartment', 'Beautiful 2-bedroom apartment in city center', 1500, 'Downtown', 2, 1, 0, 1],
+        ['Garden House', 'Spacious house with large garden', 2000, 'Suburbs', 3, 2, 1, 1],
+        ['Studio Flat', 'Cozy studio in quiet neighborhood', 800, 'Northside', 1, 1, 0, 0],
+      ];
+
+      rentals.forEach(rental => {
+        insertRental.run(...rental);
+      });
+
+      console.log('✅ Sample data seeded');
+    } else {
+      console.log('✅ Data already exists, skipping seeding');
+    }
+  }
+
+  // Simple query methods
+  prepare(sql: string) {
+    return this.db.prepare(sql);
+  }
+
+  exec(sql: string) {
+    return this.db.exec(sql);
+  }
+
+  transaction(fn: () => void) {
+    return this.db.transaction(fn);
+  }
+
+  close() {
+    this.db.close();
+  }
+
+  // Rental-specific methods
+  searchRentals(filters: any) {
+    let query = `
+      SELECT * FROM rentals
+      WHERE status = 'available'
+    `;
+    
+    const params: any[] = [];
+
+    if (filters.minPrice) {
+      query += ` AND price >= ?`;
+      params.push(filters.minPrice);
+    }
+
+    if (filters.maxPrice) {
+      query += ` AND price <= ?`;
+      params.push(filters.maxPrice);
+    }
+
+    if (filters.location) {
+      query += ` AND location LIKE ?`;
+      params.push(`%${filters.location}%`);
+    }
+
+    if (filters.bedrooms) {
+      query += ` AND bedrooms >= ?`;
+      params.push(filters.bedrooms);
+    }
+
+    if (filters.bathrooms) {
+      query += ` AND bathrooms >= ?`;
+      params.push(filters.bathrooms);
+    }
+
+    if (filters.garden !== undefined) {
+      query += ` AND garden = ?`;
+      params.push(filters.garden ? 1 : 0);
+    }
+
+    if (filters.air_conditioning !== undefined) {
+      query += ` AND air_conditioning = ?`;
+      params.push(filters.air_conditioning ? 1 : 0);
+    }
+
+    if (filters.search) {
+      query += ` AND (title LIKE ? OR description LIKE ?)`;
+      params.push(`%${filters.search}%`, `%${filters.search}%`);
+    }
+
+    query += ` ORDER BY created_at DESC`;
+
+    // Debug logging
+    console.log('Generated query:', query);
+    console.log('Parameters:', params);
+
+    const stmt = this.db.prepare(query);
+    return stmt.all(...params);
+  }
+
+  getAllRentals() {
+    return this.db.prepare('SELECT * FROM rentals ORDER BY created_at DESC').all();
+  }
+
+  getRentalById(id: number) {
+    return this.db.prepare('SELECT * FROM rentals WHERE id = ?').get(id);
+  }
+
+  createRental(rental: any) {
+    const stmt = this.db.prepare(`
+      INSERT INTO rentals (title, description, price, location, bedrooms, bathrooms, garden, air_conditioning)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `);
+    
+    const result = stmt.run(
+      rental.title,
+      rental.description,
+      rental.price,
+      rental.location,
+      rental.bedrooms,
+      rental.bathrooms,
+      rental.garden ? 1 : 0,
+      rental.air_conditioning ? 1 : 0
+    );
+    
+    return this.getRentalById(result.lastInsertRowid as number);
+  }
+
+  updateRental(id: number, updates: any) {
+    const stmt = this.db.prepare(`
+      UPDATE rentals 
+      SET title = ?, description = ?, price = ?, location = ?, bedrooms = ?, bathrooms = ?, garden = ?, air_conditioning = ?, updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `);
+    
+    stmt.run(
+      updates.title,
+      updates.description,
+      updates.price,
+      updates.location,
+      updates.bedrooms,
+      updates.bathrooms,
+      updates.garden ? 1 : 0,
+      updates.air_conditioning ? 1 : 0,
+      id
+    );
+    
+    return this.getRentalById(id);
+  }
+
+  deleteRental(id: number) {
+    const stmt = this.db.prepare('DELETE FROM rentals WHERE id = ?');
+    return stmt.run(id);
+  }
+}
