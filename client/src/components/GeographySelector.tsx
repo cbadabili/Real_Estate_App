@@ -47,8 +47,8 @@ export const GeographySelector: React.FC<GeographySelectorProps> = ({
   useEffect(() => {
     if (citySearch.trim()) {
       const filtered = getAllCities().filter(city =>
-        city.toLowerCase().includes(citySearch.toLowerCase())
-      );
+        city.name.toLowerCase().includes(citySearch.toLowerCase())
+      ).map(city => city.name);
       setFilteredCities(filtered.slice(0, 10)); // Limit to 10 suggestions
     } else {
       setFilteredCities([]);
