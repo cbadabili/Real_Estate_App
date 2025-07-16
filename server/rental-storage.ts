@@ -330,17 +330,31 @@ export class RentalStorage {
   }
 
   // Get rental statistics
-  getRentalStats(): any {
-    const totalStmt = this.db.prepare('SELECT COUNT(*) as total FROM rentals');
-    const availableStmt = this.db.prepare('SELECT COUNT(*) as available FROM rentals WHERE status = "available"');
-    const rentedStmt = this.db.prepare('SELECT COUNT(*) as rented FROM rentals WHERE status = "rented"');
-    const avgPriceStmt = this.db.prepare('SELECT AVG(price) as avg_price FROM rentals WHERE status = "available"');
+  async getRentalStats(): Promise<any> {
+    const { db } = await import('./db');
+    const { rental_listings } = await import('../shared/schema');
+    const { count, avg, eq } = await import('drizzle-orm');
 
-    return {
-      total: totalStmt.get()?.total || 0,
-      available: availableStmt.get()?.available || 0,
-      rented: rentedStmt.get()?.rented || 0,
-      avgPrice: avgPriceStmt.get()?.avg_price || 0
-    };
+    try {
+      const [totalResult] = await db.select({ total: count() }).from(rental_listings);
+      const [availableResult] = await db.select({ available: count() }).from(rental_listings).where(eq(rental_listings.status, 'active'));
+      const [rentedResult] = await db.select({ rented: count() }).from(rental_listings).where(eq(rental_listings.status, 'rented'));
+      const [avgPriceResult] = await db.select({ avg_price: avg(rental_listings.monthly_rent) }).from(rental_listings).where(eq(rental_listings.status, 'active'));
+
+      return {
+        total: totalResult?.total || 0,
+        available: availableResult?.available || 0,
+        rented: rentedResult?.rented || 0,
+        avgPrice: avgPriceResult?.avg_price || 0
+      };
+    } catch (error) {
+      console.error('Error getting rental stats:', error);
+      return {
+        total: 0,
+        available: 0,
+        rented: 0,
+        avgPrice: 0
+      };
+    }
   }
 }

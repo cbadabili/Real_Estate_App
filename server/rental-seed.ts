@@ -1,3 +1,4 @@
+
 import { db } from "./db";
 import { rental_listings } from "../shared/schema";
 import { getAllTowns } from '../client/src/data/botswanaGeography';
