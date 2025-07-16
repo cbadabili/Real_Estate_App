@@ -1,0 +1,89 @@
+The repository contains several pieces of code that appear inconsistent or unused.
+
+Unused or duplicate backend functions
+Duplicate router functions
+server/property-management-routes.ts exports a router instance and then redeclares a separate createPropertyManagementRoutes function after export default router:
+
+226      });
+227    }
+228  });
+229
+230  export default router;
+231  import express from 'express';
+232  import { RentalStorage } from './rental-storage';
+233
+234  export function createPropertyManagementRoutes(): express.Router {
+235    const router = express.Router();
+236    const rentalStorage = new RentalStorage();
+
+Tenant support routes duplication
+server/tenant-support-routes.ts follows the same pattern—exporting a router and then defining createTenantSupportRoutes which isn’t used anywhere:
+
+170  export default router;
+171  import express from 'express';
+172
+173  export function createTenantSupportRoutes(): express.Router {
+174    const router = express.Router();
+
+Unused parameters
+createRentalRoutes accepts a database argument but ignores it, instantiating RentalStorage with the globally imported db instead:
+
+4  import type { db as DrizzleDB } from './db';
+...
+6  export function createRentalRoutes(db: typeof DrizzleDB): express.Router {
+7    const router = express.Router();
+8    const rentalStorage = new RentalStorage();
+
+Placeholder functions
+At the end of server/marketplace-routes.ts there are helper functions (createProviderReview, getProviderReviews) that aren’t referenced:
+
+608  async function createProviderReview(data: any) {
+...
+616  async function getProviderReviews(providerId: number, options: any) {
+617    return [];
+618  }
+619
+620  export default router;
+
+Unused storage module
+server/marketplace-storage.ts defines a full MarketplaceStorage class and exports marketplaceStorage, but no other file imports it.
+
+Unused frontend components
+Several components exist without any imports elsewhere in client/src:
+
+ChatWidget.tsx – defined but not included in any page or layout. 
+
+ServicesShowcase.tsx – only the component file itself references this name. 
+
+TestingDashboard.tsx – declared but not used. 
+
+MortgageCalculatorWithAd.tsx – defined but never imported. 
+
+Cleaning or integrating these components would reduce dead code.
+
+Existing route for Map Search
+The application now includes a route for /map-search:
+
+134              <Route path="/secure-transactions" element={<SecureTransactionsPage />} />
+135              <Route path="/communication" element={<CommunicationPage />} />
+136              <Route path="/agent-network" element={<AgentNetworkPage />} />
+137              <Route path="/map-search" element={<MapSearchPage />} />
+
+This addresses the earlier missing route noted in previous discussions.
+
+Extraneous files
+Directories such as attached_assets/ and files like backup-files-list.txt contain historical artifacts and logs that are not part of the application code. Removing or archiving them separately would keep the repository cleaner.
+
+Summary
+
+Duplicate router functions (createPropertyManagementRoutes, createTenantSupportRoutes) can be removed.
+
+createRentalRoutes should either use its db argument or drop the parameter.
+
+Unused helper functions and entire modules (e.g., marketplace-storage.ts) increase clutter.
+
+Frontend components like ChatWidget and ServicesShowcase are defined but never imported.
+
+Non-code files in attached_assets/ could be cleaned up.
+
+Addressing these inconsistencies would streamline the codebase and make maintenance easier.
