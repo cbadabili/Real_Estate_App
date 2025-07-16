@@ -3,53 +3,6 @@ import { PropertyMap } from '../components/properties/PropertyMap';
 import { PropertyFilters } from '../components/properties/PropertyFilters';
 import { LoadingSpinner } from '../components/ui/LoadingSpinner';
 
-const MapSearchPage = () => {
-  const [properties, setProperties] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [filters, setFilters] = useState({
-    priceRange: [0, 5000000] as [number, number],
-    propertyType: 'all',
-    bedrooms: 'any',
-    bathrooms: 'any',
-    listingType: 'all'
-  });
-
-  const fetchProperties = async () => {
-    setLoading(true);
-    try {
-      const response = await fetch('/api/properties');
-      const data = await response.json();
-      
-      if (response.ok && data.success) {
-        setProperties(data.data || []);
-      } else {
-        setError('Failed to fetch properties');
-      }
-    } catch (err) {
-      setError('Error fetching properties');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchProperties();
-  }, []);
-
-  const handleFiltersChange = (newFilters: any) => {
-    setFilters(newFilters);
-    // You can implement filtering logic here
-  };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <LoadingSpinner />
-      </div>
-    );
-  }
-
 interface Property {
   id: number;
   title: string;
@@ -64,21 +17,23 @@ interface Property {
   description?: string;
 }
 
-export default function MapSearchPage() {
+const MapSearchPage = () => {
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    fetchProperties();
-  }, []);
+  const [filters, setFilters] = useState({
+    priceRange: [0, 5000000] as [number, number],
+    propertyType: 'all',
+    bedrooms: 'any',
+    bathrooms: 'any',
+    listingType: 'all'
+  });
 
   const fetchProperties = async () => {
     try {
       setLoading(true);
       setError(null);
 
-      // Fetch from properties endpoint with sample coordinates for Botswana
       const response = await fetch('/api/properties?status=active');
 
       if (!response.ok) {
@@ -88,7 +43,7 @@ export default function MapSearchPage() {
       const data = await response.json();
 
       // Transform properties to include coordinates if missing
-      const propertiesWithCoords = data.map((property: any, index: number) => ({
+      const propertiesWithCoords = data.map((property: any) => ({
         id: property.id,
         title: property.title,
         price: property.price,
@@ -111,11 +66,16 @@ export default function MapSearchPage() {
     }
   };
 
-  const handleFilterChange = (filters: any) => {
-    // Re-fetch properties with filters
-    const queryParams = new URLSearchParams();
+  useEffect(() => {
+    fetchProperties();
+  }, []);
 
-    Object.entries(filters).forEach(([key, value]) => {
+  const handleFiltersChange = (newFilters: any) => {
+    setFilters(newFilters);
+
+    // Apply filters to properties
+    const queryParams = new URLSearchParams();
+    Object.entries(newFilters).forEach(([key, value]) => {
       if (value !== undefined && value !== null && value !== '') {
         queryParams.append(key, String(value));
       }
@@ -197,12 +157,6 @@ export default function MapSearchPage() {
             </div>
           </div>
         </div>
-      </div>
-    </div>
-  );
-};
-
-export default MapSearchPage;
 
         {/* Results Summary */}
         <div className="mt-6 bg-white rounded-lg shadow-md p-4">
@@ -213,4 +167,6 @@ export default MapSearchPage;
       </div>
     </div>
   );
-}
+};
+
+export default MapSearchPage;
