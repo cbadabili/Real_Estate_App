@@ -1,0 +1,75 @@
+The Problem
+text
+[plugin:runtime-error-plugin] SyntaxError: 'import' and 'export' may only appear at the top level. (67:0)
+Occurs in:
+
+text
+client/src/pages/MapSearchPage.tsx
+Line 67: export default function MapSearchPage() { 🔥
+👉 What This Means:
+This error typically happens when an export (or import) statement is placed inside a function, block, or conditional, instead of directly at the top level of the module.
+
+That line appears to be fine in isolation:
+
+tsx
+export default function MapSearchPage() {
+  ...
+}
+But the compiler is telling you that it’s not at the top level, meaning there is likely extra code wrapping it — like an accidental closing brace (}) or function block above it that incorrectly contains the export.
+
+✅ The Fix
+🔍 Step 1: Check the ending of the code just above line 67
+You see this?
+
+tsx
+65 | }
+66 |
+>67 | export default function MapSearchPage() {
+That lone } on line 65 is most likely closing too much — maybe you're accidentally closing a wrapping function or block.
+
+✅ You should not have any wrapping function, if, or block {} around your page/component.
+
+✅ Final Form: Your file should look like this:
+tsx
+// ✅ ALL CODE STARTS HERE AT TOP LEVEL
+import { useState, useEffect } from 'react';
+// other imports...
+
+export default function MapSearchPage() {
+  const [properties, setProperties] = useState<Property[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  return (
+    <div>map here</div>
+  );
+}
+🛠 Quick Fix Instructions
+Open src/pages/MapSearchPage.tsx
+
+🎯 Scroll up to line 65, find the unexpected }
+
+🔥 Remove that extra }
+
+✅ Confirm that export default function... is now at the top level
+
+Save the file
+
+Restart the dev server if needed
+
+✅ It Should Work Now
+
+Re-run with:
+
+bash
+npm run start
+# or
+npx tsx server/index.ts
+And Vite should no longer throw a "Pre-transform" error.
+
+🧩 Pro Tip — Use ESLint for Unexpected Block Errors
+With ESLint + TypeScript, a mis-scoped export, return, or } like this will be caught automatically.
