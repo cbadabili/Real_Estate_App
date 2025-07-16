@@ -1,0 +1,79 @@
+I'll help you investigate the error in the rental search functionality. The error message indicates that there's an issue in the rental-storage.ts file at line 193 where it's trying to call the prepare method on an undefined object.
+
+Let me check the relevant code files to understand what's happening:
+
+Analyzed
+rental-storage.ts#L180-200
+Let me check the rental routes file to see how the search functionality is being called:
+
+Analyzed
+rental-routes.ts#L50-65
+I can see the issue now. The error occurs because the SQLite database connection (this.db) is undefined when trying to prepare a statement in the 
+searchRentals
+ method. This typically happens if:
+
+The database connection wasn't properly initialized
+The database connection was closed before the search operation
+The db parameter wasn't properly passed to the 
+RentalStorage
+ constructor
+Let me check how the database is initialized in the main server file:
+
+Analyzed
+index.ts#L1-50
+I see the issue now. The problem is in the database initialization. The error occurs because:
+
+The database connection is being tested but not properly initialized before use
+The database connection might be closing prematurely
+The db instance might not be properly passed to the 
+RentalStorage
+ class
+Let me check the database initialization file:
+
+Analyzed
+db.ts#L1-30
+I see the issue now. The error is occurring because:
+
+The database connection is being created with better-sqlite3 but then wrapped with drizzle ORM
+The 
+RentalStorage
+ class is trying to use raw SQLite methods (prepare) on the drizzle-wrapped database instance
+The drizzle database instance doesn't have the raw SQLite methods that the 
+RentalStorage
+ class is expecting
+Let me fix this by updating the 
+rental-storage.ts
+ file to use drizzle's query builder instead of raw SQLite methods:
+
+Edited
+rental-storage.ts
++259
+-360
+ 1
+Open diff
+I've made several important changes to fix the error:
+
+Updated the database initialization in the 
+RentalStorage
+ constructor to properly wrap the raw SQLite database with drizzle:
+typescript
+constructor(private db: Database) {
+  // Initialize drizzle instance
+  this.db = drizzle(db, { schema });
+}
+Replaced all raw SQLite queries with drizzle's query builder methods:
+Using this.db.select() instead of raw SQL
+Using drizzle's where, orderBy, eq, gte, 
+lte
+ methods instead of string concatenation
+Using drizzle's insert, 
+update
+, 
+delete
+ methods instead of prepared statements
+Added proper type safety and error handling throughout the queries
+The error "Cannot read properties of undefined (reading 'prepare')" was occurring because we were trying to use raw SQLite methods (prepare) on a database instance that had been wrapped by drizzle. The drizzle ORM provides its own query builder methods that we should be using instead.
+
+These changes should resolve the error you're seeing. The code now properly uses drizzle's query builder interface instead of trying to use raw SQLite methods. Try running the application again - the rental search functionality should now work correctly.
+
+If you encounter any other issues, please let me know and I'll help you resolve them.
