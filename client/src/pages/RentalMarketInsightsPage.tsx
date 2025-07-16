@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { TrendingUp, TrendingDown, BarChart3, MapPin, Calendar, DollarSign } from 'lucide-react';
+import { PropertyMap } from '../components/properties/PropertyMap';
 
 interface MarketData {
   location: string;
@@ -208,6 +209,32 @@ const RentalMarketInsightsPage = () => {
                   </div>
                 </div>
               </div>
+            </div>
+
+            {/* Market Map */}
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <MapPin className="h-5 w-5 mr-2 text-beedab-blue" />
+                Rental Market Map
+              </h3>
+              <PropertyMap
+                properties={marketData.map((data, index) => ({
+                  id: index,
+                  title: `${data.location} Rentals`,
+                  price: data.averageRent,
+                  latitude: -24.6282 + (index * 0.02), // Sample coordinates around Botswana
+                  longitude: 25.9231 + (index * 0.02),
+                  bedrooms: 2,
+                  bathrooms: 1,
+                  location: data.location,
+                  city: data.location,
+                  propertyType: 'rental',
+                  description: `Average rent: ${formatCurrency(data.averageRent)}, Vacancy: ${data.vacancyRate}%`
+                }))}
+                selectedProperty={null}
+                onPropertySelect={() => {}}
+                className="h-96 rounded-lg overflow-hidden"
+              />
             </div>
 
             {/* All Locations Comparison */}

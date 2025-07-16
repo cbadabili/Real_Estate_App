@@ -8,6 +8,7 @@ import { VerificationBadge } from '../components/VerificationBadge';
 import { TrustSafetyFeatures } from '../components/TrustSafetyFeatures';
 import { MortgageCalculator } from '../components/MortgageCalculator';
 import { AISearchBar } from '../components/search/AISearchBar';
+import { PropertyMap } from '../components/properties/PropertyMap';
 
 const RealPropertiesPage = () => {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
@@ -67,118 +68,39 @@ const RealPropertiesPage = () => {
     }
   };
 
-  const MapSection = () => (
-    <div className="bg-white rounded-lg shadow-sm border border-neutral-200 mb-6">
-      <div className="p-4">
-        <h3 className="text-lg font-semibold text-neutral-900 mb-4 flex items-center">
-          <MapPin className="h-5 w-5 mr-2 text-beedab-blue" />
-          Properties Map
-        </h3>
+  const MapSection = () => {
+    // Transform properties to match PropertyMap component expectations
+    const mapProperties = safeProperties.map((property: any) => ({
+      id: property.id,
+      title: property.title,
+      price: parseFloat(property.price || '0'),
+      latitude: property.latitude || (-24.6282 + (Math.random() - 0.5) * 0.1), // Default to Gaborone area with random offset if no coordinates
+      longitude: property.longitude || (25.9231 + (Math.random() - 0.5) * 0.1),
+      bedrooms: property.bedrooms || 0,
+      bathrooms: property.bathrooms || 0,
+      location: property.address || property.location || '',
+      city: property.city || '',
+      propertyType: property.propertyType || 'house',
+      description: property.description || ''
+    }));
 
-        {/* Map placeholder with property markers */}
-        <div className="relative bg-gradient-to-br from-green-50 to-blue-50 rounded-lg h-96 overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-green-100 via-yellow-50 to-blue-100 opacity-30"></div>
-
-          {/* Property markers */}
-          {safeProperties.slice(0, 8).map((property: any, index: number) => (
-            <div
-              key={property.id}
-              className="absolute cursor-pointer group"
-              style={{
-                left: `${15 + (index % 4) * 20}%`,
-                top: `${20 + Math.floor(index / 4) * 30}%`,
-                transform: 'translate(-50%, -50%)'
-              }}
-              onClick={() => setSelectedProperty(property)}
-            >
-              {/* Price marker */}
-              <div className={`
-                relative bg-white border-2 border-beedab-blue rounded-lg px-3 py-2 shadow-lg
-                hover:bg-beedab-blue hover:text-white transition-all
-                ${selectedProperty?.id === property.id ? 'bg-beedab-blue text-white' : ''}
-              `}>
-                <div className="text-sm font-bold">
-                  BWP {parseFloat(property.price || '0').toLocaleString()}
-                </div>
-
-                {/* Arrow pointer */}
-                <div className={`
-                  absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 
-                  border-l-4 border-r-4 border-t-4 border-transparent
-                  ${selectedProperty?.id === property.id ? 'border-t-beedab-blue' : 'border-t-white'}
-                `}></div>
-
-                {/* Tooltip with property details */}
-                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">
-                  <div className="font-semibold">{property.title}</div>
-                  <div className="text-xs">{property.bedrooms}bd • {property.bathrooms}ba</div>
-                </div>
-              </div>
-            </div>
-          ))}
-
-          {/* Selected property popup */}
-          {selectedProperty && (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="absolute bottom-4 left-4 bg-white rounded-lg shadow-xl p-4 max-w-sm border border-neutral-200"
-            >
-              <div className="flex space-x-3">
-                {selectedProperty.images?.[0] ? (
-                  <img 
-                    src={selectedProperty.images[0]} 
-                    alt={selectedProperty.title}
-                    className="w-20 h-20 object-cover rounded-lg"
-                  />
-                ) : (
-                  <div className="w-20 h-20 bg-neutral-200 rounded-lg flex items-center justify-center">
-                    <span className="text-xs text-neutral-500">No Image</span>
-                  </div>
-                )}
-                <div className="flex-1">
-                  <h4 className="font-semibold text-neutral-900 text-sm mb-1">{selectedProperty.title}</h4>
-                  <p className="text-lg font-bold text-beedab-blue mb-1">
-                    P{parseFloat(selectedProperty.price || '0').toLocaleString()}
-                  </p>
-                  <div className="flex items-center space-x-1 text-xs text-neutral-600 mb-2">
-                    <MapPin className="h-3 w-3" />
-                    <span>{selectedProperty.city}</span>
-                  </div>
-                  <div className="flex items-center space-x-3 text-xs text-neutral-600 mb-3">
-                    {selectedProperty.bedrooms && (
-                      <span className="flex items-center">
-                        <Bed className="h-3 w-3 mr-1" />
-                        {selectedProperty.bedrooms}
-                      </span>
-                    )}
-                    {selectedProperty.bathrooms && (
-                      <span className="flex items-center">
-                        <Bath className="h-3 w-3 mr-1" />
-                        {selectedProperty.bathrooms}
-                      </span>
-                    )}
-                  </div>
-                  <button 
-                    onClick={() => handlePropertyClick(selectedProperty)}
-                    className="w-full bg-beedab-blue text-white py-2 rounded-lg text-xs font-medium hover:bg-beedab-darkblue transition-colors"
-                  >
-                    View Details
-                  </button>
-                </div>
-              </div>
-              <button 
-                onClick={() => setSelectedProperty(null)}
-                className="absolute top-2 right-2 text-neutral-400 hover:text-neutral-600"
-              >
-                ×
-              </button>
-            </motion.div>
-          )}
+    return (
+      <div className="bg-white rounded-lg shadow-sm border border-neutral-200 mb-6">
+        <div className="p-4">
+          <h3 className="text-lg font-semibold text-neutral-900 mb-4 flex items-center">
+            <MapPin className="h-5 w-5 mr-2 text-beedab-blue" />
+            Properties Map
+          </h3>
+          <PropertyMap
+            properties={mapProperties}
+            selectedProperty={selectedProperty}
+            onPropertySelect={setSelectedProperty}
+            className="h-96 rounded-lg overflow-hidden"
+          />
         </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   const PropertyCard = ({ property }: { property: any }) => (
     <motion.div

@@ -3,6 +3,7 @@ import { Search, Filter, MapPin, Star, Clock, Phone, Mail, Globe, Shield, Award,
 import SectionContent from '../components/marketplace/SectionContent';
 import RegisterProvider from '../components/marketplace/RegisterProvider';
 import { useLocation } from 'react-router-dom';
+import { PropertyMap } from '../components/properties/PropertyMap';
 
 interface Category {
   id: number;
@@ -233,7 +234,39 @@ const MarketplacePage: React.FC<MarketplacePageProps> = () => {
         </div>
       </div>
 
-      {/* Main Content */}
+      {/* Service Provider Map */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          {!loading && filteredServices.length > 0 && (
+            <div className="bg-white rounded-lg shadow-sm border border-neutral-200 mb-6">
+              <div className="p-4">
+                <h3 className="text-lg font-semibold text-neutral-900 mb-4 flex items-center">
+                  <MapPin className="h-5 w-5 mr-2 text-beedab-blue" />
+                  Service Provider Locations
+                </h3>
+                <PropertyMap
+                  properties={filteredServices.map((service, index) => ({
+                    id: service.id,
+                    title: service.business_name,
+                    price: service.hourly_rate,
+                    latitude: -24.6282 + (index * 0.01), // Sample coordinates
+                    longitude: 25.9231 + (index * 0.01),
+                    bedrooms: service.years_experience,
+                    bathrooms: Math.round(service.rating),
+                    location: service.service_area,
+                    city: service.service_area,
+                    propertyType: 'service',
+                    description: service.business_description
+                  }))}
+                  selectedProperty={null}
+                  onPropertySelect={() => {}}
+                  className="h-80 rounded-lg overflow-hidden"
+                />
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {loading ? (
           <div className="flex items-center justify-center py-12">

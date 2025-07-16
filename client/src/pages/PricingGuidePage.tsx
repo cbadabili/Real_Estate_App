@@ -5,6 +5,7 @@ import {
   TrendingUp, Home, MapPin, Calculator, DollarSign, 
   BarChart3, Target, Zap, ArrowRight, Info
 } from 'lucide-react';
+import { PropertyMap } from '../components/properties/PropertyMap';
 
 const PricingGuidePage = () => {
   const [propertyType, setPropertyType] = useState('');
