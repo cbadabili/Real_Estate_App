@@ -3,6 +3,53 @@ import { PropertyMap } from '../components/properties/PropertyMap';
 import { PropertyFilters } from '../components/properties/PropertyFilters';
 import { LoadingSpinner } from '../components/ui/LoadingSpinner';
 
+const MapSearchPage = () => {
+  const [properties, setProperties] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [filters, setFilters] = useState({
+    priceRange: [0, 5000000] as [number, number],
+    propertyType: 'all',
+    bedrooms: 'any',
+    bathrooms: 'any',
+    listingType: 'all'
+  });
+
+  const fetchProperties = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch('/api/properties');
+      const data = await response.json();
+      
+      if (response.ok && data.success) {
+        setProperties(data.data || []);
+      } else {
+        setError('Failed to fetch properties');
+      }
+    } catch (err) {
+      setError('Error fetching properties');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchProperties();
+  }, []);
+
+  const handleFiltersChange = (newFilters: any) => {
+    setFilters(newFilters);
+    // You can implement filtering logic here
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <LoadingSpinner />
+      </div>
+    );
+  }
+
 interface Property {
   id: number;
   title: string;
@@ -131,19 +178,31 @@ export default function MapSearchPage() {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Filters Sidebar */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <h2 className="text-lg font-semibold mb-4">Search Filters</h2>
-              <PropertyFilters onFilterChange={handleFilterChange} />
-            </div>
+            <PropertyFilters 
+              filters={filters}
+              onFiltersChange={handleFiltersChange}
+              propertyCount={properties.length}
+            />
           </div>
 
           {/* Map */}
           <div className="lg:col-span-3">
-            <div className="bg-white rounded-lg shadow-md overflow-hidden">
-              <PropertyMap properties={properties} />
+            <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+              <PropertyMap 
+                properties={properties}
+                selectedProperty={null}
+                onPropertySelect={() => {}}
+                className="min-h-[600px]"
+              />
             </div>
           </div>
         </div>
+      </div>
+    </div>
+  );
+};
+
+export default MapSearchPage;
 
         {/* Results Summary */}
         <div className="mt-6 bg-white rounded-lg shadow-md p-4">
