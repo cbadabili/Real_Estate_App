@@ -5,12 +5,25 @@ import 'leaflet/dist/leaflet.css';
 
 // Add custom styles for tooltips and popups
 const customStyles = `
+  .leaflet-container {
+    z-index: 1 !important;
+  }
+  
+  .leaflet-control-container {
+    z-index: 1000 !important;
+  }
+  
+  .leaflet-popup-pane {
+    z-index: 1200 !important;
+  }
+  
   .custom-tooltip {
     background: rgba(255, 255, 255, 0.95) !important;
     border: 1px solid #e5e7eb !important;
     border-radius: 8px !important;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif !important;
+    z-index: 1200 !important;
   }
   
   .custom-tooltip::before {
@@ -121,12 +134,13 @@ export function PropertyMap({ properties, selectedProperty, onPropertySelect, cl
   };
 
   return (
-    <div className={className} style={{ height: "80vh", width: "100%" }}>
+    <div className={className} style={{ height: "80vh", width: "100%", position: "relative", zIndex: 1 }}>
       <MapContainer
         center={center}
         zoom={zoom}
-        style={{ height: "100%", width: "100%" }}
+        style={{ height: "100%", width: "100%", zIndex: 1 }}
         scrollWheelZoom={true}
+        zoomControl={true}
       >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
