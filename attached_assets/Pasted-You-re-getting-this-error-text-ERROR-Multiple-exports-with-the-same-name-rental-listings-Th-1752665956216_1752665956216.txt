@@ -1,0 +1,98 @@
+You're getting this error:
+
+text
+ERROR: Multiple exports with the same name "rental_listings"
+The symbol "rental_listings" has already been declared
+👉 And it's 100% confirmed now: you defined rental_listings twice in your shared/schema.ts file.
+
+🔥 Summary of the Problem
+You've defined rental_listings twice at two different points in the file:
+
+❌ First version (starting near line 10):
+ts
+export const rental_listings = sqliteTable("rental_listings", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  title: text("title").notNull(),
+  description: text("description"),
+  monthly_rent: real("monthly_rent").notNull(),
+  ...
+});
+❌ Second version (further down):
+ts
+export const rental_listings = sqliteTable("rental_listings", {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  landlord_id: integer('landlord_id').references(() => users.id, { onDelete: 'cascade' }),
+  ...
+});
+👎 This results in a symbol clash because TypeScript (and JavaScript) does not allow you to declare or export a const with the same name twice.
+
+✅ The Fix
+You must delete one of these two definitions.
+
+🧠 Choose which one to keep based on your app's needs:
+If you're using the newer version with more fields like ward, photos, amenities, etc., keep that one.
+
+If the first one is already wired into your migrations, logic, and routes, keep that.
+
+💡 If both have useful fields, you can merge them into one definition like this:
+
+✅ Example: Merged Single rental_listings Table (Recommended)
+ts
+export const rental_listings = sqliteTable('rental_listings', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  landlord_id: integer('landlord_id').references(() => users.id, { onDelete: 'cascade' }),
+  title: text('title').notNull(),
+  description: text('description').notNull(),
+  address: text('address'),
+  city: text('city').notNull(),
+  district: text('district'),
+  ward: text('ward'),
+  property_type: text('property_type').notNull(),
+  bedrooms: integer('bedrooms').notNull(),
+  bathrooms: integer('bathrooms').notNull(),
+  square_meters: integer('square_meters'),
+  monthly_rent: integer('monthly_rent').notNull(),
+  deposit_amount: integer('deposit_amount'),
+  lease_duration: integer('lease_duration'),
+  available_from: text('available_from'),
+  furnished: integer('furnished', { mode: 'boolean' }).default(false),
+  pets_allowed: integer('pets_allowed', { mode: 'boolean' }).default(false),
+  parking_spaces: integer('parking_spaces').default(0),
+  photos: text('photos', { mode: 'json' }).default('[]'),
+  amenities: text('amenities', { mode: 'json' }).default('[]'),
+  utilities_included: text('utilities_included', { mode: 'json' }).default('[]'),
+  status: text('status').default('active'),
+  created_at: text('created_at').default(sql`(datetime('now'))`),
+  updated_at: text('updated_at').default(sql`(datetime('now'))`)
+});
+🔁 After Fixing
+Once you delete or merge the conflict:
+
+Make sure only one version of rental_listings remains in shared/schema.ts.
+
+Save the file.
+
+Restart your dev server:
+
+bash
+npm run start
+# or:
+npx tsx server/index.ts
+🧪 Bonus: Catch These Issues Earlier
+Enable TypeScript "noDuplicateIdentifiers" and ESLint in your project settings. This will warn you about duplicated exported/declared variables.
+
+Add to your tsconfig.json:
+
+json
+"compilerOptions": {
+  ...
+  "noDuplicateCaseStatements": true,
+  "noEmitOnError": true,
+  "exactOptionalPropertyTypes": true
+}
+✅ Final Summary
+✅ What You Need To Do
+🔍 Delete or merge duplicate rental_listings export
+💾 Save the file
+🚀 Restart your server
+✅ Confirm the ESBuild error is gone
