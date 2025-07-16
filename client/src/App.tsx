@@ -113,12 +113,10 @@ function App() {
             <Route path="/rental-listing-wizard" element={<RentalListingWizard />} />
             <Route path="/rental-listing-wizard/:id" element={<RentalListingWizard />} />
             <Route path="/rent-out" element={<RentOutPage />} />
-            <Route path="/rentals" element={<RentalsPage />} />
             <Route path="/rent/create-listing" element={<RentalListingWizard />} />
             <Route path="/rent/edit/:id" element={<RentalListingWizard />} />
             <Route path="/landlord/dashboard" element={<LandlordDashboard />} />
             <Route path="/renter/dashboard" element={<RenterDashboard />} />
-            <Route path="/rental/:id" element={<RentalDetailsPage />} />
             <Route path="/rental-applications" element={<RentalApplicationsPage />} />
             <Route path="/tenant-screening" element={<TenantScreeningPage />} />
             <Route path="/maintenance-management" element={<MaintenanceManagementPage />} />

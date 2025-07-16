@@ -307,7 +307,7 @@ export function createRentalRoutes(db: Database): express.Router {
   // Get rental statistics
   router.get('/stats', async (req, res) => {
     try {
-      const stats = rentalStorage.getRentalStats();
+      const stats = await rentalStorage.getRentalStats();
       res.json({
         success: true,
         data: stats

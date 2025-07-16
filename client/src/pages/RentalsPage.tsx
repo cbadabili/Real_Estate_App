@@ -152,7 +152,10 @@ export default function RentalsPage() {
                     </p>
                   )}
 
-                  <Button className="w-full">
+                  <Button 
+                    className="w-full"
+                    onClick={() => window.location.href = `/rental/${rental.id}`}
+                  >
                     View Details
                   </Button>
                 </div>
