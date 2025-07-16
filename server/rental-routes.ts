@@ -4,7 +4,7 @@ import { Database } from 'better-sqlite3';
 
 export function createRentalRoutes(db: Database): express.Router {
   const router = express.Router();
-  const rentalStorage = new RentalStorage(); // No need to pass db, it uses the imported instance
+  const rentalStorage = new RentalStorage();
 
   // Get all rentals
   router.get('/', async (req, res) => {
