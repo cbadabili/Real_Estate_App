@@ -13,7 +13,6 @@ import { PlotsPage } from './pages/PlotsPage';
 import RentPage from './pages/RentPage';
 import RentalsPage from './pages/RentalsPage';
 import RentOutPage from './pages/RentOutPage';
-import RentalsPage from './pages/RentalsPage';
 import RentalDetailsPage from './pages/RentalDetailsPage';
 import BuyerSellerPlatformPage from './pages/BuyerSellerPlatformPage';
 import MarketIntelligencePage from './pages/MarketIntelligencePage';
