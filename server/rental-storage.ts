@@ -1,6 +1,7 @@
 import { db } from './db';
 import { rental_listings } from '../shared/schema';
 import { eq, and, gte, lte, like, or, desc, count, avg } from 'drizzle-orm';
+import type { DrizzleD1Database } from 'drizzle-orm/d1';
 
 export interface RentalFilters {
   location?: string;
@@ -38,14 +39,21 @@ export interface RentalApplication {
 }
 
 export class RentalStorage {
-  constructor(private database: any) {
-    // Constructor kept for compatibility but we'll use the imported db
+  private db: any;
+
+  constructor(database?: any) {
+    // Use the imported db instance directly for consistency
+    this.db = db;
+    
+    if (!this.db) {
+      throw new Error('Database connection not initialized in RentalStorage');
+    }
   }
 
   // Get all rentals
   getAllRentals() {
     try {
-      return db.select().from(rental_listings).orderBy(desc(rental_listings.created_at)).all();
+      return this.db.select().from(rental_listings).orderBy(desc(rental_listings.created_at)).all();
     } catch (error) {
       console.error('Error getting all rentals:', error);
       return [];
@@ -55,7 +63,7 @@ export class RentalStorage {
   // Get rental by ID
   getRentalById(id: number) {
     try {
-      const result = db.select().from(rental_listings).where(eq(rental_listings.id, id)).get();
+      const result = this.db.select().from(rental_listings).where(eq(rental_listings.id, id)).get();
       return result || null;
     } catch (error) {
       console.error('Error getting rental by ID:', error);
@@ -66,7 +74,11 @@ export class RentalStorage {
   // Search rentals with filters
   searchRentals(filters: RentalFilters) {
     try {
-      let query = db.select().from(rental_listings);
+      if (!this.db) {
+        throw new Error('Database connection not initialized in RentalStorage');
+      }
+      
+      let query = this.db.select().from(rental_listings);
       const conditions = [];
 
       // Build filter conditions
@@ -186,7 +198,7 @@ export class RentalStorage {
         updated_at: new Date().toISOString()
       };
 
-      const result = db.insert(rental_listings).values(newRental).returning().get();
+      const result = this.db.insert(rental_listings).values(newRental).returning().get();
       return result;
     } catch (error) {
       console.error('Error creating rental:', error);
@@ -202,7 +214,7 @@ export class RentalStorage {
         updated_at: new Date().toISOString()
       };
 
-      const result = db.update(rental_listings)
+      const result = this.db.update(rental_listings)
         .set(updateData)
         .where(eq(rental_listings.id, id))
         .run();
@@ -217,7 +229,7 @@ export class RentalStorage {
   // Delete rental
   deleteRental(id: number) {
     try {
-      const result = db.delete(rental_listings)
+      const result = this.db.delete(rental_listings)
         .where(eq(rental_listings.id, id))
         .run();
 
@@ -268,10 +280,10 @@ export class RentalStorage {
   // Get rental statistics
   async getRentalStats(): Promise<any> {
     try {
-      const [totalResult] = await db.select({ total: count() }).from(rental_listings);
-      const [availableResult] = await db.select({ available: count() }).from(rental_listings).where(eq(rental_listings.status, 'active'));
-      const [rentedResult] = await db.select({ rented: count() }).from(rental_listings).where(eq(rental_listings.status, 'rented'));
-      const [avgPriceResult] = await db.select({ avg_price: avg(rental_listings.monthly_rent) }).from(rental_listings).where(eq(rental_listings.status, 'active'));
+      const [totalResult] = await this.db.select({ total: count() }).from(rental_listings);
+      const [availableResult] = await this.db.select({ available: count() }).from(rental_listings).where(eq(rental_listings.status, 'active'));
+      const [rentedResult] = await this.db.select({ rented: count() }).from(rental_listings).where(eq(rental_listings.status, 'rented'));
+      const [avgPriceResult] = await this.db.select({ avg_price: avg(rental_listings.monthly_rent) }).from(rental_listings).where(eq(rental_listings.status, 'active'));
 
       return {
         total: totalResult?.total || 0,
