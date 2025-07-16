@@ -1,0 +1,84 @@
+✅ TL;DR: You’re seeing this error:
+text
+[plugin:runtime-error-plugin] SyntaxError: 'import' and 'export' may only appear at the top level.
+🔍 What It Really Means:
+You have a rogue } somewhere before this line:
+
+tsx
+export default function MapSearchPage() {
+⚠️ That misplaced } likely closes a wrapping function or block above, causing your export to be nested inside a block, which JS/TS forbids.
+
+✅ Confirm + Fix It
+✅ Step-by-step Fix — Walkthrough
+Open client/src/pages/MapSearchPage.tsx
+
+Scroll up to line 65
+
+If you see this:
+
+tsx
+65 | }
+66 |
+67 | export default function MapSearchPage() {
+💣 That } is closing something that's wrapping your export — you’re likely inside a function or conditional block.
+
+✅ Clean Example: What Your File Should Look Like
+This works:
+
+tsx
+// ✅ At the top of the file
+import { useState, useEffect } from 'react';
+import { Property } from '@/types';
+
+export default function MapSearchPage() {
+  const [properties, setProperties] = useState<Property[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Fetch properties or Mapbox data
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      // API call here...
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return <div>Map Search Page</div>;
+}
+🧪 Still not sure what’s wrapping it?
+If you're still unsure, paste the first 70 lines of your file here, and I’ll instantly spot what block or structure is open above line 67.
+
+✅ After You Fix It
+Run:
+
+bash
+npm run dev
+# OR
+npx tsx server/index.ts
+You’ll no longer get:
+
+SyntaxError: 'import' and 'export' may only appear at the top level.
+
+🧩 Bonus: Set Up ESLint + TypeScript Rules
+Add ESLint to prevent this forever.
+
+bash
+npm install -D eslint @typescript-eslint/parser @typescript-eslint/eslint-plugin
+npx eslint --init
+Then ensure this rule is enabled in .eslintrc.js or tsconfig.json:
+
+json
+"parserOptions": {
+  "sourceType": "module" // ✅ required to allow top-level imports/exports
+},
+"rules": {
+  "no-inner-declarations": ["error", "both"]
+}
+✅ Once you've removed or moved the stray } so export default is top-level, your error is permanently resolved.
