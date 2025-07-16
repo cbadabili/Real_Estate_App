@@ -177,7 +177,7 @@ const DashboardPage = () => {
                   <ArrowRight className="h-4 w-4" />
                 </Link>
               </div>
-              
+
               {isLoading ? (
                 <div className="flex justify-center py-8">
                   <LoadingSpinner />
@@ -222,7 +222,7 @@ const DashboardPage = () => {
                     to="/create-listing" 
                     className="inline-flex items-center mt-3 text-primary-600 hover:text-primary-700 font-medium text-sm"
                   >
-                    Create your first listing
+                    List your first property
                     <ArrowRight className="h-4 w-4 ml-1" />
                   </Link>
                 </div>

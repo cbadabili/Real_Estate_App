@@ -144,7 +144,7 @@ export default function RentalsPage() {
                 Map
               </button>
             </div>
-            <Button onClick={() => window.location.href = '/rental-listing-wizard'}>
+            <Button onClick={() => window.location.href = '/create-listing'}>
               List Your Property
             </Button>
           </div>

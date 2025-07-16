@@ -910,11 +910,11 @@ const Navbar = () => {
               <div className="px-3 py-2 border-t border-neutral-100">
                 <p className="text-xs font-medium text-neutral-500 mb-2">SELL</p>
                 <Link
-                  to="/create-property"
+                  to="/create-listing"
                   onClick={() => setIsOpen(false)}
                   className="block px-3 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
                 >
-                  Agent Listing
+                  List Your Property
                 </Link>
                 <Link
                   to="/create-listing"

@@ -29,7 +29,7 @@ export const QuickActions: React.FC<QuickActionsProps> = ({
       label: 'List Property',
       onClick: onCreateProperty,
       color: 'bg-green-500 hover:bg-green-600',
-      description: 'Add your property'
+      description: 'List your property'
     },
     {
       icon: Search,

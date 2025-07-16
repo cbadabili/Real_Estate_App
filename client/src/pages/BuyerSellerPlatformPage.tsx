@@ -85,13 +85,13 @@ const BuyerSellerPlatformPage = () => {
               Comprehensive For Sale By Owner tools including listing creation, legal documents, and transaction management designed specifically for Batswana.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <a
-                href="/create-property"
+              <Link
+                to="/create-listing"
                 className="inline-flex items-center px-8 py-4 bg-white text-beedab-darkblue font-semibold rounded-xl hover:bg-gray-100 transition-colors"
               >
                 <Home className="mr-2 h-5 w-5" />
                 List Your Property
-              </a>
+              </Link>
               <a
                 href="/properties"
                 className="inline-flex items-center px-8 py-4 bg-transparent border-2 border-white text-white font-semibold rounded-xl hover:bg-white hover:text-beedab-darkblue transition-colors"

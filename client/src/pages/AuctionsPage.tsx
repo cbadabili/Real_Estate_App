@@ -265,7 +265,7 @@ const AuctionsPage = () => {
                 href="/create-listing?listingType=auction"
                 className="bg-white text-beedab-blue px-6 py-3 rounded-lg font-medium hover:bg-blue-50 transition-colors border border-white/30"
               >
-                + Add Auction Property
+                List Your Property
               </a>
             </div>
           </div>

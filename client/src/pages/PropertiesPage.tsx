@@ -246,7 +246,7 @@ const PropertiesPage: React.FC = () => {
                 className="space-y-6"
               >
                 <QuickActions
-                  onCreateProperty={() => window.location.href = '/create-property'}
+                  onCreateProperty={() => window.location.href = '/create-listing'}
                   onToggleFilters={() => setShowFilters(true)}
                   onViewSavedSearches={() => setShowSavedSearches(true)}
                   onShowComparison={() => setShowComparison(true)}

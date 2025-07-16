@@ -161,7 +161,7 @@ const MyPropertiesPage = () => {
               className="inline-flex items-center px-6 py-2 bg-beedab-blue text-white rounded-lg hover:bg-beedab-darkblue transition-colors"
             >
               <Plus className="h-4 w-4 mr-2" />
-              Add Property
+              List Your Property
             </Link>
           </div>
         </div>
