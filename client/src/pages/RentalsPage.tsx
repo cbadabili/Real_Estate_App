@@ -164,6 +164,7 @@ export default function RentalsPage() {
                 window.location.href = `/rental/${property.id}`;
               }}
               className="h-[600px] rounded-lg overflow-hidden"
+              isRentalContext={true}
             />
           </div>
         ) : (
