@@ -193,7 +193,7 @@ const PricingGuidePage = () => {
                     Suggested Price Range
                   </h3>
                   <div className="text-3xl font-bold text-green-600 mb-2">
-                    P{Math.round(suggestedPrice * 0.9).toLocaleString()} - P{Math.round(suggestedPrice * 1.1).toLocaleString()}
+                    BWP {Math.round(suggestedPrice * 0.9).toLocaleString()} - BWP {Math.round(suggestedPrice * 1.1).toLocaleString()}
                   </div>
                   <p className="text-sm text-green-700">
                     Based on current market conditions and comparable properties

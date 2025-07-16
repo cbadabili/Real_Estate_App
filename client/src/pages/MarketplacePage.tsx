@@ -293,7 +293,7 @@ const MarketplacePage: React.FC<MarketplacePageProps> = () => {
                         <span>{service.years_experience} years experience</span>
                       </div>
                       <div className="flex items-center space-x-2 text-sm text-gray-500">
-                        <span className="font-semibold">P{service.hourly_rate}/hour</span>
+                        <span className="font-semibold">BWP {service.hourly_rate}/hour</span>
                       </div>
                     </div>
 

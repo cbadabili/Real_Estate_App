@@ -98,7 +98,7 @@ const RealPropertiesPage = () => {
                 ${selectedProperty?.id === property.id ? 'bg-beedab-blue text-white' : ''}
               `}>
                 <div className="text-sm font-bold">
-                  P{parseFloat(property.price || '0').toLocaleString()}
+                  BWP {parseFloat(property.price || '0').toLocaleString()}
                 </div>
 
                 {/* Arrow pointer */}

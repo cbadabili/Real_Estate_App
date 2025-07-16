@@ -39,11 +39,7 @@ export function PropertyMap({ properties, selectedProperty, onPropertySelect, cl
   const zoom = 12;
 
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('en-BW', {
-      style: 'currency',
-      currency: 'BWP',
-      minimumFractionDigits: 0,
-    }).format(price);
+    return `BWP ${price.toLocaleString()}`;
   };
 
   // Create custom markers for selected properties

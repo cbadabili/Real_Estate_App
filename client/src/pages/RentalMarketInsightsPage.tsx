@@ -64,7 +64,7 @@ const RentalMarketInsightsPage = () => {
 
   const selectedLocationData = marketData.find(data => data.location === selectedLocation) || marketData[0];
 
-  const formatCurrency = (amount: number) => `P${amount.toLocaleString()}`;
+  const formatCurrency = (amount: number) => `BWP ${amount.toLocaleString()}`;
 
   return (
     <motion.div
