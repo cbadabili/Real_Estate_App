@@ -229,7 +229,7 @@ export class SeedManager {
   await seedMarketplace(db);
 
   // Seed rentals
-  await seedRentals(db);
+  await seedRentals();
 
       console.log('✅ All seeding completed successfully');
     } catch (error) {
