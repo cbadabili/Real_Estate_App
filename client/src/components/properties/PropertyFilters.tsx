@@ -21,9 +21,19 @@ export const PropertyFilters: React.FC<PropertyFiltersProps> = ({
   propertyCount,
   className = ''
 }) => {
+  // Ensure filters has default values
+  const safeFilters = {
+    priceRange: [0, 5000000] as [number, number],
+    propertyType: 'all',
+    bedrooms: 'any',
+    bathrooms: 'any',
+    listingType: 'all',
+    ...filters
+  };
+
   const updateFilter = (key: string, value: any) => {
     onFiltersChange({
-      ...filters,
+      ...safeFilters,
       [key]: value
     });
   };
@@ -89,8 +99,8 @@ export const PropertyFilters: React.FC<PropertyFiltersProps> = ({
                 <label className="block text-xs text-gray-500 mb-1">Minimum</label>
                 <input
                   type="number"
-                  value={filters.priceRange[0]}
-                  onChange={(e) => updateFilter('priceRange', [parseInt(e.target.value) || 0, filters.priceRange[1]])}
+                  value={safeFilters.priceRange[0]}
+                  onChange={(e) => updateFilter('priceRange', [parseInt(e.target.value) || 0, safeFilters.priceRange[1]])}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
                   placeholder="Min price"
                 />
@@ -99,15 +109,15 @@ export const PropertyFilters: React.FC<PropertyFiltersProps> = ({
                 <label className="block text-xs text-gray-500 mb-1">Maximum</label>
                 <input
                   type="number"
-                  value={filters.priceRange[1]}
-                  onChange={(e) => updateFilter('priceRange', [filters.priceRange[0], parseInt(e.target.value) || 5000000])}
+                  value={safeFilters.priceRange[1]}
+                  onChange={(e) => updateFilter('priceRange', [safeFilters.priceRange[0], parseInt(e.target.value) || 5000000])}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
                   placeholder="Max price"
                 />
               </div>
             </div>
             <div className="text-xs text-gray-500">
-              {formatPrice(filters.priceRange[0])} - {formatPrice(filters.priceRange[1])}
+              {formatPrice(safeFilters.priceRange[0])} - {formatPrice(safeFilters.priceRange[1])}
             </div>
           </div>
         </div>
@@ -133,7 +143,7 @@ export const PropertyFilters: React.FC<PropertyFiltersProps> = ({
                 key={type.value}
                 onClick={() => updateFilter('propertyType', type.value)}
                 className={`p-2 text-sm rounded-lg border transition-colors ${
-                  filters.propertyType === type.value
+                  safeFilters.propertyType === type.value
                     ? 'border-beedab-blue bg-beedab-blue text-white'
                     : 'border-gray-300 text-gray-700 hover:border-beedab-blue hover:text-beedab-blue'
                 }`}
@@ -155,7 +165,7 @@ export const PropertyFilters: React.FC<PropertyFiltersProps> = ({
                 key={bedroom}
                 onClick={() => updateFilter('bedrooms', bedroom)}
                 className={`px-3 py-2 text-sm rounded-lg border transition-colors ${
-                  filters.bedrooms === bedroom
+                  safeFilters.bedrooms === bedroom
                     ? 'border-beedab-blue bg-beedab-blue text-white'
                     : 'border-gray-300 text-gray-700 hover:border-beedab-blue hover:text-beedab-blue'
                 }`}
@@ -177,7 +187,7 @@ export const PropertyFilters: React.FC<PropertyFiltersProps> = ({
                 key={bathroom}
                 onClick={() => updateFilter('bathrooms', bathroom)}
                 className={`px-3 py-2 text-sm rounded-lg border transition-colors ${
-                  filters.bathrooms === bathroom
+                  safeFilters.bathrooms === bathroom
                     ? 'border-beedab-blue bg-beedab-blue text-white'
                     : 'border-gray-300 text-gray-700 hover:border-beedab-blue hover:text-beedab-blue'
                 }`}
@@ -206,7 +216,7 @@ export const PropertyFilters: React.FC<PropertyFiltersProps> = ({
                   type="radio"
                   name="listingType"
                   value={type.value}
-                  checked={filters.listingType === type.value}
+                  checked={safeFilters.listingType === type.value}
                   onChange={(e) => updateFilter('listingType', e.target.value)}
                   className="h-4 w-4 text-beedab-blue focus:ring-beedab-blue border-gray-300"
                 />
@@ -243,7 +253,7 @@ export const PropertyFilters: React.FC<PropertyFiltersProps> = ({
           <button
             onClick={() => {
               // Filters are applied in real-time, this could trigger a search
-              console.log('Filters applied:', filters);
+              console.log('Filters applied:', safeFilters);
             }}
             className="w-full bg-beedab-blue text-white py-3 px-4 rounded-lg hover:bg-beedab-darkblue transition-colors font-medium"
           >
