@@ -3,36 +3,7 @@ import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 import { relations, sql } from "drizzle-orm";
 
-// Rental listings table
-export const rental_listings = sqliteTable("rental_listings", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
-  title: text("title").notNull(),
-  description: text("description"),
-  monthly_rent: real("monthly_rent").notNull(),
-  location: text("location").notNull(),
-  city: text("city").notNull(),
-  district: text("district"),
-  bedrooms: integer("bedrooms").default(1),
-  bathrooms: integer("bathrooms").default(1),
-  property_type: text("property_type").default("apartment"),
-  furnished: integer("furnished", { mode: "boolean" }).default(false),
-  pet_friendly: integer("pet_friendly", { mode: "boolean" }).default(false),
-  parking: integer("parking", { mode: "boolean" }).default(false),
-  garden: integer("garden", { mode: "boolean" }).default(false),
-  security: integer("security", { mode: "boolean" }).default(false),
-  air_conditioning: integer("air_conditioning", { mode: "boolean" }).default(false),
-  internet: integer("internet", { mode: "boolean" }).default(false),
-  utilities_included: integer("utilities_included", { mode: "boolean" }).default(false),
-  available_date: text("available_date"),
-  lease_duration: integer("lease_duration").default(12),
-  deposit_amount: real("deposit_amount").default(0),
-  property_size: real("property_size"),
-  images: text("images"),
-  landlord_id: integer("landlord_id").references(() => users.id),
-  status: text("status").default("active"),
-  created_at: text("created_at").default(sql`(datetime('now'))`),
-  updated_at: text("updated_at").default(sql`(datetime('now'))`)
-});
+
 
 // Users table
 export const users = sqliteTable("users", {
