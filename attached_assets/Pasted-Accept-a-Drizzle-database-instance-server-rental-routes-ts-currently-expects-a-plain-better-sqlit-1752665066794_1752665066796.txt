@@ -1,0 +1,41 @@
+Accept a Drizzle database instance
+
+server/rental-routes.ts currently expects a plain better-sqlite3 Database and passes it to RentalStorage.
+
+Change the constructor of RentalStorage to accept the type exported in server/db.ts (Drizzle’s db object) instead of better-sqlite3. Update any type annotations accordingly.
+
+Import table definitions from the schema
+
+The schema file defines tables such as rental_listings and rental_applications. Import the relevant tables into rental-storage.ts.
+
+Rewrite each query using the query builder
+
+Where raw SQL is built with string concatenation—e.g., in searchRentals lines 100‑194—replace it with Drizzle API calls:
+
+Start with db.select().from(rental_listings)
+
+Add where clauses using helpers like eq, like, gte, lte, and, and or depending on which filters are present.
+
+Use .orderBy(desc(rental_listings.created_at)) for sorting.
+
+Similarly, replace the INSERT, UPDATE, and DELETE statements (lines 197‑268) with db.insert, db.update, and db.delete calls that return typed results.
+
+Make the methods asynchronous
+
+Drizzle’s query builder returns promises. Convert methods such as getAllRentals, getRentalById, and searchRentals to async functions that await the query results.
+
+Adjust route handlers
+
+Because the storage methods become asynchronous, update the route handlers in rental-routes.ts to await these methods before sending responses.
+
+Use Drizzle for rental applications and statistics as well
+
+The getRentalStats method already uses Drizzle’s query builder as a reference. Follow the same pattern for getRentalApplications, createRentalApplication, and related helpers.
+
+Verify the schema
+
+Ensure the table names in queries match those defined in shared/schema.ts (e.g., rental_listings instead of the older rentals table name). Run migrations if needed.
+
+Test the updated endpoints
+
+After refactoring, start the server and call endpoints like /api/rentals/search to confirm that SQLite errors no longer appear and that the filters work as expected.
