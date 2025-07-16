@@ -1,7 +1,7 @@
 
 import { db } from './db';
 import { rental_listings } from '../shared/schema';
-import { eq, and, gte, lte, like, or, desc, count, avg } from 'drizzle-orm';
+import { eq, and, gte, lte, like, desc, count, avg } from 'drizzle-orm';
 
 export interface RentalFilters {
   location?: string;
@@ -39,21 +39,10 @@ export interface RentalApplication {
 }
 
 export class RentalStorage {
-  private database: any;
-
-  constructor() {
-    // Use the imported db instance directly for consistency
-    this.database = db;
-    
-    if (!this.database) {
-      throw new Error('Database connection not initialized in RentalStorage');
-    }
-  }
-
   // Get all rentals
   getAllRentals() {
     try {
-      return this.database.select().from(rental_listings).orderBy(desc(rental_listings.created_at)).all();
+      return db.select().from(rental_listings).orderBy(desc(rental_listings.created_at)).all();
     } catch (error) {
       console.error('Error getting all rentals:', error);
       return [];
@@ -63,7 +52,7 @@ export class RentalStorage {
   // Get rental by ID
   getRentalById(id: number) {
     try {
-      const result = this.database.select().from(rental_listings).where(eq(rental_listings.id, id)).get();
+      const result = db.select().from(rental_listings).where(eq(rental_listings.id, id)).get();
       return result || null;
     } catch (error) {
       console.error('Error getting rental by ID:', error);
@@ -74,11 +63,7 @@ export class RentalStorage {
   // Search rentals with filters
   searchRentals(filters: RentalFilters) {
     try {
-      if (!this.database) {
-        throw new Error('Database connection not initialized in RentalStorage');
-      }
-      
-      let query = this.database.select().from(rental_listings);
+      let query = db.select().from(rental_listings);
       const conditions = [];
 
       // Build filter conditions
@@ -148,6 +133,9 @@ export class RentalStorage {
 
       if (filters.status) {
         conditions.push(eq(rental_listings.status, filters.status));
+      } else {
+        // Default to active listings only
+        conditions.push(eq(rental_listings.status, 'active'));
       }
 
       if (filters.available_date) {
@@ -159,7 +147,11 @@ export class RentalStorage {
         query = query.where(and(...conditions));
       }
 
-      return query.orderBy(desc(rental_listings.created_at)).all();
+      console.log('Searching rentals with filters:', filters);
+      const results = query.orderBy(desc(rental_listings.created_at)).all();
+      console.log('Found rentals:', results.length);
+      
+      return results;
     } catch (error) {
       console.error('Error searching rentals:', error);
       return [];
@@ -198,7 +190,7 @@ export class RentalStorage {
         updated_at: new Date().toISOString()
       };
 
-      const result = this.database.insert(rental_listings).values(newRental).returning().get();
+      const result = db.insert(rental_listings).values(newRental).returning().get();
       return result;
     } catch (error) {
       console.error('Error creating rental:', error);
@@ -214,12 +206,13 @@ export class RentalStorage {
         updated_at: new Date().toISOString()
       };
 
-      const result = this.database.update(rental_listings)
+      const result = db.update(rental_listings)
         .set(updateData)
         .where(eq(rental_listings.id, id))
-        .returning();
+        .returning()
+        .get();
 
-      return result.length > 0;
+      return result ? true : false;
     } catch (error) {
       console.error('Error updating rental:', error);
       return false;
@@ -229,11 +222,12 @@ export class RentalStorage {
   // Delete rental
   deleteRental(id: number) {
     try {
-      const result = this.database.delete(rental_listings)
+      const result = db.delete(rental_listings)
         .where(eq(rental_listings.id, id))
-        .returning();
+        .returning()
+        .get();
 
-      return result.length > 0;
+      return result ? true : false;
     } catch (error) {
       console.error('Error deleting rental:', error);
       return false;
@@ -278,27 +272,27 @@ export class RentalStorage {
   }
 
   // Get rental statistics
-  getRentalStats(): Promise<any> {
+  getRentalStats() {
     try {
-      const totalResult = this.database.select({ total: count() }).from(rental_listings).all();
-      const availableResult = this.database.select({ available: count() }).from(rental_listings).where(eq(rental_listings.status, 'active')).all();
-      const rentedResult = this.database.select({ rented: count() }).from(rental_listings).where(eq(rental_listings.status, 'rented')).all();
-      const avgPriceResult = this.database.select({ avg_price: avg(rental_listings.monthly_rent) }).from(rental_listings).where(eq(rental_listings.status, 'active')).all();
+      const totalResult = db.select({ total: count() }).from(rental_listings).all();
+      const availableResult = db.select({ available: count() }).from(rental_listings).where(eq(rental_listings.status, 'active')).all();
+      const rentedResult = db.select({ rented: count() }).from(rental_listings).where(eq(rental_listings.status, 'rented')).all();
+      const avgPriceResult = db.select({ avg_price: avg(rental_listings.monthly_rent) }).from(rental_listings).where(eq(rental_listings.status, 'active')).all();
 
-      return Promise.resolve({
+      return {
         total: totalResult[0]?.total || 0,
         available: availableResult[0]?.available || 0,
         rented: rentedResult[0]?.rented || 0,
         avgPrice: avgPriceResult[0]?.avg_price || 0
-      });
+      };
     } catch (error) {
       console.error('Error getting rental stats:', error);
-      return Promise.resolve({
+      return {
         total: 0,
         available: 0,
         rented: 0,
         avgPrice: 0
-      });
+      };
     }
   }
 }
