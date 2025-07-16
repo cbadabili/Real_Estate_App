@@ -61,6 +61,9 @@ const CreatePropertyPage = () => {
 
   const urlParams = new URLSearchParams(window.location.search);
   const initialListingType = urlParams.get('listingType') || 'owner';
+  
+  // Handle auction-specific initialization
+  const isAuctionMode = initialListingType === 'auction';
 
   const {
     register,
@@ -74,7 +77,12 @@ const CreatePropertyPage = () => {
     mode: 'onSubmit',
     defaultValues: {
       ownerId: 1,
-      listingType: initialListingType as 'owner' | 'agent' | 'rental' | 'auction'
+      listingType: initialListingType as 'owner' | 'agent' | 'rental' | 'auction',
+      ...(isAuctionMode && {
+        auctionDate: new Date().toISOString().split('T')[0], // Today's date
+        auctionTime: '10:00',
+        auctionHouse: 'First National Bank of Botswana Limited'
+      })
     }
   });
 

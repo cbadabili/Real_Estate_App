@@ -43,7 +43,7 @@ const PropertiesPage: React.FC = () => {
   // Search functionality
   const handleSmartSearch = async (query: string) => {
     if (!query.trim()) return;
-    
+
     const result = await performSearch(query);
     if (result && result.filters) {
       // Apply AI-interpreted filters
@@ -105,35 +105,35 @@ const PropertiesPage: React.FC = () => {
         !property.location.toLowerCase().includes(searchTerm.toLowerCase())) {
       return false;
     }
-    
+
     if (filters.propertyType !== 'all' && property.propertyType !== filters.propertyType) {
       return false;
     }
-    
+
     if (filters.listingType !== 'all' && property.listingType !== filters.listingType) {
       return false;
     }
-    
+
     const price = typeof property.price === 'number' ? property.price : parseFloat(property.price);
     if (price < filters.priceRange[0] || price > filters.priceRange[1]) {
       return false;
     }
-    
+
     if (filters.bedrooms !== 'any' && property.bedrooms < parseInt(filters.bedrooms)) {
       return false;
     }
-    
+
     if (filters.bathrooms !== 'any' && property.bathrooms < parseInt(filters.bathrooms)) {
       return false;
     }
-    
+
     return true;
   });
 
   const sortedProperties = [...filteredProperties].sort((a, b) => {
     const priceA = typeof a.price === 'number' ? a.price : parseFloat(a.price);
     const priceB = typeof b.price === 'number' ? b.price : parseFloat(b.price);
-    
+
     switch (sortBy) {
       case 'price-low':
         return priceA - priceB;
@@ -176,7 +176,7 @@ const PropertiesPage: React.FC = () => {
               showFilters={true}
               onFilterClick={() => setShowFilters(!showFilters)}
             />
-            
+
             {isSearching && (
               <div className="mt-2 flex items-center text-sm text-gray-600">
                 <EnhancedLoadingSpinner size="sm" type="search" />
