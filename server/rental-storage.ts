@@ -1,7 +1,7 @@
 
 import { db } from './db';
-import { rental_listings } from '../shared/schema';
-import { eq, and, gte, lte, like, desc, count, avg } from 'drizzle-orm';
+import { rental_listings, rental_applications } from '../shared/schema';
+import { eq, and, gte, lte, like, desc, count, avg, or } from 'drizzle-orm';
 
 export interface RentalFilters {
   location?: string;
@@ -13,36 +13,29 @@ export interface RentalFilters {
   bathrooms?: number;
   property_type?: string;
   furnished?: boolean;
-  pet_friendly?: boolean;
-  parking?: boolean;
-  garden?: boolean;
-  security?: boolean;
-  air_conditioning?: boolean;
-  internet?: boolean;
-  utilities_included?: boolean;
-  available_date?: string;
+  pets_allowed?: boolean;
+  parking_spaces?: number;
   status?: string;
+  available_from?: string;
 }
 
 export interface RentalApplication {
   id?: number;
   rental_id: number;
-  applicant_name: string;
-  applicant_email: string;
-  applicant_phone: string;
-  application_date: string;
+  renter_id: number;
+  application_data: any;
   status: 'pending' | 'approved' | 'rejected';
-  monthly_income?: number;
-  employment_status?: string;
-  references?: string;
-  notes?: string;
+  background_check_status?: string;
+  credit_report_status?: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export class RentalStorage {
   // Get all rentals
-  getAllRentals() {
+  async getAllRentals() {
     try {
-      return db.select().from(rental_listings).orderBy(desc(rental_listings.created_at)).all();
+      return await db.select().from(rental_listings).orderBy(desc(rental_listings.created_at));
     } catch (error) {
       console.error('Error getting all rentals:', error);
       return [];
@@ -50,10 +43,10 @@ export class RentalStorage {
   }
 
   // Get rental by ID
-  getRentalById(id: number) {
+  async getRentalById(id: number) {
     try {
-      const result = db.select().from(rental_listings).where(eq(rental_listings.id, id)).get();
-      return result || null;
+      const result = await db.select().from(rental_listings).where(eq(rental_listings.id, id));
+      return result[0] || null;
     } catch (error) {
       console.error('Error getting rental by ID:', error);
       return null;
@@ -61,14 +54,14 @@ export class RentalStorage {
   }
 
   // Search rentals with filters
-  searchRentals(filters: RentalFilters) {
+  async searchRentals(filters: RentalFilters) {
     try {
       let query = db.select().from(rental_listings);
       const conditions = [];
 
-      // Build filter conditions
+      // Build filter conditions using Drizzle query builder
       if (filters.location) {
-        conditions.push(like(rental_listings.location, `%${filters.location}%`));
+        conditions.push(like(rental_listings.address, `%${filters.location}%`));
       }
 
       if (filters.city) {
@@ -103,32 +96,12 @@ export class RentalStorage {
         conditions.push(eq(rental_listings.furnished, filters.furnished));
       }
 
-      if (filters.pet_friendly !== undefined) {
-        conditions.push(eq(rental_listings.pet_friendly, filters.pet_friendly));
+      if (filters.pets_allowed !== undefined) {
+        conditions.push(eq(rental_listings.pets_allowed, filters.pets_allowed));
       }
 
-      if (filters.parking !== undefined) {
-        conditions.push(eq(rental_listings.parking, filters.parking));
-      }
-
-      if (filters.garden !== undefined) {
-        conditions.push(eq(rental_listings.garden, filters.garden));
-      }
-
-      if (filters.security !== undefined) {
-        conditions.push(eq(rental_listings.security, filters.security));
-      }
-
-      if (filters.air_conditioning !== undefined) {
-        conditions.push(eq(rental_listings.air_conditioning, filters.air_conditioning));
-      }
-
-      if (filters.internet !== undefined) {
-        conditions.push(eq(rental_listings.internet, filters.internet));
-      }
-
-      if (filters.utilities_included !== undefined) {
-        conditions.push(eq(rental_listings.utilities_included, filters.utilities_included));
+      if (filters.parking_spaces !== undefined) {
+        conditions.push(gte(rental_listings.parking_spaces, filters.parking_spaces));
       }
 
       if (filters.status) {
@@ -138,8 +111,8 @@ export class RentalStorage {
         conditions.push(eq(rental_listings.status, 'active'));
       }
 
-      if (filters.available_date) {
-        conditions.push(lte(rental_listings.available_date, filters.available_date));
+      if (filters.available_from) {
+        conditions.push(lte(rental_listings.available_from, filters.available_from));
       }
 
       // Apply conditions if any exist
@@ -148,7 +121,7 @@ export class RentalStorage {
       }
 
       console.log('Searching rentals with filters:', filters);
-      const results = query.orderBy(desc(rental_listings.created_at)).all();
+      const results = await query.orderBy(desc(rental_listings.created_at));
       console.log('Found rentals:', results.length);
       
       return results;
@@ -159,39 +132,35 @@ export class RentalStorage {
   }
 
   // Create new rental
-  createRental(rentalData: any) {
+  async createRental(rentalData: any) {
     try {
       const newRental = {
+        landlord_id: rentalData.landlord_id || null,
         title: rentalData.title,
-        description: rentalData.description || null,
-        monthly_rent: rentalData.price || rentalData.monthly_rent,
-        location: rentalData.location,
+        description: rentalData.description || '',
+        address: rentalData.location || rentalData.address,
         city: rentalData.city,
-        district: rentalData.district || null,
+        district: rentalData.district || '',
+        ward: rentalData.ward || null,
+        property_type: rentalData.property_type || 'apartment',
         bedrooms: rentalData.bedrooms || 1,
         bathrooms: rentalData.bathrooms || 1,
-        property_type: rentalData.property_type || 'apartment',
-        furnished: rentalData.furnished || false,
-        pet_friendly: rentalData.pet_friendly || false,
-        parking: rentalData.parking || false,
-        garden: rentalData.garden || false,
-        security: rentalData.security || false,
-        air_conditioning: rentalData.air_conditioning || false,
-        internet: rentalData.internet || false,
-        utilities_included: rentalData.utilities_included || false,
-        available_date: rentalData.available_date || new Date().toISOString().split('T')[0],
-        lease_duration: rentalData.lease_duration || 12,
+        square_meters: rentalData.square_meters || rentalData.property_size || 50,
+        monthly_rent: rentalData.price || rentalData.monthly_rent,
         deposit_amount: rentalData.deposit_amount || 0,
-        property_size: rentalData.property_size || null,
-        images: rentalData.images || null,
-        landlord_id: rentalData.landlord_id || null,
-        status: rentalData.status || 'active',
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
+        lease_duration: rentalData.lease_duration || 12,
+        available_from: rentalData.available_date || rentalData.available_from || new Date().toISOString().split('T')[0],
+        furnished: rentalData.furnished || false,
+        pets_allowed: rentalData.pet_friendly || rentalData.pets_allowed || false,
+        parking_spaces: rentalData.parking || rentalData.parking_spaces || 0,
+        photos: rentalData.images || '[]',
+        amenities: rentalData.amenities || '[]',
+        utilities_included: rentalData.utilities_included || '[]',
+        status: rentalData.status || 'active'
       };
 
-      const result = db.insert(rental_listings).values(newRental).returning().get();
-      return result;
+      const result = await db.insert(rental_listings).values(newRental).returning();
+      return result[0];
     } catch (error) {
       console.error('Error creating rental:', error);
       throw error;
@@ -199,20 +168,19 @@ export class RentalStorage {
   }
 
   // Update rental
-  updateRental(id: number, updates: any) {
+  async updateRental(id: number, updates: any) {
     try {
       const updateData = {
         ...updates,
         updated_at: new Date().toISOString()
       };
 
-      const result = db.update(rental_listings)
+      const result = await db.update(rental_listings)
         .set(updateData)
         .where(eq(rental_listings.id, id))
-        .returning()
-        .get();
+        .returning();
 
-      return result ? true : false;
+      return result.length > 0;
     } catch (error) {
       console.error('Error updating rental:', error);
       return false;
@@ -220,51 +188,76 @@ export class RentalStorage {
   }
 
   // Delete rental
-  deleteRental(id: number) {
+  async deleteRental(id: number) {
     try {
-      const result = db.delete(rental_listings)
+      const result = await db.delete(rental_listings)
         .where(eq(rental_listings.id, id))
-        .returning()
-        .get();
+        .returning();
 
-      return result ? true : false;
+      return result.length > 0;
     } catch (error) {
       console.error('Error deleting rental:', error);
       return false;
     }
   }
 
-  // Get rental applications (placeholder - would need applications table)
-  getRentalApplications(rentalId: number): RentalApplication[] {
+  // Get rental applications
+  async getRentalApplications(rentalId: number): Promise<RentalApplication[]> {
     try {
-      // This would require a rental_applications table
-      // For now, return empty array
-      console.log(`Getting applications for rental ${rentalId}`);
-      return [];
+      const applications = await db.select()
+        .from(rental_applications)
+        .where(eq(rental_applications.rental_id, rentalId))
+        .orderBy(desc(rental_applications.created_at));
+
+      return applications.map(app => ({
+        id: app.id,
+        rental_id: app.rental_id!,
+        renter_id: app.renter_id!,
+        application_data: app.application_data,
+        status: app.status as 'pending' | 'approved' | 'rejected',
+        background_check_status: app.background_check_status || undefined,
+        credit_report_status: app.credit_report_status || undefined,
+        created_at: app.created_at || undefined,
+        updated_at: app.updated_at || undefined
+      }));
     } catch (error) {
       console.error('Error getting rental applications:', error);
       return [];
     }
   }
 
-  // Create rental application (placeholder)
-  createRentalApplication(applicationData: RentalApplication) {
+  // Create rental application
+  async createRentalApplication(applicationData: Omit<RentalApplication, 'id'>) {
     try {
-      // This would require a rental_applications table
-      console.log('Creating rental application:', applicationData);
-      return { id: Date.now(), ...applicationData };
+      const newApplication = {
+        rental_id: applicationData.rental_id,
+        renter_id: applicationData.renter_id,
+        application_data: applicationData.application_data,
+        status: applicationData.status || 'pending',
+        background_check_status: applicationData.background_check_status || 'pending',
+        credit_report_status: applicationData.credit_report_status || 'pending'
+      };
+
+      const result = await db.insert(rental_applications).values(newApplication).returning();
+      return result[0];
     } catch (error) {
       console.error('Error creating rental application:', error);
       throw error;
     }
   }
 
-  // Update rental application status (placeholder)
-  updateRentalApplicationStatus(id: number, status: string) {
+  // Update rental application status
+  async updateRentalApplicationStatus(id: number, status: string) {
     try {
-      // This would require a rental_applications table
-      console.log(`Updating application ${id} status to ${status}`);
-      return true;
+      const result = await db.update(rental_applications)
+        .set({ 
+          status,
+          updated_at: new Date().toISOString()
+        })
+        .where(eq(rental_applications.id, id))
+        .returning();
+
+      return result.length > 0;
     } catch (error) {
       console.error('Error updating application status:', error);
       return false;
@@ -272,12 +265,18 @@ export class RentalStorage {
   }
 
   // Get rental statistics
-  getRentalStats() {
+  async getRentalStats() {
     try {
-      const totalResult = db.select({ total: count() }).from(rental_listings).all();
-      const availableResult = db.select({ available: count() }).from(rental_listings).where(eq(rental_listings.status, 'active')).all();
-      const rentedResult = db.select({ rented: count() }).from(rental_listings).where(eq(rental_listings.status, 'rented')).all();
-      const avgPriceResult = db.select({ avg_price: avg(rental_listings.monthly_rent) }).from(rental_listings).where(eq(rental_listings.status, 'active')).all();
+      const totalResult = await db.select({ total: count() }).from(rental_listings);
+      const availableResult = await db.select({ available: count() })
+        .from(rental_listings)
+        .where(eq(rental_listings.status, 'active'));
+      const rentedResult = await db.select({ rented: count() })
+        .from(rental_listings)
+        .where(eq(rental_listings.status, 'rented'));
+      const avgPriceResult = await db.select({ avg_price: avg(rental_listings.monthly_rent) })
+        .from(rental_listings)
+        .where(eq(rental_listings.status, 'active'));
 
       return {
         total: totalResult[0]?.total || 0,

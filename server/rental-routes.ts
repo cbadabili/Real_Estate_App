@@ -1,25 +1,25 @@
+
 import express from 'express';
 import { RentalStorage } from './rental-storage';
-import { Database } from 'better-sqlite3';
+import type { db as DrizzleDB } from './db';
 
-export function createRentalRoutes(db: Database): express.Router {
+export function createRentalRoutes(db: typeof DrizzleDB): express.Router {
   const router = express.Router();
   const rentalStorage = new RentalStorage();
 
-  // Get all rentals
-  router.get('/', async (req, res) => {
+  // Get rental statistics (must come before /:id route)
+  router.get('/stats', async (req, res) => {
     try {
-      const rentals = rentalStorage.getAllRentals();
+      const stats = await rentalStorage.getRentalStats();
       res.json({
         success: true,
-        data: rentals,
-        count: rentals.length
+        data: stats
       });
     } catch (error) {
-      console.error('Error fetching rentals:', error);
+      console.error('Error fetching rental stats:', error);
       res.status(500).json({
         success: false,
-        error: 'Failed to fetch rentals'
+        error: 'Failed to fetch rental stats'
       });
     }
   });
@@ -37,15 +37,10 @@ export function createRentalRoutes(db: Database): express.Router {
         bathrooms: req.query.bathrooms ? parseInt(req.query.bathrooms as string) : undefined,
         property_type: req.query.property_type as string,
         furnished: req.query.furnished === 'true',
-        pet_friendly: req.query.pet_friendly === 'true',
-        parking: req.query.parking === 'true',
-        garden: req.query.garden === 'true',
-        security: req.query.security === 'true',
-        air_conditioning: req.query.air_conditioning === 'true',
-        internet: req.query.internet === 'true',
-        utilities_included: req.query.utilities_included === 'true',
-        available_date: req.query.available_date as string,
-        status: req.query.status as string || 'available'
+        pets_allowed: req.query.pets_allowed === 'true' || req.query.pet_friendly === 'true',
+        parking_spaces: req.query.parking_spaces ? parseInt(req.query.parking_spaces as string) : undefined,
+        available_from: req.query.available_from as string || req.query.available_date as string,
+        status: req.query.status as string || 'active'
       };
 
       // Remove undefined values
@@ -55,7 +50,7 @@ export function createRentalRoutes(db: Database): express.Router {
         }
       });
 
-      const rentals = rentalStorage.searchRentals(filters);
+      const rentals = await rentalStorage.searchRentals(filters);
       res.json({
         success: true,
         data: rentals,
@@ -71,6 +66,24 @@ export function createRentalRoutes(db: Database): express.Router {
     }
   });
 
+  // Get all rentals
+  router.get('/', async (req, res) => {
+    try {
+      const rentals = await rentalStorage.getAllRentals();
+      res.json({
+        success: true,
+        data: rentals,
+        count: rentals.length
+      });
+    } catch (error) {
+      console.error('Error fetching rentals:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to fetch rentals'
+      });
+    }
+  });
+
   // Get rental by ID
   router.get('/:id', async (req, res) => {
     try {
@@ -82,7 +95,7 @@ export function createRentalRoutes(db: Database): express.Router {
         });
       }
 
-      const rental = rentalStorage.getRentalById(id);
+      const rental = await rentalStorage.getRentalById(id);
       if (!rental) {
         return res.status(404).json({
           success: false,
@@ -103,22 +116,20 @@ export function createRentalRoutes(db: Database): express.Router {
     }
   });
 
-  
-
   // Create new rental
   router.post('/', async (req, res) => {
     try {
       const rentalData = req.body;
 
       // Validate required fields
-      if (!rentalData.title || !rentalData.price || !rentalData.location || !rentalData.city) {
+      if (!rentalData.title || (!rentalData.price && !rentalData.monthly_rent) || !rentalData.location || !rentalData.city) {
         return res.status(400).json({
           success: false,
-          error: 'Missing required fields: title, price, location, city'
+          error: 'Missing required fields: title, price/monthly_rent, location, city'
         });
       }
 
-      const rental = rentalStorage.createRental(rentalData);
+      const rental = await rentalStorage.createRental(rentalData);
       res.status(201).json({
         success: true,
         data: rental
@@ -143,7 +154,7 @@ export function createRentalRoutes(db: Database): express.Router {
         });
       }
 
-      const updated = rentalStorage.updateRental(id, req.body);
+      const updated = await rentalStorage.updateRental(id, req.body);
       if (!updated) {
         return res.status(404).json({
           success: false,
@@ -151,7 +162,7 @@ export function createRentalRoutes(db: Database): express.Router {
         });
       }
 
-      const rental = rentalStorage.getRentalById(id);
+      const rental = await rentalStorage.getRentalById(id);
       res.json({
         success: true,
         data: rental
@@ -176,7 +187,7 @@ export function createRentalRoutes(db: Database): express.Router {
         });
       }
 
-      const deleted = rentalStorage.deleteRental(id);
+      const deleted = await rentalStorage.deleteRental(id);
       if (!deleted) {
         return res.status(404).json({
           success: false,
@@ -208,7 +219,7 @@ export function createRentalRoutes(db: Database): express.Router {
         });
       }
 
-      const applications = rentalStorage.getRentalApplications(rentalId);
+      const applications = await rentalStorage.getRentalApplications(rentalId);
       res.json({
         success: true,
         data: applications,
@@ -235,7 +246,7 @@ export function createRentalRoutes(db: Database): express.Router {
       }
 
       // Check if rental exists
-      const rental = rentalStorage.getRentalById(rentalId);
+      const rental = await rentalStorage.getRentalById(rentalId);
       if (!rental) {
         return res.status(404).json({
           success: false,
@@ -244,13 +255,13 @@ export function createRentalRoutes(db: Database): express.Router {
       }
 
       const applicationData = {
-        ...req.body,
         rental_id: rentalId,
-        application_date: new Date().toISOString(),
-        status: 'pending'
+        renter_id: req.body.renter_id || 1, // Default renter ID for testing
+        application_data: req.body,
+        status: 'pending' as const
       };
 
-      const application = rentalStorage.createRentalApplication(applicationData);
+      const application = await rentalStorage.createRentalApplication(applicationData);
       res.status(201).json({
         success: true,
         data: application
@@ -283,7 +294,7 @@ export function createRentalRoutes(db: Database): express.Router {
         });
       }
 
-      const updated = rentalStorage.updateRentalApplicationStatus(id, status);
+      const updated = await rentalStorage.updateRentalApplicationStatus(id, status);
       if (!updated) {
         return res.status(404).json({
           success: false,
@@ -300,23 +311,6 @@ export function createRentalRoutes(db: Database): express.Router {
       res.status(500).json({
         success: false,
         error: 'Failed to update application status'
-      });
-    }
-  });
-
-  // Get rental statistics
-  router.get('/stats', (req, res) => {
-    try {
-      const stats = rentalStorage.getRentalStats();
-      res.json({
-        success: true,
-        data: stats
-      });
-    } catch (error) {
-      console.error('Error fetching rental stats:', error);
-      res.status(500).json({
-        success: false,
-        error: 'Failed to fetch rental stats'
       });
     }
   });
