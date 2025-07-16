@@ -605,16 +605,4 @@ async function updateProvider(id: number, data: any) {
   return { ...provider, ...data, updated_at: new Date().toISOString() };
 }
 
-async function createProviderReview(data: any) {
-  return {
-    id: Math.floor(Math.random() * 10000),
-    ...data,
-    created_at: new Date().toISOString()
-  };
-}
-
-async function getProviderReviews(providerId: number, options: any) {
-  return [];
-}
-
 export default router;

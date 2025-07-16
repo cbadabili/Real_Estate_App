@@ -1,9 +1,8 @@
 
 import express from 'express';
 import { RentalStorage } from './rental-storage';
-import type { db as DrizzleDB } from './db';
 
-export function createRentalRoutes(db: typeof DrizzleDB): express.Router {
+export function createRentalRoutes(): express.Router {
   const router = express.Router();
   const rentalStorage = new RentalStorage();
 

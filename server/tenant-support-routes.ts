@@ -1,4 +1,3 @@
-
 import { Router } from 'express';
 import { authenticate } from './auth-middleware';
 
@@ -167,126 +166,152 @@ router.post('/support/tickets', authenticate, async (req, res) => {
   }
 });
 
+// Submit maintenance request
+router.post('/maintenance-requests', async (req, res) => {
+  try {
+    const requestData = req.body;
+
+    // Validate required fields
+    if (!requestData.property_id || !requestData.description) {
+      return res.status(400).json({
+        success: false,
+        error: 'Property ID and description are required'
+      });
+    }
+
+    // Mock creation - replace with actual database insert
+    const newRequest = {
+      id: Math.floor(Math.random() * 1000),
+      ...requestData,
+      status: 'pending',
+      created_at: new Date().toISOString()
+    };
+
+    res.status(201).json({
+      success: true,
+      data: newRequest,
+      message: 'Maintenance request submitted successfully'
+    });
+  } catch (error) {
+    console.error('Error submitting maintenance request:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to submit maintenance request'
+    });
+  }
+});
+
+// Get tenant's maintenance requests
+router.get('/maintenance-requests', async (req, res) => {
+  try {
+    const tenantId = req.query.tenant_id ? parseInt(req.query.tenant_id as string) : undefined;
+
+    if (!tenantId) {
+      return res.status(400).json({
+        success: false,
+        error: 'Tenant ID is required'
+      });
+    }
+
+    // Mock data - replace with actual database query
+    const requests = [
+      {
+        id: 1,
+        property_id: 1,
+        tenant_id: tenantId,
+        type: 'plumbing',
+        priority: 'high',
+        description: 'Kitchen sink is leaking',
+        status: 'pending',
+        created_at: new Date().toISOString()
+      }
+    ];
+
+    res.json({
+      success: true,
+      data: requests
+    });
+  } catch (error) {
+    console.error('Error fetching maintenance requests:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch maintenance requests'
+    });
+  }
+});
+
+// Make rent payment
+router.post('/rent-payments', async (req, res) => {
+  try {
+    const paymentData = req.body;
+
+    // Validate required fields
+    if (!paymentData.rental_id || !paymentData.amount) {
+      return res.status(400).json({
+        success: false,
+        error: 'Rental ID and amount are required'
+      });
+    }
+
+    // Mock payment processing - replace with actual payment gateway integration
+    const payment = {
+      id: Math.floor(Math.random() * 1000),
+      ...paymentData,
+      payment_date: new Date().toISOString(),
+      status: 'completed',
+      transaction_id: `TXN${Date.now()}`
+    };
+
+    res.status(201).json({
+      success: true,
+      data: payment,
+      message: 'Payment processed successfully'
+    });
+  } catch (error) {
+    console.error('Error processing rent payment:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to process rent payment'
+    });
+  }
+});
+
+// Get tenant's payment history
+router.get('/rent-payments', async (req, res) => {
+  try {
+    const tenantId = req.query.tenant_id ? parseInt(req.query.tenant_id as string) : undefined;
+
+    if (!tenantId) {
+      return res.status(400).json({
+        success: false,
+        error: 'Tenant ID is required'
+      });
+    }
+
+    // Mock data - replace with actual database query
+    const payments = [
+      {
+        id: 1,
+        rental_id: 1,
+        tenant_id: tenantId,
+        amount: 5000,
+        payment_date: '2024-01-28',
+        status: 'completed',
+        transaction_id: 'TXN123456'
+      }
+    ];
+
+    res.json({
+      success: true,
+      data: payments
+    });
+  } catch (error) {
+    console.error('Error fetching payment history:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch payment history'
+    });
+  }
+});
+
 export default router;
-import express from 'express';
-
-export function createTenantSupportRoutes(): express.Router {
-  const router = express.Router();
-
-  // Get support resources
-  router.get('/resources', async (req, res) => {
-    try {
-      const resources = {
-        tenantRights: [
-          {
-            title: 'Right to Peaceful Enjoyment',
-            description: 'You have the right to use your rental property without unreasonable interference from your landlord.',
-            details: 'Landlords cannot enter without proper notice (typically 24-48 hours) except in emergencies.'
-          },
-          {
-            title: 'Right to Habitable Housing',
-            description: 'Your rental property must meet basic health and safety standards.',
-            details: 'This includes proper plumbing, heating, electrical systems, and structural integrity.'
-          },
-          {
-            title: 'Right to Security Deposit Return',
-            description: 'You are entitled to the return of your security deposit minus legitimate deductions.',
-            details: 'Landlords must provide itemized list of deductions and return deposits within 30 days of lease termination.'
-          }
-        ],
-        legalRequirements: [
-          {
-            title: 'Rental Agreement Requirements',
-            description: 'All rental agreements must be in writing and include specific terms.',
-            details: 'Must include rent amount, payment schedule, lease duration, and property condition.'
-          },
-          {
-            title: 'Notice Requirements',
-            description: 'Proper notice must be given for lease termination and rent increases.',
-            details: 'Typically 30 days notice for month-to-month tenancies, 60 days for rent increases.'
-          },
-          {
-            title: 'Landlord Obligations',
-            description: 'Landlords must maintain the property and address health/safety issues.',
-            details: 'Includes repairs, pest control, and ensuring compliance with building codes.'
-          }
-        ],
-        contactInfo: {
-          helpline: '+267 123 4567',
-          email: 'support@beedab.com',
-          officeHours: 'Monday - Friday: 8:00 AM - 6:00 PM'
-        }
-      };
-
-      res.json({
-        success: true,
-        data: resources
-      });
-    } catch (error) {
-      console.error('Error fetching support resources:', error);
-      res.status(500).json({
-        success: false,
-        error: 'Failed to fetch support resources'
-      });
-    }
-  });
-
-  // Submit a complaint
-  router.post('/complaint', async (req, res) => {
-    try {
-      const { subject, description, category, propertyId } = req.body;
-      
-      const complaint = {
-        id: Date.now(),
-        referenceNumber: `TN-${Date.now().toString().slice(-6)}`,
-        subject,
-        description,
-        category,
-        propertyId,
-        status: 'submitted',
-        submittedDate: new Date().toISOString()
-      };
-
-      res.status(201).json({
-        success: true,
-        data: complaint,
-        message: 'Complaint submitted successfully'
-      });
-    } catch (error) {
-      console.error('Error submitting complaint:', error);
-      res.status(500).json({
-        success: false,
-        error: 'Failed to submit complaint'
-      });
-    }
-  });
-
-  // Get tenant complaints
-  router.get('/complaints', async (req, res) => {
-    try {
-      const complaints = [
-        {
-          id: 1,
-          referenceNumber: 'TN-123456',
-          subject: 'Heating system not working',
-          category: 'maintenance',
-          status: 'in_progress',
-          submittedDate: new Date().toISOString()
-        }
-      ];
-
-      res.json({
-        success: true,
-        data: complaints
-      });
-    } catch (error) {
-      console.error('Error fetching complaints:', error);
-      res.status(500).json({
-        success: false,
-        error: 'Failed to fetch complaints'
-      });
-    }
-  });
-
-  return router;
-}

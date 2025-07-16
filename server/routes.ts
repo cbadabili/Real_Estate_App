@@ -1142,7 +1142,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use("/api/marketplace", marketplaceRoutes);
 
   // Rental routes
-  const rentalRouter = createRentalRoutes(db._.session);
+  const rentalRouter = createRentalRoutes();
   app.use("/api/rentals", rentalRouter);
 
   // Services routes
