@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Star, MapPin, Clock, DollarSign, Filter, Search, MessageCircle, Phone, Camera, Gavel, Home, Wrench, Calculator, Shield, Award } from 'lucide-react';
+import { Star, MapPin, Clock, DollarSign, Filter, Search, MessageCircle, Phone, Camera, Gavel, Home, Wrench, Calculator, Shield, Award, Users, FileCheck, ArrowRight, CheckCircle, FileText } from 'lucide-react';
 import ServiceProviderRegistration from '../components/ServiceProviderRegistration';
 
 interface Professional {
@@ -154,19 +154,7 @@ const ServicesPage: React.FC = () => {
           <p className="text-xl text-neutral-600 max-w-3xl mx-auto">
             Connect with verified professionals for every step of your real estate journey
           </p>
-          <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-            <p className="text-blue-700 mb-3">
-              Looking for REAC-certified professionals? Visit our dedicated Professional Support section.
-            </p>
-            <Link
-              to="/professional-support"
-              className="inline-flex items-center px-6 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              <Users className="mr-2 h-4 w-4" />
-              View Professional Support
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Link>
-          </div>
+          
         </div>
 
         {/* Filters */}
@@ -334,3 +322,4 @@ const ServicesPage: React.FC = () => {
 };
 
 export default ServicesPage;
+```

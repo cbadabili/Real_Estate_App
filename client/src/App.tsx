@@ -22,6 +22,7 @@ import AgentNetworkPage from './pages/AgentNetworkPage';
 import MapSearchPage from './pages/MapSearchPage';
 import ProfilePage from './pages/ProfilePage';
 import LegalServicesPage from './pages/services/LegalServicesPage';
+import LegalDocumentTemplatesPage from './pages/LegalDocumentTemplatesPage';
 import FinancingPage from './pages/services/FinancingPage';
 import PlanningPage from './pages/buyer-journey/PlanningPage';
 import SearchingPage from './pages/buyer-journey/SearchingPage';
@@ -82,7 +83,6 @@ import PropertyValuationPage from './pages/PropertyValuationPage';
 import MarketTrendsPage from './pages/MarketTrendsPage';
 import NeighborhoodAnalyticsPage from './pages/NeighborhoodAnalyticsPage';
 import InvestmentAnalyticsPage from './pages/InvestmentAnalyticsPage';
-import LegalDocumentTemplatesPage from './pages/LegalDocumentTemplatesPage';
 import PropertyValuationToolsPage from './pages/PropertyValuationToolsPage';
 import TransactionManagementPage from './pages/TransactionManagementPage';
 import ProfessionalSupportPage from './pages/ProfessionalSupportPage';
@@ -149,9 +149,10 @@ function App() {
             <Route path="/marketplace" element={<MarketplacePage />} />
             <Route path="/marketplace/:segment" element={<MarketplacePage />} />
           <Route path="/services/legal" element={<LegalServicesPage />} />
-          <Route path="/services/financing" element={<FinancingPage />} />
+          <Route path="/services/legal-documents" element={<LegalDocumentTemplatesPage />} />
           <Route path="/services/property-management" element={<PropertyManagementPage />} />
         <Route path="/services/tenant-support" element={<TenantSupportPage />} />
+          <Route path="/services/financing" element={<FinancingPage />} />
 
           {/* Market Intelligence Routes */}
           <Route path="/property-valuation" element={<PropertyValuationPage />} />
