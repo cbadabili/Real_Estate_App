@@ -1019,7 +1019,7 @@ const Navbar = () => {
                   🧱 Find a Supplier
                 </Link>
                 <Link
-                  to="/marketplace/trades"
+                  to="/marketplace/artisans"
                   className="block px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-md text-sm"
                   onClick={() => setIsOpen(false)}
                 >

@@ -47,7 +47,7 @@ const MarketplacePage: React.FC<MarketplacePageProps> = () => {
     { id: 'all', name: 'All Services', icon: Award, description: 'Browse all service providers' },
     { id: 'professionals', name: 'Professionals', icon: Award, description: 'Legal, valuation, and professional services' },
     { id: 'suppliers', name: 'Suppliers', icon: Package, description: 'Building materials and supplies' },
-    { id: 'trades', name: 'Trades', icon: Wrench, description: 'Skilled trades and construction' },
+    { id: 'artisans', name: 'Artisans', icon: Wrench, description: 'Skilled trades and construction' },
     { id: 'training', name: 'Training', icon: GraduationCap, description: 'Professional development and training' }
   ];
 
