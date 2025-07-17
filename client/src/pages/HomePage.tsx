@@ -441,7 +441,7 @@ const HomePage = () => {
                   icon: Users,
                   title: 'REAC Agent Network',
                   description: 'Connect with certified REAC agents across Botswana and access professional real estate services',
-                  link: '/agent-network'
+                  link: '/professional-support'
                 },
                 {
                   icon: Building2,
