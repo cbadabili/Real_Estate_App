@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from '../hooks/useTranslation';
 import { MapPin, Ruler, Phone, MessageCircle, Zap, Droplets, CheckCircle } from 'lucide-react';
 
 interface PlotListingCardProps {
@@ -41,11 +42,25 @@ export interface ContactInfo {
  * Location, Size, Price, Amenities, Contact info with WhatsApp integration
  * Visual badges for "Serviced" or "Unserviced" status
  */
-export const PlotListingCard: React.FC<PlotListingCardProps> = ({ 
-  plot, 
-  onContact, 
-  className = "" 
+export const PlotListingCard: React.FC<PlotListingCardProps> = ({
+  plot,
+  onContact,
+  className = ""
 }) => {
+  const { t } = useTranslation();
+  
+  const getPlotTypeColor = (type: string) => {
+    switch (type) {
+      case 'residential':
+        return 'bg-blue-100 text-blue-800';
+      case 'commercial':
+        return 'bg-purple-100 text-purple-800';
+      case 'farm':
+        return 'bg-green-100 text-green-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  };
   const formatPrice = (price: number, currency: string) => {
     return `${currency} ${price.toLocaleString()}`;
   };
@@ -109,12 +124,14 @@ export const PlotListingCard: React.FC<PlotListingCardProps> = ({
           </div>
           
           {/* Service Status Badge */}
-          <div className={`px-2 py-1 rounded-full text-xs font-medium ${
-            plot.serviced 
-              ? 'bg-green-100 text-green-800' 
-              : 'bg-orange-100 text-orange-800'
-          }`}>
-            {plot.serviced ? 'Serviced' : 'Unserviced'}
+          <div
+            className={`px-2 py-1 rounded-full text-xs font-medium ${
+              plot.serviced
+                ? 'bg-green-100 text-green-800'
+                : 'bg-orange-100 text-orange-800'
+            }`}
+          >
+            {plot.serviced ? t('plot_status.serviced') : t('plot_status.unserviced')}
           </div>
         </div>
 
@@ -136,20 +153,20 @@ export const PlotListingCard: React.FC<PlotListingCardProps> = ({
         {/* Plot Type & Amenities */}
         <div className="flex flex-wrap gap-2">
           <span className={`px-2 py-1 rounded-full text-xs font-medium capitalize ${getPlotTypeColor(plot.plotType)}`}>
-            {plot.plotType}
+            {t(`plot_types.${plot.plotType}`) || plot.plotType}
           </span>
           
           {plot.hasWater && (
             <span className="px-2 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium flex items-center">
               <Droplets className="h-3 w-3 mr-1" />
-              Water
+              {t('amenities.water')}
             </span>
           )}
           
           {plot.hasElectricity && (
             <span className="px-2 py-1 bg-yellow-50 text-yellow-700 rounded-full text-xs font-medium flex items-center">
               <Zap className="h-3 w-3 mr-1" />
-              Power
+              {t('amenities.electricity')}
             </span>
           )}
         </div>
@@ -172,7 +189,7 @@ export const PlotListingCard: React.FC<PlotListingCardProps> = ({
             className="flex-1 bg-beedab-blue text-white px-4 py-2 rounded-lg hover:bg-beedab-darkblue transition-colors flex items-center justify-center gap-2 text-sm font-medium"
           >
             <Phone className="h-4 w-4" />
-            Call Seller
+            {t('common.call_seller')}
           </button>
           
           <button
@@ -180,7 +197,7 @@ export const PlotListingCard: React.FC<PlotListingCardProps> = ({
             className="flex-1 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center gap-2 text-sm font-medium"
           >
             <MessageCircle className="h-4 w-4" />
-            WhatsApp
+            {t('common.whatsapp')}
           </button>
         </div>
       </div>

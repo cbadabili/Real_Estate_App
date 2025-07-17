@@ -113,6 +113,3 @@ export const VerificationBadge: React.FC<VerificationBadgeProps> = ({
   );
 };
 ```
-
-```text
-The code fixes the type indexing issue in the VerificationBadge component by correctly referencing the verificationConfigs object using the type property.

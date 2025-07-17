@@ -137,3 +137,43 @@
     "max_value": "Boleng jo bo kwa godimo ke {max}"
   }
 }
+{
+  "common": {
+    "call_seller": "Bitsa Morekisi",
+    "whatsapp": "WhatsApp",
+    "contact": "Ikgolaganye",
+    "phone": "Mogala",
+    "email": "Imeile",
+    "view_details": "Bona Dintlha",
+    "save": "Boloka",
+    "share": "Arolelana",
+    "featured": "E e Tlhomamisitsweng",
+    "new": "Sesha",
+    "price": "Tlhwatlhwa",
+    "location": "Lefelo",
+    "size": "Bogolo",
+    "type": "Mofuta"
+  },
+  "plot_status": {
+    "serviced": "E na le Ditirelo",
+    "unserviced": "Ga e na Ditirelo"
+  },
+  "amenities": {
+    "water": "Metsi",
+    "electricity": "Motlakase",
+    "road_access": "Tsela ya Phitlhelelo",
+    "fenced": "E Kobaetswe"
+  },
+  "plot_types": {
+    "residential": "Bonno",
+    "commercial": "Kgwebo",
+    "farm": "Polasi",
+    "agricultural": "Temothuo"
+  },
+  "verification": {
+    "verified": "E Netefaditsweng",
+    "premium": "Ya Maemo a a Kwa Godimo",
+    "basic": "Ya Motheo",
+    "professional": "Setsebi"
+  }
+}

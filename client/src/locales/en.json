@@ -137,3 +137,43 @@
     "max_value": "Maximum value is {max}"
   }
 }
+{
+  "common": {
+    "call_seller": "Call Seller",
+    "whatsapp": "WhatsApp",
+    "contact": "Contact",
+    "phone": "Phone",
+    "email": "Email",
+    "view_details": "View Details",
+    "save": "Save",
+    "share": "Share",
+    "featured": "Featured",
+    "new": "New",
+    "price": "Price",
+    "location": "Location",
+    "size": "Size",
+    "type": "Type"
+  },
+  "plot_status": {
+    "serviced": "Serviced",
+    "unserviced": "Unserviced"
+  },
+  "amenities": {
+    "water": "Water",
+    "electricity": "Power",
+    "road_access": "Road Access",
+    "fenced": "Fenced"
+  },
+  "plot_types": {
+    "residential": "Residential",
+    "commercial": "Commercial",
+    "farm": "Farm",
+    "agricultural": "Agricultural"
+  },
+  "verification": {
+    "verified": "Verified",
+    "premium": "Premium",
+    "basic": "Basic",
+    "professional": "Professional"
+  }
+}
