@@ -350,7 +350,7 @@ const PropertyValuationToolsPage = () => {
               Get a certified property valuation from qualified Botswana valuers for mortgage, insurance, or legal purposes.
             </p>
             <Link
-              to="/property-valuation"
+              to="/marketplace/professionals?category=Property%20Valuer"
               className="inline-flex items-center px-8 py-4 bg-white text-green-600 font-semibold rounded-xl hover:bg-gray-100 transition-colors"
             >
               Book Professional Valuation

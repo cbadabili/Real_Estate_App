@@ -262,7 +262,10 @@ const PricingGuidePage = () => {
               <p className="text-neutral-600 text-sm mb-4">
                 Get an accurate valuation from certified property valuers
               </p>
-              <button className="w-full bg-green-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-green-700 transition-colors">
+              <button 
+                onClick={() => window.location.href = '/marketplace/professionals?category=Property%20Valuer'}
+                className="w-full bg-green-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-green-700 transition-colors"
+              >
                 Book Valuation
               </button>
             </div>

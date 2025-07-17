@@ -259,7 +259,7 @@ const ViewingPage = () => {
                     Get accurate property valuation
                   </p>
                   <button 
-                    onClick={() => window.open(`/services?category=Property Valuer`, '_blank')}
+                    onClick={() => window.location.href = '/marketplace/professionals?category=Property%20Valuer'}
                     className="w-full bg-green-600 text-white py-2 px-3 rounded text-sm hover:bg-green-700 transition-colors"
                   >
                     Book Valuation
