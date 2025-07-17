@@ -82,6 +82,10 @@ import PropertyValuationPage from './pages/PropertyValuationPage';
 import MarketTrendsPage from './pages/MarketTrendsPage';
 import NeighborhoodAnalyticsPage from './pages/NeighborhoodAnalyticsPage';
 import InvestmentAnalyticsPage from './pages/InvestmentAnalyticsPage';
+import LegalDocumentTemplatesPage from './pages/LegalDocumentTemplatesPage';
+import PropertyValuationToolsPage from './pages/PropertyValuationToolsPage';
+import TransactionManagementPage from './pages/TransactionManagementPage';
+import ProfessionalSupportPage from './pages/ProfessionalSupportPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -154,6 +158,11 @@ function App() {
           <Route path="/market-trends" element={<MarketTrendsPage />} />
           <Route path="/neighborhood-analytics" element={<NeighborhoodAnalyticsPage />} />
           <Route path="/investment-analytics" element={<InvestmentAnalyticsPage />} />
+           {/* Additional Service Routes */}
+           <Route path="/legal-document-templates" element={<LegalDocumentTemplatesPage />} />
+           <Route path="/property-valuation-tools" element={<PropertyValuationToolsPage />} />
+           <Route path="/transaction-management" element={<TransactionManagementPage />} />
+           <Route path="/professional-support" element={<ProfessionalSupportPage />} />
           {/* Marketplace Routes */}
           <Route path="/marketplace" element={<MarketplacePage />} />
           <Route path="/marketplace/register" element={<RegisterProviderPage />} />

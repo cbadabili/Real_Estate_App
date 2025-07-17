@@ -464,8 +464,21 @@ const HomePage = () => {
                     <h3 className="text-xl font-semibold text-gray-900 mb-4 group-hover:text-beedab-blue transition-colors">{feature.title}</h3>
                     <p className="text-gray-600">{feature.description}</p>
                     <div className="mt-4 flex items-center justify-center text-beedab-blue group-hover:text-beedab-darkblue transition-colors">
-                      <span className="text-sm font-medium">Learn More</span>
-                      <ArrowRight className="ml-2 h-4 w-4" />
+                      <Link 
+                        to={
+                          feature.title === 'Buyer and Seller Platform' ? '/buyer-seller-platform' :
+                          feature.title === 'Market Intelligence' ? '/market-intelligence' :
+                          feature.title === 'Secure Transactions' ? '/secure-transactions' :
+                          feature.title === 'Instant Communication' ? '/communication' :
+                          feature.title === 'REAC Agent Network' ? '/agent-network' :
+                          feature.title === 'Comprehensive Listings' ? '/properties' :
+                          '#'
+                        }
+                        className="text-sm font-medium flex items-center"
+                      >
+                        Learn More
+                        <ArrowRight className="ml-2 h-4 w-4" />
+                      </Link>
                     </div>
                   </motion.div>
                 );
