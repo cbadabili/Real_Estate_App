@@ -413,49 +413,50 @@ const HomePage = () => {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
-              {
-                icon: Users,
-                title: 'Buyer and Seller Platform',
-                description: 'Complete For Sale By Owner tools including listing creation, legal documents, and transaction management for Batswana',
-                link: '/buyer-seller-platform'
-              },
-              {
-                icon: TrendingUp,
-                title: 'Market Intelligence',
-                description: 'AI-powered property valuations, market trends, and investment analytics tailored for the Botswana property market',
-                link: '/market-intelligence'
-              },
-              {
-                icon: Shield,
-                title: 'Secure Transactions',
-                description: 'REAC-compliant transaction processing and secure payment systems designed for Botswana real estate laws',
-                link: '/secure-transactions'
-              },
-              {
-                icon: MessageCircle,
-                title: 'Instant Communication',
-                description: 'Real-time messaging in English and Setswana, video calls, and collaboration tools for seamless property negotiations',
-                link: '/communication'
-              },
-              {
-                icon: Users,
-                title: 'REAC Agent Network',
-                description: 'Connect with certified REAC agents across Botswana and access professional real estate services',
-                link: '/agent-network'
-              },
-              {
-                icon: Building2,
-                title: 'Comprehensive Listings',
-                description: 'Browse thousands of verified properties from direct sellers and professional agents across Botswana',
-                link: '/properties'
-              }
-            ].map((feature, index) => {
-              const Icon = feature.icon;
-              return (
-                <Link key={feature.title} to={feature.link}>
+                {
+                  icon: Users,
+                  title: 'Buyer and Seller Platform',
+                  description: 'Complete For Sale By Owner tools including listing creation, legal documents, and transaction management for Batswana',
+                  link: '/buyer-seller-platform'
+                },
+                {
+                  icon: TrendingUp,
+                  title: 'Market Intelligence',
+                  description: 'AI-powered property valuations, market trends, and investment analytics tailored for the Botswana property market',
+                  link: '/market-intelligence'
+                },
+                {
+                  icon: Shield,
+                  title: 'Secure Transactions',
+                  description: 'REAC-compliant transaction processing and secure payment systems designed for Botswana real estate laws',
+                  link: '/secure-transactions'
+                },
+                {
+                  icon: MessageCircle,
+                  title: 'Instant Communication',
+                  description: 'Real-time messaging in English and Setswana, video calls, and collaboration tools for seamless property negotiations',
+                  link: '/communication'
+                },
+                {
+                  icon: Users,
+                  title: 'REAC Agent Network',
+                  description: 'Connect with certified REAC agents across Botswana and access professional real estate services',
+                  link: '/agent-network'
+                },
+                {
+                  icon: Building2,
+                  title: 'Comprehensive Listings',
+                  description: 'Browse thousands of verified properties from direct sellers and professional agents across Botswana',
+                  link: '/properties'
+                }
+              ].map((feature, index) => {
+                const Icon = feature.icon;
+                return (
                   <motion.div
+                    key={feature.title}
                     variants={itemVariants}
                     className="bg-white p-8 rounded-xl shadow-sm border border-gray-200 hover:shadow-lg transition-shadow text-center cursor-pointer group"
+                    onClick={() => window.location.href = feature.link}
                   >
                     <div className="w-12 h-12 bg-beedab-blue/10 rounded-xl flex items-center justify-center mx-auto mb-6 group-hover:bg-beedab-blue/20 transition-colors">
                       <Icon className="h-6 w-6 text-beedab-blue" />
@@ -467,9 +468,8 @@ const HomePage = () => {
                       <ArrowRight className="ml-2 h-4 w-4" />
                     </div>
                   </motion.div>
-                </Link>
-              );
-            })}
+                );
+              })}
           </div>
         </div>
       </section>
