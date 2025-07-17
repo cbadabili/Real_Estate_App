@@ -1,3 +1,4 @@
+
 {
   "common": {
     "plot": "Poloto",
@@ -24,7 +25,14 @@
     "error": "Phoso",
     "success": "Katlego",
     "warning": "Temoso",
-    "info": "Tshedimosetso"
+    "info": "Tshedimosetso",
+    "phone": "Mogala",
+    "email": "Imeile",
+    "view_details": "Bona Dintlha",
+    "share": "Arolelana",
+    "featured": "E e Tlhomamisitsweng",
+    "new": "Sesha",
+    "type": "Mofuta"
   },
   "plot_status": {
     "serviced": "E na le ditirelo",
@@ -37,7 +45,8 @@
     "residential": "Ya bodulo",
     "farm": "Ya polasi",
     "commercial": "Ya kgwebo",
-    "industrial": "Ya madirelo"
+    "industrial": "Ya madirelo",
+    "agricultural": "Temothuo"
   },
   "amenities": {
     "water": "Metsi",
@@ -135,40 +144,37 @@
     "max_length": "Didirisiwa di le {max} kwa godimo di a letlelwa",
     "min_value": "Boleng jo bo kwa tlase ke {min}",
     "max_value": "Boleng jo bo kwa godimo ke {max}"
-  }
-}
-{
-  "common": {
-    "call_seller": "Bitsa Morekisi",
-    "whatsapp": "WhatsApp",
-    "contact": "Ikgolaganye",
-    "phone": "Mogala",
-    "email": "Imeile",
-    "view_details": "Bona Dintlha",
-    "save": "Boloka",
-    "share": "Arolelana",
-    "featured": "E e Tlhomamisitsweng",
-    "new": "Sesha",
-    "price": "Tlhwatlhwa",
-    "location": "Lefelo",
-    "size": "Bogolo",
-    "type": "Mofuta"
   },
-  "plot_status": {
-    "serviced": "E na le Ditirelo",
-    "unserviced": "Ga e na Ditirelo"
-  },
-  "amenities": {
-    "water": "Metsi",
-    "electricity": "Motlakase",
-    "road_access": "Tsela ya Phitlhelelo",
-    "fenced": "E Kobaetswe"
-  },
-  "plot_types": {
-    "residential": "Bonno",
-    "commercial": "Kgwebo",
-    "farm": "Polasi",
-    "agricultural": "Temothuo"
+  "plots": {
+    "title": "Lefatshe le Dipoloto",
+    "subtitle": "Batla poloto ya gago e e siameng",
+    "searchPlaceholder": "Batla ka lefelo, bogolo, kgotsa tlhwatlhwa...",
+    "filters": {
+      "priceRange": "Tekano ya Tlhwatlhwa",
+      "size": "Bogolo (di-hectare)",
+      "landCategory": "Sehlopha sa Lefatshe",
+      "features": "Dikarolo",
+      "electricity": "Motlakase",
+      "water": "Phitlhelelo ya Metsi",
+      "roadAccess": "Phitlhelelo ya Tsela",
+      "titleDeed": "Lengolo la Tshwanelo le Siame"
+    },
+    "categories": {
+      "residential": "Bonno",
+      "commercial": "Kgwebo", 
+      "industrial": "Madirelo",
+      "agricultural": "Temothuo",
+      "mixed": "Tiriso e e Tswakantsweng"
+    },
+    "card": {
+      "featured": "E e Tlhomamisitsweng",
+      "verified": "E Netefaditsweng",
+      "perHectare": "ka hectare",
+      "hectares": "di-hectare",
+      "viewDetails": "Bona Dintlha",
+      "contact": "Ikgolaganya le Morekisi",
+      "save": "Boloka Poloto"
+    }
   },
   "verification": {
     "verified": "E Netefaditsweng",
