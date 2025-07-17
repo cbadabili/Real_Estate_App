@@ -78,10 +78,10 @@ import RentalMarketInsightsPage from './pages/RentalMarketInsightsPage';
 import PropertyManagementPage from './pages/services/PropertyManagementPage';
 import TenantSupportPage from './pages/services/TenantSupportPage';
 //importing missing pages
-import PropertyValuationPage from './pages/market-intelligence/PropertyValuationPage';
-import MarketTrendsPage from './pages/market-intelligence/MarketTrendsPage';
-import NeighborhoodAnalyticsPage from './pages/market-intelligence/NeighborhoodAnalyticsPage';
-import InvestmentAnalyticsPage from './pages/market-intelligence/InvestmentAnalyticsPage';
+import PropertyValuationPage from './pages/PropertyValuationPage';
+import MarketTrendsPage from './pages/MarketTrendsPage';
+import NeighborhoodAnalyticsPage from './pages/NeighborhoodAnalyticsPage';
+import InvestmentAnalyticsPage from './pages/InvestmentAnalyticsPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
