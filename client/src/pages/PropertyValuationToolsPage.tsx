@@ -72,28 +72,28 @@ const PropertyValuationToolsPage = () => {
   const marketInsights = [
     {
       area: 'Gaborone CBD',
-      avgPrice: 'P 2,450,000',
+      avgPrice: 'BWP 2,450,000',
       change: '+12.5%',
       trend: 'up',
       properties: 156
     },
     {
       area: 'Phakalane',
-      avgPrice: 'P 1,850,000',
+      avgPrice: 'BWP 1,850,000',
       change: '+8.2%',
       trend: 'up',
       properties: 89
     },
     {
       area: 'Block 8',
-      avgPrice: 'P 950,000',
+      avgPrice: 'BWP 950,000',
       change: '+5.1%',
       trend: 'up',
       properties: 234
     },
     {
       area: 'Mogoditshane',
-      avgPrice: 'P 750,000',
+      avgPrice: 'BWP 750,000',
       change: '+3.8%',
       trend: 'up',
       properties: 178

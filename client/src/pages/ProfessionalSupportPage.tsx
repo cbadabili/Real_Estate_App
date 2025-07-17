@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
@@ -164,10 +163,10 @@ const ProfessionalSupportPage = () => {
               Connect with certified REAC agents, lawyers, and financial advisors when needed.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="inline-flex items-center px-8 py-4 bg-white text-purple-700 font-semibold rounded-xl hover:bg-gray-100 transition-colors">
+              <Link to="/find-professionals" className="inline-flex items-center px-8 py-4 bg-white text-purple-700 font-semibold rounded-xl hover:bg-gray-100 transition-colors">
                 <Users className="mr-2 h-5 w-5" />
                 Find Professionals
-              </button>
+              </Link>
               <Link
                 to="/register-provider"
                 className="inline-flex items-center px-8 py-4 bg-transparent border-2 border-white text-white font-semibold rounded-xl hover:bg-white hover:text-purple-700 transition-colors"
@@ -299,13 +298,13 @@ const ProfessionalSupportPage = () => {
 
                     <div className="flex space-x-2">
                       <button 
-                        onClick={() => window.open(`tel:${professional.phone}`, '_self')}
+                        onClick={() => window.location.href = `tel:${professional.phone}`}
                         className="flex-1 bg-purple-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-purple-700 transition-colors"
                       >
                         Call Now
                       </button>
                       <button 
-                        onClick={() => window.open(`mailto:${professional.email}`, '_self')}
+                        onClick={() => window.location.href = `mailto:${professional.email}`}
                         className="flex-1 border border-purple-600 text-purple-600 py-2 rounded-lg text-sm font-medium hover:bg-purple-50 transition-colors"
                       >
                         Email

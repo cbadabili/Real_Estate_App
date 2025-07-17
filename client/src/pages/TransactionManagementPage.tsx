@@ -215,7 +215,7 @@ const TransactionManagementPage = () => {
                     <DollarSign className="h-8 w-8 text-green-600" />
                     <div>
                       <p className="text-sm text-gray-500">Purchase Price</p>
-                      <p className="font-medium">P 1,850,000</p>
+                      <p className="font-medium">BWP 1,850,000</p>
                     </div>
                   </div>
                   <div className="flex items-center space-x-3">

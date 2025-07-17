@@ -55,7 +55,7 @@ const HomePage = () => {
       id: 1,
       image: 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?ixlib=rb-4.0.3&auto=format&fit=crop&w=2071&q=80',
       location: 'Gaborone CBD',
-      price: 'P3,200,000',
+      price: 'BWP 3,200,000',
       features: ['3 Bedrooms', '2 Bathrooms', 'City Views', 'Pool'],
       agent: {
         name: 'Thabo Mogami',
@@ -68,7 +68,7 @@ const HomePage = () => {
       id: 2,
       image: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80',
       location: 'Francistown Heights',
-      price: 'P2,800,000',
+      price: 'BWP 2,800,000',
       features: ['4 Bedrooms', '3 Bathrooms', 'Garden', 'Garage'],
       agent: {
         name: 'Neo Kgosana',
@@ -81,7 +81,7 @@ const HomePage = () => {
       id: 3,
       image: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=2075&q=80',
       location: 'Maun Safari Lodge',
-      price: 'P4,500,000',
+      price: 'BWP 4,500,000',
       features: ['5 Bedrooms', '4 Bathrooms', 'Safari Views', 'Pool'],
       agent: {
         name: 'Mpho Setlhare',
@@ -282,7 +282,7 @@ const HomePage = () => {
                     <motion.div
                       variants={itemVariants}
                       className="bg-white rounded-xl shadow-lg border border-gray-200 p-8 mx-4 text-center hover:shadow-xl transition-shadow cursor-pointer"
-                      onClick={() => window.open(agency.website, '_blank')}
+                      onClick={() => window.open(agency.website, '_self')}
                     >
                       <div className="w-20 h-20 mx-auto mb-6 rounded-full overflow-hidden">
                         <img
@@ -344,7 +344,7 @@ const HomePage = () => {
                 id: 1,
                 image: 'https://images.unsplash.com/photo-1605146769289-440113cc3d00?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80',
                 location: 'Gaborone West',
-                price: 'P2,500,000',
+                price: 'BWP 2,500,000',
                 bedrooms: 3,
                 bathrooms: 2,
                 sqft: 1200,
@@ -354,7 +354,7 @@ const HomePage = () => {
                 id: 2,
                 image: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80',
                 location: 'Francistown',
-                price: 'P1,800,000',
+                price: 'BWP 1,800,000',
                 bedrooms: 2,
                 bathrooms: 2,
                 sqft: 900,
@@ -364,7 +364,7 @@ const HomePage = () => {
                 id: 3,
                 image: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80',
                 location: 'Maun',
-                price: 'P3,200,000',
+                price: 'BWP 3,200,000',
                 bedrooms: 4,
                 bathrooms: 3,
                 sqft: 1800,
@@ -503,7 +503,8 @@ const HomePage = () => {
                 className="inline-flex items-center justify-center px-8 py-4 bg-white text-beedab-darkblue font-semibold rounded-xl hover:bg-gray-100 transition-colors"
               >
                 Get Started Today
-                <ArrowRight className="ml-2 h-5 w-5" />
+                <ArrowRight className="ml-2 h-5 w-5"
+              />
               </Link>
               <Link
                 to="/create-listing"

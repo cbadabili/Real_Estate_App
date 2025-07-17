@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
@@ -169,12 +168,12 @@ const BuyerSellerPlatformPage = () => {
                 <div className="flex-1">
                   <h3 className="text-xl font-semibold text-neutral-900 mb-2">Pricing Guide</h3>
                   <p className="text-neutral-600 mb-4">Set competitive prices based on market analysis and comparable sales</p>
-                  <button 
-                    onClick={() => window.open('/pricing-guide', '_blank')}
-                    className="bg-beedab-blue text-white px-6 py-2 rounded-lg hover:bg-beedab-darkblue transition-colors"
+                  <Link 
+                    to="/pricing-guide"
+                    className="inline-block bg-beedab-blue text-white px-6 py-2 rounded-lg hover:bg-beedab-darkblue transition-colors"
                   >
                     Get Started
-                  </button>
+                  </Link>
                 </div>
               </div>
             </motion.div>
@@ -187,12 +186,12 @@ const BuyerSellerPlatformPage = () => {
                 <div className="flex-1">
                   <h3 className="text-xl font-semibold text-neutral-900 mb-2">Manage Showings</h3>
                   <p className="text-neutral-600 mb-4">Schedule and coordinate property viewings with potential buyers</p>
-                  <button 
-                    onClick={() => window.open('/manage-showings', '_blank')}
-                    className="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700 transition-colors"
+                  <Link 
+                    to="/manage-showings"
+                    className="inline-block bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700 transition-colors"
                   >
                     Get Started
-                  </button>
+                  </Link>
                 </div>
               </div>
             </motion.div>
@@ -205,12 +204,12 @@ const BuyerSellerPlatformPage = () => {
                 <div className="flex-1">
                   <h3 className="text-xl font-semibold text-neutral-900 mb-2">Handle Offers</h3>
                   <p className="text-neutral-600 mb-4">Review, negotiate, and manage purchase offers efficiently</p>
-                  <button 
-                    onClick={() => window.open('/handle-offers', '_blank')}
-                    className="bg-orange-600 text-white px-6 py-2 rounded-lg hover:bg-orange-700 transition-colors"
+                  <Link 
+                    to="/handle-offers"
+                    className="inline-block bg-orange-600 text-white px-6 py-2 rounded-lg hover:bg-orange-700 transition-colors"
                   >
                     Get Started
-                  </button>
+                  </Link>
                 </div>
               </div>
             </motion.div>
@@ -223,12 +222,12 @@ const BuyerSellerPlatformPage = () => {
                 <div className="flex-1">
                   <h3 className="text-xl font-semibold text-neutral-900 mb-2">Property Handover</h3>
                   <p className="text-neutral-600 mb-4">Complete the legal transfer of ownership to buyers</p>
-                  <button 
-                    onClick={() => window.open('/property-handover', '_blank')}
-                    className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition-colors"
+                  <Link 
+                    to="/property-handover"
+                    className="inline-block bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition-colors"
                   >
                     Get Started
-                  </button>
+                  </Link>
                 </div>
               </div>
             </motion.div>
