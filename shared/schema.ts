@@ -535,7 +535,7 @@ export const service_categories = sqliteTable('service_categories', {
 export const marketplace_providers = sqliteTable('marketplace_providers', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   user_id: integer('user_id').references(() => users.id),
-  provider_type: text('provider_type').notNull(), // 'professional', 'supplier', 'artisan', 'trainer'
+  provider_type: text('provider_type').notNull(), // 'professional', 'supplier', 'artisan', 'training_provider'
   business_name: text('business_name').notNull(),
   category_id: integer('category_id').references(() => service_categories.id),
   specializations: text('specializations'), // JSON array
@@ -663,7 +663,7 @@ export const project_requests = sqliteTable('project_requests', {
   proposals_count: integer('proposals_count').default(0),
 
   created_at: integer('created_at').default(sql`(cast((julianday('now') - 2440587.5)*86400000 as integer))`),
-  updated_at: integer('updated_at').default(sql`(cast((julianday('now') - 2440587.5)*86400000 as integer))`),
+  updated_at: integer('updated_at').default(sql`(cast((julianday('now') - 2440587.5)*864000 as integer))`),
 });
 
 // Proposals from service providers

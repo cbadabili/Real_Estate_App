@@ -20,14 +20,17 @@ const categories = {
     { id: 9, name: 'Steel Suppliers', description: 'Construction steel and reinforcement', icon_url: '/icons/steel.svg', service_count: 12 },
     { id: 10, name: 'Paint Suppliers', description: 'Interior and exterior paints', icon_url: '/icons/paint.svg', service_count: 29 }
   ],
-  trades: [
-    { id: 11, name: 'Builders', description: 'General construction services', icon_url: '/icons/builder.svg', service_count: 56 },
-    { id: 12, name: 'Electricians', description: 'Electrical installation and repair', icon_url: '/icons/electrician.svg', service_count: 41 },
-    { id: 13, name: 'Plumbers', description: 'Plumbing installation and maintenance', icon_url: '/icons/plumber.svg', service_count: 33 },
-    { id: 14, name: 'Landscapers', description: 'Garden and outdoor design', icon_url: '/icons/landscaper.svg', service_count: 28 },
-    { id: 15, name: 'Surveyors', description: 'Land and building surveys', icon_url: '/icons/surveyor.svg', service_count: 19 }
+  artisans: [
+    { id: 11, name: 'Plumbers', description: 'Water systems and pipe installation', icon_url: '/icons/plumber.svg', service_count: 67 },
+    { id: 12, name: 'Electricians', description: 'Electrical installations and repairs', icon_url: '/icons/electrician.svg', service_count: 89 },
+    { id: 13, name: 'Carpenters', description: 'Woodwork and furniture specialists', icon_url: '/icons/carpenter.svg', service_count: 45 },
+    { id: 14, name: 'Masons', description: 'Brickwork and stonework experts', icon_url: '/icons/mason.svg', service_count: 34 },
+    { id: 15, name: 'Painters', description: 'Interior and exterior painting', icon_url: '/icons/painter.svg', service_count: 56 },
+    { id: 16, name: 'Roofers', description: 'Roofing installation and repairs', icon_url: '/icons/roofer.svg', service_count: 23 },
+    { id: 17, name: 'Landscapers', description: 'Garden design and maintenance', icon_url: '/icons/landscaper.svg', service_count: 31 },
+    { id: 18, name: 'Welders', description: 'Metal fabrication and welding', icon_url: '/icons/welder.svg', service_count: 19 }
   ],
-  training: [
+  training_providers: [
     { id: 16, name: 'Property Valuation', description: 'Learn property assessment skills', icon_url: '/icons/valuation-course.svg', service_count: 8 },
     { id: 17, name: 'Conveyancing', description: 'Property transfer process training', icon_url: '/icons/conveyancing-course.svg', service_count: 6 },
     { id: 18, name: 'Construction Skills', description: 'Building and trade skills', icon_url: '/icons/construction-course.svg', service_count: 14 },
@@ -59,7 +62,7 @@ const services = {
       profile_image: '/avatars/hardware1.jpg', verified: true, years_experience: 8
     }
   ],
-  trades: [
+  artisans: [
     {
       id: 4, business_name: 'Elite Builders', business_description: 'Quality construction services for residential and commercial projects',
       service_area: 'Greater Gaborone', hourly_rate: 450, rating: 4.7, review_count: 156,
@@ -67,7 +70,7 @@ const services = {
       profile_image: '/avatars/builder1.jpg', verified: true, years_experience: 18
     }
   ],
-  training: [
+  training_providers: [
     {
       id: 5, business_name: 'Property Academy Botswana', business_description: 'Professional development courses for real estate professionals',
       service_area: 'Online & Gaborone', hourly_rate: 300, rating: 4.5, review_count: 67,
@@ -250,7 +253,7 @@ router.get('/featured-services', async (req, res) => {
     const featuredServices = [
       ...services.professionals.slice(0, 2),
       ...services.suppliers.slice(0, 1),
-      ...services.trades.slice(0, 1)
+      ...services.artisans.slice(0, 1)
     ];
 
     res.json({
@@ -557,24 +560,24 @@ async function getCategories() {
 
 async function getProviders(filters: any) {
   let allProviders = Object.values(services).flat();
-  
+
   if (filters.category) {
     allProviders = allProviders.filter(p => p.category_id.toString() === filters.category);
   }
-  
+
   if (filters.location) {
     allProviders = allProviders.filter(p => 
       p.service_area.toLowerCase().includes(filters.location.toLowerCase())
     );
   }
-  
+
   if (filters.search) {
     allProviders = allProviders.filter(p => 
       p.business_name.toLowerCase().includes(filters.search.toLowerCase()) ||
       p.business_description.toLowerCase().includes(filters.search.toLowerCase())
     );
   }
-  
+
   return allProviders.slice(0, filters.limit || 12);
 }
 

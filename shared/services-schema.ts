@@ -6,7 +6,7 @@ import { z } from "zod";
 export const serviceProviders = sqliteTable("service_providers", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   companyName: text("company_name").notNull(),
-  serviceCategory: text("service_category").notNull(), // 'Photography', 'Legal', 'Moving', 'Finance', 'Insurance', 'Cleaning'
+  serviceCategory: text("service_category").notNull(), // 'Photography', 'Legal', 'Moving', 'Finance', 'Insurance', 'Cleaning', 'Construction'
   contactPerson: text("contact_person"),
   phoneNumber: text("phone_number"),
   email: text("email").unique(),

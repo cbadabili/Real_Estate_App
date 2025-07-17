@@ -175,7 +175,7 @@ export async function seedMarketplace() {
     // Training Provider
     {
       user_id: 4,
-      provider_type: "trainer",
+      provider_type: "training_provider",
       business_name: "Botswana Skills Academy",
       category_id: insertedCategories.find(c => c.name === "Construction Training")?.id,
       specializations: JSON.stringify(["Construction Skills", "Safety Training", "Equipment Operation", "Business Skills"]),

@@ -677,7 +677,7 @@ const Navbar = () => {
                       </Link>
 
                       <Link
-                        to="/marketplace/trades"
+                        to="/marketplace/artisans"
                         className="block px-4 py-3 text-sm text-neutral-700 hover:bg-neutral-100 rounded mb-2"
                         onClick={() => setServicesDropdownOpen(false)}
                       >
@@ -691,15 +691,15 @@ const Navbar = () => {
                       </Link>
 
                       <Link
-                        to="/marketplace/training"
+                        to="/marketplace/training-providers"
                         className="block px-4 py-3 text-sm text-neutral-700 hover:bg-neutral-100 rounded mb-3"
                         onClick={() => setServicesDropdownOpen(false)}
                       >
                         <div className="flex items-center">
                           <GraduationCap className="h-5 w-5 mr-3 text-beedab-blue" />
                           <div>
-                            <div className="font-semibold">Course Providers</div>
-                            <div className="text-xs text-gray-500">Professional development and training</div>
+                            <div className="font-semibold">Training Providers</div>
+                            <div className="text-xs text-gray-500">Professional development and skills training</div>
                           </div>
                         </div>
                       </Link>

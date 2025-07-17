@@ -212,7 +212,7 @@ export async function seedServices() {
   // Check if services data already exists
   try {
     const existingProviders = await db.select().from(serviceProviders).limit(1);
-    
+
     if (existingProviders.length > 0) {
       console.log("✅ Services data already exists, skipping seeding...");
       return;
@@ -241,7 +241,7 @@ export async function seedServices() {
       active: true,
       priority: 5
     },
-    
+
     // Mortgage calculation trigger
     {
       providerId: insertedProviders.find(p => p.companyName === "BotsBond Mortgage Brokers")?.id,
@@ -255,7 +255,7 @@ export async function seedServices() {
       active: true,
       priority: 5
     },
-    
+
     // Property listing creation
     {
       providerId: insertedProviders.find(p => p.companyName === "Mogapi & Associates")?.id,
@@ -269,7 +269,7 @@ export async function seedServices() {
       active: true,
       priority: 4
     },
-    
+
     // Offer received
     {
       providerId: insertedProviders.find(p => p.companyName === "Setlhare Legal Practice")?.id,
@@ -283,7 +283,7 @@ export async function seedServices() {
       active: true,
       priority: 5
     },
-    
+
     // Moving day approaching
     {
       providerId: insertedProviders.find(p => p.companyName === "Diamond Movers")?.id,
@@ -297,7 +297,7 @@ export async function seedServices() {
       active: true,
       priority: 3
     },
-    
+
     // New homeowner
     {
       providerId: insertedProviders.find(p => p.companyName === "Botswana Shield Insurance")?.id,
@@ -338,7 +338,7 @@ export async function seedServices() {
       verified: true,
       helpful: 8
     },
-    
+
     // Mogapi & Associates reviews
     {
       providerId: insertedProviders.find(p => p.companyName === "Mogapi & Associates")?.id,
@@ -358,7 +358,7 @@ export async function seedServices() {
       verified: true,
       helpful: 9
     },
-    
+
     // BotsBond reviews
     {
       providerId: insertedProviders.find(p => p.companyName === "BotsBond Mortgage Brokers")?.id,

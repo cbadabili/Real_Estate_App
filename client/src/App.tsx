@@ -45,8 +45,8 @@ import ServicesPage from './pages/ServicesPage';
 import MarketplacePage from './pages/MarketplacePage';
 import ProfessionalsPage from "./pages/marketplace/ProfessionalsPage";
 import SuppliersPage from "./pages/marketplace/SuppliersPage";
-import TradesPage from "./pages/marketplace/TradesPage";
-import TrainingPage from "./pages/marketplace/TrainingPage";
+import ArtisansPage from './pages/marketplace/ArtisansPage';
+import TrainingProvidersPage from './pages/marketplace/TrainingProvidersPage';
 import RegisterProviderPage from './pages/marketplace/RegisterProviderPage';
 import DocumentsPage from './pages/DocumentsPage';
 import LoginPage from './pages/LoginPage';
@@ -170,8 +170,8 @@ function App() {
           <Route path="/marketplace/:segment" element={<MarketplacePage />} />
           <Route path="/marketplace/professionals" element={<ProfessionalsPage />} />
           <Route path="/marketplace/suppliers" element={<SuppliersPage />} />
-          <Route path="/marketplace/trades" element={<TradesPage />} />
-          <Route path="/marketplace/training" element={<TrainingPage />} />
+          <Route path="/marketplace/artisans" element={<ArtisansPage />} />
+          <Route path="/marketplace/training-providers" element={<TrainingProvidersPage />} />
           <Route path="/buyer-journey/planning" element={<PlanningPage />} />
           <Route path="/buyer-journey/searching" element={<SearchingPage />} />
           <Route path="/buyer-journey/viewing" element={<ViewingPage />} />
