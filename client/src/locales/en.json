@@ -135,45 +135,36 @@
     "max_length": "Maximum {max} characters allowed",
     "min_value": "Minimum value is {min}",
     "max_value": "Maximum value is {max}"
-  }
-}
-{
-  "common": {
-    "call_seller": "Call Seller",
-    "whatsapp": "WhatsApp",
-    "contact": "Contact",
-    "phone": "Phone",
-    "email": "Email",
-    "view_details": "View Details",
-    "save": "Save",
-    "share": "Share",
-    "featured": "Featured",
-    "new": "New",
-    "price": "Price",
-    "location": "Location",
-    "size": "Size",
-    "type": "Type"
   },
-  "plot_status": {
-    "serviced": "Serviced",
-    "unserviced": "Unserviced"
-  },
-  "amenities": {
-    "water": "Water",
-    "electricity": "Power",
-    "road_access": "Road Access",
-    "fenced": "Fenced"
-  },
-  "plot_types": {
-    "residential": "Residential",
-    "commercial": "Commercial",
-    "farm": "Farm",
-    "agricultural": "Agricultural"
-  },
-  "verification": {
-    "verified": "Verified",
-    "premium": "Premium",
-    "basic": "Basic",
-    "professional": "Professional"
+  "plots": {
+    "title": "Land & Plots",
+    "subtitle": "Find your perfect plot of land",
+    "searchPlaceholder": "Search by location, size, or price...",
+    "filters": {
+      "priceRange": "Price Range",
+      "size": "Size (hectares)",
+      "landCategory": "Land Category",
+      "features": "Features",
+      "electricity": "Electricity",
+      "water": "Water Access",
+      "roadAccess": "Road Access",
+      "titleDeed": "Title Deed Ready"
+    },
+    "categories": {
+      "residential": "Residential",
+      "commercial": "Commercial", 
+      "industrial": "Industrial",
+      "agricultural": "Agricultural",
+      "mixed": "Mixed Use"
+    },
+    "card": {
+      "featured": "Featured",
+      "verified": "Verified",
+      "perHectare": "per hectare",
+      "hectares": "hectares",
+      "viewDetails": "View Details",
+      "contact": "Contact Seller",
+      "save": "Save Plot"
+    }
   }
 }

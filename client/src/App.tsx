@@ -77,6 +77,11 @@ import RentalAgreementsPage from './pages/RentalAgreementsPage';
 import RentalMarketInsightsPage from './pages/RentalMarketInsightsPage';
 import PropertyManagementPage from './pages/services/PropertyManagementPage';
 import TenantSupportPage from './pages/services/TenantSupportPage';
+//importing missing pages
+import PropertyValuationPage from './pages/market-intelligence/PropertyValuationPage';
+import MarketTrendsPage from './pages/market-intelligence/MarketTrendsPage';
+import NeighborhoodAnalyticsPage from './pages/market-intelligence/NeighborhoodAnalyticsPage';
+import InvestmentAnalyticsPage from './pages/market-intelligence/InvestmentAnalyticsPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -143,7 +148,12 @@ function App() {
           <Route path="/services/financing" element={<FinancingPage />} />
           <Route path="/services/property-management" element={<PropertyManagementPage />} />
         <Route path="/services/tenant-support" element={<TenantSupportPage />} />
-        <Route path="/rent-collection" element={<RentCollectionPage />} />
+
+          {/* Market Intelligence Routes */}
+          <Route path="/property-valuation" element={<PropertyValuationPage />} />
+          <Route path="/market-trends" element={<MarketTrendsPage />} />
+          <Route path="/neighborhood-analytics" element={<NeighborhoodAnalyticsPage />} />
+          <Route path="/investment-analytics" element={<InvestmentAnalyticsPage />} />
           {/* Marketplace Routes */}
           <Route path="/marketplace" element={<MarketplacePage />} />
           <Route path="/marketplace/register" element={<RegisterProviderPage />} />

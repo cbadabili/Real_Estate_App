@@ -20,7 +20,9 @@ import {
   Eye,
   MapPin,
   Heart,
-  Sparkles
+  Sparkles,
+  Smartphone,
+  CheckCircle
 } from 'lucide-react';
 
 const HomePage = () => {
