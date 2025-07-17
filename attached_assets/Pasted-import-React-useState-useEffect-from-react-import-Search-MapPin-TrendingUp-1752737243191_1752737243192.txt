@@ -1,0 +1,674 @@
+import React, { useState, useEffect } from 'react';
+import { 
+  Search, 
+  MapPin, 
+  TrendingUp, 
+  BarChart3, 
+  Calculator, 
+  Users, 
+  Shield, 
+  Star, 
+  ChevronRight,
+  Menu,
+  X,
+  Home,
+  Building,
+  DollarSign,
+  Percent,
+  Calendar,
+  Phone,
+  Mail,
+  Globe,
+  CheckCircle,
+  ArrowRight,
+  PieChart,
+  LineChart,
+  Activity
+} from 'lucide-react';
+
+const MarketIntelligencePlatform = () => {
+  const [activeTab, setActiveTab] = useState('overview');
+  const [selectedProperty, setSelectedProperty] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [modalType, setModalType] = useState('');
+  const [mortgageData, setMortgageData] = useState({
+    propertyValue: 500000,
+    downPayment: 100000,
+    interestRate: 6.5,
+    loanTerm: 30
+  });
+
+  // Sample data for demonstrations
+  const marketData = {
+    totalProperties: 15420,
+    averagePrice: 450000,
+    priceGrowth: 8.5,
+    marketActivity: 'High',
+    topAreas: ['Gaborone', 'Francistown', 'Maun', 'Palapye']
+  };
+
+  const properties = [
+    {
+      id: 1,
+      title: 'Modern Family Home',
+      location: 'Gaborone',
+      price: 750000,
+      bedrooms: 4,
+      bathrooms: 3,
+      area: 250,
+      type: 'House',
+      status: 'For Sale',
+      image: '🏠',
+      agent: 'Sarah Johnson',
+      views: 245,
+      daysOnMarket: 14
+    },
+    {
+      id: 2,
+      title: 'Luxury Apartment',
+      location: 'Francistown',
+      price: 350000,
+      bedrooms: 2,
+      bathrooms: 2,
+      area: 120,
+      type: 'Apartment',
+      status: 'For Sale',
+      image: '🏢',
+      agent: 'Michael Smith',
+      views: 189,
+      daysOnMarket: 7
+    },
+    {
+      id: 3,
+      title: 'Commercial Space',
+      location: 'Maun',
+      price: 1200000,
+      bedrooms: 0,
+      bathrooms: 2,
+      area: 500,
+      type: 'Commercial',
+      status: 'For Rent',
+      image: '🏪',
+      agent: 'David Brown',
+      views: 156,
+      daysOnMarket: 21
+    }
+  ];
+
+  const whyChooseBeedab = [
+    {
+      icon: <TrendingUp className="w-8 h-8 text-blue-500" />,
+      title: 'Market Intelligence',
+      description: 'Real-time market analytics and pricing trends',
+      features: ['Price predictions', 'Market reports', 'Trend analysis', 'Investment insights'],
+      active: true
+    },
+    {
+      icon: <Shield className="w-8 h-8 text-green-500" />,
+      title: 'Secure Transactions',
+      description: 'End-to-end security for all property transactions',
+      features: ['Secure payments', 'Legal compliance', 'Document verification', 'Insurance coverage'],
+      active: true
+    },
+    {
+      icon: <Users className="w-8 h-8 text-purple-500" />,
+      title: 'Expert Support',
+      description: 'Professional guidance throughout your journey',
+      features: ['24/7 support', 'Expert consultations', 'Local expertise', 'Multilingual service'],
+      active: true
+    },
+    {
+      icon: <Calculator className="w-8 h-8 text-orange-500" />,
+      title: 'Financial Tools',
+      description: 'Comprehensive financial planning and analysis',
+      features: ['Mortgage calculator', 'Affordability analysis', 'Investment ROI', 'Tax implications'],
+      active: true
+    }
+  ];
+
+  const services = [
+    {
+      title: 'Property Valuation',
+      description: 'AI-powered property valuations',
+      icon: <DollarSign className="w-6 h-6" />,
+      price: 'Free',
+      action: () => openModal('valuation')
+    },
+    {
+      title: 'Market Analysis',
+      description: 'Comprehensive market reports',
+      icon: <BarChart3 className="w-6 h-6" />,
+      price: 'P500',
+      action: () => openModal('analysis')
+    },
+    {
+      title: 'Investment Consulting',
+      description: 'Expert investment advice',
+      icon: <TrendingUp className="w-6 h-6" />,
+      price: 'P1,500',
+      action: () => openModal('consulting')
+    }
+  ];
+
+  const openModal = (type) => {
+    setModalType(type);
+    setShowModal(true);
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+    setModalType('');
+  };
+
+  const handleSearch = () => {
+    // Simulate search functionality
+    console.log('Searching for:', searchQuery);
+    alert(`Searching for properties: ${searchQuery}`);
+  };
+
+  const handlePropertyClick = (property) => {
+    setSelectedProperty(property);
+    setActiveTab('property-details');
+  };
+
+  const calculateMortgage = () => {
+    const { propertyValue, downPayment, interestRate, loanTerm } = mortgageData;
+    const loanAmount = propertyValue - downPayment;
+    const monthlyRate = interestRate / 100 / 12;
+    const numPayments = loanTerm * 12;
+    
+    const monthlyPayment = loanAmount * 
+      (monthlyRate * Math.pow(1 + monthlyRate, numPayments)) / 
+      (Math.pow(1 + monthlyRate, numPayments) - 1);
+    
+    return {
+      monthlyPayment: monthlyPayment.toFixed(2),
+      totalPayment: (monthlyPayment * numPayments).toFixed(2),
+      totalInterest: (monthlyPayment * numPayments - loanAmount).toFixed(2)
+    };
+  };
+
+  const scheduleViewing = (property) => {
+    alert(`Scheduling viewing for ${property.title}. You will be contacted within 24 hours.`);
+  };
+
+  const contactAgent = (agent) => {
+    alert(`Contacting ${agent}. They will reach out to you shortly.`);
+  };
+
+  const saveProperty = (property) => {
+    alert(`${property.title} has been saved to your favorites.`);
+  };
+
+  const requestMoreInfo = (property) => {
+    alert(`Information packet for ${property.title} will be sent to your email.`);
+  };
+
+  const TabButton = ({ id, label, isActive, onClick }) => (
+    <button
+      onClick={() => onClick(id)}
+      className={`px-6 py-3 rounded-lg font-medium transition-all ${
+        isActive 
+          ? 'bg-blue-500 text-white shadow-lg' 
+          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+      }`}
+    >
+      {label}
+    </button>
+  );
+
+  const FeatureCard = ({ feature, index }) => (
+    <div 
+      className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 cursor-pointer transform hover:scale-105"
+      onClick={() => openModal(`feature-${index}`)}
+    >
+      <div className="flex items-center mb-4">
+        {feature.icon}
+        <h3 className="text-xl font-semibold ml-3">{feature.title}</h3>
+      </div>
+      <p className="text-gray-600 mb-4">{feature.description}</p>
+      <div className="space-y-2">
+        {feature.features.map((item, idx) => (
+          <div key={idx} className="flex items-center text-sm">
+            <CheckCircle className="w-4 h-4 text-green-500 mr-2" />
+            {item}
+          </div>
+        ))}
+      </div>
+      <button className="mt-4 text-blue-500 font-medium flex items-center hover:text-blue-700">
+        Learn More <ArrowRight className="w-4 h-4 ml-1" />
+      </button>
+    </div>
+  );
+
+  const PropertyCard = ({ property }) => (
+    <div className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300">
+      <div className="h-48 bg-gradient-to-r from-blue-400 to-purple-500 flex items-center justify-center text-6xl">
+        {property.image}
+      </div>
+      <div className="p-6">
+        <div className="flex justify-between items-start mb-2">
+          <h3 className="text-xl font-semibold">{property.title}</h3>
+          <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+            property.status === 'For Sale' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'
+          }`}>
+            {property.status}
+          </span>
+        </div>
+        <div className="flex items-center text-gray-600 mb-2">
+          <MapPin className="w-4 h-4 mr-1" />
+          {property.location}
+        </div>
+        <div className="text-2xl font-bold text-blue-600 mb-3">
+          P{property.price.toLocaleString()}
+        </div>
+        <div className="flex justify-between text-sm text-gray-600 mb-4">
+          <span>{property.bedrooms} bed</span>
+          <span>{property.bathrooms} bath</span>
+          <span>{property.area}m²</span>
+        </div>
+        <div className="flex justify-between text-sm text-gray-500 mb-4">
+          <span>{property.views} views</span>
+          <span>{property.daysOnMarket} days on market</span>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <button 
+            onClick={() => handlePropertyClick(property)}
+            className="flex-1 bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors"
+          >
+            View Details
+          </button>
+          <button 
+            onClick={() => saveProperty(property)}
+            className="p-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+          >
+            ❤️
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
+  const Modal = ({ isOpen, onClose, type }) => {
+    if (!isOpen) return null;
+
+    const getModalContent = () => {
+      switch(type) {
+        case 'valuation':
+          return (
+            <div>
+              <h2 className="text-2xl font-bold mb-4">Property Valuation</h2>
+              <div className="space-y-4">
+                <input
+                  type="text"
+                  placeholder="Property address"
+                  className="w-full p-3 border border-gray-300 rounded-lg"
+                />
+                <input
+                  type="number"
+                  placeholder="Property size (m²)"
+                  className="w-full p-3 border border-gray-300 rounded-lg"
+                />
+                <select className="w-full p-3 border border-gray-300 rounded-lg">
+                  <option>Select property type</option>
+                  <option>House</option>
+                  <option>Apartment</option>
+                  <option>Commercial</option>
+                </select>
+                <button className="w-full bg-blue-500 text-white py-3 rounded-lg hover:bg-blue-600">
+                  Get Free Valuation
+                </button>
+              </div>
+            </div>
+          );
+        case 'analysis':
+          return (
+            <div>
+              <h2 className="text-2xl font-bold mb-4">Market Analysis</h2>
+              <p className="text-gray-600 mb-4">
+                Get comprehensive market insights for your area of interest.
+              </p>
+              <div className="space-y-4">
+                <input
+                  type="text"
+                  placeholder="Location or area"
+                  className="w-full p-3 border border-gray-300 rounded-lg"
+                />
+                <select className="w-full p-3 border border-gray-300 rounded-lg">
+                  <option>Analysis type</option>
+                  <option>Residential Market</option>
+                  <option>Commercial Market</option>
+                  <option>Investment Analysis</option>
+                </select>
+                <button className="w-full bg-green-500 text-white py-3 rounded-lg hover:bg-green-600">
+                  Order Analysis - P500
+                </button>
+              </div>
+            </div>
+          );
+        case 'consulting':
+          return (
+            <div>
+              <h2 className="text-2xl font-bold mb-4">Investment Consulting</h2>
+              <p className="text-gray-600 mb-4">
+                Book a consultation with our real estate investment experts.
+              </p>
+              <div className="space-y-4">
+                <input
+                  type="text"
+                  placeholder="Your name"
+                  className="w-full p-3 border border-gray-300 rounded-lg"
+                />
+                <input
+                  type="email"
+                  placeholder="Email address"
+                  className="w-full p-3 border border-gray-300 rounded-lg"
+                />
+                <input
+                  type="tel"
+                  placeholder="Phone number"
+                  className="w-full p-3 border border-gray-300 rounded-lg"
+                />
+                <textarea
+                  placeholder="Tell us about your investment goals"
+                  className="w-full p-3 border border-gray-300 rounded-lg h-24"
+                />
+                <button className="w-full bg-purple-500 text-white py-3 rounded-lg hover:bg-purple-600">
+                  Book Consultation - P1,500
+                </button>
+              </div>
+            </div>
+          );
+        default:
+          return (
+            <div>
+              <h2 className="text-2xl font-bold mb-4">Feature Details</h2>
+              <p className="text-gray-600">
+                This feature is fully functional and ready to use. Contact our team for more information.
+              </p>
+              <button 
+                onClick={() => contactAgent('Support Team')}
+                className="mt-4 bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600"
+              >
+                Contact Support
+              </button>
+            </div>
+          );
+      }
+    };
+
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="bg-white rounded-xl p-6 max-w-md w-full max-h-96 overflow-y-auto">
+          <div className="flex justify-between items-center mb-4">
+            <div></div>
+            <button 
+              onClick={onClose}
+              className="text-gray-500 hover:text-gray-700"
+            >
+              <X className="w-6 h-6" />
+            </button>
+          </div>
+          {getModalContent()}
+        </div>
+      </div>
+    );
+  };
+
+  const renderContent = () => {
+    switch(activeTab) {
+      case 'overview':
+        return (
+          <div className="space-y-8">
+            {/* Market Statistics */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="bg-white p-6 rounded-xl shadow-lg">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-gray-600">Total Properties</p>
+                    <p className="text-2xl font-bold">{marketData.totalProperties.toLocaleString()}</p>
+                  </div>
+                  <Home className="w-8 h-8 text-blue-500" />
+                </div>
+              </div>
+              <div className="bg-white p-6 rounded-xl shadow-lg">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-gray-600">Average Price</p>
+                    <p className="text-2xl font-bold">P{marketData.averagePrice.toLocaleString()}</p>
+                  </div>
+                  <DollarSign className="w-8 h-8 text-green-500" />
+                </div>
+              </div>
+              <div className="bg-white p-6 rounded-xl shadow-lg">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-gray-600">Price Growth</p>
+                    <p className="text-2xl font-bold">{marketData.priceGrowth}%</p>
+                  </div>
+                  <TrendingUp className="w-8 h-8 text-orange-500" />
+                </div>
+              </div>
+              <div className="bg-white p-6 rounded-xl shadow-lg">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-gray-600">Market Activity</p>
+                    <p className="text-2xl font-bold">{marketData.marketActivity}</p>
+                  </div>
+                  <Activity className="w-8 h-8 text-purple-500" />
+                </div>
+              </div>
+            </div>
+
+            {/* Why Choose Beedab */}
+            <div>
+              <h2 className="text-3xl font-bold text-center mb-8">Why Choose Beedab?</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {whyChooseBeedab.map((feature, index) => (
+                  <FeatureCard key={index} feature={feature} index={index} />
+                ))}
+              </div>
+            </div>
+
+            {/* Services */}
+            <div>
+              <h2 className="text-3xl font-bold text-center mb-8">Our Services</h2>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {services.map((service, index) => (
+                  <div key={index} className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-all">
+                    <div className="flex items-center mb-4">
+                      {service.icon}
+                      <h3 className="text-xl font-semibold ml-3">{service.title}</h3>
+                    </div>
+                    <p className="text-gray-600 mb-4">{service.description}</p>
+                    <div className="flex justify-between items-center">
+                      <span className="text-2xl font-bold text-blue-600">{service.price}</span>
+                      <button 
+                        onClick={service.action}
+                        className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors"
+                      >
+                        Get Started
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        );
+
+      case 'properties':
+        return (
+          <div className="space-y-6">
+            <div className="flex flex-col md:flex-row gap-4">
+              <div className="flex-1">
+                <input
+                  type="text"
+                  placeholder="Search properties..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full p-3 border border-gray-300 rounded-lg"
+                />
+              </div>
+              <button 
+                onClick={handleSearch}
+                className="bg-blue-500 text-white py-3 px-6 rounded-lg hover:bg-blue-600 transition-colors"
+              >
+                Search
+              </button>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {properties.map((property) => (
+                <PropertyCard key={property.id} property={property} />
+              ))}
+            </div>
+          </div>
+        );
+
+      case 'analytics':
+        return (
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="bg-white p-6 rounded-xl shadow-lg">
+                <h3 className="text-xl font-semibold mb-4">Market Trends</h3>
+                <div className="h-64 bg-gray-100 rounded-lg flex items-center justify-center">
+                  <LineChart className="w-16 h-16 text-gray-400" />
+                  <span className="ml-2 text-gray-500">Interactive Chart</span>
+                </div>
+              </div>
+              <div className="bg-white p-6 rounded-xl shadow-lg">
+                <h3 className="text-xl font-semibold mb-4">Property Distribution</h3>
+                <div className="h-64 bg-gray-100 rounded-lg flex items-center justify-center">
+                  <PieChart className="w-16 h-16 text-gray-400" />
+                  <span className="ml-2 text-gray-500">Interactive Chart</span>
+                </div>
+              </div>
+            </div>
+            
+            <div className="bg-white p-6 rounded-xl shadow-lg">
+              <h3 className="text-xl font-semibold mb-4">Top Performing Areas</h3>
+              <div className="space-y-4">
+                {marketData.topAreas.map((area, index) => (
+                  <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                    <span className="font-medium">{area}</span>
+                    <div className="flex items-center space-x-4">
+                      <span className="text-green-500">+{(Math.random() * 15 + 5).toFixed(1)}%</span>
+                      <button 
+                        onClick={() => alert(`Viewing detailed analytics for ${area}`)}
+                        className="text-blue-500 hover:text-blue-700"
+                      >
+                        View Details
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        );
+
+      case 'calculator':
+        const mortgage = calculateMortgage();
+        return (
+          <div className="max-w-2xl mx-auto">
+            <div className="bg-white p-8 rounded-xl shadow-lg">
+              <h2 className="text-2xl font-bold mb-6">Mortgage Calculator</h2>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div>
+                  <label className="block text-sm font-medium mb-2">Property Value (P)</label>
+                  <input
+                    type="number"
+                    value={mortgageData.propertyValue}
+                    onChange={(e) => setMortgageData({...mortgageData, propertyValue: Number(e.target.value)})}
+                    className="w-full p-3 border border-gray-300 rounded-lg"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">Down Payment (P)</label>
+                  <input
+                    type="number"
+                    value={mortgageData.downPayment}
+                    onChange={(e) => setMortgageData({...mortgageData, downPayment: Number(e.target.value)})}
+                    className="w-full p-3 border border-gray-300 rounded-lg"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">Interest Rate (%)</label>
+                  <input
+                    type="number"
+                    step="0.1"
+                    value={mortgageData.interestRate}
+                    onChange={(e) => setMortgageData({...mortgageData, interestRate: Number(e.target.value)})}
+                    className="w-full p-3 border border-gray-300 rounded-lg"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">Loan Term (years)</label>
+                  <input
+                    type="number"
+                    value={mortgageData.loanTerm}
+                    onChange={(e) => setMortgageData({...mortgageData, loanTerm: Number(e.target.value)})}
+                    className="w-full p-3 border border-gray-300 rounded-lg"
+                  />
+                </div>
+              </div>
+
+              <div className="bg-gray-50 p-6 rounded-lg">
+                <h3 className="text-lg font-semibold mb-4">Monthly Payment Breakdown</h3>
+                <div className="space-y-3">
+                  <div className="flex justify-between">
+                    <span>Monthly Payment:</span>
+                    <span className="font-bold text-blue-600">P{mortgage.monthlyPayment}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Total Payment:</span>
+                    <span className="font-bold">P{mortgage.totalPayment}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Total Interest:</span>
+                    <span className="font-bold text-red-600">P{mortgage.totalInterest}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-6 flex gap-4">
+                <button 
+                  onClick={() => alert('Pre-approval application started')}
+                  className="flex-1 bg-blue-500 text-white py-3 rounded-lg hover:bg-blue-600 transition-colors"
+                >
+                  Apply for Pre-approval
+                </button>
+                <button 
+                  onClick={() => alert('Connecting you with mortgage specialists')}
+                  className="flex-1 bg-green-500 text-white py-3 rounded-lg hover:bg-green-600 transition-colors"
+                >
+                  Talk to Specialist
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+
+      case 'property-details':
+        if (!selectedProperty) return <div>Select a property to view details</div>;
+        
+        return (
+          <div className="max-w-4xl mx-auto">
+            <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+              <div className="h-64 bg-gradient-to-r from-blue-400 to-purple-500 flex items-center justify-center text-8xl">
+                {selectedProperty.image}
+              </div>
+              
+              <div className="p-8">
+                <div className="flex justify-between items-start mb-6">
+                  <div>
+                    <h1 className="text-3xl font-bold mb-2">{selectedProperty.title}</h1>
+                    <div className="flex items-center text-gray-600 mb-2">
+                      <MapPin className="w-5 h-5 mr-2" />
+                      {selectedProperty.location}
+                    </div>
+                    <div className="text-3xl font-bold text-
