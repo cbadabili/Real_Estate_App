@@ -62,16 +62,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Email and password are required" });
       }
 
+      console.log('Login attempt for email:', email);
       const user = await storage.getUserByEmail(email);
 
-      if (!user || user.password !== password) {
+      if (!user) {
+        console.log('User not found for email:', email);
         return res.status(401).json({ message: "Invalid credentials" });
       }
+
+      console.log('User found, checking password...');
+      console.log('Stored password length:', user.password?.length);
+      console.log('Provided password length:', password?.length);
+      
+      // Trim whitespace and compare
+      const storedPassword = user.password?.trim();
+      const providedPassword = password?.trim();
+      
+      if (storedPassword !== providedPassword) {
+        console.log('Password mismatch');
+        return res.status(401).json({ message: "Invalid credentials" });
+      }
+
+      console.log('Password match successful');
 
       // Update last login
       try {
         const loginTimestamp = Math.floor(Date.now() / 1000);
-        console.log('Updating user with timestamp:', loginTimestamp, typeof loginTimestamp);
         await storage.updateUser(user.id, { lastLoginAt: loginTimestamp });
       } catch (error) {
         console.error('Error updating last login:', error);
@@ -79,6 +95,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const { password: _, ...userResponse } = user;
+      console.log('Login successful for user:', userResponse.email);
       res.json(userResponse);
     } catch (error) {
       console.error("Login error:", error);
@@ -1118,6 +1135,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Revoke permission error:", error);
       res.status(500).json({ message: "Failed to revoke permission" });
+    }
+  });
+
+  // Debug endpoint to check user data (remove in production)
+  app.get("/api/debug/users", async (req, res) => {
+    try {
+      const users = await storage.getUsers({ limit: 10 });
+      const safeUsers = users.map(user => ({
+        id: user.id,
+        email: user.email,
+        username: user.username,
+        passwordLength: user.password?.length,
+        userType: user.userType
+      }));
+      res.json(safeUsers);
+    } catch (error) {
+      console.error("Debug users error:", error);
+      res.status(500).json({ message: "Failed to fetch debug user data" });
     }
   });
 
