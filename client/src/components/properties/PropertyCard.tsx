@@ -203,6 +203,12 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, viewMode = 'grid'
           )}
         </div>
       </div>
+      {property.propertyType === 'land' && (
+              <div className="text-sm text-gray-600 mt-1">
+                {property.lotSize && `${property.lotSize} lot`}
+                <span className="ml-2 text-blue-600 font-medium">Land</span>
+              </div>
+            )}
     </motion.div>
   );
 };

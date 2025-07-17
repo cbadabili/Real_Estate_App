@@ -176,6 +176,30 @@ async function seed() {
         propertyTaxes: '9800.00',
         hoaFees: '275.00',
         agentId: createdUsers[1].id, // Sarah (Agent)
+      },
+      {
+        title: 'Land in Gaborone',
+        description: 'Land for sale in Gaborone',
+        price: '100000.00',
+        address: '123 Main Street',
+        city: 'Gaborone',
+        state: 'South East',
+        zipCode: '00267',
+        latitude: '30.2672',
+        longitude: '-97.7431',
+        propertyType: 'land',
+        listingType: 'fsbo',
+        bedrooms: 0,
+        bathrooms: '0.0',
+        squareFeet: 0,
+        lotSize: '1.0',
+        yearBuilt: 0,
+        status: 'active',
+        images: JSON.stringify([]),
+        features: JSON.stringify([]),
+        propertyTaxes: '0.00',
+        hoaFees: '0.00',
+        ownerId: createdUsers[2].id, // Mike (FSBO seller)
       }
     ];
 

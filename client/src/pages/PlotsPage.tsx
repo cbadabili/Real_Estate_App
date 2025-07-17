@@ -128,7 +128,7 @@ export const PlotsPage = () => {
 
   const handleFiltersChange = (filters: PlotFilters) => {
     setCurrentFilters(filters);
-    
+
     let filtered = plots.filter(plot => {
       if (filters.location && plot.location !== filters.location) return false;
       if (filters.plotType !== 'all' && plot.plotType !== filters.plotType) return false;
@@ -137,20 +137,20 @@ export const PlotsPage = () => {
       if (filters.hasWater === true && !plot.hasWater) return false;
       if (filters.hasElectricity === true && !plot.hasElectricity) return false;
       if (filters.serviced === true && !plot.serviced) return false;
-      
+
       // Size filtering with unit conversion
       if (filters.minSize || filters.maxSize) {
         let plotSizeInM2 = plot.sizeUnit === 'hectares' ? plot.size * 10000 : plot.size;
         let minSizeInM2 = filters.sizeUnit === 'hectares' && filters.minSize ? filters.minSize * 10000 : filters.minSize;
         let maxSizeInM2 = filters.sizeUnit === 'hectares' && filters.maxSize ? filters.maxSize * 10000 : filters.maxSize;
-        
+
         if (minSizeInM2 && plotSizeInM2 < minSizeInM2) return false;
         if (maxSizeInM2 && plotSizeInM2 > maxSizeInM2) return false;
       }
-      
+
       return true;
     });
-    
+
     setFilteredPlots(filtered);
   };
 
@@ -174,7 +174,7 @@ export const PlotsPage = () => {
               <h1 className="text-3xl font-bold text-gray-900">Plots & Land</h1>
               <p className="text-gray-600 mt-1">Find your perfect plot in Botswana's prime locations</p>
             </div>
-            
+
             <div className="flex items-center gap-2">
               <div className="flex items-center gap-1 text-sm text-green-600">
                 <Shield className="h-4 w-4" />
@@ -189,7 +189,7 @@ export const PlotsPage = () => {
               </button>
             </div>
           </div>
-          
+
           {/* Tab Navigation */}
           <div className="flex space-x-8 mt-6">
             {[
@@ -226,7 +226,7 @@ export const PlotsPage = () => {
                 className="sticky top-8"
               />
             </div>
-            
+
             {/* Plots Grid */}
             <div className="lg:col-span-3">
               <div className="flex items-center justify-between mb-6">
@@ -240,7 +240,7 @@ export const PlotsPage = () => {
                   <option>Size: Largest First</option>
                 </select>
               </div>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {filteredPlots.map(plot => (
                   <PlotListingCard
@@ -250,7 +250,7 @@ export const PlotsPage = () => {
                   />
                 ))}
               </div>
-              
+
               {filteredPlots.length === 0 && (
                 <div className="text-center py-12">
                   <MapPin className="h-12 w-12 text-gray-300 mx-auto mb-4" />
