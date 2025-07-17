@@ -95,11 +95,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, [authToken]);
 
   const login = async (email: string, password: string) => {
+    if (!email || !password) {
+      throw new Error('Email and password are required');
+    }
+    
     setIsLoading(true);
     try {
       const response = await apiRequest('/api/users/login', {
         method: 'POST',
-        body: JSON.stringify({ email, password })
+        body: JSON.stringify({ 
+          email: email.trim(), 
+          password: password.trim() 
+        })
       });
 
       // The server returns user data directly, not wrapped in a token structure

@@ -36,29 +36,24 @@ const LoginPage = () => {
 
   const onSubmit = async (data: any) => {
     setIsLoading(true);
+    
+    // Trim whitespace from inputs
+    const trimmedEmail = data.email?.trim();
+    const trimmedPassword = data.password?.trim();
+    
+    // Validate required fields
+    if (!trimmedEmail || !trimmedPassword) {
+      toast.error('Email and password are required');
+      setIsLoading(false);
+      return;
+    }
+    
     try {
       if (isLogin) {
-        // Login
-        const response = await fetch('/api/users/login', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            email: data.email,
-            password: data.password,
-          }),
-        });
-
-        const result = await response.json();
-
-        if (response.ok) {
-          login(result);
-          toast.success('Login successful!');
-          navigate(redirectPath);
-        } else {
-          toast.error(result.message || 'Login failed. Please check your credentials.');
-        }
+        // Use AuthContext login function
+        await login(trimmedEmail, trimmedPassword);
+        toast.success('Login successful!');
+        navigate(redirectPath);
       } else {
         // Registration
         const response = await fetch('/api/users/register', {
