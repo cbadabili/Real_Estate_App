@@ -162,7 +162,7 @@ const BuyerSellerPlatformPage = () => {
             <motion.div variants={itemVariants} className="bg-white rounded-lg shadow-sm border border-neutral-200 p-6">
               <div className="flex items-start space-x-4">
                 <div className="w-12 h-12 bg-beedab-blue rounded-lg flex items-center justify-center">
-                  <DollarSign className="h-6 w-6 text-white" />
+                  <TrendingUp className="h-6 w-6 text-white" />
                 </div>
                 <div className="flex-1">
                   <h3 className="text-xl font-semibold text-neutral-900 mb-2">Pricing Guide</h3>
