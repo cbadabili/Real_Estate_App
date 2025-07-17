@@ -114,7 +114,32 @@ const BuyerSellerPlatformPage = () => {
           </motion.div>
 
           <div className="grid md:grid-cols-2 gap-8">
-            {features.map((feature, index) => {
+            
+            <Link 
+            to="/services/legal-documents" 
+            className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 hover:shadow-lg transition-shadow cursor-pointer group"
+          >
+            <motion.div variants={itemVariants}>
+            <div className="flex items-start space-x-4">
+              <div className="w-12 h-12 bg-beedab-blue/10 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:bg-beedab-blue/20 transition-colors">
+                <FileText className="h-6 w-6 text-beedab-blue" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-xl font-semibold text-gray-900 mb-2 group-hover:text-beedab-blue transition-colors">Legal Document Templates</h3>
+                <p className="text-gray-600 mb-4">
+                  Access Botswana-compliant legal documents including sale agreements, disclosure forms, and transfer documents.
+                </p>
+                <div className="flex items-center text-beedab-blue group-hover:text-beedab-darkblue transition-colors">
+                          <span className="text-sm font-medium">Learn More</span>
+                          <ArrowRight className="ml-2 h-4 w-4" />
+                        </div>
+              </div>
+            </div>
+            </motion.div>
+          </Link>
+            
+            
+            {features.slice(1).map((feature, index) => {
               const Icon = feature.icon;
               return (
                 <Link key={feature.title} to={feature.link}>
