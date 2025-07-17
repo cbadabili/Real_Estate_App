@@ -9,7 +9,6 @@ import {
   BarChart3, 
   Building, 
   Home,
-  DollarSign,
   Calendar,
   Users,
   ArrowRight,

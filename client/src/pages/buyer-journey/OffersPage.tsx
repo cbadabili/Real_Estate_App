@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
-  DollarSign, FileText, Clock, CheckCircle, XCircle, 
+  FileText, Clock, CheckCircle, XCircle, 
   AlertCircle, TrendingUp, Calculator, MessageCircle,
   Phone, Download, Upload, User, Calendar
 } from 'lucide-react';

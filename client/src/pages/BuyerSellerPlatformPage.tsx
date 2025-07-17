@@ -14,7 +14,6 @@ import {
   Star,
   ArrowRight,
   Play,
-  DollarSign,
   Calendar,
   Handshake
 } from 'lucide-react';

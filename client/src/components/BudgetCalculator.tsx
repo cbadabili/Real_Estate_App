@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Calculator, DollarSign, PieChart, TrendingUp, AlertCircle, CheckCircle } from 'lucide-react';
+import { Calculator, PieChart, TrendingUp, AlertCircle, CheckCircle } from 'lucide-react';
 
 interface BudgetCalculatorProps {
   onBudgetCalculated?: (budget: any) => void;
@@ -267,7 +267,7 @@ export const BudgetCalculator = ({ onBudgetCalculated }: BudgetCalculatorProps) 
               {/* Budget Breakdown */}
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold text-neutral-900 flex items-center">
-                  <DollarSign className="h-5 w-5 mr-2 text-beedab-blue" />
+                  <Calculator className="h-5 w-5 mr-2 text-beedab-blue" />
                   Budget Breakdown
                 </h3>
 

@@ -153,7 +153,7 @@ const PropertyValuationPage = () => {
             {valuation ? (
               <div className="space-y-6">
                 <div className="text-center bg-beedab-blue/10 rounded-lg p-6">
-                  <DollarSign className="h-12 w-12 text-beedab-blue mx-auto mb-4" />
+                  <Home className="h-12 w-12 text-beedab-blue mx-auto mb-4" />
                   <div className="text-3xl font-bold text-beedab-blue mb-2">
                     {formatCurrency(valuation.estimatedValue)}
                   </div>

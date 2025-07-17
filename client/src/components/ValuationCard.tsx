@@ -6,7 +6,6 @@ import {
   Home, 
   MapPin, 
   Calendar, 
-  DollarSign,
   BarChart3,
   RefreshCw
 } from 'lucide-react';

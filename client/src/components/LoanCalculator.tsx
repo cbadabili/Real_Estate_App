@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Building2, Percent, Calendar, DollarSign, TrendingUp, ExternalLink, Star } from 'lucide-react';
+import { Building2, Percent, Calendar, TrendingUp, ExternalLink, Star } from 'lucide-react';
 
 interface FinancialInstitution {
   id: string;
