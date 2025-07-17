@@ -39,18 +39,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userData = insertUserSchema.parse(req.body);
 
-      // Check if user already exists
-      const existingUser = await storage.getUserByEmail(userData.email);
-      if (existingUser) {
+      console.log('Registration attempt for email:', userData.email, 'username:', userData.username);
+
+      // Check if user already exists by email
+      const existingUserByEmail = await storage.getUserByEmail(userData.email);
+      if (existingUserByEmail) {
         return res.status(400).json({ message: "User already exists with this email" });
+      }
+
+      // Check if username already exists
+      const existingUserByUsername = await storage.getUserByUsername(userData.username);
+      if (existingUserByUsername) {
+        return res.status(400).json({ message: "Username already taken. Please choose a different username." });
       }
 
       const user = await storage.createUser(userData);
       const { password, ...userResponse } = user;
+      console.log('Registration successful for user:', userData.email);
       res.status(201).json(userResponse);
     } catch (error) {
       console.error("Register error:", error);
-      res.status(400).json({ message: "Invalid user data" });
+      
+      // Handle specific database constraint errors
+      if (error.code === 'SQLITE_CONSTRAINT_UNIQUE') {
+        if (error.message.includes('users.email')) {
+          return res.status(400).json({ message: "Email address already registered" });
+        } else if (error.message.includes('users.username')) {
+          return res.status(400).json({ message: "Username already taken. Please choose a different username." });
+        }
+        return res.status(400).json({ message: "Registration failed: duplicate information" });
+      }
+      
+      res.status(400).json({ message: "Registration failed. Please check your information and try again." });
     }
   });
 
