@@ -55,6 +55,7 @@ import PricingGuidePage from './pages/PricingGuidePage';
 import ManageShowingsPage from './pages/ManageShowingsPage';
 import HandleOffersPage from './pages/HandleOffersPage';
 import PropertyHandoverPage from './pages/PropertyHandoverPage';
+import TransferProcessPage from './pages/TransferProcessPage';
 import AgentRegistrationPage from './pages/AgentRegistrationPage';
 import AgentRatingPage from './pages/AgentRatingPage';
 import HomeValueAssessmentPage from './pages/HomeValueAssessmentPage';
@@ -125,7 +126,7 @@ function App() {
             <Route path="/dashboard/renter" element={<RenterDashboard />} />
             <Route path="/maintenance-management" element={<MaintenanceManagementPage />} />
             <Route path="/maintenance-requests" element={<MaintenanceRequestsPage />} />
-            
+
             <Route path="/buyer-seller-platform" element={<BuyerSellerPlatformPage />} />
             <Route path="/platform" element={<BuyerSellerPlatformPage />} />
             <Route path="/market-intelligence" element={<MarketIntelligencePage />} />
@@ -149,7 +150,7 @@ function App() {
           <Route path="/investment-analytics" element={<InvestmentAnalyticsPage />} />
            {/* Additional Service Routes */}
            <Route path="/legal-document-templates" element={<LegalDocumentTemplatesPage />} />
-           
+
           {/* Marketplace Routes */}
           <Route path="/marketplace" element={<MarketplacePage />} />
           <Route path="/marketplace/register" element={<RegisterProviderPage />} />
@@ -193,7 +194,7 @@ function App() {
               <Route path="/home-value-assessment" element={<HomeValueAssessmentPage />} />
               <Route path="/prepare-home" element={<PrepareHomePage />} />
               <Route path="/legal-requirements" element={<LegalRequirementsPage />} />
-          <Route path="/transfer-process" element={<PropertyHandoverPage />} />
+          <Route path="/transfer-process" element={<TransferProcessPage />} />
               </Routes>
               </div>
             </PropertyProvider>
