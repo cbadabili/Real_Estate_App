@@ -41,39 +41,23 @@ const MapSearchPage = () => {
       }
 
       const data = await response.json();
+      console.log('Raw API response:', data);
 
-      // Transform properties to include coordinates if missing
-      const propertiesWithCoords = data.map((property: any, index: number) => {
-        // Parse coordinates if they're strings
-        let lat = property.latitude;
-        let lng = property.longitude;
-        
-        if (typeof lat === 'string') lat = parseFloat(lat);
-        if (typeof lng === 'string') lng = parseFloat(lng);
-        
-        // Validate coordinates and assign defaults if invalid
-        const isValidLat = lat != null && !isNaN(lat) && lat >= -90 && lat <= 90;
-        const isValidLng = lng != null && !isNaN(lng) && lng >= -180 && lng <= 180;
-        
-        if (!isValidLat || !isValidLng) {
-          // Assign coordinates around Gaborone area with slight variation
-          lat = -24.6282 + (index * 0.01) - 0.05; // Spread properties around Gaborone
-          lng = 25.9231 + (index * 0.01) - 0.05;
-        }
-        
-        console.log(`Property ${property.id}: original lat=${property.latitude}, lng=${property.longitude}, final lat=${lat}, lng=${lng}, valid=${isValidLat && isValidLng}`);
+      // The API now handles coordinate processing, so we just need to ensure proper structure
+      const propertiesWithCoords = data.map((property: any) => {
+        console.log(`Property ${property.id}: lat=${property.latitude}, lng=${property.longitude}`);
         
         return {
           id: property.id,
           title: property.title,
           price: property.price,
-          latitude: lat,
-          longitude: lng,
-          bedrooms: property.bedrooms,
-          bathrooms: property.bathrooms,
-          location: property.address || property.location,
+          latitude: property.latitude,
+          longitude: property.longitude,
+          bedrooms: property.bedrooms || 0,
+          bathrooms: property.bathrooms || 0,
+          location: property.location || property.address || `${property.city}, ${property.district}`,
           city: property.city,
-          propertyType: property.propertyType,
+          propertyType: property.propertyType || property.property_type,
           description: property.description
         };
       });
@@ -97,26 +81,35 @@ const MapSearchPage = () => {
 
     // Apply filters to properties
     const queryParams = new URLSearchParams();
+    queryParams.append('status', 'active');
+    
     Object.entries(newFilters).forEach(([key, value]) => {
-      if (value !== undefined && value !== null && value !== '') {
-        queryParams.append(key, String(value));
+      if (value !== undefined && value !== null && value !== '' && value !== 'all' && value !== 'any') {
+        if (key === 'priceRange' && Array.isArray(value)) {
+          queryParams.append(key, value.join(','));
+        } else {
+          queryParams.append(key, String(value));
+        }
       }
     });
+
+    console.log('Applying filters:', queryParams.toString());
 
     fetch(`/api/properties?${queryParams.toString()}`)
       .then(response => response.json())
       .then(data => {
+        console.log('Filtered properties received:', data);
         const propertiesWithCoords = data.map((property: any) => ({
           id: property.id,
           title: property.title,
           price: property.price,
-          latitude: property.latitude || (-24.6282 + (Math.random() - 0.5) * 0.1),
-          longitude: property.longitude || (25.9231 + (Math.random() - 0.5) * 0.1),
-          bedrooms: property.bedrooms,
-          bathrooms: property.bathrooms,
-          location: property.address || property.location,
+          latitude: property.latitude,
+          longitude: property.longitude,
+          bedrooms: property.bedrooms || 0,
+          bathrooms: property.bathrooms || 0,
+          location: property.location || property.address || `${property.city}, ${property.district}`,
           city: property.city,
-          propertyType: property.propertyType,
+          propertyType: property.propertyType || property.property_type,
           description: property.description
         }));
         setProperties(propertiesWithCoords);

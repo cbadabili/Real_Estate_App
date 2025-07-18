@@ -176,9 +176,12 @@ export function PropertyMap({ properties, selectedProperty, onPropertySelect, cl
           console.log('PropertyMap: Rendering properties', properties);
           
           const validProperties = properties.filter(property => {
-            const isValid = isValidCoordinate(property.latitude, property.longitude);
+            const lat = typeof property.latitude === 'string' ? parseFloat(property.latitude) : property.latitude;
+            const lng = typeof property.longitude === 'string' ? parseFloat(property.longitude) : property.longitude;
+            
+            const isValid = isValidCoordinate(lat, lng);
             if (!isValid) {
-              console.log(`Invalid coordinates for property ${property.id}: lat=${property.latitude}, lng=${property.longitude}`);
+              console.log(`Invalid coordinates for property ${property.id}: lat=${lat}, lng=${lng}`);
             }
             return isValid;
           });
@@ -191,11 +194,14 @@ export function PropertyMap({ properties, selectedProperty, onPropertySelect, cl
           
           return validProperties.map((property) => {
             const isSelected = selectedProperty?.id === property.id;
-            console.log(`Rendering marker for property ${property.id} at [${property.latitude}, ${property.longitude}]`);
+            const lat = typeof property.latitude === 'string' ? parseFloat(property.latitude) : property.latitude;
+            const lng = typeof property.longitude === 'string' ? parseFloat(property.longitude) : property.longitude;
+            
+            console.log(`Rendering marker for property ${property.id} at [${lat}, ${lng}]`);
             return (
             <Marker
               key={property.id}
-              position={[property.latitude, property.longitude]}
+              position={[lat, lng]}
               icon={createCustomIcon(isSelected, property.price)}
               eventHandlers={{
                 click: () => {
