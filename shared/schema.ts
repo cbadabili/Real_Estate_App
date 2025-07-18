@@ -823,3 +823,17 @@ export const job_opportunities = sqliteTable('job_opportunities', {
 
 // Re-export services schema types for convenience
 export * from "./services-schema";
+
+export const PropertyType = {
+  HOUSE: 'house',
+  APARTMENT: 'apartment',
+  CONDO: 'condo',
+  TOWNHOUSE: 'townhouse',
+  PLOT: 'plot',
+  COMMERCIAL: 'commercial',
+  OFFICE: 'office',
+  RETAIL: 'retail',
+  WAREHOUSE: 'warehouse',
+  FARM: 'farm',
+  OTHER: 'other'
+} as const;

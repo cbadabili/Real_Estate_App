@@ -250,7 +250,24 @@ export class DatabaseStorage implements IStorage {
       query = query.offset(filters.offset);
     }
 
-    return await query;
+    const results = await query;
+    
+    // Parse JSON strings back to arrays and add debug logging
+    const processedResults = results.map(prop => {
+      const processed = {
+        ...prop,
+        images: prop.images ? JSON.parse(prop.images) : [],
+        features: prop.features ? JSON.parse(prop.features) : [],
+      };
+      
+      // Debug coordinate data
+      console.log(`Property ${processed.id}: lat=${processed.latitude}, lng=${processed.longitude}, type=${processed.propertyType}`);
+      
+      return processed;
+    });
+
+    console.log(`Retrieved ${processedResults.length} properties from database`);
+    return processedResults;
   }
 
   async createProperty(property: InsertProperty): Promise<Property> {

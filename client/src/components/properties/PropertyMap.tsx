@@ -111,10 +111,16 @@ export function PropertyMap({ properties, selectedProperty, onPropertySelect, cl
 
   // Validate coordinates helper
   const isValidCoordinate = (lat: any, lng: any) => {
-    return lat != null && lng != null && 
+    const isValid = lat != null && lng != null && 
            typeof lat === 'number' && typeof lng === 'number' &&
            !isNaN(lat) && !isNaN(lng) &&
            lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180;
+    
+    if (!isValid) {
+      console.log(`Invalid coordinate: lat=${lat} (type: ${typeof lat}), lng=${lng} (type: ${typeof lng})`);
+    }
+    
+    return isValid;
   };
 
   // Create custom markers with price display
@@ -167,6 +173,8 @@ export function PropertyMap({ properties, selectedProperty, onPropertySelect, cl
         />
 
         {(() => {
+          console.log('PropertyMap: Rendering properties', properties);
+          
           const validProperties = properties.filter(property => {
             const isValid = isValidCoordinate(property.latitude, property.longitude);
             if (!isValid) {
@@ -177,8 +185,13 @@ export function PropertyMap({ properties, selectedProperty, onPropertySelect, cl
           
           console.log(`Total properties: ${properties.length}, Valid properties: ${validProperties.length}`);
           
+          if (validProperties.length === 0) {
+            console.warn('No valid properties found for map rendering');
+          }
+          
           return validProperties.map((property) => {
             const isSelected = selectedProperty?.id === property.id;
+            console.log(`Rendering marker for property ${property.id} at [${property.latitude}, ${property.longitude}]`);
             return (
             <Marker
               key={property.id}

@@ -43,11 +43,25 @@ const MapSearchPage = () => {
       const data = await response.json();
 
       // Transform properties to include coordinates if missing
-      const propertiesWithCoords = data.map((property: any) => {
-        const lat = property.latitude || (-24.6282 + (Math.random() - 0.5) * 0.1); // Gaborone area
-        const lng = property.longitude || (25.9231 + (Math.random() - 0.5) * 0.1);
+      const propertiesWithCoords = data.map((property: any, index: number) => {
+        // Parse coordinates if they're strings
+        let lat = property.latitude;
+        let lng = property.longitude;
         
-        console.log(`Property ${property.id}: original lat=${property.latitude}, lng=${property.longitude}, final lat=${lat}, lng=${lng}`);
+        if (typeof lat === 'string') lat = parseFloat(lat);
+        if (typeof lng === 'string') lng = parseFloat(lng);
+        
+        // Validate coordinates and assign defaults if invalid
+        const isValidLat = lat != null && !isNaN(lat) && lat >= -90 && lat <= 90;
+        const isValidLng = lng != null && !isNaN(lng) && lng >= -180 && lng <= 180;
+        
+        if (!isValidLat || !isValidLng) {
+          // Assign coordinates around Gaborone area with slight variation
+          lat = -24.6282 + (index * 0.01) - 0.05; // Spread properties around Gaborone
+          lng = 25.9231 + (index * 0.01) - 0.05;
+        }
+        
+        console.log(`Property ${property.id}: original lat=${property.latitude}, lng=${property.longitude}, final lat=${lat}, lng=${lng}, valid=${isValidLat && isValidLng}`);
         
         return {
           id: property.id,
