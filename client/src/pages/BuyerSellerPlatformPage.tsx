@@ -19,49 +19,17 @@ import {
 } from 'lucide-react';
 
 const BuyerSellerPlatformPage = () => {
-  const [isLoading, setIsLoading] = useState(true);
+  // Remove artificial loading - let page render immediately
 
-  React.useEffect(() => {
-    // Simulate loading time and then set loading to false
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 100);
-    return () => clearTimeout(timer);
-  }, []);
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-beedab-blue mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading platform...</p>
-        </div>
-      </div>
-    );
-  }
-
+  // Simplified animations for better performance
   const containerVariants = {
     hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        duration: 0.3,
-        delayChildren: 0.05,
-        staggerChildren: 0.05
-      }
-    }
+    visible: { opacity: 1, transition: { duration: 0.2 } }
   };
 
   const itemVariants = {
-    hidden: { y: 10, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: {
-        duration: 0.2,
-        ease: "easeOut"
-      }
-    }
+    hidden: { opacity: 0 },
+    visible: { opacity: 1, transition: { duration: 0.15 } }
   };
 
   const features = [
@@ -92,12 +60,7 @@ const BuyerSellerPlatformPage = () => {
   ];
 
   return (
-    <motion.div
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-      className="min-h-screen bg-gray-50"
-    >
+    <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
       <section className="relative py-16 bg-gradient-to-r from-beedab-darkblue to-beedab-blue text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

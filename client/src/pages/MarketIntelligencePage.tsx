@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'wouter';
@@ -196,15 +195,15 @@ const MarketIntelligencePage = () => {
     const loanAmount = propertyValue - downPayment;
     const monthlyRate = interestRate / 100 / 12;
     const numPayments = loanTerm * 12;
-    
+
     if (loanAmount <= 0 || monthlyRate <= 0 || numPayments <= 0) {
       return { monthlyPayment: '0', totalPayment: '0', totalInterest: '0' };
     }
-    
+
     const monthlyPayment = loanAmount * 
       (monthlyRate * Math.pow(1 + monthlyRate, numPayments)) / 
       (Math.pow(1 + monthlyRate, numPayments) - 1);
-    
+
     return {
       monthlyPayment: monthlyPayment.toLocaleString('en-US', { maximumFractionDigits: 2 }),
       totalPayment: (monthlyPayment * numPayments).toLocaleString('en-US', { maximumFractionDigits: 2 }),
@@ -555,7 +554,7 @@ const MarketIntelligencePage = () => {
                 Search
               </button>
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {properties.map((property) => (
                 <PropertyCard key={property.id} property={property} />
@@ -593,7 +592,7 @@ const MarketIntelligencePage = () => {
                 </Link>
               </div>
             </div>
-            
+
             <div className="bg-white p-6 rounded-xl shadow-lg">
               <h3 className="text-xl font-semibold mb-4">Top Performing Areas</h3>
               <div className="space-y-4">
@@ -621,7 +620,7 @@ const MarketIntelligencePage = () => {
           <div className="max-w-2xl mx-auto">
             <div className="bg-white p-8 rounded-xl shadow-lg">
               <h2 className="text-2xl font-bold mb-6">Mortgage Calculator</h2>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                 <div>
                   <label className="block text-sm font-medium mb-2">Property Value (P)</label>
@@ -705,14 +704,14 @@ const MarketIntelligencePage = () => {
             <p className="text-gray-500">Select a property to view details</p>
           </div>
         );
-        
+
         return (
           <div className="max-w-4xl mx-auto">
             <div className="bg-white rounded-xl shadow-lg overflow-hidden">
               <div className="h-64 bg-gradient-to-r from-beedab-blue to-beedab-darkblue flex items-center justify-center">
                 <Building className="w-24 h-24 text-white" />
               </div>
-              
+
               <div className="p-8">
                 <div className="flex justify-between items-start mb-6">
                   <div>
@@ -764,7 +763,7 @@ const MarketIntelligencePage = () => {
                   </button>
                 </div>
 
-                <div className="bg-blue-50 rounded-lg p-4">
+                <div className="bg-blue-50 rounded-lg p4">
                   <h3 className="font-semibold text-blue-900 mb-2">Market Insights</h3>
                   <ul className="text-sm text-blue-800 space-y-1">
                     <li>• Property values in this area have increased 12% this year</li>
