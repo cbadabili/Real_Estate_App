@@ -1,4 +1,4 @@
-import React, { useState, lazy, Suspense } from 'react';
+import React, { Suspense, lazy } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { 
@@ -140,7 +140,7 @@ const BuyerSellerPlatformPage = () => {
           </motion.div>
 
           <div className="grid md:grid-cols-2 gap-8">
-            
+
             <Link 
             to="/services/legal-documents" 
             className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 hover:shadow-lg transition-shadow cursor-pointer group"
@@ -174,8 +174,8 @@ const BuyerSellerPlatformPage = () => {
             </div>
             </motion.div>
           </Link>
-            
-            
+
+
             {features.slice(1).map((feature, index) => {
               const Icon = feature.icon;
               return (

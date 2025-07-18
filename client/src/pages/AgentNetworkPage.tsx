@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { 
@@ -14,7 +14,21 @@ import {
 
 const AgentNetworkPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [filteredAgents, setFilteredAgents] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Simulate initial load completion
+    const timer = setTimeout(() => {
+      try {
+        setIsLoading(false);
+      } catch (err) {
+        setError('Failed to load agent network');
+        setIsLoading(false);
+      }
+    }, 500);
+    return () => clearTimeout(timer);
+  }, []);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -35,7 +49,7 @@ const AgentNetworkPage = () => {
     }
   };
 
-  const agents = [
+  const agents = useMemo(() => [
     {
       id: 1,
       name: 'Thabo Mogami',
@@ -69,25 +83,46 @@ const AgentNetworkPage = () => {
       phone: '+267 7345 6789',
       email: 'mpho@beedab.com'
     }
-  ];
+  ], []);
 
-  // Filter agents based on search query
-  useEffect(() => {
+  // Filter agents based on search query with useMemo for better performance
+  const filteredAgents = useMemo(() => {
     if (!searchQuery.trim()) {
-      setFilteredAgents(agents);
-    } else {
-      const filtered = agents.filter(agent => 
-        agent.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        agent.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        agent.specialization.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-      setFilteredAgents(filtered);
+      return agents;
     }
-  }, [searchQuery]);
+    return agents.filter(agent => 
+      agent.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      agent.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      agent.specialization.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [searchQuery, agents]);
 
-  useEffect(() => {
-    setFilteredAgents(agents);
-  }, []);
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-beedab-blue mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading REAC Agent Network...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-600 mb-4">{error}</p>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="px-4 py-2 bg-beedab-blue text-white rounded-lg hover:bg-beedab-darkblue"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <motion.div
