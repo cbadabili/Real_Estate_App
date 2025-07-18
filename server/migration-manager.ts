@@ -1,4 +1,3 @@
-
 import { db } from "./db";
 import { sql } from "drizzle-orm";
 import fs from "fs";
@@ -96,7 +95,7 @@ export class MigrationManager {
 
   async resetDatabase(): Promise<void> {
     console.log('🗑️ Resetting database...');
-    
+
     // Get all tables
     const tables = await db.all(sql`
       SELECT name FROM sqlite_master 

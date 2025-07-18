@@ -588,7 +588,7 @@ const CreateListingPage = () => {
                     {(watchedPropertyType === 'farm' || watchedPropertyType === 'house' || watchedPropertyType === 'commercial' || watchedPropertyType === 'land') && (
                       <div>
                         <label className="block text-sm font-medium text-neutral-700 mb-2">
-                          {(watchedPropertyType === 'farm' || watchedPropertyType === 'land') ? 'Land Size *' : 'Plot Size *'}
+                          {(watchedPropertyType === 'farm' || watchedPropertyType === 'land') ? 'Land Size *' : 'Land Size *'}
                         </label>
                         <div className="flex space-x-2">
                           <input
@@ -1237,7 +1237,7 @@ const CreateListingPage = () => {
 
                           {/* Plot Size - Show for Farm, House, Commercial and Land */}
                           {(watchedPropertyType === 'farm' || watchedPropertyType === 'house' || watchedPropertyType === 'commercial' || watchedPropertyType === 'land') && watch('plotSize') && (
-                            <li>{(watchedPropertyType === 'farm' || watchedPropertyType === 'land') ? 'Land Size' : 'Plot Size'}: {parseInt(watch('plotSize') || '0').toLocaleString()} {(watchedPropertyType === 'farm' || watchedPropertyType === 'land') ? watch('plotUnit') : 'sqm'}</li>
+                            <li>{(watchedPropertyType === 'farm' || watchedPropertyType === 'land') ? 'Land Size' : 'Land Size'}: {parseInt(watch('plotSize') || '0').toLocaleString()} {(watchedPropertyType === 'farm' || watchedPropertyType === 'land') ? watch('plotUnit') : 'sqm'}</li>
                           )}
 
                           {/* Building Size - Show for House, Apartment, Townhouse and Commercial */}

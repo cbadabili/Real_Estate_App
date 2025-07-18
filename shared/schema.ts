@@ -829,7 +829,7 @@ export const PropertyType = {
   APARTMENT: 'apartment',
   CONDO: 'condo',
   TOWNHOUSE: 'townhouse',
-  PLOT: 'plot',
+  LAND: 'land',
   COMMERCIAL: 'commercial',
   OFFICE: 'office',
   RETAIL: 'retail',
