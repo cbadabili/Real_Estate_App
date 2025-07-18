@@ -75,6 +75,7 @@ import PropertyManagementPage from './pages/services/PropertyManagementPage';
 import TenantSupportPage from './pages/services/TenantSupportPage';
 //importing missing pages
 import PropertyValuationPage from './pages/PropertyValuationPage';
+import ProfessionalSupportPage from './pages/ProfessionalSupportPage';
 import MarketTrendsPage from './pages/MarketTrendsPage';
 import NeighborhoodAnalyticsPage from './pages/NeighborhoodAnalyticsPage';
 import InvestmentAnalyticsPage from './pages/InvestmentAnalyticsPage';
