@@ -68,6 +68,7 @@ import RentalApplicationsPage from './pages/RentalApplicationsPage';
 import TenantScreeningPage from './pages/TenantScreeningPage';
 import MaintenanceManagementPage from './pages/MaintenanceManagementPage';
 import MaintenanceRequestsPage from './pages/MaintenanceRequestsPage';
+import TransactionManagementPage from './pages/TransactionManagementPage';
 
 import RentalAgreementsPage from './pages/RentalAgreementsPage';
 import PropertyManagementPage from './pages/services/PropertyManagementPage';
