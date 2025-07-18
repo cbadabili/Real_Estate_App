@@ -67,9 +67,7 @@ import RentalApplicationsPage from './pages/RentalApplicationsPage';
 import TenantScreeningPage from './pages/TenantScreeningPage';
 import MaintenanceManagementPage from './pages/MaintenanceManagementPage';
 import MaintenanceRequestsPage from './pages/MaintenanceRequestsPage';
-import RentCollectionPage from './pages/RentCollectionPage';
-import RentPaymentsPage from './pages/RentPaymentsPage';
-import RentalCalculatorPage from './pages/RentalCalculatorPage';
+
 import RentalAgreementsPage from './pages/RentalAgreementsPage';
 import RentalMarketInsightsPage from './pages/RentalMarketInsightsPage';
 import PropertyManagementPage from './pages/services/PropertyManagementPage';
@@ -79,7 +77,7 @@ import PropertyValuationPage from './pages/PropertyValuationPage';
 import MarketTrendsPage from './pages/MarketTrendsPage';
 import NeighborhoodAnalyticsPage from './pages/NeighborhoodAnalyticsPage';
 import InvestmentAnalyticsPage from './pages/InvestmentAnalyticsPage';
-import PropertyValuationToolsPage from './pages/PropertyValuationToolsPage';
+
 import TransactionManagementPage from './pages/TransactionManagementPage';
 import ProfessionalSupportPage from './pages/ProfessionalSupportPage';
 
@@ -131,9 +129,7 @@ function App() {
             <Route path="/dashboard/renter" element={<RenterDashboard />} />
             <Route path="/maintenance-management" element={<MaintenanceManagementPage />} />
             <Route path="/maintenance-requests" element={<MaintenanceRequestsPage />} />
-            <Route path="/rent-collection" element={<RentCollectionPage />} />
-            <Route path="/rent-payments" element={<RentPaymentsPage />} />
-            <Route path="/rental-calculator" element={<RentalCalculatorPage />} />
+            
             <Route path="/rental-market-insights" element={<RentalMarketInsightsPage />} />
             <Route path="/buyer-seller-platform" element={<BuyerSellerPlatformPage />} />
             <Route path="/platform" element={<BuyerSellerPlatformPage />} />
@@ -158,7 +154,7 @@ function App() {
           <Route path="/investment-analytics" element={<InvestmentAnalyticsPage />} />
            {/* Additional Service Routes */}
            <Route path="/legal-document-templates" element={<LegalDocumentTemplatesPage />} />
-           <Route path="/property-valuation-tools" element={<PropertyValuationToolsPage />} />
+           
            <Route path="/transaction-management" element={<TransactionManagementPage />} />
            <Route path="/professional-support" element={<ProfessionalSupportPage />} />
           {/* Marketplace Routes */}
