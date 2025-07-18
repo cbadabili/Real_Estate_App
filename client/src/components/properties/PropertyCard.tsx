@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'wouter';
+import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
   Heart, 
@@ -91,7 +91,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, viewMode = 'grid'
             <div className="flex justify-between items-start mb-4">
               <div>
                 <Link 
-                  to={`/property/${property.id}`}
+                  to={`/properties/${property.id}`}
                   className="block hover:text-beedab-darkblue transition-colors"
                 >
                   <h3 className="text-lg font-semibold text-neutral-900 mb-1 line-clamp-2">
@@ -167,7 +167,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, viewMode = 'grid'
 
               {!isListView && (
                 <Link
-                  to={`/property/${property.id}`}
+                  to={`/properties/${property.id}`}
                   className="px-4 py-2 bg-beedab-blue hover:bg-beedab-darkblue text-white rounded-lg text-sm font-medium transition-colors"
                 >
                   View Details
@@ -190,7 +190,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, viewMode = 'grid'
 
               <div className="space-y-2">
                 <Link
-                  to={`/property/${property.id}`}
+                  to={`/properties/${property.id}`}
                   className="block px-6 py-2 bg-beedab-blue hover:bg-beedab-darkblue text-white rounded-lg text-sm font-medium transition-colors text-center"
                 >
                   View Details
