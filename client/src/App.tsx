@@ -69,7 +69,6 @@ import MaintenanceManagementPage from './pages/MaintenanceManagementPage';
 import MaintenanceRequestsPage from './pages/MaintenanceRequestsPage';
 
 import RentalAgreementsPage from './pages/RentalAgreementsPage';
-import RentalMarketInsightsPage from './pages/RentalMarketInsightsPage';
 import PropertyManagementPage from './pages/services/PropertyManagementPage';
 import TenantSupportPage from './pages/services/TenantSupportPage';
 //importing missing pages
@@ -77,9 +76,6 @@ import PropertyValuationPage from './pages/PropertyValuationPage';
 import MarketTrendsPage from './pages/MarketTrendsPage';
 import NeighborhoodAnalyticsPage from './pages/NeighborhoodAnalyticsPage';
 import InvestmentAnalyticsPage from './pages/InvestmentAnalyticsPage';
-
-import TransactionManagementPage from './pages/TransactionManagementPage';
-import ProfessionalSupportPage from './pages/ProfessionalSupportPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -130,7 +126,6 @@ function App() {
             <Route path="/maintenance-management" element={<MaintenanceManagementPage />} />
             <Route path="/maintenance-requests" element={<MaintenanceRequestsPage />} />
             
-            <Route path="/rental-market-insights" element={<RentalMarketInsightsPage />} />
             <Route path="/buyer-seller-platform" element={<BuyerSellerPlatformPage />} />
             <Route path="/platform" element={<BuyerSellerPlatformPage />} />
             <Route path="/market-intelligence" element={<MarketIntelligencePage />} />
@@ -155,8 +150,6 @@ function App() {
            {/* Additional Service Routes */}
            <Route path="/legal-document-templates" element={<LegalDocumentTemplatesPage />} />
            
-           <Route path="/transaction-management" element={<TransactionManagementPage />} />
-           <Route path="/professional-support" element={<ProfessionalSupportPage />} />
           {/* Marketplace Routes */}
           <Route path="/marketplace" element={<MarketplacePage />} />
           <Route path="/marketplace/register" element={<RegisterProviderPage />} />
