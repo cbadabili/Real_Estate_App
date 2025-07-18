@@ -1,0 +1,285 @@
+
+import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import { 
+  Search, 
+  Filter, 
+  Star, 
+  MapPin, 
+  Phone, 
+  Mail, 
+  Truck,
+  Package,
+  Shield,
+  Building2,
+  Hammer,
+  Paintbrush
+} from 'lucide-react';
+
+interface Supplier {
+  id: number;
+  name: string;
+  category: string;
+  description: string;
+  rating: number;
+  reviews: number;
+  location: string;
+  phone: string;
+  email: string;
+  services: string[];
+  verified: boolean;
+  deliveryArea: string;
+}
+
+const SuppliersPage: React.FC = () => {
+  const [suppliers, setSuppliers] = useState<Supplier[]>([]);
+  const [filteredSuppliers, setFilteredSuppliers] = useState<Supplier[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [loading, setLoading] = useState(true);
+
+  const categories = [
+    { id: 'all', name: 'All Suppliers', icon: Package },
+    { id: 'building-materials', name: 'Building Materials', icon: Building2 },
+    { id: 'construction', name: 'Construction Supplies', icon: Hammer },
+    { id: 'home-improvement', name: 'Home Improvement', icon: Paintbrush }
+  ];
+
+  useEffect(() => {
+    const fetchSuppliers = async () => {
+      try {
+        const response = await fetch('/api/marketplace/suppliers');
+        if (response.ok) {
+          const data = await response.json();
+          setSuppliers(data.suppliers || []);
+          setFilteredSuppliers(data.suppliers || []);
+        } else {
+          // Fallback data
+          const sampleSuppliers: Supplier[] = [
+            {
+              id: 1,
+              name: 'Gaborone Building Supplies',
+              category: 'Building Materials',
+              description: 'Complete range of building materials and construction supplies',
+              rating: 4.7,
+              reviews: 89,
+              location: 'Gaborone Industrial',
+              phone: '+267 390 1234',
+              email: 'info@gbsupplies.co.bw',
+              services: ['Cement', 'Steel', 'Roofing Materials', 'Tiles'],
+              verified: true,
+              deliveryArea: 'Greater Gaborone'
+            },
+            {
+              id: 2,
+              name: 'Modern Home Depot',
+              category: 'Home Improvement',
+              description: 'Modern fixtures and fittings for contemporary homes',
+              rating: 4.8,
+              reviews: 156,
+              location: 'Francistown',
+              phone: '+267 241 5678',
+              email: 'orders@modernhomedepot.bw',
+              services: ['Kitchen Fittings', 'Bathroom Fixtures', 'Lighting', 'Hardware'],
+              verified: true,
+              deliveryArea: 'Northern Botswana'
+            }
+          ];
+          setSuppliers(sampleSuppliers);
+          setFilteredSuppliers(sampleSuppliers);
+        }
+      } catch (error) {
+        console.error('Error fetching suppliers:', error);
+        setSuppliers([]);
+        setFilteredSuppliers([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSuppliers();
+  }, []);
+
+  useEffect(() => {
+    let filtered = suppliers;
+
+    if (selectedCategory !== 'all') {
+      filtered = filtered.filter(supplier => 
+        supplier.category.toLowerCase().includes(selectedCategory.toLowerCase())
+      );
+    }
+
+    if (searchTerm) {
+      filtered = filtered.filter(supplier =>
+        supplier.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        supplier.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        supplier.services.some(service => service.toLowerCase().includes(searchTerm.toLowerCase()))
+      );
+    }
+
+    setFilteredSuppliers(filtered);
+  }, [selectedCategory, searchTerm, suppliers]);
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <section className="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <h1 className="text-4xl lg:text-5xl font-bold mb-6">
+              Building Suppliers
+            </h1>
+            <p className="text-xl text-blue-100 mb-8 max-w-3xl mx-auto">
+              Find quality building materials and supplies for your property projects
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Search and Filters */}
+      <section className="py-8 bg-white border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col lg:flex-row gap-4 items-center">
+            {/* Search */}
+            <div className="flex-1 relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search suppliers and materials..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+
+            {/* Category Filter */}
+            <div className="flex flex-wrap gap-2">
+              {categories.map((category) => {
+                const IconComponent = category.icon;
+                return (
+                  <button
+                    key={category.id}
+                    onClick={() => setSelectedCategory(category.id)}
+                    className={`flex items-center px-4 py-2 rounded-lg font-medium transition-colors ${
+                      selectedCategory === category.id
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
+                  >
+                    <IconComponent className="h-4 w-4 mr-2" />
+                    {category.name}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Suppliers Grid */}
+      <section className="py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {loading ? (
+            <div className="flex justify-center items-center py-12">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+              <span className="ml-2 text-gray-600">Loading suppliers...</span>
+            </div>
+          ) : filteredSuppliers.length === 0 ? (
+            <div className="text-center py-12">
+              <Search className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-xl font-medium text-gray-900 mb-2">No suppliers found</h3>
+              <p className="text-gray-600">Try adjusting your search or filter criteria.</p>
+            </div>
+          ) : (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredSuppliers.map((supplier) => (
+                <motion.div
+                  key={supplier.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow"
+                >
+                  <div className="p-6">
+                    <div className="flex items-start justify-between mb-3">
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-1">
+                          {supplier.name}
+                        </h3>
+                        <p className="text-blue-600 font-medium text-sm">{supplier.category}</p>
+                      </div>
+                      {supplier.verified && (
+                        <div className="flex items-center space-x-1 bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">
+                          <Shield className="h-3 w-3" />
+                          <span>Verified</span>
+                        </div>
+                      )}
+                    </div>
+
+                    <p className="text-gray-600 text-sm mb-4">{supplier.description}</p>
+
+                    <div className="flex items-center text-yellow-500 mb-3">
+                      <Star className="h-4 w-4 fill-current" />
+                      <span className="ml-1 text-sm font-medium text-gray-900">
+                        {supplier.rating}
+                      </span>
+                      <span className="text-xs text-gray-600 ml-1">
+                        ({supplier.reviews} reviews)
+                      </span>
+                    </div>
+
+                    <div className="space-y-2 mb-4">
+                      <div className="flex items-center text-gray-600 text-sm">
+                        <MapPin className="h-4 w-4 mr-2" />
+                        {supplier.location}
+                      </div>
+                      <div className="flex items-center text-gray-600 text-sm">
+                        <Truck className="h-4 w-4 mr-2" />
+                        Delivers to: {supplier.deliveryArea}
+                      </div>
+                    </div>
+
+                    {/* Services */}
+                    <div className="mb-4">
+                      <h4 className="text-sm font-medium text-gray-900 mb-2">Products:</h4>
+                      <div className="flex flex-wrap gap-1">
+                        {supplier.services.slice(0, 3).map((service, idx) => (
+                          <span key={idx} className="inline-block px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded">
+                            {service}
+                          </span>
+                        ))}
+                        {supplier.services.length > 3 && (
+                          <span className="inline-block px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded">
+                            +{supplier.services.length - 3} more
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="flex space-x-2">
+                      <button 
+                        onClick={() => window.location.href = `tel:${supplier.phone}`}
+                        className="flex-1 bg-blue-600 text-white py-2 px-3 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors flex items-center justify-center"
+                      >
+                        <Phone className="h-4 w-4 mr-1" />
+                        Call
+                      </button>
+                      <button 
+                        onClick={() => window.location.href = `mailto:${supplier.email}`}
+                        className="flex-1 border border-blue-600 text-blue-600 py-2 px-3 rounded-lg text-sm font-medium hover:bg-blue-50 transition-colors flex items-center justify-center"
+                      >
+                        <Mail className="h-4 w-4 mr-1" />
+                        Email
+                      </button>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+    </div>
+  );
+};
+
+export default SuppliersPage;

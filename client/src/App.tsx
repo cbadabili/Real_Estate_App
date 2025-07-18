@@ -120,7 +120,6 @@ function App() {
           {/* Rent Routes */}
           <Route path="/rent" element={<RentPage />} />
           <Route path="/rental/:id" element={<RentalDetailsPage />} />
-          <Route path="/rent-out" element={<RentOutPage />} />
           <Route path="/rental-applications" element={<RentalApplicationsPage />} />
           <Route path="/rental-agreements" element={<RentalAgreementsPage />} />
           <Route path="/tenant-screening" element={<TenantScreeningPage />} />
