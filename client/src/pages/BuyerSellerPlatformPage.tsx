@@ -340,7 +340,7 @@ const BuyerSellerPlatformPage = () => {
           </motion.div>
         </div>
       </section>
-    </motion.div>
+    </div>
   );
 };
 
