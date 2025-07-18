@@ -185,6 +185,52 @@ const PropertiesPage: React.FC = () => {
             )}
           </div>
 
+          {/* View Mode Switcher - Prominent */}
+          <div className="flex items-center justify-between bg-white rounded-lg shadow-sm p-4 border border-gray-200">
+            <div className="flex items-center space-x-4">
+              <span className="text-sm font-medium text-gray-700">View as:</span>
+              <div className="flex bg-gray-100 rounded-lg p-1">
+                <button
+                  onClick={() => handleViewModeChange('grid')}
+                  className={`flex items-center space-x-2 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
+                    viewMode === 'grid' 
+                      ? 'bg-beedab-blue text-white shadow-sm' 
+                      : 'text-gray-600 hover:text-gray-900 hover:bg-white'
+                  }`}
+                >
+                  <Grid className="h-4 w-4" />
+                  <span>Cards</span>
+                </button>
+                <button
+                  onClick={() => handleViewModeChange('list')}
+                  className={`flex items-center space-x-2 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
+                    viewMode === 'list' 
+                      ? 'bg-beedab-blue text-white shadow-sm' 
+                      : 'text-gray-600 hover:text-gray-900 hover:bg-white'
+                  }`}
+                >
+                  <ListIcon className="h-4 w-4" />
+                  <span>List</span>
+                </button>
+                <button
+                  onClick={() => handleViewModeChange('map')}
+                  className={`flex items-center space-x-2 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
+                    viewMode === 'map' 
+                      ? 'bg-beedab-blue text-white shadow-sm' 
+                      : 'text-gray-600 hover:text-gray-900 hover:bg-white'
+                  }`}
+                >
+                  <Map className="h-4 w-4" />
+                  <span>Map</span>
+                </button>
+              </div>
+            </div>
+            
+            <div className="text-sm text-gray-600">
+              {sortedProperties.length} properties found
+            </div>
+          </div>
+
           {/* Search Results Header */}
           <SearchResultsHeader
             propertyCount={sortedProperties.length}

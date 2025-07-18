@@ -70,7 +70,7 @@ export const SearchResultsHeader: React.FC<SearchResultsHeaderProps> = ({
           <span className="text-neutral-600 text-sm">
             {propertyCount.toLocaleString()} properties found
           </span>
-          
+
           <select
             value={sortBy}
             onChange={(e) => onSortChange(e.target.value)}
@@ -83,7 +83,7 @@ export const SearchResultsHeader: React.FC<SearchResultsHeaderProps> = ({
             ))}
           </select>
         </div>
-        
+
         <div className="flex items-center space-x-2">
           {/* Comparison Button */}
           {comparisonCount > 0 && onShowComparison && (
@@ -95,44 +95,44 @@ export const SearchResultsHeader: React.FC<SearchResultsHeaderProps> = ({
               <span className="text-sm">Compare ({comparisonCount})</span>
             </button>
           )}
-          
-          {/* View Mode Toggle */}
-          <div className="flex border border-gray-300 rounded-lg overflow-hidden">
+
+          {/* View Mode Toggle - Compact */}
+          <div className="flex bg-neutral-100 rounded-md p-0.5">
             <button
               onClick={() => onViewModeChange('grid')}
-              className={`p-2 transition-colors ${
+              className={`p-1.5 transition-colors rounded ${
                 viewMode === 'grid' 
                   ? 'bg-beedab-blue text-white' 
                   : 'bg-white text-gray-600 hover:bg-gray-50'
               }`}
               title="Grid View"
             >
-              <Grid className="h-5 w-5" />
+              <Grid className="h-4 w-4" />
             </button>
             <button
               onClick={() => onViewModeChange('list')}
-              className={`p-2 transition-colors ${
+              className={`p-1.5 transition-colors rounded ${
                 viewMode === 'list' 
                   ? 'bg-beedab-blue text-white' 
                   : 'bg-white text-gray-600 hover:bg-gray-50'
               }`}
               title="List View"
             >
-              <ListIcon className="h-5 w-5" />
+              <ListIcon className="h-4 w-4" />
             </button>
             <button
               onClick={() => onViewModeChange('map')}
-              className={`p-2 transition-colors ${
+              className={`p-1.5 transition-colors rounded ${
                 viewMode === 'map' 
                   ? 'bg-beedab-blue text-white' 
                   : 'bg-white text-gray-600 hover:bg-gray-50'
               }`}
               title="Map View"
             >
-              <Map className="h-5 w-5" />
+              <Map className="h-4 w-4" />
             </button>
           </div>
-          
+
           {/* Filters Toggle */}
           <button
             onClick={onToggleFilters}
