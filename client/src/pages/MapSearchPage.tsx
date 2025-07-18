@@ -43,20 +43,28 @@ const MapSearchPage = () => {
       const data = await response.json();
 
       // Transform properties to include coordinates if missing
-      const propertiesWithCoords = data.map((property: any) => ({
-        id: property.id,
-        title: property.title,
-        price: property.price,
-        latitude: property.latitude || (-24.6282 + (Math.random() - 0.5) * 0.1), // Gaborone area
-        longitude: property.longitude || (25.9231 + (Math.random() - 0.5) * 0.1),
-        bedrooms: property.bedrooms,
-        bathrooms: property.bathrooms,
-        location: property.address || property.location,
-        city: property.city,
-        propertyType: property.propertyType,
-        description: property.description
-      }));
+      const propertiesWithCoords = data.map((property: any) => {
+        const lat = property.latitude || (-24.6282 + (Math.random() - 0.5) * 0.1); // Gaborone area
+        const lng = property.longitude || (25.9231 + (Math.random() - 0.5) * 0.1);
+        
+        console.log(`Property ${property.id}: original lat=${property.latitude}, lng=${property.longitude}, final lat=${lat}, lng=${lng}`);
+        
+        return {
+          id: property.id,
+          title: property.title,
+          price: property.price,
+          latitude: lat,
+          longitude: lng,
+          bedrooms: property.bedrooms,
+          bathrooms: property.bathrooms,
+          location: property.address || property.location,
+          city: property.city,
+          propertyType: property.propertyType,
+          description: property.description
+        };
+      });
 
+      console.log(`Fetched ${propertiesWithCoords.length} properties for map display`);
       setProperties(propertiesWithCoords);
     } catch (err) {
       console.error('Error fetching properties:', err);

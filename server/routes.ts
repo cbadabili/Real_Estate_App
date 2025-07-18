@@ -59,7 +59,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(201).json(userResponse);
     } catch (error) {
       console.error("Register error:", error);
-      
+
       // Handle specific database constraint errors
       if (error.code === 'SQLITE_CONSTRAINT_UNIQUE') {
         if (error.message.includes('users.email')) {
@@ -69,7 +69,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
         return res.status(400).json({ message: "Registration failed: duplicate information" });
       }
-      
+
       res.status(400).json({ message: "Registration failed. Please check your information and try again." });
     }
   });
@@ -93,11 +93,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log('User found, checking password...');
       console.log('Stored password length:', user.password?.length);
       console.log('Provided password length:', password?.length);
-      
+
       // Trim whitespace and compare
       const storedPassword = user.password?.trim();
       const providedPassword = password?.trim();
-      
+
       if (storedPassword !== providedPassword) {
         console.log('Password mismatch');
         return res.status(401).json({ message: "Invalid credentials" });
@@ -183,6 +183,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log('Fetching properties...');
       const properties = await storage.getProperties(filters);
       console.log('Properties fetched:', properties.length);
+
+      // Log coordinate data for debugging
+      properties.forEach(prop => {
+        console.log(`Property ${prop.id}: lat=${prop.latitude}, lng=${prop.longitude}`);
+      });
+
       res.json(properties);
     } catch (error) {
       console.error("Get properties error:", error);

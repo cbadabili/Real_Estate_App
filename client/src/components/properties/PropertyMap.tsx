@@ -109,9 +109,17 @@ export function PropertyMap({ properties, selectedProperty, onPropertySelect, cl
     return `BWP ${price.toLocaleString()}`;
   };
 
+  // Validate coordinates helper
+  const isValidCoordinate = (lat: any, lng: any) => {
+    return lat != null && lng != null && 
+           typeof lat === 'number' && typeof lng === 'number' &&
+           !isNaN(lat) && !isNaN(lng) &&
+           lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180;
+  };
+
   // Create custom markers with price display
   const createCustomIcon = (isSelected: boolean, price: number) => {
-    const formattedPrice = `BWP ${(price / 1000).toFixed(0)}k`;
+    const formattedPrice = price >= 1000 ? `BWP ${(price / 1000).toFixed(0)}k` : `BWP ${price}`;
     return L.divIcon({
       html: `
         <div style="position: relative; display: flex; flex-direction: column; align-items: center;">
@@ -158,14 +166,20 @@ export function PropertyMap({ properties, selectedProperty, onPropertySelect, cl
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
 
-        {properties.filter(property => 
-          property.latitude != null && 
-          property.longitude != null && 
-          !isNaN(property.latitude) && 
-          !isNaN(property.longitude)
-        ).map((property) => {
-          const isSelected = selectedProperty?.id === property.id;
-          return (
+        {(() => {
+          const validProperties = properties.filter(property => {
+            const isValid = isValidCoordinate(property.latitude, property.longitude);
+            if (!isValid) {
+              console.log(`Invalid coordinates for property ${property.id}: lat=${property.latitude}, lng=${property.longitude}`);
+            }
+            return isValid;
+          });
+          
+          console.log(`Total properties: ${properties.length}, Valid properties: ${validProperties.length}`);
+          
+          return validProperties.map((property) => {
+            const isSelected = selectedProperty?.id === property.id;
+            return (
             <Marker
               key={property.id}
               position={[property.latitude, property.longitude]}
@@ -259,8 +273,9 @@ export function PropertyMap({ properties, selectedProperty, onPropertySelect, cl
                 </div>
               </Popup>
             </Marker>
-          );
-        })}
+            );
+          });
+        })()}
       </MapContainer>
     </div>
   );
