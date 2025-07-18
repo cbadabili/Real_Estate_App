@@ -779,8 +779,7 @@ const Navbar = () => {
                         </Link>
                       </RoleBasedComponent>
 
-                      <RoleBasedComponent allowedRoles={['seller', 'agent', 'fsbo']}><Link
-                          to="/my-properties"
+                      <RoleBasedComponent allowedRoles={['seller', 'agent', 'fsbo']}><Linkto="/my-properties"
                           className="flex items-center px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100"
                           onClick={() => setProfileDropdownOpen(false)}
                         >
@@ -1005,32 +1004,32 @@ const Navbar = () => {
               <div className="text-sm font-medium text-neutral-900 mb-2">Marketplace</div>
               <div className="space-y-1 ml-4">
                 <Link
-                  to="/marketplace/professionals"
+                  to="/marketplace?section=professionals"
                   className="block px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-md text-sm"
                   onClick={() => setIsOpen(false)}
                 >
-                  🏠 Find a Pro
+                  👔 Find Professionals
                 </Link>
                 <Link
-                  to="/marketplace/suppliers"
+                  to="/marketplace?section=suppliers"
                   className="block px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-md text-sm"
                   onClick={() => setIsOpen(false)}
                 >
                   🧱 Find a Supplier
                 </Link>
                 <Link
-                  to="/marketplace/artisans"
+                  to="/marketplace?section=artisans"
                   className="block px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-md text-sm"
                   onClick={() => setIsOpen(false)}
                 >
-                  🔨 Find a Trade
+                  🔧 Find Artisans
                 </Link>
                 <Link
-                  to="/marketplace/training"
+                  to="/marketplace?section=training"
                   className="block px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-md text-sm"
                   onClick={() => setIsOpen(false)}
                 >
-                  🎓 Find a Course
+                  🎓 Training Providers
                 </Link>
               </div>
             </div>

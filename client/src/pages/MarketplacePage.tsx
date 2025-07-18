@@ -52,9 +52,14 @@ const MarketplacePage: React.FC<MarketplacePageProps> = () => {
   ];
 
   useEffect(() => {
-    // Check for category filter in URL
+    // Check for section and category filter in URL
     const params = new URLSearchParams(location.search);
+    const sectionFilter = params.get('section');
     const categoryFilter = params.get('category');
+    
+    if (sectionFilter) {
+      setActiveSection(sectionFilter);
+    }
     if (categoryFilter) {
       setSelectedCategory(categoryFilter);
     }

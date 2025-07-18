@@ -8,11 +8,8 @@ import Navbar from './components/layout/Navbar';
 import HomePage from './pages/HomePage';
 import DashboardPage from './pages/DashboardPage';
 import PropertiesPage from './pages/PropertiesPage';
-import RealPropertiesPage from './pages/RealPropertiesPage';
 import { PlotsPage } from './pages/PlotsPage';
 import RentPage from './pages/RentPage';
-import RentalsPage from './pages/RentalsPage';
-import RentOutPage from './pages/RentOutPage';
 import RentalDetailsPage from './pages/RentalDetailsPage';
 import BuyerSellerPlatformPage from './pages/BuyerSellerPlatformPage';
 import MarketIntelligencePage from './pages/MarketIntelligencePage';
@@ -32,7 +29,6 @@ import BidRegistrationPage from './pages/BidRegistrationPage';
 import ScheduleViewingPage from './pages/ScheduleViewingPage';
 import FSBODashboard from './pages/FSBODashboard';
 import CreateListingPage from './pages/CreateListingPage';
-import CreatePropertyPage from './pages/CreatePropertyPage';
 import PropertyDetailsPage from './pages/PropertyDetailsPage';
 import AgentDashboard from './pages/AgentDashboard';
 import MyPropertiesPage from './pages/MyPropertiesPage';
@@ -115,27 +111,30 @@ function App() {
                 <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/dashboard" element={<DashboardPage />} />
-            <Route path="/properties" element={<RealPropertiesPage />} />
-            <Route path="/properties/:id" element={<PropertyDetailsPage />} />
-            <Route path="/plots" element={<PlotsPage />} />
-            <Route path="/rent" element={<RentPage />} />
-          <Route path="/rentals" element={<RentalsPage />} />
-            <Route path="/rental/:id" element={<RentalDetailsPage />} />
+            {/* Properties Routes */}
+          <Route path="/properties" element={<PropertiesPage />} />
+          <Route path="/properties/:id" element={<PropertyDetailsPage />} />
+          <Route path="/create-listing" element={<CreateListingPage />} />
+          <Route path="/my-properties" element={<MyPropertiesPage />} />
+
+          {/* Rent Routes */}
+          <Route path="/rent" element={<RentPage />} />
+          <Route path="/rental/:id" element={<RentalDetailsPage />} />
+          <Route path="/rent-out" element={<RentOutPage />} />
+          <Route path="/rental-applications" element={<RentalApplicationsPage />} />
+          <Route path="/rental-agreements" element={<RentalAgreementsPage />} />
+          <Route path="/tenant-screening" element={<TenantScreeningPage />} />
             <Route path="/rental-listing-wizard" element={<RentalListingWizard />} />
             <Route path="/rental-listing-wizard/:id" element={<RentalListingWizard />} />
-            <Route path="/rent-out" element={<RentOutPage />} />
             <Route path="/rent/create-listing" element={<RentalListingWizard />} />
             <Route path="/rent/edit/:id" element={<RentalListingWizard />} />
-            <Route path="/landlord/dashboard" element={<LandlordDashboard />} />
-            <Route path="/renter/dashboard" element={<RenterDashboard />} />
-            <Route path="/rental-applications" element={<RentalApplicationsPage />} />
-            <Route path="/tenant-screening" element={<TenantScreeningPage />} />
+            <Route path="/dashboard/landlord" element={<LandlordDashboard />} />
+            <Route path="/dashboard/renter" element={<RenterDashboard />} />
             <Route path="/maintenance-management" element={<MaintenanceManagementPage />} />
             <Route path="/maintenance-requests" element={<MaintenanceRequestsPage />} />
             <Route path="/rent-collection" element={<RentCollectionPage />} />
             <Route path="/rent-payments" element={<RentPaymentsPage />} />
             <Route path="/rental-calculator" element={<RentalCalculatorPage />} />
-            <Route path="/rental-agreements" element={<RentalAgreementsPage />} />
             <Route path="/rental-market-insights" element={<RentalMarketInsightsPage />} />
             <Route path="/buyer-seller-platform" element={<BuyerSellerPlatformPage />} />
             <Route path="/platform" element={<BuyerSellerPlatformPage />} />
@@ -144,7 +143,6 @@ function App() {
             <Route path="/communication" element={<CommunicationPage />} />
             <Route path="/agent-network" element={<AgentNetworkPage />} />
             <Route path="/map-search" element={<MapSearchPage />} />
-            <Route path="/create-listing" element={<CreateListingPage />} />
             <Route path="/services" element={<ServicesPage />} />
             <Route path="/marketplace" element={<MarketplacePage />} />
             <Route path="/marketplace/:segment" element={<MarketplacePage />} />
