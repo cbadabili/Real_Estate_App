@@ -22,6 +22,22 @@ interface PropertyCardProps {
 const PropertyCard: React.FC<PropertyCardProps> = ({ property, viewMode = 'grid' }) => {
   const isListView = viewMode === 'list';
 
+  let imageUrls = [];
+  try {
+    if (property.images) {
+      // Handle both string and array formats
+      if (typeof property.images === 'string') {
+        imageUrls = JSON.parse(property.images);
+      } else if (Array.isArray(property.images)) {
+        imageUrls = property.images;
+      }
+    }
+  } catch (error) {
+    console.warn('Failed to parse property images:', error);
+    imageUrls = [];
+  }
+  const mainImage = imageUrls.length > 0 ? imageUrls[0] : '/placeholder-property.jpg';
+
   return (
     <motion.div
       whileHover={{ y: -4 }}
@@ -31,7 +47,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, viewMode = 'grid'
     >
       <div className={`relative ${isListView ? 'w-1/3' : ''}`}>
         <img 
-          src={property.images ? (typeof property.images === 'string' ? JSON.parse(property.images)[0] : property.images[0]) : 'https://images.pexels.com/photos/106399/pexels-photo-106399.jpeg?auto=compress&cs=tinysrgb&w=800'} 
+          src={mainImage} 
           alt={property.title}
           className={`object-cover ${isListView ? 'w-full h-full' : 'w-full h-48'}`}
         />

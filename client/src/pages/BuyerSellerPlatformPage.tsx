@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, lazy, Suspense } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { 
@@ -19,22 +19,48 @@ import {
 } from 'lucide-react';
 
 const BuyerSellerPlatformPage = () => {
+  const [isLoading, setIsLoading] = useState(true);
+
+  React.useEffect(() => {
+    // Simulate loading time and then set loading to false
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 100);
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-beedab-blue mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading platform...</p>
+        </div>
+      </div>
+    );
+  }
+
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
       transition: {
-        delayChildren: 0.1,
-        staggerChildren: 0.1
+        duration: 0.3,
+        delayChildren: 0.05,
+        staggerChildren: 0.05
       }
     }
   };
 
   const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
+    hidden: { y: 10, opacity: 0 },
     visible: {
       y: 0,
-      opacity: 1
+      opacity: 1,
+      transition: {
+        duration: 0.2,
+        ease: "easeOut"
+      }
     }
   };
 
@@ -43,25 +69,25 @@ const BuyerSellerPlatformPage = () => {
       icon: FileText,
       title: 'Legal Document Templates',
       description: 'Access Botswana-compliant legal documents including sale agreements, disclosure forms, and transfer documents.',
-      link: '/legal-documents'
+      link: '/services/legal-documents'
     },
     {
       icon: Calculator,
-      title: 'Property Valuation Tools',
-      description: 'Get accurate property valuations using local market data and comparable sales in your area.',
-      link: '/property-valuation'
+      title: 'Property Valuation',
+      description: 'Get indicative property valuations using local market data and comparable sales in your area.',
+      link: '/services/property-valuation'
     },
     {
       icon: Shield,
       title: 'Transaction Management',
       description: 'Secure escrow services and transaction tracking from listing to closing.',
-      link: '/transaction-management'
+      link: '/services/transaction-management'
     },
     {
       icon: Users,
       title: 'Professional Support',
       description: 'Connect with certified REAC agents, lawyers, and financial advisors when needed.',
-      link: '/professional-support'
+      link: '/services/professional-support'
     }
   ];
 
@@ -129,10 +155,21 @@ const BuyerSellerPlatformPage = () => {
                 <p className="text-gray-600 mb-4">
                   Access Botswana-compliant legal documents including sale agreements, disclosure forms, and transfer documents.
                 </p>
-                <div className="flex items-center text-beedab-blue group-hover:text-beedab-darkblue transition-colors">
-                          <span className="text-sm font-medium">Learn More</span>
-                          <ArrowRight className="ml-2 h-4 w-4" />
-                        </div>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center text-beedab-blue group-hover:text-beedab-darkblue transition-colors">
+                    <span className="text-sm font-medium">Access Templates</span>
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </div>
+                  <button 
+                    onClick={(e) => {
+                      e.preventDefault();
+                      window.history.back();
+                    }}
+                    className="text-xs text-gray-500 hover:text-gray-700 px-2 py-1 rounded border border-gray-300 hover:bg-gray-50"
+                  >
+                    ← Back
+                  </button>
+                </div>
               </div>
             </div>
             </motion.div>
@@ -153,12 +190,27 @@ const BuyerSellerPlatformPage = () => {
                       </div>
                       <div className="flex-1">
                         <h3 className="text-xl font-semibold text-gray-900 mb-2 group-hover:text-beedab-blue transition-colors">
-                          {feature.title}
+                          {feature.title === 'Property Valuation Tools' ? 'Property Valuation' : feature.title}
                         </h3>
                         <p className="text-gray-600 mb-4">{feature.description}</p>
-                        <div className="flex items-center text-beedab-blue group-hover:text-beedab-darkblue transition-colors">
-                          <span className="text-sm font-medium">Learn More</span>
-                          <ArrowRight className="ml-2 h-4 w-4" />
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center text-beedab-blue group-hover:text-beedab-darkblue transition-colors">
+                            <span className="text-sm font-medium">
+                              {feature.title === 'Property Valuation Tools' ? 'Get Valuation' : 
+                               feature.title === 'Transaction Management' ? 'Manage Transaction' :
+                               feature.title === 'Professional Support' ? 'Find Professionals' : 'Learn More'}
+                            </span>
+                            <ArrowRight className="ml-2 h-4 w-4" />
+                          </div>
+                          <button 
+                            onClick={(e) => {
+                              e.preventDefault();
+                              window.history.back();
+                            }}
+                            className="text-xs text-gray-500 hover:text-gray-700 px-2 py-1 rounded border border-gray-300 hover:bg-gray-50"
+                          >
+                            ← Back
+                          </button>
                         </div>
                       </div>
                     </div>
@@ -316,10 +368,10 @@ const BuyerSellerPlatformPage = () => {
               Join thousands of Batswana who have successfully bought and sold properties using our platform.
             </p>
             <Link
-              to="/register"
+              to="/properties"
               className="inline-flex items-center justify-center px-8 py-4 bg-white text-beedab-darkblue font-semibold rounded-xl hover:bg-gray-100 transition-colors"
             >
-              Get Started Today
+              Buy Property
               <ArrowRight className="ml-2 h-5 w-5" />
             </Link>
           </motion.div>

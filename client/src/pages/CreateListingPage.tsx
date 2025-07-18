@@ -505,6 +505,30 @@ const CreateListingPage = () => {
                         <option value="Gabane">Gabane</option>
                         <option value="Mmopane">Mmopane</option>
                         <option value="Kopong">Kopong</option>
+                        <option value="Phakalane">Phakalane</option>
+                        <option value="Broadhurst">Broadhurst</option>
+                        <option value="Extension 2">Extension 2</option>
+                        <option value="Extension 10">Extension 10</option>
+                        <option value="Extension 12">Extension 12</option>
+                        <option value="Extension 14">Extension 14</option>
+                        <option value="Extension 15">Extension 15</option>
+                        <option value="Block 3">Block 3</option>
+                        <option value="Block 6">Block 6</option>
+                        <option value="Block 7">Block 7</option>
+                        <option value="Block 8">Block 8</option>
+                        <option value="Block 9">Block 9</option>
+                        <option value="Block 10">Block 10</option>
+                        <option value="Village">Village</option>
+                        <option value="CBD">CBD</option>
+                        <option value="Old Naledi">Old Naledi</option>
+                        <option value="New Canada">New Canada</option>
+                        <option value="White City">White City</option>
+                        <option value="Sebele">Sebele</option>
+                        <option value="G-West">G-West</option>
+                        <option value="Kgale">Kgale</option>
+                        <option value="Riverwalk">Riverwalk</option>
+                        <option value="Masa">Masa</option>
+                        <option value="Thamaga">Thamaga</option>
                       </>
                     )}
                     {formData.state === 'North-East' && (
@@ -516,6 +540,29 @@ const CreateListingPage = () => {
                         <option value="Nata">Nata</option>
                         <option value="Bobonong">Bobonong</option>
                         <option value="Tati">Tati</option>
+                        <option value="Dukwi">Dukwi</option>
+                        <option value="Jackalas">Jackalas</option>
+                        <option value="Monarch">Monarch</option>
+                        <option value="Sua Pan">Sua Pan</option>
+                        <option value="Ramokgwebana">Ramokgwebana</option>
+                        <option value="Mathangwane">Mathangwane</option>
+                        <option value="Chadibe">Chadibe</option>
+                        <option value="Sebina">Sebina</option>
+                        <option value="Semolale">Semolale</option>
+                        <option value="Gerald Estate">Gerald Estate</option>
+                        <option value="Block 1">Block 1</option>
+                        <option value="Block 2">Block 2</option>
+                        <option value="Block 3">Block 3</option>
+                        <option value="Block 4">Block 4</option>
+                        <option value="Block 5">Block 5</option>
+                        <option value="Block 6">Block 6</option>
+                        <option value="Block 7">Block 7</option>
+                        <option value="Block 8">Block 8</option>
+                        <option value="Block 9">Block 9</option>
+                        <option value="Block 10">Block 10</option>
+                        <option value="Nyangabwe">Nyangabwe</option>
+                        <option value="Blue Jacket">Blue Jacket</option>
+                        <option value="Satellite">Satellite</option>
                       </>
                     )}
                     {formData.state === 'North-West' && (

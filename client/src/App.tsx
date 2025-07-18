@@ -140,8 +140,11 @@ function App() {
           <Route path="/services/legal" element={<LegalServicesPage />} />
           <Route path="/services/legal-documents" element={<LegalDocumentTemplatesPage />} />
           <Route path="/services/property-management" element={<PropertyManagementPage />} />
-        <Route path="/services/tenant-support" element={<TenantSupportPage />} />
+          <Route path="/services/tenant-support" element={<TenantSupportPage />} />
           <Route path="/services/financing" element={<FinancingPage />} />
+          <Route path="/services/property-valuation" element={<PropertyValuationPage />} />
+          <Route path="/services/transaction-management" element={<TransactionManagementPage />} />
+          <Route path="/services/professional-support" element={<ProfessionalSupportPage />} />
 
           {/* Market Intelligence Routes */}
           <Route path="/property-valuation" element={<PropertyValuationPage />} />
