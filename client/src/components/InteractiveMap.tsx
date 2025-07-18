@@ -108,7 +108,14 @@ const InteractiveMap: React.FC<InteractiveMapProps> = ({
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
-            {properties.map((property) => (
+            {properties.filter(property => 
+              property.coordinates && 
+              property.coordinates.length === 2 &&
+              property.coordinates[0] != null && 
+              property.coordinates[1] != null &&
+              !isNaN(property.coordinates[0]) && 
+              !isNaN(property.coordinates[1])
+            ).map((property) => (
               <Marker
                 key={property.id}
                 position={property.coordinates}

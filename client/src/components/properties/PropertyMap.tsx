@@ -90,8 +90,19 @@ interface PropertyMapProps {
 }
 
 export function PropertyMap({ properties, selectedProperty, onPropertySelect, className, isRentalContext = false }: PropertyMapProps) {
-  // Botswana center coordinates
-  const center: [number, number] = [-24.6282, 25.9231]; // Gaborone
+  // Botswana center coordinates with validation
+  const defaultCenter: [number, number] = [-24.6282, 25.9231]; // Gaborone
+  
+  // Try to center on first valid property, fallback to Gaborone
+  const getMapCenter = (): [number, number] => {
+    const validProperty = properties.find(p => 
+      p.latitude != null && p.longitude != null && 
+      !isNaN(p.latitude) && !isNaN(p.longitude)
+    );
+    return validProperty ? [validProperty.latitude, validProperty.longitude] : defaultCenter;
+  };
+  
+  const center = getMapCenter();
   const zoom = 12;
 
   const formatPrice = (price: number) => {
@@ -147,7 +158,12 @@ export function PropertyMap({ properties, selectedProperty, onPropertySelect, cl
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
 
-        {properties.map((property) => {
+        {properties.filter(property => 
+          property.latitude != null && 
+          property.longitude != null && 
+          !isNaN(property.latitude) && 
+          !isNaN(property.longitude)
+        ).map((property) => {
           const isSelected = selectedProperty?.id === property.id;
           return (
             <Marker
