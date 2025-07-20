@@ -244,12 +244,33 @@ const ProfessionalSupportPage = () => {
       {/* Professionals Directory */}
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-white rounded-lg p-6 mb-8">
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">Find the Right Professional</h2>
+
+            {/* Search */}
+            <div className="mb-4">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                <input
+                  type="text"
+                  placeholder="Search professionals..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                />
+              </div>
+            </div>
+
+            {/* Professional Categories */}
           {loading ? (
             <div className="flex justify-center items-center py-12">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
               <span className="ml-2 text-gray-600">Loading professionals...</span>
             </div>
-          ) : (
+          }  
+           
+           
+           : (
             <div className="grid md:grid-cols-2 gap-8">
               {filteredProfessionals.map((professional) => {
                 const CategoryIcon = getCategoryIcon(professional.category);

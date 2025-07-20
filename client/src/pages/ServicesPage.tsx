@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Star, MapPin, Clock, DollarSign, Filter, Search, MessageCircle, Phone, Camera, Gavel, Home, Wrench, Calculator, Shield, Award, Users, FileCheck, ArrowRight, CheckCircle, FileText } from 'lucide-react';
+import { Star, MapPin, Clock, DollarSign, Filter, Search, MessageCircle, Phone, Camera, Gavel, Home, Wrench, Calculator, Shield, Award, Users, FileCheck, ArrowRight, CheckCircle, FileText, Truck } from 'lucide-react';
 import ServiceProviderRegistration from '../components/ServiceProviderRegistration';
 
 interface Professional {
@@ -105,6 +105,62 @@ const ServicesPage: React.FC = () => {
       image: "/api/placeholder/80/80",
       specialties: ["Home Insurance", "Investment Property", "Claims Support"],
       verified: true
+    },
+    {
+      id: 6,
+      name: "Elite Construction Botswana",
+      category: "construction",
+      rating: 4.7,
+      reviews: 145,
+      location: "Gaborone",
+      responseTime: "3 hours",
+      description: "Full-service construction company specializing in residential and commercial projects.",
+      priceRange: "P2,000 - P15,000",
+      image: "/api/placeholder/80/80",
+      specialties: ["HVAC Systems", "Electrical Work", "Plumbing"],
+      verified: true
+    },
+    {
+      id: 7,
+      name: "Swift Movers Botswana",
+      category: "moving",
+      rating: 4.6,
+      reviews: 89,
+      location: "Francistown",
+      responseTime: "1 hour",
+      description: "Professional moving services with full insurance coverage across Botswana.",
+      priceRange: "P800 - P3,500",
+      image: "/api/placeholder/80/80",
+      specialties: ["Residential Moving", "Office Relocation", "Packing Services"],
+      verified: true
+    },
+    {
+      id: 8,
+      name: "Sparkle Clean Services",
+      category: "cleaning",
+      rating: 4.8,
+      reviews: 76,
+      location: "Gaborone",
+      responseTime: "2 hours",
+      description: "Professional cleaning services for move-in, move-out, and deep cleaning needs.",
+      priceRange: "P200 - P800",
+      image: "/api/placeholder/80/80",
+      specialties: ["Deep Cleaning", "Post-Construction", "Move-Out Cleaning"],
+      verified: true
+    },
+    {
+      id: 9,
+      name: "ProFix Maintenance",
+      category: "maintenance",
+      rating: 4.5,
+      reviews: 112,
+      location: "Maun",
+      responseTime: "4 hours",
+      description: "Comprehensive property maintenance including garden, pool, and security services.",
+      priceRange: "P300 - P1,200",
+      image: "/api/placeholder/80/80",
+      specialties: ["Garden Maintenance", "Pool Services", "Security Systems"],
+      verified: true
     }
   ];
 
@@ -141,6 +197,10 @@ const ServicesPage: React.FC = () => {
     { id: 'property-inspection', name: 'Property Inspection', icon: Shield },
     { id: 'finance', name: 'Finance & Loans', icon: Calculator },
     { id: 'insurance', name: 'Insurance', icon: Award },
+    { id: 'construction', name: 'Construction', icon: Wrench },
+    { id: 'moving', name: 'Moving', icon: Truck },
+    { id: 'cleaning', name: 'Cleaning', icon: Home },
+    { id: 'maintenance', name: 'Maintenance', icon: Wrench },
   ];
 
   const serviceCategories = [
@@ -149,9 +209,10 @@ const ServicesPage: React.FC = () => {
     { name: 'Property Inspection', icon: '🔍', description: 'Professional property inspections' },
     { name: 'Finance & Loans', icon: '💰', description: 'Mortgage brokers and financing' },
     { name: 'Insurance', icon: '🛡️', description: 'Property and home insurance' },
-    { name: 'Construction', icon: '🏗️', description: 'Builders and contractors' },
-    { name: 'Moving', icon: '🚚', description: 'Professional moving services' },
-    { name: 'Cleaning', icon: '🧹', description: 'Move-in and move-out cleaning' }
+    { name: 'Construction', icon: '🏗️', description: 'General construction and specialized trades' },
+    { name: 'Moving', icon: '🚚', description: 'Professional moving and relocation services' },
+    { name: 'Cleaning', icon: '🧹', description: 'Move-in, move-out, and deep cleaning' },
+    { name: 'Maintenance', icon: '🔧', description: 'Property maintenance and repair services' }
   ];
 
   return (
@@ -168,14 +229,14 @@ const ServicesPage: React.FC = () => {
 
         </div>
 
-        {/* Filters */}
+        {/* Service Categories */}
         <div className="bg-white rounded-lg shadow-sm border border-neutral-200 p-6 mb-8">
           <div className="flex items-center mb-4">
             <Filter className="h-5 w-5 text-neutral-600 mr-2" />
-            <span className="font-medium text-neutral-900">Filter Services</span>
+            <span className="font-medium text-neutral-900">Service Categories</span>
           </div>
 
-          {/* Category Filter */}
+          {/* Categories */}
           <div className="flex flex-wrap gap-2 mb-4">
             {categories.map((category) => {
               const IconComponent = category.icon;
