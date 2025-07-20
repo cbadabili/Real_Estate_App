@@ -79,13 +79,14 @@ const ServiceProviderRegistration: React.FC<ServiceProviderRegistrationProps> = 
   };
 
   const mainCategories = {
+    'Legal Services': [],
     'Photography': [],
-    'Legal': [],  
-    'Moving': [],
-    'Finance': [],
+    'Property Inspection': [],
+    'Finance & Loans': [],
     'Insurance': [],
-    'Cleaning': [],
     'Construction': ['HVAC', 'Plumbing', 'Electrical', 'Roofing', 'Flooring', 'Painting'],
+    'Moving': [],
+    'Cleaning': [],
     'Maintenance': ['Garden', 'Pool', 'Security']
   };
 

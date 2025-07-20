@@ -82,7 +82,7 @@ export async function seedServices() {
     // Legal Services
     {
       companyName: "Mogapi & Associates",
-      serviceCategory: "Legal",
+      serviceCategory: "Legal Services",
       contactPerson: "Advocate Kabo Mogapi",
       phoneNumber: "3951234",
       email: "info@mogapilaw.bw",
@@ -99,7 +99,7 @@ export async function seedServices() {
     },
     {
       companyName: "Setlhare Legal Practice",
-      serviceCategory: "Legal",
+      serviceCategory: "Legal Services",
       contactPerson: "Mma Setlhare",
       phoneNumber: "2413789",
       email: "legal@setlharelaw.bw",
@@ -137,7 +137,7 @@ export async function seedServices() {
     // Finance Services
     {
       companyName: "BotsBond Mortgage Brokers",
-      serviceCategory: "Finance",
+      serviceCategory: "Finance & Loans",
       contactPerson: "Lesego Tshwane",
       phoneNumber: "3951122",
       email: "enquiries@botsbond.bw",
@@ -154,7 +154,7 @@ export async function seedServices() {
     },
     {
       companyName: "PropertyFin Solutions",
-      serviceCategory: "Finance",
+      serviceCategory: "Finance & Loans",
       contactPerson: "Mpho Molefe",
       phoneNumber: "2414567",
       email: "info@propertyfin.bw",
@@ -185,6 +185,42 @@ export async function seedServices() {
       city: "Gaborone",
       rating: "4.4",
       reviewCount: 145,
+      verified: true,
+      featured: false
+    },
+
+    // Property Inspection Services
+    {
+      companyName: "TrustHome Inspections",
+      serviceCategory: "Property Inspection",
+      contactPerson: "Boitumelo Matlho",
+      phoneNumber: "74889900",
+      email: "inspect@trusthome.bw",
+      websiteUrl: "https://trusthome.bw",
+      logoUrl: "/api/placeholder/100/100",
+      description: "Comprehensive property inspections for buyers and sellers. Structural assessments, electrical, plumbing, and HVAC evaluations with detailed reports.",
+      reacCertified: true,
+      address: "Block 8, Gaborone West",
+      city: "Gaborone",
+      rating: "4.8",
+      reviewCount: 156,
+      verified: true,
+      featured: true
+    },
+    {
+      companyName: "ProCheck Property Services",
+      serviceCategory: "Property Inspection",
+      contactPerson: "Daniel Seru",
+      phoneNumber: "2417788",
+      email: "info@procheck.bw",
+      websiteUrl: "https://procheck.bw",
+      logoUrl: "/api/placeholder/100/100",
+      description: "Professional building inspections and property condition assessments. Pre-purchase inspections, maintenance evaluations, and compliance checks.",
+      reacCertified: false,
+      address: "Industrial Road",
+      city: "Francistown",
+      rating: "4.6",
+      reviewCount: 89,
       verified: true,
       featured: false
     },

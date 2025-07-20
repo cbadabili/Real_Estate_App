@@ -90,10 +90,11 @@ export class SeedManager {
 
     const categories = [
       { name: "Real Estate Agents", journey_type: "transaction", icon: "🏠", description: "Licensed real estate professionals", sort_order: 1 },
-      { name: "Property Lawyers", journey_type: "transaction", icon: "⚖️", description: "Legal services for property transactions", sort_order: 2 },
-      { name: "Mortgage Brokers", journey_type: "transaction", icon: "💰", description: "Financing and mortgage services", sort_order: 3 },
+      { name: "Legal Services", journey_type: "transaction", icon: "⚖️", description: "Legal services for property transactions", sort_order: 2 },
+      { name: "Finance & Loans", journey_type: "transaction", icon: "💰", description: "Financing and mortgage services", sort_order: 3 },
       { name: "Property Valuers", journey_type: "transaction", icon: "📊", description: "Property valuation and assessment", sort_order: 4 },
-      { name: "Insurance Brokers", journey_type: "transaction", icon: "🛡️", description: "Property and homeowner insurance", sort_order: 5 },
+      { name: "Property Inspection", journey_type: "transaction", icon: "🔍", description: "Professional property inspections", sort_order: 5 },
+      { name: "Insurance", journey_type: "transaction", icon: "🛡️", description: "Property and homeowner insurance", sort_order: 6 },
       { name: "Architects", journey_type: "development", icon: "📐", description: "Building design and architectural services", sort_order: 6 },
       { name: "Construction Companies", journey_type: "development", icon: "🏗️", description: "General construction and building services", sort_order: 7 },
       { name: "Project Managers", journey_type: "development", icon: "👷", description: "Construction project management", sort_order: 8 },

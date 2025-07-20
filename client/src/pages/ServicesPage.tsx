@@ -143,6 +143,17 @@ const ServicesPage: React.FC = () => {
     { id: 'insurance', name: 'Insurance', icon: Award },
   ];
 
+  const serviceCategories = [
+    { name: 'Legal Services', icon: '⚖️', description: 'Property lawyers and legal services' },
+    { name: 'Photography', icon: '📸', description: 'Property photography services' },
+    { name: 'Property Inspection', icon: '🔍', description: 'Professional property inspections' },
+    { name: 'Finance & Loans', icon: '💰', description: 'Mortgage brokers and financing' },
+    { name: 'Insurance', icon: '🛡️', description: 'Property and home insurance' },
+    { name: 'Construction', icon: '🏗️', description: 'Builders and contractors' },
+    { name: 'Moving', icon: '🚚', description: 'Professional moving services' },
+    { name: 'Cleaning', icon: '🧹', description: 'Move-in and move-out cleaning' }
+  ];
+
   return (
     <div className="min-h-screen bg-neutral-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -154,7 +165,7 @@ const ServicesPage: React.FC = () => {
           <p className="text-xl text-neutral-600 max-w-3xl mx-auto">
             Connect with verified professionals for every step of your real estate journey
           </p>
-          
+
         </div>
 
         {/* Filters */}
