@@ -39,7 +39,7 @@ const router = Router();
 router.post('/search/ai', async (req, res) => {
   try {
     const { query } = req.body;
-    
+
     if (!query || typeof query !== 'string') {
       return res.status(400).json({ message: "Query is required" });
     }
@@ -72,7 +72,8 @@ export async function parseNaturalLanguageSearch(query: string): Promise<SearchR
     'townhouse': ['townhouse', 'townhome', 'duplex'],
     'commercial': ['commercial', 'office', 'shop', 'warehouse', 'retail', 'business'],
     'farm': ['farm', 'ranch', 'agricultural', 'farming'],
-    'land': ['land', 'plot', 'stand', 'site', 'vacant', 'development']
+    'land': ['land', 'plot', 'stand', 'site', 'vacant', 'development'],
+    'mmatseta': ['mmatseta']
   };
 
   for (const [type, keywords] of Object.entries(propertyTypeMap)) {

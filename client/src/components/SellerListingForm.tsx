@@ -80,18 +80,18 @@ export const SellerListingForm: React.FC<SellerListingFormProps> = ({
     input.type = 'file';
     input.multiple = true;
     input.accept = 'image/*';
-    
+
     input.onchange = async (event) => {
       const files = (event.target as HTMLInputElement).files;
       if (!files) return;
-      
+
       setUploading(true);
       // Simulate image upload - in real app, upload to cloud storage
       const newImageUrls = Array.from(files).map(file => URL.createObjectURL(file));
       setImages([...images, ...newImageUrls]);
       setUploading(false);
     };
-    
+
     input.click();
   };
 
@@ -166,7 +166,7 @@ export const SellerListingForm: React.FC<SellerListingFormProps> = ({
               <p className="mt-1 text-sm text-red-600">{errors.size.message}</p>
             )}
           </div>
-          
+
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Unit
@@ -211,7 +211,7 @@ export const SellerListingForm: React.FC<SellerListingFormProps> = ({
               <p className="mt-1 text-sm text-red-600">{errors.price.message}</p>
             )}
           </div>
-          
+
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Currency
@@ -339,7 +339,7 @@ export const SellerListingForm: React.FC<SellerListingFormProps> = ({
               {uploading ? 'Uploading...' : 'Choose Photos'}
             </button>
           </div>
-          
+
           {images.length > 0 && (
             <div className="grid grid-cols-3 gap-4 mt-4">
               {images.map((image, index) => (

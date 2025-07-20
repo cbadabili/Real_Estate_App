@@ -205,9 +205,9 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, viewMode = 'grid'
               </div>
 
               <div className="space-y-2">
-                <Link
-                  to={`/properties/${property.id}`}
-                  className="block px-6 py-2 bg-beedab-blue hover:bg-beedab-darkblue text-white rounded-lg text-sm font-medium transition-colors text-center"
+                <Link 
+                  to={`/property/${property.id}`}
+                  className="w-full bg-beedab-blue text-white py-2 px-4 rounded-lg hover:bg-beedab-darkblue transition-colors text-center block"
                 >
                   View Details
                 </Link>

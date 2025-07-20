@@ -39,7 +39,7 @@ export const properties = sqliteTable("properties", {
   zipCode: text("zip_code").notNull(),
   latitude: text("latitude"),
   longitude: text("longitude"),
-  propertyType: text("property_type").notNull(), // 'house', 'apartment', 'townhouse', 'commercial', 'farm', 'land'
+  propertyType: text("property_type").notNull(), // 'house', 'apartment', 'condo', 'townhouse', 'land', 'mmatseta', 'commercial', 'farm'
   listingType: text("listing_type").notNull(), // 'owner', 'agent', 'rental', 'auction'
   bedrooms: integer("bedrooms"),
   bathrooms: text("bathrooms"),
@@ -663,8 +663,7 @@ export const project_requests = sqliteTable('project_requests', {
   proposals_count: integer('proposals_count').default(0),
 
   created_at: integer('created_at').default(sql`(cast((julianday('now') - 2440587.5)*86400000 as integer))`),
-  updated_at: integer('updated_at').default(sql`(cast((julianday('now') - 2440587.5)*864000 as integer))`),
-});
+  updated_at: integer('updated_at').default(sql`(cast((julianday('now') - 2440587.5)*864000 as integer))`),});
 
 // Proposals from service providers
 export const project_proposals = sqliteTable('project_proposals', {

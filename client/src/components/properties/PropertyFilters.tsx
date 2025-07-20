@@ -133,7 +133,8 @@ export const PropertyFilters: React.FC<PropertyFiltersProps> = ({
               { value: 'house', label: 'House' },
               { value: 'apartment', label: 'Apartment' },
               { value: 'townhouse', label: 'Townhouse' },
-              { value: 'plot', label: 'Plot/Land' },
+              { value: 'land', label: 'Plot/Land' },
+              { value: 'mmatseta', label: 'Mmatseta' },
               { value: 'commercial', label: 'Commercial' },
               { value: 'farm', label: 'Farm' }
             ].map((type) => (
