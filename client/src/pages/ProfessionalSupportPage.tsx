@@ -366,6 +366,7 @@ const ProfessionalSupportPage = () => {
             </div>
           )}
         </div>
+        </div>
       </section>
 
       {/* Emergency Support */}
