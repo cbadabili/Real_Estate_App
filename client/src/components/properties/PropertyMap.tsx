@@ -111,13 +111,17 @@ export function PropertyMap({ properties, selectedProperty, onPropertySelect, cl
 
   // Validate coordinates helper
   const isValidCoordinate = (lat: any, lng: any) => {
-    const isValid = lat != null && lng != null && 
-           typeof lat === 'number' && typeof lng === 'number' &&
-           !isNaN(lat) && !isNaN(lng) &&
-           lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180;
+    const latNum = typeof lat === 'string' ? parseFloat(lat) : lat;
+    const lngNum = typeof lng === 'string' ? parseFloat(lng) : lng;
+    
+    const isValid = latNum != null && lngNum != null && 
+           typeof latNum === 'number' && typeof lngNum === 'number' &&
+           !isNaN(latNum) && !isNaN(lngNum) &&
+           latNum >= -90 && latNum <= 90 && lngNum >= -180 && lngNum <= 180;
     
     if (!isValid) {
       console.log(`Invalid coordinate: lat=${lat} (type: ${typeof lat}), lng=${lng} (type: ${typeof lng})`);
+      console.log(`Parsed: lat=${latNum}, lng=${lngNum}`);
     }
     
     return isValid;
@@ -174,6 +178,14 @@ export function PropertyMap({ properties, selectedProperty, onPropertySelect, cl
 
         {(() => {
           console.log('PropertyMap: Rendering properties', properties);
+          console.log('Properties data:', properties.map(p => ({
+            id: p.id,
+            title: p.title,
+            lat: p.latitude,
+            lng: p.longitude,
+            latType: typeof p.latitude,
+            lngType: typeof p.longitude
+          })));
           
           const validProperties = properties.filter(property => {
             const lat = typeof property.latitude === 'string' ? parseFloat(property.latitude) : property.latitude;
@@ -181,7 +193,8 @@ export function PropertyMap({ properties, selectedProperty, onPropertySelect, cl
             
             const isValid = isValidCoordinate(lat, lng);
             if (!isValid) {
-              console.log(`Invalid coordinates for property ${property.id}: lat=${lat}, lng=${lng}`);
+              console.log(`Invalid coordinates for property ${property.id}: lat=${property.latitude} (${typeof property.latitude}), lng=${property.longitude} (${typeof property.longitude})`);
+              console.log(`Parsed values: lat=${lat}, lng=${lng}`);
             }
             return isValid;
           });
@@ -190,6 +203,7 @@ export function PropertyMap({ properties, selectedProperty, onPropertySelect, cl
           
           if (validProperties.length === 0) {
             console.warn('No valid properties found for map rendering');
+            console.warn('Raw properties data:', properties);
           }
           
           return validProperties.map((property) => {
@@ -197,7 +211,7 @@ export function PropertyMap({ properties, selectedProperty, onPropertySelect, cl
             const lat = typeof property.latitude === 'string' ? parseFloat(property.latitude) : property.latitude;
             const lng = typeof property.longitude === 'string' ? parseFloat(property.longitude) : property.longitude;
             
-            console.log(`Rendering marker for property ${property.id} at [${lat}, ${lng}]`);
+            console.log(`Rendering marker for property ${property.id} "${property.title}" at [${lat}, ${lng}]`);
             return (
             <Marker
               key={property.id}

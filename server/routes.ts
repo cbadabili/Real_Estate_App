@@ -32,6 +32,8 @@ import {
   UserType
 } from "../shared/schema.js";
 import { z } from "zod";
+import { eq, and, gte, lte, sql } from "drizzle-orm";
+import { properties } from "./db/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Authentication & User Management
@@ -1216,6 +1218,175 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // app.get("/marketplace/register", (req, res) => {
   //   res.sendFile(path.join(__dirname, "../client/dist/index.html"));
   // });
+
+  // Test endpoint
+  app.get('/api/test', (req, res) => {
+    res.json({ message: 'API is working!', timestamp: new Date().toISOString() });
+  });
+
+  // Debug endpoint for property coordinates
+  app.get('/api/debug/properties', async (req, res) => {
+    try {
+      const result = await db
+        .select({
+          id: properties.id,
+          title: properties.title,
+          city: properties.city,
+          district: properties.district,
+          latitude: properties.latitude,
+          longitude: properties.longitude,
+          latType: sql`typeof(${properties.latitude})`,
+          lngType: sql`typeof(${properties.longitude})`
+        })
+        .from(properties)
+        .limit(10);
+
+      console.log('Debug: Raw property coordinate data:', result);
+
+      res.json({
+        message: 'Debug data for property coordinates',
+        count: result.length,
+        properties: result
+      });
+    } catch (error) {
+      console.error('Error in debug endpoint:', error);
+      res.status(500).json({ error: 'Failed to fetch debug data' });
+    }
+  });
+
+  // Get all properties
+  app.get('/api/properties', async (req, res) => {
+    try {
+      console.log('Fetching properties with filters:', req.query);
+
+      let query = db
+        .select({
+          id: properties.id,
+          title: properties.title,
+          description: properties.description,
+          price: properties.price,
+          propertyType: properties.propertyType,
+          bedrooms: properties.bedrooms,
+          bathrooms: properties.bathrooms,
+          squareMeters: properties.squareMeters,
+          location: properties.location,
+          address: properties.address,
+          city: properties.city,
+          district: properties.district,
+          latitude: properties.latitude,
+          longitude: properties.longitude,
+          imageUrl: properties.imageUrl,
+          status: properties.status,
+          listingType: properties.listingType,
+          userId: properties.userId,
+          createdAt: properties.createdAt,
+          updatedAt: properties.updatedAt
+        })
+        .from(properties);
+
+      // Apply filters
+      const conditions = [];
+
+      if (req.query.status) {
+        conditions.push(eq(properties.status, req.query.status as string));
+      }
+
+      if (req.query.propertyType && req.query.propertyType !== 'all') {
+        conditions.push(eq(properties.propertyType, req.query.propertyType as string));
+      }
+
+      if (req.query.bedrooms && req.query.bedrooms !== 'any') {
+        const bedroomsNum = parseInt(req.query.bedrooms as string);
+        if (!isNaN(bedroomsNum)) {
+          conditions.push(eq(properties.bedrooms, bedroomsNum));
+        }
+      }
+
+      if (req.query.bathrooms && req.query.bathrooms !== 'any') {
+        const bathroomsNum = parseInt(req.query.bathrooms as string);
+        if (!isNaN(bathroomsNum)) {
+          conditions.push(eq(properties.bathrooms, bathroomsNum));
+        }
+      }
+
+      if (req.query.priceRange) {
+        const [min, max] = (req.query.priceRange as string).split(',').map(Number);
+        if (!isNaN(min) && !isNaN(max)) {
+          conditions.push(gte(properties.price, min));
+          conditions.push(lte(properties.price, max));
+        }
+      }
+
+      if (conditions.length > 0) {
+        query = query.where(and(...conditions));
+      }
+
+      const result = await query;
+
+      // Define coordinate fallbacks for Botswana cities
+      const cityCoordinates: { [key: string]: { lat: number; lng: number } } = {
+        'Gaborone': { lat: -24.6282, lng: 25.9231 },
+        'Francistown': { lat: -21.1670, lng: 27.5084 },
+        'Molepolole': { lat: -24.4069, lng: 25.4981 },
+        'Serowe': { lat: -22.3886, lng: 26.7142 },
+        'Selibe Phikwe': { lat: -22.0080, lng: 27.8475 },
+        'Maun': { lat: -20.0028, lng: 23.4162 },
+        'Kanye': { lat: -24.9833, lng: 25.3333 },
+        'Mochudi': { lat: -24.4333, lng: 25.9833 },
+        'Mahalapye': { lat: -23.1167, lng: 26.7333 },
+        'Palapye': { lat: -22.5500, lng: 27.1333 }
+      };
+
+      // Process properties to ensure valid coordinates
+      const processedResult = result.map(prop => {
+        let lat = prop.latitude;
+        let lng = prop.longitude;
+
+        // Convert string coordinates to numbers if needed
+        if (typeof lat === 'string') lat = parseFloat(lat);
+        if (typeof lng === 'string') lng = parseFloat(lng);
+
+        // Check if coordinates are valid
+        const hasValidCoords = lat != null && lng != null &&
+                             !isNaN(lat) && !isNaN(lng) &&
+                             lat >= -90 && lat <= 90 &&
+                             lng >= -180 && lng <= 180;
+
+        if (!hasValidCoords) {
+          console.log(`Property ${prop.id} has invalid coordinates (${lat}, ${lng}), using fallback for ${prop.city}`);
+
+          // Try to get coordinates from city name
+          const cityCoords = cityCoordinates[prop.city];
+          if (cityCoords) {
+            lat = cityCoords.lat + (Math.random() - 0.5) * 0.01; // Add small random offset
+            lng = cityCoords.lng + (Math.random() - 0.5) * 0.01;
+            console.log(`Using fallback coordinates for ${prop.city}: (${lat}, ${lng})`);
+          } else {
+            // Default to Gaborone with random offset
+            lat = -24.6282 + (Math.random() - 0.5) * 0.01;
+            lng = 25.9231 + (Math.random() - 0.5) * 0.01;
+            console.log(`Using default Gaborone coordinates with offset: (${lat}, ${lng})`);
+          }
+        }
+
+        return {
+          ...prop,
+          latitude: lat,
+          longitude: lng
+        };
+      });
+
+      console.log(`Found ${processedResult.length} properties`);
+      processedResult.forEach(prop => {
+        console.log(`Property ${prop.id}: lat=${prop.latitude}, lng=${prop.longitude}, title="${prop.title}"`);
+      });
+
+      res.json(processedResult);
+    } catch (error) {
+      console.error('Error fetching properties:', error);
+      res.status(500).json({ error: 'Failed to fetch properties' });
+    }
+  });
 
   const httpServer = createServer(app);
   return httpServer;
