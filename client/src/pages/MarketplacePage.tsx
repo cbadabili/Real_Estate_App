@@ -56,7 +56,7 @@ const MarketplacePage: React.FC<MarketplacePageProps> = () => {
     const params = new URLSearchParams(location.search);
     const sectionFilter = params.get('section');
     const categoryFilter = params.get('category');
-    
+
     if (sectionFilter) {
       setActiveSection(sectionFilter);
     }
