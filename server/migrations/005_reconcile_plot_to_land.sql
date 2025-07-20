@@ -5,10 +5,10 @@ UPDATE properties
 SET property_type = 'land' 
 WHERE property_type IN ('plot', 'plot/land', 'Plot/Land', 'Plot');
 
--- Add Mmatseta as a valid property type (traditional Botswana land allocation system)
+-- Ensure Mmatseta properties are categorized as land type
 UPDATE properties 
-SET property_type = 'mmatseta' 
-WHERE property_type IN ('Mmatseta', 'mmatseta', 'MMATSETA');
+SET property_type = 'land' 
+WHERE property_type IN ('Mmatseta', 'mmatseta', 'MMATSETA') OR title LIKE '%Mmatseta%' OR address LIKE '%Mmatseta%';
 
 -- Update rental listings if any exist
 UPDATE rental_listings 
@@ -16,8 +16,8 @@ SET property_type = 'land'
 WHERE property_type IN ('plot', 'plot/land', 'Plot/Land', 'Plot');
 
 UPDATE rental_listings 
-SET property_type = 'mmatseta' 
-WHERE property_type IN ('Mmatseta', 'mmatseta', 'MMATSETA');
+SET property_type = 'land' 
+WHERE property_type IN ('Mmatseta', 'mmatseta', 'MMATSETA') OR title LIKE '%Mmatseta%' OR address LIKE '%Mmatseta%';
 
 -- Update any marketplace service categories
 UPDATE service_categories 
