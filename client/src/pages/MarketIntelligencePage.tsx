@@ -59,59 +59,16 @@ const MarketIntelligencePage = () => {
     }
   };
 
-  // Sample market data
+  // Sample market data - reset for real data integration
   const marketData = {
-    totalProperties: 15420,
-    averagePrice: 2100000,
-    priceGrowth: 12.8,
-    marketActivity: 'High',
-    topAreas: ['Gaborone CBD', 'Francistown Heights', 'Maun Safari', 'Palapye Central']
+    totalProperties: 0,
+    averagePrice: 0,
+    priceGrowth: 0,
+    marketActivity: 'Loading...',
+    topAreas: []
   };
 
-  const properties = [
-    {
-      id: 1,
-      title: 'Modern Family Home',
-      location: 'Gaborone CBD',
-      price: 3200000,
-      bedrooms: 4,
-      bathrooms: 3,
-      area: 250,
-      type: 'House',
-      status: 'For Sale',
-      agent: 'Thabo Mogami',
-      views: 245,
-      daysOnMarket: 14
-    },
-    {
-      id: 2,
-      title: 'Luxury Apartment',
-      location: 'Francistown Heights',
-      price: 2800000,
-      bedrooms: 3,
-      bathrooms: 2,
-      area: 180,
-      type: 'Apartment',
-      status: 'For Sale',
-      agent: 'Neo Kgosana',
-      views: 189,
-      daysOnMarket: 7
-    },
-    {
-      id: 3,
-      title: 'Commercial Space',
-      location: 'Maun Safari',
-      price: 4500000,
-      bedrooms: 5,
-      bathrooms: 4,
-      area: 320,
-      type: 'Villa',
-      status: 'For Sale',
-      agent: 'Mpho Setlhare',
-      views: 156,
-      daysOnMarket: 21
-    }
-  ];
+  const properties = [];
 
   const whyChooseBeedab = [
     {
@@ -363,7 +320,7 @@ const MarketIntelligencePage = () => {
                   <option>Commercial Market</option>
                   <option>Investment Analysis</option>
                 </select>
-                <Link href="/market-trends">
+                <Link href="/marketplace?category=professionals&service=market-analysis">
                   <button className="w-full bg-green-500 text-white py-3 rounded-lg hover:bg-green-600 transition-colors">
                     Order Analysis - P500
                   </button>
@@ -398,7 +355,7 @@ const MarketIntelligencePage = () => {
                   placeholder="Tell us about your investment goals"
                   className="w-full p-3 border border-gray-300 rounded-lg h-24 focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
                 />
-                <Link href="/investment-analytics">
+                <Link href="/marketplace?category=professionals&service=investment-consulting">
                   <button className="w-full bg-purple-500 text-white py-3 rounded-lg hover:bg-purple-600 transition-colors">
                     Book Consultation - P1,500
                   </button>
@@ -462,9 +419,9 @@ const MarketIntelligencePage = () => {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-gray-600">Average Price</p>
-                    <p className="text-2xl font-bold">P{marketData.averagePrice.toLocaleString()}</p>
+                    <p className="text-2xl font-bold">{marketData.averagePrice > 0 ? `P${marketData.averagePrice.toLocaleString()}` : 'No data'}</p>
                   </div>
-                  <DollarSign className="w-8 h-8 text-green-500" />
+                  <Home className="w-8 h-8 text-green-500" />
                 </div>
               </motion.div>
               <motion.div variants={itemVariants} className="bg-white p-6 rounded-xl shadow-lg">
@@ -490,7 +447,7 @@ const MarketIntelligencePage = () => {
             {/* Why Choose Beedab */}
             <div>
               <motion.h2 variants={itemVariants} className="text-3xl font-bold text-center mb-8">
-                Why Choose BeeDaB?
+                Why Choose beedab?
               </motion.h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {whyChooseBeedab.map((feature, index) => (
@@ -556,9 +513,16 @@ const MarketIntelligencePage = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {properties.map((property) => (
-                <PropertyCard key={property.id} property={property} />
-              ))}
+              {properties.length > 0 ? (
+                properties.map((property) => (
+                  <PropertyCard key={property.id} property={property} />
+                ))
+              ) : (
+                <div className="col-span-full text-center py-12">
+                  <Building className="w-16 h-16 mx-auto text-gray-300 mb-4" />
+                  <p className="text-gray-500">No properties available. Real data will be displayed here.</p>
+                </div>
+              )}
             </div>
           </div>
         );
@@ -596,19 +560,26 @@ const MarketIntelligencePage = () => {
             <div className="bg-white p-6 rounded-xl shadow-lg">
               <h3 className="text-xl font-semibold mb-4">Top Performing Areas</h3>
               <div className="space-y-4">
-                {marketData.topAreas.map((area, index) => (
-                  <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                    <span className="font-medium">{area}</span>
-                    <div className="flex items-center space-x-4">
-                      <span className="text-green-500">+{(Math.random() * 15 + 5).toFixed(1)}%</span>
-                      <Link href={`/neighborhood-analytics?area=${encodeURIComponent(area)}`}>
-                        <button className="text-beedab-blue hover:text-beedab-darkblue">
-                          View Details
-                        </button>
-                      </Link>
+                {marketData.topAreas.length > 0 ? (
+                  marketData.topAreas.map((area, index) => (
+                    <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                      <span className="font-medium">{area}</span>
+                      <div className="flex items-center space-x-4">
+                        <span className="text-green-500">+{(Math.random() * 15 + 5).toFixed(1)}%</span>
+                        <Link href={`/neighborhood-analytics?area=${encodeURIComponent(area)}`}>
+                          <button className="text-beedab-blue hover:text-beedab-darkblue">
+                            View Details
+                          </button>
+                        </Link>
+                      </div>
                     </div>
+                  ))
+                ) : (
+                  <div className="text-center py-8">
+                    <MapPin className="w-12 h-12 mx-auto text-gray-300 mb-4" />
+                    <p className="text-gray-500">No area data available. Real data will be displayed here.</p>
                   </div>
-                ))}
+                )}
               </div>
             </div>
           </div>
@@ -686,12 +657,11 @@ const MarketIntelligencePage = () => {
                 >
                   Apply for Pre-approval
                 </button>
-                <button 
-                  onClick={() => alert('Connecting you with our mortgage specialists. They will contact you within 2 hours.')}
-                  className="flex-1 bg-green-500 text-white py-3 rounded-lg hover:bg-green-600 transition-colors"
-                >
-                  Talk to Specialist
-                </button>
+                <Link href="/marketplace?category=professionals&service=mortgage-consulting">
+                  <button className="flex-1 bg-green-500 text-white py-3 rounded-lg hover:bg-green-600 transition-colors">
+                    Talk to Specialist
+                  </button>
+                </Link>
               </div>
             </div>
           </div>
@@ -800,13 +770,13 @@ const MarketIntelligencePage = () => {
               AI-powered property valuations, market trends, and investment analytics tailored specifically for the Botswana property market.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button
-                onClick={() => openModal('valuation')}
+              <Link
+                href="/property-valuation"
                 className="inline-flex items-center px-8 py-4 bg-white text-beedab-darkblue font-semibold rounded-xl hover:bg-gray-100 transition-colors"
               >
                 <Calculator className="mr-2 h-5 w-5" />
                 Value My Property
-              </button>
+              </Link>
               <button
                 onClick={() => setActiveTab('analytics')}
                 className="inline-flex items-center px-8 py-4 bg-transparent border-2 border-white text-white font-semibold rounded-xl hover:bg-white hover:text-beedab-darkblue transition-colors"

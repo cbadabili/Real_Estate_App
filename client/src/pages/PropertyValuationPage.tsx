@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Calculator, TrendingUp, MapPin, Home, DollarSign } from 'lucide-react';
+import { MortgageCalculator } from '../components/MortgageCalculator';
 
 const PropertyValuationPage = () => {
   const [propertyDetails, setPropertyDetails] = useState({
@@ -63,7 +64,7 @@ const PropertyValuationPage = () => {
           </div>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-8">
+        <div className="grid lg:grid-cols-2 gap-8 mb-8">
           {/* Property Details Form */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <h2 className="text-xl font-semibold text-gray-900 mb-6">Property Details</h2>
@@ -208,6 +209,21 @@ const PropertyValuationPage = () => {
             )}
           </div>
         </div>
+
+        {/* Mortgage Calculator Integration */}
+        {valuation && (
+          <div className="max-w-4xl mx-auto">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <h2 className="text-xl font-semibold text-gray-900 mb-6">Mortgage Calculator</h2>
+              <MortgageCalculator 
+                propertyPrice={valuation.estimatedValue}
+                onCalculationChange={(calculation) => {
+                  console.log('Mortgage calculation updated:', calculation);
+                }}
+              />
+            </div>
+          </div>
+        )}
       </div>
     </motion.div>
   );
