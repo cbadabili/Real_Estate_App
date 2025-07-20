@@ -33,7 +33,7 @@ import {
 } from "../shared/schema.js";
 import { z } from "zod";
 import { eq, and, gte, lte, sql } from "drizzle-orm";
-import { properties } from "./db/schema";
+import { properties } from "../shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Authentication & User Management
