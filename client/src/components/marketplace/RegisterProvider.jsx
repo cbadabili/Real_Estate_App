@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Upload, X, Plus } from 'lucide-react';
@@ -41,7 +40,7 @@ const RegisterProvider = ({ onClose, onSubmit }) => {
 
   const handleImageUpload = (e, type) => {
     const files = Array.from(e.target.files);
-    
+
     if (type === 'profile') {
       setProfileImage(files[0]);
     } else {
@@ -61,7 +60,7 @@ const RegisterProvider = ({ onClose, onSubmit }) => {
       profile_image: profileImage,
       portfolio_images: portfolioImages
     };
-    
+
     onSubmit(formData);
   };
 
@@ -82,7 +81,7 @@ const RegisterProvider = ({ onClose, onSubmit }) => {
           {/* Business Information */}
           <div className="space-y-4">
             <h3 className="text-lg font-medium text-gray-900">Business Information</h3>
-            
+
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Business Name *
@@ -108,7 +107,7 @@ const RegisterProvider = ({ onClose, onSubmit }) => {
                 placeholder="Describe your business and services"
               />
               {errors.business_description && (
-                <p className="text-red-600 text-sm mt-1">{errors.business_description.message}</p>
+                <p className="text-red-600 text-sm mt-1">Please provide a description</p>
               )}
             </div>
 
@@ -171,7 +170,7 @@ const RegisterProvider = ({ onClose, onSubmit }) => {
           {/* Specialties */}
           <div className="space-y-4">
             <h3 className="text-lg font-medium text-gray-900">Specialties</h3>
-            
+
             <div className="flex space-x-2">
               <input
                 value={newSpecialty}
@@ -213,7 +212,7 @@ const RegisterProvider = ({ onClose, onSubmit }) => {
           {/* Contact Information */}
           <div className="space-y-4">
             <h3 className="text-lg font-medium text-gray-900">Contact Information</h3>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">

@@ -38,7 +38,7 @@ const serviceProviderSchema = z.object({
   phoneNumber: z.string().min(8, 'Valid phone number is required'),
   email: z.string().email('Valid email address is required'),
   websiteUrl: z.string().url('Valid website URL is required').optional().or(z.literal('')),
-  description: z.string().min(50, 'Description must be at least 50 characters'),
+  description: z.string(),
   address: z.string().min(5, 'Address is required'),
   city: z.string().min(2, 'City is required'),
   reacCertified: z.boolean().default(false),
@@ -255,6 +255,7 @@ const ServiceProviderRegistration: React.FC<ServiceProviderRegistrationProps> = 
               {errors.description && (
                 <p className="text-red-600 text-sm mt-1">{errors.description.message}</p>
               )}
+              <p className="mt-1 text-sm text-gray-500">Briefly describe your services</p>
             </div>
           </div>
 

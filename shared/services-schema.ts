@@ -82,6 +82,8 @@ export const insertServiceProviderSchema = createInsertSchema(serviceProviders).
   dateJoined: true,
   createdAt: true,
   updatedAt: true
+}).extend({
+    description: z.string().min(1, "Description is required"),
 });
 
 export const insertServiceAdSchema = createInsertSchema(serviceAds).omit({
