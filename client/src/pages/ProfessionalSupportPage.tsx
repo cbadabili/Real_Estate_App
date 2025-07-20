@@ -267,10 +267,7 @@ const ProfessionalSupportPage = () => {
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
               <span className="ml-2 text-gray-600">Loading professionals...</span>
             </div>
-          }  
-           
-           
-           : (
+          ) : (
             <div className="grid md:grid-cols-2 gap-8">
               {filteredProfessionals.map((professional) => {
                 const CategoryIcon = getCategoryIcon(professional.category);
