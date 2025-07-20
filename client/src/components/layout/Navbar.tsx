@@ -779,7 +779,7 @@ const Navbar = () => {
                         </Link>
                       </RoleBasedComponent>
 
-                      <RoleBasedComponent allowedRoles={['seller, 'agent', 'fsbo']}>
+                      <RoleBasedComponent allowedRoles={['seller', 'agent', 'fsbo']}>
                         <Link
                           to="/my-properties"
                           className="flex items-center px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100"
