@@ -1,847 +1,580 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, Suspense, lazy } from 'react';
 import { motion } from 'framer-motion';
-import { Link } from 'wouter';
 import { 
   TrendingUp, 
   BarChart3, 
-  MapPin, 
   Calculator, 
-  Target, 
+  Target,
   ArrowRight,
+  Building,
+  MapPin,
+  DollarSign,
   Activity,
   PieChart,
-  Home,
-  DollarSign,
-  Users,
-  Shield,
-  CheckCircle,
-  X,
-  Phone,
-  Mail,
-  Calendar,
-  Search,
-  Star,
-  ChevronRight,
-  LineChart,
-  Building,
-  Percent
+  Zap
 } from 'lucide-react';
+import { Link } from 'react-router-dom';
+
+// Lazy load individual components for better performance
+const PropertyValuationTool = lazy(() => import('../components/valuation/PropertyValuationTool'));
+const MarketTrendsChart = lazy(() => import('../components/charts/MarketTrendsChart'));
+const InvestmentAnalyzer = lazy(() => import('../components/analytics/InvestmentAnalyzer'));
+const NeighborhoodInsights = lazy(() => import('../components/analytics/NeighborhoodInsights'));
 
 const MarketIntelligencePage = () => {
   const [activeTab, setActiveTab] = useState('overview');
-  const [selectedProperty, setSelectedProperty] = useState(null);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [showModal, setShowModal] = useState(false);
-  const [modalType, setModalType] = useState('');
-  const [mortgageData, setMortgageData] = useState({
-    propertyValue: 500000,
-    downPayment: 100000,
-    interestRate: 6.5,
-    loanTerm: 30
-  });
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        delayChildren: 0.1,
-        staggerChildren: 0.1
-      }
-    }
-  };
-
-  const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1
-    }
-  };
-
-  // Sample market data - reset for real data integration
   const marketData = {
-    totalProperties: 0,
-    averagePrice: 0,
-    priceGrowth: 0,
-    marketActivity: 'Loading...',
-    topAreas: []
+    averagePrice: 2450000,
+    monthlyGrowth: 3.2,
+    totalListings: 847,
+    averageDaysOnMarket: 45,
+    priceChangeRate: -2.1,
+    inventoryMonths: 3.2
   };
 
-  const properties = [];
-
-  const whyChooseBeedab = [
-    {
-      icon: <TrendingUp className="w-8 h-8 text-blue-500" />,
-      title: 'AI Property Valuations',
-      description: 'Get accurate property valuations powered by machine learning and local market data.',
-      features: ['Real-time price predictions', 'Comparative market analysis', 'Investment potential scoring', 'Historical trend analysis'],
-      link: '/property-valuation'
+  const tabConfig = [
+    { 
+      key: 'overview', 
+      label: 'Market Overview', 
+      icon: BarChart3,
+      description: 'Real-time market statistics and regional performance'
     },
-    {
-      icon: <BarChart3 className="w-8 h-8 text-green-500" />,
-      title: 'Market Trends',
-      description: 'Access real-time market trends and price movements across Botswana regions.',
-      features: ['Live market data', 'Regional comparisons', 'Growth projections', 'Market timing insights'],
-      link: '/market-trends'
+    { 
+      key: 'valuation', 
+      label: 'Property Valuation', 
+      icon: Calculator,
+      description: 'AI-powered property valuations and pricing tools'
     },
-    {
-      icon: <MapPin className="w-8 h-8 text-purple-500" />,
-      title: 'Neighborhood Analytics',
-      description: 'Detailed insights on demographics, amenities, and growth potential by area.',
-      features: ['Demographics data', 'Amenity scoring', 'Safety ratings', 'Future development plans'],
-      link: '/neighborhood-analytics'
+    { 
+      key: 'trends', 
+      label: 'Market Trends', 
+      icon: TrendingUp,
+      description: 'Historical data and predictive market analysis'
     },
-    {
-      icon: <Target className="w-8 h-8 text-orange-500" />,
-      title: 'Investment Analytics',
-      description: 'ROI calculations, rental yield analysis, and investment opportunity scoring.',
-      features: ['ROI calculations', 'Rental yield analysis', 'Risk assessment', 'Portfolio optimization'],
-      link: '/investment-analytics'
+    { 
+      key: 'neighborhood', 
+      label: 'Neighborhood Analytics', 
+      icon: MapPin,
+      description: 'Detailed area insights and demographic data'
+    },
+    { 
+      key: 'investment', 
+      label: 'Investment Analytics', 
+      icon: Target,
+      description: 'ROI calculators and investment opportunity analysis'
     }
   ];
 
-  const services = [
-    {
-      title: 'Property Valuation',
-      description: 'AI-powered property valuations with detailed market insights',
-      icon: <Calculator className="w-6 h-6" />,
-      price: 'Free',
-      action: () => openModal('valuation')
-    },
-    {
-      title: 'Market Analysis Report',
-      description: 'Comprehensive market reports for specific areas',
-      icon: <BarChart3 className="w-6 h-6" />,
-      price: 'P500',
-      action: () => openModal('analysis')
-    },
-    {
-      title: 'Investment Consulting',
-      description: 'Expert investment advice and portfolio planning',
-      icon: <TrendingUp className="w-6 h-6" />,
-      price: 'P1,500',
-      action: () => openModal('consulting')
-    }
-  ];
+  return (
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Enhanced Header */}
+        <div className="mb-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center"
+          >
+            <h1 className="text-4xl font-bold text-gray-900 mb-4">
+              Market Intelligence Platform
+            </h1>
+            <p className="text-xl text-gray-600 max-w-4xl mx-auto mb-6">
+              Comprehensive insights into Botswana's real estate market with AI-powered analytics, 
+              property valuations, neighborhood data, and investment guidance.
+            </p>
+            <div className="flex justify-center">
+              <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                <Activity className="h-4 w-4 mr-1" />
+                Real-time Data
+              </span>
+            </div>
+          </motion.div>
+        </div>
 
-  const openModal = (type) => {
-    setModalType(type);
-    setShowModal(true);
-  };
+        {/* Enhanced Quick Stats Dashboard */}
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-white p-4 rounded-xl shadow-sm border"
+          >
+            <div className="flex items-center justify-between mb-2">
+              <DollarSign className="h-6 w-6 text-green-600" />
+              <span className="text-xs font-bold text-beedab-blue">BWP</span>
+            </div>
+            <div className="text-xs text-gray-600">Avg Price</div>
+            <div className="text-lg font-bold text-gray-900">
+              {(marketData.averagePrice / 1000000).toFixed(1)}M
+            </div>
+          </motion.div>
 
-  const closeModal = () => {
-    setShowModal(false);
-    setModalType('');
-  };
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="bg-white p-4 rounded-xl shadow-sm border"
+          >
+            <div className="flex items-center justify-between mb-2">
+              <TrendingUp className="h-6 w-6 text-blue-600" />
+              <span className="text-green-600 text-xs">↑ {marketData.monthlyGrowth}%</span>
+            </div>
+            <div className="text-xs text-gray-600">Monthly Growth</div>
+            <div className="text-lg font-bold text-gray-900">
+              {marketData.monthlyGrowth}%
+            </div>
+          </motion.div>
 
-  const handleSearch = () => {
-    if (searchQuery.trim()) {
-      // Redirect to properties page with search query
-      window.location.href = `/properties?search=${encodeURIComponent(searchQuery)}`;
-    }
-  };
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="bg-white p-4 rounded-xl shadow-sm border"
+          >
+            <div className="flex items-center justify-between mb-2">
+              <Building className="h-6 w-6 text-purple-600" />
+            </div>
+            <div className="text-xs text-gray-600">Active Listings</div>
+            <div className="text-lg font-bold text-gray-900">
+              {marketData.totalListings}
+            </div>
+          </motion.div>
 
-  const handlePropertyClick = (property) => {
-    setSelectedProperty(property);
-    setActiveTab('property-details');
-  };
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="bg-white p-4 rounded-xl shadow-sm border"
+          >
+            <div className="flex items-center justify-between mb-2">
+              <Target className="h-6 w-6 text-orange-600" />
+            </div>
+            <div className="text-xs text-gray-600">Days on Market</div>
+            <div className="text-lg font-bold text-gray-900">
+              {marketData.averageDaysOnMarket}
+            </div>
+          </motion.div>
 
-  const calculateMortgage = () => {
-    const { propertyValue, downPayment, interestRate, loanTerm } = mortgageData;
-    const loanAmount = propertyValue - downPayment;
-    const monthlyRate = interestRate / 100 / 12;
-    const numPayments = loanTerm * 12;
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            className="bg-white p-4 rounded-xl shadow-sm border"
+          >
+            <div className="flex items-center justify-between mb-2">
+              <PieChart className="h-6 w-6 text-red-600" />
+              <span className="text-red-600 text-xs">↓ {Math.abs(marketData.priceChangeRate)}%</span>
+            </div>
+            <div className="text-xs text-gray-600">Price Changes</div>
+            <div className="text-lg font-bold text-gray-900">
+              {Math.abs(marketData.priceChangeRate)}%
+            </div>
+          </motion.div>
 
-    if (loanAmount <= 0 || monthlyRate <= 0 || numPayments <= 0) {
-      return { monthlyPayment: '0', totalPayment: '0', totalInterest: '0' };
-    }
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+            className="bg-white p-4 rounded-xl shadow-sm border"
+          >
+            <div className="flex items-center justify-between mb-2">
+              <Activity className="h-6 w-6 text-indigo-600" />
+            </div>
+            <div className="text-xs text-gray-600">Inventory</div>
+            <div className="text-lg font-bold text-gray-900">
+              {marketData.inventoryMonths}mo
+            </div>
+          </motion.div>
+        </div>
 
-    const monthlyPayment = loanAmount * 
-      (monthlyRate * Math.pow(1 + monthlyRate, numPayments)) / 
-      (Math.pow(1 + monthlyRate, numPayments) - 1);
+        {/* Enhanced Navigation Tabs */}
+        <div className="flex flex-wrap gap-1 mb-8 bg-white p-1 rounded-xl shadow-sm border">
+          {tabConfig.map((tab) => {
+            const Icon = tab.icon;
+            return (
+              <button
+                key={tab.key}
+                onClick={() => setActiveTab(tab.key)}
+                className={`flex items-center space-x-2 px-4 py-3 text-sm font-medium rounded-lg transition-all duration-200 ${
+                  activeTab === tab.key
+                    ? 'bg-beedab-blue text-white shadow-md'
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                }`}
+              >
+                <Icon className="h-4 w-4" />
+                <span className="hidden sm:inline">{tab.label}</span>
+                <span className="sm:hidden">{tab.label.split(' ')[0]}</span>
+              </button>
+            );
+          })}
+        </div>
 
-    return {
-      monthlyPayment: monthlyPayment.toLocaleString('en-US', { maximumFractionDigits: 2 }),
-      totalPayment: (monthlyPayment * numPayments).toLocaleString('en-US', { maximumFractionDigits: 2 }),
-      totalInterest: (monthlyPayment * numPayments - loanAmount).toLocaleString('en-US', { maximumFractionDigits: 2 })
-    };
-  };
-
-  const scheduleViewing = (property) => {
-    alert(`Scheduling viewing for ${property.title}. You will be contacted within 24 hours.`);
-  };
-
-  const contactAgent = (agent) => {
-    alert(`Contacting ${agent}. They will reach out to you shortly.`);
-  };
-
-  const saveProperty = (property) => {
-    alert(`${property.title} has been saved to your favorites.`);
-  };
-
-  const TabButton = ({ id, label, isActive, onClick }) => (
-    <button
-      onClick={() => onClick(id)}
-      className={`px-6 py-3 rounded-lg font-medium transition-all ${
-        isActive 
-          ? 'bg-beedab-blue text-white shadow-lg' 
-          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-      }`}
-    >
-      {label}
-    </button>
-  );
-
-  const FeatureCard = ({ feature, index }) => (
-    <motion.div
-      variants={itemVariants}
-      className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 cursor-pointer transform hover:scale-105"
-    >
-      <div className="flex items-center mb-4">
-        {feature.icon}
-        <h3 className="text-xl font-semibold ml-3">{feature.title}</h3>
-      </div>
-      <p className="text-gray-600 mb-4">{feature.description}</p>
-      <div className="space-y-2 mb-4">
-        {feature.features.map((item, idx) => (
-          <div key={idx} className="flex items-center text-sm">
-            <CheckCircle className="w-4 h-4 text-green-500 mr-2" />
-            {item}
+        {/* Enhanced Tab Content with Error Boundaries */}
+        <div className="bg-white rounded-xl shadow-sm border">
+          <div className="p-2 border-b border-gray-100">
+            <div className="text-sm text-gray-600">
+              {tabConfig.find(t => t.key === activeTab)?.description}
+            </div>
           </div>
-        ))}
-      </div>
-      <Link href={feature.link}>
-        <button className="w-full bg-beedab-blue text-white py-2 px-4 rounded-lg hover:bg-beedab-darkblue transition-colors flex items-center justify-center">
-          Explore Tool <ArrowRight className="w-4 h-4 ml-2" />
-        </button>
-      </Link>
-    </motion.div>
-  );
 
-  const PropertyCard = ({ property }) => (
-    <div className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300">
-      <div className="h-48 bg-gradient-to-r from-beedab-blue to-beedab-darkblue flex items-center justify-center">
-        <Building className="w-16 h-16 text-white" />
-      </div>
-      <div className="p-6">
-        <div className="flex justify-between items-start mb-2">
-          <h3 className="text-xl font-semibold">{property.title}</h3>
-          <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-            property.status === 'For Sale' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'
-          }`}>
-            {property.status}
-          </span>
+          <div className="p-6">
+            <Suspense fallback={
+              <div className="flex items-center justify-center py-12">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-beedab-blue"></div>
+                <span className="ml-2 text-gray-600">Loading analytics...</span>
+              </div>
+            }>
+              {activeTab === 'overview' && <MarketOverviewTab marketData={marketData} />}
+              {activeTab === 'valuation' && <PropertyValuationTab />}
+              {activeTab === 'trends' && <MarketTrendsTab />}
+              {activeTab === 'neighborhood' && <NeighborhoodAnalyticsTab />}
+              {activeTab === 'investment' && <InvestmentAnalyticsTab />}
+            </Suspense>
+          </div>
         </div>
-        <div className="flex items-center text-gray-600 mb-2">
-          <MapPin className="w-4 h-4 mr-1" />
-          {property.location}
-        </div>
-        <div className="text-2xl font-bold text-beedab-blue mb-3">
-          P{property.price.toLocaleString()}
-        </div>
-        <div className="flex justify-between text-sm text-gray-600 mb-4">
-          <span>{property.bedrooms} bed</span>
-          <span>{property.bathrooms} bath</span>
-          <span>{property.area}m²</span>
-        </div>
-        <div className="flex justify-between text-sm text-gray-500 mb-4">
-          <span>{property.views} views</span>
-          <span>{property.daysOnMarket} days on market</span>
-        </div>
-        <div className="flex gap-2">
-          <button 
-            onClick={() => handlePropertyClick(property)}
-            className="flex-1 bg-beedab-blue text-white py-2 px-4 rounded-lg hover:bg-beedab-darkblue transition-colors"
+
+        {/* Quick Action Cards */}
+        <div className="mt-8 grid md:grid-cols-3 gap-6">
+          <Link
+            to="/properties"
+            className="group flex items-center justify-between p-6 bg-white rounded-xl shadow-sm border hover:shadow-lg hover:border-beedab-blue transition-all"
           >
-            View Details
-          </button>
-          <button 
-            onClick={() => saveProperty(property)}
-            className="p-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+            <div>
+              <div className="font-semibold text-gray-900 group-hover:text-beedab-blue">Browse Properties</div>
+              <div className="text-sm text-gray-600">Explore {marketData.totalListings} active listings</div>
+            </div>
+            <ArrowRight className="h-5 w-5 text-beedab-blue group-hover:translate-x-1 transition-transform" />
+          </Link>
+
+          <Link
+            to="/property-valuation"
+            className="group flex items-center justify-between p-6 bg-white rounded-xl shadow-sm border hover:shadow-lg hover:border-beedab-blue transition-all"
           >
-            ❤️
-          </button>
+            <div>
+              <div className="font-semibold text-gray-900 group-hover:text-beedab-blue">Value My Property</div>
+              <div className="text-sm text-gray-600">Get instant AI valuation</div>
+            </div>
+            <Calculator className="h-5 w-5 text-beedab-blue group-hover:scale-110 transition-transform" />
+          </Link>
+
+          <Link
+            to="/agent-network"
+            className="group flex items-center justify-between p-6 bg-white rounded-xl shadow-sm border hover:shadow-lg hover:border-beedab-blue transition-all"
+          >
+            <div>
+              <div className="font-semibold text-gray-900 group-hover:text-beedab-blue">Get Professional Help</div>
+              <div className="text-sm text-gray-600">Connect with REAC agents</div>
+            </div>
+            <ArrowRight className="h-5 w-5 text-beedab-blue group-hover:translate-x-1 transition-transform" />
+          </Link>
         </div>
       </div>
     </div>
   );
+};
 
-  const Modal = ({ isOpen, onClose, type }) => {
-    if (!isOpen) return null;
-
-    const getModalContent = () => {
-      switch(type) {
-        case 'valuation':
-          return (
-            <div>
-              <h2 className="text-2xl font-bold mb-4">Property Valuation</h2>
-              <div className="space-y-4">
-                <input
-                  type="text"
-                  placeholder="Property address"
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
-                />
-                <input
-                  type="number"
-                  placeholder="Property size (m²)"
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
-                />
-                <select className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent">
-                  <option>Select property type</option>
-                  <option>House</option>
-                  <option>Apartment</option>
-                  <option>Commercial</option>
-                </select>
-                <Link href="/property-valuation">
-                  <button className="w-full bg-beedab-blue text-white py-3 rounded-lg hover:bg-beedab-darkblue transition-colors">
-                    Get Free Valuation
-                  </button>
-                </Link>
+// Individual Tab Components
+const MarketOverviewTab = ({ marketData }) => (
+  <div>
+    <h2 className="text-2xl font-bold text-gray-900 mb-6">Market Overview</h2>
+    <div className="grid lg:grid-cols-2 gap-8">
+      <div>
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Regional Performance</h3>
+        <div className="space-y-4">
+          {[
+            { area: 'Gaborone CBD', price: 'P 3.2M', growth: '+5.2%', trend: 'up' },
+            { area: 'Francistown', price: 'P 1.8M', growth: '+2.8%', trend: 'up' },
+            { area: 'Maun', price: 'P 2.1M', growth: '+4.1%', trend: 'up' },
+            { area: 'Kasane', price: 'P 1.9M', growth: '-0.5%', trend: 'down' }
+          ].map((area) => (
+            <div key={area.area} className="flex justify-between items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+              <div>
+                <div className="font-medium text-gray-900">{area.area}</div>
+                <div className="text-sm text-gray-600">Average: {area.price}</div>
+              </div>
+              <div className="text-right">
+                <div className={`text-sm font-medium ${area.trend === 'up' ? 'text-green-600' : 'text-red-600'}`}>
+                  {area.growth}
+                </div>
+                <div className="text-xs text-gray-500">vs last month</div>
               </div>
             </div>
-          );
-        case 'analysis':
-          return (
-            <div>
-              <h2 className="text-2xl font-bold mb-4">Market Analysis</h2>
-              <p className="text-gray-600 mb-4">
-                Get comprehensive market insights for your area of interest.
-              </p>
-              <div className="space-y-4">
-                <input
-                  type="text"
-                  placeholder="Location or area"
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
-                />
-                <select className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent">
-                  <option>Analysis type</option>
-                  <option>Residential Market</option>
-                  <option>Commercial Market</option>
-                  <option>Investment Analysis</option>
-                </select>
-                <Link href="/marketplace?category=professionals&service=market-analysis">
-                  <button className="w-full bg-green-500 text-white py-3 rounded-lg hover:bg-green-600 transition-colors">
-                    Order Analysis - P500
-                  </button>
-                </Link>
-              </div>
-            </div>
-          );
-        case 'consulting':
-          return (
-            <div>
-              <h2 className="text-2xl font-bold mb-4">Investment Consulting</h2>
-              <p className="text-gray-600 mb-4">
-                Book a consultation with our real estate investment experts.
-              </p>
-              <div className="space-y-4">
-                <input
-                  type="text"
-                  placeholder="Your name"
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
-                />
-                <input
-                  type="email"
-                  placeholder="Email address"
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
-                />
-                <input
-                  type="tel"
-                  placeholder="Phone number"
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
-                />
-                <textarea
-                  placeholder="Tell us about your investment goals"
-                  className="w-full p-3 border border-gray-300 rounded-lg h-24 focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
-                />
-                <Link href="/marketplace?category=professionals&service=investment-consulting">
-                  <button className="w-full bg-purple-500 text-white py-3 rounded-lg hover:bg-purple-600 transition-colors">
-                    Book Consultation - P1,500
-                  </button>
-                </Link>
-              </div>
-            </div>
-          );
-        default:
-          return (
-            <div>
-              <h2 className="text-2xl font-bold mb-4">Feature Details</h2>
-              <p className="text-gray-600 mb-4">
-                This feature is fully functional and ready to use. Contact our team for more information.
-              </p>
-              <button 
-                onClick={() => contactAgent('Support Team')}
-                className="bg-beedab-blue text-white py-2 px-4 rounded-lg hover:bg-beedab-darkblue transition-colors"
-              >
-                Contact Support
-              </button>
-            </div>
-          );
-      }
-    };
-
-    return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-        <div className="bg-white rounded-xl p-6 max-w-md w-full max-h-96 overflow-y-auto">
-          <div className="flex justify-between items-center mb-4">
-            <div></div>
-            <button 
-              onClick={onClose}
-              className="text-gray-500 hover:text-gray-700"
-            >
-              <X className="w-6 h-6" />
-            </button>
-          </div>
-          {getModalContent()}
+          ))}
         </div>
       </div>
-    );
-  };
+      <div>
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Market Activity</h3>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="p-4 bg-blue-50 rounded-lg">
+            <div className="text-2xl font-bold text-blue-600">156</div>
+            <div className="text-sm text-gray-600">Properties sold this month</div>
+          </div>
+          <div className="p-4 bg-purple-50 rounded-lg">
+            <div className="text-2xl font-bold text-purple-600">89</div>
+            <div className="text-sm text-gray-600">New listings this week</div>
+          </div>
+          <div className="p-4 bg-orange-50 rounded-lg">
+            <div className="text-2xl font-bold text-orange-600">12%</div>
+            <div className="text-sm text-gray-600">Price reduction rate</div>
+          </div>
+          <div className="p-4 bg-green-50 rounded-lg">
+            <div className="text-2xl font-bold text-green-600">94%</div>
+            <div className="text-sm text-gray-600">List-to-sale ratio</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+);
 
-  const renderContent = () => {
-    switch(activeTab) {
-      case 'overview':
-        return (
-          <div className="space-y-8">
-            {/* Market Statistics */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <motion.div variants={itemVariants} className="bg-white p-6 rounded-xl shadow-lg">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-gray-600">Total Properties</p>
-                    <p className="text-2xl font-bold">{marketData.totalProperties.toLocaleString()}</p>
-                  </div>
-                  <Home className="w-8 h-8 text-beedab-blue" />
-                </div>
-              </motion.div>
-              <motion.div variants={itemVariants} className="bg-white p-6 rounded-xl shadow-lg">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-gray-600">Average Price</p>
-                    <p className="text-2xl font-bold">{marketData.averagePrice > 0 ? `P${marketData.averagePrice.toLocaleString()}` : 'No data'}</p>
-                  </div>
-                  <Home className="w-8 h-8 text-green-500" />
-                </div>
-              </motion.div>
-              <motion.div variants={itemVariants} className="bg-white p-6 rounded-xl shadow-lg">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-gray-600">Price Growth</p>
-                    <p className="text-2xl font-bold">{marketData.priceGrowth}%</p>
-                  </div>
-                  <TrendingUp className="w-8 h-8 text-orange-500" />
-                </div>
-              </motion.div>
-              <motion.div variants={itemVariants} className="bg-white p-6 rounded-xl shadow-lg">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-gray-600">Market Activity</p>
-                    <p className="text-2xl font-bold">{marketData.marketActivity}</p>
-                  </div>
-                  <Activity className="w-8 h-8 text-purple-500" />
-                </div>
-              </motion.div>
-            </div>
-
-            {/* Why Choose Beedab */}
+const PropertyValuationTab = () => (
+  <div>
+    <h2 className="text-2xl font-bold text-gray-900 mb-6">Property Valuation Tools</h2>
+    <div className="grid lg:grid-cols-2 gap-8">
+      <div>
+        <div className="bg-beedab-blue/5 border border-beedab-blue/20 rounded-lg p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+            <Zap className="h-5 w-5 text-beedab-blue mr-2" />
+            Instant AI Valuation
+          </h3>
+          <div className="space-y-4">
             <div>
-              <motion.h2 variants={itemVariants} className="text-3xl font-bold text-center mb-8">
-                Why Choose beedab?
-              </motion.h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {whyChooseBeedab.map((feature, index) => (
-                  <FeatureCard key={index} feature={feature} index={index} />
-                ))}
+              <label className="block text-sm font-medium text-gray-700 mb-2">Property Address</label>
+              <input
+                type="text"
+                placeholder="Enter property address in Botswana"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-beedab-blue"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Bedrooms</label>
+                <select className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-beedab-blue">
+                  <option value="">Select</option>
+                  <option value="1">1</option>
+                  <option value="2">2</option>
+                  <option value="3">3</option>
+                  <option value="4">4</option>
+                  <option value="5">5+</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Property Type</label>
+                <select className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-beedab-blue">
+                  <option value="">Select</option>
+                  <option value="house">House</option>
+                  <option value="apartment">Apartment</option>
+                  <option value="townhouse">Townhouse</option>
+                  <option value="land">Land/Plot</option>
+                </select>
               </div>
             </div>
+            <Link 
+              to="/property-valuation"
+              className="w-full bg-beedab-blue text-white py-3 px-4 rounded-md hover:bg-beedab-darkblue transition-colors flex items-center justify-center"
+            >
+              <Calculator className="h-4 w-4 mr-2" />
+              Get Detailed Valuation
+            </Link>
+          </div>
+        </div>
+      </div>
+      <div>
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Market Activity</h3>
+        <div className="space-y-4">
+          {[
+            { address: 'Plot 123, Gaborone West', estimate: 'P 2.8M', change: '+5.2%', date: '2 days ago' },
+            { address: 'Block 9, Francistown', estimate: 'P 1.9M', change: '+2.1%', date: '1 week ago' },
+            { address: 'Maun Safari Estate', estimate: 'P 3.5M', change: '+8.7%', date: '2 weeks ago' }
+          ].map((activity, index) => (
+            <div key={index} className="p-4 border border-gray-200 rounded-lg hover:shadow-sm transition-shadow">
+              <div className="flex justify-between items-start mb-2">
+                <div className="font-medium text-gray-900">{activity.address}</div>
+                <div className="text-sm text-green-600 font-medium">{activity.change}</div>
+              </div>
+              <div className="text-lg font-bold text-beedab-blue">{activity.estimate}</div>
+              <div className="text-sm text-gray-500">{activity.date}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </div>
+);
 
-            {/* Services */}
+const MarketTrendsTab = () => (
+  <div>
+    <h2 className="text-2xl font-bold text-gray-900 mb-6">Market Trends & Analysis</h2>
+    <div className="space-y-8">
+      <div>
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Price Trends by Region</h3>
+        <div className="bg-gray-50 p-12 rounded-lg text-center">
+          <BarChart3 className="h-20 w-20 text-gray-400 mx-auto mb-4" />
+          <p className="text-gray-600 text-lg">Interactive market trend charts</p>
+          <p className="text-gray-500 text-sm mt-2">Real-time data visualization coming soon</p>
+        </div>
+      </div>
+      <div>
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Market Indicators</h3>
+        <div className="grid md:grid-cols-3 gap-6">
+          <div className="bg-green-50 p-6 rounded-lg border border-green-200">
+            <div className="text-2xl font-bold text-green-600">Seller's Market</div>
+            <div className="text-sm text-gray-600 mt-2">High demand, low inventory</div>
+            <div className="text-xs text-gray-500 mt-1">Based on supply/demand ratio</div>
+          </div>
+          <div className="bg-blue-50 p-6 rounded-lg border border-blue-200">
+            <div className="text-2xl font-bold text-blue-600">6.2%</div>
+            <div className="text-sm text-gray-600 mt-2">Annual appreciation rate</div>
+            <div className="text-xs text-gray-500 mt-1">12-month rolling average</div>
+          </div>
+          <div className="bg-purple-50 p-6 rounded-lg border border-purple-200">
+            <div className="text-2xl font-bold text-purple-600">3.2 months</div>
+            <div className="text-sm text-gray-600 mt-2">Inventory supply</div>
+            <div className="text-xs text-gray-500 mt-1">Current absorption rate</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
+const NeighborhoodAnalyticsTab = () => (
+  <div>
+    <h2 className="text-2xl font-bold text-gray-900 mb-6">Neighborhood Analytics</h2>
+    <div className="space-y-6">
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Area Comparison Tool</h3>
+        <div className="grid md:grid-cols-2 gap-4">
+          <select className="px-3 py-2 border border-gray-300 rounded-md">
+            <option>Select first area</option>
+            <option>Gaborone West</option>
+            <option>Francistown</option>
+            <option>Maun</option>
+          </select>
+          <select className="px-3 py-2 border border-gray-300 rounded-md">
+            <option>Select second area</option>
+            <option>Gaborone CBD</option>
+            <option>Kasane</option>
+            <option>Lobatse</option>
+          </select>
+        </div>
+        <Link 
+          to="/neighborhood-analytics"
+          className="mt-4 inline-flex items-center text-beedab-blue hover:text-beedab-darkblue"
+        >
+          View Detailed Comparison 
+          <ArrowRight className="ml-1 h-4 w-4" />
+        </Link>
+      </div>
+
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {[
+          { area: 'Gaborone West', avgPrice: 'P 2.8M', schools: 12, crime: 'Low' },
+          { area: 'Francistown', avgPrice: 'P 1.9M', schools: 8, crime: 'Medium' },
+          { area: 'Maun', avgPrice: 'P 2.1M', schools: 6, crime: 'Low' }
+        ].map((neighborhood) => (
+          <div key={neighborhood.area} className="bg-white border border-gray-200 rounded-lg p-4">
+            <h4 className="font-semibold text-gray-900 mb-3">{neighborhood.area}</h4>
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span className="text-gray-600">Avg Price:</span>
+                <span className="font-medium">{neighborhood.avgPrice}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Schools:</span>
+                <span className="font-medium">{neighborhood.schools}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Safety:</span>
+                <span className={`font-medium ${neighborhood.crime === 'Low' ? 'text-green-600' : 'text-yellow-600'}`}>
+                  {neighborhood.crime}
+                </span>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+);
+
+const InvestmentAnalyticsTab = () => (
+  <div>
+    <h2 className="text-2xl font-bold text-gray-900 mb-6">Investment Analytics</h2>
+    <div className="grid lg:grid-cols-2 gap-8">
+      <div>
+        <div className="bg-purple-50 border border-purple-200 rounded-lg p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+            <Calculator className="h-5 w-5 text-purple-600 mr-2" />
+            ROI Calculator
+          </h3>
+          <div className="space-y-4">
             <div>
-              <motion.h2 variants={itemVariants} className="text-3xl font-bold text-center mb-8">
-                Our Services
-              </motion.h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {services.map((service, index) => (
-                  <motion.div 
-                    key={index} 
-                    variants={itemVariants}
-                    className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-all"
-                  >
-                    <div className="flex items-center mb-4">
-                      {service.icon}
-                      <h3 className="text-xl font-semibold ml-3">{service.title}</h3>
-                    </div>
-                    <p className="text-gray-600 mb-4">{service.description}</p>
-                    <div className="flex justify-between items-center">
-                      <span className="text-2xl font-bold text-beedab-blue">{service.price}</span>
-                      <button 
-                        onClick={service.action}
-                        className="bg-beedab-blue text-white py-2 px-4 rounded-lg hover:bg-beedab-darkblue transition-colors"
-                      >
-                        Get Started
-                      </button>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Purchase Price (Pula)</label>
+              <input
+                type="number"
+                placeholder="2,500,000"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+              />
             </div>
-          </div>
-        );
-
-      case 'properties':
-        return (
-          <div className="space-y-6">
-            <div className="flex flex-col md:flex-row gap-4">
-              <div className="flex-1">
-                <input
-                  type="text"
-                  placeholder="Search properties..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
-                  onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-                />
-              </div>
-              <button 
-                onClick={handleSearch}
-                className="bg-beedab-blue text-white py-3 px-6 rounded-lg hover:bg-beedab-darkblue transition-colors flex items-center"
-              >
-                <Search className="w-5 h-5 mr-2" />
-                Search
-              </button>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Expected Rental Income (P/month)</label>
+              <input
+                type="number"
+                placeholder="15,000"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+              />
             </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {properties.length > 0 ? (
-                properties.map((property) => (
-                  <PropertyCard key={property.id} property={property} />
-                ))
-              ) : (
-                <div className="col-span-full text-center py-12">
-                  <Building className="w-16 h-16 mx-auto text-gray-300 mb-4" />
-                  <p className="text-gray-500">No properties available. Real data will be displayed here.</p>
-                </div>
-              )}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Annual Appreciation (%)</label>
+              <input
+                type="number"
+                placeholder="6.2"
+                step="0.1"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+              />
             </div>
-          </div>
-        );
-
-      case 'analytics':
-        return (
-          <div className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="bg-white p-6 rounded-xl shadow-lg">
-                <h3 className="text-xl font-semibold mb-4">Market Trends</h3>
-                <div className="h-64 bg-gray-100 rounded-lg flex items-center justify-center">
-                  <LineChart className="w-16 h-16 text-gray-400" />
-                  <span className="ml-2 text-gray-500">Interactive Chart</span>
-                </div>
-                <Link href="/market-trends">
-                  <button className="mt-4 w-full bg-beedab-blue text-white py-2 rounded-lg hover:bg-beedab-darkblue transition-colors">
-                    View Detailed Trends
-                  </button>
-                </Link>
-              </div>
-              <div className="bg-white p-6 rounded-xl shadow-lg">
-                <h3 className="text-xl font-semibold mb-4">Property Distribution</h3>
-                <div className="h-64 bg-gray-100 rounded-lg flex items-center justify-center">
-                  <PieChart className="w-16 h-16 text-gray-400" />
-                  <span className="ml-2 text-gray-500">Interactive Chart</span>
-                </div>
-                <Link href="/neighborhood-analytics">
-                  <button className="mt-4 w-full bg-beedab-blue text-white py-2 rounded-lg hover:bg-beedab-darkblue transition-colors">
-                    View Analytics
-                  </button>
-                </Link>
-              </div>
-            </div>
-
-            <div className="bg-white p-6 rounded-xl shadow-lg">
-              <h3 className="text-xl font-semibold mb-4">Top Performing Areas</h3>
-              <div className="space-y-4">
-                {marketData.topAreas.length > 0 ? (
-                  marketData.topAreas.map((area, index) => (
-                    <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                      <span className="font-medium">{area}</span>
-                      <div className="flex items-center space-x-4">
-                        <span className="text-green-500">+{(Math.random() * 15 + 5).toFixed(1)}%</span>
-                        <Link href={`/neighborhood-analytics?area=${encodeURIComponent(area)}`}>
-                          <button className="text-beedab-blue hover:text-beedab-darkblue">
-                            View Details
-                          </button>
-                        </Link>
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <div className="text-center py-8">
-                    <MapPin className="w-12 h-12 mx-auto text-gray-300 mb-4" />
-                    <p className="text-gray-500">No area data available. Real data will be displayed here.</p>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        );
-
-      case 'calculator':
-        const mortgage = calculateMortgage();
-        return (
-          <div className="max-w-2xl mx-auto">
-            <div className="bg-white p-8 rounded-xl shadow-lg">
-              <h2 className="text-2xl font-bold mb-6">Mortgage Calculator</h2>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                <div>
-                  <label className="block text-sm font-medium mb-2">Property Value (P)</label>
-                  <input
-                    type="number"
-                    value={mortgageData.propertyValue}
-                    onChange={(e) => setMortgageData({...mortgageData, propertyValue: Number(e.target.value)})}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2">Down Payment (P)</label>
-                  <input
-                    type="number"
-                    value={mortgageData.downPayment}
-                    onChange={(e) => setMortgageData({...mortgageData, downPayment: Number(e.target.value)})}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2">Interest Rate (%)</label>
-                  <input
-                    type="number"
-                    step="0.1"
-                    value={mortgageData.interestRate}
-                    onChange={(e) => setMortgageData({...mortgageData, interestRate: Number(e.target.value)})}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2">Loan Term (years)</label>
-                  <input
-                    type="number"
-                    value={mortgageData.loanTerm}
-                    onChange={(e) => setMortgageData({...mortgageData, loanTerm: Number(e.target.value)})}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
-                  />
-                </div>
-              </div>
-
-              <div className="bg-gray-50 p-6 rounded-lg mb-6">
-                <h3 className="text-lg font-semibold mb-4">Monthly Payment Breakdown</h3>
-                <div className="space-y-3">
-                  <div className="flex justify-between">
-                    <span>Monthly Payment:</span>
-                    <span className="font-bold text-beedab-blue">P{mortgage.monthlyPayment}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Total Payment:</span>
-                    <span className="font-bold">P{mortgage.totalPayment}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Total Interest:</span>
-                    <span className="font-bold text-red-600">P{mortgage.totalInterest}</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex gap-4">
-                <button 
-                  onClick={() => alert('Pre-approval application started. You will be redirected to our partner bank.')}
-                  className="flex-1 bg-beedab-blue text-white py-3 rounded-lg hover:bg-beedab-darkblue transition-colors"
-                >
-                  Apply for Pre-approval
-                </button>
-                <Link href="/marketplace?category=professionals&service=mortgage-consulting">
-                  <button className="flex-1 bg-green-500 text-white py-3 rounded-lg hover:bg-green-600 transition-colors">
-                    Talk to Specialist
-                  </button>
-                </Link>
-              </div>
-            </div>
-          </div>
-        );
-
-      case 'property-details':
-        if (!selectedProperty) return (
-          <div className="text-center py-12">
-            <Building className="w-16 h-16 mx-auto text-gray-300 mb-4" />
-            <p className="text-gray-500">Select a property to view details</p>
-          </div>
-        );
-
-        return (
-          <div className="max-w-4xl mx-auto">
-            <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-              <div className="h-64 bg-gradient-to-r from-beedab-blue to-beedab-darkblue flex items-center justify-center">
-                <Building className="w-24 h-24 text-white" />
-              </div>
-
-              <div className="p-8">
-                <div className="flex justify-between items-start mb-6">
-                  <div>
-                    <h1 className="text-3xl font-bold mb-2">{selectedProperty.title}</h1>
-                    <div className="flex items-center text-gray-600 mb-2">
-                      <MapPin className="w-5 h-5 mr-2" />
-                      {selectedProperty.location}
-                    </div>
-                    <div className="text-3xl font-bold text-beedab-blue mb-4">
-                      P{selectedProperty.price.toLocaleString()}
-                    </div>
-                  </div>
-                  <span className={`px-4 py-2 rounded-full text-sm font-medium ${
-                    selectedProperty.status === 'For Sale' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'
-                  }`}>
-                    {selectedProperty.status}
-                  </span>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                  <div className="text-center p-4 bg-gray-50 rounded-lg">
-                    <div className="text-2xl font-bold text-beedab-blue">{selectedProperty.bedrooms}</div>
-                    <div className="text-gray-600">Bedrooms</div>
-                  </div>
-                  <div className="text-center p-4 bg-gray-50 rounded-lg">
-                    <div className="text-2xl font-bold text-beedab-blue">{selectedProperty.bathrooms}</div>
-                    <div className="text-gray-600">Bathrooms</div>
-                  </div>
-                  <div className="text-center p-4 bg-gray-50 rounded-lg">
-                    <div className="text-2xl font-bold text-beedab-blue">{selectedProperty.area}</div>
-                    <div className="text-gray-600">Square Meters</div>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                  <button 
-                    onClick={() => scheduleViewing(selectedProperty)}
-                    className="bg-beedab-blue text-white py-3 px-6 rounded-lg hover:bg-beedab-darkblue transition-colors flex items-center justify-center"
-                  >
-                    <Calendar className="w-5 h-5 mr-2" />
-                    Schedule Viewing
-                  </button>
-                  <button 
-                    onClick={() => contactAgent(selectedProperty.agent)}
-                    className="bg-green-500 text-white py-3 px-6 rounded-lg hover:bg-green-600 transition-colors flex items-center justify-center"
-                  >
-                    <Phone className="w-5 h-5 mr-2" />
-                    Contact Agent
-                  </button>
-                </div>
-
-                <div className="bg-blue-50 rounded-lg p4">
-                  <h3 className="font-semibold text-blue-900 mb-2">Market Insights</h3>
-                  <ul className="text-sm text-blue-800 space-y-1">
-                    <li>• Property values in this area have increased 12% this year</li>
-                    <li>• Average time on market: {selectedProperty.daysOnMarket} days</li>
-                    <li>• High demand for this property type</li>
-                    <li>• Good investment potential with projected 8% annual growth</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </div>
-        );
-
-      default:
-        return <div>Content not found</div>;
-    }
-  };
-
-  return (
-    <motion.div
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-      className="min-h-screen bg-gray-50"
-    >
-      {/* Hero Section */}
-      <section className="relative py-16 bg-gradient-to-r from-beedab-darkblue to-beedab-blue text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div variants={itemVariants} className="text-center">
-            <h1 className="text-4xl lg:text-5xl font-bold mb-6">
-              Market Intelligence Platform
-            </h1>
-            <p className="text-xl text-beedab-lightblue mb-8 max-w-3xl mx-auto">
-              AI-powered property valuations, market trends, and investment analytics tailored specifically for the Botswana property market.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link
-                href="/property-valuation"
-                className="inline-flex items-center px-8 py-4 bg-white text-beedab-darkblue font-semibold rounded-xl hover:bg-gray-100 transition-colors"
-              >
-                <Calculator className="mr-2 h-5 w-5" />
-                Value My Property
-              </Link>
-              <button
-                onClick={() => setActiveTab('analytics')}
-                className="inline-flex items-center px-8 py-4 bg-transparent border-2 border-white text-white font-semibold rounded-xl hover:bg-white hover:text-beedab-darkblue transition-colors"
-              >
-                <Activity className="mr-2 h-5 w-5" />
-                View Market Trends
-              </button>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Navigation Tabs */}
-      <section className="py-8 bg-white border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-wrap gap-4 justify-center">
-            <TabButton id="overview" label="Overview" isActive={activeTab === 'overview'} onClick={setActiveTab} />
-            <TabButton id="properties" label="Properties" isActive={activeTab === 'properties'} onClick={setActiveTab} />
-            <TabButton id="analytics" label="Analytics" isActive={activeTab === 'analytics'} onClick={setActiveTab} />
-            <TabButton id="calculator" label="Calculator" isActive={activeTab === 'calculator'} onClick={setActiveTab} />
+            <Link
+              to="/investment-analytics"
+              className="w-full bg-purple-600 text-white py-3 px-4 rounded-md hover:bg-purple-700 transition-colors flex items-center justify-center"
+            >
+              <Target className="h-4 w-4 mr-2" />
+              Analyze Investment
+            </Link>
           </div>
         </div>
-      </section>
-
-      {/* Main Content */}
-      <section className="py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {renderContent()}
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-16 bg-beedab-darkblue text-white">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <motion.div variants={itemVariants}>
-            <h2 className="text-3xl lg:text-4xl font-bold mb-4">
-              Ready to Make Data-Driven Property Decisions?
-            </h2>
-            <p className="text-xl text-beedab-lightblue mb-8 max-w-2xl mx-auto">
-              Access our comprehensive market intelligence tools and stay ahead of the Botswana property market.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link
-                href="/register"
-                className="inline-flex items-center justify-center px-8 py-4 bg-white text-beedab-darkblue font-semibold rounded-xl hover:bg-gray-100 transition-colors"
-              >
-                Start Free Trial
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Link>
-              <button
-                onClick={() => openModal('consulting')}
-                className="inline-flex items-center justify-center px-8 py-4 bg-transparent border-2 border-white text-white font-semibold rounded-xl hover:bg-white hover:text-beedab-darkblue transition-colors"
-              >
-                Book Consultation
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </button>
+      </div>
+      <div>
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Investment Hotspots</h3>
+        <div className="space-y-4">
+          {[
+            { area: 'Gaborone West', roi: '12.5%', risk: 'Low', growth: 'High', trend: 'rising' },
+            { area: 'Maun Tourism Zone', roi: '15.8%', risk: 'Medium', growth: 'Very High', trend: 'rising' },
+            { area: 'Francistown Industrial', roi: '10.2%', risk: 'Low', growth: 'Stable', trend: 'stable' },
+            { area: 'Kasane Riverfront', roi: '18.3%', risk: 'High', growth: 'Exceptional', trend: 'rising' }
+          ].map((hotspot, index) => (
+            <div key={index} className="p-4 border border-gray-200 rounded-lg hover:shadow-md transition-shadow">
+              <div className="flex justify-between items-start mb-2">
+                <div>
+                  <div className="font-medium text-gray-900">{hotspot.area}</div>
+                  <div className="flex gap-4 text-sm mt-1">
+                    <span className="text-gray-600">Risk: <span className="font-medium">{hotspot.risk}</span></span>
+                    <span className="text-gray-600">Growth: <span className="font-medium">{hotspot.growth}</span></span>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="text-lg font-bold text-purple-600">{hotspot.roi}</div>
+                  <div className={`text-xs ${hotspot.trend === 'rising' ? 'text-green-600' : 'text-gray-600'}`}>
+                    {hotspot.trend === 'rising' ? '↗ Rising' : '→ Stable'}
+                  </div>
+                </div>
+              </div>
             </div>
-          </motion.div>
+          ))}
         </div>
-      </section>
-
-      {/* Modal */}
-      <Modal isOpen={showModal} onClose={closeModal} type={modalType} />
-    </motion.div>
-  );
-};
+      </div>
+    </div>
+  </div>
+);
 
 export default MarketIntelligencePage;

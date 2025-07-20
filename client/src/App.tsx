@@ -148,7 +148,7 @@ function App() {
           <Route path="/services/transaction-management" element={<TransactionManagementPage />} />
           <Route path="/services/professional-support" element={<ProfessionalSupportPage />} />
 
-          {/* Market Intelligence Routes */}
+          {/* Market Intelligence Routes - Unified under main platform */}
           <Route path="/property-valuation" element={<PropertyValuationPage />} />
           <Route path="/market-trends" element={<MarketTrendsPage />} />
           <Route path="/neighborhood-analytics" element={<NeighborhoodAnalyticsPage />} />

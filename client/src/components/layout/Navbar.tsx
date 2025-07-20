@@ -419,7 +419,7 @@ const Navbar = () => {
                         <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide px-2 py-1">Preparation Tools</div>
 
                       <Link
-                        to="/home-value-assessment"
+                        to="/market-intelligence?tab=valuation"
                         className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
                         onClick={() => setSellDropdownOpen(false)}
                       >

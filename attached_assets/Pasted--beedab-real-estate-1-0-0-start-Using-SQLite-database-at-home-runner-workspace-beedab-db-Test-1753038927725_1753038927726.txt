@@ -1,0 +1,59 @@
+
+> beedab-real-estate@1.0.0 start
+Using SQLite database at: /home/runner/workspace/beedab.db
+Testing database connection...
+✅ Database connection successful
+🔄 Running database migrations...
+✅ No pending migrations
+🌱 Seeding database...
+🌱 Starting complete database seeding...
+Seeding users...
+✅ Users already exist, skipping...
+Seeding service categories...
+✅ Service categories already exist, skipping...
+Seeding marketplace providers...
+✅ Marketplace providers already exist, skipping...
+Seeding services data...
+✅ Services data already exists, skipping seeding...
+Seeding marketplace data...
+✅ Marketplace data already exists, skipping seeding...
+Seeding rental listings...
+✅ Rental listings already exist, skipping seeding...
+✅ All seeding completed successfully
+✅ Database initialization completed
+7:05:58 PM [express] serving on port 5000
+Browserslist: browsers data (caniuse-lite) is 9 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+Fetching properties...
+Property 3: lat=null, lng=null, type=farm
+Property 2: lat=null, lng=null, type=land
+Property 1: lat=null, lng=null, type=farm
+Retrieved 3 properties from database
+Properties fetched: 3
+Property 3: lat=null, lng=null
+Property 2: lat=null, lng=null
+Property 1: lat=null, lng=null
+7:06:09 PM [express] GET /api/properties 200 in 19ms :: [{"id":3,"title":"three bed house","descript…
+7:15:04 PM [vite] hmr update /src/pages/MarketIntelligencePage.tsx, /src/index.css?v=d3ptiyl2pt5
+7:15:05 PM [vite] hmr update /src/components/layout/Navbar.tsx, /src/index.css?v=d3ptiyl2pt5
+7:15:05 PM [vite] hmr update /src/pages/DashboardPage.tsx, /src/index.css?v=d3ptiyl2pt5
+7:15:05 PM [vite] hmr update /src/App.tsx?v=d3ptiyl2pt5, /src/index.css?v=d3ptiyl2pt5
+7:15:06 PM [vite] Internal server error: Failed to resolve import "../components/valuation/PropertyValuationTool" from "client/src/pages/MarketIntelligencePage.tsx". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /home/runner/workspace/client/src/pages/MarketIntelligencePage.tsx:19:48
+  32 |  } from "lucide-react";
+  33 |  import { Link } from "react-router-dom";
+  34 |  const PropertyValuationTool = lazy(_c = () => import("../components/valuation/PropertyValuationTool"));
+     |                                                       ^
+  35 |  _c2 = PropertyValuationTool;
+  36 |  const MarketTrendsChart = lazy(_c3 = () => import("../components/charts/MarketTrendsChart"));
+      at TransformPluginContext._formatError (/home/runner/workspace/node_modules/vite/dist/node/chunks/dep-C6uTJdX2.js:49258:41)
+      at TransformPluginContext.error (/home/runner/workspace/node_modules/vite/dist/node/chunks/dep-C6uTJdX2.js:49253:16)
+      at normalizeUrl (/home/runner/workspace/node_modules/vite/dist/node/chunks/dep-C6uTJdX2.js:64291:23)
+      at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+      at async <anonymous> (/home/runner/workspace/node_modules/vite/dist/node/chunks/dep-C6uTJdX2.js:64423:39)
+      at async Promise.all (index 7)
+      at async TransformPluginContext.transform (/home/runner/workspace/node_modules/vite/dist/node/chunks/dep-C6uTJdX2.js:64350:7)
+      at async PluginContainer.transform (/home/runner/workspace/node_modules/vite/dist/node/chunks/dep-C6uTJdX2.js:49099:18)
+      at async loadAndTransform (/home/runner/workspace/node_modules/vite/dist/node/chunks/dep-C6uTJdX2.js:51977:27)
