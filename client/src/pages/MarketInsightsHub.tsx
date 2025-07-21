@@ -116,7 +116,7 @@ const MarketInsightsHub = () => {
           <div className="space-y-6">
             <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Pricing Guidelines by Property Type</h3>
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
                 {[
                   { type: 'Houses', priceRange: 'P 1.5M - P 8M', avgSqm: 'P 15,000 - P 25,000' },
                   { type: 'Apartments', priceRange: 'P 800K - P 3.5M', avgSqm: 'P 12,000 - P 20,000' },
@@ -131,6 +131,27 @@ const MarketInsightsHub = () => {
                     <p className="text-sm text-gray-600">Per SQM: {category.avgSqm}</p>
                   </div>
                 ))}
+              </div>
+              
+              {/* Market Comparison Tool */}
+              <div className="border-t pt-6">
+                <h4 className="text-md font-medium text-gray-900 mb-4">Price Comparison by Location</h4>
+                <div className="grid md:grid-cols-2 gap-4">
+                  {[
+                    { location: 'Gaborone CBD', avgPrice: 'P 25,000/sqm', trend: '+8.5%' },
+                    { location: 'Phakalane', avgPrice: 'P 28,000/sqm', trend: '+12.3%' },
+                    { location: 'Francistown', avgPrice: 'P 18,000/sqm', trend: '+5.2%' },
+                    { location: 'Maun', avgPrice: 'P 22,000/sqm', trend: '+15.8%' }
+                  ].map((area, index) => (
+                    <div key={index} className="flex justify-between items-center p-3 bg-white border border-gray-200 rounded-lg">
+                      <div>
+                        <p className="font-medium text-gray-900">{area.location}</p>
+                        <p className="text-sm text-gray-600">{area.avgPrice}</p>
+                      </div>
+                      <span className="text-green-600 text-sm font-medium">{area.trend}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </div>

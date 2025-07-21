@@ -80,6 +80,8 @@ import MarketTrendsPage from './pages/MarketTrendsPage';
 import NeighborhoodAnalyticsPage from './pages/NeighborhoodAnalyticsPage';
 import InvestmentAnalyticsPage from './pages/InvestmentAnalyticsPage';
 import MarketInsightsHub from './pages/MarketInsightsHub';
+import LegalTransactionsHub from './pages/LegalTransactionsHub';
+import ServiceProviderDirectory from './pages/ServiceProviderDirectory';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -155,8 +157,13 @@ function App() {
           <Route path="/market-trends" element={<MarketTrendsPage />} />
           <Route path="/neighborhood-analytics" element={<NeighborhoodAnalyticsPage />} />
           <Route path="/investment-analytics" element={<InvestmentAnalyticsPage />} />
-           {/* Additional Service Routes */}
-           <Route path="/legal-document-templates" element={<LegalDocumentTemplatesPage />} />
+          
+          {/* Consolidated Hub Routes */}
+          <Route path="/legal-transactions" element={<LegalTransactionsHub />} />
+          <Route path="/service-directory" element={<ServiceProviderDirectory />} />
+          
+          {/* Additional Service Routes */}
+          <Route path="/legal-document-templates" element={<LegalDocumentTemplatesPage />} />
 
           {/* Marketplace Routes */}
           <Route path="/marketplace" element={<MarketplacePage />} />
