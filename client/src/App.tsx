@@ -32,7 +32,6 @@ import FSBODashboard from './pages/FSBODashboard';
 import CreateListingPage from './pages/CreateListingPage';
 import AgentDashboard from './pages/AgentDashboard';
 import MyPropertiesPage from './pages/MyPropertiesPage';
-import AuthTestPage from './pages/AuthTestPage';
 import AgentProfilePage from './pages/AgentProfilePage';
 import ContactAgentPage from './pages/ContactAgentPage';
 import AuctionsPage from './pages/AuctionsPage';
@@ -186,7 +185,6 @@ function App() {
               <Route path="/bid/:id" element={<BidPage />} />
             <Route path="/documents" element={<DocumentsPage />} />
             <Route path="/login" element={<LoginPage />} />
-            <Route path="/auth-test" element={<AuthTestPage />} />
             <Route path="/agent-profile/:id" element={<AgentProfilePage />} />
             <Route path="/contact-agent/:id" element={<ContactAgentPage />} />
             <Route 
