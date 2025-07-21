@@ -79,6 +79,7 @@ import ProfessionalSupportPage from './pages/ProfessionalSupportPage';
 import MarketTrendsPage from './pages/MarketTrendsPage';
 import NeighborhoodAnalyticsPage from './pages/NeighborhoodAnalyticsPage';
 import InvestmentAnalyticsPage from './pages/InvestmentAnalyticsPage';
+import MarketInsightsHub from './pages/MarketInsightsHub';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -131,7 +132,8 @@ function App() {
 
             <Route path="/buyer-seller-platform" element={<BuyerSellerPlatformPage />} />
             <Route path="/platform" element={<BuyerSellerPlatformPage />} />
-            <Route path="/market-intelligence" element={<MarketIntelligencePage />} />
+            <Route path="/market-intelligence" element={<MarketInsightsHub />} />
+            <Route path="/market-insights" element={<MarketInsightsHub />} />
             <Route path="/secure-transactions" element={<SecureTransactionsPage />} />
             <Route path="/communication" element={<CommunicationPage />} />
             <Route path="/agent-network" element={<AgentNetworkPage />} />
