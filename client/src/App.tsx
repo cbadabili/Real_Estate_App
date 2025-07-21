@@ -57,7 +57,6 @@ import TransferProcessPage from './pages/TransferProcessPage';
 import AgentRegistrationPage from './pages/AgentRegistrationPage';
 import AgentRatingPage from './pages/AgentRatingPage';
 import HomeValueAssessmentPage from './pages/HomeValueAssessmentPage';
-import PrepareHomePage from './pages/PrepareHomePage';
 import LegalRequirementsPage from './pages/LegalRequirementsPage';
 import RentalListingWizard from './pages/RentalListingWizard';
 import LandlordDashboard from './pages/LandlordDashboard';
@@ -202,7 +201,6 @@ function App() {
               <Route path="/agent-registration" element={<AgentRegistrationPage />} />
               <Route path="/rate-agent/:agentId" element={<AgentRatingPage />} />
               <Route path="/home-value-assessment" element={<HomeValueAssessmentPage />} />
-              <Route path="/prepare-home" element={<PrepareHomePage />} />
               <Route path="/legal-requirements" element={<LegalRequirementsPage />} />
           <Route path="/transfer-process" element={<TransferProcessPage />} />
               </Routes>
