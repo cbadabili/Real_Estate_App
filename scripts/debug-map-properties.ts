@@ -1,4 +1,6 @@
 import { db } from '../server/db';
+import { properties } from '../shared/schema';
+import { eq } from 'drizzle-orm';
 
 async function diagnoseMapProperties() {
   console.log('🔍 Diagnosing map property display issues...');
@@ -74,7 +76,7 @@ async function fixMissingCoordinates() {
       const randomLng = gaboroneLng + (Math.random() - 0.5) * 0.02;
 
       console.log(`Updating property ${prop.id} with coordinates: ${randomLat}, ${randomLng}`);
-      
+
       // Use proper parameter binding to fix the coordinate update
       await db.run(
         `UPDATE properties SET latitude = ?, longitude = ? WHERE id = ?`,
