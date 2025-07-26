@@ -79,6 +79,7 @@ import InvestmentAnalyticsPage from './pages/InvestmentAnalyticsPage';
 import MarketInsightsHub from './pages/MarketInsightsHub';
 import LegalTransactionsHub from './pages/LegalTransactionsHub';
 import ServiceProviderDirectory from './pages/ServiceProviderDirectory';
+import TestMapPage from './pages/TestMapPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -154,11 +155,11 @@ function App() {
           <Route path="/market-trends" element={<MarketTrendsPage />} />
           <Route path="/neighborhood-analytics" element={<NeighborhoodAnalyticsPage />} />
           <Route path="/investment-analytics" element={<InvestmentAnalyticsPage />} />
-          
+
           {/* Consolidated Hub Routes */}
           <Route path="/legal-transactions" element={<LegalTransactionsHub />} />
           <Route path="/service-directory" element={<ServiceProviderDirectory />} />
-          
+
           {/* Additional Service Routes */}
           <Route path="/legal-document-templates" element={<LegalDocumentTemplatesPage />} />
 
@@ -203,7 +204,11 @@ function App() {
               <Route path="/home-value-assessment" element={<HomeValueAssessmentPage />} />
               <Route path="/legal-requirements" element={<LegalRequirementsPage />} />
           <Route path="/transfer-process" element={<TransferProcessPage />} />
-              </Routes>
+
+              {/* Test and admin routes */}
+              <Route path="/test-map" element={<TestMapPage />} />
+              <Route path="/admin" element={<AdminPage />} />
+            </Routes>
               </div>
             </PropertyProvider>
           </AuthProvider>
