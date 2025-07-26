@@ -555,7 +555,7 @@ const Navbar = () => {
                   </motion.div>
                 )}
               </AnimatePresence>
-              </div>
+            </div>
 
             {/* Rent Dropdown */}
             <div 
