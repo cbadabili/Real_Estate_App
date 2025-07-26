@@ -1,0 +1,227 @@
+This plan will standardize all property type references from inconsistent terms (land, plot, land for development, etc.) to a unified "Land/Plot" terminology across your real estate app.
+📋 Phase 1: Preparation & Setup (15 minutes)
+1.1 Create a backup branch in Replit
+bash# In Replit Shell
+git checkout -b property-type-standardization
+git push origin property-type-standardization
+1.2 Create a tracking file for changes
+Create STANDARDIZATION_LOG.md in your root directory to track progress:
+markdown# Property Type Standardization Progress
+
+## Completed:
+- [ ] Schema updates
+- [ ] Database migration
+- [ ] Component updates
+- [ ] API updates
+- [ ] Frontend updates
+- [ ] Testing
+
+## Found Inconsistencies:
+(Add files/locations where you find inconsistent terminology)
+
+## Notes:
+(Add any observations during implementation)
+📊 Phase 2: Database Schema Updates (20 minutes)
+2.1 Update shared/schema.ts
+Replace your existing property type definitions with standardized ones:
+typescript// Add this to shared/schema.ts
+export const PROPERTY_TYPES = {
+  HOUSE: 'house',
+  APARTMENT: 'apartment', 
+  LAND_PLOT: 'land_plot',
+  COMMERCIAL: 'commercial'
+} as const;
+
+export const LAND_PLOT_SUBTYPES = {
+  RAW_LAND: 'raw_land',
+  RESIDENTIAL_PLOT: 'residential_plot', 
+  COMMERCIAL_PLOT: 'commercial_plot',
+  AGRICULTURAL_LAND: 'agricultural_land',
+  INDUSTRIAL_PLOT: 'industrial_plot'
+} as const;
+
+export const PROPERTY_TYPE_LABELS = {
+  [PROPERTY_TYPES.HOUSE]: 'House',
+  [PROPERTY_TYPES.APARTMENT]: 'Apartment',
+  [PROPERTY_TYPES.LAND_PLOT]: 'Land/Plot',
+  [PROPERTY_TYPES.COMMERCIAL]: 'Commercial Property'
+} as const;
+2.2 Create migration script
+Create scripts/migrate-property-types.ts:
+typescriptimport { db } from '../server/db';
+
+async function migratePropertyTypes() {
+  console.log('Starting property type migration...');
+  
+  // Add new columns
+  await db.execute(`
+    ALTER TABLE properties 
+    ADD COLUMN IF NOT EXISTS new_property_type VARCHAR(50),
+    ADD COLUMN IF NOT EXISTS land_plot_subtype VARCHAR(50)
+  `);
+  
+  // Map existing values
+  await db.execute(`
+    UPDATE properties 
+    SET new_property_type = CASE
+      WHEN LOWER(property_type) IN ('land', 'plot', 'land for development', 'development land', 'vacant land', 'land/plot') 
+        THEN 'land_plot'
+      WHEN LOWER(property_type) IN ('house', 'home', 'residential', 'villa', 'bungalow') 
+        THEN 'house'
+      WHEN LOWER(property_type) IN ('apartment', 'flat', 'condo', 'unit') 
+        THEN 'apartment'
+      WHEN LOWER(property_type) IN ('commercial', 'office', 'retail', 'shop') 
+        THEN 'commercial'
+      ELSE 'land_plot'
+    END
+  `);
+  
+  console.log('Migration completed!');
+}
+
+// Run with: npx tsx scripts/migrate-property-types.ts
+migratePropertyTypes().catch(console.error);
+2.3 Run migration in Replit
+bash# In Replit Shell
+npx tsx scripts/migrate-property-types.ts
+🔧 Phase 3: Component Standardization (30 minutes)
+3.1 Create standardized components
+Create client/src/components/PropertyTypeSelector.tsx:
+typescriptimport React from 'react';
+import { PROPERTY_TYPES, PROPERTY_TYPE_LABELS } from '../../../shared/schema';
+
+interface Props {
+  value: string;
+  onChange: (value: string) => void;
+  className?: string;
+}
+
+export function PropertyTypeSelector({ value, onChange, className = '' }: Props) {
+  return (
+    <select
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      className={`px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 ${className}`}
+    >
+      <option value="">Select Property Type</option>
+      {Object.entries(PROPERTY_TYPE_LABELS).map(([key, label]) => (
+        <option key={key} value={key}>{label}</option>
+      ))}
+    </select>
+  );
+}
+3.2 Update existing components
+Search and replace in these common locations:
+
+client/src/components/ (all property-related components)
+client/src/pages/ (property listing/creation pages)
+
+Files likely to need updates:
+
+Property listing components
+Search/filter components
+Property creation forms
+Property detail pages
+
+🔍 Phase 4: Find & Replace Strategy (25 minutes)
+4.1 Use Replit's search functionality
+In Replit, use Ctrl+Shift+F (or Cmd+Shift+F on Mac) to search across all files:
+Search terms to replace:
+
+"land" → Review and replace with "Land/Plot" where appropriate
+"plot" → Review and replace with "Land/Plot" where appropriate
+"land for development" → Replace with "Land/Plot"
+"development land" → Replace with "Land/Plot"
+"vacant land" → Consider as subtype or replace with "Land/Plot"
+
+4.2 Systematic file review
+Review these file types in order:
+
+Schema files (shared/schema.ts)
+API routes (server/routes.ts)
+Components (client/src/components/)
+Pages (client/src/pages/)
+Seed data (server/seed.ts)
+
+🚀 Phase 5: API Updates (20 minutes)
+5.1 Update API endpoints
+In server/routes.ts, ensure all property-related endpoints use the new schema:
+typescript// Example update for property creation
+app.post('/api/properties', async (req, res) => {
+  const propertyData = PropertySchema.parse(req.body);
+  // Ensure property_type uses standardized values
+  // ...
+});
+5.2 Update seed data
+In server/seed.ts, update sample data to use new property types:
+typescriptconst sampleProperties = [
+  {
+    title: "Residential Plot in Gaborone",
+    propertyType: "land_plot",
+    landPlotSubtype: "residential_plot",
+    // ...
+  }
+];
+🧪 Phase 6: Testing in Replit (15 minutes)
+6.1 Test database changes
+bash# In Replit Shell - Check migration worked
+npm run db:studio
+# Or query directly to verify data
+6.2 Test the application
+
+Start the dev server: npm run dev
+Test these flows:
+
+Property creation with new types
+Property search/filtering
+Property listings display
+Property detail pages
+
+
+
+6.3 Check for errors
+Monitor Replit's console and browser console for any errors related to property types.
+🔄 Phase 7: Deploy & Monitor (10 minutes)
+7.1 Commit changes
+bash# In Replit Shell
+git add .
+git commit -m "Standardize property types to Land/Plot terminology"
+git push origin property-type-standardization
+7.2 Merge to main (when ready)
+bashgit checkout main
+git merge property-type-standardization
+git push origin main
+🔍 Replit-Specific Tips
+Using Replit's Built-in Tools:
+
+File Search: Use Ctrl+P to quickly find files
+Global Search: Use Ctrl+Shift+F to search across all files
+Database: Use the Database tab to view your PostgreSQL data
+Console: Monitor the console for any runtime errors
+
+Replit Debugging:
+
+Use console.log() liberally to track changes
+Check both the Replit console and browser console
+Use the Network tab to monitor API calls
+
+📝 Verification Checklist
+After implementation, verify these work correctly:
+
+ Property creation form shows "Land/Plot" option
+ Search filters use "Land/Plot" terminology
+ Property listings display "Land/Plot" consistently
+ Database contains standardized property_type values
+ API responses use new property type format
+ No console errors related to property types
+ Existing properties still display correctly
+
+🆘 Troubleshooting Common Issues
+Issue: Database migration fails
+Solution: Check PostgreSQL connection in Replit's Database tab
+Issue: Components not updating
+Solution: Clear browser cache and restart Replit's development server
+Issue: Type errors in TypeScript
+Solution: Update imports and ensure schema types are correctly exported
+Issue: Seed data fails
+Solution: Drop and recreate database, then re-run seed script
