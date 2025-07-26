@@ -1,0 +1,106 @@
+@@ -89,27 +89,26 @@ export const VerificationBadge: React.FC<VerificationBadgeProps> = ({
+          description: 'Professional credentials verified'
+        },
+        premium: {
+          icon: User,
+          color: 'text-green-600 bg-green-100',
+          label: 'Premium Provider',
+          description: 'Top-rated professional'
+        }
+      }
+    };
+
+    const config = verificationConfigs[type as keyof typeof verificationConfigs];
+
+    return config[level as keyof typeof config] || config.basic;
+  };
+
+  const config = getBadgeConfig();
+  const Icon = config.icon;
+
+  return (
+    <div className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${config.color} ${className}`}>
+      <Icon className="h-3 w-3" />
+      {showLabel && <span>{config.label}</span>}
+    </div>
+  );
+};
+```
+};
+client/src/components/properties/PropertyMap.tsx
++17
+-4
+
+@@ -73,55 +73,68 @@ interface Property {
+  price: number;
+  latitude: number;
+  longitude: number;
+  bedrooms: number;
+  bathrooms: number;
+  location: string;
+  city: string;
+  propertyType: string;
+  description?: string;
+}
+
+interface PropertyMapProps {
+  properties: Property[];
+  selectedProperty?: Property | null;
+  onPropertySelect?: (property: Property) => void;
+  className?: string;
+  isRentalContext?: boolean;
+}
+
+export function PropertyMap({ properties, selectedProperty, onPropertySelect, className, isRentalContext = false }: PropertyMapProps) {
+  // Botswana center coordinates with validation
+  const defaultCenter: [number, number] = [-24.6282, 25.9231]; // Gaborone
+  
+  // Try to center on first valid property, fallback to Gaborone
+  const getMapCenter = (): [number, number] => {
+    const validProperty = properties.find(p => 
+      p.latitude != null && p.longitude != null && 
+      !isNaN(p.latitude) && !isNaN(p.longitude)
+    const validProperty = properties.find(p =>
+      p.latitude != null && p.longitude != null &&
+      !isNaN(p.latitude) && !isNaN(p.longitude) &&
+      isValidCoordinate(
+        typeof p.latitude === 'string' ? parseFloat(p.latitude) : p.latitude,
+        typeof p.longitude === 'string' ? parseFloat(p.longitude) : p.longitude
+      )
+    );
+    return validProperty ? [validProperty.latitude, validProperty.longitude] : defaultCenter;
+    return validProperty
+      ? [
+          typeof validProperty.latitude === 'string'
+            ? parseFloat(validProperty.latitude)
+            : validProperty.latitude,
+          typeof validProperty.longitude === 'string'
+            ? parseFloat(validProperty.longitude)
+            : validProperty.longitude,
+        ]
+      : defaultCenter;
+  };
+  
+  const center = getMapCenter();
+  const zoom = 12;
+
+  const formatPrice = (price: number) => {
+    return `BWP ${price.toLocaleString()}`;
+  };
+
+  // Validate coordinates helper with Botswana bounds check
+  const isValidCoordinate = (lat: any, lng: any) => {
+    // Handle null/undefined explicitly
+    if (lat === null || lat === undefined || lng === null || lng === undefined) {
+      console.warn(`Null/undefined coordinates: lat=${lat}, lng=${lng}`);
+      return false;
+    }
+
+    const latNum = typeof lat === 'string' ? parseFloat(lat) : lat;
+    const lngNum = typeof lng === 'string' ? parseFloat(lng) : lng;
+    
+    // Basic validation
+    const isBasicValid = latNum != null && lngNum != null && 
+           typeof latNum === 'number' && typeof lngNum === 'number' &&
+           !isNaN(latNum) && !isNaN(lngNum) &&
+           latNum !== 0 && lngNum !== 0; // Exclude 0,0 coordinates
