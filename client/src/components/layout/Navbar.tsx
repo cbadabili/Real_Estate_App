@@ -160,6 +160,21 @@ const Navbar = () => {
                       {/* Left Column - Property Types */}
                       <div className="w-1/2 pr-3">
                         <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide px-2 py-1">Property Types</div>
+                        <div className="px-1 py-1">
+                        <Link
+                          to="/properties"
+                          className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded border-b border-gray-100 mb-1"
+                          onClick={() => setBuyDropdownOpen(false)}
+                        >
+                          <div className="flex items-center">
+                            <Building className="h-4 w-4 mr-2 text-beedab-blue" />
+                            <div>
+                              <div className="font-medium">All Properties</div>
+                              <div className="text-xs text-gray-500">View all available properties</div>
+                            </div>
+                          </div>
+                        </Link>
+
                         <Link
                           to="/properties?type=house"
                           className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
