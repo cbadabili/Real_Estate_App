@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { PropertyMap } from '../components/properties/PropertyMap';
 import { PropertyFilters } from '../components/properties/PropertyFilters';
@@ -52,11 +51,11 @@ const BuyMapPage = () => {
         // Convert coordinates to numbers and validate
         let lat = property.latitude;
         let lng = property.longitude;
-        
+
         // If coordinates are strings, try to parse them
         if (typeof lat === 'string') lat = parseFloat(lat);
         if (typeof lng === 'string') lng = parseFloat(lng);
-        
+
         // If coordinates are missing or invalid, assign default Gaborone area coordinates
         if (!lat || !lng || isNaN(lat) || isNaN(lng)) {
           // Generate random coordinates around Gaborone for demo purposes
@@ -64,7 +63,7 @@ const BuyMapPage = () => {
           lng = 25.9231 + (Math.random() - 0.5) * 0.1;
           console.warn(`Property ${property.id} "${property.title}" has invalid coordinates, using demo coordinates: ${lat}, ${lng}`);
         }
-        
+
         return {
           id: property.id,
           title: property.title,
@@ -156,7 +155,7 @@ const BuyMapPage = () => {
               <span>Filters</span>
             </button>
           </div>
-          
+
           <div className="text-sm text-gray-600">
             <span className="font-medium">{properties.length}</span> properties found
           </div>

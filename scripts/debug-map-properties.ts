@@ -78,7 +78,9 @@ async function fixMissingCoordinates() {
       // Use proper parameter binding to fix the coordinate update
       await db.run(
         `UPDATE properties SET latitude = ?, longitude = ? WHERE id = ?`,
-        [randomLat.toString(), randomLng.toString(), prop.id]
+        randomLat.toString(),
+        randomLng.toString(),
+        prop.id
       );
     }
 
