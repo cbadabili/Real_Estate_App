@@ -231,14 +231,14 @@ const Navbar = () => {
                         </Link>
 
                         <Link
-                          to="/properties?type=land"
+                          to="/properties?type=land_plot"
                           className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 rounded"
                           onClick={() => setBuyDropdownOpen(false)}
                         >
                           <div className="flex items-center">
                             <MapPin className="h-4 w-4 mr-2 text-beedab-blue" />
                             <div>
-                              <div className="font-medium">Land for Development</div>
+                              <div className="font-medium">Land/Plot</div>
                               <div className="text-xs text-gray-500">Build your dream property</div>
                             </div>
                           </div>
