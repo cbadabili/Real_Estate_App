@@ -1,0 +1,184 @@
+🚨 Immediate Map Fixes - 5 Minutes
+Problem 1: Mixed Data Sources (Mapbox + OpenStreetMap)
+Current Issue: Your map shows "© Mapbox © OpenStreetMap" which means you're mixing two different map providers, causing conflicts.
+Fix: Use ONLY Mapbox, remove OpenStreetMap references.
+Problem 2: Properties Not Showing as Markers
+Current Issue: You see blue circles instead of property markers with details.
+Fix: Replace the current map component with proper property markers.
+Problem 3: Incomplete Coverage
+Current Issue: Gray areas where map data should be.
+Fix: Use better Mapbox style and ensure proper token configuration.
+
+🔧 Immediate Actions in Replit
+Step 1: Find Your Map Component (30 seconds)
+In Replit, use Ctrl+Shift+F and search for:
+
+"Property Map Search"
+"PropertyMapSearch"
+"mapbox"
+
+Tell me which file contains your map component (likely in client/src/components/ or client/src/pages/)
+Step 2: Quick Database Check (30 seconds)
+In Replit Shell, run:
+bash# Check if properties have coordinates
+echo "SELECT title, latitude, longitude FROM properties LIMIT 3;" | sqlite3 your_database.db
+Or in Database tab, run:
+sqlSELECT id, title, latitude, longitude, address FROM properties LIMIT 5;
+Step 3: Replace Map Component (3 minutes)
+Once you find the map file, replace it with this working version:
+typescriptimport React, { useEffect, useRef, useState } from 'react';
+import mapboxgl from 'mapbox-gl';
+import 'mapbox-gl/dist/mapbox-gl.css';
+
+// Your Mapbox token (get from mapbox.com if you don't have one)
+mapboxgl.accessToken = 'your_mapbox_token_here';
+
+interface Property {
+  id: string;
+  title: string;
+  latitude: number;
+  longitude: number;
+  price: number;
+  propertyType: string;
+  address?: string;
+}
+
+export const PropertyMapSearch = ({ properties = [] }) => {
+  const mapContainer = useRef<HTMLDivElement>(null);
+  const map = useRef<mapboxgl.Map | null>(null);
+
+  useEffect(() => {
+    if (!mapContainer.current || map.current) return;
+
+    // Initialize map with better settings for Botswana
+    map.current = new mapboxgl.Map({
+      container: mapContainer.current,
+      style: 'mapbox://styles/mapbox/streets-v12', // Better coverage
+      center: [25.9231, -24.6282], // Gaborone center
+      zoom: 11,
+      // Restrict to Botswana bounds
+      maxBounds: [
+        [19.999, -26.907], // Southwest
+        [29.375, -17.778]  // Northeast
+      ]
+    });
+
+    // Add controls
+    map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
+
+    return () => {
+      if (map.current) {
+        map.current.remove();
+        map.current = null;
+      }
+    };
+  }, []);
+
+  // Add property markers
+  useEffect(() => {
+    if (!map.current || !properties.length) return;
+
+    // Clear existing markers
+    document.querySelectorAll('.mapboxgl-marker').forEach(marker => marker.remove());
+
+    // Add markers for each property
+    properties.forEach(property => {
+      if (!property.latitude || !property.longitude) return;
+
+      // Create custom marker
+      const el = document.createElement('div');
+      el.style.cssText = `
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: #ff4444;
+        border: 2px solid white;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        font-size: 12px;
+      `;
+      el.innerHTML = '🏠';
+
+      // Create popup
+      const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(`
+        <div style="padding: 10px;">
+          <h3 style="margin: 0 0 5px 0;">${property.title}</h3>
+          <p style="margin: 0 0 5px 0;">📍 ${property.address || 'Gaborone'}</p>
+          <p style="margin: 0; font-weight: bold; color: #007bff;">
+            💰 P${property.price.toLocaleString()}
+          </p>
+        </div>
+      `);
+
+      // Add marker to map
+      new mapboxgl.Marker(el)
+        .setLngLat([property.longitude, property.latitude])
+        .setPopup(popup)
+        .addTo(map.current!);
+    });
+
+    // Fit map to show all properties
+    if (properties.length > 1) {
+      const bounds = new mapboxgl.LngLatBounds();
+      properties.forEach(p => {
+        if (p.latitude && p.longitude) {
+          bounds.extend([p.longitude, p.latitude]);
+        }
+      });
+      map.current.fitBounds(bounds, { padding: 50 });
+    }
+
+  }, [properties]);
+
+  return (
+    <div style={{ width: '100%', height: '600px', position: 'relative' }}>
+      <div ref={mapContainer} style={{ width: '100%', height: '100%' }} />
+      
+      {/* Property count overlay */}
+      <div style={{
+        position: 'absolute',
+        top: '10px',
+        left: '10px',
+        background: 'white',
+        padding: '8px 12px',
+        borderRadius: '5px',
+        boxShadow: '0 2px 5px rgba(0,0,0,0.2)',
+        fontSize: '14px',
+        fontWeight: 'bold'
+      }}>
+        🏠 {properties.length} properties found
+      </div>
+    </div>
+  );
+};
+Step 4: Add Test Data (1 minute)
+If properties still don't show, add test data:
+sql-- Add test properties with correct Gaborone coordinates
+INSERT INTO properties (id, title, latitude, longitude, price, property_type, address) VALUES
+('test-1', 'House in Gaborone Central', -24.6282, 25.9231, 500000, 'house', 'Central Gaborone'),
+('test-2', 'Plot in Block 8', -24.6400, 25.9100, 250000, 'land_plot', 'Block 8'),
+('test-3', 'Apartment in Mogoditshane', -24.6200, 25.8900, 350000, 'apartment', 'Mogoditshane');
+
+✅ What This Fixes
+
+✅ Removes OpenStreetMap conflict - Pure Mapbox only
+✅ Shows actual property markers - Red circles with house icons
+✅ Better map coverage - Uses Mapbox streets style
+✅ Correct positioning - Proper Botswana bounds
+✅ Interactive popups - Click markers to see property details
+✅ Auto-fit to properties - Map zooms to show all properties
+
+
+🎯 Quick Questions
+To give you the exact fix:
+
+What file contains your current map component? (search results from Ctrl+Shift+F)
+Do you have a Mapbox API token? (from mapbox.com account)
+What do you see when you run the database query? (do properties have lat/lng?)
+
+Once you answer these, I'll give you the exact file to update and the exact code to paste!

@@ -73,12 +73,13 @@ async function fixMissingCoordinates() {
       const randomLat = gaboroneLat + (Math.random() - 0.5) * 0.02;
       const randomLng = gaboroneLng + (Math.random() - 0.5) * 0.02;
 
-      // Use proper SQL update with individual queries to avoid parameter mismatch
-      const updateQuery = `UPDATE properties SET latitude = ?, longitude = ? WHERE id = ?`;
-      const params = [randomLat.toString(), randomLng.toString(), prop.id];
-
       console.log(`Updating property ${prop.id} with coordinates: ${randomLat}, ${randomLng}`);
-      await db.run(updateQuery, randomLat.toString(), randomLng.toString(), prop.id);
+      
+      // Use proper parameter binding to fix the coordinate update
+      await db.run(
+        `UPDATE properties SET latitude = ?, longitude = ? WHERE id = ?`,
+        [randomLat.toString(), randomLng.toString(), prop.id]
+      );
     }
 
     console.log(`✅ Updated ${propertiesNeedingFix.length} properties with coordinates`);
