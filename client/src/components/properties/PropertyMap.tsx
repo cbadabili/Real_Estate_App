@@ -95,11 +95,24 @@ export function PropertyMap({ properties, selectedProperty, onPropertySelect, cl
   
   // Try to center on first valid property, fallback to Gaborone
   const getMapCenter = (): [number, number] => {
-    const validProperty = properties.find(p => 
-      p.latitude != null && p.longitude != null && 
-      !isNaN(p.latitude) && !isNaN(p.longitude)
+    const validProperty = properties.find(p =>
+      p.latitude != null && p.longitude != null &&
+      !isNaN(p.latitude) && !isNaN(p.longitude) &&
+      isValidCoordinate(
+        typeof p.latitude === 'string' ? parseFloat(p.latitude) : p.latitude,
+        typeof p.longitude === 'string' ? parseFloat(p.longitude) : p.longitude
+      )
     );
-    return validProperty ? [validProperty.latitude, validProperty.longitude] : defaultCenter;
+    return validProperty
+      ? [
+          typeof validProperty.latitude === 'string'
+            ? parseFloat(validProperty.latitude)
+            : validProperty.latitude,
+          typeof validProperty.longitude === 'string'
+            ? parseFloat(validProperty.longitude)
+            : validProperty.longitude,
+        ]
+      : defaultCenter;
   };
   
   const center = getMapCenter();
