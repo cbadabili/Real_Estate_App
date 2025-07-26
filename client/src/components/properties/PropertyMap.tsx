@@ -93,35 +93,6 @@ export function PropertyMap({ properties, selectedProperty, onPropertySelect, cl
   // Botswana center coordinates with validation
   const defaultCenter: [number, number] = [-24.6282, 25.9231]; // Gaborone
   
-  // Try to center on first valid property, fallback to Gaborone
-  const getMapCenter = (): [number, number] => {
-    const validProperty = properties.find(p =>
-      p.latitude != null && p.longitude != null &&
-      !isNaN(p.latitude) && !isNaN(p.longitude) &&
-      isValidCoordinate(
-        typeof p.latitude === 'string' ? parseFloat(p.latitude) : p.latitude,
-        typeof p.longitude === 'string' ? parseFloat(p.longitude) : p.longitude
-      )
-    );
-    return validProperty
-      ? [
-          typeof validProperty.latitude === 'string'
-            ? parseFloat(validProperty.latitude)
-            : validProperty.latitude,
-          typeof validProperty.longitude === 'string'
-            ? parseFloat(validProperty.longitude)
-            : validProperty.longitude,
-        ]
-      : defaultCenter;
-  };
-  
-  const center = getMapCenter();
-  const zoom = 12;
-
-  const formatPrice = (price: number) => {
-    return `BWP ${price.toLocaleString()}`;
-  };
-
   // Validate coordinates helper with Botswana bounds check
   const isValidCoordinate = (lat: any, lng: any) => {
     // Handle null/undefined explicitly
@@ -152,6 +123,35 @@ export function PropertyMap({ properties, selectedProperty, onPropertySelect, cl
     }
     
     return isBasicValid && isInBotswana;
+  };
+
+  // Try to center on first valid property, fallback to Gaborone
+  const getMapCenter = (): [number, number] => {
+    const validProperty = properties.find(p =>
+      p.latitude != null && p.longitude != null &&
+      !isNaN(p.latitude) && !isNaN(p.longitude) &&
+      isValidCoordinate(
+        typeof p.latitude === 'string' ? parseFloat(p.latitude) : p.latitude,
+        typeof p.longitude === 'string' ? parseFloat(p.longitude) : p.longitude
+      )
+    );
+    return validProperty
+      ? [
+          typeof validProperty.latitude === 'string'
+            ? parseFloat(validProperty.latitude)
+            : validProperty.latitude,
+          typeof validProperty.longitude === 'string'
+            ? parseFloat(validProperty.longitude)
+            : validProperty.longitude,
+        ]
+      : defaultCenter;
+  };
+  
+  const center = getMapCenter();
+  const zoom = 12;
+
+  const formatPrice = (price: number) => {
+    return `BWP ${price.toLocaleString()}`;
   };
 
   // Create custom markers with price display
