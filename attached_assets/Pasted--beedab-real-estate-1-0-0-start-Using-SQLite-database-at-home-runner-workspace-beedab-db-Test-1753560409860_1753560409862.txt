@@ -1,0 +1,532 @@
+
+> beedab-real-estate@1.0.0 start
+Using SQLite database at: /home/runner/workspace/beedab.db
+Testing database connection...
+✅ Database connection successful
+🔄 Running database migrations...
+✅ No pending migrations
+Initializing database...
+Using SQLite database at: /home/runner/workspace/beedab.db
+Testing database connection...
+✅ Database connection successful
+Seeding database...
+🌱 Starting complete database seeding...
+Seeding users...
+✅ Users already exist, skipping...
+Seeding service categories...
+✅ Service categories already exist, skipping...
+Seeding marketplace providers...
+✅ Marketplace providers already exist, skipping...
+Seeding services data...
+✅ Services data already exists, skipping seeding...
+Seeding marketplace data...
+✅ Marketplace data already exists, skipping seeding...
+Seeding rental listings...
+✅ Rental listings already exist, skipping seeding...
+✅ All seeding completed successfully
+✅ Database initialization completed
+7:37:23 PM [express] serving on port 5000
+Browserslist: browsers data (caniuse-lite) is 9 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+Fetching properties...
+Property 3: lat=null, lng=null, type=farm
+Property 2: lat=null, lng=null, type=land_plot
+Property 1: lat=null, lng=null, type=farm
+Retrieved 3 properties from database
+Properties fetched: 3
+Property 3: lat=null, lng=null
+Property 2: lat=null, lng=null
+Property 1: lat=null, lng=null
+7:37:40 PM [express] GET /api/properties 304 in 29ms :: [{"id":3,"title":"three bed house","descript…
+Fetching properties...
+Property 3: lat=null, lng=null, type=farm
+Property 2: lat=null, lng=null, type=land_plot
+Property 1: lat=null, lng=null, type=farm
+Retrieved 3 properties from database
+Properties fetched: 3
+Property 3: lat=null, lng=null
+Property 2: lat=null, lng=null
+Property 1: lat=null, lng=null
+7:38:33 PM [express] GET /api/properties 304 in 11ms :: [{"id":3,"title":"three bed house","descript…
+Fetching properties...
+Property 3: lat=null, lng=null, type=farm
+Property 2: lat=null, lng=null, type=land_plot
+Property 1: lat=null, lng=null, type=farm
+Retrieved 3 properties from database
+Properties fetched: 3
+Property 3: lat=null, lng=null
+Property 2: lat=null, lng=null
+Property 1: lat=null, lng=null
+7:38:34 PM [express] GET /api/properties 304 in 10ms :: [{"id":3,"title":"three bed house","descript…
+
+> beedab-real-estate@1.0.0 start
+> npx tsx server/index.ts
+
+Using SQLite database at: /home/runner/workspace/beedab.db
+Testing database connection...
+✅ Database connection successful
+🔄 Running database migrations...
+✅ No pending migrations
+Initializing database...
+Using SQLite database at: /home/runner/workspace/beedab.db
+Testing database connection...
+✅ Database connection successful
+Seeding database...
+🌱 Starting complete database seeding...
+Seeding users...
+✅ Users already exist, skipping...
+Seeding service categories...
+✅ Service categories already exist, skipping...
+Seeding marketplace providers...
+✅ Marketplace providers already exist, skipping...
+Seeding services data...
+✅ Services data already exists, skipping seeding...
+Seeding marketplace data...
+✅ Marketplace data already exists, skipping seeding...
+Seeding rental listings...
+✅ Rental listings already exist, skipping seeding...
+✅ All seeding completed successfully
+✅ Database initialization completed
+7:37:23 PM [express] serving on port 5000
+Browserslist: browsers data (caniuse-lite) is 9 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+Fetching properties...
+Property 3: lat=null, lng=null, type=farm
+Property 2: lat=null, lng=null, type=land_plot
+Property 1: lat=null, lng=null, type=farm
+Retrieved 3 properties from database
+Properties fetched: 3
+Property 3: lat=null, lng=null
+Property 2: lat=null, lng=null
+Property 1: lat=null, lng=null
+7:37:40 PM [express] GET /api/properties 304 in 29ms :: [{"id":3,"title":"three bed house","descript…
+Fetching properties...
+Property 3: lat=null, lng=null, type=farm
+Property 2: lat=null, lng=null, type=land_plot
+Property 1: lat=null, lng=null, type=farm
+Retrieved 3 properties from database
+Properties fetched: 3
+Property 3: lat=null, lng=null
+Property 2: lat=null, lng=null
+Property 1: lat=null, lng=null
+7:38:33 PM [express] GET /api/properties 304 in 11ms :: [{"id":3,"title":"three bed house","descript…
+Fetching properties...
+Property 3: lat=null, lng=null, type=farm
+Property 2: lat=null, lng=null, type=land_plot
+Property 1: lat=null, lng=null, type=farm
+Retrieved 3 properties from database
+Properties fetched: 3
+Property 3: lat=null, lng=null
+Property 2: lat=null, lng=null
+Property 1: lat=null, lng=null
+7:38:34 PM [express] GET /api/properties 304 in 10ms :: [{"id":3,"title":"three bed house","descript…
+
+> beedab-real-estate@1.0.0 start
+> npx tsx server/index.ts
+
+Using SQLite database at: /home/runner/workspace/beedab.db
+Testing database connection...
+✅ Database connection successful
+🔄 Running database migrations...
+✅ No pending migrations
+Initializing database...
+Using SQLite database at: /home/runner/workspace/beedab.db
+Testing database connection...
+✅ Database connection successful
+Seeding database...
+🌱 Starting complete database seeding...
+Seeding users...
+✅ Users already exist, skipping...
+Seeding service categories...
+✅ Service categories already exist, skipping...
+Seeding marketplace providers...
+✅ Marketplace providers already exist, skipping...
+Seeding services data...
+✅ Services data already exists, skipping seeding...
+Seeding marketplace data...
+✅ Marketplace data already exists, skipping seeding...
+Seeding rental listings...
+✅ Rental listings already exist, skipping seeding...
+✅ All seeding completed successfully
+✅ Database initialization completed
+7:37:23 PM [express] serving on port 5000
+Browserslist: browsers data (caniuse-lite) is 9 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+Fetching properties...
+Property 3: lat=null, lng=null, type=farm
+Property 2: lat=null, lng=null, type=land_plot
+Property 1: lat=null, lng=null, type=farm
+Retrieved 3 properties from database
+Properties fetched: 3
+Property 3: lat=null, lng=null
+Property 2: lat=null, lng=null
+Property 1: lat=null, lng=null
+7:37:40 PM [express] GET /api/properties 304 in 29ms :: [{"id":3,"title":"three bed house","descript…
+Fetching properties...
+Property 3: lat=null, lng=null, type=farm
+Property 2: lat=null, lng=null, type=land_plot
+Property 1: lat=null, lng=null, type=farm
+Retrieved 3 properties from database
+Properties fetched: 3
+Property 3: lat=null, lng=null
+Property 2: lat=null, lng=null
+Property 1: lat=null, lng=null
+7:38:33 PM [express] GET /api/properties 304 in 11ms :: [{"id":3,"title":"three bed house","descript…
+Fetching properties...
+Property 3: lat=null, lng=null, type=farm
+Property 2: lat=null, lng=null, type=land_plot
+Property 1: lat=null, lng=null, type=farm
+Retrieved 3 properties from database
+Properties fetched: 3
+Property 3: lat=null, lng=null
+Property 2: lat=null, lng=null
+Property 1: lat=null, lng=null
+7:38:34 PM [express] GET /api/properties 304 in 10ms :: [{"id":3,"title":"three bed house","descript…
+Fetching properties...
+Property 3: lat=null, lng=null, type=farm
+Property 2: lat=null, lng=null, type=land_plot
+Property 1: lat=null, lng=null, type=farm
+Retrieved 3 properties from database
+Properties fetched: 3
+Property 3: lat=null, lng=null
+Property 2: lat=null, lng=null
+Property 1: lat=null, lng=null
+7:49:11 PM [express] GET /api/properties 304 in 14ms :: [{"id":3,"title":"three bed house","descript…
+Fetching properties...
+Property 3: lat=null, lng=null, type=farm
+Property 2: lat=null, lng=null, type=land_plot
+Property 1: lat=null, lng=null, type=farm
+Retrieved 3 properties from database
+Properties fetched: 3
+Property 3: lat=null, lng=null
+Property 2: lat=null, lng=null
+Property 1: lat=null, lng=null
+7:49:23 PM [express] GET /api/properties 304 in 11ms :: [{"id":3,"title":"three bed house","descript…
+Fetching properties...
+Property 3: lat=null, lng=null, type=farm
+Property 2: lat=null, lng=null, type=land_plot
+Property 1: lat=null, lng=null, type=farm
+Retrieved 3 properties from database
+Properties fetched: 3
+Property 3: lat=null, lng=null
+Property 2: lat=null, lng=null
+Property 1: lat=null, lng=null
+7:49:24 PM [express] GET /api/properties 304 in 11ms :: [{"id":3,"title":"three bed house","descript…
+7:51:16 PM [vite] hmr update /src/components/properties/PropertyMap.tsx, /src/index.css?v=652qa4i5pjt
+7:51:19 PM [vite] ✨ new dependencies optimized: mapbox-gl
+7:51:19 PM [vite] ✨ optimized dependencies changed. reloading
+Fetching properties...
+Property 3: lat=null, lng=null, type=farm
+Property 2: lat=null, lng=null, type=land_plot
+Property 1: lat=null, lng=null, type=farm
+Retrieved 3 properties from database
+Properties fetched: 3
+Property 3: lat=null, lng=null
+Property 2: lat=null, lng=null
+Property 1: lat=null, lng=null
+7:52:14 PM [express] GET /api/properties 304 in 14ms :: [{"id":3,"title":"three bed house","descript…
+Fetching properties...
+Property 3: lat=null, lng=null, type=farm
+Property 2: lat=null, lng=null, type=land_plot
+Property 1: lat=null, lng=null, type=farm
+Retrieved 3 properties from database
+Properties fetched: 3
+Property 3: lat=null, lng=null
+Property 2: lat=null, lng=null
+Property 1: lat=null, lng=null
+7:52:19 PM [express] GET /api/properties 304 in 12ms :: [{"id":3,"title":"three bed house","descript…
+Fetching properties...
+Property 3: lat=null, lng=null, type=farm
+Property 2: lat=null, lng=null, type=land_plot
+Property 1: lat=null, lng=null, type=farm
+Retrieved 3 properties from database
+Properties fetched: 3
+Property 3: lat=null, lng=null
+Property 2: lat=null, lng=null
+Property 1: lat=null, lng=null
+7:52:20 PM [express] GET /api/properties 304 in 9ms :: [{"id":3,"title":"three bed house","descripti…
+Fetching properties...
+Property 3: lat=null, lng=null, type=farm
+Property 2: lat=null, lng=null, type=land_plot
+Property 1: lat=null, lng=null, type=farm
+Retrieved 3 properties from database
+Properties fetched: 3
+Property 3: lat=null, lng=null
+Property 2: lat=null, lng=null
+Property 1: lat=null, lng=null
+7:52:54 PM [express] GET /api/properties 304 in 20ms :: [{"id":3,"title":"three bed house","descript…
+8:02:22 PM [vite] hmr update /src/components/layout/Navbar.tsx, /src/index.css?v=652qa4i5pjt
+8:02:24 PM [vite] Internal server error: /home/runner/workspace/client/src/components/layout/Navbar.tsx: Expected corresponding JSX closing tag for <div>. (371:18)
+
+  369 |                       </div>
+  370 |                     </div>
+> 371 |                   </motion.div>
+      |                   ^
+  372 |                 )}
+  373 |               </AnimatePresence>
+  374 |             </div>
+  Plugin: vite:react-babel
+  File: /home/runner/workspace/client/src/components/layout/Navbar.tsx:371:18
+  369|                        </div>
+  370|                      </div>
+  371|                    </motion.div>
+     |                    ^
+  372|                  )}
+  373|                </AnimatePresence>
+      at toParseError (/home/runner/workspace/node_modules/@babel/parser/src/parse-error.ts:95:45)
+      at raise (/home/runner/workspace/node_modules/@babel/parser/src/tokenizer/index.ts:1497:19)
+      at jsxParseElementAt (/home/runner/workspace/node_modules/@babel/parser/src/plugins/jsx/index.ts:527:18)
+      at jsxParseElementAt (/home/runner/workspace/node_modules/@babel/parser/src/plugins/jsx/index.ts:483:34)
+      at jsxParseElement (/home/runner/workspace/node_modules/@babel/parser/src/plugins/jsx/index.ts:559:19)
+      at parseExprAtom (/home/runner/workspace/node_modules/@babel/parser/src/plugins/jsx/index.ts:573:21)
+      at parseExprSubscripts (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:714:23)
+      at parseUpdate (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:693:21)
+      at parseMaybeUnary (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:655:23)
+      at parseMaybeUnary (/home/runner/workspace/node_modules/@babel/parser/src/plugins/typescript/index.ts:3735:20)
+      at parseMaybeUnaryOrPrivate (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:389:14)
+      at parseExprOps (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:401:23)
+      at parseMaybeConditional (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:356:23)
+      at parseMaybeAssign (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:298:21)
+      at fn (/home/runner/workspace/node_modules/@babel/parser/src/plugins/typescript/index.ts:3588:23)
+      at tryParse (/home/runner/workspace/node_modules/@babel/parser/src/parser/util.ts:174:20)
+      at parseMaybeAssign (/home/runner/workspace/node_modules/@babel/parser/src/plugins/typescript/index.ts:3587:20)
+      at callback (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:252:12)
+      at allowInAnd (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:3117:12)
+      at parseMaybeAssignAllowIn (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:251:17)
+      at parseParenAndDistinguishExpression (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:1771:16)
+      at parseExprAtom (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:1131:21)
+      at parseExprAtom (/home/runner/workspace/node_modules/@babel/parser/src/plugins/jsx/index.ts:583:22)
+      at parseExprSubscripts (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:714:23)
+      at parseUpdate (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:693:21)
+      at parseMaybeUnary (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:655:23)
+      at parseMaybeUnary (/home/runner/workspace/node_modules/@babel/parser/src/plugins/typescript/index.ts:3735:20)
+      at parseMaybeUnaryOrPrivate (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:389:14)
+      at parseExprOpBaseRightExpr (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:569:12)
+      at parseExprOpRightExpr (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:554:21)
+      at parseExprOp (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:485:27)
+      at parseExprOp (/home/runner/workspace/node_modules/@babel/parser/src/plugins/typescript/index.ts:2797:20)
+      at parseExprOps (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:407:17)
+      at parseMaybeConditional (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:356:23)
+      at parseMaybeAssign (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:298:21)
+      at parseMaybeAssign (/home/runner/workspace/node_modules/@babel/parser/src/plugins/typescript/index.ts:3607:22)
+      at parseExpressionBase (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:221:23)
+      at callback (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:212:39)
+      at allowInAnd (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:3117:12)
+      at parseExpression (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:212:17)
+      at jsxParseExpressionContainer (/home/runner/workspace/node_modules/@babel/parser/src/plugins/jsx/index.ts:376:33)
+      at jsxParseElementAt (/home/runner/workspace/node_modules/@babel/parser/src/plugins/jsx/index.ts:500:24)
+      at jsxParseElementAt (/home/runner/workspace/node_modules/@babel/parser/src/plugins/jsx/index.ts:483:34)
+      at jsxParseElementAt (/home/runner/workspace/node_modules/@babel/parser/src/plugins/jsx/index.ts:483:34)
+      at jsxParseElementAt (/home/runner/workspace/node_modules/@babel/parser/src/plugins/jsx/index.ts:483:34)
+      at jsxParseElementAt (/home/runner/workspace/node_modules/@babel/parser/src/plugins/jsx/index.ts:483:34)
+      at jsxParseElementAt (/home/runner/workspace/node_modules/@babel/parser/src/plugins/jsx/index.ts:483:34)
+      at jsxParseElement (/home/runner/workspace/node_modules/@babel/parser/src/plugins/jsx/index.ts:559:19)
+      at parseExprAtom (/home/runner/workspace/node_modules/@babel/parser/src/plugins/jsx/index.ts:573:21)
+      at parseExprSubscripts (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:714:23)
+
+> beedab-real-estate@1.0.0 start
+> npx tsx server/index.ts
+
+Using SQLite database at: /home/runner/workspace/beedab.db
+Testing database connection...
+✅ Database connection successful
+🔄 Running database migrations...
+✅ No pending migrations
+Initializing database...
+Using SQLite database at: /home/runner/workspace/beedab.db
+Testing database connection...
+✅ Database connection successful
+Seeding database...
+🌱 Starting complete database seeding...
+Seeding users...
+✅ Users already exist, skipping...
+Seeding service categories...
+✅ Service categories already exist, skipping...
+Seeding marketplace providers...
+✅ Marketplace providers already exist, skipping...
+Seeding services data...
+✅ Services data already exists, skipping seeding...
+Seeding marketplace data...
+✅ Marketplace data already exists, skipping seeding...
+Seeding rental listings...
+✅ Rental listings already exist, skipping seeding...
+✅ All seeding completed successfully
+✅ Database initialization completed
+7:37:23 PM [express] serving on port 5000
+Browserslist: browsers data (caniuse-lite) is 9 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+Fetching properties...
+Property 3: lat=null, lng=null, type=farm
+Property 2: lat=null, lng=null, type=land_plot
+Property 1: lat=null, lng=null, type=farm
+Retrieved 3 properties from database
+Properties fetched: 3
+Property 3: lat=null, lng=null
+Property 2: lat=null, lng=null
+Property 1: lat=null, lng=null
+7:37:40 PM [express] GET /api/properties 304 in 29ms :: [{"id":3,"title":"three bed house","descript…
+Fetching properties...
+Property 3: lat=null, lng=null, type=farm
+Property 2: lat=null, lng=null, type=land_plot
+Property 1: lat=null, lng=null, type=farm
+Retrieved 3 properties from database
+Properties fetched: 3
+Property 3: lat=null, lng=null
+Property 2: lat=null, lng=null
+Property 1: lat=null, lng=null
+7:38:33 PM [express] GET /api/properties 304 in 11ms :: [{"id":3,"title":"three bed house","descript…
+Fetching properties...
+Property 3: lat=null, lng=null, type=farm
+Property 2: lat=null, lng=null, type=land_plot
+Property 1: lat=null, lng=null, type=farm
+Retrieved 3 properties from database
+Properties fetched: 3
+Property 3: lat=null, lng=null
+Property 2: lat=null, lng=null
+Property 1: lat=null, lng=null
+7:38:34 PM [express] GET /api/properties 304 in 10ms :: [{"id":3,"title":"three bed house","descript…
+Fetching properties...
+Property 3: lat=null, lng=null, type=farm
+Property 2: lat=null, lng=null, type=land_plot
+Property 1: lat=null, lng=null, type=farm
+Retrieved 3 properties from database
+Properties fetched: 3
+Property 3: lat=null, lng=null
+Property 2: lat=null, lng=null
+Property 1: lat=null, lng=null
+7:49:11 PM [express] GET /api/properties 304 in 14ms :: [{"id":3,"title":"three bed house","descript…
+Fetching properties...
+Property 3: lat=null, lng=null, type=farm
+Property 2: lat=null, lng=null, type=land_plot
+Property 1: lat=null, lng=null, type=farm
+Retrieved 3 properties from database
+Properties fetched: 3
+Property 3: lat=null, lng=null
+Property 2: lat=null, lng=null
+Property 1: lat=null, lng=null
+7:49:23 PM [express] GET /api/properties 304 in 11ms :: [{"id":3,"title":"three bed house","descript…
+Fetching properties...
+Property 3: lat=null, lng=null, type=farm
+Property 2: lat=null, lng=null, type=land_plot
+Property 1: lat=null, lng=null, type=farm
+Retrieved 3 properties from database
+Properties fetched: 3
+Property 3: lat=null, lng=null
+Property 2: lat=null, lng=null
+Property 1: lat=null, lng=null
+7:49:24 PM [express] GET /api/properties 304 in 11ms :: [{"id":3,"title":"three bed house","descript…
+7:51:16 PM [vite] hmr update /src/components/properties/PropertyMap.tsx, /src/index.css?v=652qa4i5pjt
+7:51:19 PM [vite] ✨ new dependencies optimized: mapbox-gl
+7:51:19 PM [vite] ✨ optimized dependencies changed. reloading
+Fetching properties...
+Property 3: lat=null, lng=null, type=farm
+Property 2: lat=null, lng=null, type=land_plot
+Property 1: lat=null, lng=null, type=farm
+Retrieved 3 properties from database
+Properties fetched: 3
+Property 3: lat=null, lng=null
+Property 2: lat=null, lng=null
+Property 1: lat=null, lng=null
+7:52:14 PM [express] GET /api/properties 304 in 14ms :: [{"id":3,"title":"three bed house","descript…
+Fetching properties...
+Property 3: lat=null, lng=null, type=farm
+Property 2: lat=null, lng=null, type=land_plot
+Property 1: lat=null, lng=null, type=farm
+Retrieved 3 properties from database
+Properties fetched: 3
+Property 3: lat=null, lng=null
+Property 2: lat=null, lng=null
+Property 1: lat=null, lng=null
+7:52:19 PM [express] GET /api/properties 304 in 12ms :: [{"id":3,"title":"three bed house","descript…
+Fetching properties...
+Property 3: lat=null, lng=null, type=farm
+Property 2: lat=null, lng=null, type=land_plot
+Property 1: lat=null, lng=null, type=farm
+Retrieved 3 properties from database
+Properties fetched: 3
+Property 3: lat=null, lng=null
+Property 2: lat=null, lng=null
+Property 1: lat=null, lng=null
+7:52:20 PM [express] GET /api/properties 304 in 9ms :: [{"id":3,"title":"three bed house","descripti…
+Fetching properties...
+Property 3: lat=null, lng=null, type=farm
+Property 2: lat=null, lng=null, type=land_plot
+Property 1: lat=null, lng=null, type=farm
+Retrieved 3 properties from database
+Properties fetched: 3
+Property 3: lat=null, lng=null
+Property 2: lat=null, lng=null
+Property 1: lat=null, lng=null
+7:52:54 PM [express] GET /api/properties 304 in 20ms :: [{"id":3,"title":"three bed house","descript…
+8:02:22 PM [vite] hmr update /src/components/layout/Navbar.tsx, /src/index.css?v=652qa4i5pjt
+8:02:24 PM [vite] Internal server error: /home/runner/workspace/client/src/components/layout/Navbar.tsx: Expected corresponding JSX closing tag for <div>. (371:18)
+
+  369 |                       </div>
+  370 |                     </div>
+> 371 |                   </motion.div>
+      |                   ^
+  372 |                 )}
+  373 |               </AnimatePresence>
+  374 |             </div>
+  Plugin: vite:react-babel
+  File: /home/runner/workspace/client/src/components/layout/Navbar.tsx:371:18
+  369|                        </div>
+  370|                      </div>
+  371|                    </motion.div>
+     |                    ^
+  372|                  )}
+  373|                </AnimatePresence>
+      at toParseError (/home/runner/workspace/node_modules/@babel/parser/src/parse-error.ts:95:45)
+      at raise (/home/runner/workspace/node_modules/@babel/parser/src/tokenizer/index.ts:1497:19)
+      at jsxParseElementAt (/home/runner/workspace/node_modules/@babel/parser/src/plugins/jsx/index.ts:527:18)
+      at jsxParseElementAt (/home/runner/workspace/node_modules/@babel/parser/src/plugins/jsx/index.ts:483:34)
+      at jsxParseElement (/home/runner/workspace/node_modules/@babel/parser/src/plugins/jsx/index.ts:559:19)
+      at parseExprAtom (/home/runner/workspace/node_modules/@babel/parser/src/plugins/jsx/index.ts:573:21)
+      at parseExprSubscripts (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:714:23)
+      at parseUpdate (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:693:21)
+      at parseMaybeUnary (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:655:23)
+      at parseMaybeUnary (/home/runner/workspace/node_modules/@babel/parser/src/plugins/typescript/index.ts:3735:20)
+      at parseMaybeUnaryOrPrivate (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:389:14)
+      at parseExprOps (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:401:23)
+      at parseMaybeConditional (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:356:23)
+      at parseMaybeAssign (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:298:21)
+      at fn (/home/runner/workspace/node_modules/@babel/parser/src/plugins/typescript/index.ts:3588:23)
+      at tryParse (/home/runner/workspace/node_modules/@babel/parser/src/parser/util.ts:174:20)
+      at parseMaybeAssign (/home/runner/workspace/node_modules/@babel/parser/src/plugins/typescript/index.ts:3587:20)
+      at callback (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:252:12)
+      at allowInAnd (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:3117:12)
+      at parseMaybeAssignAllowIn (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:251:17)
+      at parseParenAndDistinguishExpression (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:1771:16)
+      at parseExprAtom (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:1131:21)
+      at parseExprAtom (/home/runner/workspace/node_modules/@babel/parser/src/plugins/jsx/index.ts:583:22)
+      at parseExprSubscripts (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:714:23)
+      at parseUpdate (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:693:21)
+      at parseMaybeUnary (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:655:23)
+      at parseMaybeUnary (/home/runner/workspace/node_modules/@babel/parser/src/plugins/typescript/index.ts:3735:20)
+      at parseMaybeUnaryOrPrivate (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:389:14)
+      at parseExprOpBaseRightExpr (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:569:12)
+      at parseExprOpRightExpr (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:554:21)
+      at parseExprOp (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:485:27)
+      at parseExprOp (/home/runner/workspace/node_modules/@babel/parser/src/plugins/typescript/index.ts:2797:20)
+      at parseExprOps (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:407:17)
+      at parseMaybeConditional (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:356:23)
+      at parseMaybeAssign (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:298:21)
+      at parseMaybeAssign (/home/runner/workspace/node_modules/@babel/parser/src/plugins/typescript/index.ts:3607:22)
+      at parseExpressionBase (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:221:23)
+      at callback (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:212:39)
+      at allowInAnd (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:3117:12)
+      at parseExpression (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:212:17)
+      at jsxParseExpressionContainer (/home/runner/workspace/node_modules/@babel/parser/src/plugins/jsx/index.ts:376:33)
+      at jsxParseElementAt (/home/runner/workspace/node_modules/@babel/parser/src/plugins/jsx/index.ts:500:24)
+      at jsxParseElementAt (/home/runner/workspace/node_modules/@babel/parser/src/plugins/jsx/index.ts:483:34)
+      at jsxParseElementAt (/home/runner/workspace/node_modules/@babel/parser/src/plugins/jsx/index.ts:483:34)
+      at jsxParseElementAt (/home/runner/workspace/node_modules/@babel/parser/src/plugins/jsx/index.ts:483:34)
+      at jsxParseElementAt (/home/runner/workspace/node_modules/@babel/parser/src/plugins/jsx/index.ts:483:34)
+      at jsxParseElementAt (/home/runner/workspace/node_modules/@babel/parser/src/plugins/jsx/index.ts:483:34)
+      at jsxParseElement (/home/runner/workspace/node_modules/@babel/parser/src/plugins/jsx/index.ts:559:19)
+      at parseExprAtom (/home/runner/workspace/node_modules/@babel/parser/src/plugins/jsx/index.ts:573:21)
+      at parseExprSubscripts (/home/runner/workspace/node_modules/@babel/parser/src/parser/expression.ts:714:23)
