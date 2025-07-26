@@ -225,7 +225,7 @@ const PropertiesPage: React.FC = () => {
                 </button>
               </div>
             </div>
-            
+
             <div className="text-sm text-gray-600">
               {sortedProperties.length} properties found
             </div>
@@ -366,12 +366,21 @@ const PropertiesPage: React.FC = () => {
                 </button>
               </div>
             ) : viewMode === 'map' ? (
-              <PropertyMap
-                properties={sortedProperties}
-                selectedProperty={selectedProperty}
-                onPropertySelect={setSelectedProperty}
-                className="min-h-[600px]"
-              />
+              <div className="h-96 bg-gray-100 rounded-lg">
+                <PropertyMap 
+                  properties={properties.map(p => ({
+                    id: p.id,
+                    title: p.title,
+                    latitude: p.latitude,
+                    longitude: p.longitude,
+                    price: p.price,
+                    propertyType: p.propertyType,
+                    location: p.location
+                  }))}
+                  height="384px"
+                  className="w-full"
+                />
+              </div>
             ) : (
               <PropertyGrid
                 properties={sortedProperties}

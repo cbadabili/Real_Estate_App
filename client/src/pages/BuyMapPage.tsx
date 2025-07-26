@@ -183,7 +183,8 @@ const BuyMapPage = () => {
                 properties={properties}
                 selectedProperty={selectedProperty}
                 onPropertySelect={handlePropertySelect}
-                className="min-h-[70vh]"
+                height="70vh"
+                className="w-full"
               />
             </div>
           </div>

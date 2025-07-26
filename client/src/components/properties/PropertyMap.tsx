@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
+import { MapPin } from 'lucide-react';
 
 // Set your Mapbox access token
 mapboxgl.accessToken = 'pk.eyJ1IjoiY2JhZGFiaWxpIiwiYSI6ImNrcHNkbmduZjBmYW0ycHQ4c2V2dmNpbjAifQ.2TxX-aS70swDry_8SrE7iQ';
@@ -173,10 +174,12 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
         className="w-full rounded-lg overflow-hidden border border-gray-200"
       />
       {properties.filter(p => p.latitude && p.longitude).length === 0 && (
-        <div className="absolute inset-0 bg-gray-100 rounded-lg flex items-center justify-center">
-          <div className="text-center text-gray-500">
+        <div className="absolute inset-0 bg-gray-50 rounded-lg flex items-center justify-center z-10">
+          <div className="text-center text-gray-600 bg-white p-6 rounded-lg shadow-sm border">
+            <MapPin className="mx-auto h-12 w-12 text-gray-400 mb-3" />
             <div className="text-lg font-medium mb-2">No Properties with Coordinates</div>
             <div className="text-sm">Properties need valid coordinates to display on the map.</div>
+            <div className="text-xs text-gray-500 mt-2">Total properties: {properties.length}</div>
           </div>
         </div>
       )}
