@@ -80,6 +80,7 @@ import MarketInsightsHub from './pages/MarketInsightsHub';
 import LegalTransactionsHub from './pages/LegalTransactionsHub';
 import ServiceProviderDirectory from './pages/ServiceProviderDirectory';
 import TestMapPage from './pages/TestMapPage';
+import BuyMapPage from './pages/BuyMapPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -207,6 +208,7 @@ function App() {
 
               {/* Test and admin routes */}
               <Route path="/test-map" element={<TestMapPage />} />
+              <Route path="/buy/map" element={<BuyMapPage />} />
               <Route path="/admin" element={<AdminPage />} />
             </Routes>
               </div>

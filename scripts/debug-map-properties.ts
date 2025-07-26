@@ -76,9 +76,9 @@ async function fixMissingCoordinates() {
       // Use proper SQL update with individual queries to avoid parameter mismatch
       const updateQuery = `UPDATE properties SET latitude = ?, longitude = ? WHERE id = ?`;
       const params = [randomLat.toString(), randomLng.toString(), prop.id];
-      
+
       console.log(`Updating property ${prop.id} with coordinates: ${randomLat}, ${randomLng}`);
-      await db.run(updateQuery, params);
+      await db.run(updateQuery, randomLat.toString(), randomLng.toString(), prop.id);
     }
 
     console.log(`✅ Updated ${propertiesNeedingFix.length} properties with coordinates`);
