@@ -80,9 +80,7 @@ async function fixMissingCoordinates() {
       // Use proper parameter binding to fix the coordinate update
       await db.run(
         `UPDATE properties SET latitude = ?, longitude = ? WHERE id = ?`,
-        randomLat.toString(),
-        randomLng.toString(),
-        prop.id
+        [randomLat.toString(), randomLng.toString(), prop.id]
       );
     }
 
@@ -179,19 +177,7 @@ async function main() {
     console.log('\n🔄 Re-running diagnosis after fix...\n');
   }
 
-  const diagnosis = await diagnoseMapProperties();
-
-  if (diagnosis) {
-    console.log('\n📈 Summary:');
-    console.log(`  Total properties: ${allProperties.length}`);
-    console.log(`  With coordinates: ${validCoords}`);
-    console.log(`  Missing coordinates: ${missingCoords}`);
-
-    if (missingCoords > 0 && !args.includes('fix')) {
-      console.log('\n💡 Run with "fix" argument to add coordinates:');
-      console.log('   npx tsx scripts/debug-map-properties.ts fix');
-    }
-  }
+  await diagnoseMapProperties();
 }
 
 main().catch(console.error);
