@@ -89,6 +89,7 @@ app.use((req, res, next) => {
 
   // Initialize database with migrations
   const { seedManager } = await import('./seed-manager');
+  const { initializeDatabase } = await import('./db');
 
   try {
     console.log('🔄 Running database migrations...');
@@ -101,7 +102,7 @@ app.use((req, res, next) => {
 
     if (shouldInitializeDB) {
       console.log('Initializing database...');
-      await db.initializeDatabase();
+      await initializeDatabase();
     }
 
     if (shouldSeedDB) {
