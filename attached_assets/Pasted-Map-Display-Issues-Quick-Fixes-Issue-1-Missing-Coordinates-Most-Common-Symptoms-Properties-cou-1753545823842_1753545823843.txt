@@ -1,0 +1,91 @@
+Map Display Issues - Quick Fixes
+Issue 1: Missing Coordinates (Most Common)
+Symptoms: Properties count shows "3 properties found" but map is empty
+Quick Fix:
+bash# Add sample coordinates to your properties
+npx tsx scripts/debug-map-properties.ts fix
+Manual Fix in Database:
+sql-- Update properties with Gaborone coordinates
+UPDATE properties SET 
+  latitude = -24.6282, 
+  longitude = 25.9231 
+WHERE latitude IS NULL OR latitude = 0;
+Issue 2: Map Component Not Loading Data
+Check your map component file (likely client/src/components/MapView.tsx or similar):
+typescript// Make sure your map component fetches properties
+useEffect(() => {
+  // This should fetch properties with coordinates
+  fetchProperties().then(setProperties);
+}, []);
+
+// Render markers for each property
+{properties.map(property => (
+  property.latitude && property.longitude && (
+    <MapMarker 
+      key={property.id}
+      lat={property.latitude}
+      lng={property.longitude}
+      property={property}
+    />
+  )
+))}
+Issue 3: Map Zoom/Center Issues
+Check map initialization:
+typescript// Map should be centered on Botswana/Gaborone
+const mapCenter = {
+  lat: -24.6282,  // Gaborone latitude
+  lng: 25.9231    // Gaborone longitude
+};
+
+const mapZoom = 12; // Zoom level for city view
+Issue 4: Console Errors
+Check browser console (F12 → Console) for:
+
+API key errors (Google Maps)
+Network errors fetching properties
+JavaScript errors in map component
+
+Issue 5: API Response Issues
+Test your properties API:
+bash# In Replit Shell - test the API
+curl http://localhost:5000/api/properties
+Expected response should include:
+json[
+  {
+    "id": "1",
+    "title": "Property Title",
+    "latitude": -24.6282,
+    "longitude": 25.9231,
+    ...
+  }
+]
+Quick Debugging Checklist
+
+ Properties have latitude/longitude values
+ Coordinates are valid for Botswana (-26.9 to -17.8 lat, 20.0 to 29.4 lng)
+ Map component is fetching data from correct API endpoint
+ No JavaScript errors in browser console
+ Map is centered on correct location (Gaborone)
+ Map markers are being rendered for each property
+
+Immediate Actions
+
+Run diagnostic script to identify the exact issue
+Check database for coordinate data
+Add sample coordinates if missing
+Refresh the map view in your app
+Check browser console for errors
+
+Emergency Fix (Add Test Data)
+If you need properties to show immediately:
+sql-- Add 3 test properties with coordinates
+INSERT INTO properties (title, latitude, longitude, property_type, price, address) VALUES
+('Test House in Gaborone', -24.6282, 25.9231, 'house', 500000, 'Central Gaborone'),
+('Test Plot in Mogoditshane', -24.6200, 25.8900, 'land_plot', 150000, 'Mogoditshane'),
+('Test Apartment in Block 8', -24.6400, 25.9100, 'apartment', 300000, 'Block 8, Gaborone');
+Next Steps After Fix
+
+Implement proper geocoding for new properties
+Add address-to-coordinate conversion
+Validate coordinates on property creation
+Add map error handling and loading states
