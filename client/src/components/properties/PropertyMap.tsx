@@ -109,23 +109,30 @@ export function PropertyMap({ properties, selectedProperty, onPropertySelect, cl
     return `BWP ${price.toLocaleString()}`;
   };
 
-  // Validate coordinates helper
+  // Validate coordinates helper with Botswana bounds check
   const isValidCoordinate = (lat: any, lng: any) => {
     const latNum = typeof lat === 'string' ? parseFloat(lat) : lat;
     const lngNum = typeof lng === 'string' ? parseFloat(lng) : lng;
     
-    const isValid = latNum != null && lngNum != null && 
+    // Basic validation
+    const isBasicValid = latNum != null && lngNum != null && 
            typeof latNum === 'number' && typeof lngNum === 'number' &&
            !isNaN(latNum) && !isNaN(lngNum) &&
-           latNum >= -90 && latNum <= 90 && lngNum >= -180 && lngNum <= 180 &&
            latNum !== 0 && lngNum !== 0; // Exclude 0,0 coordinates
     
-    if (!isValid) {
-      console.log(`Invalid coordinate: lat=${lat} (type: ${typeof lat}), lng=${lng} (type: ${typeof lng})`);
-      console.log(`Parsed: lat=${latNum}, lng=${lngNum}`);
+    // Botswana bounds check (approximately -26.9 to -17.8 lat, 20.0 to 29.4 lng)
+    const isInBotswana = isBasicValid && 
+           latNum >= -26.9 && latNum <= -17.8 && 
+           lngNum >= 20.0 && lngNum <= 29.4;
+    
+    if (!isBasicValid) {
+      console.warn(`Invalid coordinate: lat=${lat} (type: ${typeof lat}), lng=${lng} (type: ${typeof lng})`);
+      console.warn(`Parsed: lat=${latNum}, lng=${lngNum}`);
+    } else if (!isInBotswana) {
+      console.warn(`Coordinate outside Botswana bounds: lat=${latNum}, lng=${lngNum}`);
     }
     
-    return isValid;
+    return isBasicValid && isInBotswana;
   };
 
   // Create custom markers with price display
@@ -178,15 +185,22 @@ export function PropertyMap({ properties, selectedProperty, onPropertySelect, cl
         />
 
         {(() => {
-          console.log('PropertyMap: Rendering properties', properties);
-          console.log('Properties data:', properties.map(p => ({
-            id: p.id,
-            title: p.title,
-            lat: p.latitude,
-            lng: p.longitude,
-            latType: typeof p.latitude,
-            lngType: typeof p.longitude
-          })));
+          console.group('PropertyMap: Rendering Analysis');
+          console.log(`Total properties received: ${properties.length}`);
+          
+          // Detailed property analysis
+          properties.forEach((p, index) => {
+            console.log(`Property ${index + 1}:`, {
+              id: p.id,
+              title: p.title,
+              latitude: p.latitude,
+              longitude: p.longitude,
+              latType: typeof p.latitude,
+              lngType: typeof p.longitude,
+              latParsed: typeof p.latitude === 'string' ? parseFloat(p.latitude) : p.latitude,
+              lngParsed: typeof p.longitude === 'string' ? parseFloat(p.longitude) : p.longitude
+            });
+          });
           
           const validProperties = properties.filter(property => {
             const lat = typeof property.latitude === 'string' ? parseFloat(property.latitude) : property.latitude;
@@ -194,18 +208,29 @@ export function PropertyMap({ properties, selectedProperty, onPropertySelect, cl
             
             const isValid = isValidCoordinate(lat, lng);
             if (!isValid) {
-              console.log(`Invalid coordinates for property ${property.id}: lat=${property.latitude} (${typeof property.latitude}), lng=${property.longitude} (${typeof property.longitude})`);
-              console.log(`Parsed values: lat=${lat}, lng=${lng}`);
+              console.error(`❌ Invalid coordinates for property ${property.id} "${property.title}":`, {
+                rawLat: property.latitude,
+                rawLng: property.longitude,
+                parsedLat: lat,
+                parsedLng: lng,
+                latType: typeof property.latitude,
+                lngType: typeof property.longitude
+              });
+            } else {
+              console.log(`✅ Valid coordinates for property ${property.id} "${property.title}": [${lat}, ${lng}]`);
             }
             return isValid;
           });
           
-          console.log(`Total properties: ${properties.length}, Valid properties: ${validProperties.length}`);
+          console.log(`📊 Results: ${validProperties.length}/${properties.length} properties have valid coordinates`);
           
           if (validProperties.length === 0) {
-            console.warn('No valid properties found for map rendering');
-            console.warn('Raw properties data:', properties);
+            console.error('🚨 NO VALID PROPERTIES FOR MAP RENDERING');
+            console.error('This explains why the map appears empty despite showing property count');
+            console.error('Raw properties data for debugging:', properties);
           }
+          
+          console.groupEnd();
           
           return validProperties.map((property) => {
             const isSelected = selectedProperty?.id === property.id;
