@@ -117,7 +117,8 @@ export function PropertyMap({ properties, selectedProperty, onPropertySelect, cl
     const isValid = latNum != null && lngNum != null && 
            typeof latNum === 'number' && typeof lngNum === 'number' &&
            !isNaN(latNum) && !isNaN(lngNum) &&
-           latNum >= -90 && latNum <= 90 && lngNum >= -180 && lngNum <= 180;
+           latNum >= -90 && latNum <= 90 && lngNum >= -180 && lngNum <= 180 &&
+           latNum !== 0 && lngNum !== 0; // Exclude 0,0 coordinates
     
     if (!isValid) {
       console.log(`Invalid coordinate: lat=${lat} (type: ${typeof lat}), lng=${lng} (type: ${typeof lng})`);
