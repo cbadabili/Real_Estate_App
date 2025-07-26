@@ -274,6 +274,7 @@ const Navbar = () => {
                             </div>
                           </div>
                         </Link>
+                        </div>
                       </div>
 
                       {/* Right Column - Buyer Journey & Professional Services */}
