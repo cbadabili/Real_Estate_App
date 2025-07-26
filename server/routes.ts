@@ -1346,14 +1346,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         if (typeof lat === 'string') lat = parseFloat(lat);
         if (typeof lng === 'string') lng = parseFloat(lng);
 
+        // Handle null/undefined values explicitly
+        if (lat === null || lat === undefined) lat = NaN;
+        if (lng === null || lng === undefined) lng = NaN;
+
         // Check if coordinates are valid
         const hasValidCoords = lat != null && lng != null &&
                              !isNaN(lat) && !isNaN(lng) &&
                              lat >= -90 && lat <= 90 &&
-                             lng >= -180 && lng <= 180;
+                             lng >= -180 && lng <= 180 &&
+                             lat !== 0 && lng !== 0; // Exclude 0,0 coordinates
 
         if (!hasValidCoords) {
-          console.log(`Property ${prop.id} has invalid coordinates (${lat}, ${lng}), using fallback for ${prop.city || prop.state}`);
+          console.log(`Property ${prop.id} "${prop.title}" has invalid coordinates (${prop.latitude}, ${prop.longitude}), using fallback for ${prop.city || prop.state}`);
 
           // Try to get coordinates from city name
           const cityName = prop.city || prop.state;

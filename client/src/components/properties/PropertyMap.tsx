@@ -111,6 +111,12 @@ export function PropertyMap({ properties, selectedProperty, onPropertySelect, cl
 
   // Validate coordinates helper with Botswana bounds check
   const isValidCoordinate = (lat: any, lng: any) => {
+    // Handle null/undefined explicitly
+    if (lat === null || lat === undefined || lng === null || lng === undefined) {
+      console.warn(`Null/undefined coordinates: lat=${lat}, lng=${lng}`);
+      return false;
+    }
+
     const latNum = typeof lat === 'string' ? parseFloat(lat) : lat;
     const lngNum = typeof lng === 'string' ? parseFloat(lng) : lng;
     
