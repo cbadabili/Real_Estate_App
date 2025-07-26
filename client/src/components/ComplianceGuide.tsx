@@ -70,7 +70,7 @@ export const ComplianceGuide: React.FC<ComplianceGuideProps> = ({
         id: 'tribal_clearance',
         title: 'Tribal Land Board Clearance',
         description: 'Required for customary land transactions',
-        required: propertyType === 'land',
+        required: propertyType === 'land_plot',
         completed: false,
         timeframe: '14-30 business days',
         authority: 'Tribal Land Board',

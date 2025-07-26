@@ -127,30 +127,20 @@ export const PropertyFilters: React.FC<PropertyFiltersProps> = ({
             <Home className="h-4 w-4 mr-2 text-beedab-blue" />
             Property Type
           </label>
-          <div className="grid grid-cols-2 gap-2">
-            {[
-              { value: 'all', label: 'All Types' },
-              { value: 'house', label: 'House' },
-              { value: 'apartment', label: 'Apartment' },
-              { value: 'townhouse', label: 'Townhouse' },
-              { value: 'land', label: 'Plot/Land' },
-              { value: 'mmatseta', label: 'Mmatseta' },
-              { value: 'commercial', label: 'Commercial' },
-              { value: 'farm', label: 'Farm' }
-            ].map((type) => (
-              <button
-                key={type.value}
-                onClick={() => updateFilter('propertyType', type.value)}
-                className={`p-2 text-sm rounded-lg border transition-colors ${
-                  safeFilters.propertyType === type.value
-                    ? 'border-beedab-blue bg-beedab-blue text-white'
-                    : 'border-gray-300 text-gray-700 hover:border-beedab-blue hover:text-beedab-blue'
-                }`}
-              >
-                {type.label}
-              </button>
-            ))}
-          </div>
+          
+          <select
+            value={safeFilters.propertyType}
+            onChange={(e) => updateFilter('propertyType', e.target.value)}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
+          >
+            <option value="all">All Types</option>
+            <option value="house">Houses</option>
+            <option value="apartment">Apartments</option>
+            <option value="townhouse">Townhouses</option>
+            <option value="land_plot">Land/Plot</option>
+            <option value="commercial">Commercial</option>
+            <option value="farm">Farm</option>
+          </select>
         </div>
 
         {/* Bedrooms */}

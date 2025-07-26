@@ -47,7 +47,7 @@ const CreateListingPage = () => {
     { value: 'townhouse', label: 'Townhouse', icon: Home },
     { value: 'commercial', label: 'Commercial', icon: Store },
     { value: 'farm', label: 'Farm', icon: Tractor },
-    { value: 'land', label: 'Land', icon: Mountain }
+    { value: 'land_plot', label: 'Land/Plot', icon: Mountain }
   ];
 
   const listingTypes = [
@@ -632,10 +632,10 @@ const CreateListingPage = () => {
                 </div>
 
                     {/* Plot Size - Show for Farm, House, Commercial and Land */}
-                    {(watchedPropertyType === 'farm' || watchedPropertyType === 'house' || watchedPropertyType === 'commercial' || watchedPropertyType === 'land') && (
+                    {(watchedPropertyType === 'farm' || watchedPropertyType === 'house' || watchedPropertyType === 'commercial' || watchedPropertyType === 'land_plot') && (
                       <div>
                         <label className="block text-sm font-medium text-neutral-700 mb-2">
-                          {(watchedPropertyType === 'farm' || watchedPropertyType === 'land') ? 'Land Size *' : 'Land Size *'}
+                          {(watchedPropertyType === 'farm' || watchedPropertyType === 'land_plot') ? 'Land Size *' : 'Land Size *'}
                         </label>
                         <div className="flex space-x-2">
                           <input
@@ -644,7 +644,7 @@ const CreateListingPage = () => {
                             className="flex-1 px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent transition-all"
                             placeholder="1000"
                           />
-                          {(watchedPropertyType === 'farm' || watchedPropertyType === 'land') && (
+                          {(watchedPropertyType === 'farm' || watchedPropertyType === 'land_plot') && (
                             <select
                               {...register('plotUnit', { required: 'Plot unit is required' })}
                               className="px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
@@ -963,7 +963,7 @@ const CreateListingPage = () => {
                     )}
 
                     {/* Land-specific fields */}
-                    {watchedPropertyType === 'land' && (
+                    {watchedPropertyType === 'land_plot' && (
                       <div className="space-y-4">
                         <div>
                           <label className="block text-sm font-medium text-neutral-700 mb-2">
@@ -1283,8 +1283,8 @@ const CreateListingPage = () => {
                           <li>Address: {watch('address')}</li>
 
                           {/* Plot Size - Show for Farm, House, Commercial and Land */}
-                          {(watchedPropertyType === 'farm' || watchedPropertyType === 'house' || watchedPropertyType === 'commercial' || watchedPropertyType === 'land') && watch('plotSize') && (
-                            <li>{(watchedPropertyType === 'farm' || watchedPropertyType === 'land') ? 'Land Size' : 'Land Size'}: {parseInt(watch('plotSize') || '0').toLocaleString()} {(watchedPropertyType === 'farm' || watchedPropertyType === 'land') ? watch('plotUnit') : 'sqm'}</li>
+                          {(watchedPropertyType === 'farm' || watchedPropertyType === 'house' || watchedPropertyType === 'commercial' || watchedPropertyType === 'land_plot') && watch('plotSize') && (
+                            <li>{(watchedPropertyType === 'farm' || watchedPropertyType === 'land_plot') ? 'Land Size' : 'Land Size'}: {parseInt(watch('plotSize') || '0').toLocaleString()} {(watchedPropertyType === 'farm' || watchedPropertyType === 'land_plot') ? watch('plotUnit') : 'sqm'}</li>
                           )}
 
                           {/* Building Size - Show for House, Apartment, Townhouse and Commercial */}
@@ -1323,19 +1323,19 @@ const CreateListingPage = () => {
                           )}
 
                           {/* Land specific fields */}
-                          {watchedPropertyType === 'land' && watch('zoningType') && (
+                          {watchedPropertyType === 'land_plot' && watch('zoningType') && (
                             <li>Zoning: {watch('zoningType')}</li>
                           )}
-                          {watchedPropertyType === 'land' && watch('fenced') && (
+                          {watchedPropertyType === 'land_plot' && watch('fenced') && (
                             <li>Fenced: {watch('fenced') === 'yes' ? 'Yes' : 'No'}</li>
                           )}
-                          {watchedPropertyType === 'land' && watch('serviced') && (
+                          {watchedPropertyType === 'land_plot' && watch('serviced') && (
                             <li>Serviced: {watch('serviced') === 'yes' ? 'Yes' : 'No'}</li>
                           )}
-                          {watchedPropertyType === 'land' && watch('topography') && (
+                          {watchedPropertyType === 'land_plot' && watch('topography') && (
                             <li>Topography: {watch('topography')}</li>
                           )}
-                          {watchedPropertyType === 'land' && watch('roadAccess') && (
+                          {watchedPropertyType === 'land_plot' && watch('roadAccess') && (
                             <li>Road Access: {watch('roadAccess')}</li>
                           )}
                         </ul>

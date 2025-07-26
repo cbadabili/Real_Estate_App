@@ -152,9 +152,9 @@ export const PlotSearchFilters: React.FC<PlotSearchFiltersProps> = ({
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-beedab-blue"
         >
           <option value="all">All Types</option>
-          <option value="residential">Residential</option>
-          <option value="farm">Farm Land</option>
-          <option value="commercial">Commercial</option>
+          <option value="residential_plot">Residential Plot</option>
+          <option value="agricultural_land">Agricultural Land</option>
+          <option value="commercial_plot">Commercial Plot</option>
         </select>
       </div>
 

@@ -98,7 +98,7 @@ const PropertyValuationPage = () => {
                   <option value="house">House</option>
                   <option value="apartment">Apartment</option>
                   <option value="townhouse">Townhouse</option>
-                  <option value="plot">Plot</option>
+                  <option value="land_plot">Land/Plot</option>
                 </select>
               </div>
 

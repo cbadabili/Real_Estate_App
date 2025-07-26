@@ -823,12 +823,40 @@ export const job_opportunities = sqliteTable('job_opportunities', {
 // Re-export services schema types for convenience
 export * from "./services-schema";
 
+// Standardized property types
+export const PROPERTY_TYPES = {
+  HOUSE: 'house',
+  APARTMENT: 'apartment',
+  TOWNHOUSE: 'townhouse',
+  LAND_PLOT: 'land_plot',
+  COMMERCIAL: 'commercial',
+  FARM: 'farm'
+} as const;
+
+export const LAND_PLOT_SUBTYPES = {
+  RAW_LAND: 'raw_land',
+  RESIDENTIAL_PLOT: 'residential_plot',
+  COMMERCIAL_PLOT: 'commercial_plot',
+  AGRICULTURAL_LAND: 'agricultural_land',
+  INDUSTRIAL_PLOT: 'industrial_plot'
+} as const;
+
+export const PROPERTY_TYPE_LABELS = {
+  [PROPERTY_TYPES.HOUSE]: 'House',
+  [PROPERTY_TYPES.APARTMENT]: 'Apartment',
+  [PROPERTY_TYPES.TOWNHOUSE]: 'Townhouse',
+  [PROPERTY_TYPES.LAND_PLOT]: 'Land/Plot',
+  [PROPERTY_TYPES.COMMERCIAL]: 'Commercial Property',
+  [PROPERTY_TYPES.FARM]: 'Farm'
+} as const;
+
+// Legacy support - keep for backward compatibility
 export const PropertyType = {
   HOUSE: 'house',
   APARTMENT: 'apartment',
   CONDO: 'condo',
   TOWNHOUSE: 'townhouse',
-  LAND: 'land',
+  LAND: 'land_plot', // Updated to use new standard
   COMMERCIAL: 'commercial',
   OFFICE: 'office',
   RETAIL: 'retail',
