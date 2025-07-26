@@ -95,8 +95,19 @@ app.use((req, res, next) => {
     const migrationManager = getMigrationManager();
     await migrationManager.runAllPendingMigrations(); // Run all migrations, including rental
 
-    console.log('🌱 Seeding database...');
-    await seedManager.seedAll();
+    // Initialize database only in development or when explicitly requested
+    const shouldInitializeDB = process.env.NODE_ENV !== 'production' || process.env.FORCE_DB_INIT === 'true';
+    const shouldSeedDB = process.env.NODE_ENV === 'development' || process.env.FORCE_DB_SEED === 'true';
+
+    if (shouldInitializeDB) {
+      console.log('Initializing database...');
+      await db.initializeDatabase();
+    }
+
+    if (shouldSeedDB) {
+      console.log('Seeding database...');
+      await seedManager.seedAll();
+    }
 
     console.log('✅ Database initialization completed');
   } catch (error) {

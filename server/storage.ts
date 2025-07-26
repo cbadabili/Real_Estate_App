@@ -110,10 +110,10 @@ export class DatabaseStorage implements IStorage {
     try {
       // Handle timestamp conversion for any timestamp fields
       const processedUpdates = { ...updates };
-      
+
       // Handle all timestamp fields properly
       const timestampFields = ['lastLoginAt', 'createdAt', 'updatedAt'];
-      
+
       for (const field of timestampFields) {
         if (processedUpdates[field] !== undefined) {
           const value = processedUpdates[field];
@@ -251,7 +251,7 @@ export class DatabaseStorage implements IStorage {
     }
 
     const results = await query;
-    
+
     // Parse JSON strings back to arrays and add debug logging
     const processedResults = results.map(prop => {
       const processed = {
@@ -259,10 +259,10 @@ export class DatabaseStorage implements IStorage {
         images: prop.images ? JSON.parse(prop.images) : [],
         features: prop.features ? JSON.parse(prop.features) : [],
       };
-      
+
       // Debug coordinate data
       console.log(`Property ${processed.id}: lat=${processed.latitude}, lng=${processed.longitude}, type=${processed.propertyType}`);
-      
+
       return processed;
     });
 

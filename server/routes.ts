@@ -34,6 +34,7 @@ import {
 import { z } from "zod";
 import { eq, and, gte, lte, sql } from "drizzle-orm";
 import { properties } from "../shared/schema";
+import bcrypt from 'bcrypt';
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Authentication & User Management
@@ -55,7 +56,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Username already taken. Please choose a different username." });
       }
 
-      const user = await storage.createUser(userData);
+      // Hash password before storing
+      const saltRounds = 12;
+      const hashedPassword = await bcrypt.hash(userData.password, saltRounds);
+
+      const user = await storage.createUser({...userData, password: hashedPassword});
       const { password, ...userResponse } = user;
       console.log('Registration successful for user:', userData.email);
       res.status(201).json(userResponse);
@@ -92,15 +97,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: "Invalid credentials" });
       }
 
-      console.log('User found, checking password...');
-      console.log('Stored password length:', user.password?.length);
-      console.log('Provided password length:', password?.length);
+      // Compare hashed password
+      const isValidPassword = await bcrypt.compare(password, user.password);
 
-      // Trim whitespace and compare
-      const storedPassword = user.password?.trim();
-      const providedPassword = password?.trim();
-
-      if (storedPassword !== providedPassword) {
+      if (!isValidPassword) {
         console.log('Password mismatch');
         return res.status(401).json({ message: "Invalid credentials" });
       }
