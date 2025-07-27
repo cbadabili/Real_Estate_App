@@ -120,14 +120,37 @@ export const PropertyMap: React.FC<PropertyMapProps> = ({
     document.head.appendChild(link);
 
     return () => {
-      if (mapRef.current) {
-        mapRef.current.remove();
+      // Clean up existing markers first
+      if (markersRef.current) {
+        markersRef.current.forEach(marker => {
+          if (marker && typeof marker.remove === 'function') {
+            marker.remove();
+          }
+        });
+        markersRef.current = [];
+      }
+
+      // Clean up map instance
+      if (mapRef.current && typeof mapRef.current.remove === 'function') {
+        try {
+          mapRef.current.remove();
+          mapRef.current = null;
+        } catch (error) {
+          console.warn('Error removing map:', error);
+          mapRef.current = null;
+        }
       }
     };
   }, []);
 
   const initializeMap = () => {
     if (!mapContainerRef.current || mapRef.current) return;
+    
+    // Ensure window.mapboxgl is available
+    if (!window.mapboxgl) {
+      console.warn('Mapbox GL JS not loaded yet');
+      return;
+    }
 
     // Replace with your Mapbox token
     const mapboxToken = 'pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw';
@@ -155,8 +178,16 @@ export const PropertyMap: React.FC<PropertyMapProps> = ({
   const addPropertyMarkers = () => {
     if (!mapRef.current) return;
 
-    // Clear existing markers
-    markersRef.current.forEach(marker => marker.remove());
+    // Clear existing markers safely
+    markersRef.current.forEach(marker => {
+      if (marker && typeof marker.remove === 'function') {
+        try {
+          marker.remove();
+        } catch (error) {
+          console.warn('Error removing marker:', error);
+        }
+      }
+    });
     markersRef.current = [];
 
     const validCoordinates: [number, number][] = [];
