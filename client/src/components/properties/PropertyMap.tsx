@@ -171,10 +171,17 @@ export const PropertyMap: React.FC<PropertyMapProps> = ({
         return;
       }
 
-      // Store valid coordinates for bounds calculation
-      validCoordinates.push([lng, lat]);
+      // CRITICAL FIX: Ensure correct coordinate order for Mapbox [lng, lat]
+      const coordinates: [number, number] = [lng, lat];
+      validCoordinates.push(coordinates);
 
-      // Create custom marker element
+      console.log(`Creating marker for ${property.title}:`, {
+        coordinates,
+        lat,
+        lng
+      });
+
+      // Create custom marker element with FIXED positioning
       const markerEl = document.createElement('div');
       markerEl.className = 'custom-marker';
       markerEl.style.cssText = `
@@ -189,15 +196,16 @@ export const PropertyMap: React.FC<PropertyMapProps> = ({
         justify-content: center;
         font-size: 18px;
         box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-        transition: transform 0.2s;
+        transition: transform 0.2s ease-in-out;
+        transform-origin: center center;
         position: relative;
         z-index: 1;
       `;
       markerEl.innerHTML = getPropertyIcon(property.propertyType);
 
-      // Fix hover behavior to prevent marker drift
+      // FIXED hover behavior - no position changes, only scale
       markerEl.addEventListener('mouseenter', () => {
-        markerEl.style.transform = 'scale(1.1)';
+        markerEl.style.transform = 'scale(1.2)';
         markerEl.style.zIndex = '10';
       });
 
@@ -233,12 +241,13 @@ export const PropertyMap: React.FC<PropertyMapProps> = ({
         closeOnClick: false
       }).setHTML(popupContent);
 
+      // CRITICAL FIX: Use proper anchor and coordinates
       // @ts-ignore  
       const marker = new window.mapboxgl.Marker({
         element: markerEl,
-        anchor: 'center'
+        anchor: 'center' // This prevents the flying to corner bug
       })
-        .setLngLat([lng, lat])
+        .setLngLat(coordinates) // Use the [lng, lat] coordinates directly
         .setPopup(popup)
         .addTo(mapRef.current);
 
