@@ -1,6 +1,6 @@
 
 import React from 'react';
-import PropertyMap from '../components/properties/TestPropertyMap';
+import TestPropertyMap from '../components/properties/TestPropertyMap';
 
 const TestMapPage: React.FC = () => {
   return (
@@ -14,7 +14,7 @@ const TestMapPage: React.FC = () => {
           {/* Full featured map */}
           <div className="bg-white rounded-lg shadow p-6">
             <h2 className="text-xl font-semibold mb-4">Full Map with Property List</h2>
-            <PropertyMap 
+            <TestPropertyMap 
               height="400px"
               showPropertyList={true}
             />
@@ -23,7 +23,7 @@ const TestMapPage: React.FC = () => {
           {/* Compact map */}
           <div className="bg-white rounded-lg shadow p-6">
             <h2 className="text-xl font-semibold mb-4">Compact Map (No List)</h2>
-            <PropertyMap 
+            <TestPropertyMap 
               height="400px"
               showPropertyList={false}
             />
@@ -32,7 +32,7 @@ const TestMapPage: React.FC = () => {
           {/* Large map */}
           <div className="lg:col-span-2 bg-white rounded-lg shadow p-6">
             <h2 className="text-xl font-semibold mb-4">Large Interactive Map</h2>
-            <PropertyMap 
+            <TestPropertyMap 
               height="600px"
               showPropertyList={true}
             />
@@ -44,7 +44,7 @@ const TestMapPage: React.FC = () => {
           <div className="space-y-2 text-sm">
             <div className="flex items-center gap-2">
               <span className="w-3 h-3 bg-green-500 rounded-full"></span>
-              <span>Google Maps iframe loads correctly</span>
+              <span>Mapbox map loads correctly</span>
             </div>
             <div className="flex items-center gap-2">
               <span className="w-3 h-3 bg-green-500 rounded-full"></span>
@@ -52,7 +52,7 @@ const TestMapPage: React.FC = () => {
             </div>
             <div className="flex items-center gap-2">
               <span className="w-3 h-3 bg-green-500 rounded-full"></span>
-              <span>Property count overlay shows</span>
+              <span>Property markers show on map</span>
             </div>
             <div className="flex items-center gap-2">
               <span className="w-3 h-3 bg-green-500 rounded-full"></span>
