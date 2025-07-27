@@ -159,9 +159,20 @@ export const PropertyMap: React.FC<PropertyMapProps> = ({
     markersRef.current.forEach(marker => marker.remove());
     markersRef.current = [];
 
+    const validCoordinates: [number, number][] = [];
+
     validProperties.forEach(property => {
       const lat = typeof property.latitude === 'string' ? parseFloat(property.latitude) : property.latitude;
       const lng = typeof property.longitude === 'string' ? parseFloat(property.longitude) : property.longitude;
+
+      // Validate coordinates before using them
+      if (isNaN(lat) || isNaN(lng) || lat === 0 || lng === 0) {
+        console.warn(`Invalid coordinates for property ${property.id}: [${lng}, ${lat}]`);
+        return;
+      }
+
+      // Store valid coordinates for bounds calculation
+      validCoordinates.push([lng, lat]);
 
       // Create custom marker element
       const markerEl = document.createElement('div');
@@ -229,16 +240,25 @@ export const PropertyMap: React.FC<PropertyMapProps> = ({
       markersRef.current.push(marker);
     });
 
-    // Fit map to show all markers
-    if (validProperties.length > 1) {
-      // @ts-ignore
-      const bounds = new window.mapboxgl.LngLatBounds();
-      validProperties.forEach(property => {
-        const lat = typeof property.latitude === 'string' ? parseFloat(property.latitude) : property.latitude;
-        const lng = typeof property.longitude === 'string' ? parseFloat(property.longitude) : property.longitude;
-        bounds.extend([lng, lat]);
-      });
-      mapRef.current.fitBounds(bounds, { padding: 50 });
+    // Fit map to show all markers only if we have valid coordinates
+    if (validCoordinates.length > 1) {
+      try {
+        // @ts-ignore
+        const bounds = new window.mapboxgl.LngLatBounds();
+        validCoordinates.forEach(coord => {
+          bounds.extend(coord);
+        });
+        mapRef.current.fitBounds(bounds, { padding: 50 });
+      } catch (error) {
+        console.warn('Error fitting bounds:', error);
+        // Fallback to center on Gaborone
+        mapRef.current.setCenter([25.9231, -24.6282]);
+        mapRef.current.setZoom(11);
+      }
+    } else if (validCoordinates.length === 1) {
+      // If only one property, center on it
+      mapRef.current.setCenter(validCoordinates[0]);
+      mapRef.current.setZoom(14);
     }
   };
 

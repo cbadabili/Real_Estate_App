@@ -78,10 +78,22 @@ async function fixMissingCoordinates() {
       console.log(`Updating property ${prop.id} with coordinates: ${randomLat}, ${randomLng}`);
 
       // Use proper parameter binding to fix the coordinate update
-      await db.run(
-        `UPDATE properties SET latitude = ?, longitude = ? WHERE id = ?`,
-        [randomLat.toString(), randomLng.toString(), prop.id]
-      );
+      try {
+        await db.run(
+          `UPDATE properties SET latitude = ?, longitude = ? WHERE id = ?`,
+          [randomLat, randomLng, prop.id]
+        );
+        console.log(`✅ Updated property ${prop.id} successfully`);
+      } catch (updateError) {
+        console.error(`❌ Failed to update property ${prop.id}:`, updateError);
+        // Try alternative update method
+        try {
+          await db.run(`UPDATE properties SET latitude = ${randomLat}, longitude = ${randomLng} WHERE id = ${prop.id}`);
+          console.log(`✅ Updated property ${prop.id} with direct SQL`);
+        } catch (directError) {
+          console.error(`❌ Direct SQL also failed for property ${prop.id}:`, directError);
+        }
+      }
     }
 
     console.log(`✅ Updated ${propertiesNeedingFix.length} properties with coordinates`);

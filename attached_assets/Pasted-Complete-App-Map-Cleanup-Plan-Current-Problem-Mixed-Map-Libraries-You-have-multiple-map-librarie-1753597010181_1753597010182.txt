@@ -1,0 +1,234 @@
+Complete App Map Cleanup Plan
+🚨 Current Problem: Mixed Map Libraries
+You have multiple map libraries conflicting:
+
+❌ Google Maps Platform (causing the "Invalid request" error)
+❌ OpenStreetMap
+❌ Mapbox
+❌ Possibly React-Leaflet or other map components
+
+Result: Google Maps Platform rejected your request. Invalid request. Unexpected parameter 'markers'
+
+📋 Step 1: Complete Audit (5 minutes)
+🔍 Search Commands in Replit (Ctrl+Shift+F)
+Run these searches one by one and document what you find:
+A. Find All Map Libraries:
+"google"
+"Google"
+"googlemap"
+"GoogleMap"
+"leaflet"
+"Leaflet"
+"mapbox"
+"Mapbox"
+"openstreet"
+"OpenStreet"
+B. Find Map Components:
+"Map"
+"map"
+"PropertyMap"
+"MapView"
+"MapContainer"
+"MapSearch"
+C. Find API Keys:
+"AIza"
+"pk.eyJ"
+"GOOGLE_MAPS"
+"MAPBOX"
+"REACT_APP_"
+D. Find Coordinate Usage:
+"latitude"
+"longitude"
+"coordinates"
+"lat:"
+"lng:"
+"latlng"
+📝 Document Your Findings
+Create this file in Replit: MAP_CLEANUP_AUDIT.md
+markdown# Map Cleanup Audit Results
+
+## Files Found:
+
+### Google Maps References:
+- [ ] File: _________________ (Line: ___)
+- [ ] File: _________________ (Line: ___)
+
+### Mapbox References: 
+- [ ] File: _________________ (Line: ___)
+- [ ] File: _________________ (Line: ___)
+
+### OpenStreetMap/Leaflet References:
+- [ ] File: _________________ (Line: ___)
+- [ ] File: _________________ (Line: ___)
+
+### Map Components:
+- [ ] File: _________________ (Component: _______)
+- [ ] File: _________________ (Component: _______)
+
+### API Keys Found:
+- [ ] Google Maps API Key: _______________
+- [ ] Mapbox API Key: _______________
+
+## Dependencies in package.json:
+- [ ] google-maps-react
+- [ ] @react-google-maps/api  
+- [ ] react-leaflet
+- [ ] leaflet
+- [ ] mapbox-gl
+- [ ] Other: _______________
+
+📦 Step 2: Check Dependencies (2 minutes)
+Open package.json and look for these:
+bash# In Replit Shell, run:
+grep -E "(google|map|leaflet)" package.json
+Common problematic dependencies:
+
+google-maps-react
+@react-google-maps/api
+react-google-maps
+react-leaflet
+leaflet
+ol (OpenLayers)
+
+Document what you find:
+Current Map Dependencies:
+- ____________________
+- ____________________
+- ____________________
+
+🗄️ Step 3: Check Environment Variables (1 minute)
+Look for API keys in:
+A. .env file:
+bash# Check for map-related env vars
+grep -i "map\|google\|mapbox" .env
+B. Replit Secrets (Tools → Secrets):
+Look for:
+
+GOOGLE_MAPS_API_KEY
+REACT_APP_GOOGLE_MAPS_API_KEY
+MAPBOX_ACCESS_TOKEN
+REACT_APP_MAPBOX_ACCESS_TOKEN
+
+
+🔧 Step 4: Systematic Cleanup Plan
+Phase 1: Remove Google Maps (Priority 1)
+A. Remove Google Maps Dependencies:
+bash# In Replit Shell:
+npm uninstall google-maps-react
+npm uninstall @react-google-maps/api
+npm uninstall react-google-maps
+B. Remove Google Maps Imports:
+Search and remove these imports:
+typescript// Remove these lines from all files
+import GoogleMapReact from 'google-map-react';
+import { GoogleMap, Marker } from '@react-google-maps/api';
+import { Map, GoogleApiWrapper } from 'google-maps-react';
+C. Remove Google Maps API Keys:
+
+Delete from .env
+Remove from Replit Secrets
+Remove hardcoded keys in files
+
+Phase 2: Remove OpenStreetMap/Leaflet (Priority 2)
+A. Remove Leaflet Dependencies:
+bashnpm uninstall react-leaflet
+npm uninstall leaflet
+B. Remove Leaflet Imports:
+typescript// Remove these lines
+import { MapContainer, TileLayer, Marker } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+Phase 3: Standardize on Mapbox (Priority 3)
+A. Install Only Mapbox:
+bashnpm install mapbox-gl
+npm install @types/mapbox-gl --save-dev
+B. Single Mapbox Import Pattern:
+typescript// Use this pattern everywhere
+import mapboxgl from 'mapbox-gl';
+import 'mapbox-gl/dist/mapbox-gl.css';
+
+📁 Step 5: File-by-File Cleanup
+Priority Order for Cleanup:
+🥇 High Priority (Fix First):
+
+client/src/components/properties/PropertyMap.tsx
+client/src/pages/Properties.tsx
+client/src/pages/PropertyDetails.tsx
+package.json (dependencies)
+.env (environment variables)
+
+🥈 Medium Priority:
+
+client/src/components/MapView.tsx
+client/src/components/ui/Map.tsx
+client/src/pages/Search.tsx
+shared/schema.ts (coordinate types)
+
+🥉 Low Priority:
+
+client/src/lib/maps.ts
+client/src/utils/geocoding.ts
+client/src/hooks/useGeolocation.ts
+server/routes.ts (API endpoints)
+
+
+✅ Step 6: Verification Checklist
+After Each File Cleanup:
+
+ No Google Maps imports
+ No Leaflet imports
+ Only Mapbox imports
+ No console errors
+ Component renders correctly
+ Properties show on map
+ Interactions work (zoom, click)
+
+Final App Test:
+
+ All pages load without errors
+ Maps display correctly
+ Property markers show
+ No console errors
+ No "Invalid request" errors
+ Performance is good
+
+
+🚀 Step 7: Implementation Strategy
+Safe Cleanup Approach:
+Day 1: Audit & Remove Conflicts
+
+Run complete audit (Step 1)
+Remove Google Maps dependencies (Step 4A)
+Remove conflicting imports
+Test basic app functionality
+
+Day 2: Replace Components
+
+Replace main PropertyMap component
+Update property listing pages
+Test map functionality
+
+Day 3: Final Cleanup
+
+Clean up remaining files
+Remove unused dependencies
+Final testing and optimization
+
+
+📞 Next Steps
+Right now, please:
+
+Run the audit searches in Replit (Ctrl+Shift+F)
+Fill out the MAP_CLEANUP_AUDIT.md with your findings
+Check package.json for map dependencies
+Share your audit results with me
+
+Once I see your audit results, I'll give you:
+
+Exact files to change
+Exact lines to remove
+Step-by-step cleanup instructions
+Working replacement code for each component
+
+This systematic approach will eliminate all conflicts and give you a clean, working Mapbox implementation.
+Ready to start the audit?
