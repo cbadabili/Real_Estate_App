@@ -190,15 +190,20 @@ export const PropertyMap: React.FC<PropertyMapProps> = ({
         font-size: 18px;
         box-shadow: 0 2px 8px rgba(0,0,0,0.3);
         transition: transform 0.2s;
+        position: relative;
+        z-index: 1;
       `;
       markerEl.innerHTML = getPropertyIcon(property.propertyType);
 
+      // Fix hover behavior to prevent marker drift
       markerEl.addEventListener('mouseenter', () => {
         markerEl.style.transform = 'scale(1.1)';
+        markerEl.style.zIndex = '10';
       });
 
       markerEl.addEventListener('mouseleave', () => {
         markerEl.style.transform = 'scale(1)';
+        markerEl.style.zIndex = '1';
       });
 
       // Create popup content
@@ -222,11 +227,17 @@ export const PropertyMap: React.FC<PropertyMapProps> = ({
       `;
 
       // @ts-ignore
-      const popup = new window.mapboxgl.Popup({ offset: 25 })
-        .setHTML(popupContent);
+      const popup = new window.mapboxgl.Popup({ 
+        offset: 25,
+        closeButton: false,
+        closeOnClick: false
+      }).setHTML(popupContent);
 
-      // @ts-ignore
-      const marker = new window.mapboxgl.Marker(markerEl)
+      // @ts-ignore  
+      const marker = new window.mapboxgl.Marker({
+        element: markerEl,
+        anchor: 'center'
+      })
         .setLngLat([lng, lat])
         .setPopup(popup)
         .addTo(mapRef.current);
