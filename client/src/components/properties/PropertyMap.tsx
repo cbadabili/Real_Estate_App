@@ -1,5 +1,6 @@
-
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
+import Map, { Marker, Popup } from 'react-map-gl';
+import 'mapbox-gl/dist/mapbox-gl.css';
 
 interface Property {
   id: number | string;
@@ -30,9 +31,17 @@ export const PropertyMap: React.FC<PropertyMapProps> = ({
   height = '600px',
   selectedProperty
 }) => {
-  const mapContainerRef = useRef<HTMLDivElement>(null);
-  const mapRef = useRef<any>(null);
-  const markersRef = useRef<any[]>([]);
+  const [viewState, setViewState] = useState({
+    longitude: 25.9231,
+    latitude: -24.6282,
+    zoom: 11
+  });
+  const [popupInfo, setPopupInfo] = useState<Property | null>(null);
+
+  // Get Mapbox token from environment variable
+  const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN || 
+    process.env.VITE_MAPBOX_ACCESS_TOKEN ||
+    'pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw';
 
   // Test properties to ensure map shows immediately
   const testProperties = [
@@ -69,33 +78,106 @@ export const PropertyMap: React.FC<PropertyMapProps> = ({
     }
   ];
 
-  // Use test properties if no valid properties provided
-  const validProperties = properties.length > 0 ? properties.filter(property => {
-    const lat = typeof property.latitude === 'string' ? parseFloat(property.latitude) : property.latitude;
-    const lng = typeof property.longitude === 'string' ? parseFloat(property.longitude) : property.longitude;
-    
-    const isValid = lat != null && lng != null && !isNaN(lat) && !isNaN(lng) && lat !== 0 && lng !== 0;
-    
-    if (!isValid) {
-      console.warn(`Property ${property.id} (${property.title}) has invalid coordinates:`, {
-        originalLat: property.latitude,
-        originalLng: property.longitude,
-        parsedLat: lat,
-        parsedLng: lng
-      });
+  // Validate and process properties
+  const validProperties = useMemo(() => {
+    const propsToUse = properties.length > 0 ? properties : testProperties;
+
+    return propsToUse.filter(property => {
+      const lat = typeof property.latitude === 'string' ? parseFloat(property.latitude) : property.latitude;
+      const lng = typeof property.longitude === 'string' ? parseFloat(property.longitude) : property.longitude;
+
+      const isValid = lat != null && lng != null && !isNaN(lat) && !isNaN(lng) && 
+                     lat !== 0 && lng !== 0 && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180;
+
+      if (!isValid) {
+        console.warn(`Property ${property.id} (${property.title}) has invalid coordinates:`, {
+          originalLat: property.latitude,
+          originalLng: property.longitude,
+          parsedLat: lat,
+          parsedLng: lng
+        });
+      }
+
+      return isValid;
+    }).map(property => ({
+      ...property,
+      latitude: typeof property.latitude === 'string' ? parseFloat(property.latitude) : property.latitude,
+      longitude: typeof property.longitude === 'string' ? parseFloat(property.longitude) : property.longitude
+    }));
+  }, [properties]);
+
+  // Fit map to show all properties
+  useEffect(() => {
+    if (validProperties.length > 0) {
+      const bounds = validProperties.reduce(
+        (acc, property) => {
+          return {
+            minLat: Math.min(acc.minLat, property.latitude),
+            maxLat: Math.max(acc.maxLat, property.latitude),
+            minLng: Math.min(acc.minLng, property.longitude),
+            maxLng: Math.max(acc.maxLng, property.longitude)
+          };
+        },
+        {
+          minLat: validProperties[0].latitude,
+          maxLat: validProperties[0].latitude,
+          minLng: validProperties[0].longitude,
+          maxLng: validProperties[0].longitude
+        }
+      );
+
+      if (validProperties.length === 1) {
+        setViewState({
+          longitude: validProperties[0].longitude,
+          latitude: validProperties[0].latitude,
+          zoom: 14
+        });
+      } else {
+        const centerLat = (bounds.minLat + bounds.maxLat) / 2;
+        const centerLng = (bounds.minLng + bounds.maxLng) / 2;
+
+        // Calculate appropriate zoom level
+        const latDiff = bounds.maxLat - bounds.minLat;
+        const lngDiff = bounds.maxLng - bounds.minLng;
+        const maxDiff = Math.max(latDiff, lngDiff);
+
+        let zoom = 11;
+        if (maxDiff < 0.01) zoom = 15;
+        else if (maxDiff < 0.05) zoom = 13;
+        else if (maxDiff < 0.1) zoom = 12;
+        else if (maxDiff < 0.5) zoom = 10;
+        else zoom = 9;
+
+        setViewState({
+          longitude: centerLng,
+          latitude: centerLat,
+          zoom: zoom
+        });
+      }
     }
-    
-    return isValid;
-  }) : testProperties;
+  }, [validProperties]);
+
+  // Handle selected property change
+  useEffect(() => {
+    if (selectedProperty && selectedProperty.latitude && selectedProperty.longitude) {
+      setViewState(prev => ({
+        ...prev,
+        longitude: selectedProperty.longitude,
+        latitude: selectedProperty.latitude,
+        zoom: Math.max(prev.zoom, 14)
+      }));
+      setPopupInfo(selectedProperty);
+    }
+  }, [selectedProperty]);
 
   const getMarkerColor = (type?: string) => {
     switch (type?.toLowerCase()) {
-      case 'house': return '#22c55e'; // Green
-      case 'apartment': return '#3b82f6'; // Blue  
-      case 'land': case 'land_plot': return '#f59e0b'; // Orange
-      case 'townhouse': return '#8b5cf6'; // Purple
-      case 'commercial': return '#ef4444'; // Red
-      default: return '#6b7280'; // Gray
+      case 'house': return '#22c55e';
+      case 'apartment': return '#3b82f6';
+      case 'land': case 'land_plot': return '#f59e0b';
+      case 'townhouse': return '#8b5cf6';
+      case 'commercial': return '#ef4444';
+      default: return '#6b7280';
     }
   };
 
@@ -119,226 +201,99 @@ export const PropertyMap: React.FC<PropertyMapProps> = ({
     return `P${price.toLocaleString()}`;
   };
 
-  useEffect(() => {
-    // Load Mapbox GL JS
-    const script = document.createElement('script');
-    script.src = 'https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js';
-    script.onload = initializeMap;
-    document.head.appendChild(script);
-
-    const link = document.createElement('link');
-    link.href = 'https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css';
-    link.rel = 'stylesheet';
-    document.head.appendChild(link);
-
-    return () => {
-      // Clean up existing markers first
-      if (markersRef.current) {
-        markersRef.current.forEach(marker => {
-          if (marker && typeof marker.remove === 'function') {
-            marker.remove();
-          }
-        });
-        markersRef.current = [];
-      }
-
-      // Clean up map instance
-      if (mapRef.current && typeof mapRef.current.remove === 'function') {
-        try {
-          mapRef.current.remove();
-          mapRef.current = null;
-        } catch (error) {
-          console.warn('Error removing map:', error);
-          mapRef.current = null;
-        }
-      }
-    };
-  }, []);
-
-  const initializeMap = () => {
-    if (!mapContainerRef.current || mapRef.current) return;
-    
-    // Ensure window.mapboxgl is available
-    if (!window.mapboxgl) {
-      console.warn('Mapbox GL JS not loaded yet');
-      return;
-    }
-
-    // Replace with your Mapbox token
-    const mapboxToken = 'pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw';
-    
-    // @ts-ignore
-    window.mapboxgl.accessToken = mapboxToken;
-
-    // @ts-ignore
-    mapRef.current = new window.mapboxgl.Map({
-      container: mapContainerRef.current,
-      style: 'mapbox://styles/mapbox/streets-v12',
-      center: [25.9231, -24.6282], // Gaborone coordinates
-      zoom: 11
-    });
-
-    // Add navigation controls
-    // @ts-ignore
-    mapRef.current.addControl(new window.mapboxgl.NavigationControl());
-
-    mapRef.current.on('load', () => {
-      addPropertyMarkers();
-    });
-  };
-
-  const addPropertyMarkers = () => {
-    if (!mapRef.current) return;
-
-    // Clear existing markers safely
-    markersRef.current.forEach(marker => {
-      if (marker && typeof marker.remove === 'function') {
-        try {
-          marker.remove();
-        } catch (error) {
-          console.warn('Error removing marker:', error);
-        }
-      }
-    });
-    markersRef.current = [];
-
-    const validCoordinates: [number, number][] = [];
-
-    validProperties.forEach(property => {
-      const lat = typeof property.latitude === 'string' ? parseFloat(property.latitude) : property.latitude;
-      const lng = typeof property.longitude === 'string' ? parseFloat(property.longitude) : property.longitude;
-
-      // Validate coordinates before using them
-      if (isNaN(lat) || isNaN(lng) || lat === 0 || lng === 0) {
-        console.warn(`Invalid coordinates for property ${property.id}: [${lng}, ${lat}]`);
-        return;
-      }
-
-      // CRITICAL FIX: Ensure correct coordinate order for Mapbox [lng, lat]
-      const coordinates: [number, number] = [lng, lat];
-      validCoordinates.push(coordinates);
-
-      console.log(`Creating marker for ${property.title}:`, {
-        coordinates,
-        lat,
-        lng
-      });
-
-      // Create custom marker element with FIXED positioning
-      const markerEl = document.createElement('div');
-      markerEl.className = 'custom-marker';
-      markerEl.style.cssText = `
-        width: 40px;
-        height: 40px;
-        background-color: ${getMarkerColor(property.propertyType)};
-        border: 3px solid white;
-        border-radius: 50%;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 18px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-        transition: transform 0.2s ease-in-out;
-        transform-origin: center center;
-        position: relative;
-        z-index: 1;
-      `;
-      markerEl.innerHTML = getPropertyIcon(property.propertyType);
-
-      // FIXED hover behavior - no position changes, only scale
-      markerEl.addEventListener('mouseenter', () => {
-        markerEl.style.transform = 'scale(1.2)';
-        markerEl.style.zIndex = '10';
-      });
-
-      markerEl.addEventListener('mouseleave', () => {
-        markerEl.style.transform = 'scale(1)';
-        markerEl.style.zIndex = '1';
-      });
-
-      // Create popup content
-      const popupContent = `
-        <div style="padding: 12px; min-width: 200px;">
-          <h3 style="margin: 0 0 8px 0; font-size: 16px; font-weight: bold;">
-            ${getPropertyIcon(property.propertyType)} ${property.title}
-          </h3>
-          <div style="color: #0066cc; font-weight: bold; font-size: 18px; margin-bottom: 8px;">
-            ${formatPrice(property.price)}
-          </div>
-          <div style="color: #666; font-size: 14px; margin-bottom: 4px;">
-            📍 ${property.address || property.city || 'Gaborone'}
-          </div>
-          ${property.bedrooms ? `
-            <div style="color: #666; font-size: 12px;">
-              🛏️ ${property.bedrooms} bed • 🚿 ${property.bathrooms || 1} bath
-            </div>
-          ` : ''}
-        </div>
-      `;
-
-      // @ts-ignore
-      const popup = new window.mapboxgl.Popup({ 
-        offset: 25,
-        closeButton: false,
-        closeOnClick: false
-      }).setHTML(popupContent);
-
-      // CRITICAL FIX: Use proper anchor and coordinates
-      // @ts-ignore  
-      const marker = new window.mapboxgl.Marker({
-        element: markerEl,
-        anchor: 'center' // This prevents the flying to corner bug
-      })
-        .setLngLat(coordinates) // Use the [lng, lat] coordinates directly
-        .setPopup(popup)
-        .addTo(mapRef.current);
-
-      marker.getElement().addEventListener('click', () => {
-        if (onPropertySelect) {
-          onPropertySelect(property);
-        }
-      });
-
-      markersRef.current.push(marker);
-    });
-
-    // Fit map to show all markers only if we have valid coordinates
-    if (validCoordinates.length > 1) {
-      try {
-        // @ts-ignore
-        const bounds = new window.mapboxgl.LngLatBounds();
-        validCoordinates.forEach(coord => {
-          bounds.extend(coord);
-        });
-        mapRef.current.fitBounds(bounds, { padding: 50 });
-      } catch (error) {
-        console.warn('Error fitting bounds:', error);
-        // Fallback to center on Gaborone
-        mapRef.current.setCenter([25.9231, -24.6282]);
-        mapRef.current.setZoom(11);
-      }
-    } else if (validCoordinates.length === 1) {
-      // If only one property, center on it
-      mapRef.current.setCenter(validCoordinates[0]);
-      mapRef.current.setZoom(14);
+  const handleMarkerClick = (property: Property) => {
+    setPopupInfo(property);
+    if (onPropertySelect) {
+      onPropertySelect(property);
     }
   };
 
-  useEffect(() => {
-    if (mapRef.current && validProperties.length > 0) {
-      addPropertyMarkers();
-    }
-  }, [validProperties]);
+  const MarkerComponent = ({ property }: { property: Property }) => (
+    <Marker
+      longitude={property.longitude}
+      latitude={property.latitude}
+      anchor="center"
+      onClick={() => handleMarkerClick(property)}
+    >
+      <div
+        className="custom-marker"
+        style={{
+          width: '40px',
+          height: '40px',
+          backgroundColor: getMarkerColor(property.propertyType),
+          border: '3px solid white',
+          borderRadius: '50%',
+          cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: '18px',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
+          transition: 'transform 0.2s ease-in-out',
+          transformOrigin: 'center center',
+          position: 'relative',
+          zIndex: selectedProperty?.id === property.id ? 10 : 1
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.transform = 'scale(1.2)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.transform = 'scale(1)';
+        }}
+      >
+        {getPropertyIcon(property.propertyType)}
+      </div>
+    </Marker>
+  );
 
   return (
     <div className={`relative ${className}`} style={{ height }}>
       {/* Map Container */}
-      <div 
-        ref={mapContainerRef}
-        className="absolute inset-0 bg-gray-100 rounded-lg overflow-hidden"
-        style={{ height: '100%', width: '100%' }}
-      />
+      <div className="absolute inset-0 bg-gray-100 rounded-lg overflow-hidden">
+        <Map
+          {...viewState}
+          onMove={evt => setViewState(evt.viewState)}
+          mapboxAccessToken={MAPBOX_TOKEN}
+          style={{ width: '100%', height: '100%' }}
+          mapStyle="mapbox://styles/mapbox/streets-v12"
+          interactiveLayerIds={['property-markers']}
+        >
+          {/* Render property markers */}
+          {validProperties.map((property) => (
+            <MarkerComponent key={property.id} property={property} />
+          ))}
+
+          {/* Popup for selected property */}
+          {popupInfo && (
+            <Popup
+              longitude={popupInfo.longitude}
+              latitude={popupInfo.latitude}
+              anchor="bottom"
+              onClose={() => setPopupInfo(null)}
+              closeButton={true}
+              closeOnClick={false}
+              offset={25}
+            >
+              <div style={{ padding: '12px', minWidth: '200px' }}>
+                <h3 style={{ margin: '0 0 8px 0', fontSize: '16px', fontWeight: 'bold' }}>
+                  {getPropertyIcon(popupInfo.propertyType)} {popupInfo.title}
+                </h3>
+                <div style={{ color: '#0066cc', fontWeight: 'bold', fontSize: '18px', marginBottom: '8px' }}>
+                  {formatPrice(popupInfo.price)}
+                </div>
+                <div style={{ color: '#666', fontSize: '14px', marginBottom: '4px' }}>
+                  📍 {popupInfo.address || popupInfo.city || 'Gaborone'}
+                </div>
+                {popupInfo.bedrooms && (
+                  <div style={{ color: '#666', fontSize: '12px' }}>
+                    🛏️ {popupInfo.bedrooms} bed • 🚿 {popupInfo.bathrooms || 1} bath
+                  </div>
+                )}
+              </div>
+            </Popup>
+          )}
+        </Map>
+      </div>
 
       {/* Property Count Overlay */}
       <div className="absolute top-4 left-4 bg-white rounded-lg shadow-md px-3 py-2 z-10">
