@@ -207,7 +207,7 @@ function App() {
           <Route path="/transfer-process" element={<TransferProcessPage />} />
 
               {/* Test and admin routes */}
-              
+
               <Route path="/buy/map" element={<BuyMapPage />} />
               <Route path="/admin" element={<AdminPage />} />
             </Routes>

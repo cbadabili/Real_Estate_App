@@ -180,7 +180,7 @@ const BuyMapPage = () => {
                 properties={properties}
                 selectedProperty={selectedProperty}
                 onPropertySelect={handlePropertySelect}
-                className="min-h-[600px]"
+                className="min-h-[800px]"
               />
             </div>
           </div>

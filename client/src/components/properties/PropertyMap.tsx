@@ -83,7 +83,7 @@ interface PropertyMapProps {
 
 const PropertyMap: React.FC<PropertyMapProps> = ({ 
   properties, 
-  height = '400px', 
+  height = '800px', 
   className = '' 
 }) => {
   const mapContainer = useRef<HTMLDivElement>(null);
@@ -128,10 +128,10 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
       markerElement.className = 'property-marker';
       markerElement.setAttribute('data-property-id', property.id.toString());
       
-      // Get location display - prefer specific location over generic city
-      const locationDisplay = property.location && property.location !== property.city 
+      // Get actual location display - use full location or fallback
+      const locationDisplay = property.location 
         ? property.location.split(',')[0].trim()
-        : property.city || 'Location';
+        : 'Location not specified';
       
       markerElement.innerHTML = `
         <div class="relative cursor-pointer">
@@ -216,7 +216,8 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
 
         <div class="pt-3 border-t border-gray-200">
           <a href="/properties/${property.id}" 
-             class="block w-full bg-blue-600 hover:bg-blue-700 text-white text-center py-3 px-4 rounded-lg transition-colors font-semibold text-sm">
+             onclick="window.location.href='/properties/${property.id}'; return false;"
+             class="block w-full bg-blue-600 hover:bg-blue-700 text-white text-center py-3 px-4 rounded-lg transition-colors font-semibold text-sm cursor-pointer">
             View Full Details
           </a>
         </div>

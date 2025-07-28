@@ -366,7 +366,7 @@ const PropertiesPage: React.FC = () => {
                 </button>
               </div>
             ) : viewMode === 'map' ? (
-              <div className="h-96 bg-gray-100 rounded-lg">
+              <div className="h-[800px] bg-gray-100 rounded-lg">
                 <PropertyMap 
                   properties={properties.map(p => ({
                     id: p.id,
@@ -377,7 +377,7 @@ const PropertiesPage: React.FC = () => {
                     propertyType: p.propertyType,
                     location: p.location
                   }))}
-                  height="384px"
+                  height="800px"
                   className="w-full"
                 />
               </div>
