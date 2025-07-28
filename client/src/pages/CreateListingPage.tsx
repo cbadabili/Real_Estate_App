@@ -725,7 +725,7 @@ const CreateListingPage = () => {
                           <select
                             {...register('bedrooms', { required: 'Number of bedrooms is required' })}
                             className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent transition-all"
-                          >
+                          >```text
                             <option value="">Select bedrooms</option>
                             {[1, 2, 3, 4, 5, 6].map(num => (
                               <option key={num} value={num}>{num} bedroom{num !== 1 ? 's' : ''}</option>

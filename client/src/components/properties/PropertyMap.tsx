@@ -1,211 +1,151 @@
+import React, { useEffect } from 'react';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import { Link } from 'react-router-dom';
+import L from 'leaflet';
+import { MapPin, Bed, Bath, Square, Eye } from 'lucide-react';
+import 'leaflet/dist/leaflet.css';
 
-import React, { useEffect, useRef, useState } from 'react';
-import mapboxgl from 'mapbox-gl';
-import 'mapbox-gl/dist/mapbox-gl.css';
-
-// Initialize Mapbox with your token
-mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN || '';
+// Fix for default markers in React Leaflet
+delete (L.Icon.Default.prototype as any)._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+});
 
 interface Property {
   id: number;
   title: string;
-  latitude?: number;
-  longitude?: number;
+  latitude: number;
+  longitude: number;
   price: number;
   propertyType: string;
-  address?: string;
+  location: string;
+  bedrooms?: number;
+  bathrooms?: number;
+  squareFeet?: number;
+  views?: number;
 }
 
 interface PropertyMapProps {
   properties: Property[];
   height?: string;
+  className?: string;
 }
 
-export const PropertyMap: React.FC<PropertyMapProps> = ({ 
-  properties = [], 
-  height = '500px' 
+const PropertyMap: React.FC<PropertyMapProps> = ({ 
+  properties, 
+  height = '400px', 
+  className = '' 
 }) => {
-  const mapContainer = useRef<HTMLDivElement>(null);
-  const map = useRef<mapboxgl.Map | null>(null);
-  const [isLoaded, setIsLoaded] = useState(false);
+  // Filter properties with valid coordinates
+  const validProperties = properties.filter(property => 
+    property.latitude && 
+    property.longitude && 
+    !isNaN(property.latitude) && 
+    !isNaN(property.longitude) &&
+    property.latitude !== 0 &&
+    property.longitude !== 0
+  );
 
-  console.log('🗺️ PropertyMap rendering with properties:', properties.length);
+  // Default center (Gaborone, Botswana)
+  const center: [number, number] = validProperties.length > 0 
+    ? [validProperties[0].latitude, validProperties[0].longitude]
+    : [-24.6282, 25.9231];
 
-  // Initialize map once
-  useEffect(() => {
-    if (!mapContainer.current || map.current) return;
+  const accessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
 
-    console.log('🚀 Initializing new Mapbox map');
-
-    try {
-      map.current = new mapboxgl.Map({
-        container: mapContainer.current,
-        style: 'mapbox://styles/mapbox/streets-v12',
-        center: [25.9231, -24.6282], // Gaborone [longitude, latitude]
-        zoom: 11,
-        attributionControl: true
-      });
-
-      // Add navigation controls
-      map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
-
-      // Map loaded event
-      map.current.on('load', () => {
-        console.log('✅ Mapbox map loaded successfully');
-        setIsLoaded(true);
-      });
-
-      // Error handling
-      map.current.on('error', (e) => {
-        console.error('❌ Mapbox error:', e.error);
-      });
-
-    } catch (error) {
-      console.error('❌ Failed to initialize map:', error);
-    }
-
-    // Cleanup function
-    return () => {
-      if (map.current) {
-        console.log('🧹 Cleaning up map');
-        map.current.remove();
-        map.current = null;
-      }
-    };
-  }, []);
-
-  // Add markers when map is loaded and properties change
-  useEffect(() => {
-    if (!map.current || !isLoaded || !properties.length) {
-      console.log('⏸️ Skipping markers:', { mapExists: !!map.current, isLoaded, propCount: properties.length });
-      return;
-    }
-
-    console.log('📍 Adding markers for', properties.length, 'properties');
-
-    // Clear existing markers
-    const existingMarkers = document.querySelectorAll('.mapboxgl-marker');
-    existingMarkers.forEach(marker => marker.remove());
-
-    // Sample coordinates around Gaborone for properties without coordinates
-    const sampleCoords = [
-      [25.9231, -24.6282], // Central Gaborone
-      [25.9100, -24.6400], // West Gaborone  
-      [25.8900, -24.6200]  // South Gaborone
-    ];
-
-    properties.forEach((property, index) => {
-      // Use property coordinates or fallback to sample coordinates
-      const lng = property.longitude || sampleCoords[index % sampleCoords.length][0];
-      const lat = property.latitude || sampleCoords[index % sampleCoords.length][1];
-
-      console.log(`📌 Creating marker for "${property.title}" at [${lng}, ${lat}]`);
-
-      // Create popup content
-      const popupContent = `
-        <div style="padding: 10px; font-family: system-ui;">
-          <h3 style="margin: 0 0 8px 0; font-size: 16px;">${property.title}</h3>
-          <p style="margin: 0 0 5px 0; color: #666; font-size: 14px;">
-            📍 ${property.address || 'Gaborone, Botswana'}
-          </p>
-          <p style="margin: 0; font-weight: bold; color: #007bff; font-size: 16px;">
-            💰 P${property.price.toLocaleString()}
-          </p>
-          <div style="margin-top: 8px; font-size: 12px; color: #888;">
-            Type: ${property.propertyType}
-          </div>
-        </div>
-      `;
-
-      // Create marker
-      const marker = new mapboxgl.Marker({
-        color: getPropertyColor(property.propertyType)
-      })
-        .setLngLat([lng, lat])
-        .setPopup(new mapboxgl.Popup({ offset: 25 }).setHTML(popupContent))
-        .addTo(map.current!);
-
-      console.log('✅ Marker added successfully');
-    });
-
-    // Fit map to show all properties
-    if (properties.length > 1) {
-      const bounds = new mapboxgl.LngLatBounds();
-      
-      properties.forEach((property, index) => {
-        const lng = property.longitude || sampleCoords[index % sampleCoords.length][0];
-        const lat = property.latitude || sampleCoords[index % sampleCoords.length][1];
-        bounds.extend([lng, lat]);
-      });
-
-      map.current!.fitBounds(bounds, { 
-        padding: 50,
-        maxZoom: 15 
-      });
-
-      console.log('🎯 Map fitted to show all properties');
-    }
-
-  }, [properties, isLoaded]);
-
-  // Get color for property type
-  const getPropertyColor = (type: string): string => {
-    const colors = {
-      house: '#28a745',      // Green
-      apartment: '#007bff',  // Blue
-      land_plot: '#fd7e14',  // Orange
-      farm: '#6f42c1',       // Purple
-      commercial: '#dc3545'  // Red
-    };
-    return colors[type.toLowerCase() as keyof typeof colors] || '#6c757d';
-  };
-
-  // Error state - no token
-  if (!mapboxgl.accessToken) {
-    return (
-      <div style={{
-        height,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        background: '#f8f9fa',
-        border: '2px dashed #dee2e6',
-        borderRadius: '8px'
-      }}>
-        <div style={{ textAlign: 'center', color: '#6c757d' }}>
-          <h3>⚠️ Mapbox Token Missing</h3>
-          <p>Add VITE_MAPBOX_ACCESS_TOKEN to Replit Secrets</p>
-        </div>
-      </div>
-    );
+  if (!accessToken) {
+    console.warn('Mapbox access token not found. Map will use OpenStreetMap tiles.');
   }
 
   return (
-    <div style={{ 
-      width: '100%', 
-      height,
-      position: 'relative',
-      border: '1px solid #dee2e6',
-      borderRadius: '8px',
-      overflow: 'hidden'
-    }}>
-      {/* Map container */}
-      <div ref={mapContainer} style={{ width: '100%', height: '100%' }} />
-      
-      {/* Status overlay */}
-      <div style={{
-        position: 'absolute',
-        top: '10px',
-        left: '10px',
-        background: 'rgba(255, 255, 255, 0.9)',
-        padding: '8px 12px',
-        borderRadius: '4px',
-        fontSize: '12px',
-        fontWeight: 'bold',
-        boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-      }}>
-        🏠 {properties.length} properties • {isLoaded ? '✅ Loaded' : '⏳ Loading...'}
-      </div>
+    <div className={`${className}`} style={{ height }}>
+      <MapContainer
+        center={center}
+        zoom={12}
+        style={{ height: '100%', width: '100%' }}
+        className="rounded-lg"
+      >
+        <TileLayer
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        />
+
+        {validProperties.map((property) => (
+          <Marker
+            key={property.id}
+            position={[property.latitude, property.longitude]}
+          >
+            <Popup maxWidth={300} className="property-popup">
+              <div className="space-y-3 p-2">
+                {/* Header */}
+                <div>
+                  <h3 className="font-semibold text-lg text-gray-900 mb-1">
+                    {property.title}
+                  </h3>
+                  <div className="flex items-center text-gray-600 text-sm">
+                    <MapPin className="h-4 w-4 mr-1" />
+                    {property.location}
+                  </div>
+                </div>
+
+                {/* Price */}
+                <div className="text-2xl font-bold text-beedab-darkblue">
+                  P{property.price?.toLocaleString()}
+                </div>
+
+                {/* Property Details */}
+                {(property.bedrooms || property.bathrooms || property.squareFeet) && (
+                  <div className="flex items-center space-x-4 text-gray-600 text-sm">
+                    {property.bedrooms && (
+                      <div className="flex items-center">
+                        <Bed className="h-4 w-4 mr-1" />
+                        <span>{property.bedrooms} beds</span>
+                      </div>
+                    )}
+                    {property.bathrooms && (
+                      <div className="flex items-center">
+                        <Bath className="h-4 w-4 mr-1" />
+                        <span>{property.bathrooms} baths</span>
+                      </div>
+                    )}
+                    {property.squareFeet && (
+                      <div className="flex items-center">
+                        <Square className="h-4 w-4 mr-1" />
+                        <span>{property.squareFeet.toLocaleString()} sqm</span>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Property Type & Views */}
+                <div className="flex items-center justify-between text-sm">
+                  <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded-full capitalize">
+                    {property.propertyType}
+                  </span>
+                  {property.views && (
+                    <div className="flex items-center text-gray-500">
+                      <Eye className="h-4 w-4 mr-1" />
+                      {property.views} views
+                    </div>
+                  )}
+                </div>
+
+                {/* View Details Button */}
+                <div className="pt-2 border-t border-gray-200">
+                  <Link
+                    to={`/properties/${property.id}`}
+                    className="block w-full bg-beedab-blue hover:bg-beedab-darkblue text-white text-center py-2 px-4 rounded-lg transition-colors font-medium"
+                  >
+                    View Details
+                  </Link>
+                </div>
+              </div>
+            </Popup>
+          </Marker>
+        ))}
+      </MapContainer>
     </div>
   );
 };

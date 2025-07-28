@@ -117,8 +117,8 @@ const PropertiesPage: React.FC = () => {
 
   // Property filtering and sorting
   const filteredProperties = properties.filter((property: any) => {
-    if (searchTerm && !property.title.toLowerCase().includes(searchTerm.toLowerCase()) &&
-        !property.location.toLowerCase().includes(searchTerm.toLowerCase())) {
+    if (searchTerm && !property.title?.toLowerCase().includes(searchTerm.toLowerCase()) &&
+        !property.location?.toLowerCase().includes(searchTerm.toLowerCase())) {
       return false;
     }
 
@@ -300,23 +300,7 @@ const PropertiesPage: React.FC = () => {
                   </motion.div>
                 )}
               </div>
-            ) : (
-              <motion.div
-                initial={{ x: -300, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                exit={{ x: -300, opacity: 0 }}
-                className="space-y-6"
-              >
-                <QuickActions
-                  onCreateProperty={() => window.location.href = '/create-listing'}
-                  onToggleFilters={() => setShowFilters(true)}
-                  onViewSavedSearches={() => setShowSavedSearches(true)}
-                  onShowComparison={() => setShowComparison(true)}
-                  onViewMap={() => handleViewModeChange('map')}
-                  comparisonCount={comparisonProperties.length}
-                />
-              </motion.div>
-            )}
+            ) : null}
           </div>
 
           {/* Properties Grid/List */}
