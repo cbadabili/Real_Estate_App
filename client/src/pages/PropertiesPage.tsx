@@ -266,9 +266,9 @@ const PropertiesPage: React.FC = () => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex gap-8">
-          {/* Sidebar - always show but content varies */}
-          <div className="w-80 flex-shrink-0">
-            {(showFilters || showSavedSearches) ? (
+          {/* Sidebar - only show when there's content */}
+          {(showFilters || showSavedSearches) && (
+            <div className="w-80 flex-shrink-0">
               <div className="space-y-6">
                 {/* Saved Searches */}
                 {showSavedSearches && (
@@ -300,11 +300,11 @@ const PropertiesPage: React.FC = () => {
                   </motion.div>
                 )}
               </div>
-            ) : null}
-          </div>
+            </div>
+          )}
 
           {/* Properties Grid/List */}
-          <div className="flex-1">
+          <div className="flex-1 min-w-0">
             {error ? (
               <div className="text-center py-16 bg-white rounded-lg shadow-sm">
                 <div className="mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
