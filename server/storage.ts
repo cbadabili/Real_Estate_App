@@ -186,7 +186,7 @@ export class DatabaseStorage implements IStorage {
     if (filters.maxPrice) {
       conditions.push(lte(properties.price, filters.maxPrice.toString()));
     }
-    if (filters.propertyType) {
+    if (filters.propertyType && filters.propertyType !== 'all') {
       conditions.push(eq(properties.propertyType, filters.propertyType));
     }
     if (filters.minBedrooms) {
