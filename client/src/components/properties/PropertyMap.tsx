@@ -4,7 +4,7 @@ import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
 // Initialize Mapbox with your token
-mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN || '';
+mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN || '';
 
 interface Property {
   id: number;
@@ -174,7 +174,7 @@ export const PropertyMap: React.FC<PropertyMapProps> = ({
       }}>
         <div style={{ textAlign: 'center', color: '#6c757d' }}>
           <h3>⚠️ Mapbox Token Missing</h3>
-          <p>Add REACT_APP_MAPBOX_ACCESS_TOKEN to Replit Secrets</p>
+          <p>Add VITE_MAPBOX_ACCESS_TOKEN to Replit Secrets</p>
         </div>
       </div>
     );
