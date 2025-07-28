@@ -1255,155 +1255,157 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get all properties
-  app.get('/api/properties', async (req, res) => {
-    try {
-      console.log('Fetching properties with filters:', req.query);
+  
+app.get('/api/properties', async (req, res) => {
+  try {
+    console.log('Fetching properties with filters:', req.query);
 
-      let query = db
-        .select({
-          id: properties.id,
-          title: properties.title,
-          description: properties.description,
-          price: properties.price,
-          propertyType: properties.propertyType,
-          bedrooms: properties.bedrooms,
-          bathrooms: properties.bathrooms,
-          squareFeet: properties.squareFeet,
-          address: properties.address,
-          city: properties.city,
-          state: properties.state,
-          zipCode: properties.zipCode,
-          latitude: properties.latitude,
-          longitude: properties.longitude,
-          images: properties.images,
-          status: properties.status,
-          listingType: properties.listingType,
-          ownerId: properties.ownerId,
-          createdAt: properties.createdAt,
-          updatedAt: properties.updatedAt
-        })
-        .from(properties);
+    let query = db
+      .select({
+        id: properties.id,
+        title: properties.title,
+        description: properties.description,
+        price: properties.price,
+        propertyType: properties.propertyType,
+        bedrooms: properties.bedrooms,
+        bathrooms: properties.bathrooms,
+        squareFeet: properties.squareFeet,
+        address: properties.address,
+        city: properties.city,
+        state: properties.state,
+        zipCode: properties.zipCode,
+        latitude: properties.latitude,
+        longitude: properties.longitude,
+        images: properties.images,
+        status: properties.status,
+        listingType: properties.listingType,
+        ownerId: properties.ownerId,
+        createdAt: properties.createdAt,
+        updatedAt: properties.updatedAt
+      })
+      .from(properties);
 
-      // Apply filters
-      const conditions = [];
+    // Apply filters
+    const conditions = [];
 
-      if (req.query.status) {
-        conditions.push(eq(properties.status, req.query.status as string));
-      }
-
-      if (req.query.propertyType && req.query.propertyType !== 'all') {
-        conditions.push(eq(properties.propertyType, req.query.propertyType as string));
-      }
-
-      if (req.query.bedrooms && req.query.bedrooms !== 'any') {
-        const bedroomsNum = parseInt(req.query.bedrooms as string);
-        if (!isNaN(bedroomsNum)) {
-          conditions.push(eq(properties.bedrooms, bedroomsNum));
-        }
-      }
-
-      if (req.query.bathrooms && req.query.bathrooms !== 'any') {
-        const bathroomsNum = parseInt(req.query.bathrooms as string);
-        if (!isNaN(bathroomsNum)) {
-          conditions.push(eq(properties.bathrooms, bathroomsNum));
-        }
-      }
-
-      if (req.query.priceRange) {
-        const [min, max] = (req.query.priceRange as string).split(',').map(Number);
-        if (!isNaN(min) && !isNaN(max)) {
-          conditions.push(gte(properties.price, min));
-          conditions.push(lte(properties.price, max));
-        }
-      }
-
-      if (conditions.length > 0) {
-        query = query.where(and(...conditions));
-      }
-
-      const result = await query;
-
-      // Define coordinate fallbacks for Botswana cities
-      const cityCoordinates: { [key: string]: { lat: number; lng: number } } = {
-        'Gaborone': { lat: -24.6282, lng: 25.9231 },
-        'Francistown': { lat: -21.1670, lng: 27.5084 },
-        'Molepolole': { lat: -24.4069, lng: 25.4981 },
-        'Serowe': { lat: -22.3886, lng: 26.7142 },
-        'Selibe Phikwe': { lat: -22.0080, lng: 27.8475 },
-        'Maun': { lat: -20.0028, lng: 23.4162 },
-        'Kanye': { lat: -24.9833, lng: 25.3333 },
-        'Mochudi': { lat: -24.4333, lng: 25.9833 },
-        'Mahalapye': { lat: -23.1167, lng: 26.7333 },
-        'Palapye': { lat: -22.5500, lng: 27.1333 }
-      };
-
-      // Process properties to ensure valid coordinates and match expected interface
-      const processedResult = result.map(prop => {
-        let lat = prop.latitude;
-        let lng = prop.longitude;
-
-        // Convert string coordinates to numbers if needed
-        if (typeof lat === 'string') lat = parseFloat(lat);
-        if (typeof lng === 'string') lng = parseFloat(lng);
-
-        // Handle null/undefined values explicitly
-        if (lat === null || lat === undefined) lat = NaN;
-        if (lng === null || lng === undefined) lng = NaN;
-
-        // Check if coordinates are valid
-        const hasValidCoords = lat != null && lng != null &&
-                             !isNaN(lat) && !isNaN(lng) &&
-                             lat >= -90 && lat <= 90 &&
-                             lng >= -180 && lng <= 180 &&
-                             lat !== 0 && lng !== 0; // Exclude 0,0 coordinates
-
-        if (!hasValidCoords) {
-          console.log(`Property ${prop.id} "${prop.title}" has invalid coordinates (${prop.latitude}, ${prop.longitude}), using fallback for ${prop.city || prop.state}`);
-
-          // Try to get coordinates from city name
-          const cityName = prop.city || prop.state;
-          const cityCoords = cityCoordinates[cityName];
-          if (cityCoords) {
-            lat = cityCoords.lat + (Math.random() - 0.5) * 0.01; // Add small random offset
-            lng = cityCoords.lng + (Math.random() - 0.5) * 0.01;
-            console.log(`Using fallback coordinates for ${cityName}: (${lat}, ${lng})`);
-          } else {
-            // Default to Gaborone with random offset
-            lat = -24.6282 + (Math.random() - 0.5) * 0.01;
-            lng = 25.9231 + (Math.random() - 0.5) * 0.01;
-            console.log(`Using default Gaborone coordinates with offset: (${lat}, ${lng})`);
-          }
-        }
-
-        return {
-          id: prop.id,
-          title: prop.title || 'Untitled Property',
-          description: prop.description,
-          price: typeof prop.price === 'string' ? parseFloat(prop.price) : prop.price || 0,
-          latitude: lat,
-          longitude: lng,
-          bedrooms: prop.bedrooms || 0,
-          bathrooms: typeof prop.bathrooms === 'string' ? parseFloat(prop.bathrooms) : prop.bathrooms || 0,
-          location: prop.address || `${prop.city}, ${prop.state}`,
-          city: prop.city || prop.state || 'Unknown',
-          propertyType: prop.propertyType || 'house',
-          images: prop.images,
-          status: prop.status,
-          listingType: prop.listingType
-        };
-      });
-
-      console.log(`Found ${processedResult.length} properties`);
-      processedResult.forEach(prop => {
-        console.log(`Property ${prop.id}: lat=${prop.latitude}, lng=${prop.longitude}, title="${prop.title}"`);
-      });
-
-      res.json(processedResult);
-    } catch (error) {
-      console.error('Error fetching properties:', error);
-      res.status(500).json({ error: 'Failed to fetch properties' });
+    if (req.query.status) {
+      conditions.push(eq(properties.status, req.query.status as string));
     }
-  });
+
+    if (req.query.propertyType && req.query.propertyType !== 'all') {
+      conditions.push(eq(properties.propertyType, req.query.propertyType as string));
+    }
+
+    if (req.query.bedrooms && req.query.bedrooms !== 'any') {
+      const bedroomsNum = parseInt(req.query.bedrooms as string);
+      if (!isNaN(bedroomsNum)) {
+        conditions.push(eq(properties.bedrooms, bedroomsNum));
+      }
+    }
+
+    if (req.query.bathrooms && req.query.bathrooms !== 'any') {
+      const bathroomsNum = parseInt(req.query.bathrooms as string);
+      if (!isNaN(bathroomsNum)) {
+        conditions.push(eq(properties.bathrooms, bathroomsNum));
+      }
+    }
+
+    if (req.query.priceRange) {
+      const [min, max] = (req.query.priceRange as string).split(',').map(Number);
+      if (!isNaN(min) && !isNaN(max)) {
+        conditions.push(gte(properties.price, min));
+        conditions.push(lte(properties.price, max));
+      }
+    }
+
+    if (conditions.length > 0) {
+      query = query.where(and(...conditions));
+    }
+
+    const result = await query;
+
+    // Define coordinate fallbacks for Botswana cities
+    const cityCoordinates: { [key: string]: { lat: number; lng: number } } = {
+      'Gaborone': { lat: -24.6282, lng: 25.9231 },
+      'Francistown': { lat: -21.1670, lng: 27.5084 },
+      'Molepolole': { lat: -24.4069, lng: 25.4981 },
+      'Serowe': { lat: -22.3886, lng: 26.7142 },
+      'Selibe Phikwe': { lat: -22.0080, lng: 27.8475 },
+      'Maun': { lat: -20.0028, lng: 23.4162 },
+      'Kanye': { lat: -24.9833, lng: 25.3333 },
+      'Mochudi': { lat: -24.4333, lng: 25.9833 },
+      'Mahalapye': { lat: -23.1167, lng: 26.7333 },
+      'Palapye': { lat: -22.5500, lng: 27.1333 }
+    };
+
+    // Process properties to ensure valid coordinates and match expected interface
+    const processedResult = result.map(prop => {
+      let lat = prop.latitude;
+      let lng = prop.longitude;
+
+      // Convert string coordinates to numbers if needed
+      if (typeof lat === 'string') lat = parseFloat(lat);
+      if (typeof lng === 'string') lng = parseFloat(lng);
+
+      // Handle null/undefined values explicitly
+      if (lat === null || lat === undefined) lat = NaN;
+      if (lng === null || lng === undefined) lng = NaN;
+
+      // Check if coordinates are valid
+      const hasValidCoords = lat != null && lng != null &&
+                           !isNaN(lat) && !isNaN(lng) &&
+                           lat >= -90 && lat <= 90 &&
+                           lng >= -180 && lng <= 180 &&
+                           lat !== 0 && lng !== 0; // Exclude 0,0 coordinates
+
+      if (!hasValidCoords) {
+        console.log(`Property ${prop.id} "${prop.title}" has invalid coordinates (${prop.latitude}, ${prop.longitude}), using fallback for ${prop.city || prop.state}`);
+
+        // Try to get coordinates from city name
+        const cityName = prop.city || prop.state;
+        const cityCoords = cityCoordinates[cityName];
+        if (cityCoords) {
+          lat = cityCoords.lat + (Math.random() - 0.5) * 0.01; // Add small random offset
+          lng = cityCoords.lng + (Math.random() - 0.5) * 0.01;
+          console.log(`Using fallback coordinates for ${cityName}: (${lat}, ${lng})`);
+        } else {
+          // Default to Gaborone with random offset
+          lat = -24.6282 + (Math.random() - 0.5) * 0.01;
+          lng = 25.9231 + (Math.random() - 0.5) * 0.01;
+          console.log(`Using default Gaborone coordinates with offset: (${lat}, ${lng})`);
+        }
+      }
+
+      return {
+        id: prop.id,
+        title: prop.title || 'Untitled Property',
+        description: prop.description,
+        price: typeof prop.price === 'string' ? parseFloat(prop.price) : prop.price || 0,
+        latitude: lat,
+        longitude: lng,
+        bedrooms: prop.bedrooms || 0,
+        bathrooms: typeof prop.bathrooms === 'string' ? parseFloat(prop.bathrooms) : prop.bathrooms || 0,
+        location: prop.address || `${prop.city}, ${prop.state}`,
+        city: prop.city || prop.state || 'Unknown',
+        propertyType: prop.propertyType || 'house',
+        images: prop.images,
+        status: prop.status,
+        listingType: prop.listingType
+      };
+    });
+
+    console.log(`Found ${processedResult.length} properties`);
+    processedResult.forEach(prop => {
+      console.log(`Property ${prop.id}: lat=${prop.latitude}, lng=${prop.longitude}, title="${prop.title}"`);
+    });
+
+    res.json(processedResult);
+  } catch (error) {
+    console.error('Error fetching properties:', error);
+    res.status(500).json({ error: 'Failed to fetch properties' });
+  }
+});
+
 
   const httpServer = createServer(app);
   return httpServer;

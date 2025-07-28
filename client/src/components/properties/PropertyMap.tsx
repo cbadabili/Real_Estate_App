@@ -73,7 +73,19 @@ export const PropertyMap: React.FC<PropertyMapProps> = ({
   const validProperties = properties.length > 0 ? properties.filter(property => {
     const lat = typeof property.latitude === 'string' ? parseFloat(property.latitude) : property.latitude;
     const lng = typeof property.longitude === 'string' ? parseFloat(property.longitude) : property.longitude;
-    return lat != null && lng != null && !isNaN(lat) && !isNaN(lng) && lat !== 0 && lng !== 0;
+    
+    const isValid = lat != null && lng != null && !isNaN(lat) && !isNaN(lng) && lat !== 0 && lng !== 0;
+    
+    if (!isValid) {
+      console.warn(`Property ${property.id} (${property.title}) has invalid coordinates:`, {
+        originalLat: property.latitude,
+        originalLng: property.longitude,
+        parsedLat: lat,
+        parsedLng: lng
+      });
+    }
+    
+    return isValid;
   }) : testProperties;
 
   const getMarkerColor = (type?: string) => {
