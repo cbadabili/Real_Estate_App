@@ -54,8 +54,7 @@ mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN || '';
 // Format price to show K for thousands, M for millions
 const formatPrice = (price: number): string => {
   if (price >= 1000000) {
-    const millions = price / 1000000;
-    return millions >= 1 ? `${millions.toFixed(1)}M` : `${(price / 1000).toFixed(0)}K`;
+    return `${(price / 1000000).toFixed(1)}M`;
   } else if (price >= 1000) {
     return `${(price / 1000).toFixed(0)}K`;
   }
@@ -106,7 +105,13 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
     : [25.9231, -24.6282];
 
   useEffect(() => {
-    if (!mapContainer.current || map.current) return;
+    if (!mapContainer.current) return;
+
+    // Clean up existing map
+    if (map.current) {
+      map.current.remove();
+      map.current = null;
+    }
 
     // Initialize map
     map.current = new mapboxgl.Map({
@@ -121,12 +126,19 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
       // Create custom marker element with price preview
       const markerElement = document.createElement('div');
       markerElement.className = 'property-marker';
+      markerElement.setAttribute('data-property-id', property.id.toString());
+      
+      // Get location display - prefer specific location over generic city
+      const locationDisplay = property.location && property.location !== property.city 
+        ? property.location.split(',')[0].trim()
+        : property.city || 'Location';
+      
       markerElement.innerHTML = `
         <div class="relative cursor-pointer">
           <!-- Main marker pin -->
           <div class="bg-blue-600 text-white px-3 py-1 rounded-lg shadow-lg border-2 border-white transform hover:scale-110 transition-transform duration-200">
             <div class="text-sm font-bold">P${formatPrice(property.price)}</div>
-            <div class="text-xs opacity-90">${property.location || 'Location'}</div>
+            <div class="text-xs opacity-90">${locationDisplay}</div>
           </div>
           <!-- Pin tail -->
           <div class="absolute left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-8 border-r-8 border-t-8 border-transparent border-t-blue-600"></div>
