@@ -44,14 +44,27 @@ export const PropertyMap: React.FC<PropertyMapProps> = ({
 
   // Filter properties with valid coordinates
   const validProperties = useMemo(() => {
-    return properties.filter(property => 
-      property.latitude && 
-      property.longitude && 
-      !isNaN(property.latitude) && 
-      !isNaN(property.longitude) &&
-      property.latitude !== 0 &&
-      property.longitude !== 0
-    );
+    return properties.filter(property => {
+      // Convert to numbers if they're strings
+      const lat = typeof property.latitude === 'string' ? parseFloat(property.latitude) : property.latitude;
+      const lng = typeof property.longitude === 'string' ? parseFloat(property.longitude) : property.longitude;
+      
+      // Comprehensive validation
+      const isValidLat = lat != null && !isNaN(lat) && lat >= -90 && lat <= 90 && lat !== 0;
+      const isValidLng = lng != null && !isNaN(lng) && lng >= -180 && lng <= 180 && lng !== 0;
+      
+      if (!isValidLat || !isValidLng) {
+        console.warn(`Property ${property.id} has invalid coordinates: lat=${lat}, lng=${lng}`);
+        return false;
+      }
+      
+      return true;
+    }).map(property => ({
+      ...property,
+      // Ensure coordinates are numbers
+      latitude: typeof property.latitude === 'string' ? parseFloat(property.latitude) : property.latitude,
+      longitude: typeof property.longitude === 'string' ? parseFloat(property.longitude) : property.longitude
+    }));
   }, [properties]);
 
   const formatPrice = (price: number): string => {
@@ -79,17 +92,27 @@ export const PropertyMap: React.FC<PropertyMapProps> = ({
     }
   };
 
-  const MarkerComponent = ({ property }: { property: Property }) => (
-    <Marker
-      key={property.id}
-      longitude={property.longitude}
-      latitude={property.latitude}
-      anchor="bottom"
-      onClick={e => {
-        e.originalEvent.stopPropagation();
-        handleMarkerClick(property);
-      }}
-    >
+  const MarkerComponent = ({ property }: { property: Property }) => {
+    // Final safety check for coordinates
+    const lat = Number(property.latitude);
+    const lng = Number(property.longitude);
+    
+    if (isNaN(lat) || isNaN(lng) || lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+      console.error(`Skipping property ${property.id} with invalid coordinates: lat=${lat}, lng=${lng}`);
+      return null;
+    }
+    
+    return (
+      <Marker
+        key={property.id}
+        longitude={lng}
+        latitude={lat}
+        anchor="bottom"
+        onClick={e => {
+          e.originalEvent.stopPropagation();
+          handleMarkerClick(property);
+        }}
+      >
       <div
         className={`w-8 h-8 rounded-full border-2 border-white shadow-lg cursor-pointer transform transition-transform hover:scale-110 flex items-center justify-center text-white text-xs font-bold ${
           selectedProperty?.id === property.id ? 'ring-4 ring-blue-400' : ''
@@ -99,7 +122,8 @@ export const PropertyMap: React.FC<PropertyMapProps> = ({
         🏠
       </div>
     </Marker>
-  );
+    );
+  };
 
   return (
     <div className={`relative ${className}`} style={{ height }}>
@@ -119,16 +143,25 @@ export const PropertyMap: React.FC<PropertyMapProps> = ({
           ))}
 
           {/* Popup for selected property */}
-          {popupInfo && (
-            <Popup
-              anchor="top"
-              longitude={Number(popupInfo.longitude)}
-              latitude={Number(popupInfo.latitude)}
-              onClose={() => setPopupInfo(null)}
-              closeButton={true}
-              closeOnClick={false}
-              className="property-popup"
-            >
+          {popupInfo && (() => {
+            const lat = Number(popupInfo.latitude);
+            const lng = Number(popupInfo.longitude);
+            
+            // Only render popup if coordinates are valid
+            if (isNaN(lat) || isNaN(lng) || lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+              return null;
+            }
+            
+            return (
+              <Popup
+                anchor="top"
+                longitude={lng}
+                latitude={lat}
+                onClose={() => setPopupInfo(null)}
+                closeButton={true}
+                closeOnClick={false}
+                className="property-popup"
+              >
               <div className="p-3 max-w-xs">
                 <h3 className="font-semibold text-sm mb-1 text-gray-900">
                   {popupInfo.title}
@@ -156,7 +189,8 @@ export const PropertyMap: React.FC<PropertyMapProps> = ({
                 </div>
               </div>
             </Popup>
-          )}
+            );
+          })()}
         </Map>
 
         {/* Property Count Badge */}
