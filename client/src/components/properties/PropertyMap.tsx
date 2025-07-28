@@ -115,7 +115,7 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
           <!-- Main marker pin -->
           <div class="bg-blue-600 text-white px-3 py-1 rounded-lg shadow-lg border-2 border-white transform hover:scale-110 transition-transform duration-200">
             <div class="text-sm font-bold">P${(property.price / 1000000).toFixed(1)}M</div>
-            <div class="text-xs opacity-90">${property.location.split(',')[0]}</div>
+            <div class="text-xs opacity-90">${property.location ? property.location.split(',')[0] : 'Location'}</div>
           </div>
           <!-- Pin tail -->
           <div class="absolute left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-8 border-r-8 border-t-8 border-transparent border-t-blue-600"></div>
