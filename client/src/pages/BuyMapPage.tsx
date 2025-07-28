@@ -161,11 +161,11 @@ const BuyMapPage = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <div className="flex gap-6 h-[80vh]">
           {/* Filters Sidebar */}
           {showFilters && (
-            <div className="lg:col-span-1">
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+            <div className="w-80 flex-shrink-0">
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 h-full overflow-y-auto">
                 <PropertyFilters 
                   filters={filters}
                   onFiltersChange={handleFiltersChange}
@@ -176,14 +176,14 @@ const BuyMapPage = () => {
           )}
 
           {/* Map */}
-          <div className={showFilters ? "lg:col-span-3" : "lg:col-span-4"}>
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+          <div className="flex-1">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden h-full">
               <PropertyMap 
                 properties={properties}
                 selectedProperty={selectedProperty}
                 onPropertySelect={handlePropertySelect}
-                height="70vh"
-                className="w-full"
+                height="100%"
+                className="w-full h-full"
               />
             </div>
           </div>
