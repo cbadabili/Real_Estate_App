@@ -161,7 +161,7 @@ const BuyMapPage = () => {
           </div>
         </div>
 
-        <div className="flex gap-6 h-[80vh]">
+        <div className="flex gap-6 h-[85vh]">
           {/* Filters Sidebar */}
           {showFilters && (
             <div className="w-80 flex-shrink-0">
@@ -176,7 +176,7 @@ const BuyMapPage = () => {
           )}
 
           {/* Map */}
-          <div className="flex-1">
+          <div className={showFilters ? "flex-1" : "w-full"}>
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden h-full">
               <PropertyMap 
                 properties={properties}
