@@ -375,7 +375,7 @@ const PropertiesPage: React.FC = () => {
                     longitude: p.longitude,
                     price: p.price,
                     propertyType: p.propertyType,
-                    location: p.location
+                    location: p.location || p.address || `${p.city}, ${p.district}`
                   }))}
                   height="800px"
                   className="w-full"
