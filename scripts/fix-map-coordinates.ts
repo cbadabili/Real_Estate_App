@@ -1,101 +1,56 @@
+import Database from 'better-sqlite3';
+import { join } from 'path';
 
-import { db } from '../server/db';
+const dbPath = join(process.cwd(), 'beedab.db');
+console.log('Using SQLite database at:', dbPath);
 
-async function fixMapCoordinates() {
-  console.log('🗺️ Fixing map coordinates for all properties...');
+const db = new Database(dbPath);
+
+async function fixCoordinates() {
+  console.log('🧹 Cleaning and fixing coordinates...');
 
   try {
-    // Get all properties that need coordinate fixes
-    const propertiesNeedingFix = await db.all(`
-      SELECT id, title, city, latitude, longitude 
-      FROM properties 
-      WHERE 
-        latitude IS NULL OR latitude = 0 OR latitude = '' OR 
-        longitude IS NULL OR longitude = 0 OR longitude = '' OR
-        latitude < -90 OR latitude > 90 OR 
-        longitude < -180 OR longitude > 180
-    `);
+    // Set accurate Botswana coordinates for all properties
+    const updates = [
+      { id: 1, lat: -24.6282, lng: 25.9231, location: 'Central Gaborone' },
+      { id: 2, lat: -24.6400, lng: 25.9100, location: 'West Gaborone' },
+      { id: 3, lat: -24.6200, lng: 25.8900, location: 'South Gaborone' },
+      { id: 4, lat: -21.1670, lng: 27.5084, location: 'Francistown' },
+      { id: 5, lat: -19.9956, lng: 23.4053, location: 'Maun' },
+      { id: 6, lat: -17.8278, lng: 25.1567, location: 'Kasane' }
+    ];
 
-    console.log(`Found ${propertiesNeedingFix.length} properties needing coordinate fixes`);
+    for (const update of updates) {
+      const result = db.prepare(`
+        UPDATE properties 
+        SET latitude = ?, longitude = ? 
+        WHERE id = ?
+      `).run(update.lat, update.lng, update.id);
 
-    if (propertiesNeedingFix.length === 0) {
-      console.log('✅ All properties already have valid coordinates');
-      return;
-    }
-
-    // Botswana approximate bounds
-    const botswanaBounds = {
-      north: -17.78,
-      south: -26.87,
-      east: 29.43,
-      west: 19.99
-    };
-
-    // City coordinates for Botswana
-    const cityCoordinates: { [key: string]: [number, number] } = {
-      'gaborone': [25.9231, -24.6282],
-      'francistown': [27.5084, -21.1670],
-      'molepolole': [25.4923, -24.4071],
-      'kanye': [25.3311, -24.9766],
-      'serowe': [26.7172, -22.3928],
-      'mahalapye': [26.8442, -23.1080],
-      'lobatse': [25.6844, -25.2267],
-      'selibe phikwe': [27.8247, -22.0058],
-      'maun': [23.4162, -20.0028],
-      'kasane': [25.1534, -17.8154]
-    };
-
-    let updatedCount = 0;
-
-    for (const property of propertiesNeedingFix) {
-      let lat: number, lng: number;
-      
-      // Try to match city to known coordinates
-      const cityName = property.city?.toLowerCase() || '';
-      if (cityCoordinates[cityName]) {
-        [lng, lat] = cityCoordinates[cityName];
-        // Add small random offset to avoid exact duplicates
-        lat += (Math.random() - 0.5) * 0.01;
-        lng += (Math.random() - 0.5) * 0.01;
-      } else {
-        // Generate random coordinates within Botswana bounds
-        lat = botswanaBounds.south + Math.random() * (botswanaBounds.north - botswanaBounds.south);
-        lng = botswanaBounds.west + Math.random() * (botswanaBounds.east - botswanaBounds.west);
+      if (result.changes > 0) {
+        console.log(`✅ Updated property ${update.id} coordinates for ${update.location}`);
       }
-
-      // Update the property
-      await db.run(
-        `UPDATE properties SET latitude = ?, longitude = ? WHERE id = ?`,
-        [lat, lng, property.id]
-      );
-
-      console.log(`✅ Updated property ${property.id} "${property.title}" with coordinates: ${lat.toFixed(6)}, ${lng.toFixed(6)}`);
-      updatedCount++;
     }
 
-    console.log(`🎉 Successfully updated ${updatedCount} properties with valid coordinates`);
-
-    // Verify the fixes
-    const remaining = await db.all(`
-      SELECT COUNT(*) as count 
+    // Verify the updates
+    console.log('\n📊 Current property coordinates:');
+    const properties = db.prepare(`
+      SELECT id, title, latitude, longitude, city, property_type 
       FROM properties 
-      WHERE 
-        latitude IS NULL OR latitude = 0 OR latitude = '' OR 
-        longitude IS NULL OR longitude = 0 OR longitude = '' OR
-        latitude < -90 OR latitude > 90 OR 
-        longitude < -180 OR longitude > 180
-    `);
+      ORDER BY id
+    `).all();
 
-    if (remaining[0].count === 0) {
-      console.log('✅ All properties now have valid coordinates!');
-    } else {
-      console.log(`⚠️ ${remaining[0].count} properties still need coordinate fixes`);
-    }
+    properties.forEach((prop: any) => {
+      console.log(`🏠 ${prop.title} (${prop.city}): ${prop.latitude}, ${prop.longitude}`);
+    });
+
+    console.log(`\n✅ Fixed coordinates for ${updates.length} properties`);
 
   } catch (error) {
     console.error('❌ Error fixing coordinates:', error);
+  } finally {
+    db.close();
   }
 }
 
-// Run the fix
-fixMapCoordinates().catch(console.error);
+fixCoordinates();
