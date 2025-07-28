@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { PropertyMap } from '../components/properties/PropertyMap';
+import PropertyMap from '../components/properties/PropertyMap';
 import { PropertyFilters } from '../components/properties/PropertyFilters';
 import { LoadingSpinner } from '../components/ui/LoadingSpinner';
 import { MapPin, Filter, Search } from 'lucide-react';

@@ -3,7 +3,7 @@ import { Search, Filter, MapPin, Star, Clock, Phone, Mail, Globe, Shield, Award,
 import SectionContent from '../components/marketplace/SectionContent';
 import RegisterProvider from '../components/marketplace/RegisterProvider';
 import { useLocation } from 'react-router-dom';
-import { PropertyMap } from '../components/properties/PropertyMap';
+import PropertyMap from '../components/properties/PropertyMap';
 
 interface Category {
   id: number;

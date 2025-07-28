@@ -5,7 +5,7 @@ import { Filter, Search, Grid, List as ListIcon, SlidersHorizontal, AlertCircle,
 import { PropertyCard } from '../components/PropertyCard';
 import { PropertyFilters } from '../components/properties/PropertyFilters';
 import { PropertyGrid } from '../components/properties/PropertyGrid';
-import { PropertyMap } from '../components/properties/PropertyMap';
+import PropertyMap from '../components/properties/PropertyMap';
 import { PropertyComparison } from '../components/properties/PropertyComparison';
 import { SavedSearches } from '../components/properties/SavedSearches';
 import { SmartSearchBar } from '../components/search/SmartSearchBar';
