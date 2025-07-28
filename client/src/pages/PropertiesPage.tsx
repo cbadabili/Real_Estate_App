@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Filter, Search, Grid, List as ListIcon, SlidersHorizontal, AlertCircle, MapPin, Map, BarChart3 } from 'lucide-react';
 import { PropertyCard } from '../components/PropertyCard';
@@ -18,6 +19,7 @@ import { useUserPreferences } from '../hooks/useLocalStorage';
 import { useSearch } from '../hooks/useSearch';
 
 const PropertiesPage: React.FC = () => {
+  const [searchParams] = useSearchParams();
   const { data: properties = [], isLoading, error, refetch } = useProperties();
   const { success } = useToastHelpers();
   const { preferences, updatePreference } = useUserPreferences();
@@ -25,12 +27,15 @@ const PropertiesPage: React.FC = () => {
 
   // State management
   const [searchTerm, setSearchTerm] = useState('');
-  const [filters, setFilters] = useState({
-    priceRange: [0, 5000000] as [number, number],
-    propertyType: 'all',
-    bedrooms: 'any',
-    bathrooms: 'any',
-    listingType: 'all'
+  const [filters, setFilters] = useState(() => {
+    const typeFromUrl = searchParams.get('type');
+    return {
+      priceRange: [0, 5000000] as [number, number],
+      propertyType: typeFromUrl || 'all',
+      bedrooms: 'any',
+      bathrooms: 'any',
+      listingType: 'all'
+    };
   });
   const [sortBy, setSortBy] = useState(preferences.searchFilters?.defaultSortBy || 'newest');
   const [viewMode, setViewMode] = useState<'grid' | 'list' | 'map'>(preferences.searchFilters?.defaultViewMode as 'grid' | 'list' | 'map' || 'grid');
@@ -39,6 +44,17 @@ const PropertiesPage: React.FC = () => {
   const [showComparison, setShowComparison] = useState(false);
   const [comparisonProperties, setComparisonProperties] = useState<any[]>([]);
   const [selectedProperty, setSelectedProperty] = useState<any>(null);
+
+    // Update filters when URL parameters change
+  useEffect(() => {
+    const typeFromUrl = searchParams.get('type');
+    if (typeFromUrl && typeFromUrl !== filters.propertyType) {
+      setFilters(prev => ({
+        ...prev,
+        propertyType: typeFromUrl
+      }));
+    }
+  }, [searchParams]);
 
   // Search functionality
   const handleSmartSearch = async (query: string) => {
