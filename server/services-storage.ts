@@ -153,10 +153,11 @@ export class ServicesStorage implements IServicesStorage {
   }
 
   async deleteServiceProvider(id: number): Promise<boolean> {
-    const result = await db
+    const deleted = await db
       .delete(serviceProviders)
-      .where(eq(serviceProviders.id, id));
-    return result.changes > 0;
+      .where(eq(serviceProviders.id, id))
+      .returning({ id: serviceProviders.id });
+    return deleted.length > 0;
   }
 
   // Service Ads methods

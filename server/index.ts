@@ -45,6 +45,13 @@ app.use((req, res, next) => {
   next();
 });
 
+// --------------------------------------------------
+// Health check – must be registered before other routes
+// --------------------------------------------------
+app.get('/api/health', (_req: Request, res: Response) => {
+  res.json({ status: 'ok' });
+});
+
 (async () => {
   // Test database connection before starting server
   console.log('Testing database connection...');
@@ -88,32 +95,39 @@ app.use((req, res, next) => {
   }
 
   // Initialize database with migrations
-  const { seedManager } = await import('./seed-manager');
-  const { initializeDatabase } = await import('./db');
+  if (process.env.NODE_ENV !== 'production' || process.env.FORCE_DB_MIGRATIONS === 'true') {
+    const { seedManager } = await import('./seed-manager');
+    const { initializeDatabase } = await import('./db');
 
-  try {
-    console.log('🔄 Running database migrations...');
-    const migrationManager = getMigrationManager();
-    await migrationManager.runAllPendingMigrations(); // Run all migrations, including rental
+    try {
+      console.log('🔄 Running database migrations...');
+      const migrationManager = getMigrationManager();
+      await migrationManager.runAllPendingMigrations(); // Run all migrations, including rental
 
-    // Initialize database only in development or when explicitly requested
-    const shouldInitializeDB = process.env.NODE_ENV !== 'production' || process.env.FORCE_DB_INIT === 'true';
-    const shouldSeedDB = process.env.NODE_ENV === 'development' || process.env.FORCE_DB_SEED === 'true';
+      // Initialize database only in development or when explicitly requested
+      const shouldInitializeDB =
+        process.env.NODE_ENV !== 'production' || process.env.FORCE_DB_INIT === 'true';
+      const shouldSeedDB =
+        process.env.NODE_ENV === 'development' || process.env.FORCE_DB_SEED === 'true';
 
-    if (shouldInitializeDB) {
-      console.log('Initializing database...');
-      await initializeDatabase();
+      if (shouldInitializeDB) {
+        console.log('Initializing database...');
+        await initializeDatabase();
+      }
+
+      if (shouldSeedDB) {
+        console.log('Seeding database...');
+        await seedManager.seedAll();
+      }
+
+      console.log('✅ Database initialization completed');
+    } catch (error) {
+      console.error('❌ Database initialization failed:', error);
+      if (process.env.NODE_ENV !== 'production' || process.env.FORCE_DB_MIGRATIONS === 'true') {
+        process.exit(1);
+      }
+      // In production without FORCE flag just continue running
     }
-
-    if (shouldSeedDB) {
-      console.log('Seeding database...');
-      await seedManager.seedAll();
-    }
-
-    console.log('✅ Database initialization completed');
-  } catch (error) {
-    console.error('❌ Database initialization failed:', error);
-    process.exit(1);
   }
 
   // Seed rental data
@@ -121,7 +135,7 @@ app.use((req, res, next) => {
   // ALWAYS serve the app on port 5000
   // this serves both the API and the client.
   // It is the only port that is not firewalled.
-  const port = 5000;
+  const port = Number(process.env.PORT) || 5000;
   server.listen({
     port,
     host: "0.0.0.0",

@@ -222,8 +222,11 @@ export class ReviewStorage implements IReviewStorage {
   }
 
   async deleteUserReview(id: number): Promise<boolean> {
-    const result = await db.delete(userReviews).where(eq(userReviews.id, id));
-    return result.changes > 0;
+    const deleted = await db
+      .delete(userReviews)
+      .where(eq(userReviews.id, id))
+      .returning({ id: userReviews.id });
+    return deleted.length > 0;
   }
 
   async getUserReviewStats(userId: number): Promise<ReviewStats> {
@@ -318,8 +321,11 @@ export class ReviewStorage implements IReviewStorage {
   }
 
   async deleteReviewResponse(id: number): Promise<boolean> {
-    const result = await db.delete(reviewResponses).where(eq(reviewResponses.id, id));
-    return result.changes > 0;
+    const deleted = await db
+      .delete(reviewResponses)
+      .where(eq(reviewResponses.id, id))
+      .returning({ id: reviewResponses.id });
+    return deleted.length > 0;
   }
 
   // Review Helpful Votes
@@ -386,14 +392,15 @@ export class ReviewStorage implements IReviewStorage {
   }
 
   async deleteReviewHelpful(reviewId: number, userId: number): Promise<boolean> {
-    const result = await db
+    const deleted = await db
       .delete(reviewHelpful)
       .where(and(
         eq(reviewHelpful.reviewId, reviewId),
         eq(reviewHelpful.userId, userId)
-      ));
+      ))
+      .returning({ id: reviewHelpful.id });
     
-    return result.changes > 0;
+    return deleted.length > 0;
   }
 
   // User Permissions
@@ -408,7 +415,7 @@ export class ReviewStorage implements IReviewStorage {
       .from(userPermissions)
       .where(and(
         eq(userPermissions.userId, userId),
-        sql`(${userPermissions.expiresAt} IS NULL OR ${userPermissions.expiresAt} > datetime('now'))`
+        sql`(${userPermissions.expiresAt} IS NULL OR ${userPermissions.expiresAt} > now())`
       ));
   }
 
@@ -418,14 +425,15 @@ export class ReviewStorage implements IReviewStorage {
   }
 
   async revokeUserPermission(userId: number, permission: string): Promise<boolean> {
-    const result = await db
+    const deleted = await db
       .delete(userPermissions)
       .where(and(
         eq(userPermissions.userId, userId),
         eq(userPermissions.permission, permission)
-      ));
+      ))
+      .returning({ id: userPermissions.id });
     
-    return result.changes > 0;
+    return deleted.length > 0;
   }
 
   async hasUserPermission(userId: number, permission: Permission): Promise<boolean> {
@@ -435,7 +443,7 @@ export class ReviewStorage implements IReviewStorage {
       .where(and(
         eq(userPermissions.userId, userId),
         eq(userPermissions.permission, permission),
-        sql`(${userPermissions.expiresAt} IS NULL OR ${userPermissions.expiresAt} > datetime('now'))`
+        sql`(${userPermissions.expiresAt} IS NULL OR ${userPermissions.expiresAt} > now())`
       ));
     
     return (result?.count || 0) > 0;
@@ -500,16 +508,17 @@ export class ReviewStorage implements IReviewStorage {
 
   // Moderation
   async flagReview(reviewId: number, reason?: string): Promise<boolean> {
-    const result = await db
+    const flagged = await db
       .update(userReviews)
       .set({ 
         status: 'flagged',
         moderatorNotes: reason,
         updatedAt: new Date()
       })
-      .where(eq(userReviews.id, reviewId));
+      .where(eq(userReviews.id, reviewId))
+      .returning({ id: userReviews.id });
     
-    return result.changes > 0;
+    return flagged.length > 0;
   }
 
   async moderateReview(reviewId: number, status: string, moderatorNotes?: string): Promise<UserReview | undefined> {
