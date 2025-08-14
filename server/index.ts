@@ -9,7 +9,6 @@ import marketplaceRoutes from './marketplace-routes';
 import aiSearchRoutes from './ai-search';
 import tenantSupportRoutes from './tenant-support-routes';
 import propertyManagementRoutes from './property-management-routes';
-import { getMigrationManager } from './migration-manager'; // Import migration manager
 
 const app = express();
 app.use(express.json({ limit: '50mb' }));
@@ -98,6 +97,7 @@ app.get('/api/health', (_req: Request, res: Response) => {
   if (process.env.NODE_ENV !== 'production' || process.env.FORCE_DB_MIGRATIONS === 'true') {
     const { seedManager } = await import('./seed-manager');
     const { initializeDatabase } = await import('./db');
+    const { getMigrationManager } = await import('./migration-manager');
 
     try {
       console.log('🔄 Running database migrations...');
