@@ -1,4 +1,31 @@
-import { sqliteTable, text, integer, real, blob } from "drizzle-orm/sqlite-core";
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+// Temporary staged migration helper:
+// 1. We switch to pg-core import.
+// 2. We re-export a pgTable alias that points to the old sqliteTable so the
+//    remainder of the file compiles until each table is migrated.
+// 3. Incrementally convert tables from sqliteTable → pgTable with proper
+//    column types.
+
+import {
+  pgTable,
+  text,
+  integer,
+  boolean,
+  real,
+  doublePrecision,
+  numeric,
+  timestamp,
+  jsonb,
+  serial,
+} from "drizzle-orm/pg-core";
+
+// Until every table is migrated we alias pgTable to sqliteTable for unchanged
+// definitions.  Replace usages in follow-up patches.
+// Compatibility shim while we finish migrating every table definition.
+// Provides the same call-signature using pgTable so no sqlite-core import is required.
+// Remove after all tables are updated.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const sqliteTable = pgTable as any;
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 import { relations, sql } from "drizzle-orm";

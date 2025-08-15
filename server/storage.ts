@@ -318,8 +318,11 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteProperty(id: number): Promise<boolean> {
-    const result = await db.delete(properties).where(eq(properties.id, id));
-    return result.changes > 0;
+    const deleted = await db
+      .delete(properties)
+      .where(eq(properties.id, id))
+      .returning({ id: properties.id });
+    return deleted.length > 0;
   }
 
   async getUserProperties(userId: number): Promise<Property[]> {
@@ -484,8 +487,9 @@ export class DatabaseStorage implements IStorage {
       .where(and(
         eq(savedProperties.userId, userId),
         eq(savedProperties.propertyId, propertyId)
-      ));
-    return result.changes > 0;
+      ))
+      .returning({ id: savedProperties.id });
+    return result.length > 0;
   }
 
   async isPropertySaved(userId: number, propertyId: number): Promise<boolean> {

@@ -4,8 +4,10 @@ import { join } from 'path';
 export default defineConfig({
   out: "./migrations",
   schema: "./shared/schema.ts",
-  dialect: "sqlite",
+  // Switch to Postgres for production deployments
+  // NOTE: DATABASE_URL **must** be set when running drizzle-kit commands
+  dialect: "postgresql",
   dbCredentials: {
-    url: join(process.cwd(), 'beedab.db')
+    url: process.env.DATABASE_URL as string
   },
 });
