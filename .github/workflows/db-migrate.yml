@@ -1,0 +1,35 @@
+name: DB Migrations (Drizzle)
+on:
+  workflow_dispatch: {}
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install deps
+        run: npm ci
+
+      - name: Generate migrations
+        run: npx drizzle-kit generate
+
+      - name: Apply migrations
+        run: npx drizzle-kit push
+
+      - name: Commit migrations (if any)
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if [ -n "$(git status --porcelain migrations)" ]; then
+            git add migrations
+            git commit -m "chore(db): add generated drizzle migrations [skip ci]"
+            git push
+          fi
