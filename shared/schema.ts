@@ -21,9 +21,11 @@ import {
 
 // Until every table is migrated we alias pgTable to sqliteTable for unchanged
 // definitions.  Replace usages in follow-up patches.
-import { sqliteTable as _legacySqliteTable } from "drizzle-orm/sqlite-core";
-// @ts-ignore – help TS see the same call-signature
-const sqliteTable = _legacySqliteTable as unknown as typeof pgTable;
+// Compatibility shim while we finish migrating every table definition.
+// Provides the same call-signature using pgTable so no sqlite-core import is required.
+// Remove after all tables are updated.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const sqliteTable = pgTable as any;
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 import { relations, sql } from "drizzle-orm";
