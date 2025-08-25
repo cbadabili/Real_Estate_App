@@ -1,7 +1,6 @@
 name: Deploy to Vercel
+
 on:
-  push:
-    branches: [main]
   workflow_dispatch: {}
 
 jobs:
@@ -10,12 +9,20 @@ jobs:
     permissions:
       contents: read
       deployments: write
+
     steps:
       - uses: actions/checkout@v4
 
-      - uses: vercel/actions/deploy@v1
+      - name: Deploy to Vercel
+        id: vercel
+        uses: amondnet/vercel-action@v25.2.0
         with:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
           working-directory: .
+
+      - name: Echo Preview URL
+        if: always()
+        run: |
+          echo "Vercel preview: ${{ steps.vercel.outputs.preview-url }}"
