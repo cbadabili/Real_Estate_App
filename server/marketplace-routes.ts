@@ -608,4 +608,50 @@ async function updateProvider(id: number, data: any) {
   return { ...provider, ...data, updated_at: new Date().toISOString() };
 }
 
+// --------------------------------------------------
+// In-memory provider reviews helpers
+// --------------------------------------------------
+
+// Store reviews keyed by provider ID
+const providerReviews: Record<number, any[]> = {};
+
+/**
+ * Create a review for a provider (mock implementation).
+ */
+async function createProviderReview(data: {
+  provider_id: number;
+  user_id: number;
+  rating: number;
+  comment: string;
+  service_type?: string;
+}) {
+  const newReview = {
+    id: Math.floor(Math.random() * 10_000_000),
+    ...data,
+    created_at: new Date().toISOString(),
+  };
+
+  if (!providerReviews[data.provider_id]) {
+    providerReviews[data.provider_id] = [];
+  }
+  providerReviews[data.provider_id].push(newReview);
+
+  return newReview;
+}
+
+/**
+ * Fetch reviews for a provider with basic pagination (mock).
+ */
+async function getProviderReviews(
+  providerId: number,
+  opts: { page?: number; limit?: number } = {},
+) {
+  const page = opts.page && opts.page > 0 ? opts.page : 1;
+  const limit = opts.limit && opts.limit > 0 ? opts.limit : 10;
+
+  const allReviews = providerReviews[providerId] ?? [];
+  const start = (page - 1) * limit;
+  return allReviews.slice(start, start + limit);
+}
+
 export default router;

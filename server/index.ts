@@ -62,7 +62,7 @@ app.get('/api/health', (_req: Request, res: Response) => {
 
   const server = await registerRoutes(app);
 
-  const rentalRoutes = createRentalRoutes(db);
+  const rentalRoutes = createRentalRoutes();
   app.use('/api/rentals', rentalRoutes);
   app.use('/api', aiSearchRoutes);
   app.use('/api', propertyManagementRoutes);

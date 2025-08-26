@@ -5,7 +5,7 @@ import {
   getCityByName, 
   getWardsByCity,
   getAllCities,
-  getAllDistricts 
+  getDistrictNames 
 } from '../data/botswanaGeography';
 
 interface GeographySelectorProps {
@@ -61,7 +61,7 @@ const GeographySelector: React.FC<GeographySelectorProps> = ({
   // Filter districts based on search input
   useEffect(() => {
     if (stateSearch.trim()) {
-      const filtered = getAllDistricts().filter(district =>
+      const filtered = getDistrictNames().filter(district =>
         district.toLowerCase().includes(stateSearch.toLowerCase())
       );
       setFilteredStates(filtered.slice(0, 10)); // Limit to 10 suggestions
