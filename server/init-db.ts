@@ -1,6 +1,5 @@
 import { db } from './db';
-import { migrate } from 'drizzle-orm/better-sqlite3/migrator';
-import Database from 'better-sqlite3';
+import { migrate } from 'drizzle-orm/postgres-js/migrator';
 import { join } from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
@@ -9,23 +8,22 @@ import { sql } from "drizzle-orm";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const dbPath = join(__dirname, '..', 'beedab.db');
-const sqlite = new Database(dbPath);
-
 async function initializeTables() {
   try {
+    console.log('Initializing PostgreSQL tables...');
+
     // Drop existing tables to ensure clean slate
     console.log('Dropping existing tables...');
-    await db.run(sql`DROP TABLE IF EXISTS saved_properties`);
-    await db.run(sql`DROP TABLE IF EXISTS appointments`);
-    await db.run(sql`DROP TABLE IF EXISTS inquiries`);
-    await db.run(sql`DROP TABLE IF EXISTS properties`);
-    await db.run(sql`DROP TABLE IF EXISTS users`);
+    await db.execute(sql`DROP TABLE IF EXISTS saved_properties CASCADE`);
+    await db.execute(sql`DROP TABLE IF EXISTS appointments CASCADE`);
+    await db.execute(sql`DROP TABLE IF EXISTS inquiries CASCADE`);
+    await db.execute(sql`DROP TABLE IF EXISTS properties CASCADE`);
+    await db.execute(sql`DROP TABLE IF EXISTS users CASCADE`);
 
     console.log('Creating users table...');
-    await db.run(sql`
+    await db.execute(sql`
       CREATE TABLE users (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id SERIAL PRIMARY KEY,
         username TEXT NOT NULL UNIQUE,
         email TEXT NOT NULL UNIQUE,
         password TEXT NOT NULL,
@@ -37,20 +35,20 @@ async function initializeTables() {
         permissions TEXT,
         avatar TEXT,
         bio TEXT,
-        is_verified INTEGER DEFAULT 0,
-        is_active INTEGER DEFAULT 1,
+        is_verified BOOLEAN DEFAULT false,
+        is_active BOOLEAN DEFAULT true,
         reac_number TEXT,
-        last_login_at INTEGER,
-        created_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer)),
-        updated_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer))
+        last_login_at BIGINT,
+        created_at BIGINT DEFAULT EXTRACT(EPOCH FROM NOW()) * 1000,
+        updated_at BIGINT DEFAULT EXTRACT(EPOCH FROM NOW()) * 1000
       )
     `);
     console.log('✅ Users table ready');
 
     console.log('Creating properties table...');
-    await db.run(sql`
+    await db.execute(sql`
       CREATE TABLE properties (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id SERIAL PRIMARY KEY,
         title TEXT NOT NULL,
         description TEXT,
         price TEXT NOT NULL,
@@ -79,7 +77,7 @@ async function initializeTables() {
         agent_id INTEGER REFERENCES users(id),
         views INTEGER DEFAULT 0,
         days_on_market INTEGER DEFAULT 0,
-        auction_date INTEGER,
+        auction_date BIGINT,
         auction_time TEXT,
         starting_bid TEXT,
         current_bid TEXT,
@@ -91,55 +89,55 @@ async function initializeTables() {
         deposit_required TEXT,
         auction_terms TEXT,
         lot_number TEXT,
-        created_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer)),
-        updated_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer))
+        created_at BIGINT DEFAULT EXTRACT(EPOCH FROM NOW()) * 1000,
+        updated_at BIGINT DEFAULT EXTRACT(EPOCH FROM NOW()) * 1000
       )
     `);
     console.log('✅ Properties table ready');
 
     console.log('Creating inquiries table...');
-    await db.run(sql`
+    await db.execute(sql`
       CREATE TABLE inquiries (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id SERIAL PRIMARY KEY,
         property_id INTEGER REFERENCES properties(id) NOT NULL,
         buyer_id INTEGER REFERENCES users(id) NOT NULL,
         message TEXT NOT NULL,
         status TEXT NOT NULL DEFAULT 'unread',
-        created_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer))
+        created_at BIGINT DEFAULT EXTRACT(EPOCH FROM NOW()) * 1000
       )
     `);
 
     console.log('Creating appointments table...');
-    await db.run(sql`
+    await db.execute(sql`
       CREATE TABLE appointments (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id SERIAL PRIMARY KEY,
         property_id INTEGER REFERENCES properties(id) NOT NULL,
         buyer_id INTEGER REFERENCES users(id) NOT NULL,
         agent_id INTEGER REFERENCES users(id),
-        appointment_date INTEGER NOT NULL,
+        appointment_date BIGINT NOT NULL,
         type TEXT NOT NULL,
         status TEXT NOT NULL DEFAULT 'scheduled',
         notes TEXT,
-        created_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer))
+        created_at BIGINT DEFAULT EXTRACT(EPOCH FROM NOW()) * 1000
       )
     `);
 
     console.log('Creating saved_properties table...');
-    await db.run(sql`
+    await db.execute(sql`
       CREATE TABLE saved_properties (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id SERIAL PRIMARY KEY,
         user_id INTEGER REFERENCES users(id) NOT NULL,
         property_id INTEGER REFERENCES properties(id) NOT NULL,
-        created_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer))
+        created_at BIGINT DEFAULT EXTRACT(EPOCH FROM NOW()) * 1000
       )
     `);
 
     console.log('Creating services tables...');
 
     console.log('Creating service_providers table...');
-    await db.run(sql`
+    await db.execute(sql`
       CREATE TABLE service_providers (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id SERIAL PRIMARY KEY,
         company_name TEXT NOT NULL,
         service_category TEXT NOT NULL,
         contact_person TEXT,
@@ -148,25 +146,25 @@ async function initializeTables() {
         website_url TEXT,
         logo_url TEXT,
         description TEXT,
-        reac_certified INTEGER DEFAULT 0,
+        reac_certified BOOLEAN DEFAULT false,
         address TEXT,
         city TEXT,
         rating TEXT DEFAULT '4.5',
         review_count INTEGER DEFAULT 0,
-        verified INTEGER DEFAULT 0,
-        featured INTEGER DEFAULT 0,
-        date_joined INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer)),
-        created_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer)),
-        updated_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer))
+        verified BOOLEAN DEFAULT false,
+        featured BOOLEAN DEFAULT false,
+        date_joined BIGINT DEFAULT EXTRACT(EPOCH FROM NOW()) * 1000,
+        created_at BIGINT DEFAULT EXTRACT(EPOCH FROM NOW()) * 1000,
+        updated_at BIGINT DEFAULT EXTRACT(EPOCH FROM NOW()) * 1000
       )
     `);
 
-    await db.run(sql`CREATE UNIQUE INDEX service_providers_email_unique ON service_providers (email)`);
+    await db.execute(sql`CREATE UNIQUE INDEX service_providers_email_unique ON service_providers (email)`);
 
     console.log('Creating service_ads table...');
-    await db.run(sql`
+    await db.execute(sql`
       CREATE TABLE service_ads (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id SERIAL PRIMARY KEY,
         provider_id INTEGER REFERENCES service_providers(id),
         ad_title TEXT NOT NULL,
         ad_copy TEXT,
@@ -175,51 +173,51 @@ async function initializeTables() {
         context_trigger TEXT NOT NULL,
         cta_text TEXT DEFAULT 'Learn More',
         cta_url TEXT,
-        active INTEGER DEFAULT 1,
+        active BOOLEAN DEFAULT true,
         priority INTEGER DEFAULT 1,
         impressions INTEGER DEFAULT 0,
         clicks INTEGER DEFAULT 0,
-        created_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer)),
-        updated_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer))
+        created_at BIGINT DEFAULT EXTRACT(EPOCH FROM NOW()) * 1000,
+        updated_at BIGINT DEFAULT EXTRACT(EPOCH FROM NOW()) * 1000
       )
     `);
 
     console.log('Creating service_reviews table...');
-    await db.run(sql`
+    await db.execute(sql`
       CREATE TABLE service_reviews (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id SERIAL PRIMARY KEY,
         provider_id INTEGER REFERENCES service_providers(id),
         user_id INTEGER,
         rating INTEGER NOT NULL,
         review TEXT,
         reviewer_name TEXT,
         reviewer_avatar TEXT,
-        verified INTEGER DEFAULT 0,
+        verified BOOLEAN DEFAULT false,
         helpful INTEGER DEFAULT 0,
-        created_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer))
+        created_at BIGINT DEFAULT EXTRACT(EPOCH FROM NOW()) * 1000
       )
     `);
 
     console.log('Creating marketplace tables...');
 
     console.log('Creating service_categories table...');
-    await db.run(sql`
+    await db.execute(sql`
       CREATE TABLE service_categories (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id SERIAL PRIMARY KEY,
         name TEXT NOT NULL,
         journey_type TEXT NOT NULL,
         icon TEXT,
         description TEXT,
         sort_order INTEGER DEFAULT 0,
-        is_active INTEGER DEFAULT 1,
-        created_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer))
+        is_active BOOLEAN DEFAULT true,
+        created_at BIGINT DEFAULT EXTRACT(EPOCH FROM NOW()) * 1000
       )
     `);
 
     console.log('Creating marketplace_providers table...');
-    await db.run(sql`
+    await db.execute(sql`
       CREATE TABLE marketplace_providers (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id SERIAL PRIMARY KEY,
         user_id INTEGER REFERENCES users(id),
         provider_type TEXT NOT NULL,
         business_name TEXT NOT NULL,
@@ -233,9 +231,9 @@ async function initializeTables() {
         website TEXT,
         description TEXT,
         years_experience INTEGER DEFAULT 0,
-        is_verified INTEGER DEFAULT 0,
-        is_featured INTEGER DEFAULT 0,
-        reac_certified INTEGER DEFAULT 0,
+        is_verified BOOLEAN DEFAULT false,
+        is_featured BOOLEAN DEFAULT false,
+        reac_certified BOOLEAN DEFAULT false,
         business_address TEXT,
         operating_hours TEXT,
         service_radius INTEGER DEFAULT 0,
@@ -244,29 +242,29 @@ async function initializeTables() {
         projects_completed INTEGER DEFAULT 0,
         response_time INTEGER DEFAULT 24,
         availability_status TEXT DEFAULT 'available',
-        created_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer)),
-        updated_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer))
+        created_at BIGINT DEFAULT EXTRACT(EPOCH FROM NOW()) * 1000,
+        updated_at BIGINT DEFAULT EXTRACT(EPOCH FROM NOW()) * 1000
       )
     `);
 
     console.log('Creating artisan_skills table...');
-    await db.run(sql`
+    await db.execute(sql`
       CREATE TABLE artisan_skills (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id SERIAL PRIMARY KEY,
         provider_id INTEGER REFERENCES marketplace_providers(id),
         skill_name TEXT NOT NULL,
         skill_level TEXT NOT NULL,
         years_experience INTEGER DEFAULT 0,
         certification_url TEXT,
-        is_primary INTEGER DEFAULT 0,
-        created_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer))
+        is_primary BOOLEAN DEFAULT false,
+        created_at BIGINT DEFAULT EXTRACT(EPOCH FROM NOW()) * 1000
       )
     `);
 
     console.log('Creating training_programs table...');
-    await db.run(sql`
+    await db.execute(sql`
       CREATE TABLE training_programs (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id SERIAL PRIMARY KEY,
         provider_id INTEGER REFERENCES marketplace_providers(id),
         program_name TEXT NOT NULL,
         program_type TEXT NOT NULL,
@@ -278,17 +276,17 @@ async function initializeTables() {
         schedule TEXT,
         max_participants INTEGER,
         current_participants INTEGER DEFAULT 0,
-        start_date INTEGER,
-        end_date INTEGER,
-        is_active INTEGER DEFAULT 1,
-        created_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer))
+        start_date BIGINT,
+        end_date BIGINT,
+        is_active BOOLEAN DEFAULT true,
+        created_at BIGINT DEFAULT EXTRACT(EPOCH FROM NOW()) * 1000
       )
     `);
 
     console.log('Creating building_materials table...');
-    await db.run(sql`
+    await db.execute(sql`
       CREATE TABLE building_materials (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id SERIAL PRIMARY KEY,
         supplier_id INTEGER REFERENCES marketplace_providers(id),
         material_name TEXT NOT NULL,
         category TEXT NOT NULL,
@@ -303,14 +301,14 @@ async function initializeTables() {
         certifications TEXT,
         images TEXT,
         status TEXT DEFAULT 'available',
-        created_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer))
+        created_at BIGINT DEFAULT EXTRACT(EPOCH FROM NOW()) * 1000
       )
     `);
 
     console.log('Creating project_requests table...');
-    await db.run(sql`
+    await db.execute(sql`
       CREATE TABLE project_requests (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id SERIAL PRIMARY KEY,
         user_id INTEGER REFERENCES users(id),
         project_title TEXT NOT NULL,
         project_type TEXT NOT NULL,
@@ -322,8 +320,8 @@ async function initializeTables() {
         requirements TEXT,
         attachments TEXT,
         status TEXT DEFAULT 'open',
-        created_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer)),
-        updated_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer))
+        created_at BIGINT DEFAULT EXTRACT(EPOCH FROM NOW()) * 1000,
+        updated_at BIGINT DEFAULT EXTRACT(EPOCH FROM NOW()) * 1000
       )
     `);
 
@@ -336,7 +334,7 @@ async function initializeTables() {
 
 async function initializeDatabase() {
   try {
-    console.log('Initializing database...');
+    console.log('Initializing PostgreSQL database...');
 
     // Initialize tables with the corrected schema
     await initializeTables();
