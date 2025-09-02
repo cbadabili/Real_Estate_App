@@ -1,149 +1,92 @@
+
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Bell, X, Check, AlertTriangle, Info, Calendar, Home, MessageCircle } from 'lucide-react';
-import { useToastHelpers } from './Toast';
+import { 
+  Bell, 
+  X, 
+  CheckCircle, 
+  AlertCircle, 
+  Info, 
+  Heart,
+  MessageSquare,
+  Calendar,
+  TrendingUp,
+  Home,
+  Users,
+  Clock
+} from 'lucide-react';
 
 interface Notification {
   id: string;
-  type: 'info' | 'success' | 'warning' | 'message' | 'appointment' | 'property';
+  type: 'info' | 'success' | 'warning' | 'error' | 'property' | 'message' | 'appointment' | 'market';
   title: string;
   message: string;
   timestamp: Date;
   read: boolean;
   actionUrl?: string;
-  metadata?: {
-    propertyId?: string;
-    userId?: string;
-    appointmentId?: string;
-  };
+  propertyId?: number;
+  userId?: number;
 }
 
 interface NotificationCenterProps {
-  className?: string;
+  isOpen: boolean;
+  onClose: () => void;
+  notifications: Notification[];
+  onMarkAsRead: (notificationId: string) => void;
+  onMarkAllAsRead: () => void;
 }
 
-export const NotificationCenter: React.FC<NotificationCenterProps> = ({ className = '' }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [unreadCount, setUnreadCount] = useState(0);
-  const { info, success } = useToastHelpers();
+export const NotificationCenter: React.FC<NotificationCenterProps> = ({
+  isOpen,
+  onClose,
+  notifications,
+  onMarkAsRead,
+  onMarkAllAsRead
+}) => {
+  const [filter, setFilter] = useState<'all' | 'unread' | 'property' | 'messages'>('all');
 
-  // Fetch notifications from API
-  useEffect(() => {
-    const fetchNotifications = async () => {
-      try {
-        const response = await fetch('/api/notifications');
-        if (response.ok) {
-          const data = await response.json();
-          setNotifications(data);
-          setUnreadCount(data.filter((n: Notification) => !n.read).length);
-        }
-      } catch (error) {
-        console.error('Failed to fetch notifications:', error);
-        setNotifications([]);
-        setUnreadCount(0);
-      }
-    };
-
-    fetchNotifications();
-    
-    // Poll for new notifications every 30 seconds
-    const interval = setInterval(fetchNotifications, 30000);
-    
-    return () => clearInterval(interval);
-  }, []);
-
-  const markAsRead = async (notificationId: string) => {
-    try {
-      const response = await fetch(`/api/notifications/${notificationId}/read`, {
-        method: 'PATCH'
-      });
-      
-      if (response.ok) {
-        setNotifications(prev => 
-          prev.map(n => n.id === notificationId ? { ...n, read: true } : n)
-        );
-        setUnreadCount(prev => Math.max(0, prev - 1));
-      }
-    } catch (error) {
-      console.error('Failed to mark notification as read:', error);
-    }
-  };
-
-  const markAllAsRead = async () => {
-    try {
-      const response = await fetch('/api/notifications/mark-all-read', {
-        method: 'PATCH'
-      });
-      
-      if (response.ok) {
-        setNotifications(prev => prev.map(n => ({ ...n, read: true })));
-        setUnreadCount(0);
-        success('All notifications marked as read');
-      }
-    } catch (error) {
-      console.error('Failed to mark all notifications as read:', error);
-    }
-  };
-
-  const removeNotification = async (notificationId: string) => {
-    try {
-      const response = await fetch(`/api/notifications/${notificationId}`, {
-        method: 'DELETE'
-      });
-      
-      if (response.ok) {
-        const notification = notifications.find(n => n.id === notificationId);
-        setNotifications(prev => prev.filter(n => n.id !== notificationId));
-        if (notification && !notification.read) {
-          setUnreadCount(prev => Math.max(0, prev - 1));
-        }
-      }
-    } catch (error) {
-      console.error('Failed to remove notification:', error);
-    }
-  };
-
-  const getNotificationIcon = (type: Notification['type']) => {
+  const getNotificationIcon = (type: string) => {
     switch (type) {
-      case 'property':
-        return Home;
-      case 'appointment':
-        return Calendar;
-      case 'message':
-        return MessageCircle;
       case 'success':
-        return Check;
+        return <CheckCircle className="h-5 w-5 text-green-500" />;
       case 'warning':
-        return AlertTriangle;
+        return <AlertCircle className="h-5 w-5 text-yellow-500" />;
+      case 'error':
+        return <AlertCircle className="h-5 w-5 text-red-500" />;
+      case 'property':
+        return <Home className="h-5 w-5 text-beedab-blue" />;
+      case 'message':
+        return <MessageSquare className="h-5 w-5 text-blue-500" />;
+      case 'appointment':
+        return <Calendar className="h-5 w-5 text-purple-500" />;
+      case 'market':
+        return <TrendingUp className="h-5 w-5 text-green-500" />;
       default:
-        return Info;
+        return <Info className="h-5 w-5 text-gray-500" />;
     }
   };
 
-  const getNotificationColor = (type: Notification['type']) => {
-    switch (type) {
+  const filteredNotifications = notifications.filter(notification => {
+    switch (filter) {
+      case 'unread':
+        return !notification.read;
       case 'property':
-        return 'text-green-600 bg-green-100';
-      case 'appointment':
-        return 'text-blue-600 bg-blue-100';
-      case 'message':
-        return 'text-purple-600 bg-purple-100';
-      case 'success':
-        return 'text-green-600 bg-green-100';
-      case 'warning':
-        return 'text-yellow-600 bg-yellow-100';
+        return notification.type === 'property';
+      case 'messages':
+        return notification.type === 'message';
       default:
-        return 'text-gray-600 bg-gray-100';
+        return true;
     }
-  };
+  });
+
+  const unreadCount = notifications.filter(n => !n.read).length;
 
   const formatTimestamp = (timestamp: Date) => {
     const now = new Date();
     const diff = now.getTime() - timestamp.getTime();
-    const minutes = Math.floor(diff / (1000 * 60));
-    const hours = Math.floor(diff / (1000 * 60 * 60));
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const minutes = Math.floor(diff / 60000);
+    const hours = Math.floor(diff / 3600000);
+    const days = Math.floor(diff / 86400000);
 
     if (minutes < 1) return 'Just now';
     if (minutes < 60) return `${minutes}m ago`;
@@ -153,143 +96,220 @@ export const NotificationCenter: React.FC<NotificationCenterProps> = ({ classNam
   };
 
   return (
-    <div className={`relative ${className}`}>
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="relative p-2 text-gray-600 hover:text-gray-900 transition-colors"
-      >
-        <Bell className="h-6 w-6" />
-        {unreadCount > 0 && (
-          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-            {unreadCount > 9 ? '9+' : unreadCount}
-          </span>
-        )}
-      </button>
+    <AnimatePresence>
+      {isOpen && (
+        <>
+          {/* Backdrop */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/20 z-40"
+            onClick={onClose}
+          />
 
-      <AnimatePresence>
-        {isOpen && (
-          <>
-            <div
-              className="fixed inset-0 z-40"
-              onClick={() => setIsOpen(false)}
-            />
-            
-            <motion.div
-              initial={{ opacity: 0, y: -10, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -10, scale: 0.95 }}
-              className="absolute right-0 top-full mt-2 w-80 bg-white border border-gray-200 rounded-lg shadow-lg z-50"
-            >
-              <div className="flex items-center justify-between p-4 border-b border-gray-200">
-                <h3 className="text-lg font-semibold text-gray-900">Notifications</h3>
+          {/* Notification Panel */}
+          <motion.div
+            initial={{ opacity: 0, x: 400 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 400 }}
+            className="fixed right-0 top-0 h-full w-96 bg-white shadow-2xl z-50 overflow-hidden"
+          >
+            {/* Header */}
+            <div className="p-4 border-b border-gray-200 bg-white">
+              <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center space-x-2">
+                  <Bell className="h-5 w-5 text-gray-700" />
+                  <h2 className="text-lg font-semibold text-gray-900">Notifications</h2>
                   {unreadCount > 0 && (
-                    <button
-                      onClick={markAllAsRead}
-                      className="text-sm text-beedab-blue hover:text-beedab-darkblue"
-                    >
-                      Mark all read
-                    </button>
+                    <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full">
+                      {unreadCount}
+                    </span>
                   )}
-                  <button
-                    onClick={() => setIsOpen(false)}
-                    className="text-gray-400 hover:text-gray-600"
-                  >
-                    <X className="h-5 w-5" />
-                  </button>
                 </div>
+                <button
+                  onClick={onClose}
+                  className="p-1 hover:bg-gray-100 rounded-full transition-colors"
+                >
+                  <X className="h-5 w-5 text-gray-500" />
+                </button>
               </div>
 
-              <div className="max-h-96 overflow-y-auto">
-                {notifications.length === 0 ? (
-                  <div className="p-8 text-center">
-                    <Bell className="h-12 w-12 text-gray-300 mx-auto mb-3" />
-                    <p className="text-gray-500">No notifications yet</p>
-                    <p className="text-sm text-gray-400 mt-1">
-                      You'll receive notifications about property updates, messages, and appointments here.
-                    </p>
-                  </div>
-                ) : (
-                  <div className="divide-y divide-gray-100">
-                    {notifications.map((notification) => {
-                      const Icon = getNotificationIcon(notification.type);
-                      const colorClass = getNotificationColor(notification.type);
-                      
-                      return (
-                        <motion.div
-                          key={notification.id}
-                          initial={{ opacity: 0, x: -20 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          className={`p-4 hover:bg-gray-50 cursor-pointer ${
-                            !notification.read ? 'bg-blue-50' : ''
-                          }`}
-                          onClick={() => {
-                            markAsRead(notification.id);
-                            if (notification.actionUrl) {
-                              window.location.href = notification.actionUrl;
-                            }
-                          }}
-                        >
-                          <div className="flex items-start space-x-3">
-                            <div className={`rounded-full p-2 ${colorClass}`}>
-                              <Icon className="h-4 w-4" />
-                            </div>
-                            
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-start justify-between">
-                                <p className={`text-sm font-medium ${
-                                  !notification.read ? 'text-gray-900' : 'text-gray-700'
-                                }`}>
-                                  {notification.title}
-                                </p>
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    removeNotification(notification.id);
-                                  }}
-                                  className="text-gray-400 hover:text-gray-600 ml-2"
-                                >
-                                  <X className="h-4 w-4" />
-                                </button>
-                              </div>
-                              
-                              <p className="text-sm text-gray-600 mt-1">
-                                {notification.message}
-                              </p>
-                              
-                              <p className="text-xs text-gray-500 mt-2">
-                                {formatTimestamp(notification.timestamp)}
-                              </p>
-                            </div>
-                            
-                            {!notification.read && (
-                              <div className="w-2 h-2 bg-beedab-blue rounded-full mt-2" />
-                            )}
-                          </div>
-                        </motion.div>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-
-              {notifications.length > 0 && (
-                <div className="p-3 border-t border-gray-200 bg-gray-50">
+              {/* Filter Tabs */}
+              <div className="flex space-x-1 bg-gray-100 rounded-lg p-1">
+                {[
+                  { key: 'all', label: 'All' },
+                  { key: 'unread', label: 'Unread' },
+                  { key: 'property', label: 'Properties' },
+                  { key: 'messages', label: 'Messages' }
+                ].map(tab => (
                   <button
-                    onClick={() => {
-                      setIsOpen(false);
-                      window.location.href = '/notifications';
-                    }}
-                    className="w-full text-center text-sm text-beedab-blue hover:text-beedab-darkblue"
+                    key={tab.key}
+                    onClick={() => setFilter(tab.key as any)}
+                    className={`flex-1 py-2 px-3 text-xs font-medium rounded-md transition-colors ${
+                      filter === tab.key
+                        ? 'bg-white text-gray-900 shadow-sm'
+                        : 'text-gray-600 hover:text-gray-900'
+                    }`}
                   >
-                    View all notifications
+                    {tab.label}
                   </button>
+                ))}
+              </div>
+
+              {/* Mark All as Read */}
+              {unreadCount > 0 && (
+                <button
+                  onClick={onMarkAllAsRead}
+                  className="w-full mt-3 py-2 text-sm text-beedab-blue hover:text-beedab-darkblue font-medium"
+                >
+                  Mark all as read
+                </button>
+              )}
+            </div>
+
+            {/* Notifications List */}
+            <div className="flex-1 overflow-y-auto">
+              {filteredNotifications.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-12 text-gray-500">
+                  <Bell className="h-12 w-12 mb-4 text-gray-300" />
+                  <p className="text-sm">No notifications found</p>
+                </div>
+              ) : (
+                <div className="space-y-1 p-2">
+                  {filteredNotifications.map((notification) => (
+                    <motion.div
+                      key={notification.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className={`p-4 rounded-lg cursor-pointer transition-colors ${
+                        notification.read
+                          ? 'bg-gray-50 hover:bg-gray-100'
+                          : 'bg-blue-50 hover:bg-blue-100 border-l-4 border-beedab-blue'
+                      }`}
+                      onClick={() => {
+                        if (!notification.read) {
+                          onMarkAsRead(notification.id);
+                        }
+                        if (notification.actionUrl) {
+                          window.location.href = notification.actionUrl;
+                        }
+                      }}
+                    >
+                      <div className="flex items-start space-x-3">
+                        <div className="flex-shrink-0 mt-1">
+                          {getNotificationIcon(notification.type)}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-start justify-between">
+                            <h4 className={`text-sm font-medium ${
+                              notification.read ? 'text-gray-700' : 'text-gray-900'
+                            }`}>
+                              {notification.title}
+                            </h4>
+                            <div className="flex items-center space-x-2 ml-2">
+                              <span className="text-xs text-gray-500">
+                                {formatTimestamp(notification.timestamp)}
+                              </span>
+                              {!notification.read && (
+                                <div className="w-2 h-2 bg-beedab-blue rounded-full" />
+                              )}
+                            </div>
+                          </div>
+                          <p className={`text-sm mt-1 ${
+                            notification.read ? 'text-gray-500' : 'text-gray-700'
+                          }`}>
+                            {notification.message}
+                          </p>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))}
                 </div>
               )}
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
-    </div>
+            </div>
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
   );
 };
+
+// Notification Hook
+export const useNotifications = () => {
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [isOpen, setIsOpen] = useState(false);
+
+  useEffect(() => {
+    // Simulate real-time notifications
+    const mockNotifications: Notification[] = [
+      {
+        id: '1',
+        type: 'property',
+        title: 'New property match',
+        message: 'Found a 3-bedroom house in Gaborone West matching your criteria',
+        timestamp: new Date(Date.now() - 300000), // 5 minutes ago
+        read: false,
+        actionUrl: '/properties/123'
+      },
+      {
+        id: '2',
+        type: 'message',
+        title: 'New inquiry received',
+        message: 'Thabo Molefe is interested in your property listing',
+        timestamp: new Date(Date.now() - 900000), // 15 minutes ago
+        read: false,
+        actionUrl: '/dashboard/inquiries'
+      },
+      {
+        id: '3',
+        type: 'appointment',
+        title: 'Viewing scheduled',
+        message: 'Property viewing confirmed for tomorrow at 2:00 PM',
+        timestamp: new Date(Date.now() - 1800000), // 30 minutes ago
+        read: true,
+        actionUrl: '/dashboard/appointments'
+      },
+      {
+        id: '4',
+        type: 'market',
+        title: 'Market update',
+        message: 'Properties in your area increased by 5% this month',
+        timestamp: new Date(Date.now() - 3600000), // 1 hour ago
+        read: true,
+        actionUrl: '/market-insights'
+      }
+    ];
+
+    setNotifications(mockNotifications);
+  }, []);
+
+  const markAsRead = (notificationId: string) => {
+    setNotifications(prev =>
+      prev.map(notification =>
+        notification.id === notificationId
+          ? { ...notification, read: true }
+          : notification
+      )
+    );
+  };
+
+  const markAllAsRead = () => {
+    setNotifications(prev =>
+      prev.map(notification => ({ ...notification, read: true }))
+    );
+  };
+
+  const unreadCount = notifications.filter(n => !n.read).length;
+
+  return {
+    notifications,
+    isOpen,
+    setIsOpen,
+    markAsRead,
+    markAllAsRead,
+    unreadCount
+  };
+};
+
+export default NotificationCenter;
