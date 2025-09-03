@@ -128,12 +128,15 @@ const ServiceProviderRegistration: React.FC<ServiceProviderRegistrationProps> = 
         },
         body: JSON.stringify({
           ...data,
-          serviceCategory: data.subCategory || data.serviceCategory, // Use subcategory if selected, otherwise main category
-          logoUrl: '/api/placeholder/100/100', // Default placeholder
-          rating: 0.0,
+          serviceCategory: data.subCategory || data.serviceCategory,
+          logoUrl: '/api/placeholder/100/100',
+          rating: 0,
           reviewCount: 0,
           verified: false,
-          featured: false
+          featured: false,
+          priceRange: 'Contact for pricing',
+          email: data.email,
+          phone: data.phoneNumber
         }),
       });
 

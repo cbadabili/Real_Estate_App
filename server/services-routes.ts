@@ -1,4 +1,3 @@
-
 import express from 'express';
 import { servicesStorage } from './services-storage';
 import { insertServiceProviderSchema } from '@shared/services-schema';
@@ -48,11 +47,11 @@ router.get('/providers/:id', async (req, res) => {
   try {
     const id = parseInt(req.params.id);
     const provider = await servicesStorage.getServiceProvider(id);
-    
+
     if (!provider) {
       return res.status(404).json({ message: 'Service provider not found' });
     }
-    
+
     res.json(provider);
   } catch (error) {
     console.error('Error fetching service provider:', error);
@@ -68,9 +67,9 @@ router.post('/providers', async (req, res) => {
     res.status(201).json(newProvider);
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return res.status(400).json({ 
-        message: 'Validation error', 
-        errors: error.errors 
+      return res.status(400).json({
+        message: 'Validation error',
+        errors: error.errors
       });
     }
     console.error('Error creating service provider:', error);
@@ -94,11 +93,11 @@ router.get('/ads/:trigger', async (req, res) => {
   try {
     const trigger = req.params.trigger;
     const ad = await servicesStorage.getContextualAd(trigger);
-    
+
     if (!ad) {
       return res.status(404).json({ message: 'No ad found for this trigger' });
     }
-    
+
     res.json(ad);
   } catch (error) {
     console.error('Error fetching contextual ad:', error);

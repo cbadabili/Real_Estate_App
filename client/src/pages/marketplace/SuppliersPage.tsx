@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
@@ -15,6 +14,7 @@ import {
   Hammer,
   Paintbrush
 } from 'lucide-react';
+import RegisterProvider from '../../components/RegisterProvider';
 
 interface Supplier {
   id: number;
@@ -37,6 +37,7 @@ const SuppliersPage: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
+  const [showRegistration, setShowRegistration] = useState(false);
 
   const categories = [
     { id: 'all', name: 'All Suppliers', icon: Package },
@@ -127,7 +128,7 @@ const SuppliersPage: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h1 className="text-4xl lg:text-5xl font-bold mb-6">
-              Building Suppliers
+              Are you a service Provider (Need Professional Services?)
             </h1>
             <p className="text-xl text-blue-100 mb-8 max-w-3xl mx-auto">
               Find quality building materials and supplies for your property projects
@@ -278,6 +279,32 @@ const SuppliersPage: React.FC = () => {
           )}
         </div>
       </section>
+
+      {/* Register as Supplier CTA */}
+      <div className="mt-12 bg-gradient-to-r from-beedab-blue to-beedab-darkblue rounded-2xl p-8 text-center text-white">
+        <h2 className="text-2xl font-bold mb-4">Are you a Supplier?</h2>
+        <p className="text-blue-100 mb-6">
+          Join our network of verified suppliers and reach more customers
+        </p>
+        <button 
+          className="bg-white text-beedab-blue px-8 py-3 rounded-lg font-medium hover:bg-neutral-100 transition-colors"
+          onClick={() => setShowRegistration(true)}
+        >
+          Register as Supplier
+        </button>
+      </div>
+
+      {/* Registration Modal */}
+      {showRegistration && (
+        <RegisterProvider 
+          type="supplier"
+          onClose={() => setShowRegistration(false)}
+          onSuccess={() => {
+            setShowRegistration(false);
+            console.log('Supplier registered successfully!');
+          }}
+        />
+      )}
     </div>
   );
 };

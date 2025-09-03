@@ -171,7 +171,7 @@ const ServicesPage: React.FC = () => {
         const response = await fetch('/api/services/providers');
         if (response.ok) {
           const providers = await response.json();
-          
+
           // Transform API data to match Professional interface
           const transformedProviders: Professional[] = providers.map((provider: any) => ({
             id: provider.id,
@@ -187,7 +187,7 @@ const ServicesPage: React.FC = () => {
             specialties: [], // Can be expanded later
             verified: provider.verified || false
           }));
-          
+
           setProfessionals(transformedProviders);
           setFilteredProfessionals(transformedProviders);
         } else {
@@ -411,7 +411,7 @@ const ServicesPage: React.FC = () => {
             className="bg-white text-beedab-blue px-8 py-3 rounded-lg font-medium hover:bg-neutral-100 transition-colors"
             onClick={() => setShowRegistration(true)}
           >
-            Register as Professional
+            Register as a service provider
           </button>
         </div>
 
