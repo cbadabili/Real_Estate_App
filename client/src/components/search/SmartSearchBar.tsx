@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Search, MapPin, Clock, Sparkles, X, TrendingUp, Star } from 'lucide-react';
+import { Search, MapPin, Clock, Sparkles, X, TrendingUp, Star, Filter } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface SearchSuggestion {
