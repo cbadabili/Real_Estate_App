@@ -122,7 +122,19 @@ const PropertyDetailsPage = () => {
   }
 
   const images = property.images || ['/api/placeholder/600/400'];
-  const features = typeof property.features === 'string' ? JSON.parse(property.features) : property.features || [];
+  // Safely parse features data to ensure it's always an array
+  let features: string[] = [];
+  try {
+    if (typeof property.features === 'string') {
+      const parsed = JSON.parse(property.features);
+      features = Array.isArray(parsed) ? parsed : [];
+    } else if (Array.isArray(property.features)) {
+      features = property.features;
+    }
+  } catch (error) {
+    console.warn('Failed to parse features data:', error);
+    features = [];
+  }
 
   return (
     <div className="min-h-screen bg-neutral-50">
