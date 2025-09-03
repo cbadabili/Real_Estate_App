@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
@@ -24,23 +24,46 @@ const ScheduleViewingPage = () => {
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedTime, setSelectedTime] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [property, setProperty] = useState(null);
+  const [loading, setLoading] = useState(true);
   const { register, handleSubmit, watch, formState: { errors } } = useForm();
 
-  // Mock property data - in real app, fetch based on ID
-  const property = {
-    id: id,
-    title: 'Modern Family Home in Gaborone',
-    address: '123 Independence Avenue, Gaborone',
-    price: 'P850,000',
-    bedrooms: 3,
-    bathrooms: 2,
-    images: ['https://images.pexels.com/photos/106399/pexels-photo-106399.jpeg?auto=compress&cs=tinysrgb&w=800'],
-    agent: {
-      name: 'Sarah Johnson',
-      phone: '+267 1234 5678',
-      email: 'sarah@beedab.com'
+  // Fetch actual property data
+  useEffect(() => {
+    const fetchProperty = async () => {
+      try {
+        const response = await fetch(`/api/properties/${id}`);
+        if (!response.ok) {
+          throw new Error('Property not found');
+        }
+        const propertyData = await response.json();
+        setProperty({
+          id: propertyData.id,
+          title: propertyData.title,
+          address: propertyData.address || `${propertyData.city}, ${propertyData.state}`,
+          price: `P${parseFloat(propertyData.price || 0).toLocaleString()}`,
+          bedrooms: propertyData.bedrooms,
+          bathrooms: propertyData.bathrooms,
+          images: propertyData.images ? (Array.isArray(propertyData.images) ? propertyData.images : JSON.parse(propertyData.images)) : ['/api/placeholder/600/400'],
+          agent: {
+            name: 'Sarah Johnson',
+            phone: '+267 1234 5678',
+            email: 'sarah@beedab.com'
+          }
+        });
+      } catch (error) {
+        console.error('Error fetching property:', error);
+        toast.error('Failed to load property details');
+        navigate('/properties');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (id) {
+      fetchProperty();
     }
-  };
+  }, [id, navigate]);
 
   const timeSlots = [
     '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
@@ -51,13 +74,17 @@ const ScheduleViewingPage = () => {
   const onSubmit = async (data: any) => {
     setIsSubmitting(true);
     try {
+      // Convert date and time to timestamp
+      const appointmentDateTime = new Date(`${selectedDate}T${selectedTime}:00`);
+      const appointmentTimestamp = Math.floor(appointmentDateTime.getTime() / 1000);
+
       const appointmentData = {
         propertyId: parseInt(id!),
-        viewerId: 1, // Mock user ID
-        appointmentDate: selectedDate,
-        appointmentTime: selectedTime,
-        notes: data.specialRequests,
-        contactPreference: data.contactPreference
+        buyerId: 1, // Mock user ID - should be actual logged-in user
+        appointmentDate: appointmentTimestamp,
+        type: 'viewing',
+        notes: data.specialRequests || '',
+        status: 'pending'
       };
 
       const response = await fetch('/api/appointments', {
@@ -69,7 +96,8 @@ const ScheduleViewingPage = () => {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to schedule appointment');
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to schedule appointment');
       }
 
       toast.success('Viewing scheduled successfully!');
@@ -108,6 +136,34 @@ const ScheduleViewingPage = () => {
   };
 
   const availableDates = generateDates();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-neutral-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-beedab-blue mx-auto mb-4"></div>
+          <p className="text-neutral-600">Loading property details...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!property) {
+    return (
+      <div className="min-h-screen bg-neutral-50 flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-neutral-900 mb-2">Property Not Found</h2>
+          <p className="text-neutral-600 mb-4">The property you're trying to schedule a viewing for doesn't exist.</p>
+          <button 
+            onClick={() => navigate('/properties')}
+            className="bg-beedab-blue text-white px-6 py-2 rounded-lg hover:bg-beedab-darkblue transition-colors"
+          >
+            Back to Properties
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-neutral-50">
