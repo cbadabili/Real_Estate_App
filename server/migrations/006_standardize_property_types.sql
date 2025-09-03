@@ -7,7 +7,7 @@ SET property_type = 'land_plot'
 WHERE property_type IN ('land', 'plot', 'land_for_development', 'development_land', 'vacant_land', 'mmatseta');
 
 -- Update rental listings if any exist
-UPDATE rental_listings 
+UPDATE rentals 
 SET property_type = 'land_plot' 
 WHERE property_type IN ('land', 'plot', 'land_for_development', 'development_land', 'vacant_land', 'mmatseta');
 
@@ -18,7 +18,7 @@ WHERE name LIKE '%Plot%' OR name LIKE '%Land%';
 
 -- Add index for better query performance on the standardized property types
 CREATE INDEX IF NOT EXISTS idx_properties_standardized_type ON properties(property_type);
-CREATE INDEX IF NOT EXISTS idx_rental_listings_standardized_type ON rental_listings(property_type);
+CREATE INDEX IF NOT EXISTS idx_rentals_standardized_type ON rentals(property_type);
 
 -- Update marketplace provider descriptions to use consistent terminology
 UPDATE marketplace_providers 

@@ -20,7 +20,7 @@ SET
     WHEN city LIKE '%Serowe%' THEN 26.7167 + (RANDOM() * 0.02 - 0.01)
     ELSE 25.9231 + (RANDOM() * 0.02 - 0.01) -- Default to Gaborone
   END
-WHERE latitude IS NULL OR longitude IS NULL OR latitude = 0 OR longitude = 0;
+WHERE latitude IS NULL OR longitude IS NULL OR latitude = '0' OR longitude = '0' OR latitude = '' OR longitude = '';
 
 -- Update properties with invalid coordinates (outside Botswana bounds)
 UPDATE properties 
@@ -28,5 +28,7 @@ SET
   latitude = -24.6282 + (RANDOM() * 0.02 - 0.01),
   longitude = 25.9231 + (RANDOM() * 0.02 - 0.01)
 WHERE 
-  latitude < -26.5 OR latitude > -17.5 OR 
-  longitude < 20.0 OR longitude > 29.5;
+  (latitude IS NOT NULL AND latitude != '' AND latitude::NUMERIC < -26.5) OR 
+  (latitude IS NOT NULL AND latitude != '' AND latitude::NUMERIC > -17.5) OR 
+  (longitude IS NOT NULL AND longitude != '' AND longitude::NUMERIC < 20.0) OR 
+  (longitude IS NOT NULL AND longitude != '' AND longitude::NUMERIC > 29.5);

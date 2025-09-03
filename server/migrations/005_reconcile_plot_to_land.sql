@@ -11,13 +11,13 @@ SET property_type = 'land'
 WHERE property_type IN ('Mmatseta', 'mmatseta', 'MMATSETA') OR title LIKE '%Mmatseta%' OR address LIKE '%Mmatseta%';
 
 -- Update rental listings if any exist
-UPDATE rental_listings 
+UPDATE rentals 
 SET property_type = 'land' 
 WHERE property_type IN ('plot', 'plot/land', 'Plot/Land', 'Plot');
 
-UPDATE rental_listings 
+UPDATE rentals 
 SET property_type = 'land' 
-WHERE property_type IN ('Mmatseta', 'mmatseta', 'MMATSETA') OR title LIKE '%Mmatseta%' OR address LIKE '%Mmatseta%';
+WHERE property_type IN ('Mmatseta', 'mmatseta', 'MMATSETA') OR title LIKE '%Mmatseta%' OR title LIKE '%Mmatseta%';
 
 -- Update any marketplace service categories
 UPDATE service_categories 
@@ -31,9 +31,13 @@ WHERE description LIKE '%plot%';
 
 -- Add index for property_type for better query performance
 CREATE INDEX IF NOT EXISTS idx_properties_property_type ON properties(property_type);
-CREATE INDEX IF NOT EXISTS idx_rental_listings_property_type ON rental_listings(property_type);
+CREATE INDEX IF NOT EXISTS idx_rentals_property_type ON rentals(property_type);
 
--- Insert valid property types reference for future use
-INSERT OR IGNORE INTO service_categories (name, description, created_at) VALUES 
-('Plot/Land Services', 'Services related to land and plot transactions', (cast((julianday('now') - 2440587.5)*86400000 as integer))),
-('Mmatseta Services', 'Services for traditional Botswana land allocation system', (cast((julianday('now') - 2440587.5)*86400000 as integer)));
+-- Insert valid property types reference for future use (only if they don't exist)
+INSERT INTO service_categories (name, journey_type, description, created_at) 
+SELECT 'Plot/Land Services', 'property', 'Services related to land and plot transactions', EXTRACT(EPOCH FROM CURRENT_TIMESTAMP)::BIGINT
+WHERE NOT EXISTS (SELECT 1 FROM service_categories WHERE name = 'Plot/Land Services');
+
+INSERT INTO service_categories (name, journey_type, description, created_at) 
+SELECT 'Mmatseta Services', 'property', 'Services for traditional Botswana land allocation system', EXTRACT(EPOCH FROM CURRENT_TIMESTAMP)::BIGINT
+WHERE NOT EXISTS (SELECT 1 FROM service_categories WHERE name = 'Mmatseta Services');

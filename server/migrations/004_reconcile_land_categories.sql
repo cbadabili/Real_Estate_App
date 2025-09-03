@@ -6,7 +6,7 @@ SET property_type = 'land'
 WHERE property_type IN ('land for development', 'land_for_development', 'development_land');
 
 -- Update rental listings if any exist
-UPDATE rental_listings 
+UPDATE rentals 
 SET property_type = 'land' 
 WHERE property_type IN ('land for development', 'land_for_development', 'development_land');
 

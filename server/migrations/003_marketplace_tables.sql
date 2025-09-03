@@ -1,18 +1,18 @@
 
 -- Marketplace tables migration
 CREATE TABLE IF NOT EXISTS service_categories (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  id SERIAL PRIMARY KEY,
   name TEXT NOT NULL,
   journey_type TEXT NOT NULL,
   icon TEXT,
   description TEXT,
   sort_order INTEGER DEFAULT 0,
-  is_active INTEGER DEFAULT 1,
-  created_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer))
+  is_active BOOLEAN DEFAULT TRUE,
+  created_at BIGINT DEFAULT EXTRACT(EPOCH FROM CURRENT_TIMESTAMP)::BIGINT
 );
 
 CREATE TABLE IF NOT EXISTS marketplace_providers (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  id SERIAL PRIMARY KEY,
   user_id INTEGER REFERENCES users(id),
   provider_type TEXT NOT NULL,
   business_name TEXT NOT NULL,
@@ -28,9 +28,9 @@ CREATE TABLE IF NOT EXISTS marketplace_providers (
   banner_url TEXT,
   description TEXT,
   years_experience INTEGER DEFAULT 0,
-  is_verified INTEGER DEFAULT 0,
-  is_featured INTEGER DEFAULT 0,
-  reac_certified INTEGER DEFAULT 0,
+  is_verified BOOLEAN DEFAULT FALSE,
+  is_featured BOOLEAN DEFAULT FALSE,
+  reac_certified BOOLEAN DEFAULT FALSE,
   company_registration TEXT,
   tax_clearance TEXT,
   insurance_details TEXT,
@@ -48,7 +48,7 @@ CREATE TABLE IF NOT EXISTS marketplace_providers (
   hourly_rate INTEGER,
   daily_rate INTEGER,
   project_rate INTEGER,
-  emergency_services INTEGER DEFAULT 0,
+  emergency_services BOOLEAN DEFAULT FALSE,
   warranty_period INTEGER,
   payment_terms TEXT,
   payment_methods TEXT,
@@ -56,12 +56,12 @@ CREATE TABLE IF NOT EXISTS marketplace_providers (
   certifications TEXT,
   languages_spoken TEXT,
   team_size INTEGER,
-  created_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer)),
-  updated_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer))
+  created_at BIGINT DEFAULT EXTRACT(EPOCH FROM CURRENT_TIMESTAMP)::BIGINT,
+  updated_at BIGINT DEFAULT EXTRACT(EPOCH FROM CURRENT_TIMESTAMP)::BIGINT
 );
 
 CREATE TABLE IF NOT EXISTS artisan_skills (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  id SERIAL PRIMARY KEY,
   provider_id INTEGER REFERENCES marketplace_providers(id),
   skill_name TEXT NOT NULL,
   proficiency_level TEXT NOT NULL,
@@ -70,12 +70,12 @@ CREATE TABLE IF NOT EXISTS artisan_skills (
   issue_date TEXT,
   expiry_date TEXT,
   document_url TEXT,
-  is_verified INTEGER DEFAULT 0,
-  created_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer))
+  is_verified BOOLEAN DEFAULT FALSE,
+  created_at BIGINT DEFAULT EXTRACT(EPOCH FROM CURRENT_TIMESTAMP)::BIGINT
 );
 
 CREATE TABLE IF NOT EXISTS training_programs (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  id SERIAL PRIMARY KEY,
   provider_id INTEGER REFERENCES marketplace_providers(id),
   program_name TEXT NOT NULL,
   description TEXT,
@@ -88,7 +88,7 @@ CREATE TABLE IF NOT EXISTS training_programs (
   learning_outcomes TEXT,
   course_outline TEXT,
   materials_included TEXT,
-  provides_certificate INTEGER DEFAULT 0,
+  provides_certificate BOOLEAN DEFAULT FALSE,
   certificate_type TEXT,
   accreditation_body TEXT,
   schedule_type TEXT,
@@ -99,12 +99,12 @@ CREATE TABLE IF NOT EXISTS training_programs (
   delivery_method TEXT,
   status TEXT DEFAULT 'active',
   enrollment_count INTEGER DEFAULT 0,
-  created_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer)),
-  updated_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer))
+  created_at BIGINT DEFAULT EXTRACT(EPOCH FROM CURRENT_TIMESTAMP)::BIGINT,
+  updated_at BIGINT DEFAULT EXTRACT(EPOCH FROM CURRENT_TIMESTAMP)::BIGINT
 );
 
 CREATE TABLE IF NOT EXISTS building_materials (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  id SERIAL PRIMARY KEY,
   supplier_id INTEGER REFERENCES marketplace_providers(id),
   product_name TEXT NOT NULL,
   product_description TEXT,
@@ -125,12 +125,12 @@ CREATE TABLE IF NOT EXISTS building_materials (
   lead_time_days INTEGER DEFAULT 0,
   product_images TEXT,
   status TEXT DEFAULT 'available',
-  created_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer)),
-  updated_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer))
+  created_at BIGINT DEFAULT EXTRACT(EPOCH FROM CURRENT_TIMESTAMP)::BIGINT,
+  updated_at BIGINT DEFAULT EXTRACT(EPOCH FROM CURRENT_TIMESTAMP)::BIGINT
 );
 
 CREATE TABLE IF NOT EXISTS project_requests (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  id SERIAL PRIMARY KEY,
   client_id INTEGER REFERENCES users(id),
   property_id INTEGER REFERENCES properties(id),
   project_title TEXT NOT NULL,
@@ -148,6 +148,6 @@ CREATE TABLE IF NOT EXISTS project_requests (
   documents TEXT,
   status TEXT DEFAULT 'open',
   proposals_count INTEGER DEFAULT 0,
-  created_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer)),
-  updated_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer))
+  created_at BIGINT DEFAULT EXTRACT(EPOCH FROM CURRENT_TIMESTAMP)::BIGINT,
+  updated_at BIGINT DEFAULT EXTRACT(EPOCH FROM CURRENT_TIMESTAMP)::BIGINT
 );

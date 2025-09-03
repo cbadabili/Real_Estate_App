@@ -2,7 +2,7 @@
 -- Initial schema migration
 -- Users table
 CREATE TABLE IF NOT EXISTS users (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  id SERIAL PRIMARY KEY,
   username TEXT NOT NULL UNIQUE,
   email TEXT NOT NULL UNIQUE,
   password TEXT NOT NULL,
@@ -14,17 +14,17 @@ CREATE TABLE IF NOT EXISTS users (
   permissions TEXT,
   avatar TEXT,
   bio TEXT,
-  is_verified INTEGER DEFAULT 0,
-  is_active INTEGER DEFAULT 1,
+  is_verified BOOLEAN DEFAULT FALSE,
+  is_active BOOLEAN DEFAULT TRUE,
   reac_number TEXT,
-  last_login_at INTEGER,
-  created_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer)),
-  updated_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer))
+  last_login_at BIGINT,
+  created_at BIGINT DEFAULT EXTRACT(EPOCH FROM CURRENT_TIMESTAMP)::BIGINT,
+  updated_at BIGINT DEFAULT EXTRACT(EPOCH FROM CURRENT_TIMESTAMP)::BIGINT
 );
 
 -- Properties table
 CREATE TABLE IF NOT EXISTS properties (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  id SERIAL PRIMARY KEY,
   title TEXT NOT NULL,
   description TEXT,
   price TEXT NOT NULL,
@@ -53,7 +53,7 @@ CREATE TABLE IF NOT EXISTS properties (
   agent_id INTEGER REFERENCES users(id),
   views INTEGER DEFAULT 0,
   days_on_market INTEGER DEFAULT 0,
-  auction_date INTEGER,
+  auction_date BIGINT,
   auction_time TEXT,
   starting_bid TEXT,
   current_bid TEXT,
@@ -65,6 +65,6 @@ CREATE TABLE IF NOT EXISTS properties (
   deposit_required TEXT,
   auction_terms TEXT,
   lot_number TEXT,
-  created_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer)),
-  updated_at INTEGER DEFAULT (cast((julianday('now') - 2440587.5)*86400000 as integer))
+  created_at BIGINT DEFAULT EXTRACT(EPOCH FROM CURRENT_TIMESTAMP)::BIGINT,
+  updated_at BIGINT DEFAULT EXTRACT(EPOCH FROM CURRENT_TIMESTAMP)::BIGINT
 );

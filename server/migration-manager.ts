@@ -18,18 +18,19 @@ export class MigrationManager {
   private migrationsPath = path.join(__dirname, 'migrations');
 
   async initializeMigrationsTable() {
-    await db.run(sql`
+    await db.execute(sql`
       CREATE TABLE IF NOT EXISTS schema_migrations (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        id SERIAL PRIMARY KEY,
         filename TEXT NOT NULL UNIQUE,
-        applied_at TEXT DEFAULT (datetime('now'))
+        applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `);
   }
 
   async getAppliedMigrations(): Promise<Migration[]> {
     try {
-      return await db.all(sql`SELECT * FROM schema_migrations ORDER BY filename`);
+      const result = await db.execute(sql`SELECT * FROM schema_migrations ORDER BY filename`);
+      return result.rows as Migration[];
     } catch (error) {
       return [];
     }
@@ -60,7 +61,7 @@ export class MigrationManager {
 
     for (const statement of statements) {
       try {
-        await db.run(sql.raw(statement));
+        await db.execute(sql.raw(statement));
       } catch (error) {
         console.error(`Error in migration ${filename}:`, error);
         throw error;
@@ -68,7 +69,7 @@ export class MigrationManager {
     }
 
     // Mark migration as applied
-    await db.run(sql`
+    await db.execute(sql`
       INSERT INTO schema_migrations (filename) VALUES (${filename})
     `);
 
@@ -97,14 +98,15 @@ export class MigrationManager {
     console.log('🗑️ Resetting database...');
 
     // Get all tables
-    const tables = await db.all(sql`
-      SELECT name FROM sqlite_master 
-      WHERE type='table' AND name NOT LIKE 'sqlite_%'
+    const result = await db.execute(sql`
+      SELECT table_name as name FROM information_schema.tables 
+      WHERE table_schema = 'public' AND table_type = 'BASE TABLE'
     `);
+    const tables = result.rows;
 
     // Drop all tables
     for (const table of tables) {
-      await db.run(sql.raw(`DROP TABLE IF EXISTS ${table.name}`));
+      await db.execute(sql.raw(`DROP TABLE IF EXISTS ${table.name} CASCADE`));
     }
 
     console.log('✅ Database reset completed');
