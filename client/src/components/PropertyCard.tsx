@@ -149,7 +149,7 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
 
         {/* View Details Button */}
         <button 
-          onClick={() => navigate(`/property/${property.id}`)}
+          onClick={() => navigate(`/properties/${property.id}`)}
           className="w-full bg-beedab-blue text-white py-2 px-4 rounded-lg hover:bg-beedab-darkblue transition-colors"
         >
           View Details
