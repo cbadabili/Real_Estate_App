@@ -164,9 +164,47 @@ const ServicesPage: React.FC = () => {
     }
   ];
 
+  // Fetch real service providers from API
   useEffect(() => {
-    setProfessionals(sampleProfessionals);
-    setFilteredProfessionals(sampleProfessionals);
+    const fetchProviders = async () => {
+      try {
+        const response = await fetch('/api/services/providers');
+        if (response.ok) {
+          const providers = await response.json();
+          
+          // Transform API data to match Professional interface
+          const transformedProviders: Professional[] = providers.map((provider: any) => ({
+            id: provider.id,
+            name: provider.companyName,
+            category: provider.serviceCategory.toLowerCase().replace(' ', '-'),
+            rating: provider.rating || 0,
+            reviews: 0, // API doesn't have review count yet
+            location: provider.city || 'Botswana',
+            responseTime: '2 hours', // Default value
+            description: provider.description || 'Professional service provider',
+            priceRange: 'Contact for pricing',
+            image: provider.logoUrl || '/api/placeholder/80/80',
+            specialties: [], // Can be expanded later
+            verified: provider.verified || false
+          }));
+          
+          setProfessionals(transformedProviders);
+          setFilteredProfessionals(transformedProviders);
+        } else {
+          console.error('Failed to fetch providers');
+          // Fallback to sample data if API fails
+          setProfessionals(sampleProfessionals);
+          setFilteredProfessionals(sampleProfessionals);
+        }
+      } catch (error) {
+        console.error('Error fetching providers:', error);
+        // Fallback to sample data if API fails
+        setProfessionals(sampleProfessionals);
+        setFilteredProfessionals(sampleProfessionals);
+      }
+    };
+
+    fetchProviders();
   }, []);
 
   // Filter professionals based on category and search term
