@@ -332,12 +332,48 @@ async function initializeTables() {
   }
 }
 
+async function seedDatabase() {
+  console.log('Seeding database...');
+
+  // Add sample users
+  console.log('Adding sample users...');
+  await db.execute(sql`
+    INSERT INTO users (username, email, password, first_name, last_name, user_type, role, is_verified) VALUES
+    ('johndoe', 'john.doe@example.com', 'hashed_password_1', 'John', 'Doe', 'buyer', 'user', true),
+    ('agentjane', 'jane.doe@example.com', 'hashed_password_2', 'Jane', 'Doe', 'agent', 'agent', true),
+    ('adminuser', 'admin@example.com', 'hashed_password_3', 'Admin', 'User', 'admin', 'admin', true)
+    ON CONFLICT (email) DO NOTHING;
+  `);
+  console.log('✅ Sample users added');
+
+  // Add sample properties
+  console.log('Adding sample properties...');
+  await db.execute(sql`
+    INSERT INTO properties (title, description, price, address, city, state, zip_code, latitude, longitude, property_type, listing_type, bedrooms, bathrooms, square_feet, owner_id, agent_id, images, status) VALUES
+    ('Beautiful Family Home', 'A spacious home perfect for families, with a large backyard and modern amenities.', '2500000', '123 Tlokweng Road', 'Gaborone', 'South East', '00267', '-24.6282', '25.9231', 'house', 'agent', 4, '3', 2200, 1, 2, '["https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=800"]', 'active'),
+    ('Modern Downtown Condo', 'Modern condo in the heart of the city, close to all attractions.', '1800000', '456 CBD Square', 'Gaborone', 'South East', '00267', '-24.6555', '25.9125', 'apartment', 'agent', 2, '2', 1100, 1, 2, '["https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800"]', 'active'),
+    ('Luxury Estate in Phakalane', 'Stunning luxury home with pool and garden in prestigious Phakalane area.', '4500000', '789 Phakalane Drive', 'Gaborone', 'South East', '00267', '-24.5892', '25.9544', 'house', 'owner', 5, '4', 3500, 1, 2, '["https://images.unsplash.com/photo-1613977257363-707ba9348227?auto=format&fit=crop&w=800"]', 'active'),
+    ('Commercial Land Plot', 'Prime commercial land for development in growing area.', '3200000', 'Plot 12345 Kgale Hill', 'Gaborone', 'South East', '00267', '-24.6892', '25.8544', 'land_plot', 'owner', 0, '0', 5000, 3, 2, '["https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=800"]', 'active'),
+    ('Farm Property in Mogoditshane', 'Working farm with livestock facilities and water access.', '8500000', 'Farm Road Mogoditshane', 'Mogoditshane', 'South East', '00267', '-24.6950', '25.8600', 'farm', 'owner', 3, '2', 8000, 3, 2, '["https://images.unsplash.com/photo-1544047727-63d1484e9ffc?auto=format&fit=crop&w=800"]', 'active')
+    ON CONFLICT (title) DO NOTHING;
+  `);
+  console.log('✅ Sample properties added');
+
+  console.log('✅ Database seeded successfully');
+}
+
+
 async function initializeDatabase() {
   try {
     console.log('Initializing PostgreSQL database...');
 
     // Initialize tables with the corrected schema
     await initializeTables();
+
+    // Seed the database
+    console.log('Seeding database...');
+    await seedDatabase();
+    console.log('✅ Database initialization completed');
 
     // Run migrations
     await migrate(db, { migrationsFolder: join(__dirname, '..', 'migrations') });
