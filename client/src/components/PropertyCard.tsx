@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { MapPin, Bed, Bath, Square, Heart, Share2, Plus, Check } from 'lucide-react';
 
 interface Property {
@@ -30,6 +31,8 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
   isInComparison = false,
   className = ''
 }) => {
+  const navigate = useNavigate();
+  
   const formatPrice = (price: number) => {
     if (price >= 1000000) {
       return `P${(price / 1000000).toFixed(1)}M`;
@@ -145,7 +148,10 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
         )}
 
         {/* View Details Button */}
-        <button className="w-full bg-beedab-blue text-white py-2 px-4 rounded-lg hover:bg-beedab-darkblue transition-colors">
+        <button 
+          onClick={() => navigate(`/property/${property.id}`)}
+          className="w-full bg-beedab-blue text-white py-2 px-4 rounded-lg hover:bg-beedab-darkblue transition-colors"
+        >
           View Details
         </button>
       </div>
