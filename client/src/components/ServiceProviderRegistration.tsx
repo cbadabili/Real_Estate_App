@@ -130,7 +130,7 @@ const ServiceProviderRegistration: React.FC<ServiceProviderRegistrationProps> = 
           ...data,
           serviceCategory: data.subCategory || data.serviceCategory, // Use subcategory if selected, otherwise main category
           logoUrl: '/api/placeholder/100/100', // Default placeholder
-          rating: '0.0',
+          rating: 0.0,
           reviewCount: 0,
           verified: false,
           featured: false
