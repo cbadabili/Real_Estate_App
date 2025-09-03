@@ -54,14 +54,14 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
             </span>
           </div>
         )}
-        
+
         {/* Badges */}
         <div className="absolute top-3 left-3">
           <span className="inline-block bg-beedab-blue text-white text-xs px-2 py-1 rounded-full capitalize">
             {property.propertyType}
           </span>
         </div>
-        
+
         {/* Action buttons */}
         <div className="absolute top-3 right-3 flex space-x-2">
           <button className="p-2 bg-white bg-opacity-90 rounded-full hover:bg-opacity-100 transition-colors">
@@ -91,22 +91,22 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
           )}
         </div>
       </div>
-      
+
       {/* Content */}
       <div className={`p-4 ${viewMode === 'list' ? 'flex-1' : ''}`}>
         <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">
           {property.title}
         </h3>
-        
+
         <p className="text-2xl font-bold text-beedab-blue mb-2">
           {formatPrice(property.price)}
         </p>
-        
+
         <p className="text-sm text-gray-600 mb-3 flex items-center">
           <MapPin className="h-4 w-4 mr-1" />
           {property.location}
         </p>
-        
+
         {/* Property details */}
         <div className="flex items-center space-x-4 text-sm text-gray-600 mb-3">
           <span className="flex items-center">
@@ -124,7 +124,7 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
             </span>
           )}
         </div>
-        
+
         {/* Features */}
         {property.features && property.features.length > 0 && (
           <div className="flex flex-wrap gap-1 mb-3">
@@ -136,14 +136,14 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
                 {feature}
               </span>
             ))}
-            {property.features.length > 3 && (
-              <span className="inline-block bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded">
+            {Array.isArray(property.features) && property.features.length > 3 && (
+              <span className="inline-block bg-gray-100 text-gray-600 px-2 py-1 rounded-full text-xs">
                 +{property.features.length - 3} more
               </span>
             )}
           </div>
         )}
-        
+
         {/* View Details Button */}
         <button className="w-full bg-beedab-blue text-white py-2 px-4 rounded-lg hover:bg-beedab-darkblue transition-colors">
           View Details

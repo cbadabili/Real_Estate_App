@@ -257,7 +257,10 @@ export class DatabaseStorage implements IStorage {
       const processed = {
         ...prop,
         images: prop.images ? JSON.parse(prop.images) : [],
-        features: prop.features ? JSON.parse(prop.features) : [],
+        features: prop.features ? (
+          Array.isArray(JSON.parse(prop.features)) ? JSON.parse(prop.features) : 
+          typeof JSON.parse(prop.features) === 'string' ? [JSON.parse(prop.features)] : []
+        ) : [],
       };
 
       // Debug coordinate data
@@ -400,7 +403,7 @@ export class DatabaseStorage implements IStorage {
       .orderBy(asc(appointments.appointmentDate));
   }
 
-  async getUserAppointments(userId: number): Promise<Appointment[]> {
+  async getUserAppointments(userId: number): Promise<Appointment[]>{
     return await db
       .select()
       .from(appointments)
