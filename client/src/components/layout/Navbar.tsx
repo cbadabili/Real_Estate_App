@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { NotificationCenter } from '../ui/NotificationCenter';
 import { RoleBasedComponent } from '../auth/ProtectedRoute';
-import { 
+import {
   Home,
   Search,
   MapPin,
@@ -57,9 +57,9 @@ const Navbar = () => {
           {/* Logo */}
           <div className="flex items-center flex-shrink-0 min-w-0">
             <Link to="/" className="flex items-center space-x-2">
-              <img 
-                src="/logo.png" 
-                alt="beedab Real Estate Platform" 
+              <img
+                src="/logo.png"
+                alt="beedab Real Estate Platform"
                 className="h-16 w-auto sm:h-18 md:h-20 lg:h-24 xl:h-26 flex-shrink-0"
               />
             </Link>
@@ -70,7 +70,7 @@ const Navbar = () => {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-10 text-lg">
             {/* Buy Dropdown - Available to all users */}
-            <div 
+            <div
               className="relative"
               onMouseEnter={() => setBuyDropdownOpen(true)}
               onMouseLeave={() => setBuyDropdownOpen(false)}
@@ -310,7 +310,7 @@ const Navbar = () => {
 
 
             {/* Sell Dropdown - Available to all users for testing */}
-            <div 
+            <div
               className="relative"
               onMouseEnter={() => setSellDropdownOpen(true)}
               onMouseLeave={() => setSellDropdownOpen(false)}
@@ -492,7 +492,7 @@ const Navbar = () => {
             </div>
 
             {/* Rent Dropdown */}
-            <div 
+            <div
               className="relative"
               onMouseEnter={() => setRentDropdownOpen(true)}
               onMouseLeave={() => setRentDropdownOpen(false)}
@@ -575,14 +575,14 @@ const Navbar = () => {
             </div>
 
             {/* Services Dropdown */}
-            <div 
+            <div
               className="relative"
               onMouseEnter={() => setServicesDropdownOpen(true)}
               onMouseLeave={() => setServicesDropdownOpen(false)}
             >
               <button className="flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100 transition-colors">
                 <Wrench className="h-4 w-4" />
-                <span>Marketplace</span>
+                <span>Services</span>
                 <ChevronDown className="h-3 w-3" />
               </button>
 
@@ -770,7 +770,7 @@ const Navbar = () => {
                           <Gavel className="h-4 w-4 mr-2" />
                           Admin Panel
                         </Link>
-</RoleBasedComponent>
+                      </RoleBasedComponent>
 
                       <Link
                         to="/profile"
@@ -952,31 +952,31 @@ const Navbar = () => {
               )}
             </div>
             <div className="px-3 py-2">
-              <div className="text-sm font-medium text-neutral-900 mb-2">Marketplace</div>
+              <div className="text-sm font-medium text-neutral-900 mb-2">Services</div>
               <div className="space-y-1 ml-4">
                 <Link
-                  to="/marketplace?section=professionals"
+                  to="/services?section=professionals"
                   className="block px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-md text-sm"
                   onClick={() => setIsOpen(false)}
                 >
                   👔 Find Professionals
                 </Link>
                 <Link
-                  to="/marketplace?section=suppliers"
+                  to="/services?section=suppliers"
                   className="block px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-md text-sm"
                   onClick={() => setIsOpen(false)}
                 >
                   🧱 Find a Supplier
                 </Link>
                 <Link
-                  to="/marketplace?section=artisans"
+                  to="/services?section=artisans"
                   className="block px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-md text-sm"
                   onClick={() => setIsOpen(false)}
                 >
                   🔧 Find Artisans
                 </Link>
                 <Link
-                  to="/marketplace?section=training"
+                  to="/services?section=training"
                   className="block px-3 py-2 text-gray-700 hover:bg-gray-50 rounded-md text-sm"
                   onClick={() => setIsOpen(false)}
                 >

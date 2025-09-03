@@ -126,6 +126,33 @@ router.get('/categories', async (req, res) => {
   }
 });
 
+// GET /api/services/providers - New endpoint for services providers
+router.get('/services/providers', async (req, res) => {
+  try {
+    const { category, location, search, page = 1, limit = 12 } = req.query;
+
+    const filters = {
+      category: category as string,
+      location: location as string,
+      search: search as string,
+      page: parseInt(page as string),
+      limit: parseInt(limit as string)
+    };
+
+    const providers = await getProviders(filters);
+    res.json({
+      success: true,
+      data: providers
+    });
+  } catch (error) {
+    console.error('Error fetching services providers:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch services providers'
+    });
+  }
+});
+
 // GET /api/services?section={section}&category={category}&limit={limit}
 router.get('/services', async (req, res) => {
   try {

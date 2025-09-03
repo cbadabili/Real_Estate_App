@@ -67,8 +67,10 @@ app.get('/api/health', (_req: Request, res: Response) => {
   app.use('/api', aiSearchRoutes);
   app.use('/api', propertyManagementRoutes);
   app.use('/api', tenantSupportRoutes);
-  app.use('/api', servicesRoutes);
+  app.use('/api/services', servicesRoutes);
   app.use('/api', marketplaceRoutes);
+  app.use('/api/services', marketplaceRoutes); // Mount marketplace routes under services as well
+
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;

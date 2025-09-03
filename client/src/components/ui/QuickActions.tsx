@@ -147,7 +147,7 @@ export const QuickActions: React.FC<QuickActionsProps> = ({
       {
         icon: Zap,
         label: 'Quick Services',
-        href: '/marketplace',
+        href: '/services',
         color: 'bg-violet-500 hover:bg-violet-600'
       }
     ]
