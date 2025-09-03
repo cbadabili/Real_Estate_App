@@ -1,0 +1,20 @@
+Error Details (Development)
+ReferenceError: Filter is not defined
+    at SmartSearchBar (https://c5d9396e-4f47-41f7-84a6-838e7c0e0ed4-00-3i9qi3675up46.picard.replit.dev/src/components/search/SmartSearchBar.tsx:22:3)
+    at div
+    at div
+    at div
+    at div
+    at PropertiesPage (https://c5d9396e-4f47-41f7-84a6-838e7c0e0ed4-00-3i9qi3675up46.picard.replit.dev/src/pages/PropertiesPage.tsx:37:26)
+    at RenderedRoute (https://c5d9396e-4f47-41f7-84a6-838e7c0e0ed4-00-3i9qi3675up46.picard.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/react-router-dom.js?v=fcff60b9:4088:5)
+    at Routes (https://c5d9396e-4f47-41f7-84a6-838e7c0e0ed4-00-3i9qi3675up46.picard.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/react-router-dom.js?v=fcff60b9:4558:5)
+    at div
+    at PropertyProvider (https://c5d9396e-4f47-41f7-84a6-838e7c0e0ed4-00-3i9qi3675up46.picard.replit.dev/src/contexts/PropertyContext.tsx:29:36)
+    at AuthProvider (https://c5d9396e-4f47-41f7-84a6-838e7c0e0ed4-00-3i9qi3675up46.picard.replit.dev/src/contexts/AuthContext.tsx:30:32)
+    at ToastProvider (https://c5d9396e-4f47-41f7-84a6-838e7c0e0ed4-00-3i9qi3675up46.picard.replit.dev/src/components/ui/Toast.tsx:32:3)
+    at QueryClientProvider (https://c5d9396e-4f47-41f7-84a6-838e7c0e0ed4-00-3i9qi3675up46.picard.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=fcff60b9:2933:3)
+    at ErrorBoundary (https://c5d9396e-4f47-41f7-84a6-838e7c0e0ed4-00-3i9qi3675up46.picard.replit.dev/src/components/ui/ErrorBoundary.tsx:8:5)
+    at App
+    at QueryClientProvider (https://c5d9396e-4f47-41f7-84a6-838e7c0e0ed4-00-3i9qi3675up46.picard.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=fcff60b9:2933:3)
+    at Router (https://c5d9396e-4f47-41f7-84a6-838e7c0e0ed4-00-3i9qi3675up46.picard.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/react-router-dom.js?v=fcff60b9:4501:15)
+    at BrowserRouter (https://c5d9396e-4f47-41f7-84a6-838e7c0e0ed4-00-3i9qi3675up46.picard.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/react-router-dom.js?v=fcff60b9:5247:5)
