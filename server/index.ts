@@ -119,7 +119,9 @@ app.get('/api/health', (_req: Request, res: Response) => {
 
       if (shouldSeedDB) {
         console.log('Seeding database...');
-        await seedManager.seedAll();
+        // Temporarily skip seeding to avoid missing table issues
+        console.log('⚠️ Seeding temporarily disabled for testing');
+        // await seedManager.seedAll();
       }
 
       console.log('✅ Database initialization completed');
