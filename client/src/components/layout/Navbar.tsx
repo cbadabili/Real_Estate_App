@@ -77,7 +77,7 @@ const Navbar = () => {
 
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-10 text-lg">
+          <div className="hidden md:flex items-center space-x-10 text-lg ml-8">
             {/* Buy Dropdown - Available to all users */}
             <div
               className="relative"
