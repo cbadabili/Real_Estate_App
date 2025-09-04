@@ -59,9 +59,18 @@ const Navbar = () => {
             <Link to="/" className="flex items-center space-x-2">
               <img
                 src="/beedab-logo.png"
-                alt="beedab Real Estate Platform"
+                alt="BeeDab Real Estate Platform"
                 className="h-16 w-auto sm:h-18 md:h-20 lg:h-24 xl:h-26 flex-shrink-0"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.src = "/logo.png";
+                  target.onerror = () => {
+                    target.style.display = 'none';
+                    target.nextElementSibling?.classList.remove('hidden');
+                  };
+                }}
               />
+              <span className="hidden text-2xl font-bold text-beedab-blue">BeeDab</span>
             </Link>
           </div>
 
