@@ -60,7 +60,7 @@ const Navbar = () => {
               <img
                 src="/beedab-logo.png"
                 alt="BeeDab Real Estate Platform"
-                className="h-16 w-auto sm:h-18 md:h-20 lg:h-24 xl:h-26 flex-shrink-0"
+                className="h-8 w-auto sm:h-9 md:h-10 lg:h-12 xl:h-13 flex-shrink-0"
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;
                   target.src = "/logo.png";
