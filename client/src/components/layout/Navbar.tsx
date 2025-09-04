@@ -817,7 +817,7 @@ const Navbar = () => {
                   to="/register"
                   className="bg-beedab-blue text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-beedab-darkblue transition-colors"
                 >
-                  Sign Up
+                  Get Started
                 </Link>
               </div>
             )}
@@ -854,13 +854,13 @@ const Navbar = () => {
                     key={item.name}
                     to={item.href}
                     onClick={() => setIsOpen(false)}
-                    className={`flex items-center space-x-3 px-3 py-3 rounded-lg text-sm font-medium transition-colors ${
+                    className={`flex items-center space-x-3 px-3 py-3 rounded-lg text-lg font-medium transition-colors ${
                       isActive
                         ? 'bg-beedab-blue/10 text-beedab-blue'
                         : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100'
                     }`}
                   >
-                    <Icon className="h-5 w-5 text-beedab-blue" />
+                    <Icon className="h-6 w-6 text-beedab-blue" />
                     <span>{item.name}</span>
                   </Link>
                 );
@@ -957,7 +957,7 @@ const Navbar = () => {
                     onClick={() => setIsOpen(false)}
                     className="block px-3 py-2 text-sm font-medium bg-beedab-blue text-white rounded hover:bg-beedab-darkblue"
                   >
-                    Sign Up
+                    Get Started
                   </Link>
                 </div>
               )}
