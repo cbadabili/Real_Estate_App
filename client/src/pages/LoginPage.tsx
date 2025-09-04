@@ -67,7 +67,6 @@ const LoginPage = () => {
             email: data.email,
             username: data.username,
             password: data.password,
-            userType: data.userType,
             phone: data.phone,
             dateOfBirth: data.dateOfBirth,
             address: data.address,
@@ -218,24 +217,7 @@ const LoginPage = () => {
                     )}
                   </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-neutral-700 mb-1">
-                      Account Type *
-                    </label>
-                    <select
-                      {...register('userType', { required: 'Account type is required' })}
-                      className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
-                    >
-                      <option value="">Select account type</option>
-                      <option value="buyer">Buyer</option>
-                      <option value="seller">Seller</option>
-                      <option value="agent">Agent</option>
-                      <option value="fsbo">Owner Seller</option>
-                    </select>
-                    {errors.userType && (
-                      <p className="text-red-600 text-sm mt-1">{errors.userType.message as string}</p>
-                    )}
-                  </div>
+                  
 
                   <div>
                     <label className="block text-sm font-medium text-neutral-700 mb-1">
