@@ -211,7 +211,7 @@ const Navbar = () => {
                           onClick={() => setBuyDropdownOpen(false)}
                         >
                           <div className="flex items-center">
-                            <Handshake className="h-4 w-4 mr-2 text-orange-500" />
+                            <Handshake className="h-4 w-4 mr-2 text-beedab-blue" />
                             <div>
                               <div className="font-medium">Property Auctions</div>
                               <div className="text-xs text-gray-500">Bank auctions & foreclosure sales</div>
@@ -231,7 +231,7 @@ const Navbar = () => {
                           onClick={() => setBuyDropdownOpen(false)}
                         >
                           <div className="flex items-center">
-                            <Building className="h-4 w-4 mr-2 text-green-500" />
+                            <Building className="h-4 w-4 mr-2 text-beedab-blue" />
                             <div>
                               <div className="font-medium">Planning & Budgeting</div>
                               <div className="text-xs text-gray-500">Calculate affordability & get pre-approved</div>
@@ -245,7 +245,7 @@ const Navbar = () => {
                           onClick={() => setBuyDropdownOpen(false)}
                         >
                           <div className="flex items-center">
-                            <MapPin className="h-4 w-4 mr-2 text-blue-500" />
+                            <MapPin className="h-4 w-4 mr-2 text-beedab-blue" />
                             <div>
                               <div className="font-medium">Property Search</div>
                               <div className="text-xs text-gray-500">Find your perfect home with AI assistance</div>
@@ -259,7 +259,7 @@ const Navbar = () => {
                           onClick={() => setBuyDropdownOpen(false)}
                         >
                           <div className="flex items-center">
-                            <Building className="h-4 w-4 mr-2 text-purple-500" />
+                            <Building className="h-4 w-4 mr-2 text-beedab-blue" />
                             <div>
                               <div className="font-medium">Viewing & Evaluation</div>
                               <div className="text-xs text-gray-500">Schedule viewings & neighborhood insights</div>
@@ -273,7 +273,7 @@ const Navbar = () => {
                           onClick={() => setBuyDropdownOpen(false)}
                         >
                           <div className="flex items-center">
-                            <Building className="h-4 w-4 mr-2 text-orange-500" />
+                            <Building className="h-4 w-4 mr-2 text-beedab-blue" />
                             <div>
                               <div className="font-medium">Making Offers</div>
                               <div className="text-xs text-gray-500">Negotiate & secure your property</div>
@@ -531,7 +531,7 @@ const Navbar = () => {
                         onClick={() => setRentDropdownOpen(false)}
                       >
                         <div className="flex items-center">
-                          <Building className="h-4 w-4 mr-2 text-purple-500" />
+                          <Building className="h-4 w-4 mr-2 text-beedab-blue" />
                           <div>
                             <div className="font-medium">List Your Property</div>
                             <div className="text-xs text-gray-500">Rent out your property</div>
@@ -544,7 +544,7 @@ const Navbar = () => {
                         onClick={() => setRentDropdownOpen(false)}
                       >
                         <div className="flex items-center">
-                          <Building className="h-4 w-4 mr-2 text-orange-500" />
+                          <Building className="h-4 w-4 mr-2 text-beedab-blue" />
                           <div>
                             <div className="font-medium">Property Management</div>
                             <div className="text-xs text-gray-500">Full-service rental management</div>
@@ -559,7 +559,7 @@ const Navbar = () => {
                         onClick={() => setRentDropdownOpen(false)}
                       >
                         <div className="flex items-center">
-                          <Search className="h-4 w-4 mr-2 text-blue-500" />
+                          <Search className="h-4 w-4 mr-2 text-beedab-blue" />
                           <div>
                             <div className="font-medium">Find Rental Property</div>
                             <div className="text-xs text-gray-500">Browse available rentals</div>
@@ -572,7 +572,7 @@ const Navbar = () => {
                         onClick={() => setRentDropdownOpen(false)}
                       >
                         <div className="flex items-center">
-                          <User className="h-4 w-4 mr-2 text-green-500" />
+                          <User className="h-4 w-4 mr-2 text-beedab-blue" />
                           <div>
                             <div className="font-medium">Tenant Support</div>
                             <div className="text-xs text-gray-500">Rights, agreements & advice</div>
@@ -734,7 +734,7 @@ const Navbar = () => {
                           className="flex items-center px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100"
                           onClick={() => setProfileDropdownOpen(false)}
                         >
-                          <Building className="h-4 w-4 mr-2" />
+                          <Building className="h-4 w-4 mr-2 text-beedab-blue" />
                           My Dashboard
                         </Link>
                       </RoleBasedComponent>
@@ -745,7 +745,7 @@ const Navbar = () => {
                           className="flex items-center px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100"
                           onClick={() => setProfileDropdownOpen(false)}
                         >
-                          <Building className="h-4 w-4 mr-2" />
+                          <Building className="h-4 w-4 mr-2 text-beedab-blue" />
                           My Properties
                         </Link>
                       </RoleBasedComponent>
@@ -756,7 +756,7 @@ const Navbar = () => {
                           className="flex items-center px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100"
                           onClick={() => setProfileDropdownOpen(false)}
                         >
-                          <UserCheck className="h-4 w-4 mr-2" />
+                          <UserCheck className="h-4 w-4 mr-2 text-beedab-blue" />
                           Agent Tools
                         </Link>
                       </RoleBasedComponent>
@@ -767,7 +767,7 @@ const Navbar = () => {
                           className="flex items-center px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100"
                           onClick={() => setProfileDropdownOpen(false)}
                         >
-                          <Shield className="h-4 w-4 mr-2" />
+                          <Shield className="h-4 w-4 mr-2 text-beedab-blue" />
                           Moderation
                         </Link>
                       </RoleBasedComponent>
@@ -778,7 +778,7 @@ const Navbar = () => {
                           className="flex items-center px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100"
                           onClick={() => setProfileDropdownOpen(false)}
                         >
-                          <Gavel className="h-4 w-4 mr-2" />
+                          <Gavel className="h-4 w-4 mr-2 text-beedab-blue" />
                           Admin Panel
                         </Link>
                       </RoleBasedComponent>
@@ -788,7 +788,7 @@ const Navbar = () => {
                         className="flex items-center px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100"
                         onClick={() => setProfileDropdownOpen(false)}
                       >
-                        <Settings className="h-4 w-4 mr-2" />
+                        <Settings className="h-4 w-4 mr-2 text-beedab-blue" />
                         Account Settings
                       </Link>
                       <button
@@ -798,7 +798,7 @@ const Navbar = () => {
                         }}
                         className="flex items-center w-full px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 border-t border-neutral-100"
                       >
-                        <LogOut className="h-4 w-4 mr-2" />
+                        <LogOut className="h-4 w-4 mr-2 text-beedab-blue" />
                         Sign Out
                       </button>
                     </motion.div>
