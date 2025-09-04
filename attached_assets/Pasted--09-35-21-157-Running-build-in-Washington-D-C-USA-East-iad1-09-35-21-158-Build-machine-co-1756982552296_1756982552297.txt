@@ -1,0 +1,385 @@
+[09:35:21.157] Running build in Washington, D.C., USA (East) – iad1
+[09:35:21.158] Build machine configuration: 2 cores, 8 GB
+[09:35:21.185] Cloning github.com/cbadabili/Real_Estate_App (Branch: main, Commit: 5378bd2)
+[09:35:23.878] Cloning completed: 2.693s
+[09:35:24.309] Restored build cache from previous deployment (JDnbBP8iLcUEBtvBjZcbXdSGkd8x)
+[09:35:25.155] Running "vercel build"
+[09:35:25.721] Vercel CLI 47.0.4
+[09:35:25.896] WARN! Due to `builds` existing in your configuration file, the Build and Development Settings defined in your Project Settings will not apply. Learn More: https://vercel.link/unused-build-settings
+[09:35:28.346] Installing dependencies...
+[09:35:29.919] 
+[09:35:29.920] up to date in 1s
+[09:35:29.921] 
+[09:35:29.921] 81 packages are looking for funding
+[09:35:29.921]   run `npm fund` for details
+[09:35:30.207] Using TypeScript 5.6.3 (local user-provided)
+[09:36:18.631] server/routes.ts(48,64): error TS2345: Argument of type '[any, ...any[]] | unknown[] | null | undefined' is not assignable to parameter of type 'string'.
+[09:36:18.632]   Type 'undefined' is not assignable to type 'string'.
+[09:36:18.632] server/routes.ts(54,70): error TS2345: Argument of type '[any, ...any[]] | unknown[] | null | undefined' is not assignable to parameter of type 'string'.
+[09:36:18.632]   Type 'undefined' is not assignable to type 'string'.
+[09:36:18.632] server/routes.ts(61,48): error TS2345: Argument of type '[any, ...any[]] | unknown[] | null | undefined' is not assignable to parameter of type 'string | Buffer'.
+[09:36:18.632]   Type 'undefined' is not assignable to type 'string | Buffer'.
+[09:36:18.632] server/routes.ts(63,59): error TS2322: Type 'Promise<string> & void' is not assignable to type '[any, ...any[]] | unknown[] | null | undefined'.
+[09:36:18.632] server/routes.ts(71,11): error TS18046: 'error' is of type 'unknown'.
+[09:36:18.632] server/routes.ts(72,13): error TS18046: 'error' is of type 'unknown'.
+[09:36:18.632] server/routes.ts(74,20): error TS18046: 'error' is of type 'unknown'.
+[09:36:18.632] server/routes.ts(113,45): error TS2322: Type 'number' is not assignable to type '[any, ...any[]] | unknown[] | null | undefined'.
+[09:36:18.633] server/routes.ts(618,31): error TS2339: Property 'id' does not exist on type 'User'.
+[09:36:18.633] server/routes.ts(628,9): error TS2322: Type '[any, ...any[]] | unknown[] | null | undefined' is not assignable to type 'number | undefined'.
+[09:36:18.633]   Type 'null' is not assignable to type 'number | undefined'.
+[09:36:18.633] server/routes.ts(629,9): error TS2322: Type '[any, ...any[]] | unknown[] | null | undefined' is not assignable to type 'number | undefined'.
+[09:36:18.633]   Type 'null' is not assignable to type 'number | undefined'.
+[09:36:18.633] server/routes.ts(630,9): error TS2322: Type '[any, ...any[]] | unknown[] | null | undefined' is not assignable to type 'string | undefined'.
+[09:36:18.633]   Type 'null' is not assignable to type 'string | undefined'.
+[09:36:18.633] server/routes.ts(644,28): error TS2339: Property 'id' does not exist on type 'User'.
+[09:36:18.634] server/routes.ts(645,9): error TS2322: Type 'string' is not assignable to type '[any, ...any[]] | unknown[] | null | undefined'.
+[09:36:18.634] server/routes.ts(646,9): error TS2322: Type 'string' is not assignable to type '[any, ...any[]] | unknown[] | null | undefined'.
+[09:36:18.634] server/routes.ts(648,20): error TS2353: Object literal may only specify known properties, and 'revieweeId' does not exist in type '[any, ...any[]] | unknown[]'.
+[09:36:18.634] server/routes.ts(649,9): error TS2322: Type 'string | undefined' is not assignable to type '[any, ...any[]] | unknown[] | null | undefined'.
+[09:36:18.634]   Type 'string' is not assignable to type '[any, ...any[]] | unknown[] | null | undefined'.
+[09:36:18.637] server/routes.ts(650,9): error TS2322: Type 'string' is not assignable to type '[any, ...any[]] | unknown[] | null | undefined'.
+[09:36:18.637] server/routes.ts(670,63): error TS2339: Property 'id' does not exist on type 'User'.
+[09:36:18.637] server/routes.ts(682,28): error TS2339: Property 'id' does not exist on type 'User'.
+[09:36:18.637] server/routes.ts(683,9): error TS2322: Type 'string' is not assignable to type '[any, ...any[]] | unknown[] | null | undefined'.
+[09:36:18.637] server/routes.ts(684,9): error TS2322: Type 'string' is not assignable to type '[any, ...any[]] | unknown[] | null | undefined'.
+[09:36:18.637] server/routes.ts(685,9): error TS2322: Type 'number' is not assignable to type '[any, ...any[]] | unknown[] | null | undefined'.
+[09:36:18.637] server/routes.ts(686,9): error TS2322: Type '{ [x: string]: [any, ...any[]] | unknown[] | null | undefined; [x: number]: [any, ...any[]] | unknown[] | null | undefined; }' is not assignable to type '[any, ...any[]] | unknown[] | null | undefined'.
+[09:36:18.638]   Type '{ [x: string]: [any, ...any[]] | unknown[] | null | undefined; [x: number]: [any, ...any[]] | unknown[] | null | undefined; }' is not assignable to type '[any, ...any[]]'.
+[09:36:18.638] server/routes.ts(687,9): error TS2322: Type 'string | undefined' is not assignable to type '[any, ...any[]] | unknown[] | null | undefined'.
+[09:36:18.638]   Type 'string' is not assignable to type '[any, ...any[]] | unknown[] | null | undefined'.
+[09:36:18.638] server/routes.ts(688,9): error TS2322: Type 'string' is not assignable to type '[any, ...any[]] | unknown[] | null | undefined'.
+[09:36:18.638] server/routes.ts(708,63): error TS2339: Property 'id' does not exist on type 'User'.
+[09:36:18.638] server/routes.ts(723,28): error TS2339: Property 'id' does not exist on type 'User'.
+[09:36:18.638] server/routes.ts(724,9): error TS2322: Type 'string' is not assignable to type '[any, ...any[]] | unknown[] | null | undefined'.
+[09:36:18.638] server/routes.ts(725,9): error TS2322: Type 'string' is not assignable to type '[any, ...any[]] | unknown[] | null | undefined'.
+[09:36:18.638] server/routes.ts(726,9): error TS2322: Type 'number' is not assignable to type '[any, ...any[]] | unknown[] | null | undefined'.
+[09:36:18.638] server/routes.ts(727,20): error TS2353: Object literal may only specify known properties, and 'revieweeId' does not exist in type '[any, ...any[]] | unknown[]'.
+[09:36:18.639] server/routes.ts(728,9): error TS2322: Type 'string | undefined' is not assignable to type '[any, ...any[]] | unknown[] | null | undefined'.
+[09:36:18.639]   Type 'string' is not assignable to type '[any, ...any[]] | unknown[] | null | undefined'.
+[09:36:18.639] server/routes.ts(729,9): error TS2322: Type 'string' is not assignable to type '[any, ...any[]] | unknown[] | null | undefined'.
+[09:36:18.639] server/routes.ts(775,32): error TS2339: Property 'id' does not exist on type 'User'.
+[09:36:18.640] server/routes.ts(797,9): error TS2322: Type 'number' is not assignable to type '[any, ...any[]] | unknown[] | null | undefined'.
+[09:36:18.640] server/routes.ts(798,27): error TS2339: Property 'id' does not exist on type 'User'.
+[09:36:18.640] server/routes.ts(799,9): error TS2322: Type 'boolean' is not assignable to type '[any, ...any[]] | unknown[] | null | undefined'.
+[09:36:18.640] server/routes.ts(872,28): error TS2339: Property 'id' does not exist on type 'User'.
+[09:36:18.640] server/routes.ts(873,9): error TS2322: Type 'string' is not assignable to type '[any, ...any[]] | unknown[] | null | undefined'.
+[09:36:18.641] server/routes.ts(874,9): error TS2322: Type 'string' is not assignable to type '[any, ...any[]] | unknown[] | null | undefined'.
+[09:36:18.641] server/routes.ts(875,9): error TS2322: Type 'number' is not assignable to type '[any, ...any[]] | unknown[] | null | undefined'.
+[09:36:18.641] server/routes.ts(876,20): error TS2353: Object literal may only specify known properties, and 'reason' does not exist in type '[any, ...any[]] | unknown[]'.
+[09:36:18.641] server/routes.ts(877,9): error TS2322: Type 'string | undefined' is not assignable to type '[any, ...any[]] | unknown[] | null | undefined'.
+[09:36:18.641]   Type 'string' is not assignable to type '[any, ...any[]] | unknown[] | null | undefined'.
+[09:36:18.641] server/routes.ts(878,9): error TS2322: Type 'string' is not assignable to type '[any, ...any[]] | unknown[] | null | undefined'.
+[09:36:18.641] server/routes.ts(901,28): error TS2339: Property 'id' does not exist on type 'User'.
+[09:36:18.641] server/routes.ts(902,9): error TS2322: Type 'string' is not assignable to type '[any, ...any[]] | unknown[] | null | undefined'.
+[09:36:18.642] server/routes.ts(903,9): error TS2322: Type 'string' is not assignable to type '[any, ...any[]] | unknown[] | null | undefined'.
+[09:36:18.642] server/routes.ts(904,9): error TS2322: Type 'number' is not assignable to type '[any, ...any[]] | unknown[] | null | undefined'.
+[09:36:18.642] server/routes.ts(905,20): error TS2353: Object literal may only specify known properties, and 'status' does not exist in type '[any, ...any[]] | unknown[]'.
+[09:36:18.642] server/routes.ts(906,9): error TS2322: Type 'string | undefined' is not assignable to type '[any, ...any[]] | unknown[] | null | undefined'.
+[09:36:18.642]   Type 'string' is not assignable to type '[any, ...any[]] | unknown[] | null | undefined'.
+[09:36:18.642] server/routes.ts(907,9): error TS2322: Type 'string' is not assignable to type '[any, ...any[]] | unknown[] | null | undefined'.
+[09:36:18.643] server/routes.ts(986,28): error TS2339: Property 'id' does not exist on type 'User'.
+[09:36:18.643] server/routes.ts(987,9): error TS2322: Type 'string' is not assignable to type '[any, ...any[]] | unknown[] | null | undefined'.
+[09:36:18.643] server/routes.ts(988,9): error TS2322: Type 'string' is not assignable to type '[any, ...any[]] | unknown[] | null | undefined'.
+[09:36:18.643] server/routes.ts(989,9): error TS2322: Type 'number' is not assignable to type '[any, ...any[]] | unknown[] | null | undefined'.
+[09:36:18.643] server/routes.ts(991,9): error TS2322: Type 'string | undefined' is not assignable to type '[any, ...any[]] | unknown[] | null | undefined'.
+[09:36:18.643]   Type 'string' is not assignable to type '[any, ...any[]] | unknown[] | null | undefined'.
+[09:36:18.643] server/routes.ts(992,9): error TS2322: Type 'string' is not assignable to type '[any, ...any[]] | unknown[] | null | undefined'.
+[09:36:18.643] server/routes.ts(1016,28): error TS2339: Property 'id' does not exist on type 'User'.
+[09:36:18.643] server/routes.ts(1017,9): error TS2322: Type 'string' is not assignable to type '[any, ...any[]] | unknown[] | null | undefined'.
+[09:36:18.643] server/routes.ts(1018,9): error TS2322: Type 'string' is not assignable to type '[any, ...any[]] | unknown[] | null | undefined'.
+[09:36:18.644] server/routes.ts(1019,9): error TS2322: Type 'number' is not assignable to type '[any, ...any[]] | unknown[] | null | undefined'.
+[09:36:18.644] server/routes.ts(1020,20): error TS2353: Object literal may only specify known properties, and 'status' does not exist in type '[any, ...any[]] | unknown[]'.
+[09:36:18.644] server/routes.ts(1021,9): error TS2322: Type 'string | undefined' is not assignable to type '[any, ...any[]] | unknown[] | null | undefined'.
+[09:36:18.644]   Type 'string' is not assignable to type '[any, ...any[]] | unknown[] | null | undefined'.
+[09:36:18.644] server/routes.ts(1022,9): error TS2322: Type 'string' is not assignable to type '[any, ...any[]] | unknown[] | null | undefined'.
+[09:36:18.644] server/routes.ts(1063,28): error TS2339: Property 'id' does not exist on type 'User'.
+[09:36:18.644] server/routes.ts(1064,9): error TS2322: Type 'string' is not assignable to type '[any, ...any[]] | unknown[] | null | undefined'.
+[09:36:18.644] server/routes.ts(1065,9): error TS2322: Type 'string' is not assignable to type '[any, ...any[]] | unknown[] | null | undefined'.
+[09:36:18.644] server/routes.ts(1066,9): error TS2322: Type 'number' is not assignable to type '[any, ...any[]] | unknown[] | null | undefined'.
+[09:36:18.644] server/routes.ts(1067,20): error TS2353: Object literal may only specify known properties, and 'reason' does not exist in type '[any, ...any[]] | unknown[]'.
+[09:36:18.644] server/routes.ts(1068,9): error TS2322: Type 'string | undefined' is not assignable to type '[any, ...any[]] | unknown[] | null | undefined'.
+[09:36:18.645]   Type 'string' is not assignable to type '[any, ...any[]] | unknown[] | null | undefined'.
+[09:36:18.645] server/routes.ts(1069,9): error TS2322: Type 'string' is not assignable to type '[any, ...any[]] | unknown[] | null | undefined'.
+[09:36:18.645] server/routes.ts(1117,30): error TS2339: Property 'id' does not exist on type 'User'.
+[09:36:18.645] server/routes.ts(1124,28): error TS2339: Property 'id' does not exist on type 'User'.
+[09:36:18.645] server/routes.ts(1125,9): error TS2322: Type 'string' is not assignable to type '[any, ...any[]] | unknown[] | null | undefined'.
+[09:36:18.647] server/routes.ts(1126,9): error TS2322: Type 'string' is not assignable to type '[any, ...any[]] | unknown[] | null | undefined'.
+[09:36:18.647] server/routes.ts(1127,9): error TS2322: Type 'number' is not assignable to type '[any, ...any[]] | unknown[] | null | undefined'.
+[09:36:18.649] server/routes.ts(1128,20): error TS2353: Object literal may only specify known properties, and 'permission' does not exist in type '[any, ...any[]] | unknown[]'.
+[09:36:18.649] server/routes.ts(1129,9): error TS2322: Type 'string | undefined' is not assignable to type '[any, ...any[]] | unknown[] | null | undefined'.
+[09:36:18.649]   Type 'string' is not assignable to type '[any, ...any[]] | unknown[] | null | undefined'.
+[09:36:18.649] server/routes.ts(1130,9): error TS2322: Type 'string' is not assignable to type '[any, ...any[]] | unknown[] | null | undefined'.
+[09:36:18.649] server/routes.ts(1153,28): error TS2339: Property 'id' does not exist on type 'User'.
+[09:36:18.650] server/routes.ts(1154,9): error TS2322: Type 'string' is not assignable to type '[any, ...any[]] | unknown[] | null | undefined'.
+[09:36:18.650] server/routes.ts(1155,9): error TS2322: Type 'string' is not assignable to type '[any, ...any[]] | unknown[] | null | undefined'.
+[09:36:18.650] server/routes.ts(1156,9): error TS2322: Type 'number' is not assignable to type '[any, ...any[]] | unknown[] | null | undefined'.
+[09:36:18.650] server/routes.ts(1157,20): error TS2353: Object literal may only specify known properties, and 'permission' does not exist in type '[any, ...any[]] | unknown[]'.
+[09:36:18.650] server/routes.ts(1158,9): error TS2322: Type 'string | undefined' is not assignable to type '[any, ...any[]] | unknown[] | null | undefined'.
+[09:36:18.650]   Type 'string' is not assignable to type '[any, ...any[]] | unknown[] | null | undefined'.
+[09:36:18.651] server/routes.ts(1159,9): error TS2322: Type 'string' is not assignable to type '[any, ...any[]] | unknown[] | null | undefined'.
+[09:36:18.651] server/routes.ts(1322,7): error TS2740: Type 'Omit<PgSelectBase<any, { id: any; title: any; description: any; price: any; propertyType: any; bedrooms: any; bathrooms: any; squareFeet: any; address: any; city: any; state: any; zipCode: any; latitude: any; longitude: any; ... 5 more ...; updatedAt: any; }, ... 5 more ..., { ...; }>, "where">' is missing the following properties from type 'PgSelectBase<any, { id: any; title: any; description: any; price: any; propertyType: any; bedrooms: any; bathrooms: any; squareFeet: any; address: any; city: any; state: any; zipCode: any; latitude: any; longitude: any; ... 5 more ...; updatedAt: any; }, ... 5 more ..., { ...; }>': config, joinsNotNullableMap, tableName, isPartialSelect, and 5 more.
+[09:36:18.653] 
+[09:36:18.804] server/vite.ts(39,5): error TS2322: Type '{ middlewareMode: boolean; hmr: { server: Server<typeof IncomingMessage, typeof ServerResponse>; }; allowedHosts: boolean; }' is not assignable to type 'ServerOptions'.
+[09:36:18.805]   Types of property 'allowedHosts' are incompatible.
+[09:36:18.805]     Type 'boolean' is not assignable to type 'true | string[] | undefined'.
+[09:36:18.806] 
+[09:36:19.221] server/marketplace-routes.ts(245,25): error TS2339: Property 'id' does not exist on type 'User'.
+[09:36:19.225] server/marketplace-routes.ts(316,25): error TS2339: Property 'id' does not exist on type 'User'.
+[09:36:19.226] server/marketplace-routes.ts(404,25): error TS2339: Property 'id' does not exist on type 'User'.
+[09:36:19.226] server/marketplace-routes.ts(472,39): error TS2339: Property 'id' does not exist on type 'User'.
+[09:36:19.226] server/marketplace-routes.ts(534,25): error TS2339: Property 'id' does not exist on type 'User'.
+[09:36:19.226] 
+[09:36:19.436] server/tenant-support-routes.ts(72,17): error TS18048: 'req.user' is possibly 'undefined'.
+[09:36:19.437] server/tenant-support-routes.ts(72,26): error TS2339: Property 'id' does not exist on type 'User'.
+[09:36:19.437] server/tenant-support-routes.ts(151,26): error TS2339: Property 'id' does not exist on type 'User'.
+[09:36:19.437] 
+[09:36:19.518] server/seed-manager.ts(79,45): error TS2339: Property 'length' does not exist on type 'any[] | QueryResult<never>'.
+[09:36:19.519]   Property 'length' does not exist on type 'QueryResult<never>'.
+[09:36:19.519] server/seed-manager.ts(116,50): error TS2339: Property 'length' does not exist on type 'any[] | QueryResult<never>'.
+[09:36:19.519]   Property 'length' does not exist on type 'QueryResult<never>'.
+[09:36:19.519] server/seed-manager.ts(215,49): error TS2339: Property 'length' does not exist on type 'any[] | QueryResult<never>'.
+[09:36:19.520]   Property 'length' does not exist on type 'QueryResult<never>'.
+[09:36:19.520] server/seed-manager.ts(227,22): error TS2554: Expected 0 arguments, but got 1.
+[09:36:19.520] server/seed-manager.ts(230,25): error TS2554: Expected 0 arguments, but got 1.
+[09:36:19.520] 
+[09:36:19.574] server/migration-manager.ts(33,14): error TS2352: Conversion of type 'Record<string, unknown>[]' to type 'Migration[]' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+[09:36:19.575]   Type 'Record<string, unknown>' is missing the following properties from type 'Migration': id, filename, applied_at
+[09:36:19.575] 
+[09:36:19.727] server/storage.ts(102,11): error TS2488: Type 'any[] | QueryResult<never>' must have a '[Symbol.iterator]()' method that returns an iterator.
+[09:36:19.728] server/storage.ts(121,13): error TS2322: Type 'number' is not assignable to type '[any, ...any[]] | unknown[] | null | undefined'.
+[09:36:19.728] server/storage.ts(125,15): error TS2322: Type 'number' is not assignable to type '[any, ...any[]] | unknown[] | null | undefined'.
+[09:36:19.728] server/storage.ts(159,7): error TS2740: Type 'Omit<PgSelectBase<any, any, "single", {} | Record<any, "not-null">, false, "where", { [x: string]: any; }[], any>, "where">' is missing the following properties from type 'PgSelectBase<any, any, "single", {} | Record<any, "not-null">, false, never, { [x: string]: any; }[], any>': config, joinsNotNullableMap, tableName, isPartialSelect, and 5 more.
+[09:36:19.728] server/storage.ts(163,7): error TS2740: Type 'Omit<PgSelectBase<any, any, "single", {} | Record<any, "not-null">, false, "limit", { [x: string]: any; }[], any>, "limit">' is missing the following properties from type 'PgSelectBase<any, any, "single", {} | Record<any, "not-null">, false, never, { [x: string]: any; }[], any>': config, joinsNotNullableMap, tableName, isPartialSelect, and 5 more.
+[09:36:19.728] server/storage.ts(167,7): error TS2740: Type 'Omit<PgSelectBase<any, any, "single", {} | Record<any, "not-null">, false, "offset", { [x: string]: any; }[], any>, "offset">' is missing the following properties from type 'PgSelectBase<any, any, "single", {} | Record<any, "not-null">, false, never, { [x: string]: any; }[], any>': config, joinsNotNullableMap, tableName, isPartialSelect, and 5 more.
+[09:36:19.728] server/storage.ts(226,7): error TS2740: Type 'Omit<PgSelectBase<any, any, "single", {} | Record<any, "not-null">, false, "where", { [x: string]: any; }[], any>, "where">' is missing the following properties from type 'PgSelectBase<any, any, "single", {} | Record<any, "not-null">, false, never, { [x: string]: any; }[], any>': config, joinsNotNullableMap, tableName, isPartialSelect, and 5 more.
+[09:36:19.728] server/storage.ts(239,9): error TS2740: Type 'Omit<PgSelectBase<any, any, "single", {} | Record<any, "not-null">, false, "orderBy", { [x: string]: any; }[], any>, "orderBy">' is missing the following properties from type 'PgSelectBase<any, any, "single", {} | Record<any, "not-null">, false, never, { [x: string]: any; }[], any>': config, joinsNotNullableMap, tableName, isPartialSelect, and 5 more.
+[09:36:19.728] server/storage.ts(242,7): error TS2740: Type 'Omit<PgSelectBase<any, any, "single", {} | Record<any, "not-null">, false, "orderBy", { [x: string]: any; }[], any>, "orderBy">' is missing the following properties from type 'PgSelectBase<any, any, "single", {} | Record<any, "not-null">, false, never, { [x: string]: any; }[], any>': config, joinsNotNullableMap, tableName, isPartialSelect, and 5 more.
+[09:36:19.728] server/storage.ts(247,7): error TS2740: Type 'Omit<PgSelectBase<any, any, "single", {} | Record<any, "not-null">, false, "limit", { [x: string]: any; }[], any>, "limit">' is missing the following properties from type 'PgSelectBase<any, any, "single", {} | Record<any, "not-null">, false, never, { [x: string]: any; }[], any>': config, joinsNotNullableMap, tableName, isPartialSelect, and 5 more.
+[09:36:19.728] server/storage.ts(250,7): error TS2740: Type 'Omit<PgSelectBase<any, any, "single", {} | Record<any, "not-null">, false, "offset", { [x: string]: any; }[], any>, "offset">' is missing the following properties from type 'PgSelectBase<any, any, "single", {} | Record<any, "not-null">, false, never, { [x: string]: any; }[], any>': config, joinsNotNullableMap, tableName, isPartialSelect, and 5 more.
+[09:36:19.728] server/storage.ts(267,41): error TS2339: Property 'id' does not exist on type '{ images: any; features: any; }'.
+[09:36:19.728] server/storage.ts(267,62): error TS2339: Property 'latitude' does not exist on type '{ images: any; features: any; }'.
+[09:36:19.728] server/storage.ts(267,89): error TS2339: Property 'longitude' does not exist on type '{ images: any; features: any; }'.
+[09:36:19.728] server/storage.ts(267,118): error TS2339: Property 'propertyType' does not exist on type '{ images: any; features: any; }'.
+[09:36:19.728] server/storage.ts(301,7): error TS2322: Type 'string' is not assignable to type '[any, ...any[]] | unknown[] | null | undefined'.
+[09:36:19.728] server/storage.ts(304,7): error TS2322: Type 'string' is not assignable to type '[any, ...any[]] | unknown[] | null | undefined'.
+[09:36:19.728] 
+[09:36:19.935] server/services-storage.ts(86,7): error TS2740: Type 'Omit<PgSelectBase<"service_providers", { id: PgColumn<{ name: "id"; tableName: "service_providers"; dataType: "number"; columnType: "PgInteger"; data: number; driverParam: string | number; notNull: true; hasDefault: false; ... 6 more ...; generated: undefined; }, {}, {}>; ... 16 more ...; updatedAt: PgColumn<...>; }...' is missing the following properties from type 'PgSelectBase<"service_providers", { id: PgColumn<{ name: "id"; tableName: "service_providers"; dataType: "number"; columnType: "PgInteger"; data: number; driverParam: string | number; notNull: true; hasDefault: false; ... 6 more ...; generated: undefined; }, {}, {}>; ... 16 more ...; updatedAt: PgColumn<...>; }, ......': config, joinsNotNullableMap, tableName, isPartialSelect, and 5 more.
+[09:36:19.935] server/services-storage.ts(94,11): error TS2740: Type 'Omit<PgSelectBase<"service_providers", { id: PgColumn<{ name: "id"; tableName: "service_providers"; dataType: "number"; columnType: "PgInteger"; data: number; driverParam: string | number; notNull: true; hasDefault: false; ... 6 more ...; generated: undefined; }, {}, {}>; ... 16 more ...; updatedAt: PgColumn<...>; }...' is missing the following properties from type 'PgSelectBase<"service_providers", { id: PgColumn<{ name: "id"; tableName: "service_providers"; dataType: "number"; columnType: "PgInteger"; data: number; driverParam: string | number; notNull: true; hasDefault: false; ... 6 more ...; generated: undefined; }, {}, {}>; ... 16 more ...; updatedAt: PgColumn<...>; }, ......': config, joinsNotNullableMap, tableName, isPartialSelect, and 5 more.
+[09:36:19.935] server/services-storage.ts(97,11): error TS2740: Type 'Omit<PgSelectBase<"service_providers", { id: PgColumn<{ name: "id"; tableName: "service_providers"; dataType: "number"; columnType: "PgInteger"; data: number; driverParam: string | number; notNull: true; hasDefault: false; ... 6 more ...; generated: undefined; }, {}, {}>; ... 16 more ...; updatedAt: PgColumn<...>; }...' is missing the following properties from type 'PgSelectBase<"service_providers", { id: PgColumn<{ name: "id"; tableName: "service_providers"; dataType: "number"; columnType: "PgInteger"; data: number; driverParam: string | number; notNull: true; hasDefault: false; ... 6 more ...; generated: undefined; }, {}, {}>; ... 16 more ...; updatedAt: PgColumn<...>; }, ......': config, joinsNotNullableMap, tableName, isPartialSelect, and 5 more.
+[09:36:19.936] server/services-storage.ts(97,60): error TS2339: Property 'reviewCount' does not exist on type 'PgTableWithColumns<{ name: "service_providers"; schema: undefined; columns: { id: PgColumn<{ name: "id"; tableName: "service_providers"; dataType: "number"; columnType: "PgInteger"; data: number; driverParam: string | number; ... 8 more ...; generated: undefined; }, {}, {}>; ... 16 more ...; updatedAt: PgColumn<...>...'.
+[09:36:19.936] server/services-storage.ts(100,11): error TS2740: Type 'Omit<PgSelectBase<"service_providers", { id: PgColumn<{ name: "id"; tableName: "service_providers"; dataType: "number"; columnType: "PgInteger"; data: number; driverParam: string | number; notNull: true; hasDefault: false; ... 6 more ...; generated: undefined; }, {}, {}>; ... 16 more ...; updatedAt: PgColumn<...>; }...' is missing the following properties from type 'PgSelectBase<"service_providers", { id: PgColumn<{ name: "id"; tableName: "service_providers"; dataType: "number"; columnType: "PgInteger"; data: number; driverParam: string | number; notNull: true; hasDefault: false; ... 6 more ...; generated: undefined; }, {}, {}>; ... 16 more ...; updatedAt: PgColumn<...>; }, ......': config, joinsNotNullableMap, tableName, isPartialSelect, and 5 more.
+[09:36:19.936] server/services-storage.ts(103,11): error TS2740: Type 'Omit<PgSelectBase<"service_providers", { id: PgColumn<{ name: "id"; tableName: "service_providers"; dataType: "number"; columnType: "PgInteger"; data: number; driverParam: string | number; notNull: true; hasDefault: false; ... 6 more ...; generated: undefined; }, {}, {}>; ... 16 more ...; updatedAt: PgColumn<...>; }...' is missing the following properties from type 'PgSelectBase<"service_providers", { id: PgColumn<{ name: "id"; tableName: "service_providers"; dataType: "number"; columnType: "PgInteger"; data: number; driverParam: string | number; notNull: true; hasDefault: false; ... 6 more ...; generated: undefined; }, {}, {}>; ... 16 more ...; updatedAt: PgColumn<...>; }, ......': config, joinsNotNullableMap, tableName, isPartialSelect, and 5 more.
+[09:36:19.936] server/services-storage.ts(108,7): error TS2740: Type 'Omit<PgSelectBase<"service_providers", { id: PgColumn<{ name: "id"; tableName: "service_providers"; dataType: "number"; columnType: "PgInteger"; data: number; driverParam: string | number; notNull: true; hasDefault: false; ... 6 more ...; generated: undefined; }, {}, {}>; ... 16 more ...; updatedAt: PgColumn<...>; }...' is missing the following properties from type 'PgSelectBase<"service_providers", { id: PgColumn<{ name: "id"; tableName: "service_providers"; dataType: "number"; columnType: "PgInteger"; data: number; driverParam: string | number; notNull: true; hasDefault: false; ... 6 more ...; generated: undefined; }, {}, {}>; ... 16 more ...; updatedAt: PgColumn<...>; }, ......': config, joinsNotNullableMap, tableName, isPartialSelect, and 5 more.
+[09:36:19.936] server/services-storage.ts(113,7): error TS2740: Type 'Omit<PgSelectBase<"service_providers", { id: PgColumn<{ name: "id"; tableName: "service_providers"; dataType: "number"; columnType: "PgInteger"; data: number; driverParam: string | number; notNull: true; hasDefault: false; ... 6 more ...; generated: undefined; }, {}, {}>; ... 16 more ...; updatedAt: PgColumn<...>; }...' is missing the following properties from type 'PgSelectBase<"service_providers", { id: PgColumn<{ name: "id"; tableName: "service_providers"; dataType: "number"; columnType: "PgInteger"; data: number; driverParam: string | number; notNull: true; hasDefault: false; ... 6 more ...; generated: undefined; }, {}, {}>; ... 16 more ...; updatedAt: PgColumn<...>; }, ......': config, joinsNotNullableMap, tableName, isPartialSelect, and 5 more.
+[09:36:19.936] server/services-storage.ts(116,7): error TS2740: Type 'Omit<PgSelectBase<"service_providers", { id: PgColumn<{ name: "id"; tableName: "service_providers"; dataType: "number"; columnType: "PgInteger"; data: number; driverParam: string | number; notNull: true; hasDefault: false; ... 6 more ...; generated: undefined; }, {}, {}>; ... 16 more ...; updatedAt: PgColumn<...>; }...' is missing the following properties from type 'PgSelectBase<"service_providers", { id: PgColumn<{ name: "id"; tableName: "service_providers"; dataType: "number"; columnType: "PgInteger"; data: number; driverParam: string | number; notNull: true; hasDefault: false; ... 6 more ...; generated: undefined; }, {}, {}>; ... 16 more ...; updatedAt: PgColumn<...>; }, ......': config, joinsNotNullableMap, tableName, isPartialSelect, and 5 more.
+[09:36:19.936] server/services-storage.ts(141,15): error TS2769: No overload matches this call.
+[09:36:19.936]   Overload 1 of 2, '(value: { id: number | SQL<unknown> | Placeholder<string, any>; companyName: string | SQL<unknown> | Placeholder<string, any>; serviceCategory: string | SQL<...> | Placeholder<...>; ... 14 more ...; dateJoined?: SQL<...> | ... 3 more ... | undefined; }): PgInsertBase<...>', gave the following error.
+[09:36:19.936]     Argument of type '{ description: string; companyName: string; serviceCategory: "Legal Services" | "Photography" | "Property Inspection" | "Finance & Loans" | "Insurance" | "Construction" | "Moving" | "Cleaning" | "Maintenance"; ... 10 more ...; featured?: boolean | ... 1 more ... | undefined; }' is not assignable to parameter of type '{ id: number | SQL<unknown> | Placeholder<string, any>; companyName: string | SQL<unknown> | Placeholder<string, any>; serviceCategory: string | SQL<unknown> | Placeholder<...>; ... 14 more ...; dateJoined?: SQL<...> | ... 3 more ... | undefined; }'.
+[09:36:19.936]       Property 'id' is missing in type '{ description: string; companyName: string; serviceCategory: "Legal Services" | "Photography" | "Property Inspection" | "Finance & Loans" | "Insurance" | "Construction" | "Moving" | "Cleaning" | "Maintenance"; ... 10 more ...; featured?: boolean | ... 1 more ... | undefined; }' but required in type '{ id: number | SQL<unknown> | Placeholder<string, any>; companyName: string | SQL<unknown> | Placeholder<string, any>; serviceCategory: string | SQL<unknown> | Placeholder<...>; ... 14 more ...; dateJoined?: SQL<...> | ... 3 more ... | undefined; }'.
+[09:36:19.936]   Overload 2 of 2, '(values: { id: number | SQL<unknown> | Placeholder<string, any>; companyName: string | SQL<unknown> | Placeholder<string, any>; serviceCategory: string | SQL<...> | Placeholder<...>; ... 14 more ...; dateJoined?: SQL<...> | ... 3 more ... | undefined; }[]): PgInsertBase<...>', gave the following error.
+[09:36:19.937]     Argument of type '{ description: string; companyName: string; serviceCategory: "Legal Services" | "Photography" | "Property Inspection" | "Finance & Loans" | "Insurance" | "Construction" | "Moving" | "Cleaning" | "Maintenance"; ... 10 more ...; featured?: boolean | ... 1 more ... | undefined; }' is not assignable to parameter of type '{ id: number | SQL<unknown> | Placeholder<string, any>; companyName: string | SQL<unknown> | Placeholder<string, any>; serviceCategory: string | SQL<unknown> | Placeholder<...>; ... 14 more ...; dateJoined?: SQL<...> | ... 3 more ... | undefined; }[]'.
+[09:36:19.937]       Type '{ description: string; companyName: string; serviceCategory: "Legal Services" | "Photography" | "Property Inspection" | "Finance & Loans" | "Insurance" | "Construction" | "Moving" | "Cleaning" | "Maintenance"; ... 10 more ...; featured?: boolean | ... 1 more ... | undefined; }' is missing the following properties from type '{ id: number | SQL<unknown> | Placeholder<string, any>; companyName: string | SQL<unknown> | Placeholder<string, any>; serviceCategory: string | SQL<unknown> | Placeholder<...>; ... 14 more ...; dateJoined?: SQL<...> | ... 3 more ... | undefined; }[]': length, pop, push, concat, and 29 more.
+[09:36:19.937] server/services-storage.ts(187,7): error TS2740: Type 'Omit<PgSelectBase<"service_ads", { id: PgColumn<{ name: "id"; tableName: "service_ads"; dataType: "number"; columnType: "PgInteger"; data: number; driverParam: string | number; notNull: true; hasDefault: false; ... 6 more ...; generated: undefined; }, {}, {}>; ... 13 more ...; updatedAt: PgColumn<...>; }, ... 5 more...' is missing the following properties from type 'PgSelectBase<"service_ads", { id: PgColumn<{ name: "id"; tableName: "service_ads"; dataType: "number"; columnType: "PgInteger"; data: number; driverParam: string | number; notNull: true; hasDefault: false; isPrimaryKey: true; ... 5 more ...; generated: undefined; }, {}, {}>; ... 13 more ...; updatedAt: PgColumn<...>...': config, joinsNotNullableMap, tableName, isPartialSelect, and 5 more.
+[09:36:19.937] server/services-storage.ts(196,15): error TS2769: No overload matches this call.
+[09:36:19.937]   Overload 1 of 2, '(value: { id: number | SQL<unknown> | Placeholder<string, any>; adTitle: string | SQL<unknown> | Placeholder<string, any>; targetAudience: string | SQL<unknown> | Placeholder<...>; ... 11 more ...; clicks?: number | ... 3 more ... | undefined; }): PgInsertBase<...>', gave the following error.
+[09:36:19.937]     Argument of type '{ adTitle: string; targetAudience: string; contextTrigger: string; active?: boolean | null | undefined; providerId?: number | null | undefined; adCopy?: string | null | undefined; adImageUrl?: string | ... 1 more ... | undefined; ctaText?: string | ... 1 more ... | undefined; ctaUrl?: string | ... 1 more ... | undef...' is not assignable to parameter of type '{ id: number | SQL<unknown> | Placeholder<string, any>; adTitle: string | SQL<unknown> | Placeholder<string, any>; targetAudience: string | SQL<unknown> | Placeholder<...>; ... 11 more ...; clicks?: number | ... 3 more ... | undefined; }'.
+[09:36:19.937]       Property 'id' is missing in type '{ adTitle: string; targetAudience: string; contextTrigger: string; active?: boolean | null | undefined; providerId?: number | null | undefined; adCopy?: string | null | undefined; adImageUrl?: string | ... 1 more ... | undefined; ctaText?: string | ... 1 more ... | undefined; ctaUrl?: string | ... 1 more ... | undef...' but required in type '{ id: number | SQL<unknown> | Placeholder<string, any>; adTitle: string | SQL<unknown> | Placeholder<string, any>; targetAudience: string | SQL<unknown> | Placeholder<...>; ... 11 more ...; clicks?: number | ... 3 more ... | undefined; }'.
+[09:36:19.937]   Overload 2 of 2, '(values: { id: number | SQL<unknown> | Placeholder<string, any>; adTitle: string | SQL<unknown> | Placeholder<string, any>; targetAudience: string | SQL<unknown> | Placeholder<...>; ... 11 more ...; clicks?: number | ... 3 more ... | undefined; }[]): PgInsertBase<...>', gave the following error.
+[09:36:19.937]     Argument of type '{ adTitle: string; targetAudience: string; contextTrigger: string; active?: boolean | null | undefined; providerId?: number | null | undefined; adCopy?: string | null | undefined; adImageUrl?: string | ... 1 more ... | undefined; ctaText?: string | ... 1 more ... | undefined; ctaUrl?: string | ... 1 more ... | undef...' is not assignable to parameter of type '{ id: number | SQL<unknown> | Placeholder<string, any>; adTitle: string | SQL<unknown> | Placeholder<string, any>; targetAudience: string | SQL<unknown> | Placeholder<...>; ... 11 more ...; clicks?: number | ... 3 more ... | undefined; }[]'.
+[09:36:19.937]       Type '{ adTitle: string; targetAudience: string; contextTrigger: string; active?: boolean | null | undefined; providerId?: number | null | undefined; adCopy?: string | null | undefined; adImageUrl?: string | ... 1 more ... | undefined; ctaText?: string | ... 1 more ... | undefined; ctaUrl?: string | ... 1 more ... | undef...' is missing the following properties from type '{ id: number | SQL<unknown> | Placeholder<string, any>; adTitle: string | SQL<unknown> | Placeholder<string, any>; targetAudience: string | SQL<unknown> | Placeholder<...>; ... 11 more ...; clicks?: number | ... 3 more ... | undefined; }[]': length, pop, push, concat, and 29 more.
+[09:36:19.938] server/services-storage.ts(236,15): error TS2769: No overload matches this call.
+[09:36:19.938]   Overload 1 of 2, '(value: { id: number | SQL<unknown> | Placeholder<string, any>; rating: number | SQL<unknown> | Placeholder<string, any>; review?: string | SQL<unknown> | Placeholder<string, any> | null | undefined; ... 6 more ...; helpful?: number | ... 3 more ... | undefined; }): PgInsertBase<...>', gave the following error.
+[09:36:19.938]     Argument of type '{ rating: number; review?: string | null | undefined; verified?: boolean | null | undefined; providerId?: number | null | undefined; userId?: number | null | undefined; reviewerName?: string | ... 1 more ... | undefined; reviewerAvatar?: string | ... 1 more ... | undefined; }' is not assignable to parameter of type '{ id: number | SQL<unknown> | Placeholder<string, any>; rating: number | SQL<unknown> | Placeholder<string, any>; review?: string | SQL<unknown> | Placeholder<string, any> | null | undefined; ... 6 more ...; helpful?: number | ... 3 more ... | undefined; }'.
+[09:36:19.938]       Property 'id' is missing in type '{ rating: number; review?: string | null | undefined; verified?: boolean | null | undefined; providerId?: number | null | undefined; userId?: number | null | undefined; reviewerName?: string | ... 1 more ... | undefined; reviewerAvatar?: string | ... 1 more ... | undefined; }' but required in type '{ id: number | SQL<unknown> | Placeholder<string, any>; rating: number | SQL<unknown> | Placeholder<string, any>; review?: string | SQL<unknown> | Placeholder<string, any> | null | undefined; ... 6 more ...; helpful?: number | ... 3 more ... | undefined; }'.
+[09:36:19.938]   Overload 2 of 2, '(values: { id: number | SQL<unknown> | Placeholder<string, any>; rating: number | SQL<unknown> | Placeholder<string, any>; review?: string | SQL<unknown> | Placeholder<string, any> | null | undefined; ... 6 more ...; helpful?: number | ... 3 more ... | undefined; }[]): PgInsertBase<...>', gave the following error.
+[09:36:19.938]     Argument of type '{ rating: number; review?: string | null | undefined; verified?: boolean | null | undefined; providerId?: number | null | undefined; userId?: number | null | undefined; reviewerName?: string | ... 1 more ... | undefined; reviewerAvatar?: string | ... 1 more ... | undefined; }' is not assignable to parameter of type '{ id: number | SQL<unknown> | Placeholder<string, any>; rating: number | SQL<unknown> | Placeholder<string, any>; review?: string | SQL<unknown> | Placeholder<string, any> | null | undefined; ... 6 more ...; helpful?: number | ... 3 more ... | undefined; }[]'.
+[09:36:19.938]       Type '{ rating: number; review?: string | null | undefined; verified?: boolean | null | undefined; providerId?: number | null | undefined; userId?: number | null | undefined; reviewerName?: string | ... 1 more ... | undefined; reviewerAvatar?: string | ... 1 more ... | undefined; }' is missing the following properties from type '{ id: number | SQL<unknown> | Placeholder<string, any>; rating: number | SQL<unknown> | Placeholder<string, any>; review?: string | SQL<unknown> | Placeholder<string, any> | null | undefined; ... 6 more ...; helpful?: number | ... 3 more ... | undefined; }[]': length, pop, push, concat, and 29 more.
+[09:36:19.938] server/services-storage.ts(240,50): error TS2345: Argument of type 'number | null | undefined' is not assignable to parameter of type 'number'.
+[09:36:19.938]   Type 'undefined' is not assignable to type 'number'.
+[09:36:19.938] server/services-storage.ts(247,9): error TS2322: Type 'string' is not assignable to type 'number | SQL<unknown> | PgColumn<ColumnBaseConfig<ColumnDataType, string>, {}, {}> | null | undefined'.
+[09:36:19.938] server/services-storage.ts(249,14): error TS2769: No overload matches this call.
+[09:36:19.938]   Overload 1 of 3, '(left: PgColumn<{ name: "id"; tableName: "service_providers"; dataType: "number"; columnType: "PgInteger"; data: number; driverParam: string | number; notNull: true; hasDefault: false; isPrimaryKey: true; ... 5 more ...; generated: undefined; }, {}, {}>, right: number | SQLWrapper): SQL<...>', gave the following error.
+[09:36:19.939]     Argument of type 'number | null | undefined' is not assignable to parameter of type 'number | SQLWrapper'.
+[09:36:19.939]       Type 'undefined' is not assignable to type 'number | SQLWrapper'.
+[09:36:19.939]   Overload 2 of 3, '(left: Aliased<number | null | undefined>, right: number | SQLWrapper | null | undefined): SQL<unknown>', gave the following error.
+[09:36:19.939]     Argument of type 'PgColumn<{ name: "id"; tableName: "service_providers"; dataType: "number"; columnType: "PgInteger"; data: number; driverParam: string | number; notNull: true; hasDefault: false; isPrimaryKey: true; ... 5 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'Aliased<number | null | undefined>'.
+[09:36:19.939]       Type 'PgColumn<{ name: "id"; tableName: "service_providers"; dataType: "number"; columnType: "PgInteger"; data: number; driverParam: string | number; notNull: true; hasDefault: false; isPrimaryKey: true; ... 5 more ...; generated: undefined; }, {}, {}>' is missing the following properties from type 'Aliased<number | null | undefined>': sql, fieldAlias
+[09:36:19.939]   Overload 3 of 3, '(left: never, right: unknown): SQL<unknown>', gave the following error.
+[09:36:19.939]     Argument of type 'PgColumn<{ name: "id"; tableName: "service_providers"; dataType: "number"; columnType: "PgInteger"; data: number; driverParam: string | number; notNull: true; hasDefault: false; isPrimaryKey: true; ... 5 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'never'.
+[09:36:19.939] 
+[09:36:20.156] server/review-storage.ts(138,7): error TS2740: Type 'Omit<PgSelectBase<any, any, "single", {} | Record<any, "not-null">, false, "where", { [x: string]: any; }[], any>, "where">' is missing the following properties from type 'PgSelectBase<any, any, "single", {} | Record<any, "not-null">, false, never, { [x: string]: any; }[], any>': config, joinsNotNullableMap, tableName, isPartialSelect, and 5 more.
+[09:36:20.157] server/review-storage.ts(146,7): error TS2740: Type 'Omit<PgSelectBase<any, any, "single", {} | Record<any, "not-null">, false, "orderBy", { [x: string]: any; }[], any>, "orderBy">' is missing the following properties from type 'PgSelectBase<any, any, "single", {} | Record<any, "not-null">, false, never, { [x: string]: any; }[], any>': config, joinsNotNullableMap, tableName, isPartialSelect, and 5 more.
+[09:36:20.157] server/review-storage.ts(148,7): error TS2740: Type 'Omit<PgSelectBase<any, any, "single", {} | Record<any, "not-null">, false, "orderBy", { [x: string]: any; }[], any>, "orderBy">' is missing the following properties from type 'PgSelectBase<any, any, "single", {} | Record<any, "not-null">, false, never, { [x: string]: any; }[], any>': config, joinsNotNullableMap, tableName, isPartialSelect, and 5 more.
+[09:36:20.157] server/review-storage.ts(153,7): error TS2740: Type 'Omit<PgSelectBase<any, any, "single", {} | Record<any, "not-null">, false, "limit", { [x: string]: any; }[], any>, "limit">' is missing the following properties from type 'PgSelectBase<any, any, "single", {} | Record<any, "not-null">, false, never, { [x: string]: any; }[], any>': config, joinsNotNullableMap, tableName, isPartialSelect, and 5 more.
+[09:36:20.157] server/review-storage.ts(157,7): error TS2740: Type 'Omit<PgSelectBase<any, any, "single", {} | Record<any, "not-null">, false, "offset", { [x: string]: any; }[], any>, "offset">' is missing the following properties from type 'PgSelectBase<any, any, "single", {} | Record<any, "not-null">, false, never, { [x: string]: any; }[], any>': config, joinsNotNullableMap, tableName, isPartialSelect, and 5 more.
+[09:36:20.157] server/review-storage.ts(282,7): error TS2322: Type 'unknown' is not assignable to type 'number'.
+[09:36:20.157] server/review-storage.ts(286,7): error TS2322: Type '{}' is not assignable to type 'number'.
+[09:36:20.157] server/review-storage.ts(289,7): error TS2322: Type '{}' is not assignable to type 'number'.
+[09:36:20.158] server/review-storage.ts(290,7): error TS2322: Type '{}' is not assignable to type 'number'.
+[09:36:20.158] server/review-storage.ts(362,7): error TS2322: Type '{}' is not assignable to type 'number'.
+[09:36:20.158] server/review-storage.ts(363,7): error TS2322: Type '{}' is not assignable to type 'number'.
+[09:36:20.158] server/review-storage.ts(369,54): error TS2345: Argument of type '[any, ...any[]] | unknown[] | null | undefined' is not assignable to parameter of type 'number'.
+[09:36:20.158]   Type 'undefined' is not assignable to type 'number'.
+[09:36:20.158] server/review-storage.ts(373,45): error TS2345: Argument of type '[any, ...any[]] | unknown[] | null | undefined' is not assignable to parameter of type 'number'.
+[09:36:20.158]   Type 'undefined' is not assignable to type 'number'.
+[09:36:20.158] server/review-storage.ts(449,12): error TS2365: Operator '>' cannot be applied to types '{}' and 'number'.
+[09:36:20.159] server/review-storage.ts(471,7): error TS2740: Type 'Omit<PgSelectBase<any, any, "single", {} | Record<any, "not-null">, false, "where", { [x: string]: any; }[], any>, "where">' is missing the following properties from type 'PgSelectBase<any, any, "single", {} | Record<any, "not-null">, false, never, { [x: string]: any; }[], any>': config, joinsNotNullableMap, tableName, isPartialSelect, and 5 more.
+[09:36:20.159] server/review-storage.ts(474,5): error TS2740: Type 'Omit<PgSelectBase<any, any, "single", {} | Record<any, "not-null">, false, "orderBy", { [x: string]: any; }[], any>, "orderBy">' is missing the following properties from type 'PgSelectBase<any, any, "single", {} | Record<any, "not-null">, false, never, { [x: string]: any; }[], any>': config, joinsNotNullableMap, tableName, isPartialSelect, and 5 more.
+[09:36:20.159] server/review-storage.ts(477,7): error TS2740: Type 'Omit<PgSelectBase<any, any, "single", {} | Record<any, "not-null">, false, "limit", { [x: string]: any; }[], any>, "limit">' is missing the following properties from type 'PgSelectBase<any, any, "single", {} | Record<any, "not-null">, false, never, { [x: string]: any; }[], any>': config, joinsNotNullableMap, tableName, isPartialSelect, and 5 more.
+[09:36:20.159] server/review-storage.ts(481,7): error TS2740: Type 'Omit<PgSelectBase<any, any, "single", {} | Record<any, "not-null">, false, "offset", { [x: string]: any; }[], any>, "offset">' is missing the following properties from type 'PgSelectBase<any, any, "single", {} | Record<any, "not-null">, false, never, { [x: string]: any; }[], any>': config, joinsNotNullableMap, tableName, isPartialSelect, and 5 more.
+[09:36:20.159] 
+[09:36:20.231] server/auth-middleware.ts(93,34): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Permission'.
+[09:36:20.231] server/auth-middleware.ts(97,38): error TS2345: Argument of type 'string' is not assignable to parameter of type 'Permission'.
+[09:36:20.231] server/auth-middleware.ts(168,41): error TS2322: Type 'number' is not assignable to type '[any, ...any[]] | unknown[] | null | undefined'.
+[09:36:20.231] server/auth-middleware.ts(229,45): error TS2339: Property 'role' does not exist on type 'User'.
+[09:36:20.231] server/auth-middleware.ts(234,29): error TS2339: Property 'role' does not exist on type 'User'.
+[09:36:20.231] server/auth-middleware.ts(249,53): error TS2339: Property 'userType' does not exist on type 'User'.
+[09:36:20.232] server/auth-middleware.ts(254,29): error TS2339: Property 'userType' does not exist on type 'User'.
+[09:36:20.232] server/auth-middleware.ts(277,32): error TS2339: Property 'id' does not exist on type 'User'.
+[09:36:20.232] server/auth-middleware.ts(298,38): error TS2339: Property 'permissions' does not exist on type 'User'.
+[09:36:20.232] 
+[09:36:20.311] server/rental-storage.ts(120,9): error TS2740: Type 'Omit<PgSelectBase<any, any, "single", {} | Record<any, "not-null">, false, "where", { [x: string]: any; }[], any>, "where">' is missing the following properties from type 'PgSelectBase<any, any, "single", {} | Record<any, "not-null">, false, never, { [x: string]: any; }[], any>': config, joinsNotNullableMap, tableName, isPartialSelect, and 5 more.
+[09:36:20.316] server/rental-storage.ts(163,14): error TS7053: Element implicitly has an 'any' type because expression of type '0' can't be used to index type 'any[] | QueryResult<never>'.
+[09:36:20.317]   Property '0' does not exist on type 'any[] | QueryResult<never>'.
+[09:36:20.317] server/rental-storage.ts(197,21): error TS2339: Property 'length' does not exist on type 'any[] | QueryResult<never>'.
+[09:36:20.317]   Property 'length' does not exist on type 'QueryResult<never>'.
+[09:36:20.317] server/rental-storage.ts(242,14): error TS7053: Element implicitly has an 'any' type because expression of type '0' can't be used to index type 'any[] | QueryResult<never>'.
+[09:36:20.317]   Property '0' does not exist on type 'any[] | QueryResult<never>'.
+[09:36:20.317] 
+[09:36:20.366] server/services-seed.ts(262,70): error TS2769: No overload matches this call.
+[09:36:20.367]   Overload 1 of 2, '(value: { id: number | SQL<unknown> | Placeholder<string, any>; companyName: string | SQL<unknown> | Placeholder<string, any>; serviceCategory: string | SQL<...> | Placeholder<...>; ... 14 more ...; dateJoined?: SQL<...> | ... 3 more ... | undefined; }): PgInsertBase<...>', gave the following error.
+[09:36:20.367]     Argument of type '{ companyName: string; serviceCategory: string; contactPerson: string; phoneNumber: string; email: string; websiteUrl: string; logoUrl: string; description: string; reacCertified: boolean; address: string; ... 4 more ...; featured: boolean; }[]' is not assignable to parameter of type '{ id: number | SQL<unknown> | Placeholder<string, any>; companyName: string | SQL<unknown> | Placeholder<string, any>; serviceCategory: string | SQL<unknown> | Placeholder<...>; ... 14 more ...; dateJoined?: SQL<...> | ... 3 more ... | undefined; }'.
+[09:36:20.368]       Type '{ companyName: string; serviceCategory: string; contactPerson: string; phoneNumber: string; email: string; websiteUrl: string; logoUrl: string; description: string; reacCertified: boolean; address: string; ... 4 more ...; featured: boolean; }[]' is missing the following properties from type '{ id: number | SQL<unknown> | Placeholder<string, any>; companyName: string | SQL<unknown> | Placeholder<string, any>; serviceCategory: string | SQL<unknown> | Placeholder<...>; ... 14 more ...; dateJoined?: SQL<...> | ... 3 more ... | undefined; }': id, companyName, serviceCategory
+[09:36:20.369]   Overload 2 of 2, '(values: { id: number | SQL<unknown> | Placeholder<string, any>; companyName: string | SQL<unknown> | Placeholder<string, any>; serviceCategory: string | SQL<...> | Placeholder<...>; ... 14 more ...; dateJoined?: SQL<...> | ... 3 more ... | undefined; }[]): PgInsertBase<...>', gave the following error.
+[09:36:20.369]     Argument of type '{ companyName: string; serviceCategory: string; contactPerson: string; phoneNumber: string; email: string; websiteUrl: string; logoUrl: string; description: string; reacCertified: boolean; address: string; ... 4 more ...; featured: boolean; }[]' is not assignable to parameter of type '{ id: number | SQL<unknown> | Placeholder<string, any>; companyName: string | SQL<unknown> | Placeholder<string, any>; serviceCategory: string | SQL<unknown> | Placeholder<...>; ... 14 more ...; dateJoined?: SQL<...> | ... 3 more ... | undefined; }[]'.
+[09:36:20.370]       Property 'id' is missing in type '{ companyName: string; serviceCategory: string; contactPerson: string; phoneNumber: string; email: string; websiteUrl: string; logoUrl: string; description: string; reacCertified: boolean; address: string; ... 4 more ...; featured: boolean; }' but required in type '{ id: number | SQL<unknown> | Placeholder<string, any>; companyName: string | SQL<unknown> | Placeholder<string, any>; serviceCategory: string | SQL<unknown> | Placeholder<...>; ... 14 more ...; dateJoined?: SQL<...> | ... 3 more ... | undefined; }'.
+[09:36:20.372] server/services-seed.ts(353,58): error TS2769: No overload matches this call.
+[09:36:20.372]   Overload 1 of 2, '(value: { id: number | SQL<unknown> | Placeholder<string, any>; adTitle: string | SQL<unknown> | Placeholder<string, any>; targetAudience: string | SQL<unknown> | Placeholder<...>; ... 11 more ...; clicks?: number | ... 3 more ... | undefined; }): PgInsertBase<...>', gave the following error.
+[09:36:20.372]     Argument of type '{ providerId: number | undefined; adTitle: string; adCopy: string; adImageUrl: string; targetAudience: string; contextTrigger: string; ctaText: string; ctaUrl: string; active: boolean; priority: number; }[]' is not assignable to parameter of type '{ id: number | SQL<unknown> | Placeholder<string, any>; adTitle: string | SQL<unknown> | Placeholder<string, any>; targetAudience: string | SQL<unknown> | Placeholder<...>; ... 11 more ...; clicks?: number | ... 3 more ... | undefined; }'.
+[09:36:20.373]       Type '{ providerId: number | undefined; adTitle: string; adCopy: string; adImageUrl: string; targetAudience: string; contextTrigger: string; ctaText: string; ctaUrl: string; active: boolean; priority: number; }[]' is missing the following properties from type '{ id: number | SQL<unknown> | Placeholder<string, any>; adTitle: string | SQL<unknown> | Placeholder<string, any>; targetAudience: string | SQL<unknown> | Placeholder<...>; ... 11 more ...; clicks?: number | ... 3 more ... | undefined; }': id, adTitle, targetAudience, contextTrigger
+[09:36:20.373]   Overload 2 of 2, '(values: { id: number | SQL<unknown> | Placeholder<string, any>; adTitle: string | SQL<unknown> | Placeholder<string, any>; targetAudience: string | SQL<unknown> | Placeholder<...>; ... 11 more ...; clicks?: number | ... 3 more ... | undefined; }[]): PgInsertBase<...>', gave the following error.
+[09:36:20.373]     Argument of type '{ providerId: number | undefined; adTitle: string; adCopy: string; adImageUrl: string; targetAudience: string; contextTrigger: string; ctaText: string; ctaUrl: string; active: boolean; priority: number; }[]' is not assignable to parameter of type '{ id: number | SQL<unknown> | Placeholder<string, any>; adTitle: string | SQL<unknown> | Placeholder<string, any>; targetAudience: string | SQL<unknown> | Placeholder<...>; ... 11 more ...; clicks?: number | ... 3 more ... | undefined; }[]'.
+[09:36:20.373]       Property 'id' is missing in type '{ providerId: number | undefined; adTitle: string; adCopy: string; adImageUrl: string; targetAudience: string; contextTrigger: string; ctaText: string; ctaUrl: string; active: boolean; priority: number; }' but required in type '{ id: number | SQL<unknown> | Placeholder<string, any>; adTitle: string | SQL<unknown> | Placeholder<string, any>; targetAudience: string | SQL<unknown> | Placeholder<...>; ... 11 more ...; clicks?: number | ... 3 more ... | undefined; }'.
+[09:36:20.373] server/services-seed.ts(411,66): error TS2769: No overload matches this call.
+[09:36:20.373]   Overload 1 of 2, '(value: { id: number | SQL<unknown> | Placeholder<string, any>; rating: number | SQL<unknown> | Placeholder<string, any>; review?: string | SQL<unknown> | Placeholder<string, any> | null | undefined; ... 6 more ...; helpful?: number | ... 3 more ... | undefined; }): PgInsertBase<...>', gave the following error.
+[09:36:20.373]     Argument of type '{ providerId: number | undefined; rating: number; review: string; reviewerName: string; reviewerAvatar: string; verified: boolean; helpful: number; }[]' is not assignable to parameter of type '{ id: number | SQL<unknown> | Placeholder<string, any>; rating: number | SQL<unknown> | Placeholder<string, any>; review?: string | SQL<unknown> | Placeholder<string, any> | null | undefined; ... 6 more ...; helpful?: number | ... 3 more ... | undefined; }'.
+[09:36:20.373]       Type '{ providerId: number | undefined; rating: number; review: string; reviewerName: string; reviewerAvatar: string; verified: boolean; helpful: number; }[]' is missing the following properties from type '{ id: number | SQL<unknown> | Placeholder<string, any>; rating: number | SQL<unknown> | Placeholder<string, any>; review?: string | SQL<unknown> | Placeholder<string, any> | null | undefined; ... 6 more ...; helpful?: number | ... 3 more ... | undefined; }': id, rating
+[09:36:20.373]   Overload 2 of 2, '(values: { id: number | SQL<unknown> | Placeholder<string, any>; rating: number | SQL<unknown> | Placeholder<string, any>; review?: string | SQL<unknown> | Placeholder<string, any> | null | undefined; ... 6 more ...; helpful?: number | ... 3 more ... | undefined; }[]): PgInsertBase<...>', gave the following error.
+[09:36:20.373]     Argument of type '{ providerId: number | undefined; rating: number; review: string; reviewerName: string; reviewerAvatar: string; verified: boolean; helpful: number; }[]' is not assignable to parameter of type '{ id: number | SQL<unknown> | Placeholder<string, any>; rating: number | SQL<unknown> | Placeholder<string, any>; review?: string | SQL<unknown> | Placeholder<string, any> | null | undefined; ... 6 more ...; helpful?: number | ... 3 more ... | undefined; }[]'.
+[09:36:20.373]       Property 'id' is missing in type '{ providerId: number | undefined; rating: number; review: string; reviewerName: string; reviewerAvatar: string; verified: boolean; helpful: number; }' but required in type '{ id: number | SQL<unknown> | Placeholder<string, any>; rating: number | SQL<unknown> | Placeholder<string, any>; review?: string | SQL<unknown> | Placeholder<string, any> | null | undefined; ... 6 more ...; helpful?: number | ... 3 more ... | undefined; }'.
+[09:36:20.373] 
+[09:36:20.467] server/marketplace-seed.ts(59,46): error TS2339: Property 'length' does not exist on type 'any[] | QueryResult<never>'.
+[09:36:20.467]   Property 'length' does not exist on type 'QueryResult<never>'.
+[09:36:20.468] server/marketplace-seed.ts(68,39): error TS2339: Property 'find' does not exist on type 'any[] | QueryResult<never>'.
+[09:36:20.468]   Property 'find' does not exist on type 'QueryResult<never>'.
+[09:36:20.468] server/marketplace-seed.ts(68,44): error TS7006: Parameter 'c' implicitly has an 'any' type.
+[09:36:20.468] server/marketplace-seed.ts(107,39): error TS2339: Property 'find' does not exist on type 'any[] | QueryResult<never>'.
+[09:36:20.468]   Property 'find' does not exist on type 'QueryResult<never>'.
+[09:36:20.468] server/marketplace-seed.ts(107,44): error TS7006: Parameter 'c' implicitly has an 'any' type.
+[09:36:20.468] server/marketplace-seed.ts(143,39): error TS2339: Property 'find' does not exist on type 'any[] | QueryResult<never>'.
+[09:36:20.468]   Property 'find' does not exist on type 'QueryResult<never>'.
+[09:36:20.468] server/marketplace-seed.ts(143,44): error TS7006: Parameter 'c' implicitly has an 'any' type.
+[09:36:20.468] server/marketplace-seed.ts(180,39): error TS2339: Property 'find' does not exist on type 'any[] | QueryResult<never>'.
+[09:36:20.468]   Property 'find' does not exist on type 'QueryResult<never>'.
+[09:36:20.468] server/marketplace-seed.ts(180,44): error TS7006: Parameter 'c' implicitly has an 'any' type.
+[09:36:20.468] server/marketplace-seed.ts(215,45): error TS2339: Property 'length' does not exist on type 'any[] | QueryResult<never>'.
+[09:36:20.469]   Property 'length' does not exist on type 'QueryResult<never>'.
+[09:36:20.469] server/marketplace-seed.ts(220,38): error TS2339: Property 'find' does not exist on type 'any[] | QueryResult<never>'.
+[09:36:20.469]   Property 'find' does not exist on type 'QueryResult<never>'.
+[09:36:20.469] server/marketplace-seed.ts(220,43): error TS7006: Parameter 'p' implicitly has an 'any' type.
+[09:36:20.469] server/marketplace-seed.ts(247,38): error TS2339: Property 'find' does not exist on type 'any[] | QueryResult<never>'.
+[09:36:20.469]   Property 'find' does not exist on type 'QueryResult<never>'.
+[09:36:20.469] server/marketplace-seed.ts(247,43): error TS7006: Parameter 'p' implicitly has an 'any' type.
+[09:36:20.469] server/marketplace-seed.ts(276,44): error TS2339: Property 'length' does not exist on type 'any[] | QueryResult<never>'.
+[09:36:20.469]   Property 'length' does not exist on type 'QueryResult<never>'.
+[09:36:20.469] server/marketplace-seed.ts(281,38): error TS2339: Property 'find' does not exist on type 'any[] | QueryResult<never>'.
+[09:36:20.469]   Property 'find' does not exist on type 'QueryResult<never>'.
+[09:36:20.469] server/marketplace-seed.ts(281,43): error TS7006: Parameter 'p' implicitly has an 'any' type.
+[09:36:20.470] server/marketplace-seed.ts(305,38): error TS2339: Property 'find' does not exist on type 'any[] | QueryResult<never>'.
+[09:36:20.470]   Property 'find' does not exist on type 'QueryResult<never>'.
+[09:36:20.470] server/marketplace-seed.ts(305,43): error TS7006: Parameter 'p' implicitly has an 'any' type.
+[09:36:20.471] server/marketplace-seed.ts(331,45): error TS2339: Property 'length' does not exist on type 'any[] | QueryResult<never>'.
+[09:36:20.471]   Property 'length' does not exist on type 'QueryResult<never>'.
+[09:36:20.471] 
+[09:36:20.528] server/rental-seed.ts(163,60): error TS2339: Property 'length' does not exist on type 'any[] | QueryResult<never>'.
+[09:36:20.529]   Property 'length' does not exist on type 'QueryResult<never>'.
+[09:36:20.529] 
+[09:36:20.701] shared/schema.ts(37,32): error TS2554: Expected 0 arguments, but got 1.
+[09:36:20.701] shared/schema.ts(49,38): error TS2554: Expected 0-1 arguments, but got 2.
+[09:36:20.701] shared/schema.ts(49,67): error TS2345: Argument of type 'boolean' is not assignable to parameter of type 'number | SQL<unknown>'.
+[09:36:20.701] shared/schema.ts(50,34): error TS2554: Expected 0-1 arguments, but got 2.
+[09:36:20.701] shared/schema.ts(50,63): error TS2345: Argument of type 'boolean' is not assignable to parameter of type 'number | SQL<unknown>'.
+[09:36:20.701] shared/schema.ts(59,32): error TS2554: Expected 0 arguments, but got 1.
+[09:36:20.701] shared/schema.ts(107,32): error TS2554: Expected 0 arguments, but got 1.
+[09:36:20.701] shared/schema.ts(117,32): error TS2554: Expected 0 arguments, but got 1.
+[09:36:20.701] shared/schema.ts(130,32): error TS2554: Expected 0 arguments, but got 1.
+[09:36:20.701] shared/schema.ts(138,32): error TS2554: Expected 0 arguments, but got 1.
+[09:36:20.701] shared/schema.ts(148,32): error TS2554: Expected 0 arguments, but got 1.
+[09:36:20.702] shared/schema.ts(159,32): error TS2554: Expected 0 arguments, but got 1.
+[09:36:20.702] shared/schema.ts(166,38): error TS2554: Expected 0-1 arguments, but got 2.
+[09:36:20.702] shared/schema.ts(166,67): error TS2345: Argument of type 'boolean' is not assignable to parameter of type 'number | SQL<unknown>'.
+[09:36:20.702] shared/schema.ts(167,34): error TS2554: Expected 0-1 arguments, but got 2.
+[09:36:20.702] shared/schema.ts(167,63): error TS2345: Argument of type 'boolean' is not assignable to parameter of type 'number | SQL<unknown>'.
+[09:36:20.702] shared/schema.ts(176,32): error TS2554: Expected 0 arguments, but got 1.
+[09:36:20.702] shared/schema.ts(180,38): error TS2554: Expected 0-1 arguments, but got 2.
+[09:36:20.702] shared/schema.ts(180,67): error TS2345: Argument of type 'boolean' is not assignable to parameter of type 'number | SQL<unknown>'.
+[09:36:20.702] shared/schema.ts(186,32): error TS2554: Expected 0 arguments, but got 1.
+[09:36:20.702] shared/schema.ts(189,36): error TS2554: Expected 0-1 arguments, but got 2.
+[09:36:20.702] shared/schema.ts(195,32): error TS2554: Expected 0 arguments, but got 1.
+[09:36:20.702] shared/schema.ts(205,32): error TS2554: Expected 0 arguments, but got 1.
+[09:36:20.702] shared/schema.ts(217,32): error TS2554: Expected 0 arguments, but got 1.
+[09:36:20.702] shared/schema.ts(219,46): error TS2353: Object literal may only specify known properties, and 'mode' does not exist in type 'PgTextConfig<readonly [string, ...string[]] | [string, ...string[]]>'.
+[09:36:20.702] shared/schema.ts(221,41): error TS2554: Expected 0-1 arguments, but got 2.
+[09:36:20.702] shared/schema.ts(221,70): error TS2345: Argument of type 'boolean' is not assignable to parameter of type 'number | SQL<unknown>'.
+[09:36:20.702] shared/schema.ts(226,32): error TS2554: Expected 0 arguments, but got 1.
+[09:36:20.702] shared/schema.ts(242,35): error TS2554: Expected 0-1 arguments, but got 2.
+[09:36:20.703] shared/schema.ts(242,64): error TS2345: Argument of type 'boolean' is not assignable to parameter of type 'number | SQL<unknown>'.
+[09:36:20.703] shared/schema.ts(243,41): error TS2554: Expected 0-1 arguments, but got 2.
+[09:36:20.703] shared/schema.ts(243,70): error TS2345: Argument of type 'boolean' is not assignable to parameter of type 'number | SQL<unknown>'.
+[09:36:20.703] shared/schema.ts(245,28): error TS2353: Object literal may only specify known properties, and 'mode' does not exist in type 'PgTextConfig<readonly [string, ...string[]] | [string, ...string[]]>'.
+[09:36:20.703] shared/schema.ts(246,34): error TS2353: Object literal may only specify known properties, and 'mode' does not exist in type 'PgTextConfig<readonly [string, ...string[]] | [string, ...string[]]>'.
+[09:36:20.703] shared/schema.ts(247,52): error TS2353: Object literal may only specify known properties, and 'mode' does not exist in type 'PgTextConfig<readonly [string, ...string[]] | [string, ...string[]]>'.
+[09:36:20.703] shared/schema.ts(254,32): error TS2554: Expected 0 arguments, but got 1.
+[09:36:20.703] shared/schema.ts(257,48): error TS2353: Object literal may only specify known properties, and 'mode' does not exist in type 'PgTextConfig<readonly [string, ...string[]] | [string, ...string[]]>'.
+[09:36:20.703] shared/schema.ts(266,32): error TS2554: Expected 0 arguments, but got 1.
+[09:36:20.703] shared/schema.ts(275,38): error TS2353: Object literal may only specify known properties, and 'mode' does not exist in type 'PgTextConfig<readonly [string, ...string[]] | [string, ...string[]]>'.
+[09:36:20.703] shared/schema.ts(551,32): error TS2554: Expected 0 arguments, but got 1.
+[09:36:20.703] shared/schema.ts(557,35): error TS2554: Expected 0-1 arguments, but got 2.
+[09:36:20.703] shared/schema.ts(557,64): error TS2345: Argument of type 'boolean' is not assignable to parameter of type 'number | SQL<unknown>'.
+[09:36:20.703] shared/schema.ts(563,32): error TS2554: Expected 0 arguments, but got 1.
+[09:36:20.703] shared/schema.ts(581,39): error TS2554: Expected 0-1 arguments, but got 2.
+[09:36:20.703] shared/schema.ts(581,68): error TS2345: Argument of type 'boolean' is not assignable to parameter of type 'number | SQL<unknown>'.
+[09:36:20.703] shared/schema.ts(582,39): error TS2554: Expected 0-1 arguments, but got 2.
+[09:36:20.703] shared/schema.ts(582,68): error TS2345: Argument of type 'boolean' is not assignable to parameter of type 'number | SQL<unknown>'.
+[09:36:20.703] shared/schema.ts(583,45): error TS2554: Expected 0-1 arguments, but got 2.
+[09:36:20.704] shared/schema.ts(583,74): error TS2345: Argument of type 'boolean' is not assignable to parameter of type 'number | SQL<unknown>'.
+[09:36:20.704] shared/schema.ts(609,32): error TS2554: Expected 0 arguments, but got 1.
+[09:36:20.705] shared/schema.ts(618,39): error TS2554: Expected 0-1 arguments, but got 2.
+[09:36:20.705] shared/schema.ts(618,68): error TS2345: Argument of type 'boolean' is not assignable to parameter of type 'number | SQL<unknown>'.
+[09:36:20.705] shared/schema.ts(624,32): error TS2554: Expected 0 arguments, but got 1.
+[09:36:20.705] shared/schema.ts(641,57): error TS2554: Expected 0-1 arguments, but got 2.
+[09:36:20.705] shared/schema.ts(641,86): error TS2345: Argument of type 'boolean' is not assignable to parameter of type 'number | SQL<unknown>'.
+[09:36:20.705] shared/schema.ts(663,32): error TS2554: Expected 0 arguments, but got 1.
+[09:36:20.705] shared/schema.ts(697,32): error TS2554: Expected 0 arguments, but got 1.
+[09:36:20.705] shared/schema.ts(710,53): error TS2554: Expected 0-1 arguments, but got 2.
+[09:36:20.705] shared/schema.ts(710,82): error TS2345: Argument of type 'boolean' is not assignable to parameter of type 'number | SQL<unknown>'.
+[09:36:20.705] shared/schema.ts(721,32): error TS2554: Expected 0 arguments, but got 1.
+[09:36:20.705] shared/schema.ts(738,39): error TS2554: Expected 0-1 arguments, but got 2.
+[09:36:20.705] shared/schema.ts(738,68): error TS2345: Argument of type 'boolean' is not assignable to parameter of type 'number | SQL<unknown>'.
+[09:36:20.705] shared/schema.ts(752,32): error TS2554: Expected 0 arguments, but got 1.
+[09:36:20.705] shared/schema.ts(792,32): error TS2554: Expected 0 arguments, but got 1.
+[09:36:20.705] shared/schema.ts(817,32): error TS2554: Expected 0 arguments, but got 1.
+[09:36:20.705] shared/schema.ts(840,39): error TS2554: Expected 0-1 arguments, but got 2.
+[09:36:20.706] shared/schema.ts(840,68): error TS2345: Argument of type 'boolean' is not assignable to parameter of type 'number | SQL<unknown>'.
+[09:36:20.706] 
+[09:36:21.015] shared/services-schema.ts(14,32): error TS2554: Expected 0 arguments, but got 1.
+[09:36:21.016] shared/services-schema.ts(34,32): error TS2554: Expected 0 arguments, but got 1.
+[09:36:21.016] shared/services-schema.ts(52,32): error TS2554: Expected 0 arguments, but got 1.
+[09:36:21.016] 
+[09:36:30.235] Build Completed in /vercel/output [1m]
+[09:36:30.621] Deploying outputs...
+[09:36:39.186] Deployment completed
+[09:36:39.985] Creating build cache...
+[09:36:56.217] Created build cache: 16.230s
+[09:36:56.217] Uploading build cache [119.55 MB]
+[09:36:58.447] Build cache uploaded: 2.231s
