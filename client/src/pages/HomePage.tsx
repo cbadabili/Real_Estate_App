@@ -136,6 +136,12 @@ const HomePage = () => {
     return () => clearInterval(interval);
   }, [agencies.length]);
 
+  const handleAISearch = (query: string) => {
+    if (query.trim()) {
+      window.location.href = `/properties?search=${encodeURIComponent(query)}`;
+    }
+  };
+
   return (
     <motion.div
       variants={containerVariants}
@@ -320,23 +326,14 @@ const HomePage = () => {
       </section>
 
       {/* Featured Properties Section */}
-      <section className="py-16 bg-white">
+      <section className="py-12 md:py-16 bg-gray-50 mt-8 md:mt-0">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div variants={containerVariants} className="flex justify-between items-center mb-12">
-            <div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-4">Featured Properties</h2>
-              <p className="text-gray-600">
-                Discover premium properties handpicked by our experts
-              </p>
-            </div>
-            <Link
-              to="/properties"
-              className="flex items-center text-beedab-blue hover:text-beedab-darkblue font-medium"
-            >
-              View All Properties
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Link>
-          </motion.div>
+          <div className="text-center mb-8 md:mb-12">
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">Featured Properties</h2>
+            <p className="text-base md:text-lg text-gray-600 max-w-2xl mx-auto">
+              Discover hand-picked properties from across Botswana
+            </p>
+          </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
@@ -441,7 +438,7 @@ const HomePage = () => {
                   icon: Users,
                   title: 'REAC Agent Network',
                   description: 'Connect with certified REAC agents across Botswana and access professional real estate services',
-                  link: '/professional-support'
+                  link: '/agent-network'
                 },
                 {
                   icon: Building2,
