@@ -58,12 +58,12 @@ const Navbar = () => {
           <div className="flex items-center flex-shrink-0 min-w-0">
             <Link to="/" className="flex items-center space-x-2">
               <img
-                src="/favicon.png"
+                src="/logo.png"
                 alt="beedab Real Estate Platform"
                 className="h-8 w-auto sm:h-9 md:h-10 lg:h-12 xl:h-13 flex-shrink-0"
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;
-                  target.src = "/favicon.png";
+                  target.src = "/logo.png";
                   target.onerror = () => {
                     target.style.display = 'none';
                     target.nextElementSibling?.classList.remove('hidden');
