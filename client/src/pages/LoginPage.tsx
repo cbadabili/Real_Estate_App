@@ -127,7 +127,7 @@ const LoginPage = () => {
               <div className="flex items-center justify-center mb-4">
                 <h1 className="text-2xl font-bold text-neutral-900">
                   {isLogin ? 'Welcome Back' : (
-                    <div className="flex items-center">
+                    <div className="flex items-end">
                       Join <img src="/logo.png" alt="BeeDaB" className="h-10 w-auto ml-2" />
                     </div>
                   )}
