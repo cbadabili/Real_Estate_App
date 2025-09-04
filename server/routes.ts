@@ -7,6 +7,7 @@ import marketplaceRoutes from "./marketplace-routes";
 import { createRentalRoutes } from "./rental-routes";
 import { db } from "./db";
 import { parseNaturalLanguageSearch } from './ai-search';
+import realEstateIntelSearchRoutes from './real-estate-intel-search';
 import { 
   authenticate, 
   optionalAuthenticate, 
@@ -1224,6 +1225,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Rental routes
   const rentalRouter = createRentalRoutes();
   app.use("/api/rentals", rentalRouter);
+
+  // Enhanced search routes (RealEstateIntel integration)
+  app.use(realEstateIntelSearchRoutes);
 
   // Services routes
   // Assuming servicesRoutes is defined elsewhere

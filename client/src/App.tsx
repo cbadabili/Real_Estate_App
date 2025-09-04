@@ -73,6 +73,7 @@ import TenantSupportPage from './pages/services/TenantSupportPage';
 //importing missing pages
 import PropertyValuationPage from './pages/PropertyValuationPage';
 import ProfessionalSupportPage from './pages/ProfessionalSupportPage';
+import EnhancedSearchPage from './pages/EnhancedSearchPage';
 import MarketTrendsPage from './pages/MarketTrendsPage';
 import NeighborhoodAnalyticsPage from './pages/NeighborhoodAnalyticsPage';
 import InvestmentAnalyticsPage from './pages/InvestmentAnalyticsPage';
@@ -160,6 +161,7 @@ function App() {
             <Route path="/communication" element={<CommunicationPage />} />
             <Route path="/agent-network" element={<AgentNetworkPage />} />
             <Route path="/map-search" element={<MapSearchPage />} />
+            <Route path="/enhanced-search" element={<EnhancedSearchPage />} />
             <Route path="/services" element={<ServicesPage />} />
             <Route path="/marketplace" element={<MarketplacePage />} />
             <Route path="/marketplace/:segment" element={<MarketplacePage />} />
