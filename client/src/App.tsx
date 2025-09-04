@@ -159,6 +159,10 @@ function App() {
             <Route path="/market-insights" element={<MarketInsightsHub />} />
             <Route path="/secure-transactions" element={<SecureTransactionsPage />} />
             <Route path="/communication" element={<CommunicationPage />} />
+            <Route path="/messaging" element={<CommunicationPage />} />
+            <Route path="/video-calls" element={<CommunicationPage />} />
+            <Route path="/document-sharing" element={<CommunicationPage />} />
+            <Route path="/group-chat" element={<CommunicationPage />} />
             <Route path="/agent-network" element={<AgentNetworkPage />} />
             <Route path="/map-search" element={<MapSearchPage />} />
             <Route path="/enhanced-search" element={<EnhancedSearchPage />} />
