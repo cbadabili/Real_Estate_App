@@ -14,7 +14,7 @@ const parseNumber = (value: any): number | null => {
 };
 
 // Main search endpoint that prioritizes local properties, then external
-router.get('/api/search/enhanced', async (req, res) => {
+router.get('/search/enhanced', async (req, res) => {
   try {
     // Parse search query from request
     const searchQuery: SearchQuery = {
