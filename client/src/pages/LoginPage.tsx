@@ -125,7 +125,7 @@ const LoginPage = () => {
             {/* Header */}
             <div className="text-center mb-8">
               <div className="flex items-center justify-center mb-4">
-                <Building className="h-8 w-8 text-beedab-blue mr-3" />
+                <img src="/logo.png" alt="BeeDaB" className="h-8 w-8 mr-3" />
                 <h1 className="text-2xl font-bold text-neutral-900">
                   {isLogin ? 'Welcome Back' : 'Join BeeDaB'}
                 </h1>
