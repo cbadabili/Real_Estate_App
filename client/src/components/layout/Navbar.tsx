@@ -61,12 +61,17 @@ const Navbar = () => {
                 src="/logo.png"
                 alt="beedab Real Estate Platform"
                 className="h-8 w-auto sm:h-9 md:h-10 lg:h-12 xl:h-13 flex-shrink-0"
+                style={{ display: 'block' }}
                 onError={(e) => {
-                  console.log('Logo failed to load, checking fallback');
+                  console.error('Logo failed to load from /logo.png');
                   const target = e.target as HTMLImageElement;
+                  // Try fallback to text
                   target.style.display = 'none';
+                  const fallbackText = document.createElement('span');
+                  fallbackText.textContent = 'beedab';
+                  fallbackText.className = 'text-2xl font-bold text-beedab-blue';
+                  target.parentNode?.appendChild(fallbackText);
                 }}
-                onLoad={() => console.log('Logo loaded successfully')}
               />
             </Link>
           </div>
