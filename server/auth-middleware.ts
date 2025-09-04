@@ -5,8 +5,13 @@ import { storage } from './storage';
 // Extend Express Request interface to include user
 declare global {
   namespace Express {
-    interface Request {
-      user?: User;
+    interface User {
+      id: number;
+      email: string;
+      name?: string;
+      role?: string;
+      userType?: string;
+      permissions?: string[];
     }
   }
 }

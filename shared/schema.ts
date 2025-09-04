@@ -298,13 +298,13 @@ export const usersRelations = relations(users, ({ many }) => ({
 }));
 
 export const propertiesRelations = relations(properties, ({ one, many }) => ({
-  owner: one(users, { 
-    fields: [properties.ownerId], 
+  owner: one(users, {
+    fields: [properties.ownerId],
     references: [users.id],
     relationName: "propertyOwner"
   }),
-  agent: one(users, { 
-    fields: [properties.agentId], 
+  agent: one(users, {
+    fields: [properties.agentId],
     references: [users.id],
     relationName: "propertyAgent"
   }),
@@ -495,14 +495,14 @@ export type InsertAdminAuditLog = z.infer<typeof insertAdminAuditLogSchema>;
 // User roles and permissions
 export enum UserRole {
   USER = "user",
-  MODERATOR = "moderator", 
+  MODERATOR = "moderator",
   ADMIN = "admin",
   SUPER_ADMIN = "super_admin"
 }
 
 export enum UserType {
   BUYER = "buyer",
-  SELLER = "seller", 
+  SELLER = "seller",
   AGENT = "agent",
   FSBO = "fsbo",
   ADMIN = "admin"
@@ -578,9 +578,9 @@ export const marketplace_providers = sqliteTable('marketplace_providers', {
   years_experience: integer('years_experience'),
 
   // Verification & Certifications
-  is_verified: integer('is_verified', { mode: 'boolean' }).default(false),
-  is_featured: integer('is_featured', { mode: 'boolean' }).default(false),
-  reac_certified: integer('reac_certified', { mode: 'boolean' }).default(false),
+  verified: boolean('verified').default(false),
+  featured: boolean('featured').default(false),
+  reac_certified: boolean('reac_certified').default(false),
   company_registration: text('company_registration'),
   tax_clearance: text('tax_clearance'),
   insurance_details: text('insurance_details'),
