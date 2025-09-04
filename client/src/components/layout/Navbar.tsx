@@ -59,7 +59,7 @@ const Navbar = () => {
             <Link to="/" className="flex items-center space-x-2">
               <img
                 src="/beedab-logo.png"
-                alt="BeeDab Real Estate Platform"
+                alt="beedab Real Estate Platform"
                 className="h-8 w-auto sm:h-9 md:h-10 lg:h-12 xl:h-13 flex-shrink-0"
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;
@@ -70,7 +70,7 @@ const Navbar = () => {
                   };
                 }}
               />
-              <span className="hidden text-2xl font-bold text-beedab-blue">BeeDab</span>
+              <span className="hidden text-2xl font-bold text-beedab-blue">beedab</span>
             </Link>
           </div>
 
@@ -858,7 +858,7 @@ const Navbar = () => {
                         : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100'
                     }`}
                   >
-                    <Icon className="h-5 w-5" />
+                    <Icon className="h-5 w-5 text-beedab-blue" />
                     <span>{item.name}</span>
                   </Link>
                 );
