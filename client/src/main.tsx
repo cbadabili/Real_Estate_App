@@ -7,20 +7,6 @@ import { queryClient } from './lib/queryClient';
 import App from './App.tsx';
 import './index.css';
 
-// Handle unhandled promise rejections (often from browser extensions)
-window.addEventListener('unhandledrejection', (event) => {
-  // Suppress extension-related errors
-  if (event.reason?.message?.includes('message channel closed') ||
-      event.reason?.message?.includes('listener indicated an asynchronous response')) {
-    event.preventDefault();
-    console.debug('Suppressed extension-related error:', event.reason);
-    return;
-  }
-  
-  // Log other unhandled rejections for debugging
-  console.error('Unhandled promise rejection:', event.reason);
-});
-
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter>
