@@ -65,7 +65,6 @@ const LoginPage = () => {
             firstName: data.firstName,
             lastName: data.lastName,
             email: data.email,
-            username: data.username,
             password: data.password,
             phone: data.phone,
             dateOfBirth: data.dateOfBirth,
@@ -198,26 +197,6 @@ const LoginPage = () => {
                       )}
                     </div>
                   </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-neutral-700 mb-1">
-                      Username *
-                    </label>
-                    <div className="relative">
-                      <User className="absolute left-3 top-2.5 h-5 w-5 text-neutral-400" />
-                      <input
-                        type="text"
-                        {...register('username', { required: 'Username is required' })}
-                        className="w-full pl-10 pr-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
-                        placeholder="johndoe"
-                      />
-                    </div>
-                    {errors.username && (
-                      <p className="text-red-600 text-sm mt-1">{errors.username.message as string}</p>
-                    )}
-                  </div>
-
-                  
 
                   <div>
                     <label className="block text-sm font-medium text-neutral-700 mb-1">
