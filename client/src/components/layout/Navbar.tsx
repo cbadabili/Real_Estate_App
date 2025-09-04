@@ -61,6 +61,12 @@ const Navbar = () => {
                 src="/logo.png"
                 alt="beedab Real Estate Platform"
                 className="h-8 w-auto sm:h-9 md:h-10 lg:h-12 xl:h-13 flex-shrink-0"
+                onError={(e) => {
+                  console.log('Logo failed to load, checking fallback');
+                  const target = e.target as HTMLImageElement;
+                  target.style.display = 'none';
+                }}
+                onLoad={() => console.log('Logo loaded successfully')}
               />
             </Link>
           </div>
