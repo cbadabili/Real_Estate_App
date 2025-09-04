@@ -87,9 +87,9 @@ const Navbar = () => {
               onMouseLeave={() => setBuyDropdownOpen(false)}
             >
               <button className="flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100 transition-colors">
-                <Building2 className="h-4 w-4" />
+                <Building2 className="h-4 w-4 text-beedab-blue" />
                 <span>Buy</span>
-                <ChevronDown className="h-3 w-3" />
+                <ChevronDown className="h-3 w-3 text-beedab-blue" />
               </button>
 
               <AnimatePresence>
@@ -329,7 +329,7 @@ const Navbar = () => {
                 <button className="flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100 transition-colors">
                   <span className="text-beedab-blue font-bold text-xs">BWP</span>
                   <span>Sell</span>
-                  <ChevronDown className="h-3 w-3" />
+                  <ChevronDown className="h-3 w-3 text-beedab-blue" />
                 </button>
 
               <AnimatePresence>
@@ -509,9 +509,9 @@ const Navbar = () => {
               onMouseLeave={() => setRentDropdownOpen(false)}
             >
               <button className="flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100 transition-colors">
-                <Home className="h-4 w-4" />
+                <Home className="h-4 w-4 text-beedab-blue" />
                 <span>Rent</span>
-                <ChevronDown className="h-3 w-3" />
+                <ChevronDown className="h-3 w-3 text-beedab-blue" />
               </button>
 
               <AnimatePresence>
@@ -592,9 +592,9 @@ const Navbar = () => {
               onMouseLeave={() => setServicesDropdownOpen(false)}
             >
               <button className="flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100 transition-colors">
-                <Wrench className="h-4 w-4" />
+                <Wrench className="h-4 w-4 text-beedab-blue" />
                 <span>Services</span>
-                <ChevronDown className="h-3 w-3" />
+                <ChevronDown className="h-3 w-3 text-beedab-blue" />
               </button>
 
               <AnimatePresence>
@@ -693,7 +693,7 @@ const Navbar = () => {
                       : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100'
                   }`}
                 >
-                  <Icon className="h-4 w-4" />
+                  <Icon className="h-4 w-4 text-beedab-blue" />
                   <span>{item.name}</span>
                 </Link>
               );
