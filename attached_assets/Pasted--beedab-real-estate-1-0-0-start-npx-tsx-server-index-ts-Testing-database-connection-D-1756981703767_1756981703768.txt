@@ -1,0 +1,54 @@
+
+> beedab-real-estate@1.0.0 start
+> npx tsx server/index.ts
+
+Testing database connection...
+✅ Database connection successful
+🔄 Running database migrations...
+✅ No pending migrations
+Initializing database...
+Testing PostgreSQL database connection...
+✅ Database connection successful
+Seeding database...
+⚠️ Seeding temporarily disabled for testing
+✅ Database initialization completed
+9:56:02 AM [express] serving on port 5000
+Browserslist: browsers data (caniuse-lite) is 11 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+Fetching properties...
+Retrieved 0 properties from database
+Properties fetched: 0
+9:56:14 AM [express] GET /api/properties 304 in 25ms :: []
+Fetching properties...
+Retrieved 0 properties from database
+Properties fetched: 0
+9:56:25 AM [express] GET /api/properties 304 in 12ms :: []
+Fetching properties...
+Retrieved 0 properties from database
+Properties fetched: 0
+10:21:19 AM [express] GET /api/properties 304 in 34ms :: []
+Fetching properties...
+Retrieved 0 properties from database
+Properties fetched: 0
+10:21:59 AM [express] GET /api/properties 304 in 10ms :: []
+10:22:25 AM [express] GET /api/services/providers 200 in 48ms :: [{"id":2,"companyName":"Photo Pro Se…
+10:22:25 AM [express] GET /api/services/providers 304 in 2ms :: [{"id":2,"companyName":"Photo Pro Ser…
+Fetching properties...
+Retrieved 0 properties from database
+Properties fetched: 0
+10:22:50 AM [express] GET /api/properties 200 in 10ms :: []
+Fetching properties...
+Retrieved 0 properties from database
+Properties fetched: 0
+10:22:50 AM [express] GET /api/properties 304 in 2ms :: []
+Fetching properties...
+Retrieved 0 properties from database
+Properties fetched: 0
+10:22:54 AM [express] GET /api/properties 200 in 2ms :: []
+Login attempt for email: cbadabili@gmail.com
+User not found for email: cbadabili@gmail.com
+10:27:15 AM [express] POST /api/users/login 401 in 20ms :: {"message":"Invalid credentials"}
+Login attempt for email: cbadabili@gmail.com
+User not found for email: cbadabili@gmail.com
+10:27:44 AM [express] POST /api/users/login 401 in 10ms :: {"message":"Invalid credentials"}
