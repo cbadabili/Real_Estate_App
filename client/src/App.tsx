@@ -207,6 +207,7 @@ function App() {
               <Route path="/bid/:id" element={<BidPage />} />
             <Route path="/documents" element={<DocumentsPage />} />
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<LoginPage />} />
             <Route path="/agent-profile/:id" element={<AgentProfilePage />} />
             <Route path="/contact-agent/:id" element={<ContactAgentPage />} />
             <Route 
