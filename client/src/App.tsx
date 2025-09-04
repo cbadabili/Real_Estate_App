@@ -109,12 +109,33 @@ function App() {
                 <Navbar />
                 <Routes>
             <Route path="/" element={<HomePage />} />
-            <Route path="/dashboard" element={<DashboardPage />} />
+            <Route 
+              path="/dashboard" 
+              element={
+                <ProtectedRoute>
+                  <DashboardPage />
+                </ProtectedRoute>
+              } 
+            />
             {/* Properties Routes */}
           <Route path="/properties" element={<PropertiesPage />} />
           <Route path="/properties/:id" element={<PropertyDetailsPage />} />
-          <Route path="/create-listing" element={<CreateListingPage />} />
-          <Route path="/my-properties" element={<MyPropertiesPage />} />
+          <Route 
+            path="/create-listing" 
+            element={
+              <ProtectedRoute>
+                <CreateListingPage />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/my-properties" 
+            element={
+              <ProtectedRoute>
+                <MyPropertiesPage />
+              </ProtectedRoute>
+            } 
+          />
 
           {/* Rent Routes */}
           <Route path="/rent" element={<RentPage />} />

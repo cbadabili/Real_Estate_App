@@ -152,11 +152,18 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
 
     const token = authHeader.substring(7);
 
-    // In a real application, you would verify JWT token here
-    // For now, we'll simulate by extracting user ID from token
-    const userId = parseInt(token);
+    // Extract user ID from token
+    let userId: number;
+    if (token.startsWith('user_')) {
+      // Handle legacy token format
+      userId = parseInt(token.split('_')[1]);
+    } else {
+      // Handle simple numeric token
+      userId = parseInt(token);
+    }
+
     if (isNaN(userId)) {
-      return res.status(401).json({ error: 'Invalid token' });
+      return res.status(401).json({ error: 'Invalid token format' });
     }
 
     const user = await storage.getUser(userId);

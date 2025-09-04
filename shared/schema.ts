@@ -43,7 +43,7 @@ export const users = sqliteTable("users", {
   phone: text("phone"),
   userType: text("user_type").notNull(), // 'buyer', 'seller', 'agent', 'fsbo', 'admin'
   role: text("role").notNull().default("user"), // 'user', 'moderator', 'admin', 'super_admin'
-  permissions: text("permissions"), // JSON string of permission array
+  permissions: text("permissions").array().default([]), // JSON string of permission array
   avatar: text("avatar"),
   bio: text("bio"),
   isVerified: integer("is_verified", { mode: "boolean" }).default(false),

@@ -84,7 +84,8 @@ const LoginPage = () => {
           toast.success('Registration successful! Please login.');
           setIsLogin(true);
         } else {
-          toast.error(result.message || 'Registration failed. Please try again.');
+          const errorMessage = result.message || 'Registration failed. Please try again.';
+          toast.error(errorMessage);
         }
       }
     } catch (error) {

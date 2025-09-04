@@ -125,9 +125,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/users/:id", async (req, res) => {
+  app.get("/api/users/:id", optionalAuthenticate, async (req, res) => {
     try {
       const userId = parseInt(req.params.id);
+      
+      // Check if user is requesting their own data or is an admin
+      if (req.user && (req.user.id !== userId && !AuthService.isAdmin(req.user))) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+      
       const user = await storage.getUser(userId);
 
       if (!user) {
@@ -139,6 +145,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Get user error:", error);
       res.status(500).json({ message: "Failed to fetch user" });
+    }
+  });
+
+  // Add auth verification endpoint
+  app.get("/api/auth/user", authenticate, async (req, res) => {
+    try {
+      const { password, ...userResponse } = req.user!;
+      res.json(userResponse);
+    } catch (error) {
+      console.error("Auth verification error:", error);
+      res.status(500).json({ message: "Authentication verification failed" });
     }
   });
 

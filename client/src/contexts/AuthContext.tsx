@@ -74,7 +74,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
 
       try {
-        const userData = await apiRequest('/api/auth/user', {
+        // Extract user ID from token
+        const userId = authToken.split('_')[1];
+        if (!userId) {
+          throw new Error('Invalid token format');
+        }
+
+        const userData = await apiRequest(`/api/users/${userId}`, {
           headers: {
             Authorization: `Bearer ${authToken}`
           }
@@ -109,10 +115,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         })
       });
 
-      // The server returns user data directly, not wrapped in a token structure
+      // Set user data
       setUser(response);
-      // For now, we'll create a simple token from user ID
-      const token = `user_${response.id}_${Date.now()}`;
+      
+      // Create a token that the middleware can understand
+      const token = response.id.toString();
       setAuthToken(token);
       if (typeof window !== 'undefined') {
         localStorage.setItem('authToken', token);
@@ -136,15 +143,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const register = async (userData: RegisterData) => {
     setIsLoading(true);
     try {
-      const response = await apiRequest('/api/users/register', {
+      await apiRequest('/api/users/register', {
         method: 'POST',
         body: JSON.stringify(userData)
       });
 
-      // Auto-login after registration
-      if (response.user) {
-        await login(userData.email, userData.password);
-      }
+      // Registration successful, user needs to login manually
+      // (This is more secure than auto-login)
     } catch (error) {
       console.error('Registration failed:', error);
       throw error;
