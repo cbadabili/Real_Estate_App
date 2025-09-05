@@ -45,6 +45,7 @@ import RegisterProviderPage from './pages/marketplace/RegisterProviderPage';
 import DocumentsPage from './pages/DocumentsPage';
 import LoginPage from './pages/LoginPage';
 import AdminPage from './pages/AdminPage';
+import AdminTestPage from './pages/AdminTestPage';
 import { AuthProvider } from './contexts/AuthContext';
 import { PropertyProvider } from './contexts/PropertyContext';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
@@ -166,84 +167,13 @@ function App() {
             <Route path="/agent-network" element={<AgentNetworkPage />} />
             <Route path="/map-search" element={<MapSearchPage />} />
             <Route path="/enhanced-search" element={<EnhancedSearchPage />} />
-            <Route path="/services" element={<ServicesPage />} />
-            <Route path="/marketplace" element={<MarketplacePage />} />
-            <Route path="/marketplace/:segment" element={<MarketplacePage />} />
-          <Route path="/services/legal" element={<LegalServicesPage />} />
-          <Route path="/services/legal-documents" element={<LegalDocumentTemplatesPage />} />
-          <Route path="/services/property-management" element={<PropertyManagementPage />} />
-          <Route path="/services/tenant-support" element={<TenantSupportPage />} />
-          <Route path="/services/financing" element={<FinancingPage />} />
-          <Route path="/services/property-valuation" element={<PropertyValuationPage />} />
-          <Route path="/services/transaction-management" element={<TransactionManagementPage />} />
-          <Route path="/services/professional-support" element={<ProfessionalSupportPage />} />
-
-          {/* Market Intelligence Routes - Unified under main platform */}
-          <Route path="/property-valuation" element={<PropertyValuationPage />} />
-          <Route path="/market-trends" element={<MarketTrendsPage />} />
-          <Route path="/neighborhood-analytics" element={<NeighborhoodAnalyticsPage />} />
-          <Route path="/investment-analytics" element={<InvestmentAnalyticsPage />} />
-
-          {/* Consolidated Hub Routes */}
-          <Route path="/legal-transactions" element={<LegalTransactionsHub />} />
-          <Route path="/service-directory" element={<ServiceProviderDirectory />} />
-
-          {/* Additional Service Routes */}
-          <Route path="/legal-document-templates" element={<LegalDocumentTemplatesPage />} />
-
-          {/* Marketplace Routes */}
-          <Route path="/marketplace" element={<MarketplacePage />} />
-          <Route path="/marketplace/register" element={<RegisterProviderPage />} />
-          <Route path="/marketplace/:segment" element={<MarketplacePage />} />
-          <Route path="/marketplace/professionals" element={<ProfessionalsPage />} />
-          <Route path="/marketplace/suppliers" element={<SuppliersPage />} />
-          <Route path="/marketplace/artisans" element={<ArtisansPage />} />
-          <Route path="/marketplace/training-providers" element={<TrainingProvidersPage />} />
-          <Route path="/buyer-journey/planning" element={<PlanningPage />} />
-          <Route path="/buyer-journey/searching" element={<SearchingPage />} />
-          <Route path="/buyer-journey/viewing" element={<ViewingPage />} />
-          <Route path="/buyer-journey/offers" element={<OffersPage />} />
-
-          {/* Auction routes */}
-          <Route path="/auctions/:id/register" element={<BidRegistrationPage />} />
-
-          {/* Viewing routes */}
-          <Route path="/properties/:id/schedule-viewing" element={<ScheduleViewingPage />} />
-            <Route path="/auctions" element={<AuctionsPage />} />
-              <Route path="/bid/:id" element={<BidPage />} />
-            <Route path="/documents" element={<DocumentsPage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<LoginPage />} />
-            <Route path="/agent-profile/:id" element={<AgentProfilePage />} />
-            <Route path="/contact-agent/:id" element={<ContactAgentPage />} />
-            <Route 
-              path="/admin" 
-              element={
-                <ProtectedRoute requiredRoles={['admin', 'super_admin']}>
-                  <AdminPage />
-                </ProtectedRoute>
-              } 
-            />
-          <Route path="/pricing-guide" element={<PricingGuidePage />} />
-          <Route path="/manage-showings" element={<ManageShowingsPage />} />
-          <Route path="/handle-offers" element={<HandleOffersPage />} />
-              <Route path="/property-handover" element={<PropertyHandoverPage />} />
-              <Route path="/agent-registration" element={<AgentRegistrationPage />} />
-              <Route path="/rate-agent/:agentId" element={<AgentRatingPage />} />
-              <Route path="/home-value-assessment" element={<HomeValueAssessmentPage />} />
-              <Route path="/legal-requirements" element={<LegalRequirementsPage />} />
-          <Route path="/transfer-process" element={<TransferProcessPage />} />
-
-              {/* Test and admin routes */}
-
-              <Route path="/buy/map" element={<BuyMapPage />} />
-              <Route path="/admin" element={<AdminPage />} />
-            </Routes>
-              </div>
-            </PropertyProvider>
-          </AuthProvider>
-        </ToastProvider>
-      </QueryClientProvider>
+            <Route path="/admin-test" element={<AdminTestPage />} />
+          </Routes>
+        </div>
+      </div>
+    </AuthProvider>
+  </ToastProvider>
+</QueryClientProvider>
     </ErrorBoundary>
   );
 }
