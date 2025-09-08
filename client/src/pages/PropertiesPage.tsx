@@ -91,17 +91,17 @@ const PropertiesPage: React.FC = () => {
   // Handle AI search query and apply filters
   const handleSmartSearch = async (query: string) => {
     if (!query.trim()) return;
-    
+
     setSearchTerm(query);
     setIsSearching(true);
-    
+
     try {
       // First try the regular search endpoint
       const response = await fetch(`/api/search?q=${encodeURIComponent(query)}&sort=${sortBy}&limit=20`);
       if (!response.ok) throw new Error('Search failed');
 
       const data = await response.json();
-      
+
       if (data.results && data.results.length > 0) {
         setSearchResults(data.results);
       } else {
@@ -154,6 +154,11 @@ const PropertiesPage: React.FC = () => {
       }
     } else {
       // If no AI filters or results, perform a standard search
+      handleSearch(query);
+    }
+    } catch (error) {
+      console.error('AI search failed:', error);
+      // Fall back to regular search
       handleSearch(query);
     }
   };
