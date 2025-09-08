@@ -158,6 +158,7 @@ function App() {
             <Route path="/training-providers" element={<TrainingProvidersPage />} />
             <Route path="/register-provider" element={<RegisterProviderPage />} />
             <Route path="/property-management" element={<PropertyManagementPage />} />
+            <Route path="/services/property-management" element={<PropertyManagementPage />} />
             <Route path="/legal-services" element={<LegalServicesPage />} />
             <Route path="/financing" element={<FinancingPage />} />
             <Route path="/tenant-support" element={<TenantSupportPage />} />
