@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Search, MapPin, Clock, Sparkles, X, TrendingUp, Star, Filter } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
 
 interface SearchSuggestion {
   label: string;
@@ -220,16 +219,12 @@ export const SmartSearchBar: React.FC<SmartSearchBarProps> = ({
           )}
 
           {value.length > 2 && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="absolute right-10 top-1/2 transform -translate-y-1/2"
-            >
+            <div className="absolute right-10 top-1/2 transform -translate-y-1/2 transition-all duration-200">
               <div className="flex items-center space-x-1 text-purple-600">
                 <Sparkles className="h-4 w-4" />
                 <span className="text-xs font-medium">AI</span>
               </div>
-            </motion.div>
+            </div>
           )}
 
           {showFilters && onFilterClick && (
@@ -263,7 +258,10 @@ export const SmartSearchBar: React.FC<SmartSearchBarProps> = ({
               top: rect.bottom + 8,
               left: rect.left,
               width: rect.width,
-              zIndex: 2147483647, // above everything
+              zIndex: 2147483647,
+              opacity: showSuggestions ? 1 : 0,
+              transform: showSuggestions ? 'translateY(0)' : 'translateY(-10px)',
+              transition: 'all 0.2s ease-out'
             }}
             className="max-h-96 overflow-auto rounded-lg border bg-white shadow-xl"
           >
