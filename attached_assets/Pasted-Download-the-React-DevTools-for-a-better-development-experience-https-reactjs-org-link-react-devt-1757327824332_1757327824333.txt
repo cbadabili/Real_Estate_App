@@ -1,0 +1,326 @@
+Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+useProperties.ts:40  GET https://c5d9396e-4f47-41f7-84a6-838e7c0e0ed4-00-3i9qi3675up46.picard.replit.dev:5173/api/properties 500 (Internal Server Error)
+queryFn @ useProperties.ts:40
+fetchFn @ @tanstack_react-query.js?v=fcff60b9:881
+run @ @tanstack_react-query.js?v=fcff60b9:513
+start @ @tanstack_react-query.js?v=fcff60b9:555
+fetch @ @tanstack_react-query.js?v=fcff60b9:969
+executeFetch_fn @ @tanstack_react-query.js?v=fcff60b9:2279
+onSubscribe @ @tanstack_react-query.js?v=fcff60b9:1983
+subscribe @ @tanstack_react-query.js?v=fcff60b9:24
+(anonymous) @ @tanstack_react-query.js?v=fcff60b9:3146
+subscribeToStore @ chunk-WERSD76P.js?v=fcff60b9:11984
+commitHookEffectListMount @ chunk-WERSD76P.js?v=fcff60b9:16915
+commitPassiveMountOnFiber @ chunk-WERSD76P.js?v=fcff60b9:18156
+commitPassiveMountEffects_complete @ chunk-WERSD76P.js?v=fcff60b9:18129
+commitPassiveMountEffects_begin @ chunk-WERSD76P.js?v=fcff60b9:18119
+commitPassiveMountEffects @ chunk-WERSD76P.js?v=fcff60b9:18109
+flushPassiveEffectsImpl @ chunk-WERSD76P.js?v=fcff60b9:19490
+flushPassiveEffects @ chunk-WERSD76P.js?v=fcff60b9:19447
+(anonymous) @ chunk-WERSD76P.js?v=fcff60b9:19328
+workLoop @ chunk-WERSD76P.js?v=fcff60b9:197
+flushWork @ chunk-WERSD76P.js?v=fcff60b9:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=fcff60b9:384Understand this error
+useProperties.ts:40  GET https://c5d9396e-4f47-41f7-84a6-838e7c0e0ed4-00-3i9qi3675up46.picard.replit.dev:5173/api/properties 500 (Internal Server Error)
+queryFn @ useProperties.ts:40
+fetchFn @ @tanstack_react-query.js?v=fcff60b9:881
+run @ @tanstack_react-query.js?v=fcff60b9:513
+(anonymous) @ @tanstack_react-query.js?v=fcff60b9:538
+Promise.then
+(anonymous) @ @tanstack_react-query.js?v=fcff60b9:534
+Promise.catch
+run @ @tanstack_react-query.js?v=fcff60b9:517
+start @ @tanstack_react-query.js?v=fcff60b9:555
+fetch @ @tanstack_react-query.js?v=fcff60b9:969
+executeFetch_fn @ @tanstack_react-query.js?v=fcff60b9:2279
+onSubscribe @ @tanstack_react-query.js?v=fcff60b9:1983
+subscribe @ @tanstack_react-query.js?v=fcff60b9:24
+(anonymous) @ @tanstack_react-query.js?v=fcff60b9:3146
+subscribeToStore @ chunk-WERSD76P.js?v=fcff60b9:11984
+commitHookEffectListMount @ chunk-WERSD76P.js?v=fcff60b9:16915
+commitPassiveMountOnFiber @ chunk-WERSD76P.js?v=fcff60b9:18156
+commitPassiveMountEffects_complete @ chunk-WERSD76P.js?v=fcff60b9:18129
+commitPassiveMountEffects_begin @ chunk-WERSD76P.js?v=fcff60b9:18119
+commitPassiveMountEffects @ chunk-WERSD76P.js?v=fcff60b9:18109
+flushPassiveEffectsImpl @ chunk-WERSD76P.js?v=fcff60b9:19490
+flushPassiveEffects @ chunk-WERSD76P.js?v=fcff60b9:19447
+(anonymous) @ chunk-WERSD76P.js?v=fcff60b9:19328
+workLoop @ chunk-WERSD76P.js?v=fcff60b9:197
+flushWork @ chunk-WERSD76P.js?v=fcff60b9:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=fcff60b9:384Understand this error
+useProperties.ts:40  GET https://c5d9396e-4f47-41f7-84a6-838e7c0e0ed4-00-3i9qi3675up46.picard.replit.dev:5173/api/properties 500 (Internal Server Error)
+queryFn @ useProperties.ts:40
+fetchFn @ @tanstack_react-query.js?v=fcff60b9:881
+run @ @tanstack_react-query.js?v=fcff60b9:513
+(anonymous) @ @tanstack_react-query.js?v=fcff60b9:538
+Promise.then
+(anonymous) @ @tanstack_react-query.js?v=fcff60b9:534
+Promise.catch
+run @ @tanstack_react-query.js?v=fcff60b9:517
+(anonymous) @ @tanstack_react-query.js?v=fcff60b9:538
+Promise.then
+(anonymous) @ @tanstack_react-query.js?v=fcff60b9:534
+Promise.catch
+run @ @tanstack_react-query.js?v=fcff60b9:517
+start @ @tanstack_react-query.js?v=fcff60b9:555
+fetch @ @tanstack_react-query.js?v=fcff60b9:969
+executeFetch_fn @ @tanstack_react-query.js?v=fcff60b9:2279
+onSubscribe @ @tanstack_react-query.js?v=fcff60b9:1983
+subscribe @ @tanstack_react-query.js?v=fcff60b9:24
+(anonymous) @ @tanstack_react-query.js?v=fcff60b9:3146
+subscribeToStore @ chunk-WERSD76P.js?v=fcff60b9:11984
+commitHookEffectListMount @ chunk-WERSD76P.js?v=fcff60b9:16915
+commitPassiveMountOnFiber @ chunk-WERSD76P.js?v=fcff60b9:18156
+commitPassiveMountEffects_complete @ chunk-WERSD76P.js?v=fcff60b9:18129
+commitPassiveMountEffects_begin @ chunk-WERSD76P.js?v=fcff60b9:18119
+commitPassiveMountEffects @ chunk-WERSD76P.js?v=fcff60b9:18109
+flushPassiveEffectsImpl @ chunk-WERSD76P.js?v=fcff60b9:19490
+flushPassiveEffects @ chunk-WERSD76P.js?v=fcff60b9:19447
+(anonymous) @ chunk-WERSD76P.js?v=fcff60b9:19328
+workLoop @ chunk-WERSD76P.js?v=fcff60b9:197
+flushWork @ chunk-WERSD76P.js?v=fcff60b9:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=fcff60b9:384Understand this error
+chunk-WERSD76P.js?v=fcff60b9:16670 Uncaught TypeError: Failed to construct 'HTMLDivElement': Please use the 'new' operator, this DOM object constructor cannot be called as a function.
+    at framer-motion.js?v=fcff60b9:820:11
+    at commitAttachRef (chunk-WERSD76P.js?v=fcff60b9:17279:28)
+    at commitLayoutEffectOnFiber (chunk-WERSD76P.js?v=fcff60b9:17168:17)
+    at commitLayoutMountEffects_complete (chunk-WERSD76P.js?v=fcff60b9:17980:17)
+    at commitLayoutEffects_begin (chunk-WERSD76P.js?v=fcff60b9:17969:15)
+    at commitLayoutEffects (chunk-WERSD76P.js?v=fcff60b9:17920:11)
+    at commitRootImpl (chunk-WERSD76P.js?v=fcff60b9:19353:13)
+    at commitRoot (chunk-WERSD76P.js?v=fcff60b9:19277:13)
+    at finishConcurrentRender (chunk-WERSD76P.js?v=fcff60b9:18805:15)
+    at performConcurrentWorkOnRoot (chunk-WERSD76P.js?v=fcff60b9:18718:15)
+(anonymous) @ framer-motion.js?v=fcff60b9:820
+commitAttachRef @ chunk-WERSD76P.js?v=fcff60b9:17279
+commitLayoutEffectOnFiber @ chunk-WERSD76P.js?v=fcff60b9:17168
+commitLayoutMountEffects_complete @ chunk-WERSD76P.js?v=fcff60b9:17980
+commitLayoutEffects_begin @ chunk-WERSD76P.js?v=fcff60b9:17969
+commitLayoutEffects @ chunk-WERSD76P.js?v=fcff60b9:17920
+commitRootImpl @ chunk-WERSD76P.js?v=fcff60b9:19353
+commitRoot @ chunk-WERSD76P.js?v=fcff60b9:19277
+finishConcurrentRender @ chunk-WERSD76P.js?v=fcff60b9:18805
+performConcurrentWorkOnRoot @ chunk-WERSD76P.js?v=fcff60b9:18718
+workLoop @ chunk-WERSD76P.js?v=fcff60b9:197
+flushWork @ chunk-WERSD76P.js?v=fcff60b9:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=fcff60b9:384Understand this error
+chunk-WERSD76P.js?v=fcff60b9:16670 Uncaught TypeError: Failed to construct 'HTMLDivElement': Please use the 'new' operator, this DOM object constructor cannot be called as a function.
+    at framer-motion.js?v=fcff60b9:820:11
+    at safelyDetachRef (chunk-WERSD76P.js?v=fcff60b9:16726:30)
+    at commitDeletionEffectsOnFiber (chunk-WERSD76P.js?v=fcff60b9:17495:17)
+    at recursivelyTraverseDeletionEffects (chunk-WERSD76P.js?v=fcff60b9:17486:13)
+    at commitDeletionEffectsOnFiber (chunk-WERSD76P.js?v=fcff60b9:17610:15)
+    at recursivelyTraverseDeletionEffects (chunk-WERSD76P.js?v=fcff60b9:17486:13)
+    at commitDeletionEffectsOnFiber (chunk-WERSD76P.js?v=fcff60b9:17577:15)
+    at recursivelyTraverseDeletionEffects (chunk-WERSD76P.js?v=fcff60b9:17486:13)
+    at commitDeletionEffectsOnFiber (chunk-WERSD76P.js?v=fcff60b9:17534:17)
+    at recursivelyTraverseDeletionEffects (chunk-WERSD76P.js?v=fcff60b9:17486:13)
+(anonymous) @ framer-motion.js?v=fcff60b9:820
+safelyDetachRef @ chunk-WERSD76P.js?v=fcff60b9:16726
+commitDeletionEffectsOnFiber @ chunk-WERSD76P.js?v=fcff60b9:17495
+recursivelyTraverseDeletionEffects @ chunk-WERSD76P.js?v=fcff60b9:17486
+commitDeletionEffectsOnFiber @ chunk-WERSD76P.js?v=fcff60b9:17610
+recursivelyTraverseDeletionEffects @ chunk-WERSD76P.js?v=fcff60b9:17486
+commitDeletionEffectsOnFiber @ chunk-WERSD76P.js?v=fcff60b9:17577
+recursivelyTraverseDeletionEffects @ chunk-WERSD76P.js?v=fcff60b9:17486
+commitDeletionEffectsOnFiber @ chunk-WERSD76P.js?v=fcff60b9:17534
+recursivelyTraverseDeletionEffects @ chunk-WERSD76P.js?v=fcff60b9:17486
+commitDeletionEffectsOnFiber @ chunk-WERSD76P.js?v=fcff60b9:17503
+recursivelyTraverseDeletionEffects @ chunk-WERSD76P.js?v=fcff60b9:17486
+commitDeletionEffectsOnFiber @ chunk-WERSD76P.js?v=fcff60b9:17577
+recursivelyTraverseDeletionEffects @ chunk-WERSD76P.js?v=fcff60b9:17486
+commitDeletionEffectsOnFiber @ chunk-WERSD76P.js?v=fcff60b9:17503
+recursivelyTraverseDeletionEffects @ chunk-WERSD76P.js?v=fcff60b9:17486
+commitDeletionEffectsOnFiber @ chunk-WERSD76P.js?v=fcff60b9:17503
+recursivelyTraverseDeletionEffects @ chunk-WERSD76P.js?v=fcff60b9:17486
+commitDeletionEffectsOnFiber @ chunk-WERSD76P.js?v=fcff60b9:17503
+recursivelyTraverseDeletionEffects @ chunk-WERSD76P.js?v=fcff60b9:17486
+commitDeletionEffectsOnFiber @ chunk-WERSD76P.js?v=fcff60b9:17503
+recursivelyTraverseDeletionEffects @ chunk-WERSD76P.js?v=fcff60b9:17486
+commitDeletionEffectsOnFiber @ chunk-WERSD76P.js?v=fcff60b9:17577
+recursivelyTraverseDeletionEffects @ chunk-WERSD76P.js?v=fcff60b9:17486
+commitDeletionEffectsOnFiber @ chunk-WERSD76P.js?v=fcff60b9:17610
+recursivelyTraverseDeletionEffects @ chunk-WERSD76P.js?v=fcff60b9:17486
+commitDeletionEffectsOnFiber @ chunk-WERSD76P.js?v=fcff60b9:17577
+recursivelyTraverseDeletionEffects @ chunk-WERSD76P.js?v=fcff60b9:17486
+commitDeletionEffectsOnFiber @ chunk-WERSD76P.js?v=fcff60b9:17577
+recursivelyTraverseDeletionEffects @ chunk-WERSD76P.js?v=fcff60b9:17486
+commitDeletionEffectsOnFiber @ chunk-WERSD76P.js?v=fcff60b9:17503
+recursivelyTraverseDeletionEffects @ chunk-WERSD76P.js?v=fcff60b9:17486
+commitDeletionEffectsOnFiber @ chunk-WERSD76P.js?v=fcff60b9:17610
+recursivelyTraverseDeletionEffects @ chunk-WERSD76P.js?v=fcff60b9:17486
+commitDeletionEffectsOnFiber @ chunk-WERSD76P.js?v=fcff60b9:17577
+recursivelyTraverseDeletionEffects @ chunk-WERSD76P.js?v=fcff60b9:17486
+commitDeletionEffectsOnFiber @ chunk-WERSD76P.js?v=fcff60b9:17610
+recursivelyTraverseDeletionEffects @ chunk-WERSD76P.js?v=fcff60b9:17486
+commitDeletionEffectsOnFiber @ chunk-WERSD76P.js?v=fcff60b9:17577
+recursivelyTraverseDeletionEffects @ chunk-WERSD76P.js?v=fcff60b9:17486
+commitDeletionEffectsOnFiber @ chunk-WERSD76P.js?v=fcff60b9:17610
+recursivelyTraverseDeletionEffects @ chunk-WERSD76P.js?v=fcff60b9:17486
+commitDeletionEffectsOnFiber @ chunk-WERSD76P.js?v=fcff60b9:17577
+recursivelyTraverseDeletionEffects @ chunk-WERSD76P.js?v=fcff60b9:17486
+commitDeletionEffectsOnFiber @ chunk-WERSD76P.js?v=fcff60b9:17610
+recursivelyTraverseDeletionEffects @ chunk-WERSD76P.js?v=fcff60b9:17486
+commitDeletionEffectsOnFiber @ chunk-WERSD76P.js?v=fcff60b9:17577
+commitDeletionEffects @ chunk-WERSD76P.js?v=fcff60b9:17477
+recursivelyTraverseMutationEffects @ chunk-WERSD76P.js?v=fcff60b9:17674
+commitMutationEffectsOnFiber @ chunk-WERSD76P.js?v=fcff60b9:17727
+recursivelyTraverseMutationEffects @ chunk-WERSD76P.js?v=fcff60b9:17685
+commitMutationEffectsOnFiber @ chunk-WERSD76P.js?v=fcff60b9:17699
+recursivelyTraverseMutationEffects @ chunk-WERSD76P.js?v=fcff60b9:17685
+commitMutationEffectsOnFiber @ chunk-WERSD76P.js?v=fcff60b9:17896
+recursivelyTraverseMutationEffects @ chunk-WERSD76P.js?v=fcff60b9:17685
+commitMutationEffectsOnFiber @ chunk-WERSD76P.js?v=fcff60b9:17699
+recursivelyTraverseMutationEffects @ chunk-WERSD76P.js?v=fcff60b9:17685
+commitMutationEffectsOnFiber @ chunk-WERSD76P.js?v=fcff60b9:17896
+recursivelyTraverseMutationEffects @ chunk-WERSD76P.js?v=fcff60b9:17685
+commitMutationEffectsOnFiber @ chunk-WERSD76P.js?v=fcff60b9:17896
+recursivelyTraverseMutationEffects @ chunk-WERSD76P.js?v=fcff60b9:17685
+commitMutationEffectsOnFiber @ chunk-WERSD76P.js?v=fcff60b9:17699
+recursivelyTraverseMutationEffects @ chunk-WERSD76P.js?v=fcff60b9:17685
+commitMutationEffectsOnFiber @ chunk-WERSD76P.js?v=fcff60b9:17699
+recursivelyTraverseMutationEffects @ chunk-WERSD76P.js?v=fcff60b9:17685
+commitMutationEffectsOnFiber @ chunk-WERSD76P.js?v=fcff60b9:17896
+recursivelyTraverseMutationEffects @ chunk-WERSD76P.js?v=fcff60b9:17685
+commitMutationEffectsOnFiber @ chunk-WERSD76P.js?v=fcff60b9:17794
+commitMutationEffects @ chunk-WERSD76P.js?v=fcff60b9:17663
+commitRootImpl @ chunk-WERSD76P.js?v=fcff60b9:19347
+commitRoot @ chunk-WERSD76P.js?v=fcff60b9:19277
+performSyncWorkOnRoot @ chunk-WERSD76P.js?v=fcff60b9:18895
+flushSyncCallbacks @ chunk-WERSD76P.js?v=fcff60b9:9119
+commitRootImpl @ chunk-WERSD76P.js?v=fcff60b9:19432
+commitRoot @ chunk-WERSD76P.js?v=fcff60b9:19277
+finishConcurrentRender @ chunk-WERSD76P.js?v=fcff60b9:18805
+performConcurrentWorkOnRoot @ chunk-WERSD76P.js?v=fcff60b9:18718
+workLoop @ chunk-WERSD76P.js?v=fcff60b9:197
+flushWork @ chunk-WERSD76P.js?v=fcff60b9:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=fcff60b9:384Understand this error
+chunk-WERSD76P.js?v=fcff60b9:14032 The above error occurred in the <div> component:
+
+    at div
+    at MotionComponent (https://c5d9396e-4f47-41f7-84a6-838e7c0e0ed4-00-3i9qi3675up46.picard.replit.dev:5173/@fs/home/runner/workspace/node_modules/.vite/deps/framer-motion.js?v=fcff60b9:945:40)
+    at div
+    at SmartSearchBar (https://c5d9396e-4f47-41f7-84a6-838e7c0e0ed4-00-3i9qi3675up46.picard.replit.dev:5173/src/components/search/SmartSearchBar.tsx:23:3)
+    at div
+    at div
+    at div
+    at div
+    at PropertiesPage (https://c5d9396e-4f47-41f7-84a6-838e7c0e0ed4-00-3i9qi3675up46.picard.replit.dev:5173/src/pages/PropertiesPage.tsx:37:26)
+    at RenderedRoute (https://c5d9396e-4f47-41f7-84a6-838e7c0e0ed4-00-3i9qi3675up46.picard.replit.dev:5173/@fs/home/runner/workspace/node_modules/.vite/deps/react-router-dom.js?v=fcff60b9:4088:5)
+    at Routes (https://c5d9396e-4f47-41f7-84a6-838e7c0e0ed4-00-3i9qi3675up46.picard.replit.dev:5173/@fs/home/runner/workspace/node_modules/.vite/deps/react-router-dom.js?v=fcff60b9:4558:5)
+    at div
+    at PropertyProvider (https://c5d9396e-4f47-41f7-84a6-838e7c0e0ed4-00-3i9qi3675up46.picard.replit.dev:5173/src/contexts/PropertyContext.tsx:29:36)
+    at AuthProvider (https://c5d9396e-4f47-41f7-84a6-838e7c0e0ed4-00-3i9qi3675up46.picard.replit.dev:5173/src/contexts/AuthContext.tsx:30:32)
+    at ToastProvider (https://c5d9396e-4f47-41f7-84a6-838e7c0e0ed4-00-3i9qi3675up46.picard.replit.dev:5173/src/components/ui/Toast.tsx:32:3)
+    at QueryClientProvider (https://c5d9396e-4f47-41f7-84a6-838e7c0e0ed4-00-3i9qi3675up46.picard.replit.dev:5173/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=fcff60b9:2933:3)
+    at ErrorBoundary (https://c5d9396e-4f47-41f7-84a6-838e7c0e0ed4-00-3i9qi3675up46.picard.replit.dev:5173/src/components/ui/ErrorBoundary.tsx:8:5)
+    at App
+    at QueryClientProvider (https://c5d9396e-4f47-41f7-84a6-838e7c0e0ed4-00-3i9qi3675up46.picard.replit.dev:5173/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=fcff60b9:2933:3)
+    at Router (https://c5d9396e-4f47-41f7-84a6-838e7c0e0ed4-00-3i9qi3675up46.picard.replit.dev:5173/@fs/home/runner/workspace/node_modules/.vite/deps/react-router-dom.js?v=fcff60b9:4501:15)
+    at BrowserRouter (https://c5d9396e-4f47-41f7-84a6-838e7c0e0ed4-00-3i9qi3675up46.picard.replit.dev:5173/@fs/home/runner/workspace/node_modules/.vite/deps/react-router-dom.js?v=fcff60b9:5247:5)
+
+React will try to recreate this component tree from scratch using the error boundary you provided, ErrorBoundary.
+logCapturedError @ chunk-WERSD76P.js?v=fcff60b9:14032
+callback @ chunk-WERSD76P.js?v=fcff60b9:14078
+callCallback @ chunk-WERSD76P.js?v=fcff60b9:11248
+commitUpdateQueue @ chunk-WERSD76P.js?v=fcff60b9:11265
+commitLayoutEffectOnFiber @ chunk-WERSD76P.js?v=fcff60b9:17075
+commitLayoutMountEffects_complete @ chunk-WERSD76P.js?v=fcff60b9:17980
+commitLayoutEffects_begin @ chunk-WERSD76P.js?v=fcff60b9:17969
+commitLayoutEffects @ chunk-WERSD76P.js?v=fcff60b9:17920
+commitRootImpl @ chunk-WERSD76P.js?v=fcff60b9:19353
+commitRoot @ chunk-WERSD76P.js?v=fcff60b9:19277
+performSyncWorkOnRoot @ chunk-WERSD76P.js?v=fcff60b9:18895
+flushSyncCallbacks @ chunk-WERSD76P.js?v=fcff60b9:9119
+commitRootImpl @ chunk-WERSD76P.js?v=fcff60b9:19432
+commitRoot @ chunk-WERSD76P.js?v=fcff60b9:19277
+finishConcurrentRender @ chunk-WERSD76P.js?v=fcff60b9:18805
+performConcurrentWorkOnRoot @ chunk-WERSD76P.js?v=fcff60b9:18718
+workLoop @ chunk-WERSD76P.js?v=fcff60b9:197
+flushWork @ chunk-WERSD76P.js?v=fcff60b9:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=fcff60b9:384Understand this error
+ErrorBoundary.tsx:30 ErrorBoundary caught an error: TypeError: Failed to construct 'HTMLDivElement': Please use the 'new' operator, this DOM object constructor cannot be called as a function.
+    at framer-motion.js?v=fcff60b9:820:11
+    at commitAttachRef (chunk-WERSD76P.js?v=fcff60b9:17279:28)
+    at commitLayoutEffectOnFiber (chunk-WERSD76P.js?v=fcff60b9:17168:17)
+    at commitLayoutMountEffects_complete (chunk-WERSD76P.js?v=fcff60b9:17980:17)
+    at commitLayoutEffects_begin (chunk-WERSD76P.js?v=fcff60b9:17969:15)
+    at commitLayoutEffects (chunk-WERSD76P.js?v=fcff60b9:17920:11)
+    at commitRootImpl (chunk-WERSD76P.js?v=fcff60b9:19353:13)
+    at commitRoot (chunk-WERSD76P.js?v=fcff60b9:19277:13)
+    at finishConcurrentRender (chunk-WERSD76P.js?v=fcff60b9:18805:15)
+    at performConcurrentWorkOnRoot (chunk-WERSD76P.js?v=fcff60b9:18718:15) {componentStack: '\n    at div\n    at MotionComponent (https://c5d939….vite/deps/react-router-dom.js?v=fcff60b9:5247:5)'}
+componentDidCatch @ ErrorBoundary.tsx:30
+callback @ chunk-WERSD76P.js?v=fcff60b9:14084
+callCallback @ chunk-WERSD76P.js?v=fcff60b9:11248
+commitUpdateQueue @ chunk-WERSD76P.js?v=fcff60b9:11265
+commitLayoutEffectOnFiber @ chunk-WERSD76P.js?v=fcff60b9:17075
+commitLayoutMountEffects_complete @ chunk-WERSD76P.js?v=fcff60b9:17980
+commitLayoutEffects_begin @ chunk-WERSD76P.js?v=fcff60b9:17969
+commitLayoutEffects @ chunk-WERSD76P.js?v=fcff60b9:17920
+commitRootImpl @ chunk-WERSD76P.js?v=fcff60b9:19353
+commitRoot @ chunk-WERSD76P.js?v=fcff60b9:19277
+performSyncWorkOnRoot @ chunk-WERSD76P.js?v=fcff60b9:18895
+flushSyncCallbacks @ chunk-WERSD76P.js?v=fcff60b9:9119
+commitRootImpl @ chunk-WERSD76P.js?v=fcff60b9:19432
+commitRoot @ chunk-WERSD76P.js?v=fcff60b9:19277
+finishConcurrentRender @ chunk-WERSD76P.js?v=fcff60b9:18805
+performConcurrentWorkOnRoot @ chunk-WERSD76P.js?v=fcff60b9:18718
+workLoop @ chunk-WERSD76P.js?v=fcff60b9:197
+flushWork @ chunk-WERSD76P.js?v=fcff60b9:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=fcff60b9:384Understand this error
+chunk-WERSD76P.js?v=fcff60b9:14032 The above error occurred in the <div> component:
+
+    at div
+    at MotionComponent (https://c5d9396e-4f47-41f7-84a6-838e7c0e0ed4-00-3i9qi3675up46.picard.replit.dev:5173/@fs/home/runner/workspace/node_modules/.vite/deps/framer-motion.js?v=fcff60b9:945:40)
+    at div
+    at SmartSearchBar (https://c5d9396e-4f47-41f7-84a6-838e7c0e0ed4-00-3i9qi3675up46.picard.replit.dev:5173/src/components/search/SmartSearchBar.tsx:23:3)
+    at div
+    at div
+    at div
+    at div
+    at PropertiesPage (https://c5d9396e-4f47-41f7-84a6-838e7c0e0ed4-00-3i9qi3675up46.picard.replit.dev:5173/src/pages/PropertiesPage.tsx:37:26)
+    at RenderedRoute (https://c5d9396e-4f47-41f7-84a6-838e7c0e0ed4-00-3i9qi3675up46.picard.replit.dev:5173/@fs/home/runner/workspace/node_modules/.vite/deps/react-router-dom.js?v=fcff60b9:4088:5)
+    at Routes (https://c5d9396e-4f47-41f7-84a6-838e7c0e0ed4-00-3i9qi3675up46.picard.replit.dev:5173/@fs/home/runner/workspace/node_modules/.vite/deps/react-router-dom.js?v=fcff60b9:4558:5)
+    at div
+    at PropertyProvider (https://c5d9396e-4f47-41f7-84a6-838e7c0e0ed4-00-3i9qi3675up46.picard.replit.dev:5173/src/contexts/PropertyContext.tsx:29:36)
+    at AuthProvider (https://c5d9396e-4f47-41f7-84a6-838e7c0e0ed4-00-3i9qi3675up46.picard.replit.dev:5173/src/contexts/AuthContext.tsx:30:32)
+    at ToastProvider (https://c5d9396e-4f47-41f7-84a6-838e7c0e0ed4-00-3i9qi3675up46.picard.replit.dev:5173/src/components/ui/Toast.tsx:32:3)
+    at QueryClientProvider (https://c5d9396e-4f47-41f7-84a6-838e7c0e0ed4-00-3i9qi3675up46.picard.replit.dev:5173/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=fcff60b9:2933:3)
+    at ErrorBoundary (https://c5d9396e-4f47-41f7-84a6-838e7c0e0ed4-00-3i9qi3675up46.picard.replit.dev:5173/src/components/ui/ErrorBoundary.tsx:8:5)
+    at App
+    at QueryClientProvider (https://c5d9396e-4f47-41f7-84a6-838e7c0e0ed4-00-3i9qi3675up46.picard.replit.dev:5173/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=fcff60b9:2933:3)
+    at Router (https://c5d9396e-4f47-41f7-84a6-838e7c0e0ed4-00-3i9qi3675up46.picard.replit.dev:5173/@fs/home/runner/workspace/node_modules/.vite/deps/react-router-dom.js?v=fcff60b9:4501:15)
+    at BrowserRouter (https://c5d9396e-4f47-41f7-84a6-838e7c0e0ed4-00-3i9qi3675up46.picard.replit.dev:5173/@fs/home/runner/workspace/node_modules/.vite/deps/react-router-dom.js?v=fcff60b9:5247:5)
+
+React will try to recreate this component tree from scratch using the error boundary you provided, ErrorBoundary.
+logCapturedError @ chunk-WERSD76P.js?v=fcff60b9:14032
+callback @ chunk-WERSD76P.js?v=fcff60b9:14078
+callCallback @ chunk-WERSD76P.js?v=fcff60b9:11248
+commitUpdateQueue @ chunk-WERSD76P.js?v=fcff60b9:11265
+commitLayoutEffectOnFiber @ chunk-WERSD76P.js?v=fcff60b9:17075
+commitLayoutMountEffects_complete @ chunk-WERSD76P.js?v=fcff60b9:17980
+commitLayoutEffects_begin @ chunk-WERSD76P.js?v=fcff60b9:17969
+commitLayoutEffects @ chunk-WERSD76P.js?v=fcff60b9:17920
+commitRootImpl @ chunk-WERSD76P.js?v=fcff60b9:19353
+commitRoot @ chunk-WERSD76P.js?v=fcff60b9:19277
+performSyncWorkOnRoot @ chunk-WERSD76P.js?v=fcff60b9:18895
+flushSyncCallbacks @ chunk-WERSD76P.js?v=fcff60b9:9119
+commitRootImpl @ chunk-WERSD76P.js?v=fcff60b9:19432
+commitRoot @ chunk-WERSD76P.js?v=fcff60b9:19277
+finishConcurrentRender @ chunk-WERSD76P.js?v=fcff60b9:18805
+performConcurrentWorkOnRoot @ chunk-WERSD76P.js?v=fcff60b9:18718
+workLoop @ chunk-WERSD76P.js?v=fcff60b9:197
+flushWork @ chunk-WERSD76P.js?v=fcff60b9:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=fcff60b9:384Understand this error
+ErrorBoundary.tsx:30 ErrorBoundary caught an error: TypeError: Failed to construct 'HTMLDivElement': Please use the 'new' operator, this DOM object constructor cannot be called as a function.
+    at framer-motion.js?v=fcff60b9:820:11
+    at safelyDetachRef (chunk-WERSD76P.js?v=fcff60b9:16726:30)
+    at commitDeletionEffectsOnFiber (chunk-WERSD76P.js?v=fcff60b9:17495:17)
+    at recursivelyTraverseDeletionEffects (chunk-WERSD76P.js?v=fcff60b9:17486:13)
+    at commitDeletionEffectsOnFiber (chunk-WERSD76P.js?v=fcff60b9:17610:15)
+    at recursivelyTraverseDeletionEffects (chunk-WERSD76P.js?v=fcff60b9:17486:13)
+    at commitDeletionEffectsOnFiber (chunk-WERSD76P.js?v=fcff60b9:17577:15)
+    at recursivelyTraverseDeletionEffects (chunk-WERSD76P.js?v=fcff60b9:17486:13)
+    at commitDeletionEffectsOnFiber (chunk-WERSD76P.js?v=fcff60b9:17534:17)
+    at recursivelyTraverseDeletionEffects (chunk-WERSD76P.js?v=fcff60b9:17486:13) {componentStack: '\n    at div\n    at MotionComponent (https://c5d939….vite/deps/react-router-dom.js?v=fcff60b9:5247:5)'}
