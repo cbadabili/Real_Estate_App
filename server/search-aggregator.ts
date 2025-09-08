@@ -81,7 +81,6 @@ async function queryDB(q: string, sort: string): Promise<UnifiedProperty[]> {
         ilike(properties.title, like),
         ilike(properties.description, like),
         ilike(properties.city, like),
-        ilike(properties.neighborhood, like),
         ilike(properties.address, like)
       )
     );
