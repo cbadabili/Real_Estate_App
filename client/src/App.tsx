@@ -83,6 +83,7 @@ import LegalTransactionsHub from './pages/LegalTransactionsHub';
 import ServiceProviderDirectory from './pages/ServiceProviderDirectory';
 
 import BuyMapPage from './pages/BuyMapPage';
+import TestMapPage from './pages/TestMapPage'; // Assuming this is a missing import
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -111,52 +112,24 @@ function App() {
                 <Navbar />
                 <Routes>
             <Route path="/" element={<HomePage />} />
-            <Route 
-              path="/dashboard" 
-              element={
-                <ProtectedRoute>
-                  <DashboardPage />
-                </ProtectedRoute>
-              } 
-            />
-            {/* Properties Routes */}
-          <Route path="/properties" element={<PropertiesPage />} />
-          <Route path="/properties/:id" element={<PropertyDetailsPage />} />
-          <Route 
-            path="/create-listing" 
-            element={
-              <ProtectedRoute>
-                <CreateListingPage />
-              </ProtectedRoute>
-            } 
-          />
-          <Route 
-            path="/my-properties" 
-            element={
-              <ProtectedRoute>
-                <MyPropertiesPage />
-              </ProtectedRoute>
-            } 
-          />
-
-          {/* Rent Routes */}
-          <Route path="/rent" element={<RentPage />} />
-          <Route path="/rental/:id" element={<RentalDetailsPage />} />
-          <Route path="/rental-applications" element={<RentalApplicationsPage />} />
-          <Route path="/rental-agreements" element={<RentalAgreementsPage />} />
-          <Route path="/tenant-screening" element={<TenantScreeningPage />} />
-            <Route path="/rental-listing-wizard" element={<RentalListingWizard />} />
-            <Route path="/rental-listing-wizard/:id" element={<RentalListingWizard />} />
-            <Route path="/rent/create-listing" element={<RentalListingWizard />} />
-            <Route path="/rent/edit/:id" element={<RentalListingWizard />} />
-            <Route path="/dashboard/landlord" element={<LandlordDashboard />} />
-            <Route path="/dashboard/renter" element={<RenterDashboard />} />
-            <Route path="/maintenance-management" element={<MaintenanceManagementPage />} />
-            <Route path="/maintenance-requests" element={<MaintenanceRequestsPage />} />
-
-            <Route path="/buyer-seller-platform" element={<BuyerSellerPlatformPage />} />
-            <Route path="/platform" element={<BuyerSellerPlatformPage />} />
-            <Route path="/market-intelligence" element={<MarketInsightsHub />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+            <Route path="/admin" element={<ProtectedRoute requiredRole="admin"><AdminPage /></ProtectedRoute>} />
+            <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
+            <Route path="/agent-dashboard" element={<ProtectedRoute><AgentDashboard /></ProtectedRoute>} />
+            <Route path="/fsbo-dashboard" element={<ProtectedRoute><FSBODashboard /></ProtectedRoute>} />
+            <Route path="/landlord-dashboard" element={<ProtectedRoute><LandlordDashboard /></ProtectedRoute>} />
+            <Route path="/renter-dashboard" element={<ProtectedRoute><RenterDashboard /></ProtectedRoute>} />
+            <Route path="/properties" element={<PropertiesPage />} />
+            <Route path="/properties/:id" element={<PropertyDetailsPage />} />
+            <Route path="/create-listing" element={<ProtectedRoute><CreateListingPage /></ProtectedRoute>} />
+            <Route path="/my-properties" element={<ProtectedRoute><MyPropertiesPage /></ProtectedRoute>} />
+            <Route path="/rent" element={<RentPage />} />
+            <Route path="/rent/:id" element={<RentalDetailsPage />} />
+            <Route path="/rent-out" element={<ProtectedRoute><RentOutPage /></ProtectedRoute>} />
+            <Route path="/rental-listing-wizard" element={<ProtectedRoute><RentalListingWizard /></ProtectedRoute>} />
+            <Route path="/plots" element={<PlotsPage />} />
+            <Route path="/auctions" element={<AuctionsPage />} />
             <Route path="/market-insights" element={<MarketInsightsHub />} />
             <Route path="/secure-transactions" element={<SecureTransactionsPage />} />
             <Route path="/communication" element={<CommunicationPage />} />
@@ -167,14 +140,62 @@ function App() {
             <Route path="/agent-network" element={<AgentNetworkPage />} />
             <Route path="/map-search" element={<MapSearchPage />} />
             <Route path="/enhanced-search" element={<EnhancedSearchPage />} />
-            <Route path="/admin-test" element={<AdminTestPage />} />
+            <Route path="/services" element={<ServicesPage />} />
+            <Route path="/marketplace" element={<MarketplacePage />} />
+            <Route path="/schedule-viewing/:id" element={<ProtectedRoute><ScheduleViewingPage /></ProtectedRoute>} />
+            <Route path="/contact-agent/:id" element={<ProtectedRoute><ContactAgentPage /></ProtectedRoute>} />
+            <Route path="/handle-offers" element={<ProtectedRoute><HandleOffersPage /></ProtectedRoute>} />
+            <Route path="/manage-showings" element={<ProtectedRoute><ManageShowingsPage /></ProtectedRoute>} />
+            <Route path="/buy-map" element={<BuyMapPage />} />
+            <Route path="/tenant-screening" element={<ProtectedRoute><TenantScreeningPage /></ProtectedRoute>} />
+            <Route path="/rental-applications" element={<ProtectedRoute><RentalApplicationsPage /></ProtectedRoute>} />
+            <Route path="/maintenance-requests" element={<ProtectedRoute><MaintenanceRequestsPage /></ProtectedRoute>} />
+            <Route path="/maintenance-management" element={<ProtectedRoute><MaintenanceManagementPage /></ProtectedRoute>} />
+            <Route path="/legal-transactions" element={<LegalTransactionsHub />} />
+            <Route path="/professional-support" element={<ProfessionalSupportPage />} />
+            <Route path="/artisans" element={<ArtisansPage />} />
+            <Route path="/professionals" element={<ProfessionalsPage />} />
+            <Route path="/suppliers" element={<SuppliersPage />} />
+            <Route path="/training-providers" element={<TrainingProvidersPage />} />
+            <Route path="/register-provider" element={<RegisterProviderPage />} />
+            <Route path="/property-management" element={<PropertyManagementPage />} />
+            <Route path="/legal-services" element={<LegalServicesPage />} />
+            <Route path="/financing" element={<FinancingPage />} />
+            <Route path="/tenant-support" element={<TenantSupportPage />} />
+            <Route path="/offers" element={<ProtectedRoute><OffersPage /></ProtectedRoute>} />
+            <Route path="/planning" element={<PlanningPage />} />
+            <Route path="/searching" element={<SearchingPage />} />
+            <Route path="/viewing" element={<ProtectedRoute><ViewingPage /></ProtectedRoute>} />
+            <Route path="/market-intelligence" element={<MarketIntelligencePage />} />
+            <Route path="/market-trends" element={<MarketTrendsPage />} />
+            <Route path="/neighborhood-analytics" element={<NeighborhoodAnalyticsPage />} />
+            <Route path="/investment-analytics" element={<InvestmentAnalyticsPage />} />
+            <Route path="/property-valuation" element={<PropertyValuationPage />} />
+            <Route path="/home-value-assessment" element={<HomeValueAssessmentPage />} />
+            <Route path="/pricing-guide" element={<PricingGuidePage />} />
+            <Route path="/documents" element={<ProtectedRoute><DocumentsPage /></ProtectedRoute>} />
+            <Route path="/legal-requirements" element={<LegalRequirementsPage />} />
+            <Route path="/legal-document-templates" element={<LegalDocumentTemplatesPage />} />
+            <Route path="/secure-transactions" element={<SecureTransactionsPage />} />
+            <Route path="/transaction-management" element={<ProtectedRoute><TransactionManagementPage /></ProtectedRoute>} />
+            <Route path="/transfer-process" element={<TransferProcessPage />} />
+            <Route path="/property-handover" element={<ProtectedRoute><PropertyHandoverPage /></ProtectedRoute>} />
+            <Route path="/rental-agreements" element={<ProtectedRoute><RentalAgreementsPage /></ProtectedRoute>} />
+            <Route path="/agent-registration" element={<AgentRegistrationPage />} />
+            <Route path="/agent-profile/:id" element={<AgentProfilePage />} />
+            <Route path="/agent-rating" element={<ProtectedRoute><AgentRatingPage /></ProtectedRoute>} />
+            <Route path="/bid/:id" element={<ProtectedRoute><BidPage /></ProtectedRoute>} />
+            <Route path="/bid-registration" element={<ProtectedRoute><BidRegistrationPage /></ProtectedRoute>} />
+            <Route path="/buyer-seller-platform" element={<BuyerSellerPlatformPage />} />
+            <Route path="/service-provider-directory" element={<ServiceProviderDirectory />} />
+            <Route path="/test-map" element={<TestMapPage />} />
           </Routes>
         </div>
-      </div>
+      </PropertyProvider>
     </AuthProvider>
   </ToastProvider>
 </QueryClientProvider>
-    </ErrorBoundary>
+</ErrorBoundary>
   );
 }
 
