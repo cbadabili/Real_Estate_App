@@ -34,7 +34,7 @@ export const SmartSearchBar: React.FC<SmartSearchBarProps> = ({
   const [aiRecommendations, setAiRecommendations] = useState<string[]>([]);
   const [trendingSearches, setTrendingSearches] = useState<string[]>([]);
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
-  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
+  const [rect, setRect] = useState<DOMRect | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const suggestionsRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -119,14 +119,47 @@ export const SmartSearchBar: React.FC<SmartSearchBarProps> = ({
     }
   };
 
+  // Recompute dropdown position when things move/resize/scroll
+  useEffect(() => {
+    const updateRect = () => {
+      if (containerRef.current) {
+        setRect(containerRef.current.getBoundingClientRect());
+      }
+    };
+    
+    if (showSuggestions) {
+      updateRect();
+      const resizeObserver = new ResizeObserver(updateRect);
+      if (containerRef.current) {
+        resizeObserver.observe(containerRef.current);
+      }
+      window.addEventListener('scroll', updateRect, true);
+      window.addEventListener('resize', updateRect);
+      
+      return () => {
+        resizeObserver.disconnect();
+        window.removeEventListener('scroll', updateRect, true);
+        window.removeEventListener('resize', updateRect);
+      };
+    }
+  }, [showSuggestions]);
+
+  // Close on outside click
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (suggestionsRef.current && !suggestionsRef.current.contains(event.target as Node)) {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
         setShowSuggestions(false);
         setIsFocused(false);
       }
     };
 
+    if (showSuggestions) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [showSuggestions]);
+
+  useEffect(() => {
     // Load AI recommendations and trending searches
     const loadRecommendations = () => {
       setAiRecommendations([
@@ -149,12 +182,10 @@ export const SmartSearchBar: React.FC<SmartSearchBarProps> = ({
     };
 
     loadRecommendations();
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   return (
-    <div className={`relative ${className}`} ref={containerRef} style={{ zIndex: 999999 }}>
+    <div className={`relative ${className}`} ref={containerRef}>
       <form onSubmit={handleSubmit} className="relative">
         <div className={`
           relative flex items-center bg-white border-2 rounded-lg transition-all duration-200
@@ -221,15 +252,23 @@ export const SmartSearchBar: React.FC<SmartSearchBarProps> = ({
         </button>
       </form>
 
-      <AnimatePresence>
-        {showSuggestions && (
+      
+      {/* Portalized dropdown */}
+      {showSuggestions && rect &&
+        createPortal(
           <motion.div
             ref={suggestionsRef}
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            style={{ zIndex: 999999 }}
-            className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-xl max-h-96 overflow-y-auto"
+            style={{
+              position: 'fixed',
+              top: rect.bottom + 8,
+              left: rect.left,
+              width: rect.width,
+              zIndex: 2147483647, // above everything
+            }}
+            className="max-h-96 overflow-auto rounded-lg border bg-white shadow-xl"
           >
             {value.length === 0 && trendingSearches.length > 0 && (
               <div className="p-3 border-b border-gray-100">
@@ -264,6 +303,7 @@ export const SmartSearchBar: React.FC<SmartSearchBarProps> = ({
                   {combinedFilteredSuggestions.slice(0, 7).map((suggestion, index) => (
                     <button
                       key={index}
+                      onMouseDown={(e) => e.preventDefault()} // prevent input blur before click fires
                       onClick={() => handleSuggestionClick(suggestion)}
                       className={`w-full text-left px-3 py-2 text-sm rounded-lg transition-colors ${selectedIndex === index ? 'bg-gray-100' : ''} hover:bg-gray-50`}
                     >
@@ -295,6 +335,7 @@ export const SmartSearchBar: React.FC<SmartSearchBarProps> = ({
                   {aiRecommendations.map((recommendation, index) => (
                     <button
                       key={index}
+                      onMouseDown={(e) => e.preventDefault()}
                       onClick={() => handleSuggestionClick({ label: recommendation, type: 'suggestion' })}
                       className={`w-full text-left px-3 py-2 text-sm rounded-lg transition-colors ${selectedIndex === index ? 'bg-gray-100' : ''} hover:bg-gray-50`}
                     >
@@ -304,9 +345,9 @@ export const SmartSearchBar: React.FC<SmartSearchBarProps> = ({
                 </div>
               </div>
             )}
-          </motion.div>
+          </motion.div>,
+          document.body
         )}
-      </AnimatePresence>
     </div>
   );
 };

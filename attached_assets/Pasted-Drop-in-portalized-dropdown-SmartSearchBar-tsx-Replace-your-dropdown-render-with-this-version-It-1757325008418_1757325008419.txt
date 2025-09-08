@@ -1,0 +1,124 @@
+Drop-in portalized dropdown (SmartSearchBar.tsx)
+
+Replace your dropdown render with this version. It measures the input, then renders suggestions to document.body using a portal and position: fixed with a very high z-index.
+
+// client/src/components/search/SmartSearchBar.tsx
+import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+
+export default function SmartSearchBar() {
+  const anchorRef = useRef<HTMLDivElement>(null);
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState("");
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [rect, setRect] = useState<DOMRect | null>(null);
+
+  // Recompute dropdown position when things move/resize/scroll
+  useEffect(() => {
+    const update = () => {
+      if (anchorRef.current) setRect(anchorRef.current.getBoundingClientRect());
+    };
+    update();
+    const ro = new ResizeObserver(update);
+    if (anchorRef.current) ro.observe(anchorRef.current);
+    window.addEventListener("scroll", update, true);
+    window.addEventListener("resize", update);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("scroll", update, true);
+      window.removeEventListener("resize", update);
+    };
+  }, [open]);
+
+  // Example: fetch/typeahead
+  useEffect(() => {
+    if (!query.trim()) {
+      setSuggestions([]);
+      return;
+    }
+    // TODO: replace with your real fetch
+    setSuggestions(
+      ["Gaborone", "Francistown", "Phakalane", "Mogoditshane"].filter((s) =>
+        s.toLowerCase().includes(query.toLowerCase())
+      )
+    );
+  }, [query]);
+
+  // Close on outside click
+  useEffect(() => {
+    function onDocClick(e: MouseEvent) {
+      if (!anchorRef.current) return;
+      if (!anchorRef.current.contains(e.target as Node)) setOpen(false);
+    }
+    if (open) document.addEventListener("mousedown", onDocClick);
+    return () => document.removeEventListener("mousedown", onDocClick);
+  }, [open]);
+
+  return (
+    <div ref={anchorRef} className="relative w-full">
+      <div className="flex items-center gap-2">
+        <input
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          onFocus={() => setOpen(true)}
+          placeholder="Search properties in Botswana..."
+          className="w-full rounded-lg border px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+        <button
+          className="rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
+          onClick={() => setOpen(false)}
+        >
+          Search
+        </button>
+      </div>
+
+      {/* Portalized dropdown */}
+      {open && rect &&
+        createPortal(
+          <div
+            style={{
+              position: "fixed",
+              top: rect.bottom + 4,
+              left: rect.left,
+              width: rect.width,
+              zIndex: 2147483647, // above everything
+            }}
+            className="max-h-80 overflow-auto rounded-md border bg-white shadow-xl dark:bg-slate-900"
+          >
+            {suggestions.length === 0 ? (
+              <div className="p-3 text-sm opacity-60">No suggestions</div>
+            ) : (
+              suggestions.map((s) => (
+                <button
+                  key={s}
+                  className="block w-full px-3 py-2 text-left hover:bg-slate-100 dark:hover:bg-slate-800"
+                  // prevent input blur before click fires
+                  onMouseDown={(e) => e.preventDefault()}
+                  onClick={() => {
+                    setQuery(s);
+                    setOpen(false);
+                  }}
+                >
+                  {s}
+                </button>
+              ))
+            )}
+          </div>,
+          document.body
+        )}
+    </div>
+  );
+}
+
+2) Make sure the search bar wrapper can’t clip the portal anchor
+
+If the search lives inside a header/hero with overflow-hidden or a high stacking context, that’s fine now (portal bypasses it). Still, add a safe stacking context to the search section container so the input outline isn’t covered:
+
+// Wherever the SmartSearchBar is used (e.g., PropertiesPage)
+<div className="relative z-50"> 
+  <SmartSearchBar />
+</div>
+
+3) Optional polish (prevents keyboard scroll jumps)
+
+If you support keyboard navigation in the list later, keep the portal; it avoids scroll/clip issues entirely and is production-grade.
