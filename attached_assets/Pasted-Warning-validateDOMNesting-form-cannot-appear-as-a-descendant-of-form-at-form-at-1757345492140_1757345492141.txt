@@ -1,0 +1,41 @@
+Warning: validateDOMNesting(...): <form> cannot appear as a descendant of <form>.
+    at form
+    at div
+    at SmartSearchBar (https://c5d9396e-4f47-41f7-84a6-838e7c0e0ed4-00-3i9qi3675up46.picard.replit.dev:5173/src/components/search/SmartSearchBar.tsx:36:42)
+    at div
+    at div
+    at form
+    at div
+    at div
+    at MotionComponent (https://c5d9396e-4f47-41f7-84a6-838e7c0e0ed4-00-3i9qi3675up46.picard.replit.dev:5173/@fs/home/runner/workspace/node_modules/.vite/deps/framer-motion.js?v=1452f759:945:40)
+    at PresenceChild (https://c5d9396e-4f47-41f7-84a6-838e7c0e0ed4-00-3i9qi3675up46.picard.replit.dev:5173/@fs/home/runner/workspace/node_modules/.vite/deps/framer-motion.js?v=1452f759:121:24)
+    at AnimatePresence (https://c5d9396e-4f47-41f7-84a6-838e7c0e0ed4-00-3i9qi3675up46.picard.replit.dev:5173/@fs/home/runner/workspace/node_modules/.vite/deps/framer-motion.js?v=1452f759:210:26)
+    at div
+    at div
+    at MotionComponent (https://c5d9396e-4f47-41f7-84a6-838e7c0e0ed4-00-3i9qi3675up46.picard.replit.dev:5173/@fs/home/runner/workspace/node_modules/.vite/deps/framer-motion.js?v=1452f759:945:40)
+    at RentPage (https://c5d9396e-4f47-41f7-84a6-838e7c0e0ed4-00-3i9qi3675up46.picard.replit.dev:5173/src/pages/RentPage.tsx:37:20)
+    at RenderedRoute (https://c5d9396e-4f47-41f7-84a6-838e7c0e0ed4-00-3i9qi3675up46.picard.replit.dev:5173/@fs/home/runner/workspace/node_modules/.vite/deps/react-router-dom.js?v=1452f759:4088:5)
+    at Routes (https://c5d9396e-4f47-41f7-84a6-838e7c0e0ed4-00-3i9qi3675up46.picard.replit.dev:5173/@fs/home/runner/workspace/node_modules/.vite/deps/react-router-dom.js?v=1452f759:4558:5)
+    at div
+    at PropertyProvider (https://c5d9396e-4f47-41f7-84a6-838e7c0e0ed4-00-3i9qi3675up46.picard.replit.dev:5173/src/contexts/PropertyContext.tsx:29:36)
+    at AuthProvider (https://c5d9396e-4f47-41f7-84a6-838e7c0e0ed4-00-3i9qi3675up46.picard.replit.dev:5173/src/contexts/AuthContext.tsx:30:32)
+    at ToastProvider (https://c5d9396e-4f47-41f7-84a6-838e7c0e0ed4-00-3i9qi3675up46.picard.replit.dev:5173/src/components/ui/Toast.tsx:32:3)
+    at QueryClientProvider (https://c5d9396e-4f47-41f7-84a6-838e7c0e0ed4-00-3i9qi3675up46.picard.replit.dev:5173/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=1452f759:2933:3)
+    at ErrorBoundary (https://c5d9396e-4f47-41f7-84a6-838e7c0e0ed4-00-3i9qi3675up46.picard.replit.dev:5173/src/components/ui/ErrorBoundary.tsx:8:5)
+    at App
+    at QueryClientProvider (https://c5d9396e-4f47-41f7-84a6-838e7c0e0ed4-00-3i9qi3675up46.picard.replit.dev:5173/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=1452f759:2933:3)
+    at Router (https://c5d9396e-4f47-41f7-84a6-838e7c0e0ed4-00-3i9qi3675up46.picard.replit.dev:5173/@fs/home/runner/workspace/node_modules/.vite/deps/react-router-dom.js?v=1452f759:4501:15)
+    at BrowserRouter (https://c5d9396e-4f47-41f7-84a6-838e7c0e0ed4-00-3i9qi3675up46.picard.replit.dev:5173/@fs/home/runner/workspace/node_modules/.vite/deps/react-router-dom.js?v=1452f759:5247:5)
+printWarning @ chunk-HHM7JWV7.js?v=1452f759:521
+error @ chunk-HHM7JWV7.js?v=1452f759:505
+validateDOMNesting @ chunk-HHM7JWV7.js?v=1452f759:8256
+createInstance @ chunk-HHM7JWV7.js?v=1452f759:8328
+completeWork @ chunk-HHM7JWV7.js?v=1452f759:16290
+completeUnitOfWork @ chunk-HHM7JWV7.js?v=1452f759:19224
+performUnitOfWork @ chunk-HHM7JWV7.js?v=1452f759:19206
+workLoopSync @ chunk-HHM7JWV7.js?v=1452f759:19137
+renderRootSync @ chunk-HHM7JWV7.js?v=1452f759:19116
+performConcurrentWorkOnRoot @ chunk-HHM7JWV7.js?v=1452f759:18678
+workLoop @ chunk-HHM7JWV7.js?v=1452f759:197
+flushWork @ chunk-HHM7JWV7.js?v=1452f759:176
+performWorkUntilDeadline @ chunk-HHM7JWV7.js?v=1452f759:384Understand this error
