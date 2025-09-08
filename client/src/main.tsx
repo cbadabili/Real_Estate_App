@@ -7,6 +7,16 @@ import { queryClient } from './lib/queryClient';
 import App from './App';
 import './index.css';
 
+// Handle unhandled promise rejections
+window.addEventListener('unhandledrejection', (event) => {
+  // Suppress browser extension related errors
+  if (event.reason?.message?.includes('message channel')) {
+    event.preventDefault();
+    return;
+  }
+  console.error('Unhandled promise rejection:', event.reason);
+});
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>

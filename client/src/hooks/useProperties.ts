@@ -35,20 +35,28 @@ export const useProperties = (filters?: PropertyFilters) => {
   const url = `/api/properties${queryString ? `?${queryString}` : ''}`;
 
   return useQuery({
-    queryKey: ['/api/properties', filters],
+    queryKey: ['properties', queryParams.toString()],
     queryFn: async () => {
-      const response = await fetch(url, {
-        headers: {
-          'Cache-Control': 'no-cache',
-          'Pragma': 'no-cache',
-          'Accept': 'application/json'
+      try {
+        const response = await fetch(`/api/properties?${queryParams.toString()}`);
+        if (!response.ok) {
+          throw new Error(`Failed to fetch properties: ${response.statusText}`);
         }
-      });
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const data = await response.json();
+        return data;
+      } catch (error) {
+        console.error('Property fetch error:', error);
+        throw error;
       }
-      const data = await response.json();
-      return data;
+    },
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    refetchOnWindowFocus: false,
+    retry: (failureCount, error) => {
+      // Don't retry on network errors that might be browser extension related
+      if (error.message.includes('message channel')) {
+        return false;
+      }
+      return failureCount < 2;
     },
   });
 };
