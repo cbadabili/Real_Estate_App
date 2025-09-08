@@ -46,7 +46,7 @@ export const SearchResultsHeader: React.FC<SearchResultsHeaderProps> = ({
           <div className="flex items-center text-sm text-blue-800">
             <Search className="h-4 w-4 mr-2" />
             <span className="font-medium">Search interpreted:</span>
-            <span className="ml-1">{aiSearchResult.explanation}</span>
+            <span className="ml-1">{aiSearchResult.explanation || 'Processing search query...'}</span>
             {aiSearchResult.confidence && (
               <span className="ml-2 text-xs bg-blue-200 px-2 py-1 rounded">
                 {Math.round(aiSearchResult.confidence * 100)}% confidence

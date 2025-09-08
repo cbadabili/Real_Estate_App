@@ -14,6 +14,8 @@ export interface SearchFilters {
   state?: string;
   features?: string[];
   listingType?: string;
+  minSquareFeet?: number;
+  maxSquareFeet?: number;
 }
 
 export interface AISearchResult {
@@ -179,16 +181,18 @@ export async function parseNaturalLanguageSearch(query: string): Promise<SearchR
     'kgalagadi': ['kgalagadi']
   };
 
+  let locationFound = false;
   for (const [location, keywords] of Object.entries(locations)) {
     if (keywords.some(keyword => lowercaseQuery.includes(keyword))) {
       if (location.includes('-') || location === 'central' || location === 'southern') {
-        filters.state = location.split('-').map(word => 
+        filters.state = location.split('-').map(word =>
           word.charAt(0).toUpperCase() + word.slice(1)
         ).join('-');
       } else {
         filters.city = location.charAt(0).toUpperCase() + location.slice(1);
       }
       confidence += 0.2;
+      locationFound = true;
       break;
     }
   }
@@ -221,13 +225,14 @@ export async function parseNaturalLanguageSearch(query: string): Promise<SearchR
   }
 
   // Features detection
-  const features = [
-    'pool', 'swimming pool', 'garage', 'parking', 'garden', 'yard', 'balcony', 
+  const featuresList = [
+    'pool', 'swimming pool', 'garage', 'parking', 'garden', 'yard', 'balcony',
     'patio', 'fireplace', 'air conditioning', 'security', 'fence', 'borehole'
   ];
 
-  const foundFeatures = features.filter(feature => lowercaseQuery.includes(feature));
+  const foundFeatures = featuresList.filter(feature => lowercaseQuery.includes(feature));
   if (foundFeatures.length > 0) {
+    filters.features = foundFeatures;
     confidence += foundFeatures.length * 0.05;
   }
 
@@ -284,12 +289,84 @@ export async function parseNaturalLanguageSearch(query: string): Promise<SearchR
     suggestions.push('Try broadening your search criteria or check spelling');
   }
 
+  const extractedFilters = {
+    propertyType: filters.propertyType,
+    minPrice: filters.minPrice,
+    maxPrice: filters.maxPrice,
+    minBedrooms: filters.minBedrooms,
+    minBathrooms: filters.minBathrooms,
+    city: filters.city,
+    state: filters.state,
+    features: filters.features,
+    listingType: filters.listingType,
+    minSquareFeet: filters.minSquareFeet,
+    maxSquareFeet: filters.maxSquareFeet,
+  };
+
+  const explanation = generateSearchExplanation(query, extractedFilters);
+
   return {
     query,
-    filters,
+    filters: extractedFilters,
     suggestions,
+    explanation,
     confidence,
     matchedProperties: matchedProperties.slice(0, 10), // Limit to top 10 matches
     autoSuggestions: autoSuggestions.slice(0, 5) // Limit to 5 suggestions
   };
+}
+
+function generateSearchExplanation(query: string, filters: SearchFilters): string {
+  let parts: string[] = [];
+
+  if (filters.propertyType) {
+    parts.push(`searching for ${filters.propertyType}`);
+  } else {
+    parts.push('searching for properties');
+  }
+
+  if (filters.city) {
+    parts.push(`in ${filters.city}`);
+  } else if (filters.state) {
+    parts.push(`in ${filters.state}`);
+  }
+
+  if (filters.minBedrooms) {
+    parts.push(`with at least ${filters.minBedrooms} bedroom${filters.minBedrooms > 1 ? 's' : ''}`);
+  }
+
+  if (filters.minBathrooms) {
+    parts.push(`with at least ${filters.minBathrooms} bathroom${filters.minBathrooms > 1 ? 's' : ''}`);
+  }
+
+  if (filters.minPrice && filters.maxPrice) {
+    parts.push(`between P${filters.minPrice.toLocaleString()} and P${filters.maxPrice.toLocaleString()}`);
+  } else if (filters.minPrice) {
+    parts.push(`above P${filters.minPrice.toLocaleString()}`);
+  } else if (filters.maxPrice) {
+    parts.push(`below P${filters.maxPrice.toLocaleString()}`);
+  }
+
+  if (filters.features && filters.features.length > 0) {
+    parts.push(`with ${filters.features.join(', ')}`);
+  }
+
+  if (filters.listingType) {
+    parts.push(`listed as ${filters.listingType}`);
+  }
+
+  if (filters.minSquareFeet || filters.maxSquareFeet) {
+    let sizeDescription = 'with a size';
+    if (filters.minSquareFeet && filters.maxSquareFeet) {
+      sizeDescription += ` between ${filters.minSquareFeet} sqm and ${filters.maxSquareFeet} sqm`;
+    } else if (filters.minSquareFeet) {
+      sizeDescription += ` over ${filters.minSquareFeet} sqm`;
+    } else if (filters.maxSquareFeet) {
+      sizeDescription += ` under ${filters.maxSquareFeet} sqm`;
+    }
+    parts.push(sizeDescription);
+  }
+
+
+  return parts.join(', ') + '.';
 }

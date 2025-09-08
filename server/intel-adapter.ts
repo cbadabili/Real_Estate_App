@@ -2,7 +2,9 @@
 import type { Request, Response } from "express";
 import OpenAI from "openai";
 
-const openai = process.env.OPENAI_API_KEY ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY }) : null;
+const openai = process.env.OPENAI_API_KEY ? new OpenAI({ 
+  apiKey: process.env.OPENAI_API_KEY 
+}) : null;
 
 export async function intelSearch(req: Request, res: Response) {
   const q = String(req.body?.query || "").trim();
@@ -14,68 +16,34 @@ export async function intelSearch(req: Request, res: Response) {
   }
 
   try {
-    const response = await openai.beta.chat.completions.parse({
-      model: "gpt-4o",
+    // Use regular chat completion instead of beta parse
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
       messages: [
         {
           role: "system",
-          content: "You are RealEstateIntel for Botswana. Search for real estate properties and return normalized JSON data. Focus on reputable Botswana property websites and listings."
+          content: "You are a real estate search assistant for Botswana. Return property results in JSON format with the following structure: {\"results\": [{\"id\": \"string\", \"title\": \"string\", \"price\": number, \"city\": \"string\", \"propertyType\": \"string\", \"bedrooms\": number, \"bathrooms\": number, \"description\": \"string\"}]}"
         },
         {
           role: "user",
-          content: `Find properties matching: "${q}". Prefer Botswana sources like Property24, Seeff, Pam Golding, etc. Include price in BWP, beds/baths, property type, location, URL, and images if available.`
+          content: `Find properties in Botswana matching: "${q}". Return realistic sample properties in JSON format.`
         }
       ],
-      response_format: {
-        type: "json_schema",
-        json_schema: {
-          name: "PropertyResults",
-          schema: {
-            type: "object",
-            properties: {
-              results: {
-                type: "array",
-                items: {
-                  type: "object",
-                  properties: {
-                    id: { type: "string" },
-                    title: { type: "string" },
-                    description: { type: "string" },
-                    price: { type: "number" },
-                    currency: { type: "string", default: "BWP" },
-                    bedrooms: { type: "integer" },
-                    bathrooms: { type: "integer" },
-                    propertyType: { type: "string" },
-                    city: { type: "string" },
-                    neighborhood: { type: "string" },
-                    address: { type: "string" },
-                    lat: { type: "number" },
-                    lng: { type: "number" },
-                    images: { type: "array", items: { type: "string" } },
-                    url: { type: "string" },
-                    listedAt: { type: "string" },
-                    agent: {
-                      type: "object",
-                      properties: {
-                        name: { type: "string" },
-                        phone: { type: "string" },
-                        email: { type: "string" }
-                      }
-                    }
-                  },
-                  required: ["title", "price"]
-                }
-              }
-            },
-            required: ["results"],
-            additionalProperties: false
-          }
-        }
-      }
+      temperature: 0.7,
+      max_tokens: 1000
     });
 
-    const json = response.choices[0].message.parsed || { results: [] };
-    console.log(`OpenAI search returned ${json.results.length} properties`);
+    const content = response.choices[0].message.content;
+    let json;
+    
+    try {
+      json = JSON.parse(content || '{"results": []}');
+    } catch (parseError) {
+      console.warn("Failed to parse OpenAI response as JSON:", parseError);
+      json = { results: [] };
+    }
+
+    console.log(`OpenAI search returned ${json.results?.length || 0} properties`);
     res.json(json);
   } catch (error) {
     console.warn("OpenAI search error:", error);
@@ -95,31 +63,32 @@ export async function intelSuggest(req: Request, res: Response) {
   }
 
   try {
-    const response = await openai.beta.chat.completions.parse({
+    const response = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
         {
           role: "system",
-          content: "Return only a JSON array of location/keyword suggestions for property search in Botswana. Focus on cities, neighborhoods, and property-related terms."
+          content: "Return 8 location suggestions for Botswana property search as a JSON array of strings."
         },
         {
           role: "user",
-          content: `Suggest up to 8 terms related to: "${q}"`
+          content: `Suggest locations in Botswana related to: "${q}"`
         }
       ],
-      response_format: {
-        type: "json_schema",
-        json_schema: {
-          name: "SuggestList",
-          schema: {
-            type: "array",
-            items: { type: "string" }
-          }
-        }
-      }
+      temperature: 0.3,
+      max_tokens: 200
     });
 
-    const suggestions = response.choices[0].message.parsed || [];
+    const content = response.choices[0].message.content;
+    let suggestions;
+    
+    try {
+      suggestions = JSON.parse(content || '[]');
+    } catch (parseError) {
+      console.warn("Failed to parse suggestions:", parseError);
+      suggestions = [];
+    }
+
     res.json(Array.isArray(suggestions) ? suggestions.slice(0, 8) : []);
   } catch (error) {
     console.warn("OpenAI suggest error:", error);
