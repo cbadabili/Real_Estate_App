@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 // Removed framer-motion for better compatibility
 import { Filter, Search, Grid, List as ListIcon, SlidersHorizontal, AlertCircle, MapPin, Map, BarChart3 } from 'lucide-react';
@@ -23,7 +23,7 @@ const PropertiesPage: React.FC = () => {
   const { data: properties = [], isLoading, error, refetch } = useProperties();
   const { success } = useToastHelpers();
   const { preferences, updatePreference } = useUserPreferences();
-  const { performSearch, isSearching, searchResult: aiSearchResult, clearSearchResult } = useSearch();
+  const { performSearch, isSearching: aiIsSearching, searchResult: aiSearchResult, clearSearchResult } = useSearch(); // Renamed to avoid conflict
 
   // State management
   const [searchTerm, setSearchTerm] = useState('');
@@ -45,36 +45,79 @@ const PropertiesPage: React.FC = () => {
   const [comparisonProperties, setComparisonProperties] = useState<any[]>([]);
   const [selectedProperty, setSelectedProperty] = useState<any>(null);
 
-    // Update filters when URL parameters change
-  useEffect(() => {
-    const typeFromUrl = searchParams.get('type');
-    if (typeFromUrl && typeFromUrl !== filters.propertyType) {
-      setFilters(prev => ({
-        ...prev,
-        propertyType: typeFromUrl
-      }));
-    }
-  }, [searchParams]);
+  // State for manual search functionality
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
 
-  // Search functionality
+  // AI suggestions function
+  const fetchSuggestions = async (q: string): Promise<string[]> => {
+    try {
+      const response = await fetch(`/api/suggest?q=${encodeURIComponent(q)}`, {
+        headers: { Accept: "application/json" }
+      });
+      if (!response.ok) return [];
+      const data = await response.json();
+      return Array.isArray(data) ? data : (data.suggestions ?? []);
+    } catch (error) {
+      console.warn('Failed to fetch suggestions:', error);
+      return [];
+    }
+  };
+
+  // Search handler for the SmartSearchBar
+  const handleSearch = useCallback(async (query: string) => {
+    setIsSearching(true);
+    setSearchQuery(query);
+
+    try {
+      const response = await fetch(`/api/search?q=${encodeURIComponent(query)}&sort=${sortBy}&limit=20`);
+      if (!response.ok) throw new Error('Search failed');
+
+      const data = await response.json();
+
+      if (data.results) {
+        setSearchResults(data.results);
+      }
+    } catch (error) {
+      console.error('Search failed:', error);
+      setSearchResults([]);
+    } finally {
+      setIsSearching(false);
+    }
+  }, [sortBy]);
+
+
+  // Handle AI search query and apply filters
   const handleSmartSearch = async (query: string) => {
     if (!query.trim()) return;
 
-    const result = await performSearch(query);
-    if (result && result.filters) {
+    // First, try to perform an AI-driven search
+    const aiResult = await performSearch(query); // Use performSearch from useSearch hook
+
+    if (aiResult && aiResult.filters) {
       // Apply AI-interpreted filters
       const newFilters = {
         priceRange: [
-          result.filters.minPrice || filters.priceRange[0],
-          result.filters.maxPrice || filters.priceRange[1]
+          aiResult.filters.minPrice || filters.priceRange[0],
+          aiResult.filters.maxPrice || filters.priceRange[1]
         ] as [number, number],
-        propertyType: result.filters.propertyType || filters.propertyType,
-        bedrooms: result.filters.minBedrooms ? result.filters.minBedrooms.toString() : filters.bedrooms,
-        bathrooms: result.filters.minBathrooms ? result.filters.minBathrooms.toString() : filters.bathrooms,
-        listingType: result.filters.listingType || filters.listingType
+        propertyType: aiResult.filters.propertyType || filters.propertyType,
+        bedrooms: aiResult.filters.minBedrooms ? aiResult.filters.minBedrooms.toString() : filters.bedrooms,
+        bathrooms: aiResult.filters.minBathrooms ? aiResult.filters.minBathrooms.toString() : filters.bathrooms,
+        listingType: aiResult.filters.listingType || filters.listingType
       };
       setFilters(newFilters);
-      setSearchTerm(query);
+      setSearchTerm(query); // Update the general searchTerm
+      // If AI search provides results, use them, otherwise fall back to general search
+      if (aiResult.properties && aiResult.properties.length > 0) {
+        setSearchResults(aiResult.properties);
+      } else {
+        handleSearch(query); // Fallback to regular search if no properties returned by AI
+      }
+    } else {
+      // If no AI filters or results, perform a standard search
+      handleSearch(query);
     }
   };
 
@@ -164,6 +207,9 @@ const PropertiesPage: React.FC = () => {
     }
   });
 
+  // Determine which properties to display: AI search results or regular search results
+  const propertiesToDisplay = searchResults.length > 0 ? searchResults : sortedProperties;
+
   return (
     <div className="min-h-screen bg-neutral-50">
       <PageHeader
@@ -185,15 +231,15 @@ const PropertiesPage: React.FC = () => {
           {/* Smart Search Bar */}
           <div className="relative z-50">
             <SmartSearchBar
-              value={searchTerm}
-              onChange={setSearchTerm}
-              onSearch={handleSmartSearch}
+              initial={searchTerm} // Use searchTerm for initial value
+              onSearch={handleSmartSearch} // Use the combined handler
+              suggest={fetchSuggestions} // Pass the fetchSuggestions function
               placeholder="Search properties in Botswana..."
-              showFilters={true}
-              onFilterClick={() => setShowFilters(!showFilters)}
+              showFilters={true} // This prop might be for internal SmartSearchBar UI
+              onFilterClick={() => setShowFilters(!showFilters)} // This prop might be for internal SmartSearchBar UI
             />
 
-            {isSearching && (
+            {(aiIsSearching || isSearching) && ( // Show loading if either AI or regular search is active
               <div className="mt-2 flex items-center text-sm text-gray-600">
                 <EnhancedLoadingSpinner size="sm" type="search" />
                 <span className="ml-2">Processing your search...</span>
@@ -209,8 +255,8 @@ const PropertiesPage: React.FC = () => {
                 <button
                   onClick={() => handleViewModeChange('grid')}
                   className={`flex items-center space-x-2 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
-                    viewMode === 'grid' 
-                      ? 'bg-beedab-blue text-white shadow-sm' 
+                    viewMode === 'grid'
+                      ? 'bg-beedab-blue text-white shadow-sm'
                       : 'text-gray-600 hover:text-gray-900 hover:bg-white'
                   }`}
                 >
@@ -220,8 +266,8 @@ const PropertiesPage: React.FC = () => {
                 <button
                   onClick={() => handleViewModeChange('list')}
                   className={`flex items-center space-x-2 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
-                    viewMode === 'list' 
-                      ? 'bg-beedab-blue text-white shadow-sm' 
+                    viewMode === 'list'
+                      ? 'bg-beedab-blue text-white shadow-sm'
                       : 'text-gray-600 hover:text-gray-900 hover:bg-white'
                   }`}
                 >
@@ -231,8 +277,8 @@ const PropertiesPage: React.FC = () => {
                 <button
                   onClick={() => handleViewModeChange('map')}
                   className={`flex items-center space-x-2 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
-                    viewMode === 'map' 
-                      ? 'bg-beedab-blue text-white shadow-sm' 
+                    viewMode === 'map'
+                      ? 'bg-beedab-blue text-white shadow-sm'
                       : 'text-gray-600 hover:text-gray-900 hover:bg-white'
                   }`}
                 >
@@ -243,13 +289,13 @@ const PropertiesPage: React.FC = () => {
             </div>
 
             <div className="text-sm text-gray-600">
-              {sortedProperties.length} properties found
+              {propertiesToDisplay.length} properties found
             </div>
           </div>
 
           {/* Search Results Header */}
           <SearchResultsHeader
-            propertyCount={sortedProperties.length}
+            propertyCount={propertiesToDisplay.length}
             sortBy={sortBy}
             onSortChange={handleSortChange}
             viewMode={viewMode}
@@ -258,8 +304,8 @@ const PropertiesPage: React.FC = () => {
             onToggleFilters={() => setShowFilters(!showFilters)}
             comparisonCount={comparisonProperties.length}
             onShowComparison={() => setShowComparison(true)}
-            aiSearchResult={aiSearchResult}
-            onClearAiSearch={clearSearchResult}
+            aiSearchResult={aiSearchResult} // Pass the AI search result
+            onClearAiSearch={clearSearchResult} // Pass the clear function for AI search
           />
         </div>
       </div>
@@ -284,10 +330,10 @@ const PropertiesPage: React.FC = () => {
                 {/* Filters */}
                 {showFilters && (
                   <div className="animate-in slide-in-from-left-8 fade-in duration-300">
-                    <PropertyFilters 
-                      filters={filters} 
+                    <PropertyFilters
+                      filters={filters}
                       onFiltersChange={setFilters}
-                      propertyCount={sortedProperties.length}
+                      propertyCount={propertiesToDisplay.length} // Use propertiesToDisplay for count
                     />
                   </div>
                 )}
@@ -307,13 +353,13 @@ const PropertiesPage: React.FC = () => {
                   {error.message || 'There was a problem loading the properties. Please try again.'}
                 </p>
                 <div className="space-x-3">
-                  <button 
+                  <button
                     onClick={() => refetch && refetch()}
                     className="bg-beedab-blue text-white px-6 py-2 rounded-lg hover:bg-beedab-darkblue transition-colors"
                   >
                     Try Again
                   </button>
-                  <button 
+                  <button
                     onClick={() => {
                       setFilters({
                         priceRange: [0, 5000000] as [number, number],
@@ -323,6 +369,8 @@ const PropertiesPage: React.FC = () => {
                         listingType: 'all'
                       });
                       setSearchTerm('');
+                      setSearchQuery(''); // Clear manual search query
+                      setSearchResults([]); // Clear manual search results
                     }}
                     className="bg-gray-100 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-200 transition-colors"
                   >
@@ -330,9 +378,9 @@ const PropertiesPage: React.FC = () => {
                   </button>
                 </div>
               </div>
-            ) : isLoading ? (
+            ) : (isLoading && properties.length === 0) ? ( // Only show skeleton if initial load is happening and no properties yet
               <SearchResultsSkeleton viewMode={viewMode === 'map' ? 'grid' : viewMode} />
-            ) : sortedProperties.length === 0 ? (
+            ) : propertiesToDisplay.length === 0 ? (
               <div className="text-center py-16 bg-white rounded-lg shadow-sm">
                 <div className="mx-auto w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
                   <Search className="h-8 w-8 text-gray-400" />
@@ -351,6 +399,8 @@ const PropertiesPage: React.FC = () => {
                       listingType: 'all'
                     });
                     setSearchTerm('');
+                    setSearchQuery(''); // Clear manual search query
+                    setSearchResults([]); // Clear manual search results
                   }}
                   className="bg-beedab-blue text-white px-6 py-2 rounded-lg hover:bg-beedab-darkblue transition-colors"
                 >
@@ -359,7 +409,7 @@ const PropertiesPage: React.FC = () => {
               </div>
             ) : viewMode === 'map' ? (
               <div className="h-[800px] bg-gray-100 rounded-lg">
-                <PropertyMap 
+                <PropertyMap
                   properties={properties.map((p: any) => ({
                     id: p.id,
                     title: p.title,
@@ -375,9 +425,9 @@ const PropertiesPage: React.FC = () => {
               </div>
             ) : (
               <PropertyGrid
-                properties={sortedProperties}
+                properties={propertiesToDisplay} // Display AI or regular search results
                 viewMode={viewMode !== 'map' ? viewMode as 'grid' | 'list' : 'grid'}
-                isLoading={isLoading}
+                isLoading={isLoading} // Keep isLoading for initial load indicator
                 onAddToComparison={addToComparison}
                 comparisonProperties={comparisonProperties}
                 className="w-full"

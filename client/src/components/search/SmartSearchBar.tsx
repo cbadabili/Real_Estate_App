@@ -1,348 +1,233 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { createPortal } from 'react-dom';
-import { Search, MapPin, Clock, Sparkles, X, TrendingUp, Star, Filter } from 'lucide-react';
 
-interface SearchSuggestion {
-  label: string;
-  type: 'location' | 'suggestion' | 'recent';
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+import { Search, Clock, Sparkles } from 'lucide-react';
+
+type Props = {
+  onSearch: (q: string) => void;
+  initial?: string;
+  // Optional: provide your AI suggestor (return plain strings)
+  suggest?: (q: string) => Promise<string[]>;
+};
+
+const RECENTS_KEY = "beedab_recent_searches";
+const MAX_RECENTS = 10;
+
+function loadRecents(): string[] {
+  try {
+    const v = localStorage.getItem(RECENTS_KEY);
+    return v ? JSON.parse(v) : [];
+  } catch {
+    return [];
+  }
 }
 
-interface SmartSearchBarProps {
-  value: string;
-  onChange: (value: string) => void;
-  onSearch: (query: string) => void;
-  placeholder?: string;
-  showFilters?: boolean;
-  onFilterClick?: () => void;
-  className?: string;
+function saveRecent(q: string) {
+  const prev = loadRecents().filter((x) => x.toLowerCase() !== q.toLowerCase());
+  const next = [q, ...prev].slice(0, MAX_RECENTS);
+  localStorage.setItem(RECENTS_KEY, JSON.stringify(next));
 }
 
-export const SmartSearchBar: React.FC<SmartSearchBarProps> = ({
-  value,
-  onChange,
-  onSearch,
-  placeholder = "Search properties...",
-  showFilters = false,
-  onFilterClick,
-  className = ''
-}) => {
-  const [isFocused, setIsFocused] = useState(false);
-  const [suggestions, setSuggestions] = useState<SearchSuggestion[]>([]);
-  const [showSuggestions, setShowSuggestions] = useState(false);
-  const [selectedIndex, setSelectedIndex] = useState(-1);
-  const [aiRecommendations, setAiRecommendations] = useState<string[]>([]);
-  const [trendingSearches, setTrendingSearches] = useState<string[]>([]);
-  const [recentSearches, setRecentSearches] = useState<string[]>([]);
-  const [rect, setRect] = useState<DOMRect | null>(null);
+export default function SmartSearchBar({ onSearch, initial = "", suggest }: Props) {
+  const anchorRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
-  const suggestionsRef = useRef<HTMLDivElement | null>(null);
-  const containerRef = useRef<HTMLDivElement | null>(null);
 
-  const botswanaLocations = [
-    'Gaborone', 'Francistown', 'Molepolole', 'Kanye', 'Serowe',
-    'Mahalapye', 'Mogoditshane', 'Mochudi', 'Maun', 'Lobatse',
-    'Block 8', 'Block 9', 'Block 10', 'G-West', 'Phakalane'
-  ];
+  const [q, setQ] = useState(initial);
+  const [open, setOpen] = useState(false);
+  const [rect, setRect] = useState<DOMRect | null>(null);
+  const [ai, setAi] = useState<string[]>([]);
+  const [recents, setRecents] = useState<string[]>(loadRecents());
+  const [highlight, setHighlight] = useState<number>(-1);
+  const [loading, setLoading] = useState(false);
 
-  const searchSuggestions = [
-    'Houses under P2M in Gaborone',
-    'Apartments for rent in Francistown',
-    '3 bedroom houses with garden',
-    'Plot for sale in G-West',
-    'Commercial property in CBD',
-    'Luxury homes in Phakalane'
-  ];
-
-  const filteredLocations = botswanaLocations.filter(location =>
-    location.toLowerCase().includes(value.toLowerCase()) && value.length > 0
-  ).map(location => ({ label: location, type: 'location' as const }));
-
-  const filteredSuggestions = searchSuggestions.filter(suggestion =>
-    suggestion.toLowerCase().includes(value.toLowerCase()) && value.length > 0
-  ).map(suggestion => ({ label: suggestion, type: 'suggestion' as const }));
-
-  const filteredRecentSearches = recentSearches.filter(search =>
-    search.toLowerCase().includes(value.toLowerCase()) && value.length > 0
-  ).map(search => ({ label: search, type: 'recent' as const }));
-
-  const combinedFilteredSuggestions = [
-    ...filteredLocations,
-    ...filteredSuggestions,
-    ...filteredRecentSearches
-  ];
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (value.trim()) {
-      const newRecentSearches = [value, ...recentSearches].slice(0, 5);
-      setRecentSearches(newRecentSearches);
-      localStorage.setItem('recentSearches', JSON.stringify(newRecentSearches));
-      onSearch(value.trim());
-      setShowSuggestions(false);
-    }
-  };
-
-  const handleSuggestionClick = (suggestion: SearchSuggestion) => {
-    onChange(suggestion.label);
-    onSearch(suggestion.label);
-    if (suggestion.type !== 'recent') {
-      const newRecentSearches = [suggestion.label, ...recentSearches].slice(0, 5);
-      setRecentSearches(newRecentSearches);
-      localStorage.setItem('recentSearches', JSON.stringify(newRecentSearches));
-    }
-    setShowSuggestions(false);
-    setSelectedIndex(-1);
-  };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newValue = e.target.value;
-    onChange(newValue);
-    setShowSuggestions(newValue.length > 0 || aiRecommendations.length > 0 || trendingSearches.length > 0);
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (showSuggestions) {
-      if (e.key === 'ArrowDown') {
-        e.preventDefault();
-        setSelectedIndex(prev => Math.min(prev + 1, combinedFilteredSuggestions.length - 1));
-      } else if (e.key === 'ArrowUp') {
-        e.preventDefault();
-        setSelectedIndex(prev => Math.max(prev - 1, -1));
-      } else if (e.key === 'Enter' && selectedIndex !== -1) {
-        e.preventDefault();
-        handleSuggestionClick(combinedFilteredSuggestions[selectedIndex]);
-      } else if (e.key === 'Escape') {
-        setShowSuggestions(false);
-        setSelectedIndex(-1);
-      }
-    }
-  };
-
-  // Recompute dropdown position when things move/resize/scroll
+  // Positioning for portal
   useEffect(() => {
-    const updateRect = () => {
-      if (containerRef.current) {
-        setRect(containerRef.current.getBoundingClientRect());
-      }
+    if (!open) return;
+    const update = () => {
+      const el = anchorRef.current;
+      if (el) setRect(el.getBoundingClientRect());
     };
+    update();
+    const ro = new ResizeObserver(update);
+    if (anchorRef.current) ro.observe(anchorRef.current);
+    window.addEventListener("scroll", update, true);
+    window.addEventListener("resize", update);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("scroll", update, true);
+      window.removeEventListener("resize", update);
+    };
+  }, [open]);
 
-    if (showSuggestions) {
-      updateRect();
-      const resizeObserver = new ResizeObserver(updateRect);
-      if (containerRef.current) {
-        resizeObserver.observe(containerRef.current);
-      }
-      window.addEventListener('scroll', updateRect, true);
-      window.addEventListener('resize', updateRect);
-
-      return () => {
-        resizeObserver.disconnect();
-        window.removeEventListener('scroll', updateRect, true);
-        window.removeEventListener('resize', updateRect);
-      };
+  // Debounced AI suggestions
+  useEffect(() => {
+    if (!suggest) return;
+    if (!open) return;
+    const term = q.trim();
+    if (!term) { 
+      setAi([]);
+      setLoading(false);
+      return; 
     }
-  }, [showSuggestions]);
+    
+    setLoading(true);
+    const t = setTimeout(async () => {
+      try {
+        const list = await suggest(term);
+        setAi(Array.isArray(list) ? list : []);
+        setHighlight(list.length ? 0 : -1);
+      } catch (error) {
+        console.warn('Suggestions failed:', error);
+        setAi([]);
+      } finally {
+        setLoading(false);
+      }
+    }, 250);
+    return () => clearTimeout(t);
+  }, [q, open, suggest]);
 
   // Close on outside click
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
-        setShowSuggestions(false);
-        setIsFocused(false);
-      }
+    const onDoc = (e: MouseEvent) => {
+      if (!anchorRef.current) return;
+      if (!anchorRef.current.contains(e.target as Node)) setOpen(false);
     };
+    if (open) document.addEventListener("mousedown", onDoc);
+    return () => document.removeEventListener("mousedown", onDoc);
+  }, [open]);
 
-    if (showSuggestions) {
-      document.addEventListener('mousedown', handleClickOutside);
-      return () => document.removeEventListener('mousedown', handleClickOutside);
+  const visibleList = useMemo(() => {
+    const term = q.trim();
+    return term ? ai : recents;
+  }, [q, ai, recents]);
+
+  function doSearch(term: string) {
+    const value = term.trim();
+    if (!value) return;
+    saveRecent(value);
+    setRecents(loadRecents());
+    onSearch(value);
+    setOpen(false);
+    setHighlight(-1);
+  }
+
+  function onSubmit(e?: React.FormEvent) {
+    e?.preventDefault();
+    doSearch(q);
+  }
+
+  function onPick(item: string) {
+    setQ(item);
+    doSearch(item);
+  }
+
+  function onKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (!open && (e.key === "ArrowDown" || e.key === "ArrowUp")) {
+      setOpen(true);
+      return;
     }
-  }, [showSuggestions]);
+    if (!visibleList.length) return;
 
-  useEffect(() => {
-    // Load AI recommendations and trending searches
-    const loadRecommendations = () => {
-      setAiRecommendations([
-        "3 bedroom house in Gaborone under P2M",
-        "Apartments near University of Botswana",
-        "Investment properties in CBD",
-        "Family homes with pools in Phakalane"
-      ]);
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setHighlight((i) => Math.min(i + 1, visibleList.length - 1));
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setHighlight((i) => Math.max(i - 1, 0));
+    } else if (e.key === "Enter") {
+      if (highlight >= 0) {
+        e.preventDefault();
+        onPick(visibleList[highlight]);
+      } else {
+        onSubmit(e);
+      }
+    } else if (e.key === "Escape") {
+      setOpen(false);
+    }
+  }
 
-      setTrendingSearches([
-        "Gaborone West properties",
-        "Francistown commercial spaces",
-        "Plots in Tlokweng",
-        "Luxury homes Phakalane"
-      ]);
-
-      // Load recent searches from localStorage
-      const recent = JSON.parse(localStorage.getItem('recentSearches') || '[]');
-      setRecentSearches(recent.slice(0, 5));
-    };
-
-    loadRecommendations();
-  }, []);
+  const isShowingAI = q.trim() && ai.length > 0;
+  const isShowingRecents = !q.trim() && recents.length > 0;
 
   return (
-    <div className={`relative ${className}`} ref={containerRef}>
-      <form onSubmit={handleSubmit} className="relative">
-        <div className={`
-          relative flex items-center bg-white border-2 rounded-lg transition-all duration-200
-          ${isFocused ? 'border-beedab-blue shadow-lg' : 'border-gray-300 shadow-sm'}
-        `}>
-          <div className="absolute left-4 top-1/2 transform -translate-y-1/2">
-            <Search className="h-5 w-5 text-gray-400" />
-          </div>
-
+    <div ref={anchorRef} className="relative w-full">
+      <form onSubmit={onSubmit} className="relative">
+        <div className="relative flex items-center">
+          <Search className="absolute left-4 h-5 w-5 text-gray-400" />
           <input
             ref={inputRef}
-            type="text"
-            value={value}
-            onChange={handleInputChange}
-            onFocus={() => {
-              setIsFocused(true);
-              setShowSuggestions(true);
-            }}
-            onKeyDown={handleKeyDown}
-            placeholder={placeholder}
-            className="w-full pl-12 pr-20 py-4 text-lg bg-transparent border-none outline-none placeholder-gray-500"
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            onFocus={() => setOpen(true)}
+            onKeyDown={onKeyDown}
+            placeholder="Search properties in Botswana…"
+            className="w-full rounded-lg border border-gray-300 bg-white pl-12 pr-24 py-4 text-gray-900 placeholder-gray-500 focus:border-beedab-blue focus:outline-none focus:ring-1 focus:ring-beedab-blue"
           />
-
-          {value.length > 0 && (
-            <button
-              type="button"
-              onClick={() => { onChange(''); setShowSuggestions(false); }}
-              className="absolute right-16 top-1/2 transform -translate-y-1/2 p-2 text-gray-400 hover:text-gray-600 transition-colors"
-            >
-              <X className="h-5 w-5" />
-            </button>
-          )}
-
-          {value.length > 2 && (
-            <div className="absolute right-10 top-1/2 transform -translate-y-1/2 transition-all duration-200">
-              <div className="flex items-center space-x-1 text-purple-600">
-                <Sparkles className="h-4 w-4" />
-                <span className="text-xs font-medium">AI</span>
-              </div>
-            </div>
-          )}
-
-          {showFilters && onFilterClick && (
-            <button
-              type="button"
-              onClick={onFilterClick}
-              className="absolute right-4 top-1/2 transform -translate-y-1/2 p-2 text-gray-400 hover:text-gray-600 transition-colors"
-            >
-              <Filter className="h-5 w-5" />
-            </button>
-          )}
+          <button
+            type="submit"
+            className="absolute right-2 rounded-md bg-beedab-blue px-4 py-2 text-white font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-beedab-blue focus:ring-offset-2 transition-colors"
+          >
+            Search
+          </button>
         </div>
-
-        <button
-          type="submit"
-          disabled={!value.trim()}
-          className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-beedab-blue text-white px-4 py-2 rounded-lg hover:bg-beedab-darkblue transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          Search
-        </button>
       </form>
 
-
-      {/* Portalized dropdown */}
-      {showSuggestions && rect &&
-        createPortal(
-          <div
-            ref={suggestionsRef}
-            style={{
-              position: 'fixed',
-              top: rect.bottom + 8,
-              left: rect.left,
-              width: rect.width,
-              zIndex: 2147483647,
-              opacity: showSuggestions ? 1 : 0,
-              transform: showSuggestions ? 'translateY(0)' : 'translateY(-10px)',
-              transition: 'all 0.2s ease-out'
-            }}
-            className="max-h-96 overflow-auto rounded-lg border bg-white shadow-xl"
-          >
-            {value.length === 0 && trendingSearches.length > 0 && (
-              <div className="p-3 border-b border-gray-100">
-                <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2 flex items-center">
-                  <TrendingUp className="h-3 w-3 mr-1" />
-                  Trending Searches
-                </h4>
-                <div className="space-y-1">
-                  {trendingSearches.map((search, index) => (
-                    <button
-                      key={index}
-                      onClick={() => handleSuggestionClick({ label: search, type: 'suggestion' })}
-                      className={`w-full text-left px-3 py-2 text-sm rounded-lg transition-colors ${selectedIndex === index ? 'bg-gray-100' : ''} hover:bg-gray-50`}
-                    >
-                      {search}
-                    </button>
-                  ))}
-                </div>
-              </div>
+      {/* Portal dropdown */}
+      {open && rect && (isShowingAI || isShowingRecents || loading) && createPortal(
+        <div
+          style={{
+            position: "fixed",
+            top: rect.bottom + 4,
+            left: rect.left,
+            width: rect.width,
+            zIndex: 2147483647,
+          }}
+          className="max-h-80 overflow-auto rounded-lg border border-gray-200 bg-white shadow-xl"
+        >
+          <div className="flex items-center gap-2 px-4 py-3 text-xs font-medium uppercase tracking-wide text-gray-500 border-b border-gray-100">
+            {q.trim() ? (
+              <>
+                <Sparkles className="h-3 w-3" />
+                AI Suggestions
+              </>
+            ) : (
+              <>
+                <Clock className="h-3 w-3" />
+                Recent searches
+              </>
             )}
+            {loading && <div className="ml-auto animate-spin rounded-full h-3 w-3 border border-gray-300 border-t-beedab-blue" />}
+          </div>
 
-            {combinedFilteredSuggestions.length > 0 && (
-              <div className="p-3 border-b border-gray-100">
-                <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2 flex items-center">
-                  {combinedFilteredSuggestions[0]?.type === 'location' && <MapPin className="h-3 w-3 mr-1" />}
-                  {combinedFilteredSuggestions[0]?.type === 'suggestion' && <Sparkles className="h-3 w-3 mr-1" />}
-                  {combinedFilteredSuggestions[0]?.type === 'recent' && <Clock className="h-3 w-3 mr-1" />}
-                  {combinedFilteredSuggestions[0]?.type === 'location' ? 'Locations' :
-                   combinedFilteredSuggestions[0]?.type === 'suggestion' ? 'Suggestions' : 'Recent Searches'}
-                </h4>
-                <div className="space-y-1">
-                  {combinedFilteredSuggestions.slice(0, 7).map((suggestion, index) => (
-                    <button
-                      key={index}
-                      onMouseDown={(e) => e.preventDefault()} // prevent input blur before click fires
-                      onClick={() => handleSuggestionClick(suggestion)}
-                      className={`w-full text-left px-3 py-2 text-sm rounded-lg transition-colors ${selectedIndex === index ? 'bg-gray-100' : ''} hover:bg-gray-50`}
-                    >
-                      {suggestion.type === 'location' && <MapPin className="h-4 w-4 inline-block mr-2 text-gray-400" />}
-                      {suggestion.type === 'suggestion' && <Star className="h-4 w-4 inline-block mr-2 text-yellow-500" />}
-                      {suggestion.type === 'recent' && <Clock className="h-4 w-4 inline-block mr-2 text-gray-400" />}
-                      {suggestion.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {value.length > 0 && combinedFilteredSuggestions.length === 0 && (
-              <div className="p-6 text-center">
-                <Search className="h-8 w-8 text-gray-300 mx-auto mb-2" />
-                <p className="text-sm text-gray-500">No results found</p>
-                <p className="text-xs text-gray-400">Try a different search term</p>
-              </div>
-            )}
-
-            {value.length === 0 && aiRecommendations.length > 0 && (
-              <div className="p-3">
-                <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2 flex items-center">
-                  <Sparkles className="h-3 w-3 mr-1" />
-                  AI Recommendations
-                </h4>
-                <div className="space-y-1">
-                  {aiRecommendations.map((recommendation, index) => (
-                    <button
-                      key={index}
-                      onMouseDown={(e) => e.preventDefault()}
-                      onClick={() => handleSuggestionClick({ label: recommendation, type: 'suggestion' })}
-                      className={`w-full text-left px-3 py-2 text-sm rounded-lg transition-colors ${selectedIndex === index ? 'bg-gray-100' : ''} hover:bg-gray-50`}
-                    >
-                      {recommendation}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>,
-          document.body
-        )}
+          {loading && !visibleList.length ? (
+            <div className="px-4 py-3 text-sm text-gray-500">Loading suggestions...</div>
+          ) : visibleList.length === 0 ? (
+            <div className="px-4 py-3 text-sm text-gray-500">
+              {q.trim() ? "No suggestions found" : "No recent searches"}
+            </div>
+          ) : (
+            visibleList.map((item, idx) => (
+              <button
+                key={`${item}-${idx}`}
+                className={`flex w-full items-center gap-3 px-4 py-3 text-left text-sm hover:bg-gray-50 transition-colors ${
+                  idx === highlight ? "bg-blue-50 text-beedab-blue" : "text-gray-900"
+                }`}
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={() => onPick(item)}
+                onMouseEnter={() => setHighlight(idx)}
+              >
+                {q.trim() ? (
+                  <Sparkles className="h-4 w-4 text-gray-400 flex-shrink-0" />
+                ) : (
+                  <Clock className="h-4 w-4 text-gray-400 flex-shrink-0" />
+                )}
+                <span className="truncate">{item}</span>
+              </button>
+            ))
+          )}
+        </div>,
+        document.body
+      )}
     </div>
   );
-};
+}

@@ -1228,9 +1228,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const rentalRouter = createRentalRoutes();
   app.use("/api/rentals", rentalRouter);
 
-  // Import search aggregator
-  // Import moved to top of file
-
   // Search aggregator endpoint (combines local + RealEstateIntel AI)
   app.get('/api/search', searchAggregator);
 
@@ -1417,6 +1414,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // app.get("/marketplace/register", (req, res) => {
   //   res.sendFile(path.join(__dirname, "../client/dist/index.html"));
   // });
+
+  // AI Suggestions endpoint
+  app.get('/api/suggest', async (req, res) => {
+    const { suggest } = await import('./suggest');
+    return suggest(req, res);
+  });
 
   // Test endpoint
   app.get('/api/test', (req, res) => {
