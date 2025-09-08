@@ -1,0 +1,282 @@
+Server: aggregator endpoint /api/search
+
+It fans out to:
+
+your DB (structured filters)
+
+RealEstateIntel AI GPT (semantic results / external sources)
+
+then merges + ranks with dedupe.
+
+// server/search-aggregator.ts
+import type { Request, Response } from "express";
+import { db } from "./db";
+import { properties } from "../shared/schema";
+import { and, desc, gte, ilike, or, sql } from "drizzle-orm";
+import fetch from "node-fetch";
+
+// ---- CONFIG ----
+const REALINTEL_URL = process.env.REALESTATEINTEL_URL!;        // e.g. https://api.realestateintel.ai/search
+const REALINTEL_KEY = process.env.REALESTATEINTEL_API_KEY!;    // secret
+
+// crude NL parser (you can keep improving)
+function parseFreeText(q: string) {
+  const lower = q.toLowerCase();
+  let beds: number | undefined;
+  const digit = lower.match(/(\d+)\s*(bed|bedroom)/);
+  if (digit) beds = parseInt(digit[1], 10);
+  else {
+    const words: Record<string, number> = { one:1, two:2, three:3, four:4, five:5, six:6 };
+    const w = lower.match(/(one|two|three|four|five|six)\s*(bed|bedroom|bedroomed)/);
+    if (w) beds = words[w[1]];
+  }
+  let type: string | undefined;
+  if (/\b(house|standalone)\b/.test(lower)) type = "house";
+  else if (/\b(apartment|flat)\b/.test(lower)) type = "apartment";
+  else if (/\b(townhouse)\b/.test(lower)) type = "townhouse";
+  else if (/\b(plot|land)\b/.test(lower)) type = "plot";
+  return { beds, type };
+}
+
+async function queryDB(q: string, sort: string) {
+  const terms = [];
+  if (q) {
+    const like = `%${q}%`;
+    terms.push(
+      or(
+        ilike(properties.title, like),
+        ilike(properties.description, like),
+        ilike(properties.city, like),
+        ilike(properties.neighborhood, like),
+        ilike(properties.address, like)
+      )
+    );
+    const derived = parseFreeText(q);
+    if (derived.beds) terms.push(gte(properties.bedrooms, derived.beds));
+    if (derived.type) terms.push(ilike(properties.propertyType, derived.type));
+  }
+  const where = terms.length ? and(...terms) : undefined;
+  const order =
+    sort === "price_low"
+      ? properties.price
+      : sort === "price_high"
+      ? desc(properties.price)
+      : desc(properties.createdAt);
+
+  const rows = await db.select().from(properties).where(where).orderBy(order).limit(50);
+  return rows.map(mapDBRowToUnified);
+}
+
+// Call your RealEstateIntel AI GPT (adjust URL/payload to your provider)
+async function queryIntel(q: string, filters: any) {
+  const r = await fetch(`${REALINTEL_URL}`, {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${REALINTEL_KEY}`,
+      "Content-Type": "application/json",
+      "Accept": "application/json"
+    },
+    body: JSON.stringify({
+      query: q,
+      locationBias: filters?.location,      // optional
+      minBeds: filters?.beds,
+      propertyType: filters?.type,
+      maxResults: 50,
+      // add any knobs your GPT supports
+    })
+  });
+  if (!r.ok) throw new Error(`RealEstateIntel error ${r.status}`);
+  const data = await r.json();
+  // Expecting data.results: Array<ExternalProperty>
+  return (data.results || []).map(mapIntelToUnified);
+}
+
+// Map your DB and Intel items into the same shape
+function mapDBRowToUnified(p: any) {
+  return {
+    id: `local_${p.id}`,
+    source: "local",
+    title: p.title,
+    summary: p.description,
+    price: p.price,
+    currency: "BWP",
+    bedrooms: p.bedrooms,
+    bathrooms: p.bathrooms,
+    propertyType: p.propertyType,
+    city: p.city,
+    neighborhood: p.neighborhood,
+    address: p.address,
+    lat: p.latitude,
+    lng: p.longitude,
+    images: p.images || [],
+    url: `/properties/${p.id}`,
+    score: 0.6, // base; will be re-ranked
+    createdAt: p.createdAt
+  };
+}
+
+function mapIntelToUnified(x: any) {
+  return {
+    id: `intel_${x.id || x.externalId}`,
+    source: "intel",
+    title: x.title || x.headline,
+    summary: x.summary || x.description || "",
+    price: x.price?.amount ?? null,
+    currency: x.price?.currency ?? "BWP",
+    bedrooms: x.bedrooms ?? null,
+    bathrooms: x.bathrooms ?? null,
+    propertyType: (x.type || x.propertyType || "").toLowerCase(),
+    city: x.city || x.location?.city,
+    neighborhood: x.neighborhood || x.location?.neighborhood,
+    address: x.address || x.location?.address,
+    lat: x.lat ?? x.location?.lat ?? null,
+    lng: x.lng ?? x.location?.lng ?? null,
+    images: x.images || [],
+    url: x.url,            // outbound link if available
+    score: x.score ?? 0.55,
+    createdAt: x.createdAt || x.listedAt || null
+  };
+}
+
+// simple dedupe by address+price (customize as needed)
+function dedupe(items: any[]) {
+  const seen = new Set<string>();
+  const out: any[] = [];
+  for (const it of items) {
+    const key = `${(it.address||"").toLowerCase()}|${it.price||""}|${it.bedrooms||""}|${it.propertyType||""}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push(it);
+  }
+  return out;
+}
+
+// relevance score boost if item matches derived filters
+function scoreBoost(it: any, derived: {beds?: number, type?: string}, q: string) {
+  let s = it.score || 0.5;
+  if (derived.beds && (it.bedrooms ?? 0) >= derived.beds) s += 0.1;
+  if (derived.type && it.propertyType?.includes(derived.type)) s += 0.1;
+  // lightweight semantic bump if title/summary includes tokens
+  if (q) {
+    const hit = (txt: string) => txt?.toLowerCase().includes(q.toLowerCase());
+    if (hit(it.title)) s += 0.05;
+    if (hit(it.summary)) s += 0.05;
+  }
+  return s;
+}
+
+export async function searchAggregator(req: Request, res: Response) {
+  try {
+    const q = String(req.query.q || "").trim();
+    const sort = String(req.query.sort || "newest");
+
+    const derived = parseFreeText(q);
+
+    // Run in parallel with timeout guards
+    const [local, intel] = await Promise.allSettled([
+      queryDB(q, sort),
+      queryIntel(q, derived)
+    ]);
+
+    const localItems = local.status === "fulfilled" ? local.value : [];
+    const intelItems = intel.status === "fulfilled" ? intel.value : [];
+
+    let merged = dedupe([...localItems, ...intelItems]).map((it) => ({
+      ...it,
+      score: scoreBoost(it, derived, q)
+    }));
+
+    // final sort
+    merged.sort((a, b) => b.score - a.score);
+
+    res.json({ query: q, count: merged.length, items: merged });
+  } catch (e: any) {
+    res.status(500).json({ error: e?.message || "Search failed" });
+  }
+}
+
+
+Wire it up:
+
+// server/index.ts
+import { searchAggregator } from "./search-aggregator";
+app.get("/api/search", searchAggregator);
+
+
+Add env vars:
+
+REALESTATEINTEL_URL=https://<your-intel-endpoint>/search
+REALESTATEINTEL_API_KEY=***************
+
+2) Client: call the aggregator (button now triggers real search)
+// client/src/pages/PropertiesPage.tsx
+const [filters, setFilters] = useState({ q: "", sort: "newest" });
+
+const { data, isLoading, isError } = useQuery({
+  queryKey: ["search", filters],
+  queryFn: async () => {
+    const params = new URLSearchParams();
+    if (filters.q) params.set("q", filters.q);
+    if (filters.sort) params.set("sort", filters.sort);
+    const r = await fetch(`/api/search?${params.toString()}`, {
+      headers: { Accept: "application/json" }
+    });
+    if (!r.ok) throw new Error(await r.text());
+    const { items } = await r.json();
+    return items; // unified list
+  },
+});
+
+<SmartSearchBar
+  initial={filters.q}
+  onSearch={(q) => setFilters((f) => ({ ...f, q }))}
+/>
+
+// then render `data` as your property cards (id/url/source/price/... are unified)
+
+3) Prompting RealEstateIntel (if it expects GPT-style prompts)
+
+If your Intel endpoint accepts a “prompt” instead of strict fields, send both:
+
+natural language: the user query
+
+structured intent: beds/type/location extracted
+
+Example body you can use in queryIntel instead:
+
+body: JSON.stringify({
+  prompt: `
+You are RealEstateIntel for Botswana. Return up to 50 property results as JSON.
+User query: "${q}"
+Derived filters: ${JSON.stringify(derived)}
+Return fields: id,title,description,price{amount,currency},bedrooms,bathrooms,propertyType,location{address,city,neighborhood,lat,lng},images[],url,listedAt,score.
+Only JSON.`,
+  q,
+  derived,
+  market: "BW",
+  maxResults: 50
+})
+
+4) Nice touches (optional but recommended)
+
+Feature flag: allow turning Intel on/off via USE_INTEL=true|false for quick isolation.
+
+Caching: wrap queryIntel with a 30–60s in-memory cache keyed by q to keep the UI snappy.
+
+Telemetry: log query, sources_hit, count_local, count_intel to spot coverage gaps.
+
+Fallback: if Intel fails, still return local results; if local empty but Intel has hits, render with a “from partner sources” badge.
+
+Badge in UI: show item.source as a small tag (“Local” | “Intel”) for transparency.
+
+5) Why your “Search” was toggling without results
+
+The button likely only flipped a local “loading” state and didn’t change the queryKey for TanStack Query → no refetch.
+
+Backend only supported strict filters; free-text like “three bedroomed house” had no effect → empty array.
+
+This aggregator fixes both: refetch on q change + NLP mapping + Intel enrichment.
+
+If you want, I can also give you a tiny seed file with 3-bed houses in Phakalane and G-West to verify the “three bedroomed house” query returns hits immediately.
+
+ChatGPT can make mistakes. Check important info.
