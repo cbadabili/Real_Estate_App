@@ -22,7 +22,7 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { SmartSearchBar } from '../components/search/SmartSearchBar';
+import SmartSearchBar from '../components/search/SmartSearchBar';
 
 interface RentalProperty {
   id: number;
