@@ -368,7 +368,7 @@ const PropertiesPage: React.FC = () => {
             ) : viewMode === 'map' ? (
               <div className="h-[800px] bg-gray-100 rounded-lg">
                 <PropertyMap 
-                  properties={properties.map(p => ({
+                  properties={properties.map((p: any) => ({
                     id: p.id,
                     title: p.title,
                     latitude: p.latitude,
@@ -384,7 +384,7 @@ const PropertiesPage: React.FC = () => {
             ) : (
               <PropertyGrid
                 properties={sortedProperties}
-                viewMode={viewMode === 'map' ? 'grid' : viewMode as 'grid' | 'list'}
+                viewMode={viewMode !== 'map' ? viewMode as 'grid' | 'list' : 'grid'}
                 isLoading={isLoading}
                 onAddToComparison={addToComparison}
                 comparisonProperties={comparisonProperties}
