@@ -4,7 +4,7 @@ import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
 // Mapbox access token - you'll need to set this in your environment
-const MAPBOX_TOKEN = process.env.VITE_MAPBOX_TOKEN || 'pk.eyJ1IjoiYmVlZGFiIiwiYSI6ImNsdXNxYjhxZDBienEyanRiOGt4cXNrd2QifQ.your-token-here';
+const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN || 'pk.eyJ1IjoiYmVlZGFiIiwiYSI6ImNsdXNxYjhxZDBienEyanRiOGt4cXNrd2QifQ.your-token-here';
 
 interface Location {
   id: string;
