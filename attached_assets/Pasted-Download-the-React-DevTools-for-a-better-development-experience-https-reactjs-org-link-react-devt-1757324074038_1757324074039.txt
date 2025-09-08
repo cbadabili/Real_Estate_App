@@ -1,0 +1,82 @@
+Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+useProperties.ts:40  GET https://c5d9396e-4f47-41f7-84a6-838e7c0e0ed4-00-3i9qi3675up46.picard.replit.dev:5173/api/properties net::ERR_ABORTED 404 (Not Found)
+queryFn @ useProperties.ts:40
+fetchFn @ @tanstack_react-query.js?v=fcff60b9:881
+run @ @tanstack_react-query.js?v=fcff60b9:513
+start @ @tanstack_react-query.js?v=fcff60b9:555
+fetch @ @tanstack_react-query.js?v=fcff60b9:969
+executeFetch_fn @ @tanstack_react-query.js?v=fcff60b9:2279
+onSubscribe @ @tanstack_react-query.js?v=fcff60b9:1983
+subscribe @ @tanstack_react-query.js?v=fcff60b9:24
+(anonymous) @ @tanstack_react-query.js?v=fcff60b9:3146
+subscribeToStore @ chunk-WERSD76P.js?v=fcff60b9:11984
+commitHookEffectListMount @ chunk-WERSD76P.js?v=fcff60b9:16915
+commitPassiveMountOnFiber @ chunk-WERSD76P.js?v=fcff60b9:18156
+commitPassiveMountEffects_complete @ chunk-WERSD76P.js?v=fcff60b9:18129
+commitPassiveMountEffects_begin @ chunk-WERSD76P.js?v=fcff60b9:18119
+commitPassiveMountEffects @ chunk-WERSD76P.js?v=fcff60b9:18109
+flushPassiveEffectsImpl @ chunk-WERSD76P.js?v=fcff60b9:19490
+flushPassiveEffects @ chunk-WERSD76P.js?v=fcff60b9:19447
+(anonymous) @ chunk-WERSD76P.js?v=fcff60b9:19328
+workLoop @ chunk-WERSD76P.js?v=fcff60b9:197
+flushWork @ chunk-WERSD76P.js?v=fcff60b9:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=fcff60b9:384Understand this error
+useProperties.ts:40  GET https://c5d9396e-4f47-41f7-84a6-838e7c0e0ed4-00-3i9qi3675up46.picard.replit.dev:5173/api/properties net::ERR_ABORTED 404 (Not Found)
+queryFn @ useProperties.ts:40
+fetchFn @ @tanstack_react-query.js?v=fcff60b9:881
+run @ @tanstack_react-query.js?v=fcff60b9:513
+(anonymous) @ @tanstack_react-query.js?v=fcff60b9:538
+Promise.then
+(anonymous) @ @tanstack_react-query.js?v=fcff60b9:534
+Promise.catch
+run @ @tanstack_react-query.js?v=fcff60b9:517
+start @ @tanstack_react-query.js?v=fcff60b9:555
+fetch @ @tanstack_react-query.js?v=fcff60b9:969
+executeFetch_fn @ @tanstack_react-query.js?v=fcff60b9:2279
+onSubscribe @ @tanstack_react-query.js?v=fcff60b9:1983
+subscribe @ @tanstack_react-query.js?v=fcff60b9:24
+(anonymous) @ @tanstack_react-query.js?v=fcff60b9:3146
+subscribeToStore @ chunk-WERSD76P.js?v=fcff60b9:11984
+commitHookEffectListMount @ chunk-WERSD76P.js?v=fcff60b9:16915
+commitPassiveMountOnFiber @ chunk-WERSD76P.js?v=fcff60b9:18156
+commitPassiveMountEffects_complete @ chunk-WERSD76P.js?v=fcff60b9:18129
+commitPassiveMountEffects_begin @ chunk-WERSD76P.js?v=fcff60b9:18119
+commitPassiveMountEffects @ chunk-WERSD76P.js?v=fcff60b9:18109
+flushPassiveEffectsImpl @ chunk-WERSD76P.js?v=fcff60b9:19490
+flushPassiveEffects @ chunk-WERSD76P.js?v=fcff60b9:19447
+(anonymous) @ chunk-WERSD76P.js?v=fcff60b9:19328
+workLoop @ chunk-WERSD76P.js?v=fcff60b9:197
+flushWork @ chunk-WERSD76P.js?v=fcff60b9:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=fcff60b9:384Understand this error
+useProperties.ts:40  GET https://c5d9396e-4f47-41f7-84a6-838e7c0e0ed4-00-3i9qi3675up46.picard.replit.dev:5173/api/properties 404 (Not Found)
+queryFn @ useProperties.ts:40
+fetchFn @ @tanstack_react-query.js?v=fcff60b9:881
+run @ @tanstack_react-query.js?v=fcff60b9:513
+(anonymous) @ @tanstack_react-query.js?v=fcff60b9:538
+Promise.then
+(anonymous) @ @tanstack_react-query.js?v=fcff60b9:534
+Promise.catch
+run @ @tanstack_react-query.js?v=fcff60b9:517
+(anonymous) @ @tanstack_react-query.js?v=fcff60b9:538
+Promise.then
+(anonymous) @ @tanstack_react-query.js?v=fcff60b9:534
+Promise.catch
+run @ @tanstack_react-query.js?v=fcff60b9:517
+start @ @tanstack_react-query.js?v=fcff60b9:555
+fetch @ @tanstack_react-query.js?v=fcff60b9:969
+executeFetch_fn @ @tanstack_react-query.js?v=fcff60b9:2279
+onSubscribe @ @tanstack_react-query.js?v=fcff60b9:1983
+subscribe @ @tanstack_react-query.js?v=fcff60b9:24
+(anonymous) @ @tanstack_react-query.js?v=fcff60b9:3146
+subscribeToStore @ chunk-WERSD76P.js?v=fcff60b9:11984
+commitHookEffectListMount @ chunk-WERSD76P.js?v=fcff60b9:16915
+commitPassiveMountOnFiber @ chunk-WERSD76P.js?v=fcff60b9:18156
+commitPassiveMountEffects_complete @ chunk-WERSD76P.js?v=fcff60b9:18129
+commitPassiveMountEffects_begin @ chunk-WERSD76P.js?v=fcff60b9:18119
+commitPassiveMountEffects @ chunk-WERSD76P.js?v=fcff60b9:18109
+flushPassiveEffectsImpl @ chunk-WERSD76P.js?v=fcff60b9:19490
+flushPassiveEffects @ chunk-WERSD76P.js?v=fcff60b9:19447
+(anonymous) @ chunk-WERSD76P.js?v=fcff60b9:19328
+workLoop @ chunk-WERSD76P.js?v=fcff60b9:197
+flushWork @ chunk-WERSD76P.js?v=fcff60b9:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=fcff60b9:384Understand this error
