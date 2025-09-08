@@ -113,6 +113,7 @@ export default function SmartSearchBar({ onSearch, initial = "", suggest }: Prop
 
   function onSubmit(e?: React.FormEvent) {
     e?.preventDefault();
+    if (!q.trim()) return;
     doSearch(q);
   }
 
@@ -161,13 +162,15 @@ export default function SmartSearchBar({ onSearch, initial = "", suggest }: Prop
             onFocus={() => setOpen(true)}
             onKeyDown={onKeyDown}
             placeholder="Search properties in Botswana…"
-            className="w-full rounded-lg border border-gray-300 bg-white pl-12 pr-24 py-4 text-gray-900 placeholder-gray-500 focus:border-beedab-blue focus:outline-none focus:ring-1 focus:ring-beedab-blue"
+            className="w-full rounded-lg border border-gray-300 bg-white pl-12 pr-16 sm:pr-24 py-3 sm:py-4 text-sm sm:text-base text-gray-900 placeholder-gray-500 focus:border-beedab-blue focus:outline-none focus:ring-1 focus:ring-beedab-blue"
           />
           <button
             type="submit"
-            className="absolute right-2 rounded-md bg-beedab-blue px-4 py-2 text-white font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-beedab-blue focus:ring-offset-2 transition-colors"
+            disabled={!q.trim()}
+            className="absolute right-2 rounded-md bg-beedab-blue px-2 sm:px-4 py-1.5 sm:py-2 text-white text-xs sm:text-sm font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-beedab-blue focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Search
+            <span className="hidden sm:inline">Search</span>
+            <Search className="h-4 w-4 sm:hidden" />
           </button>
         </div>
       </form>

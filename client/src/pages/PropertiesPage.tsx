@@ -91,6 +91,34 @@ const PropertiesPage: React.FC = () => {
   // Handle AI search query and apply filters
   const handleSmartSearch = async (query: string) => {
     if (!query.trim()) return;
+    
+    setSearchTerm(query);
+    setIsSearching(true);
+    
+    try {
+      // First try the regular search endpoint
+      const response = await fetch(`/api/search?q=${encodeURIComponent(query)}&sort=${sortBy}&limit=20`);
+      if (!response.ok) throw new Error('Search failed');
+
+      const data = await response.json();
+      
+      if (data.results) {
+        setProperties(data.results);
+        setSearchResults(data.results);
+      }
+    } catch (error) {
+      console.error('Search failed:', error);
+      // Fall back to filtering existing properties
+      const filteredProperties = properties.filter(property =>
+        property.title?.toLowerCase().includes(query.toLowerCase()) ||
+        property.description?.toLowerCase().includes(query.toLowerCase()) ||
+        property.city?.toLowerCase().includes(query.toLowerCase()) ||
+        property.neighborhood?.toLowerCase().includes(query.toLowerCase())
+      );
+      setSearchResults(filteredProperties);
+    } finally {
+      setIsSearching(false);
+    }
 
     // First, try to perform an AI-driven search
     const aiResult = await performSearch(query); // Use performSearch from useSearch hook
@@ -231,12 +259,9 @@ const PropertiesPage: React.FC = () => {
           {/* Smart Search Bar */}
           <div className="relative z-50">
             <SmartSearchBar
-              initial={searchTerm} // Use searchTerm for initial value
-              onSearch={handleSmartSearch} // Use the combined handler
-              suggest={fetchSuggestions} // Pass the fetchSuggestions function
-              placeholder="Search properties in Botswana..."
-              showFilters={true} // This prop might be for internal SmartSearchBar UI
-              onFilterClick={() => setShowFilters(!showFilters)} // This prop might be for internal SmartSearchBar UI
+              initial={searchTerm}
+              onSearch={handleSmartSearch}
+              suggest={fetchSuggestions}
             />
 
             {(aiIsSearching || isSearching) && ( // Show loading if either AI or regular search is active
