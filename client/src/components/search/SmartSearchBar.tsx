@@ -151,7 +151,7 @@ export const SmartSearchBar: React.FC<SmartSearchBarProps> = ({
   }, []);
 
   return (
-    <div className={`relative ${className}`}>
+    <div className={`relative z-[10000] ${className}`}>
       <form onSubmit={handleSubmit} className="relative">
         <div className={`
           relative flex items-center bg-white border-2 rounded-lg transition-all duration-200
@@ -225,7 +225,7 @@ export const SmartSearchBar: React.FC<SmartSearchBarProps> = ({
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-96 overflow-y-auto"
+            className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg z-[10001] max-h-96 overflow-y-auto"
           >
             {value.length === 0 && trendingSearches.length > 0 && (
               <div className="p-3 border-b border-gray-100">
