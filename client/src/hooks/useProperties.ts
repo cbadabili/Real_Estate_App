@@ -40,7 +40,8 @@ export const useProperties = (filters?: PropertyFilters) => {
       const response = await fetch(url, {
         headers: {
           'Cache-Control': 'no-cache',
-          'Pragma': 'no-cache'
+          'Pragma': 'no-cache',
+          'Accept': 'application/json'
         }
       });
       if (!response.ok) {

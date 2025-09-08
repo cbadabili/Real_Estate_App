@@ -1219,6 +1219,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.send(svg);
   });
 
+
   // Marketplace routes
   app.use("/api/marketplace", marketplaceRoutes);
 
