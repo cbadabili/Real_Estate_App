@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { Search, MapPin, Clock, Sparkles, X, TrendingUp, Star, Filter } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -33,8 +34,10 @@ export const SmartSearchBar: React.FC<SmartSearchBarProps> = ({
   const [aiRecommendations, setAiRecommendations] = useState<string[]>([]);
   const [trendingSearches, setTrendingSearches] = useState<string[]>([]);
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
+  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
   const inputRef = useRef<HTMLInputElement>(null);
   const suggestionsRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const botswanaLocations = [
     'Gaborone', 'Francistown', 'Molepolole', 'Kanye', 'Serowe',
@@ -151,7 +154,7 @@ export const SmartSearchBar: React.FC<SmartSearchBarProps> = ({
   }, []);
 
   return (
-    <div className={`relative z-[10000] ${className}`}>
+    <div className={`relative ${className}`} ref={containerRef} style={{ zIndex: 999999 }}>
       <form onSubmit={handleSubmit} className="relative">
         <div className={`
           relative flex items-center bg-white border-2 rounded-lg transition-all duration-200
@@ -225,7 +228,8 @@ export const SmartSearchBar: React.FC<SmartSearchBarProps> = ({
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg z-[10001] max-h-96 overflow-y-auto"
+            style={{ zIndex: 999999 }}
+            className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-xl max-h-96 overflow-y-auto"
           >
             {value.length === 0 && trendingSearches.length > 0 && (
               <div className="p-3 border-b border-gray-100">
