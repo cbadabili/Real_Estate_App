@@ -1,0 +1,135 @@
+That 500 means the server route for /api/properties is crashing. Given the recent edits we made to add natural-language search, the most likely culprit is a tiny import bug:
+
+We used or(...) in the WHERE clause but didn’t import it from drizzle-orm.
+When Node hits or(...) → ReferenceError: or is not defined → 500.
+
+Here’s a tight patch + a couple of safeguards.
+
+1) Fix the route (import or and harden ordering)
+
+server/routes.ts (or wherever your properties GET lives)
+
+// ⬇️ make sure `or` is imported
+import { and, or, ilike, gte, desc } from "drizzle-orm"; // add `or`
+
+// ...inside your routes file...
+
+// Optional: keep our simple free-text parser
+function parseFreeText(q: string) {
+  const lower = q.toLowerCase();
+  let beds: number | undefined;
+  const digit = lower.match(/(\d+)\s*(bed|bedroom)/);
+  if (digit) beds = parseInt(digit[1], 10);
+  else {
+    const words: Record<string, number> = { one:1, two:2, three:3, four:4, five:5, six:6 };
+    const w = lower.match(/(one|two|three|four|five|six)\s*(bed|bedroom|bedroomed)/);
+    if (w) beds = words[w[1]];
+  }
+  let type: string | undefined;
+  if (/\b(house|standalone)\b/.test(lower)) type = "house";
+  else if (/\b(apartment|flat)\b/.test(lower)) type = "apartment";
+  else if (/\b(townhouse)\b/.test(lower)) type = "townhouse";
+  else if (/\b(plot|land)\b/.test(lower)) type = "plot";
+  return { beds, type };
+}
+
+app.get("/api/properties", async (req, res) => {
+  try {
+    const q = String(req.query.q ?? "").trim();
+    const sort = String(req.query.sort ?? "newest");
+
+    const whereTerms: any[] = [];
+
+    if (q) {
+      const like = `%${q}%`;
+      // ⬇️ this uses `or(...)` — import added above
+      whereTerms.push(
+        or(
+          ilike(properties.title, like),
+          ilike(properties.description, like),
+          ilike(properties.city, like),
+          ilike(properties.neighborhood, like),
+          ilike(properties.address, like),
+        )
+      );
+
+      const { beds, type } = parseFreeText(q);
+      if (beds) whereTerms.push(gte(properties.bedrooms, beds));
+      if (type) whereTerms.push(ilike(properties.propertyType, `%${type}%`));
+    }
+
+    const where = whereTerms.length ? and(...whereTerms) : undefined;
+
+    // ⬇️ be defensive if `createdAt` doesn’t exist in your schema
+    const orderBy =
+      sort === "price_low"  ?  properties.price :
+      sort === "price_high" ?  desc(properties.price) :
+      (properties as any).createdAt ? desc((properties as any).createdAt) :
+      desc(properties.id);
+
+    const rows = await db
+      .select()
+      .from(properties)
+      .where(where)
+      .orderBy(orderBy)
+      .limit(50);
+
+    res.json(rows);
+  } catch (err: any) {
+    console.error("GET /api/properties error:", err);
+    res.status(500).json({ error: err?.message || "Internal Server Error" });
+  }
+});
+
+2) Make sure the dev proxy is in place (frontend → backend)
+
+Your browser shows …:5173/api/properties — that’s fine as long as Vite proxies it to Express (5000). Double-check:
+
+client/vite.config.ts
+
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+
+export default defineConfig({
+  plugins: [react()],
+  server: {
+    port: 5173,
+    proxy: {
+      '/api': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+        secure: false,
+      },
+    },
+  },
+})
+
+3) (Optional) Point your hooks at the aggregator search
+
+If you already added /api/search (local DB + RealEstateIntel merge), update your hook so the Search button/Enter actually pull from the combined source:
+
+client/src/hooks/useProperties.ts
+
+// change this:
+const res = await fetch(`/api/properties?...`)
+
+// to this (if using the aggregator):
+const res = await fetch(`/api/search?${params.toString()}`, {
+  headers: { Accept: 'application/json' },
+});
+
+
+And ensure the query key includes filters.q so React Query refetches when you click Search / pick a suggestion:
+
+useQuery({ queryKey: ['search', filters], queryFn: ... });
+
+4) Quick sanity checks
+
+Restart the server after the import change.
+
+In the Network tab, click Properties page → GET /api/properties should return 200 JSON (or [] if empty), not 500.
+
+If you still get 500, open the server logs — you’ll see the precise error line now (we added console.error).
+The next most common issue is a column name mismatch (e.g., createdAt vs created_at). If so, swap the orderBy to a column you have (often id).
+
+If you paste your current server/routes.ts (or the file that defines /api/properties) I’ll patch it line-by-line to match your exact schema.
