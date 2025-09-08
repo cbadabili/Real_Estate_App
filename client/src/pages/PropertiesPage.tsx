@@ -8,7 +8,7 @@ import { PropertyGrid } from '../components/properties/PropertyGrid';
 import PropertyMap from '../components/properties/PropertyMap';
 import { PropertyComparison } from '../components/properties/PropertyComparison';
 import { SavedSearches } from '../components/properties/SavedSearches';
-import { SmartSearchBar } from '../components/search/SmartSearchBar';
+import SmartSearchBar from '../components/search/SmartSearchBar';
 import { SearchResultsHeader } from '../components/search/SearchResultsHeader';
 import { PageHeader } from '../components/layout/PageHeader';
 import { QuickActions } from '../components/ui/QuickActions';
