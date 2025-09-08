@@ -1,0 +1,158 @@
+useProperties.ts:40  GET https://c5d9396e-4f47-41f7-84a6-838e7c0e0ed4-00-3i9qi3675up46.picard.replit.dev:5173/api/properties 500 (Internal Server Error)
+queryFn @ useProperties.ts:40
+fetchFn @ @tanstack_react-query.js?v=33fe446a:881
+run @ @tanstack_react-query.js?v=33fe446a:513
+start @ @tanstack_react-query.js?v=33fe446a:555
+fetch @ @tanstack_react-query.js?v=33fe446a:969
+executeFetch_fn @ @tanstack_react-query.js?v=33fe446a:2279
+onSubscribe @ @tanstack_react-query.js?v=33fe446a:1983
+subscribe @ @tanstack_react-query.js?v=33fe446a:24
+(anonymous) @ @tanstack_react-query.js?v=33fe446a:3146
+subscribeToStore @ chunk-WERSD76P.js?v=33fe446a:11984
+commitHookEffectListMount @ chunk-WERSD76P.js?v=33fe446a:16915
+commitPassiveMountOnFiber @ chunk-WERSD76P.js?v=33fe446a:18156
+commitPassiveMountEffects_complete @ chunk-WERSD76P.js?v=33fe446a:18129
+commitPassiveMountEffects_begin @ chunk-WERSD76P.js?v=33fe446a:18119
+commitPassiveMountEffects @ chunk-WERSD76P.js?v=33fe446a:18109
+flushPassiveEffectsImpl @ chunk-WERSD76P.js?v=33fe446a:19490
+flushPassiveEffects @ chunk-WERSD76P.js?v=33fe446a:19447
+(anonymous) @ chunk-WERSD76P.js?v=33fe446a:19328
+workLoop @ chunk-WERSD76P.js?v=33fe446a:197
+flushWork @ chunk-WERSD76P.js?v=33fe446a:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=33fe446a:384Understand this error
+useProperties.ts:40  GET https://c5d9396e-4f47-41f7-84a6-838e7c0e0ed4-00-3i9qi3675up46.picard.replit.dev:5173/api/properties net::ERR_ABORTED 500 (Internal Server Error)
+queryFn @ useProperties.ts:40
+fetchFn @ @tanstack_react-query.js?v=33fe446a:881
+run @ @tanstack_react-query.js?v=33fe446a:513
+(anonymous) @ @tanstack_react-query.js?v=33fe446a:538
+Promise.then
+(anonymous) @ @tanstack_react-query.js?v=33fe446a:534
+Promise.catch
+run @ @tanstack_react-query.js?v=33fe446a:517
+start @ @tanstack_react-query.js?v=33fe446a:555
+fetch @ @tanstack_react-query.js?v=33fe446a:969
+executeFetch_fn @ @tanstack_react-query.js?v=33fe446a:2279
+onSubscribe @ @tanstack_react-query.js?v=33fe446a:1983
+subscribe @ @tanstack_react-query.js?v=33fe446a:24
+(anonymous) @ @tanstack_react-query.js?v=33fe446a:3146
+subscribeToStore @ chunk-WERSD76P.js?v=33fe446a:11984
+commitHookEffectListMount @ chunk-WERSD76P.js?v=33fe446a:16915
+commitPassiveMountOnFiber @ chunk-WERSD76P.js?v=33fe446a:18156
+commitPassiveMountEffects_complete @ chunk-WERSD76P.js?v=33fe446a:18129
+commitPassiveMountEffects_begin @ chunk-WERSD76P.js?v=33fe446a:18119
+commitPassiveMountEffects @ chunk-WERSD76P.js?v=33fe446a:18109
+flushPassiveEffectsImpl @ chunk-WERSD76P.js?v=33fe446a:19490
+flushPassiveEffects @ chunk-WERSD76P.js?v=33fe446a:19447
+(anonymous) @ chunk-WERSD76P.js?v=33fe446a:19328
+workLoop @ chunk-WERSD76P.js?v=33fe446a:197
+flushWork @ chunk-WERSD76P.js?v=33fe446a:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=33fe446a:384Understand this error
+useProperties.ts:40  GET https://c5d9396e-4f47-41f7-84a6-838e7c0e0ed4-00-3i9qi3675up46.picard.replit.dev:5173/api/properties 500 (Internal Server Error)
+queryFn @ useProperties.ts:40
+fetchFn @ @tanstack_react-query.js?v=33fe446a:881
+run @ @tanstack_react-query.js?v=33fe446a:513
+(anonymous) @ @tanstack_react-query.js?v=33fe446a:538
+Promise.then
+(anonymous) @ @tanstack_react-query.js?v=33fe446a:534
+Promise.catch
+run @ @tanstack_react-query.js?v=33fe446a:517
+(anonymous) @ @tanstack_react-query.js?v=33fe446a:538
+Promise.then
+(anonymous) @ @tanstack_react-query.js?v=33fe446a:534
+Promise.catch
+run @ @tanstack_react-query.js?v=33fe446a:517
+start @ @tanstack_react-query.js?v=33fe446a:555
+fetch @ @tanstack_react-query.js?v=33fe446a:969
+executeFetch_fn @ @tanstack_react-query.js?v=33fe446a:2279
+onSubscribe @ @tanstack_react-query.js?v=33fe446a:1983
+subscribe @ @tanstack_react-query.js?v=33fe446a:24
+(anonymous) @ @tanstack_react-query.js?v=33fe446a:3146
+subscribeToStore @ chunk-WERSD76P.js?v=33fe446a:11984
+commitHookEffectListMount @ chunk-WERSD76P.js?v=33fe446a:16915
+commitPassiveMountOnFiber @ chunk-WERSD76P.js?v=33fe446a:18156
+commitPassiveMountEffects_complete @ chunk-WERSD76P.js?v=33fe446a:18129
+commitPassiveMountEffects_begin @ chunk-WERSD76P.js?v=33fe446a:18119
+commitPassiveMountEffects @ chunk-WERSD76P.js?v=33fe446a:18109
+flushPassiveEffectsImpl @ chunk-WERSD76P.js?v=33fe446a:19490
+flushPassiveEffects @ chunk-WERSD76P.js?v=33fe446a:19447
+(anonymous) @ chunk-WERSD76P.js?v=33fe446a:19328
+workLoop @ chunk-WERSD76P.js?v=33fe446a:197
+flushWork @ chunk-WERSD76P.js?v=33fe446a:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=33fe446a:384Understand this error
+MapSearchPage.tsx:37  GET https://c5d9396e-4f47-41f7-84a6-838e7c0e0ed4-00-3i9qi3675up46.picard.replit.dev:5173/api/properties?status=active 500 (Internal Server Error)
+fetchProperties @ MapSearchPage.tsx:37
+(anonymous) @ MapSearchPage.tsx:140
+commitHookEffectListMount @ chunk-WERSD76P.js?v=33fe446a:16915
+commitPassiveMountOnFiber @ chunk-WERSD76P.js?v=33fe446a:18156
+commitPassiveMountEffects_complete @ chunk-WERSD76P.js?v=33fe446a:18129
+commitPassiveMountEffects_begin @ chunk-WERSD76P.js?v=33fe446a:18119
+commitPassiveMountEffects @ chunk-WERSD76P.js?v=33fe446a:18109
+flushPassiveEffectsImpl @ chunk-WERSD76P.js?v=33fe446a:19490
+flushPassiveEffects @ chunk-WERSD76P.js?v=33fe446a:19447
+(anonymous) @ chunk-WERSD76P.js?v=33fe446a:19328
+workLoop @ chunk-WERSD76P.js?v=33fe446a:197
+flushWork @ chunk-WERSD76P.js?v=33fe446a:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=33fe446a:384Understand this error
+MapSearchPage.tsx:132 Error fetching properties: Error: HTTP error! status: 500
+    at fetchProperties (MapSearchPage.tsx:40:15)
+fetchProperties @ MapSearchPage.tsx:132
+await in fetchProperties
+(anonymous) @ MapSearchPage.tsx:140
+commitHookEffectListMount @ chunk-WERSD76P.js?v=33fe446a:16915
+commitPassiveMountOnFiber @ chunk-WERSD76P.js?v=33fe446a:18156
+commitPassiveMountEffects_complete @ chunk-WERSD76P.js?v=33fe446a:18129
+commitPassiveMountEffects_begin @ chunk-WERSD76P.js?v=33fe446a:18119
+commitPassiveMountEffects @ chunk-WERSD76P.js?v=33fe446a:18109
+flushPassiveEffectsImpl @ chunk-WERSD76P.js?v=33fe446a:19490
+flushPassiveEffects @ chunk-WERSD76P.js?v=33fe446a:19447
+(anonymous) @ chunk-WERSD76P.js?v=33fe446a:19328
+workLoop @ chunk-WERSD76P.js?v=33fe446a:197
+flushWork @ chunk-WERSD76P.js?v=33fe446a:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=33fe446a:384Understand this error
+MapSearchPage.tsx:37  GET https://c5d9396e-4f47-41f7-84a6-838e7c0e0ed4-00-3i9qi3675up46.picard.replit.dev:5173/api/properties?status=active net::ERR_ABORTED 500 (Internal Server Error)
+fetchProperties @ MapSearchPage.tsx:37
+(anonymous) @ MapSearchPage.tsx:140
+commitHookEffectListMount @ chunk-WERSD76P.js?v=33fe446a:16915
+invokePassiveEffectMountInDEV @ chunk-WERSD76P.js?v=33fe446a:18324
+invokeEffectsInDev @ chunk-WERSD76P.js?v=33fe446a:19701
+commitDoubleInvokeEffectsInDEV @ chunk-WERSD76P.js?v=33fe446a:19686
+flushPassiveEffectsImpl @ chunk-WERSD76P.js?v=33fe446a:19503
+flushPassiveEffects @ chunk-WERSD76P.js?v=33fe446a:19447
+(anonymous) @ chunk-WERSD76P.js?v=33fe446a:19328
+workLoop @ chunk-WERSD76P.js?v=33fe446a:197
+flushWork @ chunk-WERSD76P.js?v=33fe446a:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=33fe446a:384Understand this error
+MapSearchPage.tsx:132 Error fetching properties: Error: HTTP error! status: 500
+    at fetchProperties (MapSearchPage.tsx:40:15)
+fetchProperties @ MapSearchPage.tsx:132
+await in fetchProperties
+(anonymous) @ MapSearchPage.tsx:140
+commitHookEffectListMount @ chunk-WERSD76P.js?v=33fe446a:16915
+invokePassiveEffectMountInDEV @ chunk-WERSD76P.js?v=33fe446a:18324
+invokeEffectsInDev @ chunk-WERSD76P.js?v=33fe446a:19701
+commitDoubleInvokeEffectsInDEV @ chunk-WERSD76P.js?v=33fe446a:19686
+flushPassiveEffectsImpl @ chunk-WERSD76P.js?v=33fe446a:19503
+flushPassiveEffects @ chunk-WERSD76P.js?v=33fe446a:19447
+(anonymous) @ chunk-WERSD76P.js?v=33fe446a:19328
+workLoop @ chunk-WERSD76P.js?v=33fe446a:197
+flushWork @ chunk-WERSD76P.js?v=33fe446a:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=33fe446a:384Understand this error
+MapSearchPage.tsx:37  GET https://c5d9396e-4f47-41f7-84a6-838e7c0e0ed4-00-3i9qi3675up46.picard.replit.dev:5173/api/properties?status=active net::ERR_ABORTED 500 (Internal Server Error)
+fetchProperties @ MapSearchPage.tsx:37
+callCallback2 @ chunk-WERSD76P.js?v=33fe446a:3674
+invokeGuardedCallbackDev @ chunk-WERSD76P.js?v=33fe446a:3699
+invokeGuardedCallback @ chunk-WERSD76P.js?v=33fe446a:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-WERSD76P.js?v=33fe446a:3736
+executeDispatch @ chunk-WERSD76P.js?v=33fe446a:7014
+processDispatchQueueItemsInOrder @ chunk-WERSD76P.js?v=33fe446a:7034
+processDispatchQueue @ chunk-WERSD76P.js?v=33fe446a:7043
+dispatchEventsForPlugins @ chunk-WERSD76P.js?v=33fe446a:7051
+(anonymous) @ chunk-WERSD76P.js?v=33fe446a:7174
+batchedUpdates$1 @ chunk-WERSD76P.js?v=33fe446a:18913
+batchedUpdates @ chunk-WERSD76P.js?v=33fe446a:3579
+dispatchEventForPluginEventSystem @ chunk-WERSD76P.js?v=33fe446a:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-WERSD76P.js?v=33fe446a:5478
+dispatchEvent @ chunk-WERSD76P.js?v=33fe446a:5472
+dispatchDiscreteEvent @ chunk-WERSD76P.js?v=33fe446a:5449Understand this error
+MapSearchPage.tsx:132 Error fetching properties: Error: HTTP error! status: 500
+    at fetchProperties (MapSearchPage.tsx:40:15)
