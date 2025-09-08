@@ -1,0 +1,391 @@
+Awesome—let’s flip Smart Search ON and wire the whole flow end-to-end (DB + OpenAI “intel” + suggestions), with the cost-efficient model split we discussed.
+
+I’ll give you copy-paste patches by file so you can enable this right now.
+
+0) Server env (secrets)
+
+Add these server-side vars (Replit → Tools → Secrets, Vercel → Project → Settings → Environment Variables, or server/.env):
+
+OPENAI_API_KEY=sk-...            # your key
+USE_INTEL=true                   # turns on external intel
+REALESTATEINTEL_URL=http://localhost:5000/intel/search
+REALESTATEINTEL_SUGGEST_URL=http://localhost:5000/intel/suggest
+
+
+Don’t expose the key to the browser (no VITE_ prefix).
+
+At the top of server/index.ts:
+
+import 'dotenv/config';
+
+1) Install the OpenAI SDK (server)
+cd server
+npm i openai
+
+2) Add the Intel Adapter (OpenAI-backed)
+
+Create server/intel-adapter.ts:
+
+import type { Request, Response } from "express";
+import OpenAI from "openai";
+
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
+
+function requireKey() {
+  if (!process.env.OPENAI_API_KEY) {
+    throw new Error("OPENAI_API_KEY is missing in server env.");
+  }
+}
+
+// Cost-efficient default: lightweight for suggest, slightly larger for search.
+const SUGGEST_MODEL = "gpt-4o-mini"; // cheap + fast for short lists
+const SEARCH_MODEL  = "gpt-4o-mini"; // good balance for extracting structured JSON
+
+export async function intelSearch(req: Request, res: Response) {
+  requireKey();
+  const q = String(req.body?.query || "").trim();
+  if (!q) return res.json({ results: [] });
+
+  try {
+    // Ask the model to return ONLY JSON in a normalized format
+    const r = await openai.responses.create({
+      model: SEARCH_MODEL,
+      response_format: {
+        type: "json_schema",
+        json_schema: {
+          name: "PropertyResults",
+          schema: {
+            type: "object",
+            properties: {
+              results: {
+                type: "array",
+                items: {
+                  type: "object",
+                  properties: {
+                    id: { type: "string" },
+                    title: { type: "string" },
+                    description: { type: "string" },
+                    price: { type: "number" },
+                    currency: { type: "string" },
+                    bedrooms: { type: "integer" },
+                    bathrooms: { type: "integer" },
+                    propertyType: { type: "string" },
+                    city: { type: "string" },
+                    neighborhood: { type: "string" },
+                    address: { type: "string" },
+                    lat: { type: "number" },
+                    lng: { type: "number" },
+                    images: { type: "array", items: { type: "string" } },
+                    url: { type: "string" },
+                    listedAt: { type: "string" }
+                  },
+                  required: ["title","url"]
+                }
+              }
+            },
+            required: ["results"],
+            additionalProperties: false
+          }
+        }
+      },
+      input: [
+        {
+          role: "system",
+          content:
+            "You are RealEstateIntel for Botswana. Return ONLY valid JSON matching the schema. Prefer reputable, current listing sources for Botswana. Do NOT include prose."
+        },
+        {
+          role: "user",
+          content:
+            `Find properties matching: ${q}. Include BWP price if present, beds/baths, type, city/neighborhood/address, coordinates if shown, a canonical listing URL, and 1-3 image URLs if available.`
+        }
+      ]
+    });
+
+    const json = JSON.parse(r.output_text || '{"results": []}');
+    res.json(json);
+  } catch (e) {
+    console.warn("intelSearch error:", e);
+    res.json({ results: [] }); // soft-fail, never crash the page
+  }
+}
+
+export async function intelSuggest(req: Request, res: Response) {
+  requireKey();
+  const q = String(req.query.q || "").trim();
+  if (!q) return res.json([]);
+
+  try {
+    const r = await openai.responses.create({
+      model: SUGGEST_MODEL,
+      response_format: {
+        type: "json_schema",
+        json_schema: {
+          name: "SuggestList",
+          schema: { type: "array", items: { type: "string" } }
+        }
+      },
+      input: [
+        { role: "system", content: "Return ONLY a JSON array (strings) of up to 8 location/keyword suggestions for property search in Botswana." },
+        { role: "user", content: `Suggestions for: ${q}` }
+      ]
+    });
+    const out = JSON.parse(r.output_text || "[]");
+    res.json(Array.isArray(out) ? out.slice(0, 8) : []);
+  } catch (e) {
+    console.warn("intelSuggest error:", e);
+    // Fallback
+    const pool = ["Gaborone","Francistown","Phakalane","Mogoditshane","Lobatse","Tlokweng"];
+    const term = q.toLowerCase();
+    res.json(pool.filter(s => s.toLowerCase().includes(term)).slice(0, 8));
+  }
+}
+
+
+Mount it in server/index.ts:
+
+import express from "express";
+import { intelSearch, intelSuggest } from "./intel-adapter";
+const app = express();
+
+app.use(express.json());
+
+app.post("/intel/search", intelSearch);
+app.get("/intel/suggest", intelSuggest);
+
+3) Unified search: merge DB + Intel (works even with 0 DB rows)
+
+Create server/search-aggregator.ts:
+
+import type { Request, Response } from "express";
+import { db } from "./db";
+import { properties } from "../shared/schema";
+import { and, or, ilike, gte, desc } from "drizzle-orm";
+
+const USE_INTEL = String(process.env.USE_INTEL || "").toLowerCase() === "true";
+const INTEL_URL = process.env.REALESTATEINTEL_URL || "";
+const INTEL_KEY = process.env.REALESTATEINTEL_API_KEY || ""; // optional, unused here
+
+function parseFreeText(q: string) {
+  const lower = q.toLowerCase();
+  let beds: number | undefined;
+  const digit = lower.match(/(\d+)\s*(bed|bedroom)/);
+  if (digit) beds = parseInt(digit[1], 10);
+  else {
+    const map: Record<string, number> = { one:1,two:2,three:3,four:4,five:5,six:6 };
+    const word = lower.match(/(one|two|three|four|five|six)\s*(bed|bedroom|bedroomed)/);
+    if (word) beds = map[word[1]];
+  }
+  let type: string | undefined;
+  if (/\b(house|standalone)\b/.test(lower)) type = "house";
+  else if (/\b(apartment|flat)\b/.test(lower)) type = "apartment";
+  else if (/\b(townhouse)\b/.test(lower)) type = "townhouse";
+  else if (/\b(plot|land)\b/.test(lower)) type = "plot";
+  const city = (lower.match(/\b(gaborone|francistown|phakalane|mogoditshane|lobatse|tlokweng)\b/) || [])[0];
+  return { beds, type, city };
+}
+
+async function queryDB(q: string, sort: string) {
+  const terms: any[] = [];
+  if (q) {
+    const like = `%${q}%`;
+    terms.push(
+      or(
+        ilike(properties.title, like),
+        ilike(properties.description, like),
+        ilike(properties.city, like),
+        ilike(properties.neighborhood, like),
+        ilike(properties.address, like)
+      )
+    );
+    const d = parseFreeText(q);
+    if (d.beds) terms.push(gte(properties.bedrooms, d.beds));
+    if (d.type) terms.push(ilike(properties.propertyType, `%${d.type}%`));
+    if (d.city) terms.push(ilike(properties.city, `%${d.city}%`));
+  }
+  const where = terms.length ? and(...terms) : undefined;
+  const order =
+    sort === "price_low"  ?  properties.price :
+    sort === "price_high" ?  desc(properties.price) :
+    (properties as any).createdAt ? desc((properties as any).createdAt) :
+    desc(properties.id);
+
+  const rows = await db.select().from(properties).where(where).orderBy(order).limit(50);
+  return rows.map((p: any) => ({
+    id: `local_${p.id}`,
+    source: "local",
+    title: p.title,
+    summary: p.description,
+    price: p.price,
+    currency: "BWP",
+    bedrooms: p.bedrooms,
+    bathrooms: p.bathrooms,
+    propertyType: (p.propertyType || "").toLowerCase(),
+    city: p.city, neighborhood: p.neighborhood, address: p.address,
+    lat: p.latitude, lng: p.longitude,
+    images: p.images || [],
+    url: `/properties/${p.id}`,
+    createdAt: p.createdAt ?? null,
+    score: 0.6,
+  }));
+}
+
+async function queryIntel(q: string) {
+  if (!USE_INTEL || !INTEL_URL || !q.trim()) return [];
+  const r = await fetch(INTEL_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Accept: "application/json" },
+    body: JSON.stringify({ query: q }),
+  });
+  if (!r.ok) return [];
+  const data = await r.json().catch(() => ({}));
+  const list = Array.isArray(data) ? data : (data.results || []);
+  return list.map((x: any) => ({
+    id: `intel_${x.id || x.externalId || crypto.randomUUID()}`,
+    source: "intel",
+    title: x.title || x.headline || "Property",
+    summary: x.description || x.summary || "",
+    price: x.price?.amount ?? x.price ?? null,
+    currency: x.price?.currency ?? "BWP",
+    bedrooms: x.bedrooms ?? null,
+    bathrooms: x.bathrooms ?? null,
+    propertyType: (x.propertyType || x.type || "").toLowerCase(),
+    city: x.city || x.location?.city || null,
+    neighborhood: x.neighborhood || x.location?.neighborhood || null,
+    address: x.address || x.location?.address || null,
+    lat: x.lat ?? x.location?.lat ?? null,
+    lng: x.lng ?? x.location?.lng ?? null,
+    images: x.images || [],
+    url: x.url || null,
+    createdAt: x.listedAt || x.createdAt || null,
+    score: x.score ?? 0.55
+  }));
+}
+
+function dedupe(items: any[]) {
+  const seen = new Set<string>();
+  const out: any[] = [];
+  for (const it of items) {
+    const key = `${(it.address||"").toLowerCase()}|${it.price||""}|${it.bedrooms||""}|${it.propertyType||""}`;
+    if (!seen.has(key)) { seen.add(key); out.push(it); }
+  }
+  return out;
+}
+
+export async function searchAggregator(req: Request, res: Response) {
+  try {
+    const q = String(req.query.q || "").trim();
+    const sort = String(req.query.sort || "newest");
+
+    const [local, intel] = await Promise.allSettled([ queryDB(q, sort), queryIntel(q) ]);
+    const A = local.status === "fulfilled" ? local.value : [];
+    const B = intel.status === "fulfilled" ? intel.value : [];
+
+    const merged = dedupe([...A, ...B]).sort((x: any, y: any) => (y.score ?? 0) - (x.score ?? 0));
+
+    res.json({
+      query: q,
+      intelEnabled: USE_INTEL,
+      counts: { local: A.length, intel: B.length, merged: merged.length },
+      items: merged
+    });
+  } catch (e: any) {
+    console.error("GET /api/search failed:", e);
+    res.status(500).json({ error: e?.message || "Search failed" });
+  }
+}
+
+
+Mount it in server/index.ts:
+
+import { searchAggregator } from "./search-aggregator";
+import { intelSearch, intelSuggest } from "./intel-adapter";
+
+app.get("/api/search", searchAggregator);
+app.get("/api/suggest", intelSuggest);   // proxy suggest through adapter
+// (We already mounted /intel/search and /intel/suggest for direct calls)
+
+
+Optional quick health route:
+
+app.get("/api/intel/health", (_req, res) => {
+  res.json({
+    hasOpenAIKey: !!process.env.OPENAI_API_KEY,
+    useIntel: String(process.env.USE_INTEL || "").toLowerCase() === "true",
+    searchUrl: process.env.REALESTATEINTEL_URL || null,
+    suggestUrl: process.env.REALESTATEINTEL_SUGGEST_URL || null,
+  });
+});
+
+4) Client: point hooks & UI to the aggregator
+
+client/src/hooks/useProperties.ts (or inline in the page)
+
+import { useQuery } from "@tanstack/react-query";
+
+export function useProperties(filters: { q?: string; sort?: string }) {
+  return useQuery({
+    queryKey: ["search", filters], // include q so clicking Search/Enter refetches
+    queryFn: async () => {
+      const params = new URLSearchParams();
+      if (filters.q) params.set("q", filters.q);
+      if (filters.sort) params.set("sort", filters.sort);
+      const r = await fetch(`/api/search?${params.toString()}`, {
+        headers: { Accept: "application/json" }
+      });
+      if (!r.ok) throw new Error(await r.text());
+      const data = await r.json();
+      return data.items ?? [];
+    }
+  });
+}
+
+
+SmartSearchBar (make sure it’s a default export and the ref fix is in place).
+Import everywhere as:
+
+import SmartSearchBar from "@/components/search/SmartSearchBar";
+
+
+When rendering a page (e.g., PropertiesPage.tsx / RentPage.tsx):
+
+const [filters, setFilters] = useState({ q: "", sort: "newest" });
+const { data: items, isLoading, isError } = useProperties(filters);
+
+<SmartSearchBar
+  initial={filters.q}
+  onSearch={(q) => setFilters((f) => ({ ...f, q }))}
+  suggest={async (q) => {
+    const r = await fetch(`/api/suggest?q=${encodeURIComponent(q)}`, {
+      headers: { Accept: "application/json" }
+    });
+    if (!r.ok) return [];
+    return await r.json();
+  }}
+/>
+
+5) Dev proxy (so /api/* hits Express)
+
+client/vite.config.ts
+
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+
+export default defineConfig({
+  plugins: [react()],
+  server: {
+    port: 5173,
+    proxy: {
+      "/api": { target: "http://localhost:5000", changeOrigin: true, secure: false },
+      "/intel": { target: "http://localhost:5000", changeOrigin: true, secure: false }
+    },
+  },
+});
+
+6) Sanity checks
+
+Visit /api/intel/health → you should see "hasOpenAIKey": true and "useIntel": true.
+
+Type in the search bar (e.g., “three bedroomed house in gaborone”) → Network shows /api/search; response includes counts.intel (even if DB is empty).
+
+Suggestions call /api/suggest and clicking a suggestion runs the search (enter key and “Search” button do too).
