@@ -1,0 +1,139 @@
+Use OpenAI’s Responses API with the web search tool (preview) to fetch/normalize listings into JSON. This is fully API-driven and deployable in your backend. 
+OpenAI
+
+1) Server routes (drop-in)
+
+Create two endpoints your frontend can hit:
+
+POST /intel/search → returns { results: [...] }
+
+GET /intel/suggest?q=... → returns [ "Phakalane", "Gaborone", ... ]
+
+Example (Node/Express, using OpenAI SDK):
+
+// server/intel-adapter.ts
+import type { Request, Response } from "express";
+import OpenAI from "openai";
+
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
+
+export async function intelSearch(req: Request, res: Response) {
+  const q = String(req.body?.query || "").trim();
+  if (!q) return res.json({ results: [] });
+
+  try {
+    const response = await openai.responses.create({
+      model: "gpt-4o",
+      tools: [{ type: "web_search_preview" }], // web search (preview)
+      response_format: {
+        type: "json_schema",
+        json_schema: {
+          name: "PropertyResults",
+          schema: {
+            type: "object",
+            properties: {
+              results: {
+                type: "array",
+                items: {
+                  type: "object",
+                  properties: {
+                    id: { type: "string" },
+                    title: { type: "string" },
+                    description: { type: "string" },
+                    price: { type: "number" },
+                    currency: { type: "string" },
+                    bedrooms: { type: "integer" },
+                    bathrooms: { type: "integer" },
+                    propertyType: { type: "string" },
+                    city: { type: "string" },
+                    neighborhood: { type: "string" },
+                    address: { type: "string" },
+                    lat: { type: "number" },
+                    lng: { type: "number" },
+                    images: { type: "array", items: { type: "string" } },
+                    url: { type: "string" },
+                    listedAt: { type: "string" }
+                  },
+                  required: ["title","url"]
+                }
+              }
+            },
+            required: ["results"],
+            additionalProperties: false
+          }
+        }
+      },
+      input: [
+        {
+          role: "system",
+          content:
+            "You are RealEstateIntel for Botswana. Search reputable listings and return normalized JSON only."
+        },
+        {
+          role: "user",
+          content:
+            `Find properties matching: ${q}. Prefer Botswana sources; include price (BWP), beds/baths, type, location, URL, images if present.`
+        }
+      ]
+    });
+
+    const json = JSON.parse(response.output_text || '{"results": []}');
+    res.json(json);
+  } catch (e) {
+    console.warn("intelSearch error:", e);
+    res.json({ results: [] }); // soft-fail
+  }
+}
+
+export async function intelSuggest(req: Request, res: Response) {
+  const q = String(req.query.q || "").trim();
+  if (!q) return res.json([]);
+  try {
+    const r = await openai.responses.create({
+      model: "gpt-4o-mini",
+      tools: [{ type: "web_search_preview" }],
+      response_format: { type: "json_schema", json_schema: {
+        name: "SuggestList",
+        schema: { type: "array", items: { type: "string" } }
+      }},
+      input: [
+        { role: "system", content: "Return only a JSON array of location/keyword suggestions for property search in Botswana." },
+        { role: "user", content: `Suggest up to 8 terms related to: ${q}` }
+      ]
+    });
+    const out = JSON.parse(r.output_text || "[]");
+    res.json(Array.isArray(out) ? out.slice(0, 8) : []);
+  } catch {
+    // simple fallback
+    const pool = ["Gaborone","Francistown","Phakalane","Mogoditshane","Lobatse","Tlokweng"];
+    const term = q.toLowerCase();
+    res.json(pool.filter(s => s.toLowerCase().includes(term)).slice(0,8));
+  }
+}
+
+
+Mount them:
+
+// server/index.ts
+import express from "express";
+import { intelSearch, intelSuggest } from "./intel-adapter";
+const app = express();
+app.use(express.json());
+app.post("/intel/search", intelSearch);
+app.get("/intel/suggest", intelSuggest);
+
+2) Env vars (server)
+
+Set these (Replit “Secrets”, Vercel “Environment Variables”, or server/.env):
+
+OPENAI_API_KEY=sk-...
+USE_INTEL=true
+REALESTATEINTEL_URL=http://localhost:5000/intel/search
+REALESTATEINTEL_SUGGEST_URL=http://localhost:5000/intel/suggest
+
+
+Note: we no longer need a third-party REALESTATEINTEL_API_KEY. Your backend talks directly to OpenAI with OPENAI_API_KEY. The USE_INTEL flag just toggles external search on/off.
+
+3) Point your aggregator to your adapter
+
+If you’re using the unified /api/search we added earlier, change it to call REALESTATEINTEL_URL (your own adapter). You already have the plumbing—this just swaps a placeholder provider for your internal one.
