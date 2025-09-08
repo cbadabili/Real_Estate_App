@@ -36,7 +36,7 @@ export const SmartSearchBar: React.FC<SmartSearchBarProps> = ({
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
   const [rect, setRect] = useState<DOMRect | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const suggestionsRef = useRef<HTMLDivElement>(null);
+  const suggestionsRef = HTMLDivElement;
   const containerRef = useRef<HTMLDivElement>(null);
 
   const botswanaLocations = [
@@ -126,7 +126,7 @@ export const SmartSearchBar: React.FC<SmartSearchBarProps> = ({
         setRect(containerRef.current.getBoundingClientRect());
       }
     };
-    
+
     if (showSuggestions) {
       updateRect();
       const resizeObserver = new ResizeObserver(updateRect);
@@ -135,7 +135,7 @@ export const SmartSearchBar: React.FC<SmartSearchBarProps> = ({
       }
       window.addEventListener('scroll', updateRect, true);
       window.addEventListener('resize', updateRect);
-      
+
       return () => {
         resizeObserver.disconnect();
         window.removeEventListener('scroll', updateRect, true);
@@ -252,7 +252,7 @@ export const SmartSearchBar: React.FC<SmartSearchBarProps> = ({
         </button>
       </form>
 
-      
+
       {/* Portalized dropdown */}
       {showSuggestions && rect &&
         createPortal(

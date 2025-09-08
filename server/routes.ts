@@ -1227,6 +1227,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const rentalRouter = createRentalRoutes();
   app.use("/api/rentals", rentalRouter);
 
+  // Import search aggregator
+  const { searchAggregator } = require('./search-aggregator');
+
+  // Search aggregator endpoint (combines local + RealEstateIntel AI)
+  app.get('/api/search', searchAggregator);
+
   // Enhanced search routes (RealEstateIntel integration)
   app.get('/api/search/enhanced', async (req, res) => {
     try {
