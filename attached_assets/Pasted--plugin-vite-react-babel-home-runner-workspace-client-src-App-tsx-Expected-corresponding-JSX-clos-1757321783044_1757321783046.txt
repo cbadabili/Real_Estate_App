@@ -1,0 +1,61 @@
+[plugin:vite:react-babel] /home/runner/workspace/client/src/App.tsx: Expected corresponding JSX closing tag for <PropertyProvider>. (173:6)
+  176 | </QueryClientProvider>
+/home/runner/workspace/client/src/App.tsx:173:6
+171|            </Routes>
+172|          </div>
+173|        </div>
+   |        ^
+174|      </AuthProvider>
+175|    </ToastProvider>
+    at constructor (/home/runner/workspace/node_modules/@babel/parser/lib/index.js:360:19)
+    at TypeScriptParserMixin.raise (/home/runner/workspace/node_modules/@babel/parser/lib/index.js:3327:19)
+    at TypeScriptParserMixin.jsxParseElementAt (/home/runner/workspace/node_modules/@babel/parser/lib/index.js:6900:16)
+    at TypeScriptParserMixin.jsxParseElementAt (/home/runner/workspace/node_modules/@babel/parser/lib/index.js:6871:32)
+    at TypeScriptParserMixin.jsxParseElementAt (/home/runner/workspace/node_modules/@babel/parser/lib/index.js:6871:32)
+    at TypeScriptParserMixin.jsxParseElementAt (/home/runner/workspace/node_modules/@babel/parser/lib/index.js:6871:32)
+    at TypeScriptParserMixin.jsxParseElementAt (/home/runner/workspace/node_modules/@babel/parser/lib/index.js:6871:32)
+    at TypeScriptParserMixin.jsxParseElement (/home/runner/workspace/node_modules/@babel/parser/lib/index.js:6922:17)
+    at TypeScriptParserMixin.parseExprAtom (/home/runner/workspace/node_modules/@babel/parser/lib/index.js:6932:19)
+    at TypeScriptParserMixin.parseExprSubscripts (/home/runner/workspace/node_modules/@babel/parser/lib/index.js:10758:23)
+    at TypeScriptParserMixin.parseUpdate (/home/runner/workspace/node_modules/@babel/parser/lib/index.js:10743:21)
+    at TypeScriptParserMixin.parseMaybeUnary (/home/runner/workspace/node_modules/@babel/parser/lib/index.js:10723:23)
+    at TypeScriptParserMixin.parseMaybeUnary (/home/runner/workspace/node_modules/@babel/parser/lib/index.js:9672:18)
+    at TypeScriptParserMixin.parseMaybeUnaryOrPrivate (/home/runner/workspace/node_modules/@babel/parser/lib/index.js:10576:61)
+    at TypeScriptParserMixin.parseExprOps (/home/runner/workspace/node_modules/@babel/parser/lib/index.js:10581:23)
+    at TypeScriptParserMixin.parseMaybeConditional (/home/runner/workspace/node_modules/@babel/parser/lib/index.js:10558:23)
+    at TypeScriptParserMixin.parseMaybeAssign (/home/runner/workspace/node_modules/@babel/parser/lib/index.js:10521:21)
+    at /home/runner/workspace/node_modules/@babel/parser/lib/index.js:9610:39
+    at TypeScriptParserMixin.tryParse (/home/runner/workspace/node_modules/@babel/parser/lib/index.js:3665:20)
+    at TypeScriptParserMixin.parseMaybeAssign (/home/runner/workspace/node_modules/@babel/parser/lib/index.js:9610:18)
+    at /home/runner/workspace/node_modules/@babel/parser/lib/index.js:10491:39
+    at TypeScriptParserMixin.allowInAnd (/home/runner/workspace/node_modules/@babel/parser/lib/index.js:12100:12)
+    at TypeScriptParserMixin.parseMaybeAssignAllowIn (/home/runner/workspace/node_modules/@babel/parser/lib/index.js:10491:17)
+    at TypeScriptParserMixin.parseParenAndDistinguishExpression (/home/runner/workspace/node_modules/@babel/parser/lib/index.js:11359:28)
+    at TypeScriptParserMixin.parseExprAtom (/home/runner/workspace/node_modules/@babel/parser/lib/index.js:11006:23)
+    at TypeScriptParserMixin.parseExprAtom (/home/runner/workspace/node_modules/@babel/parser/lib/index.js:6937:20)
+    at TypeScriptParserMixin.parseExprSubscripts (/home/runner/workspace/node_modules/@babel/parser/lib/index.js:10758:23)
+    at TypeScriptParserMixin.parseUpdate (/home/runner/workspace/node_modules/@babel/parser/lib/index.js:10743:21)
+    at TypeScriptParserMixin.parseMaybeUnary (/home/runner/workspace/node_modules/@babel/parser/lib/index.js:10723:23)
+    at TypeScriptParserMixin.parseMaybeUnary (/home/runner/workspace/node_modules/@babel/parser/lib/index.js:9672:18)
+    at TypeScriptParserMixin.parseMaybeUnaryOrPrivate (/home/runner/workspace/node_modules/@babel/parser/lib/index.js:10576:61)
+    at TypeScriptParserMixin.parseExprOps (/home/runner/workspace/node_modules/@babel/parser/lib/index.js:10581:23)
+    at TypeScriptParserMixin.parseMaybeConditional (/home/runner/workspace/node_modules/@babel/parser/lib/index.js:10558:23)
+    at TypeScriptParserMixin.parseMaybeAssign (/home/runner/workspace/node_modules/@babel/parser/lib/index.js:10521:21)
+    at TypeScriptParserMixin.parseMaybeAssign (/home/runner/workspace/node_modules/@babel/parser/lib/index.js:9621:20)
+    at TypeScriptParserMixin.parseExpressionBase (/home/runner/workspace/node_modules/@babel/parser/lib/index.js:10475:23)
+    at /home/runner/workspace/node_modules/@babel/parser/lib/index.js:10471:39
+    at TypeScriptParserMixin.allowInAnd (/home/runner/workspace/node_modules/@babel/parser/lib/index.js:12095:16)
+    at TypeScriptParserMixin.parseExpression (/home/runner/workspace/node_modules/@babel/parser/lib/index.js:10471:17)
+    at TypeScriptParserMixin.parseReturnStatement (/home/runner/workspace/node_modules/@babel/parser/lib/index.js:12786:28)
+    at TypeScriptParserMixin.parseStatementContent (/home/runner/workspace/node_modules/@babel/parser/lib/index.js:12437:21)
+    at TypeScriptParserMixin.parseStatementContent (/home/runner/workspace/node_modules/@babel/parser/lib/index.js:9344:18)
+    at TypeScriptParserMixin.parseStatementLike (/home/runner/workspace/node_modules/@babel/parser/lib/index.js:12406:17)
+    at TypeScriptParserMixin.parseStatementListItem (/home/runner/workspace/node_modules/@babel/parser/lib/index.js:12386:17)
+    at TypeScriptParserMixin.parseBlockOrModuleBlockBody (/home/runner/workspace/node_modules/@babel/parser/lib/index.js:12960:61)
+    at TypeScriptParserMixin.parseBlockBody (/home/runner/workspace/node_modules/@babel/parser/lib/index.js:12953:10)
+    at TypeScriptParserMixin.parseBlock (/home/runner/workspace/node_modules/@babel/parser/lib/index.js:12941:10)
+    at TypeScriptParserMixin.parseFunctionBody (/home/runner/workspace/node_modules/@babel/parser/lib/index.js:11783:24)
+    at TypeScriptParserMixin.parseFunctionBodyAndFinish (/home/runner/workspace/node_modules/@babel/parser/lib/index.js:11769:10)
+    at TypeScriptParserMixin.parseFunctionBodyAndFinish (/home/runner/workspace/node_modules/@babel/parser/lib/index.js:9074:18
+Click outside, press Esc key, or fix the code to dismiss.
+You can also disable this overlay by setting server.hmr.overlay to false in vite.config.ts.
