@@ -6,8 +6,7 @@ import { and, desc, gte, ilike, or, sql } from "drizzle-orm";
 import fetch from "node-fetch";
 
 // ---- CONFIG ----
-const REALINTEL_URL = process.env.REALESTATEINTEL_URL || 'https://api.realestateintel.ai/search';
-const REALINTEL_KEY = process.env.REALESTATEINTEL_API_KEY;
+// Now using OpenAI-powered search via /intel/search endpoint
 
 interface UnifiedProperty {
   id: string;
@@ -124,32 +123,20 @@ function mapDBRowToUnified(row: any): UnifiedProperty {
   };
 }
 
-// Call RealEstateIntel AI GPT
+// Call OpenAI-powered search
 async function queryIntel(q: string, filters: any = {}): Promise<UnifiedProperty[]> {
-  if (!REALINTEL_KEY) {
-    console.warn('RealEstateIntel API key not configured, skipping external search');
+  if (!process.env.OPENAI_API_KEY) {
+    console.warn('OpenAI API key not configured, skipping external search');
     return [];
   }
 
   try {
-    const payload = {
-      query: q,
-      locationBias: filters.location || 'Botswana',
-      minBeds: filters.beds,
-      propertyType: filters.type,
-      minPrice: filters.minPrice,
-      maxPrice: filters.maxPrice,
-      maxResults: 25,
-      includeImages: true,
-      includeCoordinates: true
-    };
-
-    console.log('Calling RealEstateIntel AI with payload:', payload);
+    const payload = { query: q };
+    console.log('Calling OpenAI search with query:', q);
     
-    const response = await fetch(REALINTEL_URL, {
+    const response = await fetch('http://0.0.0.0:5000/intel/search', {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${REALINTEL_KEY}`,
         "Content-Type": "application/json",
         "Accept": "application/json"
       },
@@ -157,37 +144,37 @@ async function queryIntel(q: string, filters: any = {}): Promise<UnifiedProperty
     });
 
     if (!response.ok) {
-      throw new Error(`RealEstateIntel API error: ${response.status} ${response.statusText}`);
+      throw new Error(`OpenAI search API error: ${response.status} ${response.statusText}`);
     }
 
     const data = await response.json();
-    console.log('RealEstateIntel response received:', { count: data.results?.length || 0 });
+    console.log('OpenAI search response received:', { count: data.results?.length || 0 });
 
-    // Map RealEstateIntel results to unified format
+    // Map OpenAI results to unified format
     return (data.results || []).map((result: any, index: number) => ({
-      id: `external_${result.reference || index}`,
+      id: `external_${result.id || index}`,
       title: result.title || 'External Property',
       price: result.price || 0,
       address: result.address || '',
       city: result.city || '',
-      bedrooms: result.beds,
-      bathrooms: result.baths,
-      propertyType: result.property_type || '',
+      bedrooms: result.bedrooms,
+      bathrooms: result.bathrooms,
+      propertyType: result.propertyType || '',
       source: 'external' as const,
-      score: result.score || 0.5,
-      description: result.highlights?.join(', ') || '',
-      images: [result.media?.cover, ...(result.media?.gallery || [])].filter(Boolean),
-      coordinates: result.latitude && result.longitude ? {
-        lat: result.latitude,
-        lng: result.longitude
+      score: 0.8, // Default high score for OpenAI results
+      description: result.description || '',
+      images: result.images || [],
+      coordinates: result.lat && result.lng ? {
+        lat: result.lat,
+        lng: result.lng
       } : undefined,
       agency: {
-        name: result.agency?.name || 'External Agency',
-        contact: result.agency?.phone || result.agency?.email
+        name: result.agent?.name || 'External Agent',
+        contact: result.agent?.phone || result.agent?.email
       }
     }));
   } catch (error) {
-    console.error('RealEstateIntel API error:', error);
+    console.error('OpenAI search API error:', error);
     return [];
   }
 }
