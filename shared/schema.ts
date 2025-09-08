@@ -55,8 +55,8 @@ export const users = sqliteTable("users", {
 });
 
 // Properties table
-export const properties = sqliteTable("properties", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
+export const properties = pgTable("properties", {
+  id: serial("id").primaryKey(),
   title: text("title").notNull(),
   description: text("description"),
   price: text("price").notNull(),
@@ -98,8 +98,8 @@ export const properties = sqliteTable("properties", {
   depositRequired: text("deposit_required"),
   auctionTerms: text("auction_terms"),
   lotNumber: text("lot_number"),
-  createdAt: integer("created_at").default(sql`(cast((julianday('now') - 2440587.5)*86400000 as integer))`),
-  updatedAt: integer("updated_at").default(sql`(cast((julianday('now') - 2440587.5)*86400000 as integer))`),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 // Property inquiries
