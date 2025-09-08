@@ -8,6 +8,7 @@ import { createRentalRoutes } from "./rental-routes";
 import { db } from "./db";
 import { parseNaturalLanguageSearch } from './ai-search';
 import realEstateIntelSearchRoutes from './real-estate-intel-search';
+import { searchAggregator } from './search-aggregator';
 import { 
   authenticate, 
   optionalAuthenticate, 
@@ -1228,7 +1229,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use("/api/rentals", rentalRouter);
 
   // Import search aggregator
-  const { searchAggregator } = require('./search-aggregator');
+  // Import moved to top of file
 
   // Search aggregator endpoint (combines local + RealEstateIntel AI)
   app.get('/api/search', searchAggregator);
