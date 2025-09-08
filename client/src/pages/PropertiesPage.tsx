@@ -183,7 +183,7 @@ const PropertiesPage: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div className="space-y-6">
           {/* Smart Search Bar */}
-          <div>
+          <div className="relative z-50">
             <SmartSearchBar
               value={searchTerm}
               onChange={setSearchTerm}
