@@ -1,4 +1,3 @@
-
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Search, Clock, Sparkles } from 'lucide-react';
@@ -64,12 +63,12 @@ export default function SmartSearchBar({ onSearch, initial = "", suggest }: Prop
     if (!suggest) return;
     if (!open) return;
     const term = q.trim();
-    if (!term) { 
+    if (!term) {
       setAi([]);
       setLoading(false);
-      return; 
+      return;
     }
-    
+
     setLoading(true);
     const t = setTimeout(async () => {
       try {
@@ -152,28 +151,31 @@ export default function SmartSearchBar({ onSearch, initial = "", suggest }: Prop
 
   return (
     <div ref={anchorRef} className="relative w-full">
-      <form onSubmit={onSubmit} className="relative">
-        <div className="relative flex items-center">
-          <Search className="absolute left-4 h-5 w-5 text-gray-400" />
-          <input
-            ref={inputRef}
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-            onFocus={() => setOpen(true)}
-            onKeyDown={onKeyDown}
-            placeholder="Search properties in Botswana…"
-            className="w-full rounded-lg border border-gray-300 bg-white pl-12 pr-16 sm:pr-24 py-3 sm:py-4 text-sm sm:text-base text-gray-900 placeholder-gray-500 focus:border-beedab-blue focus:outline-none focus:ring-1 focus:ring-beedab-blue"
-          />
-          <button
-            type="submit"
-            disabled={!q.trim()}
-            className="absolute right-2 rounded-md bg-beedab-blue px-2 sm:px-4 py-1.5 sm:py-2 text-white text-xs sm:text-sm font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-beedab-blue focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <span className="hidden sm:inline">Search</span>
-            <Search className="h-4 w-4 sm:hidden" />
-          </button>
+      <div className="w-full">
+        <div className="relative">
+          <div className="flex items-center">
+            <Search className="absolute left-4 h-5 w-5 text-gray-400" />
+            <input
+              ref={inputRef}
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              onFocus={() => setOpen(true)}
+              onKeyDown={onKeyDown}
+              placeholder="Search properties in Botswana…"
+              className="w-full rounded-lg border border-gray-300 bg-white pl-12 pr-16 sm:pr-24 py-3 sm:py-4 text-sm sm:text-base text-gray-900 placeholder-gray-500 focus:border-beedab-blue focus:outline-none focus:ring-1 focus:ring-beedab-blue"
+            />
+            <button
+              type="submit"
+              onClick={onSubmit}
+              disabled={!q.trim()}
+              className="absolute right-2 rounded-md bg-beedab-blue px-2 sm:px-4 py-1.5 sm:py-2 text-white text-xs sm:text-sm font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-beedab-blue focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <span className="hidden sm:inline">Search</span>
+              <Search className="h-4 w-4 sm:hidden" />
+            </button>
+          </div>
         </div>
-      </form>
+      </div>
 
       {/* Portal dropdown */}
       {open && rect && (isShowingAI || isShowingRecents || loading) && createPortal(
