@@ -114,7 +114,7 @@ function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
-            <Route path="/admin" element={<ProtectedRoute requiredRole="admin"><AdminPage /></ProtectedRoute>} />
+            <Route path="/admin" element={<ProtectedRoute requiredRoles={["admin"]}><AdminPage /></ProtectedRoute>} />
             <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
             <Route path="/agent-dashboard" element={<ProtectedRoute><AgentDashboard /></ProtectedRoute>} />
             <Route path="/fsbo-dashboard" element={<ProtectedRoute><FSBODashboard /></ProtectedRoute>} />
@@ -126,7 +126,6 @@ function App() {
             <Route path="/my-properties" element={<ProtectedRoute><MyPropertiesPage /></ProtectedRoute>} />
             <Route path="/rent" element={<RentPage />} />
             <Route path="/rent/:id" element={<RentalDetailsPage />} />
-            <Route path="/rent-out" element={<ProtectedRoute><RentOutPage /></ProtectedRoute>} />
             <Route path="/rental-listing-wizard" element={<ProtectedRoute><RentalListingWizard /></ProtectedRoute>} />
             <Route path="/plots" element={<PlotsPage />} />
             <Route path="/auctions" element={<AuctionsPage />} />
