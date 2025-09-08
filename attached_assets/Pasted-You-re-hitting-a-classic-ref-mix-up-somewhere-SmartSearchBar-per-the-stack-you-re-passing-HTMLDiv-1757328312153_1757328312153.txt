@@ -1,0 +1,115 @@
+You’re hitting a classic ref mix-up: somewhere (SmartSearchBar per the stack) you’re passing HTMLDivElement itself as a ref/callback, or initializing a ref with HTMLDivElement instead of null. React then calls that “ref function” → the browser tries to construct a native DOM class as a function →
+“Failed to construct 'HTMLDivElement'”.
+
+Fix it surgically
+1) SmartSearchBar: use a proper object ref
+
+Make sure it looks exactly like this (note the | null and the null initializer):
+
+// client/src/components/search/SmartSearchBar.tsx
+import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+
+type Props = { onSearch: (q: string) => void; initial?: string };
+
+export default function SmartSearchBar({ onSearch, initial = "" }: Props) {
+  // ✅ correct: object ref, initialized to null
+  const anchorRef = useRef<HTMLDivElement | null>(null);
+
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState(initial);
+  const [rect, setRect] = useState<DOMRect | null>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const update = () => {
+      const el = anchorRef.current;
+      if (el) setRect(el.getBoundingClientRect());
+    };
+    update();
+    const ro = new ResizeObserver(update);
+    if (anchorRef.current) ro.observe(anchorRef.current);
+    window.addEventListener("scroll", update, true);
+    window.addEventListener("resize", update);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("scroll", update, true);
+      window.removeEventListener("resize", update);
+    };
+  }, [open]);
+
+  const run = () => query.trim() && onSearch(query.trim());
+
+  return (
+    <div ref={anchorRef} className="relative w-full">
+      {/* input + button */}
+      {/* ... */}
+
+      {open && rect &&
+        createPortal(
+          <div
+            style={{
+              position: "fixed",
+              top: rect.bottom + 4,
+              left: rect.left,
+              width: rect.width,
+              zIndex: 2147483647,
+            }}
+            className="max-h-80 overflow-auto rounded-md border bg-white shadow-xl"
+          >
+            {/* suggestions */}
+          </div>,
+          document.body
+        )}
+    </div>
+  );
+}
+
+
+Common wrong patterns to delete wherever they exist:
+
+// ❌ wrong
+const anchorRef = useRef<HTMLDivElement>(HTMLDivElement as any);
+const anchorRef = HTMLDivElement as any;
+<div ref={HTMLDivElement} />         // passing constructor as ref
+<div ref={anchorRef.current} />      // passing the node, not the ref object
+
+
+If you intentionally used a callback ref, it must be a function you define, not the constructor:
+
+// ✅ also fine
+const setAnchorRef = (el: HTMLDivElement | null) => { anchorRef.current = el; };
+<div ref={setAnchorRef} />
+
+2) Quick scan to catch any other offenders
+
+Run these from the project root; fix any matches you see:
+
+grep -R "ref={HTMLDivElement}" -n client/src
+grep -R "HTMLDivElement(" -n client/src | grep -v "useRef<"
+grep -R "const .* = HTMLDivElement" -n client/src
+grep -R "useRef<HTMLDivElement>(HTMLDivElement" -n client/src
+
+
+Wherever you find them, switch to useRef<HTMLDivElement | null>(null) and pass ref={thatRef}.
+
+3) (Optional) If you created a portal container manually
+
+Never try HTMLDivElement() or new HTMLDivElement(). Use the DOM API:
+
+// ✅ correct
+const el = document.createElement('div');
+
+// ❌ incorrect
+// const el = HTMLDivElement();       // will throw
+// const el = new HTMLDivElement();   // also invalid
+
+After the fix
+
+The red overlay should disappear immediately.
+
+Your search bar + dropdown portal will render normally.
+
+You can keep using the aggregator /api/search (local DB + RealEstateIntel) without this crashing the tree.
+
+If anything else still trips that error after this change, send me the one or two lines around any remaining ref={ usages and I’ll rewrite them on the spot.

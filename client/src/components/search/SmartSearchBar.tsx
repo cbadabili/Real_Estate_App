@@ -34,9 +34,9 @@ export const SmartSearchBar: React.FC<SmartSearchBarProps> = ({
   const [trendingSearches, setTrendingSearches] = useState<string[]>([]);
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
   const [rect, setRect] = useState<DOMRect | null>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
-  const suggestionsRef = HTMLDivElement;
-  const containerRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement | null>(null);
+  const suggestionsRef = useRef<HTMLDivElement | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
   const botswanaLocations = [
     'Gaborone', 'Francistown', 'Molepolole', 'Kanye', 'Serowe',
