@@ -22,7 +22,7 @@ export interface PropertyFilters {
 
 export const useProperties = (filters?: PropertyFilters) => {
   const queryParams = new URLSearchParams();
-  
+
   if (filters) {
     Object.entries(filters).forEach(([key, value]) => {
       if (value !== undefined && value !== null && value !== '') {
@@ -64,7 +64,7 @@ export const useCreateProperty = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (propertyData: any) => 
+    mutationFn: (propertyData: any) =>
       apiRequest('/api/properties', {
         method: 'POST',
         body: propertyData,

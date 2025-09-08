@@ -132,7 +132,7 @@ const PropertiesPage: React.FC = () => {
     try {
       const aiResult = await performSearch(query);
 
-    if (aiResult && aiResult.filters) {
+      if (aiResult && aiResult.filters) {
       // Apply AI-interpreted filters
       const newFilters = {
         priceRange: [
