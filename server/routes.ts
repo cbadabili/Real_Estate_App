@@ -9,19 +9,19 @@ import { db } from "./db";
 import { parseNaturalLanguageSearch } from './ai-search';
 import realEstateIntelSearchRoutes from './real-estate-intel-search';
 import { searchAggregator } from './search-aggregator';
-import { 
-  authenticate, 
-  optionalAuthenticate, 
-  authorize, 
-  requireAdmin, 
+import {
+  authenticate,
+  optionalAuthenticate,
+  authorize,
+  requireAdmin,
   requireModerator,
   requireOwnerOrAdmin,
   AuthService
 } from "./auth-middleware";
-import { 
-  insertUserSchema, 
-  insertPropertySchema, 
-  insertInquirySchema, 
+import {
+  insertUserSchema,
+  insertPropertySchema,
+  insertInquirySchema,
   insertAppointmentSchema,
   insertServiceProviderSchema,
   insertUserReviewSchema,
@@ -34,8 +34,8 @@ import {
   UserType
 } from "../shared/schema.js";
 import { z } from "zod";
-import { eq, and, gte, lte, sql } from "drizzle-orm";
-import { properties } from "../shared/schema";
+import { eq, and, or, ilike, gte, lte, desc, asc } from "drizzle-orm";
+import { properties, users, reviews } from "../shared/schema";
 import bcrypt from 'bcrypt';
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -130,12 +130,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/users/:id", optionalAuthenticate, async (req, res) => {
     try {
       const userId = parseInt(req.params.id);
-      
+
       // Check if user is requesting their own data or is an admin
       if (req.user && (req.user.id !== userId && !AuthService.isAdmin(req.user))) {
         return res.status(403).json({ message: "Access denied" });
       }
-      
+
       const user = await storage.getUser(userId);
 
       if (!user) {
@@ -568,7 +568,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const monthlyRate = interestRate / 100 / 12;
       const numberOfPayments = loanTermYears * 12;
 
-      const monthlyPayment = principal * 
+      const monthlyPayment = principal *
         (monthlyRate * Math.pow(1 + monthlyRate, numberOfPayments)) /
         (Math.pow(1 + monthlyRate, numberOfPayments) - 1);
 
@@ -949,7 +949,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Apply search filter if provided
       if (search) {
         const searchLower = search.toLowerCase();
-        users = users.filter(user => 
+        users = users.filter(user =>
           user.firstName.toLowerCase().includes(searchLower) ||
           user.lastName.toLowerCase().includes(searchLower) ||
           user.email.toLowerCase().includes(searchLower) ||
@@ -1235,7 +1235,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/search/enhanced', async (req, res) => {
     try {
       console.log('Enhanced search API called with query:', req.query);
-      
+
       // Simple demo response since no local properties exist
       const demoResponse = {
         query: {
@@ -1396,7 +1396,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         },
         notes: 'Found 0 local properties and 3 external properties. External properties are demo data.'
       };
-      
+
       res.json(demoResponse);
     } catch (error) {
       console.error('Enhanced search error:', error);
@@ -1457,7 +1457,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get all properties
-  
+
 app.get('/api/properties', async (req, res) => {
   try {
     console.log('Fetching properties with filters:', req.query);
