@@ -36,7 +36,14 @@ export const useProperties = (filters?: PropertyFilters) => {
 
   return useQuery({
     queryKey: ['/api/properties', filters],
-    queryFn: () => fetch(url).then(res => res.json()),
+    queryFn: async () => {
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      return data;
+    },
   });
 };
 

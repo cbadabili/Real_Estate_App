@@ -116,7 +116,7 @@ export const AISearchBar: React.FC<AISearchBarProps> = ({
   ];
 
   return (
-    <div className={`relative ${className}`}>
+    <div className={`relative z-[9999] ${className}`}>
       <div className="relative">
         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
           <Sparkles className="h-5 w-5 text-purple-500" />
@@ -156,7 +156,7 @@ export const AISearchBar: React.FC<AISearchBarProps> = ({
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-80 overflow-y-auto"
+            className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-[9999] max-h-80 overflow-y-auto"
           >
             <div className="p-2">
               {/* Auto-suggestions based on current query */}
