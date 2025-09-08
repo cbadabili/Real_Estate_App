@@ -102,9 +102,17 @@ const PropertiesPage: React.FC = () => {
 
       const data = await response.json();
       
-      if (data.results) {
-        setProperties(data.results);
+      if (data.results && data.results.length > 0) {
         setSearchResults(data.results);
+      } else {
+        // Fall back to filtering existing properties
+        const filteredProperties = properties.filter(property =>
+          property.title?.toLowerCase().includes(query.toLowerCase()) ||
+          property.description?.toLowerCase().includes(query.toLowerCase()) ||
+          property.city?.toLowerCase().includes(query.toLowerCase()) ||
+          property.neighborhood?.toLowerCase().includes(query.toLowerCase())
+        );
+        setSearchResults(filteredProperties);
       }
     } catch (error) {
       console.error('Search failed:', error);
@@ -120,8 +128,9 @@ const PropertiesPage: React.FC = () => {
       setIsSearching(false);
     }
 
-    // First, try to perform an AI-driven search
-    const aiResult = await performSearch(query); // Use performSearch from useSearch hook
+    // Also try AI-driven search
+    try {
+      const aiResult = await performSearch(query);
 
     if (aiResult && aiResult.filters) {
       // Apply AI-interpreted filters
