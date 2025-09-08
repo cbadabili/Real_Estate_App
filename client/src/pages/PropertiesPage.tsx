@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+// Removed framer-motion for better compatibility
 import { Filter, Search, Grid, List as ListIcon, SlidersHorizontal, AlertCircle, MapPin, Map, BarChart3 } from 'lucide-react';
 import { PropertyCard } from '../components/PropertyCard';
 import { PropertyFilters } from '../components/properties/PropertyFilters';
@@ -272,32 +272,24 @@ const PropertiesPage: React.FC = () => {
               <div className="space-y-6">
                 {/* Saved Searches */}
                 {showSavedSearches && (
-                  <motion.div
-                    initial={{ x: -300, opacity: 0 }}
-                    animate={{ x: 0, opacity: 1 }}
-                    exit={{ x: -300, opacity: 0 }}
-                  >
+                  <div className="animate-in slide-in-from-left-8 fade-in duration-300">
                     <SavedSearches
                       onLoadSearch={handleLoadSavedSearch}
                       currentFilters={filters}
                       currentQuery={searchTerm}
                     />
-                  </motion.div>
+                  </div>
                 )}
 
                 {/* Filters */}
                 {showFilters && (
-                  <motion.div
-                    initial={{ x: -300, opacity: 0 }}
-                    animate={{ x: 0, opacity: 1 }}
-                    exit={{ x: -300, opacity: 0 }}
-                  >
+                  <div className="animate-in slide-in-from-left-8 fade-in duration-300">
                     <PropertyFilters 
                       filters={filters} 
                       onFiltersChange={setFilters}
                       propertyCount={sortedProperties.length}
                     />
-                  </motion.div>
+                  </div>
                 )}
               </div>
             </div>
@@ -396,15 +388,13 @@ const PropertiesPage: React.FC = () => {
       </div>
 
       {/* Property Comparison Modal */}
-      <AnimatePresence>
-        {showComparison && comparisonProperties.length > 0 && (
-          <PropertyComparison
-            properties={comparisonProperties}
-            onClose={() => setShowComparison(false)}
-            onRemoveProperty={removeFromComparison}
-          />
-        )}
-      </AnimatePresence>
+      {showComparison && comparisonProperties.length > 0 && (
+        <PropertyComparison
+          properties={comparisonProperties}
+          onClose={() => setShowComparison(false)}
+          onRemoveProperty={removeFromComparison}
+        />
+      )}
     </div>
   );
 };
