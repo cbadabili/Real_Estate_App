@@ -64,8 +64,12 @@ export const properties = pgTable("properties", {
   city: text("city").notNull(),
   state: text("state").notNull(),
   zipCode: text("zip_code").notNull(),
-  latitude: text("latitude"),
-  longitude: text("longitude"),
+  latitude: doublePrecision("latitude"),
+  longitude: doublePrecision("longitude"),
+  areaText: text("area_text"),
+  placeName: text("place_name"),
+  placeId: text("place_id"),
+  locationSource: text("location_source"), // 'user_pin' | 'geocode'
   propertyType: text("property_type").notNull(), // 'house', 'apartment', 'condo', 'townhouse', 'land', 'mmatseta', 'commercial', 'farm'
   listingType: text("listing_type").notNull(), // 'owner', 'agent', 'rental', 'auction'
   bedrooms: integer("bedrooms"),

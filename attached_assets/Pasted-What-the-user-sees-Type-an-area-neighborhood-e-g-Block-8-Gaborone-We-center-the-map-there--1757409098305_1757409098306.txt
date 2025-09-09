@@ -1,0 +1,256 @@
+What the user sees
+
+Type an area/neighborhood (e.g., “Block 8, Gaborone”).
+
+We center the map there.
+
+They drop/drag a pin to the exact spot.
+
+Save. (We store both the typed area and the exact lat/lng.)
+
+Data model (add fields)
+
+area_text: string (what they typed)
+
+place_name: string | null (normalized label, e.g., “Block 8, Gaborone, BW”)
+
+place_id: string | null (from Mapbox)
+
+latitude: number | null
+
+longitude: number | null
+
+location_source: 'user_pin' | 'geocode'
+
+(optional privacy) public_latitude, public_longitude, location_privacy: 'exact' | 'approx'
+
+Client: “Location” step with search + draggable pin (Mapbox GL)
+// client/src/components/properties/PropertyLocationStep.tsx
+import { useEffect, useMemo, useRef, useState } from "react";
+import mapboxgl from "mapbox-gl";
+
+const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN; // pk-...
+
+type Props = {
+  initialArea?: string;
+  initialCoords?: { lat: number; lng: number } | null;
+  onChange: (loc: {
+    area_text: string;
+    place_name?: string;
+    place_id?: string;
+    latitude?: number;
+    longitude?: number;
+    location_source: "user_pin" | "geocode";
+  }) => void;
+};
+
+const IN_BW = (lng: number, lat: number) =>
+  lng >= 20 && lng <= 29 && lat >= -27 && lat <= -17;
+
+export default function PropertyLocationStep({ initialArea = "", initialCoords = null, onChange }: Props) {
+  const [area, setArea] = useState(initialArea);
+  const [suggestions, setSuggestions] = useState<Array<{ id: string; name: string; center: [number, number] }>>([]);
+  const mapRef = useRef<mapboxgl.Map | null>(null);
+  const markerRef = useRef<mapboxgl.Marker | null>(null);
+  const mapEl = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => { mapboxgl.accessToken = MAPBOX_TOKEN; }, []);
+
+  // init map
+  useEffect(() => {
+    if (!mapEl.current || mapRef.current) return;
+    mapRef.current = new mapboxgl.Map({
+      container: mapEl.current,
+      style: "mapbox://styles/mapbox/streets-v12",
+      center: initialCoords ? [initialCoords.lng, initialCoords.lat] : [25.91, -24.65], // Gaborone
+      zoom: initialCoords ? 13 : 11,
+    });
+
+    // if we have initial pin
+    if (initialCoords) {
+      markerRef.current = new mapboxgl.Marker({ draggable: true })
+        .setLngLat([initialCoords.lng, initialCoords.lat])
+        .addTo(mapRef.current);
+      markerRef.current.on("dragend", handleDragEnd);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mapEl.current]);
+
+  // Search suggestions (Mapbox forward geocode, BW only)
+  useEffect(() => {
+    const q = area.trim();
+    if (!q) { setSuggestions([]); return; }
+    const ctl = new AbortController();
+    const run = async () => {
+      const url =
+        `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(q + ", Gaborone, Botswana")}.json` +
+        `?access_token=${MAPBOX_TOKEN}&country=bw&limit=5&proximity=25.91,-24.65`;
+      const res = await fetch(url, { signal: ctl.signal });
+      if (!res.ok) return;
+      const data = await res.json();
+      const sug = (data.features || []).map((f: any) => ({
+        id: f.id,
+        name: f.place_name as string,
+        center: f.center as [number, number], // [lng, lat]
+      }));
+      setSuggestions(sug);
+    };
+    const t = setTimeout(run, 250); // debounce
+    return () => { clearTimeout(t); ctl.abort(); };
+  }, [area]);
+
+  function handleChooseSuggestion(s: { id: string; name: string; center: [number, number] }) {
+    setArea(s.name);
+    setSuggestions([]);
+    const [lng, lat] = s.center;
+
+    // place or move marker
+    if (!markerRef.current) {
+      markerRef.current = new mapboxgl.Marker({ draggable: true })
+        .setLngLat([lng, lat])
+        .addTo(mapRef.current!);
+      markerRef.current.on("dragend", handleDragEnd);
+    } else {
+      markerRef.current.setLngLat([lng, lat]);
+    }
+
+    mapRef.current!.flyTo({ center: [lng, lat], zoom: 14, essential: true });
+
+    if (IN_BW(lng, lat)) {
+      onChange({
+        area_text: area || s.name,
+        place_name: s.name,
+        place_id: s.id,
+        latitude: lat,
+        longitude: lng,
+        location_source: "geocode",
+      });
+    }
+  }
+
+  function handleDragEnd() {
+    if (!markerRef.current) return;
+    const { lng, lat } = markerRef.current.getLngLat();
+    if (!IN_BW(lng, lat)) return; // ignore out-of-bounds drags
+    onChange({
+      area_text: area,
+      latitude: lat,
+      longitude: lng,
+      location_source: "user_pin",
+    });
+  }
+
+  return (
+    <div className="flex flex-col gap-3">
+      <label className="text-sm font-medium">Area / Neighborhood</label>
+      <input
+        value={area}
+        onChange={(e) => setArea(e.target.value)}
+        placeholder="e.g., Block 8, Phakalane, Village..."
+        className="w-full rounded-md border px-3 py-2"
+      />
+      {!!suggestions.length && (
+        <div className="rounded-md border max-h-56 overflow-auto">
+          {suggestions.map((s) => (
+            <button
+              key={s.id}
+              className="w-full text-left px-3 py-2 hover:bg-gray-50"
+              onClick={() => handleChooseSuggestion(s)}
+              type="button"
+            >
+              {s.name}
+            </button>
+          ))}
+        </div>
+      )}
+      <div ref={mapEl} className="h-80 w-full rounded-lg border" />
+      <p className="text-xs text-gray-500">
+        Tip: Type the area to center the map, then drag the pin to the exact location.
+      </p>
+    </div>
+  );
+}
+
+
+Use it in your listing wizard:
+
+// client/src/pages/PropertyCreatePage.tsx (snippet)
+const [location, setLocation] = useState<any>({});
+// ...
+<PropertyLocationStep initialArea="" initialCoords={null} onChange={setLocation} />
+<Button onClick={handleSave}>Save Listing</Button>
+
+// inside handleSave:
+await fetch("/api/properties", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    ...formValues,
+    area_text: location.area_text,
+    place_name: location.place_name,
+    place_id: location.place_id,
+    latitude: location.latitude,
+    longitude: location.longitude,
+    location_source: location.location_source,
+    location_privacy, // 'exact' | 'approx' (see privacy below)
+  }),
+});
+
+Server: accept & validate pin
+// server/routes.ts (snippet)
+app.post("/api/properties", async (req, res) => {
+  const {
+    area_text, place_name, place_id,
+    latitude, longitude, location_source, location_privacy = "exact",
+    ...rest
+  } = req.body;
+
+  const isNum = (v: any) => typeof v === "number" && Number.isFinite(v);
+  const inBW = (lng: number, lat: number) => lng >= 20 && lng <= 29 && lat >= -27 && lat <= -17;
+
+  if (isNum(latitude) && isNum(longitude) && !inBW(longitude, latitude)) {
+    return res.status(400).json({ error: "Coordinates must be in Botswana." });
+  }
+
+  // (optional) jitter for privacy if not exact
+  let saveLat = latitude, saveLng = longitude, publicLat = latitude, publicLng = longitude;
+  if (location_privacy === "approx" && isNum(latitude) && isNum(longitude)) {
+    const { lat: jLat, lng: jLng } = jitter(latitude, longitude, 120); // ~120m radius
+    publicLat = jLat; publicLng = jLng;
+  }
+
+  // insert with drizzle
+  // await db.insert(properties).values({ ...rest, area_text, place_name, place_id, latitude: saveLat, longitude: saveLng, public_latitude: publicLat, public_longitude: publicLng, location_source });
+  return res.status(201).json({ ok: true });
+});
+
+// small jitter util
+function jitter(lat: number, lng: number, radiusMeters: number) {
+  const r = radiusMeters / 111320; // deg approx
+  const u = Math.random(); const v = Math.random();
+  const w = r * Math.sqrt(u);
+  const t = 2 * Math.PI * v;
+  return { lat: lat + w * Math.sin(t), lng: lng + (w * Math.cos(t)) / Math.cos(lat * Math.PI / 180) };
+}
+
+UX niceties (highly recommended)
+
+“Show exact location?” toggle on the create form:
+
+Off (default for privacy) → display approximate public pin; store exact privately for agent-only.
+
+Pin required: if user never touched the map, still save geocode center (with location_source='geocode').
+
+Botswana bounds check as above to prevent accidental global clicks.
+
+Reverse geocode preview (optional): when they drop the pin, show “near: ___” to reassure them.
+
+Why this works well
+
+Your search stays fast (only geocode to center, then user refines).
+
+You avoid bad auto-geocodes because the user confirms final pin.
+
+You keep both the human-readable area and precise coordinates.
+
+You have a built-in privacy model for public maps.
