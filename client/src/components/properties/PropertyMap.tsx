@@ -89,14 +89,19 @@ const PropertyMap: React.FC<PropertyMapProps> = ({
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
 
-  // Filter properties with valid coordinates
+  // Botswana bounds validation
+  const IN_BW = (lng: number, lat: number) =>
+    lng >= 20 && lng <= 29 && lat >= -27 && lat <= -17;
+
+  // Filter properties with valid coordinates within Botswana
   const validProperties = properties.filter(property => 
     property.latitude && 
     property.longitude && 
     !isNaN(property.latitude) && 
     !isNaN(property.longitude) &&
     property.latitude !== 0 &&
-    property.longitude !== 0
+    property.longitude !== 0 &&
+    IN_BW(property.longitude, property.latitude)
   );
 
   // Default center (Gaborone, Botswana)
