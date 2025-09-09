@@ -21,7 +21,7 @@ export async function geocodeAddress(address: string): Promise<GeocodeResult> {
       return null;
     }
     
-    const data = await res.json();
+    const data = await res.json() as any;
 
     const f = data?.features?.[0];
     if (!f?.center?.length) {
