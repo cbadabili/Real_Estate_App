@@ -162,8 +162,10 @@ function App() {
             <Route path="/legal-services" element={<LegalServicesPage />} />
             <Route path="/financing" element={<FinancingPage />} />
             <Route path="/tenant-support" element={<TenantSupportPage />} />
+            <Route path="/services/tenant-support" element={<TenantSupportPage />} />
             <Route path="/offers" element={<ProtectedRoute><OffersPage /></ProtectedRoute>} />
             <Route path="/planning" element={<PlanningPage />} />
+            <Route path="/buyer-journey/planning" element={<PlanningPage />} />
             <Route path="/searching" element={<SearchingPage />} />
             <Route path="/viewing" element={<ProtectedRoute><ViewingPage /></ProtectedRoute>} />
             <Route path="/market-intelligence" element={<MarketIntelligencePage />} />
