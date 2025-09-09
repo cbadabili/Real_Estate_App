@@ -3,8 +3,8 @@ import React, { useRef, useEffect, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
-// Mapbox access token - you'll need to set this in your environment
-const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN || 'pk.eyJ1IjoiYmVlZGFiIiwiYSI6ImNsdXNxYjhxZDBienEyanRiOGt4cXNrd2QifQ.your-token-here';
+// Mapbox access token - using working token from PropertyMap
+const MAPBOX_TOKEN = 'pk.eyJ1IjoiY2JhZGFiaWxpIiwiYSI6ImNrcHNkbmduZjBmYW0ycHQ4c2V2dmNpbjAifQ.2TxX-aS70swDry_8SrE7iQ';
 
 interface Location {
   id: string;
