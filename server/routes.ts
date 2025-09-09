@@ -42,7 +42,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Authentication & User Management
   app.post("/api/users/register", async (req, res) => {
     try {
-      const userData = insertUserSchema.parse(req.body);
+      // Handle boolean to integer conversion for isActive
+      const processedData = {
+        ...req.body,
+        isActive: req.body.isActive === true ? 1 : 0
+      };
+      
+      const userData = insertUserSchema.parse(processedData);
 
       console.log('Registration attempt for email:', userData.email, 'username:', userData.username);
 

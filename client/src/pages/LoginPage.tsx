@@ -64,9 +64,11 @@ const LoginPage = () => {
           body: JSON.stringify({
             firstName: data.firstName,
             lastName: data.lastName,
+            username: data.email.split('@')[0], // Generate username from email
             email: data.email,
             password: data.password,
             phone: data.phone,
+            userType: data.userType || 'buyer', // Default to buyer if not specified
             dateOfBirth: data.dateOfBirth,
             address: data.address,
             city: data.city,
@@ -208,6 +210,25 @@ const LoginPage = () => {
                       className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
                       placeholder="+267 1234 5678"
                     />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-700 mb-1">
+                      Account Type *
+                    </label>
+                    <select
+                      {...register('userType', { required: 'Please select an account type' })}
+                      className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
+                    >
+                      <option value="">Select Account Type</option>
+                      <option value="buyer">Buyer - Looking to buy or rent property</option>
+                      <option value="seller">Seller - Selling my property</option>
+                      <option value="agent">Real Estate Agent</option>
+                      <option value="fsbo">FSBO - For Sale By Owner</option>
+                    </select>
+                    {errors.userType && (
+                      <p className="text-red-600 text-sm mt-1">{errors.userType.message as string}</p>
+                    )}
                   </div>
                 </>
               )}
