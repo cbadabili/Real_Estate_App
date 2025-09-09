@@ -74,9 +74,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
 
       try {
-        // Extract user ID from token
-        const userId = authToken.split('_')[1];
-        if (!userId) {
+        // The token is simply the user ID
+        const userId = authToken;
+        if (!userId || isNaN(Number(userId))) {
           throw new Error('Invalid token format');
         }
 
