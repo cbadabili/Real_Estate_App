@@ -48,8 +48,8 @@ if (typeof document !== 'undefined') {
   document.head.appendChild(styleSheet);
 }
 
-// Initialize Mapbox with your token
-mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN || import.meta.env.MAPBOX_PUBLIC_KEY || '';
+// Initialize Mapbox with your token - force use public key for now
+mapboxgl.accessToken = 'pk.eyJ1IjoiY2JhZGFiaWxpIiwiYSI6ImNrcHNkbmduZjBmYW0ycHQ4c2V2dmNpbjAifQ.2TxX-aS70swDry_8SrE7iQ';
 
 // Format price to show K for thousands, M for millions
 const formatPrice = (price: number): string => {
