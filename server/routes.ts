@@ -238,11 +238,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/properties", async (req, res) => {
     try {
-      const propertyData = insertPropertySchema.parse(req.body);
-      const property = await storage.createProperty(propertyData);
+      const {
+        areaText, placeName, placeId,
+        latitude, longitude, locationSource,
+        ...rest
+      } = req.body;
+
+      // Validate coordinates are within Botswana bounds
+      const isNum = (v: any) => typeof v === "number" && Number.isFinite(v);
+      const inBW = (lng: number, lat: number) => lng >= 20 && lng <= 29 && lat >= -27 && lat <= -17;
+
+      if (isNum(latitude) && isNum(longitude) && !inBW(longitude, latitude)) {
+        return res.status(400).json({ error: "Coordinates must be within Botswana bounds." });
+      }
+
+      // Prepare property data with location fields
+      const propertyData = {
+        ...rest,
+        areaText: areaText || null,
+        placeName: placeName || null,
+        placeId: placeId || null,
+        latitude: isNum(latitude) ? latitude : null,
+        longitude: isNum(longitude) ? longitude : null,
+        locationSource: locationSource || 'geocode'
+      };
+
+      const validatedData = insertPropertySchema.parse(propertyData);
+      const property = await storage.createProperty(validatedData);
       res.status(201).json(property);
     } catch (error) {
       console.error("Create property error:", error);
+      if (error.name === 'ZodError') {
+        return res.status(400).json({ 
+          message: "Invalid property data", 
+          details: error.errors 
+        });
+      }
       res.status(400).json({ message: "Invalid property data" });
     }
   });
