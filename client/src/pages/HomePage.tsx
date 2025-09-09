@@ -65,19 +65,6 @@ const HomePage = () => {
       }
     },
     {
-      id: 2,
-      image: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80',
-      location: 'Francistown Heights',
-      price: 'BWP 2,800,000',
-      features: ['4 Bedrooms', '3 Bathrooms', 'Garden', 'Garage'],
-      agent: {
-        name: 'Neo Kgosana',
-        photo: 'https://images.unsplash.com/photo-1494790108755-2616b6b7867c?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80',
-        phone: '+267 7234 5678',
-        email: 'neo@beedab.com'
-      }
-    },
-    {
       id: 3,
       image: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=2075&q=80',
       location: 'Maun Safari Lodge',
