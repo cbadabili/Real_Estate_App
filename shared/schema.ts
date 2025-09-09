@@ -19,11 +19,7 @@ import {
   serial,
 } from "drizzle-orm/pg-core";
 
-// Until every table is migrated we alias pgTable to sqliteTable for unchanged
-// definitions.  Replace usages in follow-up patches.
-// Compatibility shim while we finish migrating every table definition.
-// Provides the same call-signature using pgTable so no sqlite-core import is required.
-// Remove after all tables are updated.
+// For rapid migration, we'll temporarily use pgTable for all sqliteTable references
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const sqliteTable = pgTable as any;
 import { createInsertSchema } from "drizzle-zod";
@@ -32,9 +28,9 @@ import { relations, sql } from "drizzle-orm";
 
 
 
-// Users table
-export const users = sqliteTable("users", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
+// Users table  
+export const users = pgTable("users", {
+  id: serial("id").primaryKey(),
   username: text("username").notNull().unique(),
   email: text("email").notNull().unique(),
   password: text("password").notNull(),
@@ -43,15 +39,15 @@ export const users = sqliteTable("users", {
   phone: text("phone"),
   userType: text("user_type").notNull(), // 'buyer', 'seller', 'agent', 'fsbo', 'admin'
   role: text("role").notNull().default("user"), // 'user', 'moderator', 'admin', 'super_admin'
-  permissions: text("permissions").array().default([]), // JSON string of permission array
+  permissions: text("permissions").array().default(sql`'{}'::text[]`), // JSON string of permission array
   avatar: text("avatar"),
   bio: text("bio"),
-  isVerified: integer("is_verified", { mode: "boolean" }).default(false),
-  isActive: integer("is_active", { mode: "boolean" }).default(true),
+  isVerified: integer("is_verified").default(0),
+  isActive: integer("is_active").default(1),
   reacNumber: text("reac_number"), // For certified agents
-  lastLoginAt: integer("last_login_at"),
-  createdAt: integer("created_at").default(sql`(cast((julianday('now') - 2440587.5)*86400000 as integer))`),
-  updatedAt: integer("updated_at").default(sql`(cast((julianday('now') - 2440587.5)*86400000 as integer))`),
+  lastLoginAt: timestamp("last_login_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 // Properties table
@@ -107,72 +103,72 @@ export const properties = pgTable("properties", {
 });
 
 // Property inquiries
-export const inquiries = sqliteTable("inquiries", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
+export const inquiries = pgTable("inquiries", {
+  id: serial("id").primaryKey(),
   propertyId: integer("property_id").references(() => properties.id).notNull(),
   buyerId: integer("buyer_id").references(() => users.id).notNull(),
   message: text("message").notNull(),
   status: text("status").notNull().default('unread'), // 'unread', 'read', 'replied'
-  createdAt: integer("created_at").default(sql`(cast((julianday('now') - 2440587.5)*86400000 as integer))`),
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
 // Appointments for property viewings
-export const appointments = sqliteTable("appointments", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
+export const appointments = pgTable("appointments", {
+  id: serial("id").primaryKey(),
   propertyId: integer("property_id").references(() => properties.id).notNull(),
   buyerId: integer("buyer_id").references(() => users.id).notNull(),
   agentId: integer("agent_id").references(() => users.id),
-  appointmentDate: integer("appointment_date").notNull(),
+  appointmentDate: timestamp("appointment_date").notNull(),
   type: text("type").notNull(), // 'in-person', 'virtual'
   status: text("status").notNull().default('scheduled'), // 'scheduled', 'confirmed', 'completed', 'cancelled'
   notes: text("notes"),
-  createdAt: integer("created_at").default(sql`(cast((julianday('now') - 2440587.5)*86400000 as integer))`),
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
 // Saved properties (favorites)
-export const savedProperties = sqliteTable("saved_properties", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
+export const savedProperties = pgTable("saved_properties", {
+  id: serial("id").primaryKey(),
   userId: integer("user_id").references(() => users.id).notNull(),
   propertyId: integer("property_id").references(() => properties.id).notNull(),
-  createdAt: integer("created_at").default(sql`(cast((julianday('now') - 2440587.5)*86400000 as integer))`),
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
 // Property reviews and ratings
-export const propertyReviews = sqliteTable("property_reviews", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
+export const propertyReviews = pgTable("property_reviews", {
+  id: serial("id").primaryKey(),
   propertyId: integer("property_id").references(() => properties.id).notNull(),
   reviewerId: integer("reviewer_id").references(() => users.id).notNull(),
   rating: integer("rating").notNull(), // 1-5 stars
   review: text("review"),
-  createdAt: integer("created_at").default(sql`(cast((julianday('now') - 2440587.5)*86400000 as integer))`),
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
 // Agent reviews and ratings
-export const agentReviews = sqliteTable("agent_reviews", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
+export const agentReviews = pgTable("agent_reviews", {
+  id: serial("id").primaryKey(),
   agentId: integer("agent_id").references(() => users.id).notNull(),
   reviewerId: integer("reviewer_id").references(() => users.id).notNull(),
   rating: integer("rating").notNull(), // 1-5 stars
   review: text("review"),
   transactionType: text("transaction_type"), // 'buy', 'sell', 'rent'
-  createdAt: integer("created_at").default(sql`(cast((julianday('now') - 2440587.5)*86400000 as integer))`),
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
 // User reviews and ratings (for all user types)
-export const userReviews = sqliteTable("user_reviews", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
+export const userReviews = pgTable("user_reviews", {
+  id: serial("id").primaryKey(),
   revieweeId: integer("reviewee_id").references(() => users.id).notNull(), // User being reviewed
   reviewerId: integer("reviewer_id").references(() => users.id).notNull(), // User writing review
   rating: integer("rating").notNull(), // 1-5 stars
   review: text("review"),
   reviewType: text("review_type").notNull(), // 'buyer', 'seller', 'agent', 'service_provider'
   transactionId: integer("transaction_id"), // Reference to property transaction if applicable
-  isVerified: integer("is_verified", { mode: "boolean" }).default(false), // Verified by transaction
-  isPublic: integer("is_public", { mode: "boolean" }).default(true),
+  isVerified: integer("is_verified").default(0), // Verified by transaction
+  isPublic: integer("is_public").default(1),
   status: text("status").notNull().default("active"), // 'active', 'hidden', 'flagged', 'removed'
   moderatorNotes: text("moderator_notes"),
-  createdAt: integer("created_at").default(sql`(cast((julianday('now') - 2440587.5)*86400000 as integer))`),
-  updatedAt: integer("updated_at").default(sql`(cast((julianday('now') - 2440587.5)*86400000 as integer))`),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 // Review responses (for business replies)
@@ -182,7 +178,7 @@ export const reviewResponses = sqliteTable("review_responses", {
   responderId: integer("responder_id").references(() => users.id).notNull(),
   response: text("response").notNull(),
   isOfficial: integer("is_official", { mode: "boolean" }).default(false), // Official business response
-  createdAt: integer("created_at").default(sql`(cast((julianday('now') - 2440587.5)*86400000 as integer))`),
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
 // Review helpful votes
@@ -191,7 +187,7 @@ export const reviewHelpful = sqliteTable("review_helpful", {
   reviewId: integer("review_id").references(() => userReviews.id).notNull(),
   userId: integer("user_id").references(() => users.id).notNull(),
   isHelpful: integer("is_helpful", { mode: "boolean" }).notNull(), // true for helpful, false for not helpful
-  createdAt: integer("created_at").default(sql`(cast((julianday('now') - 2440587.5)*86400000 as integer))`),
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
 // User permissions and roles
@@ -201,7 +197,7 @@ export const userPermissions = sqliteTable("user_permissions", {
   permission: text("permission").notNull(),
   grantedBy: integer("granted_by").references(() => users.id),
   expiresAt: integer("expires_at"),
-  createdAt: integer("created_at").default(sql`(cast((julianday('now') - 2440587.5)*86400000 as integer))`),
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
 // Admin audit log
@@ -214,7 +210,7 @@ export const adminAuditLog = sqliteTable("admin_audit_log", {
   details: text("details"), // JSON string of details
   ipAddress: text("ip_address"),
   userAgent: text("user_agent"),
-  createdAt: integer("created_at").default(sql`(cast((julianday('now') - 2440587.5)*86400000 as integer))`),
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
 export const saved_searches = sqliteTable('saved_searches', {
@@ -223,7 +219,7 @@ export const saved_searches = sqliteTable('saved_searches', {
   search_criteria: text('search_criteria', { mode: 'json' }),
   name: text('name'),
   email_alerts: integer('email_alerts', { mode: 'boolean' }).default(false),
-  created_at: text('created_at').default(sql`(datetime('now'))`),
+  created_at: timestamp('created_at').defaultNow(),
 });
 
 export const rental_listings = sqliteTable('rental_listings', {
@@ -250,8 +246,8 @@ export const rental_listings = sqliteTable('rental_listings', {
   amenities: text('amenities', { mode: 'json' }).default('[]'),
   utilities_included: text('utilities_included', { mode: 'json' }).default('[]'),
   status: text('status').default('active'),
-  created_at: text('created_at').default(sql`(datetime('now'))`),
-  updated_at: text('updated_at').default(sql`(datetime('now'))`),
+  created_at: timestamp('created_at').defaultNow(),
+  updated_at: timestamp('updated_at').defaultNow(),
 });
 
 export const rental_applications = sqliteTable('rental_applications', {
@@ -262,8 +258,8 @@ export const rental_applications = sqliteTable('rental_applications', {
   status: text('status').default('pending'),
   background_check_status: text('background_check_status').default('pending'),
   credit_report_status: text('credit_report_status').default('pending'),
-  created_at: text('created_at').default(sql`(datetime('now'))`),
-  updated_at: text('updated_at').default(sql`(datetime('now'))`),
+  created_at: timestamp('created_at').defaultNow(),
+  updated_at: timestamp('updated_at').defaultNow(),
 });
 
 export const lease_agreements = sqliteTable('lease_agreements', {
@@ -280,8 +276,8 @@ export const lease_agreements = sqliteTable('lease_agreements', {
   landlord_signature_status: text('landlord_signature_status').default('pending'),
   renter_signature_status: text('renter_signature_status').default('pending'),
   e_signature_status: text('e_signature_status').default('pending'),
-  created_at: text('created_at').default(sql`(datetime('now'))`),
-  updated_at: text('updated_at').default(sql`(datetime('now'))`),
+  created_at: timestamp('created_at').defaultNow(),
+  updated_at: timestamp('updated_at').defaultNow(),
 });
 
 // Relations
