@@ -42,10 +42,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Authentication & User Management
   app.post("/api/users/register", async (req, res) => {
     try {
-      // Handle boolean to integer conversion for isActive
+      // Handle boolean to integer conversion for isActive and provide default userType
       const processedData = {
         ...req.body,
-        isActive: req.body.isActive === true ? 1 : 0
+        isActive: req.body.isActive === true ? 1 : 0,
+        userType: req.body.userType || 'buyer' // Default to buyer if not provided
       };
       
       const userData = insertUserSchema.parse(processedData);
