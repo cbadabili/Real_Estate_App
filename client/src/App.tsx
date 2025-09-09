@@ -60,6 +60,7 @@ import AgentRatingPage from './pages/AgentRatingPage';
 import HomeValueAssessmentPage from './pages/HomeValueAssessmentPage';
 import LegalRequirementsPage from './pages/LegalRequirementsPage';
 import RentalListingWizard from './pages/RentalListingWizard';
+import SellListingWizard from './pages/SellListingWizard';
 import LandlordDashboard from './pages/LandlordDashboard';
 import RenterDashboard from './pages/RenterDashboard';
 import RentalApplicationsPage from './pages/RentalApplicationsPage';
@@ -127,6 +128,7 @@ function App() {
             <Route path="/rent" element={<RentPage />} />
             <Route path="/rent/:id" element={<RentalDetailsPage />} />
             <Route path="/rental-listing-wizard" element={<ProtectedRoute><RentalListingWizard /></ProtectedRoute>} />
+            <Route path="/sell-listing-wizard" element={<ProtectedRoute><SellListingWizard /></ProtectedRoute>} />
             <Route path="/plots" element={<PlotsPage />} />
             <Route path="/auctions" element={<AuctionsPage />} />
             <Route path="/market-insights" element={<MarketInsightsHub />} />
