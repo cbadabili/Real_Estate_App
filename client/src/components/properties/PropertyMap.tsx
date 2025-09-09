@@ -49,7 +49,7 @@ if (typeof document !== 'undefined') {
 }
 
 // Initialize Mapbox with your token
-mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN || '';
+mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN || import.meta.env.MAPBOX_PUBLIC_KEY || '';
 
 // Format price to show K for thousands, M for millions
 const formatPrice = (price: number): string => {
