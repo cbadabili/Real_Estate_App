@@ -1,0 +1,177 @@
+Quick client-side sanity fix (likely the bug)
+
+Mapbox (and most map libs) want [lng, lat]. If your props are { latitude, longitude }, a tiny swap will throw pins way off.
+
+client/src/components/properties/PropertyMap.tsx
+
+// BEFORE (buggy)
+new mapboxgl.Marker().setLngLat([prop.latitude, prop.longitude]).addTo(map.current!);
+
+// AFTER (correct: [lng, lat])
+new mapboxgl.Marker().setLngLat([prop.longitude, prop.latitude]).addTo(map.current!);
+
+
+Also make sure your “flyTo” uses [lng, lat]:
+
+map.current!.flyTo({
+  center: [centerLng, centerLat], // NOT [lat, lng]
+  zoom: 11,
+  essential: true,
+});
+
+2) Guard against impossible coordinates (Botswana bbox)
+
+Even with correct order, a bad geocode can sneak in. Add a quick guard so you never plot nonsense.
+
+Botswana rough bounds:
+
+Longitude: 20 → 29
+
+Latitude: −27 → −17
+
+client/src/components/properties/PropertyMap.tsx
+
+const IN_BW = (lng: number, lat: number) =>
+  lng >= 20 && lng <= 29 && lat >= -27 && lat <= -17;
+
+properties
+  .filter(p => p.longitude != null && p.latitude != null && IN_BW(p.longitude, p.latitude))
+  .forEach(prop => {
+    new mapboxgl.Marker()
+      .setLngLat([prop.longitude, prop.latitude])
+      .setPopup(new mapboxgl.Popup().setHTML(`<strong>${prop.address}</strong>`))
+      .addTo(map.current!);
+  });
+
+3) Server-side: reliable geocoding (constrained to Gaborone/Botswana)
+
+When you create or edit a property, geocode the address with country and city bias so “Block 8” resolves inside Gaborone.
+
+server/geocode.ts
+
+import fetch from "node-fetch";
+
+const MAPBOX_TOKEN = process.env.MAPBOX_PUBLIC_KEY || process.env.VITE_MAPBOX_ACCESS_TOKEN;
+
+export type GeocodeResult = { longitude: number; latitude: number } | null;
+
+export async function geocodeAddress(address: string): Promise<GeocodeResult> {
+  if (!MAPBOX_TOKEN) return null;
+
+  // Bias to Gaborone & restrict to Botswana (BW)
+  const q = encodeURIComponent(address + ", Gaborone, Botswana");
+  const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${q}.json?access_token=${MAPBOX_TOKEN}&country=bw&limit=1&proximity=25.92,-24.65`; // ~Gaborone
+
+  const res = await fetch(url);
+  if (!res.ok) return null;
+  const data = await res.json();
+
+  const f = data?.features?.[0];
+  if (!f?.center?.length) return null;
+
+  const [lng, lat] = f.center;
+  // Botswana bounds sanity check
+  if (lng < 20 || lng > 29 || lat < -27 || lat > -17) return null;
+
+  return { longitude: lng, latitude: lat };
+}
+
+
+Use it in create/update routes (so new/edited listings auto-get correct coords):
+
+server/routes.ts (snippet)
+
+import { geocodeAddress } from "./geocode";
+
+// On create
+app.post("/api/properties", async (req, res) => {
+  const { address, latitude, longitude, ...rest } = req.body;
+
+  let coords = (latitude && longitude) ? { latitude, longitude } : null;
+  if (!coords && address) {
+    const geo = await geocodeAddress(address);
+    if (geo) coords = { latitude: geo.latitude, longitude: geo.longitude };
+  }
+
+  // ... insert with coords.latitude & coords.longitude
+});
+
+// On update (if address changed and no coords provided)
+app.put("/api/properties/:id", async (req, res) => {
+  const { address, latitude, longitude, ...rest } = req.body;
+  let newLat = latitude, newLng = longitude;
+
+  if ((!latitude || !longitude) && address) {
+    const geo = await geocodeAddress(address);
+    if (geo) { newLat = geo.latitude; newLng = geo.longitude; }
+  }
+
+  // ... update with newLat/newLng
+});
+
+4) One-time backfill for existing records (fix your “456 Block 8” now)
+
+Create a small script to geocode anything missing/obviously wrong.
+
+scripts/backfill-geocodes.ts
+
+import "dotenv/config";
+import { db } from "../server/db";
+import { properties } from "../shared/schema";
+import { geocodeAddress } from "../server/geocode";
+
+const IN_BW = (lng: number, lat: number) => lng >= 20 && lng <= 29 && lat >= -27 && lat <= -17;
+
+async function run() {
+  const rows = await db.select().from(properties);
+  for (const p of rows) {
+    const hasCoords = p.latitude != null && p.longitude != null && IN_BW(p.longitude, p.latitude);
+    if (hasCoords) continue;
+
+    if (!p.address) continue;
+    const geo = await geocodeAddress(p.address);
+    if (geo) {
+      await db.update(properties)
+        .set({ latitude: geo.latitude, longitude: geo.longitude })
+        .where(properties.id.eq(p.id));
+      console.log(`Updated ${p.id}: ${p.address} -> ${geo.latitude}, ${geo.longitude}`);
+    } else {
+      console.warn(`Failed geocode: ${p.id} :: ${p.address}`);
+    }
+  }
+  process.exit(0);
+}
+
+run().catch(e => { console.error(e); process.exit(1); });
+
+
+Run: npx tsx scripts/backfill-geocodes.ts
+
+5) Seed data sanity
+
+If you seed sample Botswana listings, give either:
+
+Correct lat/lng (double-checked on a map), or
+
+Just the address and let the geocoder fill them in during seeding.
+
+server/seed.ts (idea)
+
+const samples = [
+  { address: "456 Block 8, Gaborone", /* omit lat/lng */ },
+  // ...
+];
+
+for (const s of samples) {
+  let coords = null;
+  if (s.address) coords = await geocodeAddress(s.address);
+  await db.insert(properties).values({
+    ...s,
+    latitude: coords?.latitude ?? null,
+    longitude: coords?.longitude ?? null,
+  });
+}
+
+6) Helpful UI hint (so users see what you searched)
+
+Show the resolved place name next to the query (“Block 8, Gaborone, BW”), and add a small warning chip if coordinates were auto-fixed by geocoding. That makes debugging obvious.
