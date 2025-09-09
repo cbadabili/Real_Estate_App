@@ -1,0 +1,60 @@
+chunk-WERSD76P.js?v=1452f759:21551 Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+6/dashboard:1 Uncaught (in promise) Error: A listener indicated an asynchronous response by returning true, but the message channel closed before a response was receivedUnderstand this error
+MapSearchPage.tsx:44 Raw API response: []
+MapSearchPage.tsx:81 Fetched 0 properties for map display
+MapSearchPage.tsx:85 No properties from API, adding demo properties for map display
+MapSearchPage.tsx:44 Raw API response: []
+MapSearchPage.tsx:81 Fetched 0 properties for map display
+MapSearchPage.tsx:85 No properties from API, adding demo properties for map display
+MapSearchPage.tsx:44 Raw API response: []
+MapSearchPage.tsx:81 Fetched 0 properties for map display
+MapSearchPage.tsx:85 No properties from API, adding demo properties for map display
+MapSearchPage.tsx:44 Raw API response: []
+MapSearchPage.tsx:81 Fetched 0 properties for map display
+MapSearchPage.tsx:85 No properties from API, adding demo properties for map display
+PropertyManagementPage.tsx:48 Error fetching dashboard data: SyntaxError: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+fetchDashboardData @ PropertyManagementPage.tsx:48
+await in fetchDashboardData
+(anonymous) @ PropertyManagementPage.tsx:54
+commitHookEffectListMount @ chunk-WERSD76P.js?v=1452f759:16915
+commitPassiveMountOnFiber @ chunk-WERSD76P.js?v=1452f759:18156
+commitPassiveMountEffects_complete @ chunk-WERSD76P.js?v=1452f759:18129
+commitPassiveMountEffects_begin @ chunk-WERSD76P.js?v=1452f759:18119
+commitPassiveMountEffects @ chunk-WERSD76P.js?v=1452f759:18109
+flushPassiveEffectsImpl @ chunk-WERSD76P.js?v=1452f759:19490
+flushPassiveEffects @ chunk-WERSD76P.js?v=1452f759:19447
+(anonymous) @ chunk-WERSD76P.js?v=1452f759:19328
+workLoop @ chunk-WERSD76P.js?v=1452f759:197
+flushWork @ chunk-WERSD76P.js?v=1452f759:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=1452f759:384Understand this error
+PropertyManagementPage.tsx:48 Error fetching dashboard data: SyntaxError: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+fetchDashboardData @ PropertyManagementPage.tsx:48
+await in fetchDashboardData
+(anonymous) @ PropertyManagementPage.tsx:54
+commitHookEffectListMount @ chunk-WERSD76P.js?v=1452f759:16915
+invokePassiveEffectMountInDEV @ chunk-WERSD76P.js?v=1452f759:18324
+invokeEffectsInDev @ chunk-WERSD76P.js?v=1452f759:19701
+commitDoubleInvokeEffectsInDEV @ chunk-WERSD76P.js?v=1452f759:19686
+flushPassiveEffectsImpl @ chunk-WERSD76P.js?v=1452f759:19503
+flushPassiveEffects @ chunk-WERSD76P.js?v=1452f759:19447
+(anonymous) @ chunk-WERSD76P.js?v=1452f759:19328
+workLoop @ chunk-WERSD76P.js?v=1452f759:197
+flushWork @ chunk-WERSD76P.js?v=1452f759:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=1452f759:384Understand this error
+react-router-dom.js?v=1452f759:214 No routes matched location "/services/tenant-support" 
+warning @ react-router-dom.js?v=1452f759:214
+useRoutesImpl @ react-router-dom.js?v=1452f759:3983
+useRoutes @ react-router-dom.js?v=1452f759:3936
+Routes @ react-router-dom.js?v=1452f759:4561
+renderWithHooks @ chunk-WERSD76P.js?v=1452f759:11548
+updateFunctionComponent @ chunk-WERSD76P.js?v=1452f759:14582
+beginWork @ chunk-WERSD76P.js?v=1452f759:15924
+beginWork$1 @ chunk-WERSD76P.js?v=1452f759:19753
+performUnitOfWork @ chunk-WERSD76P.js?v=1452f759:19198
+workLoopConcurrent @ chunk-WERSD76P.js?v=1452f759:19189
+renderRootConcurrent @ chunk-WERSD76P.js?v=1452f759:19164
+performConcurrentWorkOnRoot @ chunk-WERSD76P.js?v=1452f759:18678
+workLoop @ chunk-WERSD76P.js?v=1452f759:197
+flushWork @ chunk-WERSD76P.js?v=1452f759:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=1452f759:384Understand this warning
+react-router-dom.js?v=1452f759:214 No routes matched location "/services/tenant-support" 

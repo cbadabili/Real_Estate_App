@@ -708,7 +708,9 @@ const Navbar = () => {
                   onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
                   className="h-10 w-10 bg-beedab-blue rounded-full flex items-center justify-center text-white font-semibold hover:bg-beedab-darkblue transition-colors"
                 >
-                  {user.firstName ? user.firstName.charAt(0).toUpperCase() : user.email.charAt(0).toUpperCase()}
+                  {user.firstName && user.lastName 
+                    ? user.firstName.charAt(0).toUpperCase() + user.lastName.charAt(0).toUpperCase()
+                    : user.email.charAt(0).toUpperCase()}
                 </button>
 
                 <AnimatePresence>
