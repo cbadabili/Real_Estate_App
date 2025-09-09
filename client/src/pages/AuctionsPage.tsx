@@ -7,6 +7,36 @@ const AuctionsPage = () => {
   const { data: auctionProperties = [], isLoading } = useProperties({ listingType: 'auction' });
   const [timeLeft, setTimeLeft] = useState<{ [key: string]: string }>({});
 
+  // Default images for auction properties
+  const defaultImages = [
+    'https://images.pexels.com/photos/106399/pexels-photo-106399.jpeg?auto=compress&cs=tinysrgb&w=800',
+    'https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=800',
+    'https://images.pexels.com/photos/1438832/pexels-photo-1438832.jpeg?auto=compress&cs=tinysrgb&w=800',
+    'https://images.pexels.com/photos/2581922/pexels-photo-2581922.jpg?auto=compress&cs=tinysrgb&w=800'
+  ];
+
+  // Transform database auction properties to match expected structure
+  const transformedAuctions = auctionProperties.map((property: any, index: number) => ({
+    id: `auction_${property.id}`,
+    lotNumber: property.lot_number || `${property.id}`,
+    title: property.title,
+    location: property.city,
+    propertyType: property.property_type?.toLowerCase() || 'house',
+    bedrooms: property.bedrooms || 0,
+    plotSize: property.square_feet ? `${property.square_feet} sq ft` : 'Unknown',
+    description: property.description || `${property.property_type} for auction in ${property.city}`,
+    startingBid: parseInt(property.starting_bid) || parseInt(property.price) || 0,
+    reservePrice: parseInt(property.reserve_price) || null,
+    currentBid: property.current_bid ? parseInt(property.current_bid) : null,
+    auctionDate: property.auction_date ? new Date(parseInt(property.auction_date)).toISOString().split('T')[0] : '2025-02-15',
+    auctionTime: property.auction_time || '10:00hrs',
+    auctionHouse: property.auction_house || 'First National Bank of Botswana Limited',
+    auctioneerContact: property.auctioneer_contact || '72192666 / 300 8293',
+    depositRequired: property.deposit_required ? parseFloat(property.deposit_required) : 12.5,
+    images: [defaultImages[index % defaultImages.length]],
+    deputySheriff: 'Authorized Deputy Sheriff'
+  }));
+
   // Sample auction data based on the FNB notice
   const sampleAuctions = [
     {
@@ -97,7 +127,7 @@ const AuctionsPage = () => {
       const now = new Date();
       const newTimeLeft: { [key: string]: string } = {};
 
-      sampleAuctions.forEach(auction => {
+      transformedAuctions.forEach(auction => {
         const auctionDateTime = new Date(`${auction.auctionDate}T${auction.auctionTime.replace('hrs', ':00')}`);
         const difference = auctionDateTime.getTime() - now.getTime();
 
@@ -245,7 +275,7 @@ const AuctionsPage = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8 max-w-4xl mx-auto">
               <div className="bg-white/20 backdrop-blur-sm p-4 rounded-lg border border-white/30">
                 <TrendingUp className="h-6 w-6 text-white mx-auto mb-2" />
-                <div className="text-2xl font-bold text-white">{sampleAuctions.length}</div>
+                <div className="text-2xl font-bold text-white">{transformedAuctions.length}</div>
                 <div className="text-sm text-blue-100">Active Auctions</div>
               </div>
               <div className="bg-white/20 backdrop-blur-sm p-4 rounded-lg border border-white/30">
@@ -306,7 +336,7 @@ const AuctionsPage = () => {
           </div>
         ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {sampleAuctions.map((auction) => (
+            {transformedAuctions.map((auction) => (
               <AuctionCard key={auction.id} auction={auction} />
             ))}
           </div>
