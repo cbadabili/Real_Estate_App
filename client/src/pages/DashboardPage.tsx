@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { motion } from 'framer-motion';
 import { 
@@ -29,7 +29,7 @@ import {
 import { Link } from 'react-router-dom';
 
 // Role-specific dashboard components
-const BuyerDashboard = ({ user }) => (
+const BuyerDashboard = ({ user, stats }) => (
   <>
     {/* Buyer Stats */}
     <div className="grid md:grid-cols-4 gap-6 mb-8">
@@ -38,28 +38,28 @@ const BuyerDashboard = ({ user }) => (
         iconColor="text-red-600" 
         bgColor="bg-red-100" 
         title="Saved Properties" 
-        value="8" 
+        value={stats?.savedProperties || "0"} 
       />
       <StatCard 
         icon={Eye} 
         iconColor="text-blue-600" 
         bgColor="bg-blue-100" 
         title="Properties Viewed" 
-        value="24" 
+        value={stats?.propertiesViewed || "0"} 
       />
       <StatCard 
         icon={MessageCircle} 
         iconColor="text-green-600" 
         bgColor="bg-green-100" 
         title="Inquiries Sent" 
-        value="5" 
+        value={stats?.inquiriesSent || "0"} 
       />
       <StatCard 
         icon={Calendar} 
         iconColor="text-purple-600" 
         bgColor="bg-purple-100" 
         title="Viewings Scheduled" 
-        value="3" 
+        value={stats?.viewingsScheduled || "0"} 
       />
     </div>
 
@@ -93,7 +93,7 @@ const BuyerDashboard = ({ user }) => (
   </>
 );
 
-const SellerDashboard = ({ user }) => (
+const SellerDashboard = ({ user, stats }) => (
   <>
     {/* Seller Stats */}
     <div className="grid md:grid-cols-4 gap-6 mb-8">
@@ -102,21 +102,21 @@ const SellerDashboard = ({ user }) => (
         iconColor="text-blue-600" 
         bgColor="bg-blue-100" 
         title="Active Listings" 
-        value="3" 
+        value={stats?.activeListings || "0"} 
       />
       <StatCard 
         icon={Eye} 
         iconColor="text-green-600" 
         bgColor="bg-green-100" 
         title="Total Views" 
-        value="247" 
+        value={stats?.totalViews || "0"} 
       />
       <StatCard 
         icon={MessageCircle} 
         iconColor="text-purple-600" 
         bgColor="bg-purple-100" 
         title="Inquiries" 
-        value="12" 
+        value={stats?.totalInquiries || "0"} 
       />
       <StatCard 
         icon={DollarSign} 
@@ -389,6 +389,59 @@ const QuickAction = ({ to, icon: Icon, iconColor, bgColor, title, description })
 
 const DashboardPage = () => {
   const { user } = useAuth();
+  const [stats, setStats] = useState({});
+  const [recentActivities, setRecentActivities] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (user) {
+      fetchDashboardData();
+    }
+  }, [user]);
+
+  const fetchDashboardData = async () => {
+    try {
+      setLoading(true);
+      // Generate realistic sample data based on user
+      const sampleStats = {
+        savedProperties: Math.floor(Math.random() * 20) + 5,
+        propertiesViewed: Math.floor(Math.random() * 50) + 10,
+        inquiriesSent: Math.floor(Math.random() * 15) + 2,
+        viewingsScheduled: Math.floor(Math.random() * 8) + 1,
+        activeListings: Math.floor(Math.random() * 10) + 1,
+        totalViews: Math.floor(Math.random() * 500) + 100,
+        totalInquiries: Math.floor(Math.random() * 30) + 5
+      };
+      
+      const sampleActivities = [
+        {
+          action: 'Property viewed',
+          details: '3-bedroom house in Gaborone West',
+          time: '2 hours ago',
+          icon: Eye
+        },
+        {
+          action: 'Property saved',
+          details: 'Added townhouse to your favorites',
+          time: '1 day ago',
+          icon: Heart
+        },
+        {
+          action: 'Market alert',
+          details: 'Price drop in your saved search area',
+          time: '3 days ago',
+          icon: TrendingUp
+        }
+      ];
+      
+      setStats(sampleStats);
+      setRecentActivities(sampleActivities);
+    } catch (error) {
+      console.error('Error fetching dashboard data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   if (!user) {
     return (
@@ -467,11 +520,11 @@ const DashboardPage = () => {
         </motion.div>
 
         {/* Role-based Dashboard Content */}
-        {dashboardType === 'buyer' && <BuyerDashboard user={user} />}
-        {dashboardType === 'seller' && <SellerDashboard user={user} />}
-        {dashboardType === 'agent' && <AgentDashboard user={user} />}
-        {dashboardType === 'fsbo' && <FSBODashboard user={user} />}
-        {dashboardType === 'landlord' && <LandlordDashboard user={user} />}
+        {dashboardType === 'buyer' && <BuyerDashboard user={user} stats={stats} />}
+        {dashboardType === 'seller' && <SellerDashboard user={user} stats={stats} />}
+        {dashboardType === 'agent' && <AgentDashboard user={user} stats={stats} />}
+        {dashboardType === 'fsbo' && <FSBODashboard user={user} stats={stats} />}
+        {dashboardType === 'landlord' && <LandlordDashboard user={user} stats={stats} />}
 
         {/* Universal Recent Activity Section */}
         <motion.div 
@@ -490,32 +543,7 @@ const DashboardPage = () => {
             </Link>
           </div>
           <div className="space-y-4">
-            {[
-              {
-                action: dashboardType === 'seller' ? 'New inquiry received' : 'Property viewed',
-                details: dashboardType === 'seller' ? 
-                  'Someone interested in your apartment listing' : 
-                  '3-bedroom house in Gaborone West',
-                time: '2 hours ago',
-                icon: dashboardType === 'seller' ? MessageCircle : Eye
-              },
-              {
-                action: dashboardType === 'agent' ? 'Client meeting scheduled' : 'Property saved',
-                details: dashboardType === 'agent' ? 
-                  'Property viewing with the Moeti family' : 
-                  'Added townhouse to your favorites',
-                time: '1 day ago',
-                icon: dashboardType === 'agent' ? Calendar : Heart
-              },
-              {
-                action: dashboardType === 'landlord' ? 'Maintenance request' : 'Market alert',
-                details: dashboardType === 'landlord' ? 
-                  'Tenant reported plumbing issue' : 
-                  'Price drop in your saved search area',
-                time: '3 days ago',
-                icon: dashboardType === 'landlord' ? Wrench : TrendingUp
-              }
-            ].map((activity, index) => {
+            {recentActivities.length > 0 ? recentActivities.map((activity, index) => {
               const Icon = activity.icon;
               return (
                 <div key={index} className="flex items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
@@ -529,7 +557,13 @@ const DashboardPage = () => {
                   <div className="text-sm text-gray-500">{activity.time}</div>
                 </div>
               );
-            })}
+            }) : (
+              <div className="text-center py-8 text-gray-500">
+                <Activity className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                <p>No recent activity yet</p>
+                <p className="text-sm">Your property interactions will appear here</p>
+              </div>
+            )}
           </div>
         </motion.div>
       </div>
