@@ -19,6 +19,7 @@ import {
   ChevronRight
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import PropertyLocationStep from '../components/properties/PropertyLocationStep';
 
 const CreateListingPage = () => {
   const navigate = useNavigate();
@@ -36,6 +37,17 @@ const CreateListingPage = () => {
   const [formData, setFormData] = useState({
     city: '',
     state: '',
+  });
+  const [locationData, setLocationData] = useState<{
+    area_text: string;
+    place_name?: string;
+    place_id?: string;
+    latitude?: number;
+    longitude?: number;
+    location_source: "user_pin" | "geocode";
+  }>({
+    area_text: '',
+    location_source: 'geocode'
   });
 
   const totalSteps = 5;
@@ -210,10 +222,17 @@ const CreateListingPage = () => {
         title: data.title,
         description: data.description,
         price: data.price.toString(), // Convert to string to match schema
-        address: data.address,
-        city: data.city || 'Gaborone',
-        state: data.state || 'South-East',
+        address: locationData.area_text || 'Address not specified',
+        city: formData.city || 'Gaborone',
+        state: formData.state || 'South-East',
         zipCode: data.zipCode || '00000',
+        // New location fields
+        areaText: locationData.area_text,
+        placeName: locationData.place_name,
+        placeId: locationData.place_id,
+        latitude: locationData.latitude,
+        longitude: locationData.longitude,
+        locationSource: locationData.location_source,
         propertyType: data.propertyType,
         listingType: data.listingType === 'fsbo' ? 'owner' : 'agent',
         bedrooms: data.bedrooms ? parseInt(data.bedrooms) : null,
@@ -440,21 +459,15 @@ const CreateListingPage = () => {
                     </div>
 
                     <div className="md:col-span-2">
-                      <label className="block text-sm font-medium text-neutral-700 mb-2">
-                        Address *
-                      </label>
-                      <div className="relative">
-                        <MapPin className="absolute left-3 top-3 h-5 w-5 text-neutral-400" />
-                        <input
-                          type="text"
-                          {...register('address', { required: 'Address is required' })}
-                          className="w-full pl-10 pr-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent transition-all"
-                          placeholder="123 Main Street, Gaborone"
-                        />
-                      </div>
-                      {errors.address && (
-                        <p className="text-error-600 text-sm mt-1">{errors.address.message as string}</p>
-                      )}
+                      <h3 className="text-lg font-medium text-neutral-900 mb-4">Property Location</h3>
+                      <PropertyLocationStep
+                        initialArea={locationData.area_text}
+                        initialCoords={locationData.latitude && locationData.longitude ? {
+                          lat: locationData.latitude,
+                          lng: locationData.longitude
+                        } : null}
+                        onChange={setLocationData}
+                      />
                     </div>
                      <div>
                   <label className="block text-sm font-medium text-neutral-700 mb-2">
