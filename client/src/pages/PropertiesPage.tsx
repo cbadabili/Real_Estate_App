@@ -117,11 +117,11 @@ const PropertiesPage: React.FC = () => {
     } catch (error) {
       console.error('Search failed:', error);
       // Fall back to filtering existing properties
-      const filteredProperties = properties.filter(property =>
+      const filteredProperties = properties.filter((property: any) =>
         property.title?.toLowerCase().includes(query.toLowerCase()) ||
         property.description?.toLowerCase().includes(query.toLowerCase()) ||
         property.city?.toLowerCase().includes(query.toLowerCase()) ||
-        property.neighborhood?.toLowerCase().includes(query.toLowerCase())
+        property.address?.toLowerCase().includes(query.toLowerCase())
       );
       setSearchResults(filteredProperties);
     } finally {
@@ -147,8 +147,8 @@ const PropertiesPage: React.FC = () => {
       setFilters(newFilters);
       setSearchTerm(query); // Update the general searchTerm
       // If AI search provides results, use them, otherwise fall back to general search
-      if (aiResult.properties && aiResult.properties.length > 0) {
-        setSearchResults(aiResult.properties);
+      if (aiResult.results && aiResult.results.length > 0) {
+        setSearchResults(aiResult.results);
       } else {
         handleSearch(query); // Fallback to regular search if no properties returned by AI
       }
