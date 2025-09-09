@@ -2,7 +2,7 @@
 import type { Request, Response } from "express";
 import { db } from "./db";
 import { properties } from "../shared/schema";
-import { and, desc, gte, ilike, or, sql } from "drizzle-orm";
+import { and, desc, eq, gte, ilike, or, sql } from "drizzle-orm";
 import fetch from "node-fetch";
 
 // ---- CONFIG ----
@@ -71,33 +71,52 @@ function parseFreeText(q: string) {
 }
 
 async function queryDB(q: string, sort: string): Promise<UnifiedProperty[]> {
-  const terms = [];
-  
-  if (q) {
-    const like = `%${q}%`;
-    terms.push(
-      or(
-        ilike(properties.title, like),
-        ilike(properties.description, like),
-        ilike(properties.city, like),
-        ilike(properties.address, like)
-      )
-    );
+  try {
+    console.log('QueryDB called with:', { q, sort });
     
-    const derived = parseFreeText(q);
-    if (derived.beds) terms.push(gte(properties.bedrooms, derived.beds));
-    if (derived.type) terms.push(ilike(properties.propertyType, derived.type));
-    if (derived.location) terms.push(ilike(properties.city, `%${derived.location}%`));
-  }
-  
-  const where = terms.length ? and(...terms) : undefined;
-  const order = 
-    sort === "price_low" ? properties.price :
-    sort === "price_high" ? desc(properties.price) :
-    desc(properties.createdAt);
+    const terms = [];
+    
+    if (q) {
+      const derived = parseFreeText(q);
+      console.log('Parsed query filters:', derived);
+      
+      // More flexible approach: Apply semantic filters
+      if (derived.beds) terms.push(gte(properties.bedrooms, derived.beds));
+      if (derived.type) terms.push(eq(properties.propertyType, derived.type));
+      if (derived.location) terms.push(ilike(properties.city, `%${derived.location}%`));
+      
+      // If no specific filters detected, fall back to text search
+      if (!derived.beds && !derived.type && !derived.location) {
+        const like = `%${q}%`;
+        terms.push(
+          or(
+            ilike(properties.title, like),
+            ilike(properties.description, like),
+            ilike(properties.city, like),
+            ilike(properties.address, like)
+          )
+        );
+      }
+    }
+    
+    const where = terms.length ? and(...terms) : undefined;
+    const order = 
+      sort === "price_low" ? properties.price :
+      sort === "price_high" ? desc(properties.price) :
+      desc(properties.createdAt);
 
-  const rows = await db.select().from(properties).where(where).orderBy(order).limit(50);
-  return rows.map(mapDBRowToUnified);
+    console.log('Executing query with', terms.length, 'filter terms');
+    const rows = await db.select().from(properties).where(where).orderBy(order).limit(50);
+    console.log('Raw query result:', rows.length, 'rows');
+    
+    const mappedResults = rows.map(mapDBRowToUnified);
+    console.log('Mapped results:', mappedResults.length, 'properties');
+    return mappedResults;
+    
+  } catch (error) {
+    console.error('QueryDB error:', error);
+    return [];
+  }
 }
 
 function mapDBRowToUnified(row: any): UnifiedProperty {
@@ -147,7 +166,7 @@ async function queryIntel(q: string, filters: any = {}): Promise<UnifiedProperty
       throw new Error(`OpenAI search API error: ${response.status} ${response.statusText}`);
     }
 
-    const data = await response.json();
+    const data = await response.json() as any;
     console.log('OpenAI search response received:', { count: data.results?.length || 0 });
 
     // Map OpenAI results to unified format
@@ -232,7 +251,17 @@ export async function searchAggregator(req: Request, res: Response) {
     
     // Step 1: Search local database
     console.log('Searching local database...');
-    const localResults = await queryDB(query, sortBy);
+    console.log('About to call queryDB with:', { query, sortBy });
+    let localResults: UnifiedProperty[] = [];
+    try {
+      console.log('Calling queryDB now...');
+      localResults = await queryDB(query, sortBy);
+      console.log('QueryDB returned:', localResults.length, 'results');
+    } catch (error) {
+      console.error('QueryDB threw error:', error);
+      localResults = [];
+    }
+    console.log('Local search phase completed with', localResults.length, 'results');
     
     // Step 2: Search RealEstateIntel AI
     console.log('Searching RealEstateIntel AI...');
@@ -240,9 +269,11 @@ export async function searchAggregator(req: Request, res: Response) {
     
     // Step 3: Merge and deduplicate
     const mergedResults = mergeAndDedupe(localResults, externalResults);
+    console.log('After merge:', mergedResults.length, 'results');
     
     // Step 4: Rank results
     const rankedResults = rankResults(mergedResults, sortBy);
+    console.log('After ranking:', rankedResults.length, 'results');
     
     // Step 5: Apply limit
     const finalResults = rankedResults.slice(0, maxResults);
