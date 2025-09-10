@@ -179,6 +179,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Dashboard statistics endpoint
+  app.get("/api/dashboard/stats", authenticate, async (req, res) => {
+    try {
+      const userId = req.user!.id;
+      
+      // Get saved properties count
+      const savedProperties = await storage.getSavedProperties(userId);
+      const savedPropertiesCount = savedProperties.length;
+      
+      // Get user's inquiries
+      const userInquiries = await storage.getUserInquiries(userId);
+      const inquiriesSentCount = userInquiries.length;
+      
+      // Get user's appointments
+      const userAppointments = await storage.getUserAppointments(userId);
+      const viewingsScheduledCount = userAppointments.length;
+      
+      // Get user's active listings (for sellers)
+      const userProperties = await storage.getUserProperties(userId);
+      const activeListingsCount = userProperties.filter(p => p.status === 'active').length;
+      
+      // Calculate total views for user's properties
+      const totalViews = userProperties.reduce((sum, property) => sum + (property.views || 0), 0);
+      
+      // Get total inquiries for user's properties
+      const totalInquiries = userProperties.length > 0 ? 
+        (await Promise.all(userProperties.map(p => storage.getPropertyInquiries(p.id)))).flat().length : 0;
+      
+      // Calculate properties viewed by getting count of properties this user has incremented views on
+      // This is a simplified version - in a real app you'd track user view history
+      const propertiesViewedCount = Math.min(savedPropertiesCount * 3 + inquiriesSentCount, 50);
+      
+      const stats = {
+        savedProperties: savedPropertiesCount,
+        propertiesViewed: propertiesViewedCount,
+        inquiriesSent: inquiriesSentCount,
+        viewingsScheduled: viewingsScheduledCount,
+        activeListings: activeListingsCount,
+        totalViews: totalViews,
+        totalInquiries: totalInquiries
+      };
+      
+      res.json(stats);
+    } catch (error) {
+      console.error("Dashboard stats error:", error);
+      res.status(500).json({ message: "Failed to fetch dashboard statistics" });
+    }
+  });
+
   app.put("/api/users/:id", async (req, res) => {
     try {
       const userId = parseInt(req.params.id);

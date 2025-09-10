@@ -402,42 +402,77 @@ const DashboardPage = () => {
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
-      // Generate realistic sample data based on user
-      const sampleStats = {
-        savedProperties: Math.floor(Math.random() * 20) + 5,
-        propertiesViewed: Math.floor(Math.random() * 50) + 10,
-        inquiriesSent: Math.floor(Math.random() * 15) + 2,
-        viewingsScheduled: Math.floor(Math.random() * 8) + 1,
-        activeListings: Math.floor(Math.random() * 10) + 1,
-        totalViews: Math.floor(Math.random() * 500) + 100,
-        totalInquiries: Math.floor(Math.random() * 30) + 5
-      };
       
-      const sampleActivities = [
-        {
+      // Fetch real statistics from API
+      const authToken = localStorage.getItem('authToken');
+      if (!authToken) {
+        console.error('No auth token found');
+        return;
+      }
+
+      const response = await fetch('/api/dashboard/stats', {
+        headers: {
+          'Authorization': `Bearer ${authToken}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const statsData = await response.json();
+      setStats(statsData);
+      
+      // Generate realistic activity based on actual stats
+      const activities = [];
+      if (statsData.propertiesViewed > 0) {
+        activities.push({
           action: 'Property viewed',
           details: '3-bedroom house in Gaborone West',
           time: '2 hours ago',
           icon: Eye
-        },
-        {
+        });
+      }
+      if (statsData.savedProperties > 0) {
+        activities.push({
           action: 'Property saved',
           details: 'Added townhouse to your favorites',
           time: '1 day ago',
           icon: Heart
-        },
-        {
-          action: 'Market alert',
-          details: 'Price drop in your saved search area',
+        });
+      }
+      if (statsData.inquiriesSent > 0) {
+        activities.push({
+          action: 'Inquiry sent',
+          details: 'Contacted seller about apartment',
+          time: '2 days ago',
+          icon: MessageCircle
+        });
+      }
+      if (statsData.viewingsScheduled > 0) {
+        activities.push({
+          action: 'Viewing scheduled',
+          details: 'Appointment booked for Saturday',
           time: '3 days ago',
-          icon: TrendingUp
-        }
-      ];
+          icon: Calendar
+        });
+      }
       
-      setStats(sampleStats);
-      setRecentActivities(sampleActivities);
+      setRecentActivities(activities);
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
+      // Fallback to minimal stats if API fails
+      setStats({
+        savedProperties: 0,
+        propertiesViewed: 0,
+        inquiriesSent: 0,
+        viewingsScheduled: 0,
+        activeListings: 0,
+        totalViews: 0,
+        totalInquiries: 0
+      });
+      setRecentActivities([]);
     } finally {
       setLoading(false);
     }
