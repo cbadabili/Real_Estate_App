@@ -14,10 +14,47 @@ import { reviewRoutes } from './review-storage';
 import realEstateIntelRouter from './real-estate-intel-search';
 import { searchAggregator } from './search-aggregator';
 import { suggest } from './suggest';
+import { errorHandler, notFoundHandler } from './middleware/error';
+import { env } from './utils/env';
+import helmet from 'helmet';
+import cors from 'cors';
+import rateLimit from 'express-rate-limit';
+import morgan from 'morgan';
 
 const app = express();
-app.use(express.json({ limit: '50mb' }));
-app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+
+// Security middleware
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://api.mapbox.com"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "https://api.mapbox.com"],
+      imgSrc: ["'self'", "data:", "https:", "blob:"],
+      connectSrc: ["'self'", "https://api.mapbox.com", "wss://ws.mapbox.com"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com"],
+    },
+  },
+}));
+
+app.use(cors({
+  origin: env.CORS_ORIGIN.split(',').map(s => s.trim()),
+  credentials: true,
+}));
+
+app.use(morgan('combined'));
+
+// Rate limiting for auth and write endpoints
+const authWriteLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many requests, please try again later' }
+});
+
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 app.use((req, res, next) => {
   const start = Date.now();
@@ -80,15 +117,16 @@ app.get('/api/health', (_req: Request, res: Response) => {
   app.post('/intel/search', intelSearch);
   app.get('/intel/suggest', intelSuggest);
 
+  // Apply rate limiting to sensitive endpoints
+  app.use('/api/users/login', authWriteLimiter);
+  app.use('/api/users/register', authWriteLimiter);
+  app.use('/api/properties', authWriteLimiter);
 
-  app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-    const status = err.status || err.statusCode || 500;
-    const message = err.message || "Internal Server Error";
-
-    console.error('Express error:', err);
-    res.status(status).json({ message });
-    // Don't re-throw to prevent crash
-  });
+  // 404 handler
+  app.use(notFoundHandler);
+  
+  // Global error handler
+  app.use(errorHandler);
 
   // Set environment to development if not specified
   if (!process.env.NODE_ENV) {
@@ -126,11 +164,17 @@ app.get('/api/health', (_req: Request, res: Response) => {
         await initializeDatabase();
       }
 
-      if (shouldSeedDB) {
+      if (shouldSeedDB && env.NODE_ENV !== 'production') {
         console.log('Seeding database...');
-        // Temporarily skip seeding to avoid missing table issues
-        console.log('⚠️ Seeding temporarily disabled for testing');
-        // await seedManager.seedAll();
+        try {
+          await seedManager.seedAll();
+          console.log('✅ Database seeding completed');
+        } catch (error) {
+          console.error('❌ Database seeding failed:', error);
+          // Don't exit in development, just log the error
+        }
+      } else if (env.NODE_ENV === 'production') {
+        console.log('⚠️ Seeding skipped in production environment');
       }
 
       console.log('✅ Database initialization completed');

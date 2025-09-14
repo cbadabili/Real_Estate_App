@@ -1,8 +1,13 @@
 import OpenAI from "openai";
 import { storage } from './storage';
+import { z } from 'zod';
 
 // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
 const openai = process.env.OPENAI_API_KEY ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY }) : null;
+
+const AISearchRequest = z.object({
+  query: z.string().min(1).max(500),
+});
 
 export interface SearchFilters {
   minPrice?: number;
@@ -41,18 +46,17 @@ const router = Router();
 // Add the AI search route
 router.post('/search/ai', async (req, res) => {
   try {
-    const { query } = req.body;
+    const { query } = AISearchRequest.parse(req.body);
     console.log('AI Search request received:', query);
-
-    if (!query || typeof query !== 'string') {
-      return res.status(400).json({ message: "Query is required" });
-    }
 
     const result = await parseNaturalLanguageSearch(query);
     console.log('AI Search result:', { query, resultFilters: result.filters, confidence: result.confidence });
     res.json(result);
   } catch (error) {
     console.error('AI search error:', error);
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({ error: 'Invalid request', details: error.flatten() });
+    }
     res.status(500).json({ message: 'Search failed' });
   }
 });
