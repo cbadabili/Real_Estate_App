@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { 
   Search, 
   Filter, 
@@ -14,7 +15,8 @@ import {
   Shield,
   GraduationCap,
   Award,
-  Calendar
+  Calendar,
+  Plus
 } from 'lucide-react';
 
 interface TrainingProvider {
@@ -35,11 +37,16 @@ interface TrainingProvider {
 }
 
 const TrainingProvidersPage: React.FC = () => {
+  const navigate = useNavigate();
   const [providers, setProviders] = useState<TrainingProvider[]>([]);
   const [filteredProviders, setFilteredProviders] = useState<TrainingProvider[]>([]);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
+
+  const handleRegisterProvider = () => {
+    navigate('/marketplace/register-provider?type=trainer');
+  };
 
   const categories = [
     { id: 'all', name: 'All Training', icon: GraduationCap },
@@ -139,6 +146,15 @@ const TrainingProvidersPage: React.FC = () => {
             <p className="text-xl text-green-100 mb-8 max-w-3xl mx-auto">
               Professional development and skills training for real estate professionals
             </p>
+            <div className="flex justify-center">
+              <button
+                onClick={handleRegisterProvider}
+                className="bg-white text-green-600 px-8 py-3 rounded-lg font-semibold hover:bg-green-50 transition-colors flex items-center space-x-2 shadow-lg"
+              >
+                <Plus className="h-5 w-5" />
+                <span>Register as Training Provider</span>
+              </button>
+            </div>
           </div>
         </div>
       </section>
@@ -182,6 +198,45 @@ const TrainingProvidersPage: React.FC = () => {
           </div>
         </div>
       </section>
+
+      {/* Registration Call-to-Action */}
+      {filteredProviders.length === 0 && !loading && (
+        <section className="py-12 bg-green-50">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <GraduationCap className="h-16 w-16 text-green-600 mx-auto mb-6" />
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">
+              Become a Training Provider
+            </h2>
+            <p className="text-xl text-gray-600 mb-8">
+              Share your expertise and help others develop their skills in real estate and construction.
+            </p>
+            <div className="grid md:grid-cols-3 gap-6 mb-8">
+              <div className="text-center">
+                <Users className="h-8 w-8 text-green-600 mx-auto mb-3" />
+                <h3 className="font-semibold text-gray-900 mb-2">Reach More Students</h3>
+                <p className="text-gray-600 text-sm">Connect with learners across Botswana</p>
+              </div>
+              <div className="text-center">
+                <Award className="h-8 w-8 text-green-600 mx-auto mb-3" />
+                <h3 className="font-semibold text-gray-900 mb-2">Build Your Reputation</h3>
+                <p className="text-gray-600 text-sm">Establish yourself as a trusted educator</p>
+              </div>
+              <div className="text-center">
+                <BookOpen className="h-8 w-8 text-green-600 mx-auto mb-3" />
+                <h3 className="font-semibold text-gray-900 mb-2">Flexible Teaching</h3>
+                <p className="text-gray-600 text-sm">Offer courses online or in-person</p>
+              </div>
+            </div>
+            <button
+              onClick={handleRegisterProvider}
+              className="bg-green-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors flex items-center space-x-2 mx-auto"
+            >
+              <Plus className="h-5 w-5" />
+              <span>Register as Training Provider</span>
+            </button>
+          </div>
+        </section>
+      )}
 
       {/* Training Providers Grid */}
       <section className="py-16">
@@ -297,6 +352,16 @@ const TrainingProvidersPage: React.FC = () => {
           )}
         </div>
       </section>
+
+      {/* Floating Registration Button */}
+      <button
+        onClick={handleRegisterProvider}
+        className="fixed bottom-8 right-8 bg-green-600 text-white p-4 rounded-full shadow-lg hover:bg-green-700 transition-colors z-50 flex items-center space-x-2"
+        title="Register as Training Provider"
+      >
+        <Plus className="h-6 w-6" />
+        <span className="hidden sm:inline">Register</span>
+      </button>
     </div>
   );
 };
