@@ -90,7 +90,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/properties/:id", async (req, res) => {
     try {
       const propertyId = parseInt(req.params.id);
-      
+
       // Validate that propertyId is a valid number
       if (isNaN(propertyId) || propertyId <= 0) {
         return res.status(400).json({ message: "Invalid property ID" });
@@ -157,7 +157,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/api/properties/:id", async (req, res) => {
     try {
       const propertyId = parseInt(req.params.id);
-      
+
       // Validate that propertyId is a valid number
       if (isNaN(propertyId) || propertyId <= 0) {
         return res.status(400).json({ message: "Invalid property ID" });
@@ -180,7 +180,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete("/api/properties/:id", async (req, res) => {
     try {
       const propertyId = parseInt(req.params.id);
-      
+
       // Validate that propertyId is a valid number
       if (isNaN(propertyId) || propertyId <= 0) {
         return res.status(400).json({ message: "Invalid property ID" });
@@ -1408,19 +1408,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       console.log('Property search filters:', JSON.stringify(filters, null, 2));
 
-      const properties = await storage.getProperties(filters);
-      
+      const rawProperties = await storage.getProperties(filters);
+
+      // Process properties to match the expected format from PropertySearchPage
+      const processedProperties = rawProperties.map(prop => ({
+        id: prop.id,
+        title: prop.title || 'Untitled Property',
+        description: prop.description,
+        price: typeof prop.price === 'string' ? parseFloat(prop.price) : prop.price || 0,
+        latitude: typeof prop.latitude === 'string' ? parseFloat(prop.latitude) : prop.latitude,
+        longitude: typeof prop.longitude === 'string' ? parseFloat(prop.longitude) : prop.longitude,
+        bedrooms: prop.bedrooms || 0,
+        bathrooms: typeof prop.bathrooms === 'string' ? parseFloat(prop.bathrooms) : prop.bathrooms || 0,
+        location: prop.address || `${prop.city}, ${prop.state}`,
+        city: prop.city || prop.state || 'Unknown',
+        propertyType: prop.propertyType || 'house',
+        images: Array.isArray(prop.images) ? prop.images : (prop.images ? JSON.parse(prop.images) : []),
+        status: prop.status || 'active',
+        listingType: prop.listingType || 'owner'
+      }));
+
       res.json({
         success: true,
-        properties: properties,
-        count: properties.length
+        properties: processedProperties,
+        count: processedProperties.length
       });
     } catch (error) {
       console.error("Property search error:", error);
       res.status(500).json({ 
         success: false,
         error: "Failed to search properties",
-        message: error.message 
+        message: error instanceof Error ? error.message : 'Unknown error'
       });
     }
   });
