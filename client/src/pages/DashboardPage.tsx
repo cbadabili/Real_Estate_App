@@ -27,6 +27,7 @@ import {
   Wrench
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import BuyerDashboard from './dashboard/BuyerDashboard';
 
 // Role-specific dashboard components
 const BuyerDashboard = ({ user, stats }) => (
@@ -515,6 +516,11 @@ const DashboardPage = () => {
   };
 
   const dashboardType = getDashboardType();
+
+  // Use specialized dashboard components for better UX
+  if (dashboardType === 'buyer') {
+    return <BuyerDashboard />;
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">

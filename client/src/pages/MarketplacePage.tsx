@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Filter, MapPin, Star, Clock, Phone, Mail, Globe, Shield, Award, Package, Wrench, GraduationCap, UserPlus, Plus } from 'lucide-react';
-import SectionContent from '../components/marketplace/SectionContent';
+import ServiceProviderCard from '../components/domain/marketplace/ServiceProviderCard';
 import RegisterProvider from '../components/marketplace/RegisterProvider';
 import { useLocation } from 'react-router-dom';
 import PropertyMap from '../components/properties/PropertyMap';

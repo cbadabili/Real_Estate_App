@@ -7,7 +7,7 @@ import { OfflineIndicator } from './components/ui/OfflineIndicator';
 import Navbar from './components/layout/Navbar';
 import HomePage from './pages/HomePage';
 import DashboardPage from './pages/DashboardPage';
-import PropertiesPage from './pages/PropertiesPage';
+import PropertySearchPage from './pages/property/PropertySearchPage';
 import PropertyDetailsPage from './pages/PropertyDetailsPage';
 import { PlotsPage } from './pages/PlotsPage';
 import RentPage from './pages/RentPage';
@@ -121,7 +121,7 @@ function App() {
             <Route path="/fsbo-dashboard" element={<ProtectedRoute><FSBODashboard /></ProtectedRoute>} />
             <Route path="/landlord-dashboard" element={<ProtectedRoute><LandlordDashboard /></ProtectedRoute>} />
             <Route path="/renter-dashboard" element={<ProtectedRoute><RenterDashboard /></ProtectedRoute>} />
-            <Route path="/properties" element={<PropertiesPage />} />
+            <Route path="/properties" element={<PropertySearchPage />} />
             <Route path="/properties/:id" element={<PropertyDetailsPage />} />
             <Route path="/create-listing" element={<ProtectedRoute><CreateListingPage /></ProtectedRoute>} />
             <Route path="/my-properties" element={<ProtectedRoute><MyPropertiesPage /></ProtectedRoute>} />
