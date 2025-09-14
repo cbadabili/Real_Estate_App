@@ -34,7 +34,7 @@ export async function intelSearch(req: Request, res: Response) {
 
     const content = response.choices[0].message.content;
     let json;
-    
+
     try {
       json = JSON.parse(content || '{"results": []}');
     } catch (parseError) {
@@ -80,7 +80,7 @@ export async function intelSuggest(req: Request, res: Response) {
 
     const content = response.choices[0].message.content;
     let suggestions;
-    
+
     try {
       suggestions = JSON.parse(content || '[]');
     } catch (parseError) {

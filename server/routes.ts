@@ -32,10 +32,11 @@ import {
   insertAdminAuditLogSchema,
   Permission,
   UserRole,
-  UserType
+  UserType,
+  insertPropertySchema // Import schema for property creation
 } from "../shared/schema.js";
 import { z } from "zod";
-import { eq, and, or, ilike, gte, lte, desc, asc } from "drizzle-orm";
+import { eq, and, or, ilike, gte, lte, desc, asc, sql } from "drizzle-orm";
 import { properties, users, reviews } from "../shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {

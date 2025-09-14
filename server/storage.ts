@@ -1,9 +1,9 @@
-import { 
-  inquiries, 
-  appointments, 
+import {
+  inquiries,
+  appointments,
   savedProperties,
   properties,
-  type User, 
+  type User,
   type InsertUser,
   type Property,
   type InsertProperty,
@@ -15,7 +15,7 @@ import {
   type InsertSavedProperty
 } from "../shared/schema";
 import { db } from "./db";
-import { eq, and, desc, asc, sql } from "drizzle-orm";
+import { eq, and, desc, asc, sql, gte, lte, like, or } from "drizzle-orm";
 import { userRepository, type IUserRepository } from "./repositories/user-repository";
 import { propertyRepository, type IPropertyRepository, type PropertyFilters } from "./repositories/property-repository";
 
@@ -199,7 +199,7 @@ export class DatabaseStorage implements IStorage {
         ...prop,
         images: prop.images ? JSON.parse(prop.images) : [],
         features: prop.features ? (
-          Array.isArray(JSON.parse(prop.features)) ? JSON.parse(prop.features) : 
+          Array.isArray(JSON.parse(prop.features)) ? JSON.parse(prop.features) :
           typeof JSON.parse(prop.features) === 'string' ? [JSON.parse(prop.features)] : []
         ) : [],
       };

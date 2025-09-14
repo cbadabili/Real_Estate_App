@@ -58,32 +58,32 @@ export interface IReviewStorage {
   updateUserReview(id: number, updates: Partial<InsertUserReview>): Promise<UserReview | undefined>;
   deleteUserReview(id: number): Promise<boolean>;
   getUserReviewStats(userId: number): Promise<ReviewStats>;
-  
+
   // Review Responses
   getReviewResponse(id: number): Promise<ReviewResponse | undefined>;
   getReviewResponses(reviewId: number): Promise<ReviewResponse[]>;
   createReviewResponse(response: InsertReviewResponse): Promise<ReviewResponse>;
   updateReviewResponse(id: number, updates: Partial<InsertReviewResponse>): Promise<ReviewResponse | undefined>;
   deleteReviewResponse(id: number): Promise<boolean>;
-  
+
   // Review Helpful Votes
   getReviewHelpful(reviewId: number, userId: number): Promise<ReviewHelpful | undefined>;
   getReviewHelpfulStats(reviewId: number): Promise<{ helpful: number; notHelpful: number }>;
   voteReviewHelpful(vote: InsertReviewHelpful): Promise<ReviewHelpful>;
   updateReviewHelpful(reviewId: number, userId: number, isHelpful: boolean): Promise<ReviewHelpful | undefined>;
   deleteReviewHelpful(reviewId: number, userId: number): Promise<boolean>;
-  
+
   // User Permissions
   getUserPermission(id: number): Promise<UserPermission | undefined>;
   getUserPermissions(userId: number): Promise<UserPermission[]>;
   createUserPermission(permission: InsertUserPermission): Promise<UserPermission>;
   revokeUserPermission(userId: number, permission: string): Promise<boolean>;
   hasUserPermission(userId: number, permission: Permission): Promise<boolean>;
-  
+
   // Admin Audit Log
   getAuditLog(filters?: { adminId?: number; action?: string; targetType?: string; limit?: number; offset?: number }): Promise<AdminAuditLog[]>;
   createAuditLogEntry(entry: InsertAdminAuditLog): Promise<AdminAuditLog>;
-  
+
   // Moderation
   flagReview(reviewId: number, reason?: string): Promise<boolean>;
   moderateReview(reviewId: number, status: string, moderatorNotes?: string): Promise<UserReview | undefined>;
@@ -99,64 +99,64 @@ export class ReviewStorage implements IReviewStorage {
 
   async getUserReviews(filters: ReviewFilters = {}): Promise<UserReview[]> {
     let query = db.select().from(userReviews);
-    
+
     const conditions = [];
-    
+
     if (filters.revieweeId) {
       conditions.push(eq(userReviews.revieweeId, filters.revieweeId));
     }
-    
+
     if (filters.reviewerId) {
       conditions.push(eq(userReviews.reviewerId, filters.reviewerId));
     }
-    
+
     if (filters.reviewType) {
       conditions.push(eq(userReviews.reviewType, filters.reviewType));
     }
-    
+
     if (filters.minRating) {
       conditions.push(sql`${userReviews.rating} >= ${filters.minRating}`);
     }
-    
+
     if (filters.maxRating) {
       conditions.push(sql`${userReviews.rating} <= ${filters.maxRating}`);
     }
-    
+
     if (filters.status) {
       conditions.push(eq(userReviews.status, filters.status));
     }
-    
+
     if (filters.isPublic !== undefined) {
       conditions.push(eq(userReviews.isPublic, filters.isPublic));
     }
-    
+
     if (filters.isVerified !== undefined) {
       conditions.push(eq(userReviews.isVerified, filters.isVerified));
     }
-    
+
     if (conditions.length > 0) {
       query = query.where(and(...conditions));
     }
-    
+
     // Sorting
     const sortBy = filters.sortBy || 'date';
     const sortOrder = filters.sortOrder || 'desc';
-    
+
     if (sortBy === 'rating') {
       query = sortOrder === 'asc' ? query.orderBy(asc(userReviews.rating)) : query.orderBy(desc(userReviews.rating));
     } else if (sortBy === 'date') {
       query = sortOrder === 'asc' ? query.orderBy(asc(userReviews.createdAt)) : query.orderBy(desc(userReviews.createdAt));
     }
-    
+
     // Pagination
     if (filters.limit) {
       query = query.limit(filters.limit);
     }
-    
+
     if (filters.offset) {
       query = query.offset(filters.offset);
     }
-    
+
     return await query;
   }
 
@@ -168,7 +168,7 @@ export class ReviewStorage implements IReviewStorage {
     notHelpfulCount?: number;
   })[]> {
     const reviews = await this.getUserReviews(filters);
-    
+
     const reviewsWithDetails = await Promise.all(
       reviews.map(async (review) => {
         // Get reviewer details
@@ -176,22 +176,22 @@ export class ReviewStorage implements IReviewStorage {
           .select({ firstName: users.firstName, lastName: users.lastName, avatar: users.avatar })
           .from(users)
           .where(eq(users.id, review.reviewerId));
-        
+
         // Get reviewee details
         const [reviewee] = await db
           .select({ firstName: users.firstName, lastName: users.lastName, avatar: users.avatar })
           .from(users)
           .where(eq(users.id, review.revieweeId));
-        
+
         // Get response count
         const [responsesResult] = await db
           .select({ count: sql`count(*)` })
           .from(reviewResponses)
           .where(eq(reviewResponses.reviewId, review.id));
-        
+
         // Get helpful votes
         const helpfulStats = await this.getReviewHelpfulStats(review.id);
-        
+
         return {
           ...review,
           reviewer: reviewer || { firstName: 'Unknown', lastName: 'User', avatar: null },
@@ -202,7 +202,7 @@ export class ReviewStorage implements IReviewStorage {
         };
       })
     );
-    
+
     return reviewsWithDetails;
   }
 
@@ -217,7 +217,7 @@ export class ReviewStorage implements IReviewStorage {
       .set({ ...updates, updatedAt: new Date() })
       .where(eq(userReviews.id, id))
       .returning();
-    
+
     return updatedReview;
   }
 
@@ -242,7 +242,7 @@ export class ReviewStorage implements IReviewStorage {
         eq(userReviews.status, 'active'),
         eq(userReviews.isPublic, true)
       ));
-    
+
     // Get rating distribution
     const ratingDistribution = await db
       .select({
@@ -256,7 +256,7 @@ export class ReviewStorage implements IReviewStorage {
         eq(userReviews.isPublic, true)
       ))
       .groupBy(userReviews.rating);
-    
+
     // Get verified reviews count
     const [verifiedStats] = await db
       .select({ count: sql`count(*)` })
@@ -266,7 +266,7 @@ export class ReviewStorage implements IReviewStorage {
         eq(userReviews.isVerified, true),
         eq(userReviews.status, 'active')
       ));
-    
+
     // Get total helpful votes
     const [helpfulStats] = await db
       .select({ count: sql`count(*)` })
@@ -276,12 +276,12 @@ export class ReviewStorage implements IReviewStorage {
         eq(userReviews.revieweeId, userId),
         eq(reviewHelpful.isHelpful, true)
       ));
-    
+
     const distribution: Record<number, number> = {};
     ratingDistribution.forEach(item => {
       distribution[item.rating] = item.count;
     });
-    
+
     return {
       totalReviews: statsResult?.totalReviews || 0,
       averageRating: parseFloat(statsResult?.averageRating?.toString() || '0'),
@@ -316,7 +316,7 @@ export class ReviewStorage implements IReviewStorage {
       .set(updates)
       .where(eq(reviewResponses.id, id))
       .returning();
-    
+
     return updatedResponse;
   }
 
@@ -337,7 +337,7 @@ export class ReviewStorage implements IReviewStorage {
         eq(reviewHelpful.reviewId, reviewId),
         eq(reviewHelpful.userId, userId)
       ));
-    
+
     return vote;
   }
 
@@ -349,7 +349,7 @@ export class ReviewStorage implements IReviewStorage {
         eq(reviewHelpful.reviewId, reviewId),
         eq(reviewHelpful.isHelpful, true)
       ));
-    
+
     const [notHelpfulCount] = await db
       .select({ count: sql`count(*)` })
       .from(reviewHelpful)
@@ -357,7 +357,7 @@ export class ReviewStorage implements IReviewStorage {
         eq(reviewHelpful.reviewId, reviewId),
         eq(reviewHelpful.isHelpful, false)
       ));
-    
+
     return {
       helpful: helpfulCount?.count || 0,
       notHelpful: notHelpfulCount?.count || 0,
@@ -367,7 +367,7 @@ export class ReviewStorage implements IReviewStorage {
   async voteReviewHelpful(vote: InsertReviewHelpful): Promise<ReviewHelpful> {
     // First check if vote already exists
     const existingVote = await this.getReviewHelpful(vote.reviewId, vote.userId);
-    
+
     if (existingVote) {
       // Update existing vote
       return await this.updateReviewHelpful(vote.reviewId, vote.userId, vote.isHelpful);
@@ -387,7 +387,7 @@ export class ReviewStorage implements IReviewStorage {
         eq(reviewHelpful.userId, userId)
       ))
       .returning();
-    
+
     return updatedVote;
   }
 
@@ -399,7 +399,7 @@ export class ReviewStorage implements IReviewStorage {
         eq(reviewHelpful.userId, userId)
       ))
       .returning({ id: reviewHelpful.id });
-    
+
     return deleted.length > 0;
   }
 
@@ -432,7 +432,7 @@ export class ReviewStorage implements IReviewStorage {
         eq(userPermissions.permission, permission)
       ))
       .returning({ id: userPermissions.id });
-    
+
     return deleted.length > 0;
   }
 
@@ -445,65 +445,61 @@ export class ReviewStorage implements IReviewStorage {
         eq(userPermissions.permission, permission),
         sql`(${userPermissions.expiresAt} IS NULL OR ${userPermissions.expiresAt} > now())`
       ));
-    
+
     return (result?.count || 0) > 0;
   }
 
   // Admin Audit Log
   async getAuditLog(filters: { adminId?: number; action?: string; targetType?: string; limit?: number; offset?: number } = {}): Promise<AdminAuditLog[]> {
     let query = db.select().from(adminAuditLog);
-    
+
     const conditions = [];
-    
+
     if (filters.adminId) {
       conditions.push(eq(adminAuditLog.adminId, filters.adminId));
     }
-    
+
     if (filters.action) {
       conditions.push(eq(adminAuditLog.action, filters.action));
     }
-    
+
     if (filters.targetType) {
       conditions.push(eq(adminAuditLog.targetType, filters.targetType));
     }
-    
+
     if (conditions.length > 0) {
       query = query.where(and(...conditions));
     }
-    
+
     query = query.orderBy(desc(adminAuditLog.createdAt));
-    
+
     if (filters.limit) {
       query = query.limit(filters.limit);
     }
-    
+
     if (filters.offset) {
       query = query.offset(filters.offset);
     }
-    
+
     const logs = await query;
-    
-    // Parse JSON strings back to objects
+
+    // JSONB fields are automatically parsed by Drizzle
     return logs.map(log => ({
       ...log,
-      details: log.details ? JSON.parse(log.details) : null
+      details: log.details // No need to parse JSON.parse if it's JSONB
     }));
   }
 
   async createAuditLogEntry(entry: InsertAdminAuditLog): Promise<AdminAuditLog> {
-    // Convert details object to JSON string for SQLite
+    // Drizzle handles JSONB serialization automatically
     const entryData = {
       ...entry,
-      details: entry.details ? JSON.stringify(entry.details) : null
+      details: entry.details
     };
-    
+
     const [newEntry] = await db.insert(adminAuditLog).values(entryData).returning();
-    
-    // Parse JSON string back to object
-    return {
-      ...newEntry,
-      details: newEntry.details ? JSON.parse(newEntry.details) : null
-    };
+
+    return newEntry;
   }
 
   // Moderation
@@ -517,7 +513,7 @@ export class ReviewStorage implements IReviewStorage {
       })
       .where(eq(userReviews.id, reviewId))
       .returning({ id: userReviews.id });
-    
+
     return flagged.length > 0;
   }
 
@@ -531,7 +527,7 @@ export class ReviewStorage implements IReviewStorage {
       })
       .where(eq(userReviews.id, reviewId))
       .returning();
-    
+
     return moderatedReview;
   }
 

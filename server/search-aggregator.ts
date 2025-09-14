@@ -1,4 +1,3 @@
-
 import type { Request, Response } from "express";
 import { db } from "./db";
 import { properties } from "../shared/schema";
@@ -31,7 +30,7 @@ interface UnifiedProperty {
 // Enhanced NL parser with more sophisticated pattern matching
 function parseFreeText(q: string) {
   const lower = q.toLowerCase();
-  
+
   // Bedroom extraction
   let beds: number | undefined;
   const digitBed = lower.match(/(\d+)\s*(bed|bedroom|bedroomed)/);
@@ -73,18 +72,18 @@ function parseFreeText(q: string) {
 async function queryDB(q: string, sort: string): Promise<UnifiedProperty[]> {
   try {
     console.log('QueryDB called with:', { q, sort });
-    
+
     const terms = [];
-    
+
     if (q) {
       const derived = parseFreeText(q);
       console.log('Parsed query filters:', derived);
-      
+
       // More flexible approach: Apply semantic filters
       if (derived.beds) terms.push(gte(properties.bedrooms, derived.beds));
       if (derived.type) terms.push(eq(properties.propertyType, derived.type));
       if (derived.location) terms.push(ilike(properties.city, `%${derived.location}%`));
-      
+
       // If no specific filters detected, fall back to text search
       if (!derived.beds && !derived.type && !derived.location) {
         const like = `%${q}%`;
@@ -98,7 +97,7 @@ async function queryDB(q: string, sort: string): Promise<UnifiedProperty[]> {
         );
       }
     }
-    
+
     const where = terms.length ? and(...terms) : undefined;
     const order = 
       sort === "price_low" ? properties.price :
@@ -108,11 +107,11 @@ async function queryDB(q: string, sort: string): Promise<UnifiedProperty[]> {
     console.log('Executing query with', terms.length, 'filter terms');
     const rows = await db.select().from(properties).where(where).orderBy(order).limit(50);
     console.log('Raw query result:', rows.length, 'rows');
-    
+
     const mappedResults = rows.map(mapDBRowToUnified);
     console.log('Mapped results:', mappedResults.length, 'properties');
     return mappedResults;
-    
+
   } catch (error) {
     console.error('QueryDB error:', error);
     return [];
@@ -152,7 +151,7 @@ async function queryIntel(q: string, filters: any = {}): Promise<UnifiedProperty
   try {
     const payload = { query: q };
     console.log('Calling OpenAI search with query:', q);
-    
+
     const response = await fetch('http://0.0.0.0:5000/intel/search', {
       method: "POST",
       headers: {
@@ -201,19 +200,19 @@ async function queryIntel(q: string, filters: any = {}): Promise<UnifiedProperty
 // Merge and dedupe results
 function mergeAndDedupe(localResults: UnifiedProperty[], externalResults: UnifiedProperty[]): UnifiedProperty[] {
   const merged = [...localResults];
-  
+
   // Simple deduplication based on address similarity
   for (const external of externalResults) {
     const isDuplicate = localResults.some(local => 
       local.address.toLowerCase().includes(external.address.toLowerCase()) ||
       external.address.toLowerCase().includes(local.address.toLowerCase())
     );
-    
+
     if (!isDuplicate) {
       merged.push(external);
     }
   }
-  
+
   return merged;
 }
 
@@ -223,7 +222,7 @@ function rankResults(results: UnifiedProperty[], sort: string): UnifiedProperty[
     // Local properties get priority
     if (a.source === 'local' && b.source === 'external') return -1;
     if (a.source === 'external' && b.source === 'local') return 1;
-    
+
     // Then by specified sort
     switch (sort) {
       case 'price_low':
@@ -248,7 +247,7 @@ export async function searchAggregator(req: Request, res: Response) {
 
     // Parse additional filters from query
     const filters = parseFreeText(query);
-    
+
     // Step 1: Search local database
     console.log('Searching local database...');
     console.log('About to call queryDB with:', { query, sortBy });
@@ -262,19 +261,19 @@ export async function searchAggregator(req: Request, res: Response) {
       localResults = [];
     }
     console.log('Local search phase completed with', localResults.length, 'results');
-    
+
     // Step 2: Search RealEstateIntel AI
     console.log('Searching RealEstateIntel AI...');
     const externalResults = await queryIntel(query, filters);
-    
+
     // Step 3: Merge and deduplicate
     const mergedResults = mergeAndDedupe(localResults, externalResults);
     console.log('After merge:', mergedResults.length, 'results');
-    
+
     // Step 4: Rank results
     const rankedResults = rankResults(mergedResults, sortBy);
     console.log('After ranking:', rankedResults.length, 'results');
-    
+
     // Step 5: Apply limit
     const finalResults = rankedResults.slice(0, maxResults);
 
