@@ -59,7 +59,15 @@ const services = {
       id: 3, business_name: 'BuildMax Hardware', business_description: 'Complete range of building materials and tools',
       service_area: 'Gaborone, Molepolole', hourly_rate: 0, rating: 4.6, review_count: 203,
       contact_email: 'orders@buildmax.bw', contact_phone: '+267 390 1234', category_id: 6, user_id: 103,
-      profile_image: '/avatars/hardware1.jpg', verified: true, years_experience: 8
+      profile_image: '/avatars/hardware1.jpg', verified: true, years_experience: 8,
+      services: ['Cement', 'Steel', 'Tools', 'Paint'], deliveryArea: 'Greater Gaborone'
+    },
+    {
+      id: 13, business_name: 'Concrete Supply Co', business_description: 'Ready-mix concrete and building materials supplier',
+      service_area: 'Nationwide', hourly_rate: 0, rating: 4.5, review_count: 78,
+      contact_email: 'orders@concretesupply.bw', contact_phone: '+267 392 1111', category_id: 7, user_id: 113,
+      profile_image: '/avatars/concrete1.jpg', verified: true, years_experience: 10,
+      services: ['Concrete', 'Aggregates', 'Cement'], deliveryArea: 'Nationwide'
     }
   ],
   artisans: [
@@ -67,7 +75,22 @@ const services = {
       id: 4, business_name: 'Elite Builders', business_description: 'Quality construction services for residential and commercial projects',
       service_area: 'Greater Gaborone', hourly_rate: 450, rating: 4.7, review_count: 156,
       contact_email: 'projects@elitebuilders.bw', contact_phone: '+267 392 5678', category_id: 11, user_id: 104,
-      profile_image: '/avatars/builder1.jpg', verified: true, years_experience: 18
+      profile_image: '/avatars/builder1.jpg', verified: true, years_experience: 18,
+      specialties: ['Construction', 'Masonry', 'Electrical', 'Plumbing']
+    },
+    {
+      id: 11, business_name: 'Gaborone Plumbing Services', business_description: 'Professional plumbing installation and repair services',
+      service_area: 'Gaborone', hourly_rate: 350, rating: 4.6, review_count: 89,
+      contact_email: 'info@gabplumbing.bw', contact_phone: '+267 391 4567', category_id: 11, user_id: 111,
+      profile_image: '/avatars/plumber1.jpg', verified: true, years_experience: 12,
+      specialties: ['Plumbing', 'Water Systems', 'Pipe Installation']
+    },
+    {
+      id: 12, business_name: 'Botswana Electricians', business_description: 'Certified electrical contractors for residential and commercial properties',
+      service_area: 'Francistown', hourly_rate: 400, rating: 4.8, review_count: 134,
+      contact_email: 'contact@bwelectricians.bw', contact_phone: '+267 241 7890', category_id: 12, user_id: 112,
+      profile_image: '/avatars/electrician1.jpg', verified: true, years_experience: 15,
+      specialties: ['Electrical', 'Wiring', 'Solar Installation']
     }
   ],
   training_providers: [
