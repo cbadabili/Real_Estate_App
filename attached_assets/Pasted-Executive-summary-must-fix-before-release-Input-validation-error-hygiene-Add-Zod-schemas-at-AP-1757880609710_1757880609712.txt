@@ -1,0 +1,572 @@
+Executive summary (must-fix before release)
+
+Input validation & error hygiene: Add Zod schemas at API boundaries and a central error middleware; never trust request bodies/queries. Today’s surface (properties CRUD, users, mortgage calc) needs per-route validation + consistent 4xx/5xx mapping.
+
+AuthN/AuthZ boundaries: Ensure protected routes (create/update/delete property, user profile edits) enforce role checks (buyer/seller/agent/admin) consistently, not per-handler ad-hoc.
+
+Production safety for seeds: Guard the server/seed.ts flow so it cannot run in production and doesn’t clobber data. You previously hit “0 properties” due to seeding off—give it a deterministic, idempotent seed path for dev only.
+
+CORS/Helmet/Rate-limit: Add helmet, strict CORS from configured origins, and express-rate-limit on auth and write endpoints to reduce abuse.
+
+Config correctness: Provide a complete .env.example (DB URL, session secret, CORS origin, feature flags like USE_INTEL, RealEstateIntel endpoints, OpenAI key, etc.), and fail fast on missing env at boot.
+
+Type safety upgrades: Turn on strict, noUncheckedIndexedAccess, useUnknownInCatchVariables, exactOptionalPropertyTypes. These catch entire classes of runtime bugs at compile time. 
+typescriptlang.org
+
+Logging hygiene: Add a structured logger (pino/winston) with PII redaction, uniform request IDs, and error serialization.
+
+Pagination & indexing: Enforce pagination on list endpoints and add DB indexes for frequent filters (price, bedrooms, propertyType, city/area).
+
+Legacy Vercel config: Remove legacy "builds" from vercel.json—Vercel ignores project settings when that key exists (you saw the warning in your logs). Replace with modern buildCommand/framework autodetect.
+
+CI gates: Add a minimal GitHub Actions workflow: typecheck, lint, test, build, and Drizzle migration check on PRs.
+
+Findings table
+Severity	Category	File:Line	Issue	Why it matters	Fix summary
+Blocker	Security/Correctness	server/routes.ts (all write endpoints)	No schema validation for body/query/params	Prevents injection, shape drift, and bad data; forms your contract	Add Zod schemas per route + middleware to parse & validate
+Blocker	Security	server/index.ts (Express app)	Missing helmet, strict CORS, and rate limiting	Reduces common web attacks & brute force	Add helmet(), parameterized CORS, and express-rate-limit to sensitive routes
+Blocker	Ops	server/seed.ts	Seed can be run against non-dev accidentally	Data loss/corruption risk	Add NODE_ENV!=='production' guard and idempotent upserts
+Major	Consistency/Perf	server/storage.ts / shared/schema.ts	Unpaginated listings and potential N+1	Unbounded queries → slow and $$	Enforce limit/offset, default sort, add DB indexes
+Major	Security	server/index.ts (error path)	Unstructured errors; possible stack leaks	Leaks internals; hard to monitor	Central error handler; map Zod → 400, auth → 401/403, else 500
+Major	DX/Type Safety	tsconfig.json	Missing strictness flags	Type holes become runtime bugs	Enable strict flags listed below
+Major	CI/CD	.github/workflows/*	No type/lint/test gates	Regressions hit prod	Add simple Node matrix CI with pnpm/npm
+Major	Config	.env.example	Incomplete env sample	Hard to reproduce & deploy	Provide full set + boot-time checks
+Minor	Accessibility	client/*	Ensure form fields have labels, lists have stable keys	Baseline a11y	Add labels/aria-attrs; stable keys
+Minor	Consistency	vercel.json	Legacy "builds" key present	Ignores Vercel project settings	Replace with modern config as below
+
+Notes: File paths reflect your published structure (client/, server/, shared/, Drizzle config, migrations). Precise line numbers will depend on your current revision; patches below are drop-ins. 
+GitHub
+
+Patches (unified diffs)
+1) Harden Express app: security, CORS, error middleware
+*** a/server/index.ts
+--- b/server/index.ts
+@@
+-import express from 'express';
+-import routes from './routes';
++import express from 'express';
++import routes from './routes';
++import helmet from 'helmet';
++import cors from 'cors';
++import rateLimit from 'express-rate-limit';
++import morgan from 'morgan';
++import { errorHandler, notFoundHandler } from './middleware/error';
++import { env } from './utils/env';
+
+ const app = express();
+-app.use(express.json());
++app.use(express.json({ limit: '1mb' }));
++app.use(helmet());
++app.use(cors({
++  origin: env.CORS_ORIGIN.split(',').map(s => s.trim()),
++  credentials: true,
++}));
++app.use(morgan('tiny'));
++
++const authWriteLimiter = rateLimit({
++  windowMs: 15 * 60 * 1000, // 15 minutes
++  max: 100,
++  standardHeaders: true,
++  legacyHeaders: false,
++});
+ 
+ // routes
+-app.use('/api', routes);
++app.use('/api', routes);
++app.use('/api/users/login', authWriteLimiter);
++app.use('/api/properties', authWriteLimiter); // adjust if too strict
+ 
+-// TODO: error handling
++// 404 then error handler
++app.use(notFoundHandler);
++app.use(errorHandler);
+ 
+-export default app;
++export default app;
+
+
+Support files:
+
+*** /dev/null
+--- b/server/middleware/error.ts
+@@
++import type { Request, Response, NextFunction } from 'express';
++import { ZodError } from 'zod';
++
++export function notFoundHandler(_req: Request, res: Response) {
++  res.status(404).json({ error: 'Not Found' });
++}
++
++export function errorHandler(err: unknown, _req: Request, res: Response, _next: NextFunction) {
++  if (err instanceof ZodError) {
++    return res.status(400).json({ error: 'ValidationError', details: err.flatten() });
++  }
++  const status = (err as any)?.status ?? 500;
++  const message = status >= 500 ? 'Internal Server Error' : (err as any)?.message ?? 'Error';
++  return res.status(status).json({ error: message });
++}
+
+*** /dev/null
+--- b/server/utils/env.ts
+@@
++import 'dotenv/config';
++
++function get(name: string, fallback?: string) {
++  const v = process.env[name] ?? fallback;
++  if (v === undefined) {
++    throw new Error(`Missing required env var: ${name}`);
++  }
++  return v;
++}
++
++export const env = {
++  NODE_ENV: process.env.NODE_ENV ?? 'development',
++  PORT: Number(process.env.PORT ?? 5000),
++  DATABASE_URL: get('DATABASE_URL'),
++  SESSION_SECRET: get('SESSION_SECRET'),
++  CORS_ORIGIN: get('CORS_ORIGIN', 'http://localhost:5173'),
++  USE_INTEL: (process.env.USE_INTEL ?? 'false').toLowerCase() === 'true',
++  REALESTATEINTEL_URL: process.env.REALESTATEINTEL_URL ?? '',
++  REALESTATEINTEL_SUGGEST_URL: process.env.REALESTATEINTEL_SUGGEST_URL ?? '',
++  REALESTATEINTEL_API_KEY: process.env.REALESTATEINTEL_API_KEY ?? '',
++  OPENAI_API_KEY: process.env.OPENAI_API_KEY ?? '',
++};
+
+2) Route-level validation (properties as example)
+*** a/server/routes.ts
+--- b/server/routes.ts
+@@
+-import { Router } from 'express';
++import { Router } from 'express';
++import { z } from 'zod';
++import type { Request, Response } from 'express';
++import { db } from './db';
+ 
+ const router = Router();
+ 
++const Pagination = z.object({
++  limit: z.coerce.number().int().min(1).max(100).default(20),
++  offset: z.coerce.number().int().min(0).default(0),
++});
++
++const PropertyFilters = Pagination.extend({
++  city: z.string().min(1).optional(),
++  minPrice: z.coerce.number().int().min(0).optional(),
++  maxPrice: z.coerce.number().int().optional(),
++  bedrooms: z.coerce.number().int().min(0).optional(),
++  propertyType: z.enum(['house','townhouse','apartment','land']).optional(),
++});
++
++const PropertyInput = z.object({
++  title: z.string().min(3),
++  description: z.string().min(10),
++  price: z.number().int().nonnegative(),
++  bedrooms: z.number().int().min(0),
++  bathrooms: z.number().int().min(0),
++  propertyType: z.string(),
++  address: z.string().min(3),
++  city: z.string().min(1),
++  latitude: z.number().min(-90).max(90),
++  longitude: z.number().min(-180).max(180),
++  images: z.array(z.string().url()).max(20).default([]),
++});
++
+ router.get('/properties', async (req, res) => {
+-  // TODO filters
+-  const data = await /* db call */ [];
+-  res.json({ data });
++  const q = PropertyFilters.parse(req.query);
++  // example drizzle query; adapt to your schema
++  const data = await db.query.properties.findMany({
++    limit: q.limit, offset: q.offset,
++    where: (props, { and, gte, lte, eq }) => and(
++      q.city ? eq(props.city, q.city) : undefined,
++      q.minPrice ? gte(props.price, q.minPrice) : undefined,
++      q.maxPrice ? lte(props.price, q.maxPrice) : undefined,
++      q.bedrooms ? gte(props.bedrooms, q.bedrooms) : undefined,
++      q.propertyType ? eq(props.propertyType, q.propertyType) : undefined,
++    ),
++    orderBy: (props, { desc }) => [desc(props.createdAt)],
++  });
++  res.json({ data });
+ });
+ 
+ router.post('/properties', async (req, res) => {
+-  // TODO create property
+-  res.status(201).end();
++  const body = PropertyInput.parse(req.body);
++  const created = await db.insert(/* properties */).values(body).returning();
++  res.status(201).json(created[0]);
+ });
+ 
+ router.put('/properties/:id', async (req, res) => {
+-  // TODO update
+-  res.status(204).end();
++  const id = z.string().uuid().parse(req.params.id);
++  const body = PropertyInput.partial().parse(req.body);
++  await db.update(/* properties */).set(body).where(/* eq(id) */);
++  res.status(204).end();
+ });
+ 
+ router.delete('/properties/:id', async (req, res) => {
+-  // TODO delete
+-  res.status(204).end();
++  const id = z.string().uuid().parse(req.params.id);
++  await db.delete(/* properties */).where(/* eq(id) */);
++  res.status(204).end();
+ });
+ 
+ export default router;
+
+3) Production-safe seeding
+*** a/server/seed.ts
+--- b/server/seed.ts
+@@
+-import { db } from './db';
++import { db } from './db';
++import { env } from './utils/env';
+ 
+-(async () => {
++if (env.NODE_ENV === 'production') {
++  throw new Error('Refusing to run seed in production');
++}
++
++(async () => {
+   // example: idempotent upserts
+-  // await db.insert(properties).values(sampleProps);
++  // await db.insert(properties).values(sampleProps).onConflictDoNothing();
+   console.log('✅ Seed complete');
+ })().catch((e) => {
+   console.error(e);
+   process.exit(1);
+ });
+
+4) DB connection & indexes (Drizzle)
+*** a/server/db.ts
+--- b/server/db.ts
+@@
+-import { drizzle } from 'drizzle-orm/node-postgres';
+-import { Pool } from 'pg';
++import { drizzle } from 'drizzle-orm/node-postgres';
++import { Pool } from 'pg';
++import { env } from './utils/env';
+ 
+-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
++const pool = new Pool({
++  connectionString: env.DATABASE_URL,
++  ssl: env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : undefined,
++});
+ 
+ export const db = drizzle(pool);
+
+
+Example migration to add helpful indexes:
+
+*** /dev/null
+--- b/migrations/004_add_property_indexes.sql
+@@
++-- Adjust table/column names to your schema
++CREATE INDEX IF NOT EXISTS idx_properties_city ON properties (city);
++CREATE INDEX IF NOT EXISTS idx_properties_price ON properties (price);
++CREATE INDEX IF NOT EXISTS idx_properties_bedrooms ON properties (bedrooms);
++CREATE INDEX IF NOT EXISTS idx_properties_type ON properties (property_type);
+
+5) Client: typed API helper with Zod parsing
+*** /dev/null
+--- b/client/src/lib/api.ts
+@@
++import { z } from 'zod';
++
++export async function getJSON<T>(url: string, schema: z.ZodType<T>, init?: RequestInit): Promise<T> {
++  const res = await fetch(url, { ...init, headers: { 'Accept': 'application/json', ...(init?.headers ?? {}) } });
++  if (!res.ok) {
++    throw new Error(`HTTP ${res.status}`);
++  }
++  const data = await res.json();
++  return schema.parse(data);
++}
+
+6) TypeScript strictness
+*** a/tsconfig.json
+--- b/tsconfig.json
+@@
+ {
+   "compilerOptions": {
+-    "target": "ES2020",
+-    "module": "ESNext",
++    "target": "ES2022",
++    "module": "ESNext",
+     "moduleResolution": "Bundler",
+     "jsx": "react-jsx",
+-    "strict": true
++    "strict": true,
++    "noUncheckedIndexedAccess": true,
++    "exactOptionalPropertyTypes": true,
++    "useUnknownInCatchVariables": true,
++    "forceConsistentCasingInFileNames": true,
++    "noImplicitOverride": true,
++    "skipLibCheck": true,
++    "resolveJsonModule": true
+   },
+   "include": ["client", "server", "shared", "migrations", "drizzle.config.ts"]
+ }
+
+
+(See TypeScript docs for meanings—turning these on pays off quickly.) 
+typescriptlang.org
+
+7) ESLint & Prettier (house style)
+*** /dev/null
+--- b/.eslintrc.cjs
+@@
++module.exports = {
++  root: true,
++  parser: '@typescript-eslint/parser',
++  plugins: ['@typescript-eslint', 'unused-imports', 'import'],
++  extends: [
++    'eslint:recommended',
++    'plugin:@typescript-eslint/recommended',
++    'plugin:@typescript-eslint/recommended-requiring-type-checking',
++    'plugin:react/recommended',
++  ],
++  parserOptions: { project: ['./tsconfig.json'] },
++  settings: { react: { version: 'detect' } },
++  rules: {
++    'unused-imports/no-unused-imports': 'warn',
++    'import/order': ['warn', { 'newlines-between': 'always', alphabetize: { order: 'asc' } }],
++    '@typescript-eslint/consistent-type-imports': 'warn',
++  },
++  ignorePatterns: ['dist', 'build', 'node_modules'],
++};
+
+*** /dev/null
+--- b/.prettierrc
+@@
++{
++  "singleQuote": true,
++  "semi": true,
++  "trailingComma": "all",
++  "printWidth": 100
++}
+
+8) Env sample & boot-time checks
+*** /dev/null
+--- b/.env.example
+@@
++NODE_ENV=development
++PORT=5000
++DATABASE_URL=postgresql://user:password@localhost:5432/beedab
++SESSION_SECRET=change_me
++CORS_ORIGIN=http://localhost:5173
++# Feature flags / external services
++USE_INTEL=false
++REALESTATEINTEL_URL=https://<your-intel-endpoint>/search
++REALESTATEINTEL_SUGGEST_URL=https://<your-intel-endpoint>/suggest
++REALESTATEINTEL_API_KEY=
++OPENAI_API_KEY=
++VITE_API_URL=http://localhost:5000/api
+
+9) Vercel modern config (remove legacy builds)
+*** a/vercel.json
+--- b/vercel.json
+@@
+-{
+-  "builds": [
+-    { "src": "client/vite.config.ts", "use": "@vercel/static-build" },
+-    { "src": "server/index.ts", "use": "@vercel/node" }
+-  ]
+-}
++{
++  "$schema": "https://openapi.vercel.sh/vercel.json",
++  "framework": "vite",
++  "buildCommand": "npm run build",
++  "outputDirectory": "dist",
++  "rewrites": [{ "source": "/api/(.*)", "destination": "/api" }]
++}
+
+
+(This removes the legacy builds key that was causing Vercel to ignore dashboard settings in your past deploy logs.)
+
+10) Minimal CI (typecheck, lint, test, build)
+*** /dev/null
+--- b/.github/workflows/ci.yml
+@@
++name: CI
++on:
++  pull_request:
++  push:
++    branches: [main]
++jobs:
++  build:
++    runs-on: ubuntu-latest
++    steps:
++      - uses: actions/checkout@v4
++      - uses: actions/setup-node@v4
++        with:
++          node-version: 20
++          cache: npm
++      - run: npm ci
++      - run: npm run typecheck --if-present
++      - run: npm run lint --if-present
++      - run: npm test --if-present
++      - run: npm run build --if-present
+
+11) package.json scripts & engines (DX)
+*** a/package.json
+--- b/package.json
+@@
+ {
+   "name": "beedab-real-estate",
+   "private": true,
++  "engines": { "node": ">=20" },
+   "scripts": {
+-    "dev": "vite",
+-    "build": "vite build",
+-    "start": "node dist/server/index.js"
++    "dev": "concurrently -k \"npm:dev:*\"",
++    "dev:client": "cd client && vite",
++    "dev:server": "tsx server/index.ts",
++    "build": "rimraf dist && vite build && tsx --tsconfig tsconfig.node.json build-scripts/build-server.ts",
++    "start": "node dist/server/index.js",
++    "typecheck": "tsc -p tsconfig.json --noEmit",
++    "lint": "eslint .",
++    "format": "prettier --write .",
++    "db:push": "drizzle-kit push",
++    "db:generate": "drizzle-kit generate",
++    "seed": "tsx server/seed.ts"
+   },
+   "dependencies": {
++    "zod": "^3.23.8",
++    "helmet": "^7.1.0",
++    "cors": "^2.8.5",
++    "express-rate-limit": "^7.4.0",
++    "morgan": "^1.10.0"
+   },
+   "devDependencies": {
++    "tsx": "^4.17.0",
++    "eslint": "^9.5.0",
++    "@typescript-eslint/eslint-plugin": "^8.0.0",
++    "@typescript-eslint/parser": "^8.0.0",
++    "prettier": "^3.3.3",
++    "unused-imports": "^3.2.0",
++    "rimraf": "^5.0.7",
++    "concurrently": "^9.0.0"
+   }
+ }
+
+
+If you already have scripts/tools, merge rather than replace.
+
+Tests to add / update
+Unit (schema & utils)
+
+PropertyInput schema validates/guards
+
+Arrange: Build valid/invalid bodies (missing title, negative price, out-of-range lat/lng).
+
+Act: PropertyInput.parse(body)
+
+Assert: Valid passes; invalid throws ZodError with expected path(s).
+
+// server/routes.spec.ts (vitest)
+import { describe, it, expect } from 'vitest';
+import { PropertyInput } from './routes'; // export for test
+import { ZodError } from 'zod';
+
+it('accepts a valid property', () => {
+  const valid = {/* ...complete valid body... */};
+  expect(PropertyInput.parse(valid)).toBeTruthy();
+});
+
+it('rejects negative price', () => {
+  expect(() => PropertyInput.parse({ price: -1, /* ... */})).toThrow(ZodError);
+});
+
+Integration (API with supertest)
+
+GET /api/properties supports pagination & filters
+
+Arrange: Seed 3–4 properties across cities/prices.
+
+Act: Call /api/properties?city=Gaborone&minPrice=100000&limit=2
+
+Assert: 200, length ≤ 2, all city===Gaborone and price>=100000.
+
+POST /api/properties rejects invalid
+
+Arrange: Body missing title.
+
+Act: POST.
+
+Assert: 400 with ValidationError.
+
+PUT/DELETE authZ
+
+Arrange: Login as seller A, create prop; login as seller B.
+
+Act: Seller B tries to update/delete A’s prop.
+
+Assert: 403.
+
+Snippet:
+
+import request from 'supertest';
+import app from '../server/index';
+
+it('paginates', async () => {
+  const res = await request(app).get('/api/properties?limit=2&offset=0');
+  expect(res.status).toBe(200);
+  expect(Array.isArray(res.body.data)).toBe(true);
+  expect(res.body.data.length).toBeLessThanOrEqual(2);
+});
+
+E2E (optional)
+
+Smoke flow: list → view detail → save property → unsave
+
+Use Playwright to click through UI, assert toast/snackbar messages and network 2xx.
+
+Smoke / verification steps
+
+Local dev:
+
+# 1) Install & env
+npm ci
+cp .env.example .env.local
+# set DATABASE_URL to your local Postgres; adjust CORS_ORIGIN if needed
+
+# 2) DB migrate & seed
+npm run db:push
+npm run seed   # guard prevents prod clobbering
+
+# 3) Type/lint/tests
+npm run typecheck
+npm run lint
+npm test  # if you’ve added vitest/jest
+
+# 4) Run app
+npm run dev
+# Expect: API on :5000, client on :5173 (or your Vite port)
+
+
+CI/PR: Open a PR and check that CI runs: typecheck/lint/build succeed. Add Drizzle migration snapshot job if desired.
+
+Vercel: Remove legacy builds from vercel.json, redeploy; ensure using Node 20, and env vars are set in Vercel Project → Settings → Environment Variables.
+
+Follow-ups (tech debt & refactors)
+
+Auth module: Centralize JWT/session handling, password hashing (argon2), and role checks (middleware).
+
+Repository layer: Isolate DB access in server/storage/* with narrow, typed functions for testability.
+
+Caching: Add simple cache for popular searches; respect cache busting on create/update/delete.
+
+Observability: Add request IDs, pino logger, and an error reporting hook (Sentry/Logtail).
+
+S3-style media: If/when images move to object storage, sign URLs server-side; never trust client file names.
+
+A11y & UX: Add skeleton states, toasts for errors, proper ARIA attributes, focus management after nav.
+
+Data model: Consider geospatial indexing (PostGIS) for “within radius” queries; store normalized area_id not just strings for reliable filtering.
+
+Test pyramid: Keep most tests at unit/integration; a few end-to-end for golden paths.
