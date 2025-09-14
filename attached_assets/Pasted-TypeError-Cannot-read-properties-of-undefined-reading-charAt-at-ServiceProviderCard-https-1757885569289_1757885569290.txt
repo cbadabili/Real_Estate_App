@@ -1,0 +1,18 @@
+TypeError: Cannot read properties of undefined (reading 'charAt')
+    at ServiceProviderCard (https://331c9cdc-a1e3-4369-9dda-5ae35b395e48-00-21ptexpix7co9.worf.replit.dev/src/components/domain/marketplace/ServiceProviderCard.tsx:19:3)
+    at div
+    at div
+    at div
+    at ArtisansPage (https://331c9cdc-a1e3-4369-9dda-5ae35b395e48-00-21ptexpix7co9.worf.replit.dev/src/pages/marketplace/ArtisansPage.tsx:24:35)
+    at RenderedRoute (https://331c9cdc-a1e3-4369-9dda-5ae35b395e48-00-21ptexpix7co9.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/react-router-dom.js?v=a5ff08da:4088:5)
+    at Routes (https://331c9cdc-a1e3-4369-9dda-5ae35b395e48-00-21ptexpix7co9.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/react-router-dom.js?v=a5ff08da:4558:5)
+    at div
+    at PropertyProvider (https://331c9cdc-a1e3-4369-9dda-5ae35b395e48-00-21ptexpix7co9.worf.replit.dev/src/contexts/PropertyContext.tsx:29:36)
+    at AuthProvider (https://331c9cdc-a1e3-4369-9dda-5ae35b395e48-00-21ptexpix7co9.worf.replit.dev/src/contexts/AuthContext.tsx:30:32)
+    at ToastProvider (https://331c9cdc-a1e3-4369-9dda-5ae35b395e48-00-21ptexpix7co9.worf.replit.dev/src/components/ui/Toast.tsx:32:3)
+    at QueryClientProvider (https://331c9cdc-a1e3-4369-9dda-5ae35b395e48-00-21ptexpix7co9.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=a5ff08da:2933:3)
+    at ErrorBoundary (https://331c9cdc-a1e3-4369-9dda-5ae35b395e48-00-21ptexpix7co9.worf.replit.dev/src/components/ui/ErrorBoundary.tsx:8:5)
+    at App
+    at QueryClientProvider (https://331c9cdc-a1e3-4369-9dda-5ae35b395e48-00-21ptexpix7co9.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=a5ff08da:2933:3)
+    at Router (https://331c9cdc-a1e3-4369-9dda-5ae35b395e48-00-21ptexpix7co9.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/react-router-dom.js?v=a5ff08da:4501:15)
+    at BrowserRouter (https://331c9cdc-a1e3-4369-9dda-5ae35b395e48-00-21ptexpix7co9.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/react-router-dom.js?v=a5ff08da:5247:5)
