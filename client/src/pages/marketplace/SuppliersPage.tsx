@@ -18,14 +18,14 @@ import RegisterProvider from '../../components/RegisterProvider';
 
 interface Supplier {
   id: number;
-  name: string;
-  category: string;
-  description: string;
+  business_name: string;
+  category_id: number;
+  business_description: string;
   rating: number;
-  reviews: number;
-  location: string;
-  phone: string;
-  email: string;
+  review_count: number;
+  service_area: string;
+  contact_phone: string;
+  contact_email: string;
   services: string[];
   verified: boolean;
   deliveryArea: string;
@@ -107,15 +107,23 @@ const SuppliersPage: React.FC = () => {
     let filtered = suppliers;
 
     if (selectedCategory !== 'all') {
+      // Map category IDs to category names for filtering
+      const categoryMapping: { [key: string]: number[] } = {
+        'building-materials': [6], // Hardware stores
+        'construction': [7], // Concrete suppliers
+        'home-improvement': [8, 9, 10] // Paint, timber, steel suppliers
+      };
+      
+      const categoryIds = categoryMapping[selectedCategory] || [];
       filtered = filtered.filter(supplier => 
-        supplier.category.toLowerCase().includes(selectedCategory.toLowerCase())
+        categoryIds.includes(supplier.category_id)
       );
     }
 
     if (searchTerm) {
       filtered = filtered.filter(supplier =>
-        supplier.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        supplier.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        supplier.business_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        supplier.business_description.toLowerCase().includes(searchTerm.toLowerCase()) ||
         supplier.services.some(service => service.toLowerCase().includes(searchTerm.toLowerCase()))
       );
     }
@@ -206,9 +214,16 @@ const SuppliersPage: React.FC = () => {
                     <div className="flex items-start justify-between mb-3">
                       <div>
                         <h3 className="text-lg font-semibold text-gray-900 mb-1">
-                          {supplier.name}
+                          {supplier.business_name}
                         </h3>
-                        <p className="text-blue-600 font-medium text-sm">{supplier.category}</p>
+                        <p className="text-blue-600 font-medium text-sm">{
+                          supplier.category_id === 6 ? 'Hardware Store' :
+                          supplier.category_id === 7 ? 'Concrete Supplier' :
+                          supplier.category_id === 8 ? 'Paint Supplier' :
+                          supplier.category_id === 9 ? 'Timber Supplier' :
+                          supplier.category_id === 10 ? 'Steel Supplier' :
+                          'Building Supplier'
+                        }</p>
                       </div>
                       {supplier.verified && (
                         <div className="flex items-center space-x-1 bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">
@@ -218,7 +233,7 @@ const SuppliersPage: React.FC = () => {
                       )}
                     </div>
 
-                    <p className="text-gray-600 text-sm mb-4">{supplier.description}</p>
+                    <p className="text-gray-600 text-sm mb-4">{supplier.business_description}</p>
 
                     <div className="flex items-center text-yellow-500 mb-3">
                       <Star className="h-4 w-4 fill-current" />
@@ -226,14 +241,14 @@ const SuppliersPage: React.FC = () => {
                         {supplier.rating}
                       </span>
                       <span className="text-xs text-gray-600 ml-1">
-                        ({supplier.reviews} reviews)
+                        ({supplier.review_count} reviews)
                       </span>
                     </div>
 
                     <div className="space-y-2 mb-4">
                       <div className="flex items-center text-gray-600 text-sm">
                         <MapPin className="h-4 w-4 mr-2" />
-                        {supplier.location}
+                        {supplier.service_area}
                       </div>
                       <div className="flex items-center text-gray-600 text-sm">
                         <Truck className="h-4 w-4 mr-2" />
@@ -260,14 +275,14 @@ const SuppliersPage: React.FC = () => {
 
                     <div className="flex space-x-2">
                       <button 
-                        onClick={() => window.location.href = `tel:${supplier.phone}`}
+                        onClick={() => window.location.href = `tel:${supplier.contact_phone}`}
                         className="flex-1 bg-blue-600 text-white py-2 px-3 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors flex items-center justify-center"
                       >
                         <Phone className="h-4 w-4 mr-1" />
                         Call
                       </button>
                       <button 
-                        onClick={() => window.location.href = `mailto:${supplier.email}`}
+                        onClick={() => window.location.href = `mailto:${supplier.contact_email}`}
                         className="flex-1 border border-blue-600 text-blue-600 py-2 px-3 rounded-lg text-sm font-medium hover:bg-blue-50 transition-colors flex items-center justify-center"
                       >
                         <Mail className="h-4 w-4 mr-1" />
