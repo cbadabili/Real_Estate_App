@@ -28,11 +28,13 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'", "https://api.mapbox.com"],
-      scriptSrc: ["'self'", "'unsafe-inline'", "https://api.mapbox.com"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://api.mapbox.com", "https://fonts.googleapis.com"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "https://api.mapbox.com", "https://replit.com"],
       imgSrc: ["'self'", "data:", "https:", "blob:"],
-      connectSrc: ["'self'", "https://api.mapbox.com", "wss://ws.mapbox.com"],
-      fontSrc: ["'self'", "https://fonts.gstatic.com"],
+      connectSrc: ["'self'", "https://api.mapbox.com", "https://events.mapbox.com", "wss:", "ws:"],
+      fontSrc: ["'self'", "'unsafe-inline'", "data:", "https://fonts.gstatic.com", "https://fonts.googleapis.com"],
+      objectSrc: ["'none'"],
+      upgradeInsecureRequests: [],
     },
   },
 }));
