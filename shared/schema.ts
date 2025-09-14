@@ -222,8 +222,8 @@ export const saved_searches = sqliteTable('saved_searches', {
   created_at: timestamp('created_at').defaultNow(),
 });
 
-export const rental_listings = sqliteTable('rental_listings', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
+export const rental_listings = pgTable('rental_listings', {
+  id: serial('id').primaryKey(),
   landlord_id: integer('landlord_id').references(() => users.id, { onDelete: 'cascade' }),
   title: text('title').notNull(),
   description: text('description').notNull(),
@@ -239,22 +239,22 @@ export const rental_listings = sqliteTable('rental_listings', {
   deposit_amount: integer('deposit_amount').notNull(),
   lease_duration: integer('lease_duration').notNull(),
   available_from: text('available_from').notNull(),
-  furnished: integer('furnished', { mode: 'boolean' }).default(false),
-  pets_allowed: integer('pets_allowed', { mode: 'boolean' }).default(false),
+  furnished: boolean('furnished').default(false),
+  pets_allowed: boolean('pets_allowed').default(false),
   parking_spaces: integer('parking_spaces').default(0),
-  photos: text('photos', { mode: 'json' }).default('[]'),
-  amenities: text('amenities', { mode: 'json' }).default('[]'),
-  utilities_included: text('utilities_included', { mode: 'json' }).default('[]'),
+  photos: jsonb('photos').default(sql`'[]'::jsonb`),
+  amenities: jsonb('amenities').default(sql`'[]'::jsonb`),
+  utilities_included: jsonb('utilities_included').default(sql`'[]'::jsonb`),
   status: text('status').default('active'),
   created_at: timestamp('created_at').defaultNow(),
   updated_at: timestamp('updated_at').defaultNow(),
 });
 
-export const rental_applications = sqliteTable('rental_applications', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
+export const rental_applications = pgTable('rental_applications', {
+  id: serial('id').primaryKey(),
   rental_id: integer('rental_id').references(() => rental_listings.id, { onDelete: 'cascade' }),
   renter_id: integer('renter_id').references(() => users.id, { onDelete: 'cascade' }),
-  application_data: text('application_data', { mode: 'json' }).notNull(),
+  application_data: jsonb('application_data').notNull(),
   status: text('status').default('pending'),
   background_check_status: text('background_check_status').default('pending'),
   credit_report_status: text('credit_report_status').default('pending'),
@@ -262,8 +262,8 @@ export const rental_applications = sqliteTable('rental_applications', {
   updated_at: timestamp('updated_at').defaultNow(),
 });
 
-export const lease_agreements = sqliteTable('lease_agreements', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
+export const lease_agreements = pgTable('lease_agreements', {
+  id: serial('id').primaryKey(),
   application_id: integer('application_id').references(() => rental_applications.id, { onDelete: 'cascade' }),
   rental_id: integer('rental_id').references(() => rental_listings.id, { onDelete: 'cascade' }),
   landlord_id: integer('landlord_id').references(() => users.id, { onDelete: 'cascade' }),
@@ -272,7 +272,7 @@ export const lease_agreements = sqliteTable('lease_agreements', {
   lease_end_date: text('lease_end_date').notNull(),
   monthly_rent: integer('monthly_rent').notNull(),
   deposit_amount: integer('deposit_amount').notNull(),
-  lease_terms: text('lease_terms', { mode: 'json' }),
+  lease_terms: jsonb('lease_terms'),
   landlord_signature_status: text('landlord_signature_status').default('pending'),
   renter_signature_status: text('renter_signature_status').default('pending'),
   e_signature_status: text('e_signature_status').default('pending'),

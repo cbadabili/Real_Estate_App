@@ -1,0 +1,277 @@
+
+> beedab-real-estate@1.0.0 start
+Testing database connection...
+✅ Database connection successful
+Re-optimizing dependencies because lockfile has changed
+🔄 Running database migrations...
+✅ No pending migrations
+Initializing database...
+Testing PostgreSQL database connection...
+✅ Database connection successful
+Seeding database...
+🌱 Starting complete database seeding...
+Seeding users...
+✅ Inserted 5 users
+Seeding service categories...
+✅ Service categories already exist, skipping...
+Seeding marketplace providers...
+✅ Marketplace providers already exist, skipping...
+Seeding services data...
+✅ Services data already exists, skipping seeding...
+Seeding marketplace data...
+✅ Marketplace data already exists, skipping seeding...
+Seeding rental listings...
+No existing rental listings found, proceeding with seeding...
+Adding 5 rental listings...
+❌ Rental listings seeding failed: error: relation "rental_listings" does not exist
+    at /home/runner/workspace/node_modules/pg-pool/index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async <anonymous> (/home/runner/workspace/node_modules/src/node-postgres/session.ts:104:19)
+    at async seedRentals (/home/runner/workspace/server/rental-seed.ts:162:29)
+    at async SeedManager.seedAll (/home/runner/workspace/server/seed-manager.ts:233:3)
+    at async <anonymous> (/home/runner/workspace/server/index.ts:169:11) {
+  length: 114,
+  severity: 'ERROR',
+  code: '42P01',
+  detail: undefined,
+  hint: undefined,
+  position: '13',
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: 'parse_relation.c',
+  line: '1449',
+  routine: 'parserOpenTable'
+}
+❌ Seeding failed: error: relation "rental_listings" does not exist
+    at /home/runner/workspace/node_modules/pg-pool/index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async <anonymous> (/home/runner/workspace/node_modules/src/node-postgres/session.ts:104:19)
+    at async seedRentals (/home/runner/workspace/server/rental-seed.ts:162:29)
+    at async SeedManager.seedAll (/home/runner/workspace/server/seed-manager.ts:233:3)
+    at async <anonymous> (/home/runner/workspace/server/index.ts:169:11) {
+  length: 114,
+  severity: 'ERROR',
+  code: '42P01',
+  detail: undefined,
+  hint: undefined,
+  position: '13',
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: 'parse_relation.c',
+  line: '1449',
+  routine: 'parserOpenTable'
+}
+❌ Database seeding failed: error: relation "rental_listings" does not exist
+    at /home/runner/workspace/node_modules/pg-pool/index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async <anonymous> (/home/runner/workspace/node_modules/src/node-postgres/session.ts:104:19)
+    at async seedRentals (/home/runner/workspace/server/rental-seed.ts:162:29)
+    at async SeedManager.seedAll (/home/runner/workspace/server/seed-manager.ts:233:3)
+    at async <anonymous> (/home/runner/workspace/server/index.ts:169:11) {
+  length: 114,
+  severity: 'ERROR',
+  code: '42P01',
+  detail: undefined,
+  hint: undefined,
+  position: '13',
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: 'parse_relation.c',
+  line: '1449',
+  routine: 'parserOpenTable'
+}
+✅ Database initialization completed
+8:40:45 PM [express] serving on port 5000
+172.31.70.226 - - [14/Sep/2025:20:40:46 +0000] "GET / HTTP/1.1" 200 - "https://331c9cdc-a1e3-4369-9dda-5ae35b395e48-00-21ptexpix7co9.worf.replit.dev/__replco/workspace_iframe.html?initialPath=%2F&id=%3Ar1v2%3A" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+Browserslist: browsers data (caniuse-lite) is 11 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+172.31.70.226 - - [14/Sep/2025:20:40:47 +0000] "GET /src/main.tsx?v=5rk3m2n8658 HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:51 +0000] "GET /@react-refresh HTTP/1.1" 304 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:51 +0000] "GET /@vite/client HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:53 +0000] "GET /@fs/home/runner/workspace/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=3219f27e HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:53 +0000] "GET /@fs/home/runner/workspace/node_modules/.vite/deps/react.js?v=3219f27e HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:53 +0000] "GET /@fs/home/runner/workspace/node_modules/.vite/deps/react-dom_client.js?v=c3774b02 HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:53 +0000] "GET /@fs/home/runner/workspace/node_modules/.vite/deps/react-router-dom.js?v=b93f0c63 HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:53 +0000] "GET /@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=1c8d94b1 HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:53 +0000] "GET /@fs/home/runner/workspace/node_modules/.vite/deps/react-hot-toast.js?v=8ec1c099 HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:53 +0000] "GET /src/lib/queryClient.ts?v=5rk3m2n8658 HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:53 +0000] "GET /src/App.tsx?v=5rk3m2n8658 HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:53 +0000] "GET /src/index.css?v=5rk3m2n8658 HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:54 +0000] "GET /@fs/home/runner/workspace/node_modules/vite/dist/client/env.mjs HTTP/1.1" 304 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:54 +0000] "GET /@fs/home/runner/workspace/node_modules/.vite/deps/chunk-3TFVT2CW.js?v=e97dda90 HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:54 +0000] "GET /@fs/home/runner/workspace/node_modules/.vite/deps/chunk-4MBMRILA.js?v=e97dda90 HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:54 +0000] "GET /@fs/home/runner/workspace/node_modules/.vite/deps/chunk-WERSD76P.js?v=e97dda90 HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:54 +0000] "GET /@fs/home/runner/workspace/node_modules/.vite/deps/chunk-S77I6LSE.js?v=e97dda90 HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:54 +0000] "GET /src/components/ui/Toast.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:54 +0000] "GET /src/components/ui/ErrorBoundary.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:54 +0000] "GET /src/components/ui/OfflineIndicator.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:54 +0000] "GET /src/components/layout/Navbar.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:54 +0000] "GET /src/pages/HomePage.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:55 +0000] "GET /src/pages/DashboardPage.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:55 +0000] "GET /src/pages/PropertiesPage.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:55 +0000] "GET /src/pages/PropertyDetailsPage.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:55 +0000] "GET /src/pages/PlotsPage.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:55 +0000] "GET /src/pages/RentPage.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:55 +0000] "GET /src/pages/RentalDetailsPage.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:55 +0000] "GET /src/pages/BuyerSellerPlatformPage.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:55 +0000] "GET /src/pages/MarketIntelligencePage.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:55 +0000] "GET /src/pages/SecureTransactionsPage.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:55 +0000] "GET /src/pages/CommunicationPage.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:55 +0000] "GET /src/pages/AgentNetworkPage.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:55 +0000] "GET /src/pages/MapSearchPage.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:55 +0000] "GET /src/pages/ProfilePage.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:55 +0000] "GET /src/pages/services/LegalServicesPage.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:55 +0000] "GET /src/pages/LegalDocumentTemplatesPage.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:55 +0000] "GET /src/pages/services/FinancingPage.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:55 +0000] "GET /src/pages/buyer-journey/PlanningPage.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:55 +0000] "GET /src/pages/buyer-journey/SearchingPage.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:55 +0000] "GET /src/pages/buyer-journey/ViewingPage.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:56 +0000] "GET /src/pages/buyer-journey/OffersPage.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:56 +0000] "GET /src/pages/BidRegistrationPage.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:56 +0000] "GET /src/pages/ScheduleViewingPage.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:56 +0000] "GET /src/pages/FSBODashboard.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:56 +0000] "GET /src/pages/CreateListingPage.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:56 +0000] "GET /src/pages/AgentDashboard.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:56 +0000] "GET /src/pages/AgentProfilePage.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:56 +0000] "GET /src/pages/MyPropertiesPage.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:56 +0000] "GET /src/pages/ContactAgentPage.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:56 +0000] "GET /src/pages/AuctionsPage.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:56 +0000] "GET /src/pages/ServicesPage.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:56 +0000] "GET /src/pages/MarketplacePage.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:56 +0000] "GET /src/pages/marketplace/ProfessionalsPage.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:56 +0000] "GET /src/pages/marketplace/SuppliersPage.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:56 +0000] "GET /src/pages/marketplace/ArtisansPage.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:56 +0000] "GET /src/pages/marketplace/TrainingProvidersPage.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:56 +0000] "GET /src/pages/DocumentsPage.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:56 +0000] "GET /src/pages/marketplace/RegisterProviderPage.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:56 +0000] "GET /src/pages/LoginPage.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:56 +0000] "GET /src/contexts/AuthContext.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:56 +0000] "GET /src/pages/AdminPage.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:56 +0000] "GET /src/contexts/PropertyContext.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:56 +0000] "GET /src/components/auth/ProtectedRoute.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:56 +0000] "GET /src/pages/BidPage.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:57 +0000] "GET /src/pages/PricingGuidePage.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:57 +0000] "GET /src/pages/ManageShowingsPage.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:57 +0000] "GET /src/pages/HandleOffersPage.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:57 +0000] "GET /src/pages/PropertyHandoverPage.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:57 +0000] "GET /src/pages/TransferProcessPage.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:57 +0000] "GET /src/pages/AgentRegistrationPage.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:57 +0000] "GET /src/pages/AgentRatingPage.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:57 +0000] "GET /src/pages/HomeValueAssessmentPage.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:57 +0000] "GET /src/pages/LegalRequirementsPage.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:57 +0000] "GET /src/pages/RentalListingWizard.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:57 +0000] "GET /src/pages/SellListingWizard.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:57 +0000] "GET /src/pages/LandlordDashboard.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:57 +0000] "GET /src/pages/RenterDashboard.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:57 +0000] "GET /src/pages/RentalApplicationsPage.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:57 +0000] "GET /src/pages/TenantScreeningPage.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:57 +0000] "GET /src/pages/MaintenanceManagementPage.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:57 +0000] "GET /src/pages/MaintenanceRequestsPage.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:57 +0000] "GET /src/pages/TransactionManagementPage.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:57 +0000] "GET /src/pages/RentalAgreementsPage.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:57 +0000] "GET /src/pages/services/PropertyManagementPage.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:57 +0000] "GET /src/pages/services/TenantSupportPage.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:57 +0000] "GET /src/pages/PropertyValuationPage.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:57 +0000] "GET /src/pages/ProfessionalSupportPage.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:57 +0000] "GET /src/pages/EnhancedSearchPage.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:58 +0000] "GET /src/pages/MarketTrendsPage.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:58 +0000] "GET /src/pages/NeighborhoodAnalyticsPage.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:58 +0000] "GET /src/pages/InvestmentAnalyticsPage.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:58 +0000] "GET /src/pages/MarketInsightsHub.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:58 +0000] "GET /src/pages/LegalTransactionsHub.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:58 +0000] "GET /src/pages/ServiceProviderDirectory.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:58 +0000] "GET /src/pages/BuyMapPage.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:58 +0000] "GET /src/pages/TestMapPage.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:58 +0000] "GET /@fs/home/runner/workspace/node_modules/.vite/deps/lucide-react.js?v=ece8df50 HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:58 +0000] "GET /@fs/home/runner/workspace/node_modules/.vite/deps/framer-motion.js?v=572bfe84 HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:58 +0000] "GET /src/hooks/useProperties.ts HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:58 +0000] "GET /src/components/properties/PropertyFilters.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:58 +0000] "GET /src/components/properties/PropertyGrid.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:58 +0000] "GET /src/components/properties/PropertyMap.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:58 +0000] "GET /src/components/properties/PropertyComparison.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:58 +0000] "GET /src/components/properties/SavedSearches.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:58 +0000] "GET /src/components/search/SmartSearchBar.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:58 +0000] "GET /src/components/search/SearchResultsHeader.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:58 +0000] "GET /src/components/layout/PageHeader.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:58 +0000] "GET /src/components/ui/EnhancedLoadingSpinner.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:58 +0000] "GET /src/hooks/useLocalStorage.ts HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:59 +0000] "GET /src/hooks/useSearch.ts HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:59 +0000] "GET /src/components/PlotSearchFilters.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:59 +0000] "GET /src/components/PlotListingCard.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:59 +0000] "GET /src/components/InteractiveMap.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:59 +0000] "GET /src/components/PlotAlerts.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:59 +0000] "GET /src/components/SellerListingForm.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:59 +0000] "GET /src/components/RentalApplicationForm.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:59 +0000] "GET /src/components/MortgageCalculator.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:59 +0000] "GET /src/components/ui/LoadingSpinner.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:59 +0000] "GET /src/components/BudgetCalculator.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:59 +0000] "GET /src/components/LoanCalculator.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:59 +0000] "GET /src/components/search/AISearchBar.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:59 +0000] "GET /@fs/home/runner/workspace/node_modules/.vite/deps/react-hook-form.js?v=4fb7f618 HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:59 +0000] "GET /src/components/properties/PropertyLocationStep.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:59 +0000] "GET /src/components/ServiceProviderRegistration.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:59 +0000] "GET /src/components/marketplace/RegisterProvider.jsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:59 +0000] "GET /src/components/RegisterProvider.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:59 +0000] "GET /src/components/DocumentUploader.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:59 +0000] "GET /src/lib/queryClient.ts HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:59 +0000] "GET /src/components/ui/card.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:59 +0000] "GET /src/components/ui/button.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:59 +0000] "GET /src/components/ui/input.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:59 +0000] "GET /src/components/ui/badge.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:40:59 +0000] "GET /src/components/ui/tabs.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:41:00 +0000] "GET /src/components/ui/select.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:41:00 +0000] "GET /src/hooks/use-toast.ts HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:41:00 +0000] "GET /src/components/search/EnhancedSearchBar.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:41:00 +0000] "GET /src/components/search/EnhancedSearchResults.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:41:00 +0000] "GET /src/components/charts/MarketTrendsChart.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:41:00 +0000] "GET /src/components/analytics/InvestmentAnalyzer.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:41:00 +0000] "GET /src/components/analytics/NeighborhoodInsights.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:41:00 +0000] "GET /src/components/valuation/PropertyValuationTool.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:41:00 +0000] "GET /src/components/PropertyCard.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:41:00 +0000] "GET /@fs/home/runner/workspace/node_modules/.vite/deps/mapbox-gl.js?v=2ebe1f12 HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:41:00 +0000] "GET /@fs/home/runner/workspace/node_modules/mapbox-gl/dist/mapbox-gl.css HTTP/1.1" 304 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:41:00 +0000] "GET /@fs/home/runner/workspace/node_modules/.vite/deps/react-dom.js?v=3219f27e HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:41:00 +0000] "GET /src/hooks/useTranslation.ts HTTP/1.1" 304 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:41:00 +0000] "GET /@fs/home/runner/workspace/node_modules/.vite/deps/@hookform_resolvers_zod.js?v=88d56464 HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:41:00 +0000] "GET /@fs/home/runner/workspace/node_modules/.vite/deps/zod.js?v=6f987439 HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:41:00 +0000] "GET /@fs/home/runner/workspace/node_modules/.vite/deps/chunk-CGMLHTWH.js?v=e97dda90 HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:41:00 +0000] "GET /src/lib/utils.ts HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:41:00 +0000] "GET /@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-slot.js?v=c0b672ee HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:41:00 +0000] "GET /@fs/home/runner/workspace/node_modules/.vite/deps/class-variance-authority.js?v=183c4dd1 HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:41:00 +0000] "GET /@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tabs.js?v=dbf66aa3 HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:41:01 +0000] "GET /@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-select.js?v=4ea0b76c HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:41:01 +0000] "GET /src/components/ui/label.tsx HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:41:01 +0000] "GET /src/locales/en.json?import HTTP/1.1" 304 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:41:01 +0000] "GET /src/locales/tn.json?import HTTP/1.1" 304 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:41:01 +0000] "GET /@fs/home/runner/workspace/node_modules/.vite/deps/clsx.js?v=606c66f8 HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:41:01 +0000] "GET /@fs/home/runner/workspace/node_modules/.vite/deps/tailwind-merge.js?v=e660c054 HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:41:01 +0000] "GET /@fs/home/runner/workspace/node_modules/.vite/deps/chunk-6LRRM7M2.js?v=e97dda90 HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:41:01 +0000] "GET /@fs/home/runner/workspace/node_modules/.vite/deps/chunk-U7P2NEEE.js?v=e97dda90 HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:41:01 +0000] "GET /@fs/home/runner/workspace/node_modules/.vite/deps/chunk-BQRSBKB5.js?v=e97dda90 HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:41:01 +0000] "GET /@fs/home/runner/workspace/node_modules/.vite/deps/chunk-VK2OJPQA.js?v=e97dda90 HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:41:01 +0000] "GET /@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-label.js?v=33d29ee3 HTTP/1.1" 200 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:41:01 +0000] "GET /logo.png HTTP/1.1" 304 - "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+Fetching properties...
+Retrieved 0 properties from database
+Properties fetched: 0
+172.31.70.226 - - [14/Sep/2025:20:41:02 +0000] "GET /api/properties? HTTP/1.1" 200 2 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+8:41:02 PM [express] GET /api/properties 200 in 180ms :: []
