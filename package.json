@@ -13,6 +13,9 @@
     "test:run": "vitest run",
     "test:coverage": "vitest run --coverage",
     "test:ui": "vitest --ui",
+    "test:performance": "npx tsx scripts/run-performance-tests.ts",
+    "test:load": "vitest run tests/performance/load.test.ts",
+    "test:lighthouse": "vitest run tests/performance/lighthouse.test.ts",
     "health-check": "npx tsx scripts/health-check.ts",
     "lint": "eslint . --ext .ts,.tsx",
     "type-check": "tsc --noEmit"
