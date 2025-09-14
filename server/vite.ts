@@ -3,7 +3,7 @@ import fs from "fs/promises";
 import path from "path";
 import { createServer as createViteServer, createLogger } from "vite";
 import { type Server } from "http";
-import viteConfig from "../vite.config.js";
+import viteConfig from "../vite.config.ts";
 
 const generateId = () => Math.random().toString(36).substring(2, 15);
 const viteLogger = createLogger();

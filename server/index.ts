@@ -102,6 +102,10 @@ app.get('/api/health', (_req: Request, res: Response) => {
     process.exit(1);
   }
 
+  // Apply rate limiting to sensitive endpoints BEFORE registering routes
+  app.use('/api/users/login', authWriteLimiter);
+  app.use('/api/users/register', authWriteLimiter);
+
   const server = await registerRoutes(app);
 
   const rentalRoutes = createRentalRoutes();
@@ -117,17 +121,6 @@ app.get('/api/health', (_req: Request, res: Response) => {
   app.post('/intel/search', intelSearch);
   app.get('/intel/suggest', intelSuggest);
 
-  // Apply rate limiting to sensitive endpoints
-  app.use('/api/users/login', authWriteLimiter);
-  app.use('/api/users/register', authWriteLimiter);
-  app.use('/api/properties', authWriteLimiter);
-
-  // 404 handler
-  app.use(notFoundHandler);
-  
-  // Global error handler
-  app.use(errorHandler);
-
   // Set environment to development if not specified
   if (!process.env.NODE_ENV) {
     process.env.NODE_ENV = 'development';
@@ -141,6 +134,12 @@ app.get('/api/health', (_req: Request, res: Response) => {
   } else {
     serveStatic(app);
   }
+
+  // 404 handler must come AFTER Vite setup so frontend serving works
+  app.use(notFoundHandler);
+  
+  // Global error handler must come last
+  app.use(errorHandler);
 
   // Initialize database with migrations
   if (process.env.NODE_ENV !== 'production' || process.env.FORCE_DB_MIGRATIONS === 'true') {
