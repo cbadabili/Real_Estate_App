@@ -28,6 +28,7 @@ interface SearchResult {
   query: string;
   filters: any;
   suggestions: string[];
+  explanation: string;
   confidence: number;
   matchedProperties?: any[];
   autoSuggestions?: string[];
