@@ -2,6 +2,9 @@
 import type { Request, Response } from "express";
 import OpenAI from "openai";
 
+import OpenAI from "openai";
+import type { Request, Response } from "express";
+
 const openai = process.env.OPENAI_API_KEY ? new OpenAI({ 
   apiKey: process.env.OPENAI_API_KEY 
 }) : null;
@@ -88,6 +91,16 @@ export async function intelSuggest(req: Request, res: Response) {
       console.warn("Failed to parse suggestions:", parseError);
       suggestions = [];
     }
+
+    return res.json(Array.isArray(suggestions) ? suggestions.slice(0, 8) : []);
+  } catch (error) {
+    console.warn('OpenAI suggestions error:', error);
+    // Fallback to hardcoded suggestions
+    const fallbackSuggestions = ["Gaborone", "Francistown", "Phakalane", "Mogoditshane", "Lobatse", "Tlokweng"];
+    const term = q.toLowerCase();
+    return res.json(fallbackSuggestions.filter(s => s.toLowerCase().includes(term)).slice(0, 8));
+  }
+}
 
     res.json(Array.isArray(suggestions) ? suggestions.slice(0, 8) : []);
   } catch (error) {

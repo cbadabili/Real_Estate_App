@@ -72,7 +72,8 @@ export default function SmartSearchBar({ onSearch, initial = "", suggest }: Prop
     setLoading(true);
     const t = setTimeout(async () => {
       try {
-        const list = await suggest(term);
+        const response = await fetch(`/api/suggest?q=${encodeURIComponent(term)}`);
+        const list = await response.json();
         setAi(Array.isArray(list) ? list : []);
         setHighlight(list.length ? 0 : -1);
       } catch (error) {

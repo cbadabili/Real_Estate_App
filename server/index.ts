@@ -10,6 +10,10 @@ import aiSearchRoutes from './ai-search';
 import tenantSupportRoutes from './tenant-support-routes';
 import propertyManagementRoutes from './property-management-routes';
 import { intelSearch, intelSuggest } from './intel-adapter';
+import { reviewRoutes } from './review-storage';
+import realEstateIntelRouter from './real-estate-intel-search';
+import { searchAggregator } from './search-aggregator';
+import { suggest } from './suggest';
 
 const app = express();
 app.use(express.json({ limit: '50mb' }));
@@ -71,7 +75,7 @@ app.get('/api/health', (_req: Request, res: Response) => {
   app.use('/api/services', servicesRoutes);
   app.use('/api', marketplaceRoutes);
   app.use('/api/services', marketplaceRoutes); // Mount marketplace routes under services as well
-  
+
   // OpenAI-powered Intel adapter routes
   app.post('/intel/search', intelSearch);
   app.get('/intel/suggest', intelSuggest);

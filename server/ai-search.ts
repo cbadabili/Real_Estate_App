@@ -1,5 +1,4 @@
 import OpenAI from "openai";
-import { Router } from 'express';
 import { storage } from './storage';
 
 // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
@@ -29,11 +28,12 @@ interface SearchResult {
   query: string;
   filters: any;
   suggestions: string[];
-  explanation: string;
   confidence: number;
   matchedProperties?: any[];
   autoSuggestions?: string[];
 }
+
+import { Router } from 'express';
 
 const router = Router();
 
@@ -41,12 +41,14 @@ const router = Router();
 router.post('/search/ai', async (req, res) => {
   try {
     const { query } = req.body;
+    console.log('AI Search request received:', query);
 
     if (!query || typeof query !== 'string') {
       return res.status(400).json({ message: "Query is required" });
     }
 
     const result = await parseNaturalLanguageSearch(query);
+    console.log('AI Search result:', { query, resultFilters: result.filters, confidence: result.confidence });
     res.json(result);
   } catch (error) {
     console.error('AI search error:', error);

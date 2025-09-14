@@ -3,7 +3,10 @@ import type { Request, Response } from "express";
 import fetch from "node-fetch";
 
 const INTEL_SUGGEST_URL = process.env.REALESTATEINTEL_SUGGEST_URL || 'https://api.realestateintel.ai/suggest';
+import type { Request, Response } from "express";
+
 const INTEL_KEY = process.env.REALESTATEINTEL_API_KEY;
+const INTEL_SUGGEST_URL = 'https://api.realestateintel.ai/suggest';
 
 export async function suggest(req: Request, res: Response) {
   const q = String(req.query.q || "").trim();
@@ -43,6 +46,9 @@ export async function suggest(req: Request, res: Response) {
     ...propertyTypes.filter(s => s.toLowerCase().includes(term)).map(t => `${t} in Botswana`),
     ...features.filter(s => s.toLowerCase().includes(term))
   ];
+  
+  return res.json(suggestions.slice(0, 8));
+}
 
   return res.json(suggestions.slice(0, 8));
 }
