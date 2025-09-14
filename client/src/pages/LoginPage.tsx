@@ -24,7 +24,7 @@ const LoginPage = () => {
   const location = useLocation();
   const { login } = useAuth();
 
-  const [isLogin, setIsLogin] = useState(location.pathname !== '/register');
+  const [isLogin, setIsLogin] = useState(location.pathname === '/login');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
