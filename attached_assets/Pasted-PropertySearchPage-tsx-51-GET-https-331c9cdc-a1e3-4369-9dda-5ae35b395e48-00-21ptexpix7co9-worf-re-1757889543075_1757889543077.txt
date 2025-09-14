@@ -1,0 +1,43 @@
+PropertySearchPage.tsx:51  GET https://331c9cdc-a1e3-4369-9dda-5ae35b395e48-00-21ptexpix7co9.worf.replit.dev/api/properties/search?minPrice=0&maxPrice=5000000&sortBy=newest 400 (Bad Request)
+searchProperties @ PropertySearchPage.tsx:51
+(anonymous) @ PropertySearchPage.tsx:33
+commitHookEffectListMount @ chunk-WERSD76P.js?v=a5ff08da:16915
+commitPassiveMountOnFiber @ chunk-WERSD76P.js?v=a5ff08da:18156
+commitPassiveMountEffects_complete @ chunk-WERSD76P.js?v=a5ff08da:18129
+commitPassiveMountEffects_begin @ chunk-WERSD76P.js?v=a5ff08da:18119
+commitPassiveMountEffects @ chunk-WERSD76P.js?v=a5ff08da:18109
+flushPassiveEffectsImpl @ chunk-WERSD76P.js?v=a5ff08da:19490
+flushPassiveEffects @ chunk-WERSD76P.js?v=a5ff08da:19447
+(anonymous) @ chunk-WERSD76P.js?v=a5ff08da:19328
+workLoop @ chunk-WERSD76P.js?v=a5ff08da:197
+flushWork @ chunk-WERSD76P.js?v=a5ff08da:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=a5ff08da:384Understand this error
+PropertySearchPage.tsx:61 Search request failed: 400 Bad Request
+searchProperties @ PropertySearchPage.tsx:61
+await in searchProperties
+(anonymous) @ PropertySearchPage.tsx:33
+commitHookEffectListMount @ chunk-WERSD76P.js?v=a5ff08da:16915
+commitPassiveMountOnFiber @ chunk-WERSD76P.js?v=a5ff08da:18156
+commitPassiveMountEffects_complete @ chunk-WERSD76P.js?v=a5ff08da:18129
+commitPassiveMountEffects_begin @ chunk-WERSD76P.js?v=a5ff08da:18119
+commitPassiveMountEffects @ chunk-WERSD76P.js?v=a5ff08da:18109
+flushPassiveEffectsImpl @ chunk-WERSD76P.js?v=a5ff08da:19490
+flushPassiveEffects @ chunk-WERSD76P.js?v=a5ff08da:19447
+(anonymous) @ chunk-WERSD76P.js?v=a5ff08da:19328
+workLoop @ chunk-WERSD76P.js?v=a5ff08da:197
+flushWork @ chunk-WERSD76P.js?v=a5ff08da:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=a5ff08da:384Understand this error
+PropertySearchPage.tsx:51  GET https://331c9cdc-a1e3-4369-9dda-5ae35b395e48-00-21ptexpix7co9.worf.replit.dev/api/properties/search?minPrice=0&maxPrice=5000000&sortBy=newest 400 (Bad Request)
+searchProperties @ PropertySearchPage.tsx:51
+(anonymous) @ PropertySearchPage.tsx:33
+commitHookEffectListMount @ chunk-WERSD76P.js?v=a5ff08da:16915
+invokePassiveEffectMountInDEV @ chunk-WERSD76P.js?v=a5ff08da:18324
+invokeEffectsInDev @ chunk-WERSD76P.js?v=a5ff08da:19701
+commitDoubleInvokeEffectsInDEV @ chunk-WERSD76P.js?v=a5ff08da:19686
+flushPassiveEffectsImpl @ chunk-WERSD76P.js?v=a5ff08da:19503
+flushPassiveEffects @ chunk-WERSD76P.js?v=a5ff08da:19447
+(anonymous) @ chunk-WERSD76P.js?v=a5ff08da:19328
+workLoop @ chunk-WERSD76P.js?v=a5ff08da:197
+flushWork @ chunk-WERSD76P.js?v=a5ff08da:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=a5ff08da:384Understand this error
+PropertySearchPage.tsx:61 Search request failed: 400 Bad Request
