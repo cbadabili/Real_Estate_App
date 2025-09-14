@@ -30,69 +30,6 @@ import { Link } from 'react-router-dom';
 import BuyerDashboard from './dashboard/BuyerDashboard';
 
 // Role-specific dashboard components
-const BuyerDashboard = ({ user, stats }) => (
-  <>
-    {/* Buyer Stats */}
-    <div className="grid md:grid-cols-4 gap-6 mb-8">
-      <StatCard 
-        icon={Heart} 
-        iconColor="text-red-600" 
-        bgColor="bg-red-100" 
-        title="Saved Properties" 
-        value={stats?.savedProperties || "0"} 
-      />
-      <StatCard 
-        icon={Eye} 
-        iconColor="text-blue-600" 
-        bgColor="bg-blue-100" 
-        title="Properties Viewed" 
-        value={stats?.propertiesViewed || "0"} 
-      />
-      <StatCard 
-        icon={MessageCircle} 
-        iconColor="text-green-600" 
-        bgColor="bg-green-100" 
-        title="Inquiries Sent" 
-        value={stats?.inquiriesSent || "0"} 
-      />
-      <StatCard 
-        icon={Calendar} 
-        iconColor="text-purple-600" 
-        bgColor="bg-purple-100" 
-        title="Viewings Scheduled" 
-        value={stats?.viewingsScheduled || "0"} 
-      />
-    </div>
-
-    {/* Buyer Quick Actions */}
-    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-      <QuickAction
-        to="/properties"
-        icon={Building}
-        iconColor="text-blue-600"
-        bgColor="bg-blue-100"
-        title="Browse Properties"
-        description="Find your dream home"
-      />
-      <QuickAction
-        to="/market-intelligence"
-        icon={TrendingUp}
-        iconColor="text-green-600"
-        bgColor="bg-green-100"
-        title="Market Intelligence"
-        description="Get market insights"
-      />
-      <QuickAction
-        to="/services/financing"
-        icon={CreditCard}
-        iconColor="text-purple-600"
-        bgColor="bg-purple-100"
-        title="Get Pre-approved"
-        description="Mortgage consultation"
-      />
-    </div>
-  </>
-);
 
 const SellerDashboard = ({ user, stats }) => (
   <>
@@ -561,7 +498,7 @@ const DashboardPage = () => {
         </motion.div>
 
         {/* Role-based Dashboard Content */}
-        {dashboardType === 'buyer' && <BuyerDashboard user={user} stats={stats} />}
+        {dashboardType === 'buyer' && <BuyerDashboard />}
         {dashboardType === 'seller' && <SellerDashboard user={user} stats={stats} />}
         {dashboardType === 'agent' && <AgentDashboard user={user} stats={stats} />}
         {dashboardType === 'fsbo' && <FSBODashboard user={user} stats={stats} />}
