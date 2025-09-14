@@ -1,0 +1,56 @@
+
+> beedab-real-estate@1.0.0 start
+> npx tsx server/index.ts
+
+Testing database connection...
+✅ Database connection successful
+🔄 Running database migrations...
+Running 1 pending migrations...
+Running migration: 010_create_billing_tables.sql
+Error in migration 010_create_billing_tables.sql: error: syntax error at or near "AUTOINCREMENT"
+    at /home/runner/workspace/node_modules/pg-pool/index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async MigrationManager.runMigration (/home/runner/workspace/server/migration-manager.ts:64:9)
+    at async MigrationManager.runAllPendingMigrations (/home/runner/workspace/server/migration-manager.ts:91:7)
+    at async <anonymous> (/home/runner/workspace/server/index.ts:161:7) {
+  length: 102,
+  severity: 'ERROR',
+  code: '42601',
+  detail: undefined,
+  hint: undefined,
+  position: '69',
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: 'scan.l',
+  line: '1244',
+  routine: 'scanner_yyerror'
+}
+❌ Database initialization failed: error: syntax error at or near "AUTOINCREMENT"
+    at /home/runner/workspace/node_modules/pg-pool/index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async MigrationManager.runMigration (/home/runner/workspace/server/migration-manager.ts:64:9)
+    at async MigrationManager.runAllPendingMigrations (/home/runner/workspace/server/migration-manager.ts:91:7)
+    at async <anonymous> (/home/runner/workspace/server/index.ts:161:7) {
+  length: 102,
+  severity: 'ERROR',
+  code: '42601',
+  detail: undefined,
+  hint: undefined,
+  position: '69',
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: 'scan.l',
+  line: '1244',
+  routine: 'scanner_yyerror'
