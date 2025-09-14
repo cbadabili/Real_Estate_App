@@ -24,6 +24,7 @@ import {
   Smartphone,
   CheckCircle
 } from 'lucide-react';
+import HeroCarousel from '../components/HeroCarousel';
 
 const HomePage = () => {
   const [currentSlide, setCurrentSlide] = useState(0);

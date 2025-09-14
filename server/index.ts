@@ -20,6 +20,8 @@ import helmet from 'helmet';
 import cors from 'cors';
 import rateLimit from 'express-rate-limit';
 import morgan from 'morgan';
+import billingRoutes from './billing-routes';
+import heroRoutes from './hero-routes';
 
 const app = express();
 
@@ -119,6 +121,10 @@ app.get('/api/health', (_req: Request, res: Response) => {
   app.use('/api', marketplaceRoutes);
   app.use('/api/services', marketplaceRoutes); // Mount marketplace routes under services as well
 
+  // Register billing and hero routes
+  app.use('/api/billing', billingRoutes);
+  app.use('/api/hero', heroRoutes);
+
   // OpenAI-powered Intel adapter routes
   app.post('/intel/search', intelSearch);
   app.get('/intel/suggest', intelSuggest);
@@ -139,7 +145,7 @@ app.get('/api/health', (_req: Request, res: Response) => {
 
   // 404 handler must come AFTER Vite setup so frontend serving works
   app.use(notFoundHandler);
-  
+
   // Global error handler must come last
   app.use(errorHandler);
 

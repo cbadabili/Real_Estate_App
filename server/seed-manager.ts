@@ -2,8 +2,10 @@ import { db } from "./db";
 import { users, service_categories, marketplace_providers } from "../shared/schema";
 import { eq } from "drizzle-orm";
 import { seedServices } from './services-seed';
-import { seedMarketplace } from './marketplace-seed';
 import { seedRentals } from './rental-seed';
+import { seedProperties } from './properties-seed';
+import { seedMarketplace } from './marketplace-seed';
+import { seedBilling } from './billing-seed';
 
 export class SeedManager {
   async seedUsers() {
@@ -231,6 +233,9 @@ export class SeedManager {
 
   // Seed rentals
   await seedRentals();
+
+      // Seed billing
+      await seedBilling();
 
       console.log('✅ All seeding completed successfully');
     } catch (error) {

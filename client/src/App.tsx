@@ -7,6 +7,7 @@ import { OfflineIndicator } from './components/ui/OfflineIndicator';
 import Navbar from './components/layout/Navbar';
 import HomePage from './pages/HomePage';
 import DashboardPage from './pages/DashboardPage';
+import PricingPage from './pages/PricingPage';
 import PropertySearchPage from './pages/property/PropertySearchPage';
 import PropertyDetailsPage from './pages/PropertyDetailsPage';
 import { PlotsPage } from './pages/PlotsPage';
@@ -118,6 +119,7 @@ function App() {
             <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
             <Route path="/admin" element={<ProtectedRoute requiredRoles={["admin"]}><AdminPage /></ProtectedRoute>} />
             <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
+            <Route path="/pricing" element={<PricingPage />} />
             <Route path="/agent-dashboard" element={<ProtectedRoute><AgentDashboard /></ProtectedRoute>} />
             <Route path="/fsbo-dashboard" element={<ProtectedRoute><FSBODashboard /></ProtectedRoute>} />
             <Route path="/landlord-dashboard" element={<ProtectedRoute><LandlordDashboard /></ProtectedRoute>} />

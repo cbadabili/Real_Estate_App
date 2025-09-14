@@ -509,20 +509,11 @@ export enum UserType {
 }
 
 export enum Permission {
-  // User management
-  CREATE_USER = "create_user",
-  UPDATE_USER = "update_user",
-  DELETE_USER = "delete_user",
-  VIEW_USER = "view_user",
-  BAN_USER = "ban_user",
-  VERIFY_USER = "verify_user",
-
   // Property management
   CREATE_PROPERTY = "create_property",
   UPDATE_PROPERTY = "update_property",
   DELETE_PROPERTY = "delete_property",
   VIEW_PROPERTY = "view_property",
-  APPROVE_PROPERTY = "approve_property",
   FEATURE_PROPERTY = "feature_property",
 
   // Review management
@@ -542,6 +533,11 @@ export enum Permission {
   // Services
   MANAGE_SERVICES = "manage_services",
   APPROVE_SERVICE_PROVIDER = "approve_service_provider",
+
+  // Billing
+  MANAGE_BILLING = "manage_billing",
+  VIEW_PAYMENTS = "view_payments",
+  APPROVE_PAYMENTS = "approve_payments",
 }
 
 // Marketplace tables for comprehensive property ecosystem
@@ -891,3 +887,122 @@ export const PropertyType = {
   FARM: 'farm',
   OTHER: 'other'
 } as const;
+
+// Billing and subscription tables
+export const plans = sqliteTable('plans', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  code: text('code').notNull().unique(),
+  name: text('name').notNull(),
+  description: text('description'),
+  price_bwp: integer('price_bwp').notNull().default(0),
+  interval: text('interval').notNull().default('monthly'), // monthly, yearly, one_time
+  features: text('features', { mode: 'json' }).notNull().default('{}'), // JSON object with features
+  is_active: integer('is_active', { mode: 'boolean' }).default(true),
+  created_at: integer('created_at').default(sql`(cast((julianday('now') - 2440587.5)*86400000 as integer))`),
+  updated_at: integer('updated_at').default(sql`(cast((julianday('now') - 2440587.5)*86400000 as integer))`),
+});
+
+export const subscriptions = sqliteTable('subscriptions', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  user_id: integer('user_id').notNull().references(() => users.id),
+  plan_id: integer('plan_id').notNull().references(() => plans.id),
+  status: text('status').notNull().default('pending'), // pending, active, past_due, canceled, expired
+  starts_at: integer('starts_at').notNull(),
+  ends_at: integer('ends_at'),
+  next_billing_date: integer('next_billing_date'),
+  created_at: integer('created_at').default(sql`(cast((julianday('now') - 2440587.5)*86400000 as integer))`),
+  updated_at: integer('updated_at').default(sql`(cast((julianday('now') - 2440587.5)*86400000 as integer))`),
+});
+
+export const entitlements = sqliteTable('entitlements', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  user_id: integer('user_id').notNull().references(() => users.id),
+  subscription_id: integer('subscription_id').notNull().references(() => subscriptions.id),
+  feature_key: text('feature_key').notNull(), // e.g., 'listingLimit', 'heroSlots', 'analytics'
+  feature_value: integer('feature_value').notNull(), // numeric value or boolean (0/1)
+  used_count: integer('used_count').notNull().default(0),
+  expires_at: integer('expires_at'),
+  created_at: integer('created_at').default(sql`(cast((julianday('now') - 2440587.5)*86400000 as integer))`),
+  updated_at: integer('updated_at').default(sql`(cast((julianday('now') - 2440587.5)*86400000 as integer))`),
+});
+
+export const payments = sqliteTable('payments', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  user_id: integer('user_id').notNull().references(() => users.id),
+  subscription_id: integer('subscription_id').references(() => subscriptions.id),
+  plan_id: integer('plan_id').notNull().references(() => plans.id),
+  amount_bwp: integer('amount_bwp').notNull(),
+  payment_method: text('payment_method').notNull().default('bank_transfer'), // bank_transfer, mobile_money, card
+  payment_reference: text('payment_reference'),
+  status: text('status').notNull().default('pending'), // pending, succeeded, failed, refunded
+  notes: text('notes'),
+  created_at: integer('created_at').default(sql`(cast((julianday('now') - 2440587.5)*86400000 as integer))`),
+  updated_at: integer('updated_at').default(sql`(cast((julianday('now') - 2440587.5)*86400000 as integer))`),
+});
+
+export const hero_slots = sqliteTable('hero_slots', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  property_id: integer('property_id').notNull().references(() => properties.id),
+  user_id: integer('user_id').notNull().references(() => users.id),
+  starts_at: integer('starts_at').notNull(),
+  ends_at: integer('ends_at').notNull(),
+  position: integer('position').default(0), // carousel position priority
+  is_active: integer('is_active', { mode: 'boolean' }).default(true),
+  created_at: integer('created_at').default(sql`(cast((julianday('now') - 2440587.5)*86400000 as integer))`),
+});
+
+// Relations for billing tables
+export const plansRelations = relations(plans, ({ many }) => ({
+  subscriptions: many(subscriptions),
+  payments: many(payments),
+}));
+
+export const subscriptionsRelations = relations(subscriptions, ({ one, many }) => ({
+  user: one(users, {
+    fields: [subscriptions.user_id],
+    references: [users.id],
+  }),
+  plan: one(plans, {
+    fields: [subscriptions.plan_id],
+    references: [plans.id],
+  }),
+  entitlements: many(entitlements),
+  payments: many(payments),
+}));
+
+export const entitlementsRelations = relations(entitlements, ({ one }) => ({
+  user: one(users, {
+    fields: [entitlements.user_id],
+    references: [users.id],
+  }),
+  subscription: one(subscriptions, {
+    fields: [entitlements.subscription_id],
+    references: [subscriptions.id],
+  }),
+}));
+
+export const paymentsRelations = relations(payments, ({ one }) => ({
+  user: one(users, {
+    fields: [payments.user_id],
+    references: [users.id],
+  }),
+  subscription: one(subscriptions, {
+    fields: [payments.subscription_id],
+    references: [subscriptions.id],
+  }),
+  plan: one(plans, {
+    fields: [payments.plan_id],
+    references: [plans.id],
+  }),
+}));
+
+export const heroSlotsRelations = relations(hero_slots, ({ one }) => ({
+  property: one(properties, {
+    fields: [hero_slots.property_id],
+    references: [properties.id],
+  }),
+  user: one(users, {
+    fields: [hero_slots.user_id],
+    references: [users.id],
+  }),
+}));

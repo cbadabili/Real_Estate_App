@@ -679,6 +679,14 @@ const Navbar = () => {
               </AnimatePresence>
             </div>
 
+            {/* Pricing Link */}
+            <Link
+              to="/pricing"
+              className="text-neutral-700 hover:text-beedab-blue px-3 py-2 rounded-md text-sm font-medium transition-colors"
+            >
+              Pricing
+            </Link>
+
             {/* Post-dropdown Navigation */}
             {postDropdownNavigation.map((item) => {
               const Icon = item.icon;
