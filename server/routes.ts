@@ -1360,20 +1360,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Property search endpoint
   app.get("/api/properties/search", async (req, res) => {
     try {
+      // Safe number parsing helper
+      const safeParseFloat = (value: any): number | undefined => {
+        if (!value || value === 'undefined' || value === 'null') return undefined;
+        const parsed = parseFloat(value as string);
+        return isNaN(parsed) ? undefined : parsed;
+      };
+
+      const safeParseInt = (value: any): number | undefined => {
+        if (!value || value === 'undefined' || value === 'null') return undefined;
+        const parsed = parseInt(value as string);
+        return isNaN(parsed) ? undefined : parsed;
+      };
+
       const filters = {
-        minPrice: req.query.minPrice ? parseFloat(req.query.minPrice as string) : undefined,
-        maxPrice: req.query.maxPrice ? parseFloat(req.query.maxPrice as string) : undefined,
+        minPrice: safeParseFloat(req.query.minPrice),
+        maxPrice: safeParseFloat(req.query.maxPrice),
         propertyType: req.query.type as string,
-        minBedrooms: req.query.bedrooms && req.query.bedrooms !== 'any' ? parseInt(req.query.bedrooms as string) : undefined,
-        minBathrooms: req.query.bathrooms && req.query.bathrooms !== 'any' ? parseFloat(req.query.bathrooms as string) : undefined,
+        minBedrooms: req.query.bedrooms && req.query.bedrooms !== 'any' ? safeParseInt(req.query.bedrooms) : undefined,
+        minBathrooms: req.query.bathrooms && req.query.bathrooms !== 'any' ? safeParseFloat(req.query.bathrooms) : undefined,
         city: req.query.location as string,
         listingType: req.query.listingType as string,
         status: req.query.status as string || 'active',
-        limit: req.query.limit ? parseInt(req.query.limit as string) : 20,
-        offset: req.query.offset ? parseInt(req.query.offset as string) : 0,
+        limit: safeParseInt(req.query.limit) || 20,
+        offset: safeParseInt(req.query.offset) || 0,
         sortBy: req.query.sortBy as 'price' | 'date' | 'size' | 'bedrooms' || 'date',
         sortOrder: 'desc' as const
       };
+
+      console.log('Property search filters:', JSON.stringify(filters, null, 2));
 
       const properties = await storage.getProperties(filters);
       
