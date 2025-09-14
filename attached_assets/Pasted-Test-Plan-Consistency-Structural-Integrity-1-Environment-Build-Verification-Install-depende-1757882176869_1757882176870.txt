@@ -1,0 +1,73 @@
+Test Plan – Consistency & Structural Integrity
+1. Environment & Build Verification
+Install dependencies and verify TypeScript compiles cleanly for both client and server (npm run build or tsc --noEmit).
+
+Run linting to catch style/typing issues early.
+
+Ensure required environment variables exist—particularly DATABASE_URL, used during server startup to initialize the PostgreSQL pool via Drizzle ORM
+
+2. Front-End Unit & Component Tests
+Bootstrap & Providers
+Validate main.tsx renders the app inside BrowserRouter, QueryClientProvider, and displays toast notifications; test that unhandled rejections are logged without crashing
+
+Routing Consistency
+Confirm every route in App.tsx renders the expected page (e.g., /rent/:id → RentalDetailsPage) and ensure protected routes redirect when unauthenticated
+
+Authentication Context
+Mock API responses for /api/users/login and /api/users/register to test login, logout, token persistence, and error handling
+
+Property Context
+Test add/update/delete/save flows for property data and search filters to guarantee state consistency
+
+ProtectedRoute Component
+Verify RBAC logic: loading state, unauthenticated redirects, role- and permission-based gating, and custom fallback UI
+
+3. Server-Side Unit Tests
+Auth Middleware
+Exercise AuthService helpers to confirm role, user-type, and permission checks reflect the enumerations defined in the shared schema
+
+Route Handlers
+Test individual handlers in routes.ts (register, login, profile retrieval) and confirm proper validation & error responses
+
+AI Search & Rentals
+Mock OpenAI/DB responses for /search/ai and validate rental endpoints’ filtering, stats, and ID validation logic
+
+4. Integration Tests (API + DB)
+Startup & Health Checks
+Launch the Express app, verify /api/health returns {status: 'ok'}, and ensure database connection succeeds on boot
+
+User & Session Flow
+Register and log in a user; capture token, verify profile retrieval, and test token revocation/expiration paths.
+
+Property Lifecycle
+Create, read, update, and delete properties; confirm persisted data matches schema expectations for fields like propertyType and listingType
+
+Permission Enforcement
+Using different roles (user, moderator, admin), hit protected endpoints and expect 403/401 when permissions are lacking.
+
+Rental & Service Provider Features
+Run searches with varied filters, validate stats output, and ensure that service-provider endpoints enforce role-based creation/approval.
+
+5. Front-End ↔ Back-End Contract Tests
+Verify client-side apiRequest helper attaches auth tokens and redirects on 401 errors
+
+Confirm fields sent by front end align with Zod insert schemas and database types (e.g., userType, role, property coordinates).
+
+6. End-to-End Scenarios
+Happy Path: User registers, logs in, creates a property, schedules a viewing, and logs out.
+
+RBAC Path: Non-admin tries to access admin routes and is blocked; admin accesses same routes successfully.
+
+Search & Analytics: Run AI-driven search queries and rental searches, ensuring results are ordered and filtered as expected.
+
+7. Error Handling & Resilience
+Simulate network failures and malformed JSON to confirm graceful error messages on both client and server.
+
+Trigger unhandled promise rejections and inspect console logging without interrupting the app.
+
+8. Structural Integrity Checks
+Run database migrations on a clean instance and verify all tables and foreign keys exist per shared/schema.ts.
+
+Cross-check that route paths used in client context/components match server endpoints (/api/users/login, /api/rentals/search, /search/ai, etc.) to avoid dead links or mismatches.
+
+This test plan emphasizes cross-layer consistency, strict schema adherence, and robust permission handling to ensure the application remains structurally sound as features evolve.
