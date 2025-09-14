@@ -199,44 +199,7 @@ const TrainingProvidersPage: React.FC = () => {
         </div>
       </section>
 
-      {/* Registration Call-to-Action */}
-      {filteredProviders.length === 0 && !loading && (
-        <section className="py-12 bg-green-50">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <GraduationCap className="h-16 w-16 text-green-600 mx-auto mb-6" />
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              Become a Training Provider
-            </h2>
-            <p className="text-xl text-gray-600 mb-8">
-              Share your expertise and help others develop their skills in real estate and construction.
-            </p>
-            <div className="grid md:grid-cols-3 gap-6 mb-8">
-              <div className="text-center">
-                <Users className="h-8 w-8 text-green-600 mx-auto mb-3" />
-                <h3 className="font-semibold text-gray-900 mb-2">Reach More Students</h3>
-                <p className="text-gray-600 text-sm">Connect with learners across Botswana</p>
-              </div>
-              <div className="text-center">
-                <Award className="h-8 w-8 text-green-600 mx-auto mb-3" />
-                <h3 className="font-semibold text-gray-900 mb-2">Build Your Reputation</h3>
-                <p className="text-gray-600 text-sm">Establish yourself as a trusted educator</p>
-              </div>
-              <div className="text-center">
-                <BookOpen className="h-8 w-8 text-green-600 mx-auto mb-3" />
-                <h3 className="font-semibold text-gray-900 mb-2">Flexible Teaching</h3>
-                <p className="text-gray-600 text-sm">Offer courses online or in-person</p>
-              </div>
-            </div>
-            <button
-              onClick={handleRegisterProvider}
-              className="bg-green-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors flex items-center space-x-2 mx-auto"
-            >
-              <Plus className="h-5 w-5" />
-              <span>Register as Training Provider</span>
-            </button>
-          </div>
-        </section>
-      )}
+      
 
       {/* Training Providers Grid */}
       <section className="py-16">
@@ -248,9 +211,18 @@ const TrainingProvidersPage: React.FC = () => {
             </div>
           ) : filteredProviders.length === 0 ? (
             <div className="text-center py-12">
-              <Search className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+              <GraduationCap className="h-16 w-16 text-gray-400 mx-auto mb-4" />
               <h3 className="text-xl font-medium text-gray-900 mb-2">No training providers found</h3>
-              <p className="text-gray-600">Try adjusting your search or filter criteria.</p>
+              <p className="text-gray-600 mb-4">Try adjusting your search or filter criteria.</p>
+              <p className="text-sm text-gray-500">
+                Are you a BQA or HRDC certified training provider? 
+                <button
+                  onClick={handleRegisterProvider}
+                  className="text-green-600 hover:text-green-700 font-medium ml-1"
+                >
+                  Join our platform
+                </button>
+              </p>
             </div>
           ) : (
             <div className="grid md:grid-cols-2 gap-8">
