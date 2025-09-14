@@ -1,9 +1,8 @@
 import { 
-  users, 
-  properties, 
   inquiries, 
   appointments, 
   savedProperties,
+  properties,
   type User, 
   type InsertUser,
   type Property,
@@ -16,7 +15,9 @@ import {
   type InsertSavedProperty
 } from "../shared/schema";
 import { db } from "./db";
-import { eq, and, desc, asc, gte, lte, like, or, sql } from "drizzle-orm";
+import { eq, and, desc, asc, sql } from "drizzle-orm";
+import { userRepository, type IUserRepository } from "./repositories/user-repository";
+import { propertyRepository, type IPropertyRepository, type PropertyFilters } from "./repositories/property-repository";
 
 export interface IStorage {
   // User methods
@@ -77,97 +78,37 @@ export interface PropertyFilters {
 }
 
 export class DatabaseStorage implements IStorage {
-  // User methods
+  private userRepo: IUserRepository;
+  private propertyRepo: IPropertyRepository;
+
+  constructor() {
+    this.userRepo = userRepository;
+    this.propertyRepo = propertyRepository;
+  }
+
+  // User methods - delegate to user repository
   async getUser(id: number): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.id, id));
-    return user || undefined;
+    return this.userRepo.getUser(id);
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.username, username));
-    return user || undefined;
+    return this.userRepo.getUserByUsername(username);
   }
 
   async getUserByEmail(email: string): Promise<User | undefined> {
-    try {
-      const [user] = await db.select().from(users).where(eq(users.email, email));
-      return user || undefined;
-    } catch (error) {
-      console.error("Error fetching user by email:", error);
-      throw error;
-    }
+    return this.userRepo.getUserByEmail(email);
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const [user] = await db
-      .insert(users)
-      .values(insertUser)
-      .returning();
-    return user;
+    return this.userRepo.createUser(insertUser);
   }
 
   async updateUser(id: number, updates: Partial<InsertUser>): Promise<User | undefined> {
-    try {
-      // Handle timestamp conversion for any timestamp fields
-      const processedUpdates = { ...updates };
-
-      // Handle all timestamp fields properly
-      const timestampFields = ['lastLoginAt', 'createdAt', 'updatedAt'];
-
-      for (const field of timestampFields) {
-        if (processedUpdates[field] !== undefined) {
-          const value = processedUpdates[field];
-          if (value instanceof Date) {
-            processedUpdates[field] = Math.floor(value.getTime() / 1000);
-          } else if (typeof value === 'number') {
-            // If it's already a number, ensure it's in seconds, not milliseconds
-            if (value > 1000000000000) {
-              processedUpdates[field] = Math.floor(value / 1000);
-            }
-            // If it's already a reasonable timestamp in seconds, leave it as is
-          }
-        }
-      }
-
-      const [user] = await db
-        .update(users)
-        .set({ 
-          ...processedUpdates, 
-          updatedAt: Math.floor(Date.now() / 1000) 
-        })
-        .where(eq(users.id, id))
-        .returning();
-      return user || undefined;
-    } catch (error) {
-      console.error('Error updating user:', error);
-      throw error;
-    }
+    return this.userRepo.updateUser(id, updates);
   }
 
   async getUsers(filters: { userType?: string; isActive?: boolean; limit?: number; offset?: number } = {}): Promise<User[]> {
-    let query = db.select().from(users);
-
-    const conditions = [];
-    if (filters.userType) {
-      conditions.push(eq(users.userType, filters.userType));
-    }
-    if (filters.isActive !== undefined) {
-      conditions.push(eq(users.isActive, filters.isActive));
-    }
-
-    if (conditions.length > 0) {
-      query = query.where(and(...conditions));
-    }
-
-    if (filters.limit) {
-      query = query.limit(filters.limit);
-    }
-
-    if (filters.offset) {
-      query = query.offset(filters.offset);
-    }
-
-    return await query;
+    return this.userRepo.getUsers(filters);
   }
 
   // Property methods

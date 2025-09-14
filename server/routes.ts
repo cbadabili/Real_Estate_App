@@ -9,6 +9,9 @@ import { db } from "./db";
 import { parseNaturalLanguageSearch } from './ai-search';
 import realEstateIntelSearchRoutes from './real-estate-intel-search';
 import { searchAggregator } from './search-aggregator';
+import { registerAuthRoutes } from "./routes/auth-routes";
+import { registerUserRoutes } from "./routes/user-routes";
+import { registerPropertyRoutes } from "./routes/property-routes";
 import {
   authenticate,
   optionalAuthenticate,
@@ -19,8 +22,6 @@ import {
   AuthService
 } from "./auth-middleware";
 import {
-  insertUserSchema,
-  insertPropertySchema,
   insertInquirySchema,
   insertAppointmentSchema,
   insertServiceProviderSchema,
@@ -36,215 +37,12 @@ import {
 import { z } from "zod";
 import { eq, and, or, ilike, gte, lte, desc, asc } from "drizzle-orm";
 import { properties, users, reviews } from "../shared/schema";
-import bcrypt from 'bcrypt';
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Authentication & User Management
-  app.post("/api/users/register", async (req, res) => {
-    try {
-      // Ensure all required fields and proper type conversion
-      const processedData = {
-        firstName: req.body.firstName,
-        lastName: req.body.lastName,
-        username: req.body.username,
-        email: req.body.email,
-        password: req.body.password,
-        phone: req.body.phone || null,
-        userType: req.body.userType || 'buyer', // Default to buyer if not provided
-        isActive: req.body.isActive === true ? 1 : 0, // Convert boolean to integer
-        // Optional fields that might be in the body
-        dateOfBirth: req.body.dateOfBirth || null,
-        address: req.body.address || null,
-        city: req.body.city || null,
-        state: req.body.state || null,
-        zipCode: req.body.zipCode || null,
-      };
-      
-      const userData = insertUserSchema.parse(processedData);
-
-      console.log('Registration attempt for email:', userData.email, 'username:', userData.username);
-
-      // Check if user already exists by email
-      const existingUserByEmail = await storage.getUserByEmail(userData.email);
-      if (existingUserByEmail) {
-        return res.status(400).json({ message: "User already exists with this email" });
-      }
-
-      // Check if username already exists
-      const existingUserByUsername = await storage.getUserByUsername(userData.username);
-      if (existingUserByUsername) {
-        return res.status(400).json({ message: "Username already taken. Please choose a different username." });
-      }
-
-      // Hash password before storing
-      const saltRounds = 12;
-      const hashedPassword = await bcrypt.hash(userData.password, saltRounds);
-
-      const user = await storage.createUser({...userData, password: hashedPassword});
-      const { password, ...userResponse } = user;
-      console.log('Registration successful for user:', userData.email);
-      res.status(201).json(userResponse);
-    } catch (error) {
-      console.error("Register error:", error);
-
-      // Handle specific database constraint errors
-      if (error.code === 'SQLITE_CONSTRAINT_UNIQUE') {
-        if (error.message.includes('users.email')) {
-          return res.status(400).json({ message: "Email address already registered" });
-        } else if (error.message.includes('users.username')) {
-          return res.status(400).json({ message: "Username already taken. Please choose a different username." });
-        }
-        return res.status(400).json({ message: "Registration failed: duplicate information" });
-      }
-
-      res.status(400).json({ message: "Registration failed. Please check your information and try again." });
-    }
-  });
-
-  app.post("/api/users/login", async (req, res) => {
-    try {
-      const { email, password } = req.body;
-
-      if (!email || !password) {
-        return res.status(400).json({ message: "Email and password are required" });
-      }
-
-      console.log('Login attempt for email:', email);
-      const user = await storage.getUserByEmail(email);
-
-      if (!user) {
-        console.log('User not found for email:', email);
-        return res.status(401).json({ message: "Invalid credentials" });
-      }
-
-      // Compare hashed password
-      const isValidPassword = await bcrypt.compare(password, user.password);
-
-      if (!isValidPassword) {
-        console.log('Password mismatch');
-        return res.status(401).json({ message: "Invalid credentials" });
-      }
-
-      console.log('Password match successful');
-
-      // Update last login
-      try {
-        const loginTimestamp = Math.floor(Date.now() / 1000);
-        await storage.updateUser(user.id, { lastLoginAt: loginTimestamp });
-      } catch (error) {
-        console.error('Error updating last login:', error);
-        // Don't fail the login if we can't update the timestamp
-      }
-
-      const { password: _, ...userResponse } = user;
-      console.log('Login successful for user:', userResponse.email);
-      res.json(userResponse);
-    } catch (error) {
-      console.error("Login error:", error);
-      res.status(500).json({ message: "Login failed" });
-    }
-  });
-
-  app.get("/api/users/:id", optionalAuthenticate, async (req, res) => {
-    try {
-      const userId = parseInt(req.params.id);
-
-      // Check if user is requesting their own data or is an admin
-      if (req.user && (req.user.id !== userId && !AuthService.isAdmin(req.user))) {
-        return res.status(403).json({ message: "Access denied" });
-      }
-
-      const user = await storage.getUser(userId);
-
-      if (!user) {
-        return res.status(404).json({ message: "User not found" });
-      }
-
-      const { password, ...userResponse } = user;
-      res.json(userResponse);
-    } catch (error) {
-      console.error("Get user error:", error);
-      res.status(500).json({ message: "Failed to fetch user" });
-    }
-  });
-
-  // Add auth verification endpoint
-  app.get("/api/auth/user", authenticate, async (req, res) => {
-    try {
-      const { password, ...userResponse } = req.user!;
-      res.json(userResponse);
-    } catch (error) {
-      console.error("Auth verification error:", error);
-      res.status(500).json({ message: "Authentication verification failed" });
-    }
-  });
-
-  // Dashboard statistics endpoint
-  app.get("/api/dashboard/stats", authenticate, async (req, res) => {
-    try {
-      const userId = req.user!.id;
-      
-      // Get saved properties count
-      const savedProperties = await storage.getSavedProperties(userId);
-      const savedPropertiesCount = savedProperties.length;
-      
-      // Get user's inquiries
-      const userInquiries = await storage.getUserInquiries(userId);
-      const inquiriesSentCount = userInquiries.length;
-      
-      // Get user's appointments
-      const userAppointments = await storage.getUserAppointments(userId);
-      const viewingsScheduledCount = userAppointments.length;
-      
-      // Get user's active listings (for sellers)
-      const userProperties = await storage.getUserProperties(userId);
-      const activeListingsCount = userProperties.filter(p => p.status === 'active').length;
-      
-      // Calculate total views for user's properties
-      const totalViews = userProperties.reduce((sum, property) => sum + (property.views || 0), 0);
-      
-      // Get total inquiries for user's properties
-      const totalInquiries = userProperties.length > 0 ? 
-        (await Promise.all(userProperties.map(p => storage.getPropertyInquiries(p.id)))).flat().length : 0;
-      
-      // Calculate properties viewed by getting count of properties this user has incremented views on
-      // This is a simplified version - in a real app you'd track user view history
-      const propertiesViewedCount = Math.min(savedPropertiesCount * 3 + inquiriesSentCount, 50);
-      
-      const stats = {
-        savedProperties: savedPropertiesCount,
-        propertiesViewed: propertiesViewedCount,
-        inquiriesSent: inquiriesSentCount,
-        viewingsScheduled: viewingsScheduledCount,
-        activeListings: activeListingsCount,
-        totalViews: totalViews,
-        totalInquiries: totalInquiries
-      };
-      
-      res.json(stats);
-    } catch (error) {
-      console.error("Dashboard stats error:", error);
-      res.status(500).json({ message: "Failed to fetch dashboard statistics" });
-    }
-  });
-
-  app.put("/api/users/:id", async (req, res) => {
-    try {
-      const userId = parseInt(req.params.id);
-      const updates = req.body;
-
-      const user = await storage.updateUser(userId, updates);
-      if (!user) {
-        return res.status(404).json({ message: "User not found" });
-      }
-
-      const { password, ...userResponse } = user;
-      res.json(userResponse);
-    } catch (error) {
-      console.error("Update user error:", error);
-      res.status(500).json({ message: "Failed to update user" });
-    }
-  });
+  // Register modular routes
+  registerAuthRoutes(app);
+  registerUserRoutes(app);
+  registerPropertyRoutes(app);
 
   // Property Management
   app.get("/api/properties", async (req, res) => {
