@@ -154,11 +154,11 @@ function App() {
             <Route path="/maintenance-management" element={<ProtectedRoute><MaintenanceManagementPage /></ProtectedRoute>} />
             <Route path="/legal-transactions" element={<LegalTransactionsHub />} />
             <Route path="/professional-support" element={<ProfessionalSupportPage />} />
-            <Route path="/artisans" element={<ArtisansPage />} />
-            <Route path="/professionals" element={<ProfessionalsPage />} />
-            <Route path="/suppliers" element={<SuppliersPage />} />
-            <Route path="/training-providers" element={<TrainingProvidersPage />} />
-            <Route path="/register-provider" element={<RegisterProviderPage />} />
+            <Route path="/marketplace/artisans" element={<ArtisansPage />} />
+            <Route path="/marketplace/professionals" element={<ProfessionalsPage />} />
+            <Route path="/marketplace/suppliers" element={<SuppliersPage />} />
+            <Route path="/marketplace/training-providers" element={<TrainingProvidersPage />} />
+            <Route path="/marketplace/register" element={<RegisterProviderPage />} />
             <Route path="/property-management" element={<PropertyManagementPage />} />
             <Route path="/services/property-management" element={<PropertyManagementPage />} />
             <Route path="/legal-services" element={<LegalServicesPage />} />
