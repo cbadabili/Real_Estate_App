@@ -1,7 +1,8 @@
 
 import { db } from "./db";
-import { rental_listings } from "../shared/schema";
+import { rental_listings, users } from "../shared/schema";
 import { getAllTowns } from '../client/src/data/botswanaGeography';
+import { inArray, asc } from 'drizzle-orm';
 
 export async function seedRentals() {
   console.log("Seeding rental listings...");
@@ -18,11 +19,25 @@ export async function seedRentals() {
     console.log("No existing rental listings found, proceeding with seeding...");
   }
 
+  // Get existing users for landlord IDs
+  const landlords = await db.select({id: users.id})
+    .from(users)
+    .where(inArray(users.userType, ['agent', 'fsbo', 'seller']))
+    .orderBy(asc(users.id));
+    
+  if (landlords.length === 0) {
+    console.log("❌ No eligible landlord users found. Need users with type 'agent', 'fsbo', or 'seller'");
+    return;
+  }
+  
+  console.log(`Found ${landlords.length} eligible landlords with IDs: ${landlords.map(l => l.id).join(', ')}`);
+  
+  const getLandlordId = (i: number) => landlords[i % landlords.length].id;
+
   const towns = getAllTowns();
 
-  const sampleRentals = [
+  const baseRentals = [
     {
-      landlord_id: 1,
       title: 'Modern 2-Bedroom Apartment',
       description: 'Beautiful modern apartment in the heart of Gaborone with all amenities',
       address: 'Gaborone CBD, Plot 123',
@@ -49,7 +64,6 @@ export async function seedRentals() {
       status: 'active'
     },
     {
-      landlord_id: 2,
       title: 'Spacious Family House',
       description: 'Large family house with garden in quiet neighborhood',
       address: 'Gaborone West, Plot 456',
@@ -75,7 +89,6 @@ export async function seedRentals() {
       status: 'active'
     },
     {
-      landlord_id: 3,
       title: 'Luxury Executive Apartment',
       description: 'High-end apartment with premium finishes and city views',
       address: 'Francistown CBD, Plot 789',
@@ -102,7 +115,6 @@ export async function seedRentals() {
       status: 'active'
     },
     {
-      landlord_id: 4,
       title: 'Cozy Studio Apartment',
       description: 'Perfect for students or young professionals',
       address: 'Molepolole, Plot 321',
@@ -128,7 +140,6 @@ export async function seedRentals() {
       status: 'active'
     },
     {
-      landlord_id: 5,
       title: 'Safari Lodge Style Home',
       description: 'Unique property with safari theme and amazing views',
       address: 'Maun, Plot 654',
@@ -155,6 +166,12 @@ export async function seedRentals() {
       status: 'active'
     }
   ];
+
+  // Map base rentals to actual landlord IDs
+  const sampleRentals = baseRentals.map((rental, i) => ({
+    ...rental,
+    landlord_id: getLandlordId(i)
+  }));
 
   try {
     console.log(`Adding ${sampleRentals.length} rental listings...`);
