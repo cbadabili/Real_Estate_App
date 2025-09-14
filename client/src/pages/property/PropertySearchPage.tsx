@@ -48,15 +48,10 @@ const PropertySearchPage = () => {
       queryParams.set('maxPrice', filters.priceRange[1].toString());
       queryParams.set('sortBy', sortBy);
 
-      const response = await fetch(`/api/properties/search?${queryParams}`);
+      const response = await fetch(`/api/properties?${queryParams}`);
       if (response.ok) {
         const data = await response.json();
-        if (data.success) {
-          setProperties(data.properties || []);
-        } else {
-          console.error('Search failed:', data.error);
-          setProperties([]);
-        }
+        setProperties(Array.isArray(data) ? data : []);
       } else {
         console.error('Search request failed:', response.status, response.statusText);
         setProperties([]);
