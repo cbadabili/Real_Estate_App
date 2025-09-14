@@ -46,6 +46,12 @@ export function registerPropertyRoutes(app: Express) {
   app.get("/api/properties/:id", async (req, res) => {
     try {
       const propertyId = parseInt(req.params.id);
+      
+      // Validate that propertyId is a valid number
+      if (isNaN(propertyId) || propertyId <= 0) {
+        return res.status(400).json({ message: "Invalid property ID" });
+      }
+
       const property = await storage.getProperty(propertyId);
 
       if (!property) {
@@ -105,6 +111,12 @@ export function registerPropertyRoutes(app: Express) {
   app.put("/api/properties/:id", async (req, res) => {
     try {
       const propertyId = parseInt(req.params.id);
+      
+      // Validate that propertyId is a valid number
+      if (isNaN(propertyId) || propertyId <= 0) {
+        return res.status(400).json({ message: "Invalid property ID" });
+      }
+
       const updates = req.body;
 
       const property = await storage.updateProperty(propertyId, updates);
@@ -123,6 +135,12 @@ export function registerPropertyRoutes(app: Express) {
   app.delete("/api/properties/:id", async (req, res) => {
     try {
       const propertyId = parseInt(req.params.id);
+      
+      // Validate that propertyId is a valid number
+      if (isNaN(propertyId) || propertyId <= 0) {
+        return res.status(400).json({ message: "Invalid property ID" });
+      }
+
       const deleted = await storage.deleteProperty(propertyId);
 
       if (!deleted) {

@@ -90,6 +90,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/properties/:id", async (req, res) => {
     try {
       const propertyId = parseInt(req.params.id);
+      
+      // Validate that propertyId is a valid number
+      if (isNaN(propertyId) || propertyId <= 0) {
+        return res.status(400).json({ message: "Invalid property ID" });
+      }
+
       const property = await storage.getProperty(propertyId);
 
       if (!property) {
@@ -151,6 +157,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/api/properties/:id", async (req, res) => {
     try {
       const propertyId = parseInt(req.params.id);
+      
+      // Validate that propertyId is a valid number
+      if (isNaN(propertyId) || propertyId <= 0) {
+        return res.status(400).json({ message: "Invalid property ID" });
+      }
+
       const updates = req.body;
 
       const property = await storage.updateProperty(propertyId, updates);
@@ -168,6 +180,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.delete("/api/properties/:id", async (req, res) => {
     try {
       const propertyId = parseInt(req.params.id);
+      
+      // Validate that propertyId is a valid number
+      if (isNaN(propertyId) || propertyId <= 0) {
+        return res.status(400).json({ message: "Invalid property ID" });
+      }
+
       const deleted = await storage.deleteProperty(propertyId);
 
       if (!deleted) {
