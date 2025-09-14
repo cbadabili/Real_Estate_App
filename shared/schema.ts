@@ -578,8 +578,8 @@ export const marketplace_providers = sqliteTable('marketplace_providers', {
   years_experience: integer('years_experience'),
 
   // Verification & Certifications
-  verified: boolean('verified').default(false),
-  featured: boolean('featured').default(false),
+  isVerified: boolean('is_verified').default(false),
+  isFeatured: boolean('is_featured').default(false),
   reac_certified: boolean('reac_certified').default(false),
   company_registration: text('company_registration'),
   tax_clearance: text('tax_clearance'),

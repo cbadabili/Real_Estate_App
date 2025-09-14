@@ -1,0 +1,72 @@
+
+> beedab-real-estate@1.0.0 start
+Testing database connection...
+✅ Database connection successful
+Re-optimizing dependencies because lockfile has changed
+🔄 Running database migrations...
+✅ No pending migrations
+Initializing database...
+Testing PostgreSQL database connection...
+✅ Database connection successful
+Seeding database...
+🌱 Starting complete database seeding...
+Seeding users...
+✅ Users already exist, skipping...
+Seeding service categories...
+✅ Service categories already exist, skipping...
+Seeding marketplace providers...
+❌ Seeding failed: error: column "verified" does not exist
+    at /home/runner/workspace/node_modules/pg-pool/index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async <anonymous> (/home/runner/workspace/node_modules/src/node-postgres/session.ts:104:19)
+    at async SeedManager.seedMarketplaceProviders (/home/runner/workspace/server/seed-manager.ts:122:31)
+    at async SeedManager.seedAll (/home/runner/workspace/server/seed-manager.ts:224:7)
+    at async <anonymous> (/home/runner/workspace/server/index.ts:170:11) {
+  length: 189,
+  severity: 'ERROR',
+  code: '42703',
+  detail: undefined,
+  hint: 'Perhaps you meant to reference the column "marketplace_providers.is_verified".',
+  position: '230',
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: 'parse_relation.c',
+  line: '3729',
+  routine: 'errorMissingColumn'
+}
+❌ Database seeding failed: error: column "verified" does not exist
+    at /home/runner/workspace/node_modules/pg-pool/index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async <anonymous> (/home/runner/workspace/node_modules/src/node-postgres/session.ts:104:19)
+    at async SeedManager.seedMarketplaceProviders (/home/runner/workspace/server/seed-manager.ts:122:31)
+    at async SeedManager.seedAll (/home/runner/workspace/server/seed-manager.ts:224:7)
+    at async <anonymous> (/home/runner/workspace/server/index.ts:170:11) {
+  length: 189,
+  severity: 'ERROR',
+  code: '42703',
+  detail: undefined,
+  hint: 'Perhaps you meant to reference the column "marketplace_providers.is_verified".',
+  position: '230',
+  internalPosition: undefined,
+  internalQuery: undefined,
+  where: undefined,
+  schema: undefined,
+  table: undefined,
+  column: undefined,
+  dataType: undefined,
+  constraint: undefined,
+  file: 'parse_relation.c',
+  line: '3729',
+  routine: 'errorMissingColumn'
+}
+✅ Database initialization completed
+8:17:20 PM [express] serving on port 5000
+172.31.70.226 - - [14/Sep/2025:20:17:21 +0000] "GET / HTTP/1.1" 404 21 "https://331c9cdc-a1e3-4369-9dda-5ae35b395e48-00-21ptexpix7co9.worf.replit.dev/__replco/workspace_iframe.html?initialPath=%2F&id=%3Ar1k2%3A" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:18:04 +0000] "GET /properties?search=three%20bedroomed%20 HTTP/1.1" 404 21 "https://331c9cdc-a1e3-4369-9dda-5ae35b395e48-00-21ptexpix7co9.worf.replit.dev/properties?search=three%20bedroomed%20" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
+172.31.70.226 - - [14/Sep/2025:20:18:05 +0000] "GET /favicon.ico HTTP/1.1" 404 21 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36"
