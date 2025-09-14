@@ -37,7 +37,7 @@ const ArtisansPage: React.FC = () => {
 
   const fetchArtisans = async () => {
     try {
-      const response = await fetch('/api/marketplace/providers?section=artisans');
+      const response = await fetch('/api/services?section=artisans');
       const data = await response.json();
       if (data.success) {
         setArtisans(data.data);
