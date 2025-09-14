@@ -1,0 +1,125 @@
+Below is a comprehensive, step‑by‑step enhancement plan for Beedab to support the monetisation scheme you described. It covers database changes, server routes, client components, and simple pricing, and is grounded in best practices for marketplace revenue models
+fiare.com
+7searchppc.com
+.
+
+1. Database schema updates
+
+Add new tables to shared/schema.ts and create migrations accordingly:
+
+plans: Stores lister/agent/service provider plans with fields like code, name, price_bwp, interval, and features. Plan codes could include LISTER_FREE, LISTER_PRO, LISTER_PREMIUM, AGENT, and SERVICE_PROVIDER.
+
+subscriptions: Links a user to a plan, tracks status (active, past_due, canceled), next billing date, etc.
+
+entitlements: Tracks quantifiable rights (e.g., number of listings, hero slots) per user with expiry dates.
+
+payments: Records subscription purchases and one‑off hero slot fees.
+
+hero_slots (optional): Tracks which listings occupy hero carousel slots and their time windows.
+
+Use seeds to pre‑populate the plans table with your simple price tiers; e.g.:
+
+LISTER_FREE – BWP 0, features: listingLimit: 1.
+
+LISTER_PRO – BWP 100/mo, listingLimit: 5, analytics: true.
+
+LISTER_PREMIUM – BWP 200/mo, listingLimit: unlimited, heroSlots: 1.
+
+AGENT – BWP 150/mo, listingLimit: unlimited, leadManager: true.
+
+SERVICE_PROVIDER – BWP 100/mo, directoryListing: true.
+
+These subscription fees provide a predictable revenue stream and are straightforward to implement
+fiare.com
+.
+
+2. Server‑side (Express) changes
+
+Create new route modules under server/:
+
+billing‑routes.ts
+
+GET /billing/plans: return the available plans from the plans table.
+
+POST /billing/subscribe: accept {planCode} and create a pending payments record. For now you can assume manual payments (e.g., bank transfer) and mark as pending; an admin UI can mark them succeeded. When a payment succeeds, insert or update a subscriptions record and populate entitlements based on plan features.
+
+GET /billing/me: return the current user’s subscription and entitlements.
+
+listing‑routes.ts
+
+Middleware to check entitlements before allowing listing creation. If the user has reached their listing limit, return an error prompting them to upgrade.
+
+POST /listings/:id/hero: purchase a hero slot; decrement the user’s heroSlots entitlement and insert into the hero_slots table.
+
+hero‑routes.ts
+
+GET /hero: return active hero listings (to power the carousel).
+
+Update auth‑middleware.ts to add entitlements to the req.user object after authentication, so downstream handlers can check them easily.
+
+3. Client‑side (React) changes
+
+Subscription context/hooks
+
+Extend AuthContext or create a SubscriptionProvider to fetch /billing/me and store the user’s entitlements and current plan.
+
+Provide a hook like useEntitlements() for components to access limits.
+
+Pricing page and modals
+
+Create a PricingPage that fetches available plans and clearly shows Free, Pro and Premium tiers with features and costs.
+
+A generic SubscribeModal can be opened from pricing buttons; it calls POST /billing/subscribe and displays payment instructions (e.g. bank deposit info).
+
+Listing logic
+
+In CreateListingPage, check useEntitlements().listingLimit. If the user has no available listings, display an upgrade prompt linking to the Pricing page.
+
+For hero slots, display a “Feature on Hero Carousel” button in the listing dashboard. This should call POST /listings/:id/hero and update local entitlements.
+
+Hero carousel
+
+On HomePage, add a HeroCarousel component that requests /hero and displays premium listings in a rotating banner. Use a react-slick slider or similar library to implement the carousel.
+
+Service provider/agent flows
+
+When an agent or service provider registers, require them to choose a plan. Display the appropriate pricing options and call POST /billing/subscribe when they select.
+
+Agents should see extra tools (e.g. lead manager) only if they have an active AGENT subscription. Similarly, service providers should see booking widgets and directory profile editing only if subscribed.
+
+4. Admin tools
+
+Implement a simple admin dashboard (e.g. under /admin/billing) to view pending payments and mark them as succeeded. When an admin marks a payment as succeeded, trigger subscription activation and entitlements assignment.
+
+Provide a UI to manage hero carousel slots (view current slots, remove expired slots, or reassign).
+
+5. Payment processing
+
+Because PayKarata is unavailable, the plan assumes manual confirmation or integration with a generic payment provider. Start with a simple manual workflow:
+
+Display bank or mobile‑money deposit instructions to the user.
+
+Insert a payments record with status pending.
+
+After verifying payment offline, an admin updates the status to succeeded, which activates the subscription. This manual process is simple to implement yet allows monetisation to begin immediately.
+
+Later you can swap in an automated gateway (e.g. DPO or PayGate) and hook into their webhook to auto‑update payments.
+
+6. Pricing summary
+
+To keep prices simple, consider the following monthly fees:
+
+Plan	Target user	Monthly fee	Included features
+Free	First‑time listers	BWP 0	1 listing, 5 photos
+Pro	Casual listers	BWP 100	Up to 5 listings, 20 photos per listing, basic analytics
+Premium	Serious sellers/landlords	BWP 200	Unlimited listings, hero carousel slots, priority search ranking
+Agent	Real‑estate agents	BWP 150	Unlimited listings, agent CRM, lead manager
+Service Provider	Contractors & artisans	BWP 100	Service directory listing, booking widget, reviews management
+
+These subscription tiers align with common marketplace strategies: subscriptions provide predictable income
+fiare.com
+, premium listings offer high visibility for a fee
+7searchppc.com
+, and limiting free usage helps convert users from the freemium tier to paid plans
+codica.com
+. You can adjust the exact fees after testing user willingness to pay.
