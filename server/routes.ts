@@ -79,7 +79,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(properties);
     } catch (error) {
       console.error("Get properties error:", error);
-      res.status(500).json({ message: "Failed to fetch properties" });
+      res.status(500).json({ 
+        success: false,
+        error: "Failed to fetch properties",
+        message: error.message 
+      });
     }
   });
 
@@ -1350,6 +1354,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error in debug endpoint:', error);
       res.status(500).json({ error: 'Failed to fetch debug data' });
+    }
+  });
+
+  // Property search endpoint
+  app.get("/api/properties/search", async (req, res) => {
+    try {
+      const filters = {
+        minPrice: req.query.minPrice ? parseFloat(req.query.minPrice as string) : undefined,
+        maxPrice: req.query.maxPrice ? parseFloat(req.query.maxPrice as string) : undefined,
+        propertyType: req.query.type as string,
+        minBedrooms: req.query.bedrooms && req.query.bedrooms !== 'any' ? parseInt(req.query.bedrooms as string) : undefined,
+        minBathrooms: req.query.bathrooms && req.query.bathrooms !== 'any' ? parseFloat(req.query.bathrooms as string) : undefined,
+        city: req.query.location as string,
+        listingType: req.query.listingType as string,
+        status: req.query.status as string || 'active',
+        limit: req.query.limit ? parseInt(req.query.limit as string) : 20,
+        offset: req.query.offset ? parseInt(req.query.offset as string) : 0,
+        sortBy: req.query.sortBy as 'price' | 'date' | 'size' | 'bedrooms' || 'date',
+        sortOrder: 'desc' as const
+      };
+
+      const properties = await storage.getProperties(filters);
+      
+      res.json({
+        success: true,
+        properties: properties,
+        count: properties.length
+      });
+    } catch (error) {
+      console.error("Property search error:", error);
+      res.status(500).json({ 
+        success: false,
+        error: "Failed to search properties",
+        message: error.message 
+      });
     }
   });
 

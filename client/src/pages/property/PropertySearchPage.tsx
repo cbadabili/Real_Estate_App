@@ -38,7 +38,7 @@ const PropertySearchPage = () => {
     try {
       const queryParams = new URLSearchParams();
       
-      if (searchQuery) queryParams.set('q', searchQuery);
+      if (searchQuery) queryParams.set('location', searchQuery);
       if (filters.propertyType !== 'all') queryParams.set('type', filters.propertyType);
       if (filters.bedrooms !== 'any') queryParams.set('bedrooms', filters.bedrooms);
       if (filters.bathrooms !== 'any') queryParams.set('bathrooms', filters.bathrooms);
@@ -51,10 +51,19 @@ const PropertySearchPage = () => {
       const response = await fetch(`/api/properties/search?${queryParams}`);
       if (response.ok) {
         const data = await response.json();
-        setProperties(data.properties || []);
+        if (data.success) {
+          setProperties(data.properties || []);
+        } else {
+          console.error('Search failed:', data.error);
+          setProperties([]);
+        }
+      } else {
+        console.error('Search request failed:', response.status, response.statusText);
+        setProperties([]);
       }
     } catch (error) {
       console.error('Failed to search properties:', error);
+      setProperties([]);
     } finally {
       setIsLoading(false);
     }
