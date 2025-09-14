@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Star, MapPin, Phone, Mail, Shield, Clock } from 'lucide-react';
 
@@ -21,17 +20,27 @@ interface ServiceProviderCardProps {
   onContact: (provider: any) => void;
 }
 
-export const ServiceProviderCard: React.FC<ServiceProviderCardProps> = ({ 
-  provider, 
-  onContact 
+export const ServiceProviderCard: React.FC<ServiceProviderCardProps> = ({
+  provider,
+  onContact
 }) => {
+  // Generate initials for avatar
+  const initials = provider.name
+    ? provider.name
+        .split(' ')
+        .map(word => word?.charAt(0) || '')
+        .join('')
+        .toUpperCase()
+        .slice(0, 2)
+    : 'N/A';
+
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center space-x-3">
           <div className="w-12 h-12 bg-beedab-blue rounded-full flex items-center justify-center">
             <span className="text-white font-semibold text-lg">
-              {provider.name.charAt(0)}
+              {initials}
             </span>
           </div>
           <div>
@@ -93,19 +102,19 @@ export const ServiceProviderCard: React.FC<ServiceProviderCardProps> = ({
 
       {/* Contact Actions */}
       <div className="flex space-x-2">
-        <button 
+        <button
           onClick={() => onContact(provider)}
           className="flex-1 bg-beedab-blue text-white py-2 px-3 rounded-lg text-sm font-medium hover:bg-beedab-darkblue transition-colors"
         >
           Contact
         </button>
-        <button 
+        <button
           onClick={() => window.location.href = `tel:${provider.phone}`}
           className="p-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
         >
           <Phone className="h-4 w-4" />
         </button>
-        <button 
+        <button
           onClick={() => window.location.href = `mailto:${provider.email}`}
           className="p-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
         >
