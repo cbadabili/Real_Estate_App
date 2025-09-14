@@ -53,11 +53,13 @@ const ProfessionalsPage: React.FC = () => {
   useEffect(() => {
     const fetchProfessionals = async () => {
       try {
-        const response = await fetch('/api/marketplace/professionals');
+        const response = await fetch('/api/services?section=professionals');
         if (response.ok) {
           const data = await response.json();
-          setProfessionals(data.professionals || []);
-          setFilteredProfessionals(data.professionals || []);
+          if (data.success) {
+            setProfessionals(data.data || []);
+            setFilteredProfessionals(data.data || []);
+          }
         } else {
           // Fallback data
           const sampleProfessionals: Professional[] = [

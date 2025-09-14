@@ -49,11 +49,13 @@ const SuppliersPage: React.FC = () => {
   useEffect(() => {
     const fetchSuppliers = async () => {
       try {
-        const response = await fetch('/api/marketplace/suppliers');
+        const response = await fetch('/api/services?section=suppliers');
         if (response.ok) {
           const data = await response.json();
-          setSuppliers(data.suppliers || []);
-          setFilteredSuppliers(data.suppliers || []);
+          if (data.success) {
+            setSuppliers(data.data || []);
+            setFilteredSuppliers(data.data || []);
+          }
         } else {
           // Fallback data
           const sampleSuppliers: Supplier[] = [
