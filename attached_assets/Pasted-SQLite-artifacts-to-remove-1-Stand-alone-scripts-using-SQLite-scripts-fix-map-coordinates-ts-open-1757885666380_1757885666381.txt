@@ -1,0 +1,110 @@
+SQLite artifacts to remove
+1. Stand‑alone scripts using SQLite
+scripts/fix-map-coordinates.ts opens a better-sqlite3 database file and runs raw SQL updates
+
+Suggested task
+Replace SQLite coordinate fixer with Postgres/Drizzle script
+
+Start task
+2. Rental migration script still written for SQLite
+server/rental-migration.ts creates tables via better-sqlite3 and SQLite SQL syntax
+
+Suggested task
+Rewrite rental migrations for PostgreSQL
+
+Start task
+3. SQLite error handling in user registration
+server/routes.ts checks for 'SQLITE_CONSTRAINT_UNIQUE' when handling duplicate users
+
+Suggested task
+Use Postgres error codes in registration handler
+
+Start task
+4. SQLite-oriented JSON conversions in property storage
+server/storage.ts stringifies arrays because SQLite lacks native array/JSON types
+
+Suggested task
+Leverage Postgres JSON/array types in PropertyStorage
+
+Start task
+5. Audit log still assumes SQLite JSON strings
+server/review-storage.ts serializes details before insertion
+
+Suggested task
+Store audit-log details as JSONB
+
+Start task
+6. SQLite-specific rating comparison
+server/services-storage.ts casts ratings with CAST(... AS REAL) for SQLite
+
+Suggested task
+Use numeric comparison for provider ratings
+
+Start task
+7. Schema still defines tables via sqliteTable
+shared/schema.ts aliases sqliteTable to pgTable and many tables remain unconverted
+
+Suggested task
+Convert remaining tables to pgTable
+
+Start task
+8. Auction schema tied to SQLite core
+shared/auction-schema.ts imports drizzle-orm/sqlite-core and defines tables with sqliteTable
+
+Suggested task
+Move auction schema to PostgreSQL core
+
+Start task
+9. Migration journal still marked as SQLite
+migrations/meta/_journal.json records "dialect": "sqlite"
+
+Suggested task
+Reset migration metadata for Postgres
+
+Start task
+These changes will remove leftover SQLite assumptions and align the repository fully with PostgreSQL.
+
+Looks like there was tendency to create the same files using different names so lets also look for those duplicates
+Copy
+1. Duplicate coordinate‑fix scripts
+Both scripts/fix-coordinates.ts (PostgreSQL/Drizzle) and scripts/fix-map-coordinates.ts (SQLite) serve the same purpose. Maintaining two versions risks diverging logic and confusion about which database is authoritative.
+
+Suggested task
+Consolidate coordinate fixer
+
+Start task
+2. Multiple database seeding entry points
+server/seed.ts, server/seed-manager.ts, and scripts/seed-db.ts all attempt to seed data. scripts/seed-db.ts calls a non-existent db.seedDatabase, while seed.ts and seed-manager.ts overlap responsibilities.
+
+Suggested task
+Unify seeding workflow
+
+Start task
+3. Duplicate service‑provider routes
+server/marketplace-routes.ts serves mock provider data, whereas server/services-routes.ts exposes similar endpoints backed by services-storage.ts. Having both causes API ambiguity.
+
+Suggested task
+Merge service-provider APIs
+
+Start task
+4. Redundant suggestion handlers
+server/suggest.ts and the intelSuggest function inside server/intel-adapter.ts both implement search suggestions, each with fallback logic.
+
+Suggested task
+Centralize suggestion logic
+
+Start task
+5. Overlapping AI/search modules
+Search functionality is spread across ai-search.ts, search-aggregator.ts, intel-adapter.ts, and real-estate-intel-search.ts, each parsing queries and calling OpenAI or external APIs.
+
+Suggested task
+Consolidate search services
+
+Start task
+6. Marketplace seeding scattered across files
+Seeding logic appears in server/services-seed.ts, server/marketplace-seed.ts, and seed-manager.ts, leading to repeated categories/providers data.
+
+Suggested task
+Deduplicate marketplace seeding
+
+Start task
