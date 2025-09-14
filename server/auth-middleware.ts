@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { User, UserRole, UserType, Permission } from '@shared/schema';
+import { User, UserRole, UserType, Permission } from '../shared/schema';
 import { storage } from './storage';
 
 // Extend Express Request interface to include user

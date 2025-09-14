@@ -1,5 +1,5 @@
 import { db } from "./db";
-import { users, service_categories, marketplace_providers } from "@shared/schema";
+import { users, service_categories, marketplace_providers } from "../shared/schema";
 import { eq } from "drizzle-orm";
 import { seedServices } from './services-seed';
 import { seedMarketplace } from './marketplace-seed';

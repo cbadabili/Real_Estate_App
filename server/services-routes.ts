@@ -1,6 +1,6 @@
 import express from 'express';
 import { servicesStorage } from './services-storage';
-import { insertServiceProviderSchema } from '@shared/services-schema';
+import { insertServiceProviderSchema } from '../shared/services-schema';
 import { z } from 'zod';
 
 const router = express.Router();

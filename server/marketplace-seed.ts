@@ -7,7 +7,7 @@ import {
   training_programs,
   building_materials,
   project_requests
-} from "@shared/schema";
+} from "../shared/schema";
 
 export async function seedMarketplace() {
   console.log("Seeding marketplace data...");

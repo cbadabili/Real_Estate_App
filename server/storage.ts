@@ -14,7 +14,7 @@ import {
   type InsertAppointment,
   type SavedProperty,
   type InsertSavedProperty
-} from "@shared/schema";
+} from "../shared/schema";
 import { db } from "./db";
 import { eq, and, desc, asc, gte, lte, like, or, sql } from "drizzle-orm";
 

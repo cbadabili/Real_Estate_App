@@ -17,7 +17,7 @@ import {
   type AdminAuditLog,
   type InsertAdminAuditLog,
   Permission
-} from "@shared/schema";
+} from "../shared/schema";
 import { eq, desc, asc, and, sql } from "drizzle-orm";
 
 export interface ReviewFilters {

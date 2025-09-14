@@ -8,7 +8,7 @@ import {
   type InsertServiceAd,
   type ServiceReview,
   type InsertServiceReview
-} from "@shared/services-schema";
+} from "../shared/services-schema";
 import { db } from "./db";
 import { eq, and, desc, asc, like, sql } from "drizzle-orm";
 

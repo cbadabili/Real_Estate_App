@@ -1,5 +1,5 @@
 import { db } from "./db";
-import { serviceProviders, serviceAds, serviceReviews } from "@shared/services-schema";
+import { serviceProviders, serviceAds, serviceReviews } from "../shared/services-schema";
 import { eq } from "drizzle-orm";
 
 export async function seedServices() {
