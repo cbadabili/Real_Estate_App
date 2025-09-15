@@ -102,8 +102,7 @@ const PricingPage = () => {
       case 'LISTER_FREE': return Star;
       case 'LISTER_PRO': return Zap;
       case 'LISTER_PREMIUM': return Award;
-      case 'AGENT': return Users;
-      case 'SERVICE_PROVIDER': return Package;
+      case 'BUSINESS': return Users;
       default: return Star;
     }
   };
@@ -113,36 +112,35 @@ const PricingPage = () => {
       case 'LISTER_FREE': return 'bg-gray-100 border-gray-200';
       case 'LISTER_PRO': return 'bg-blue-50 border-blue-200';
       case 'LISTER_PREMIUM': return 'bg-purple-50 border-purple-200 ring-2 ring-purple-500';
-      case 'AGENT': return 'bg-green-50 border-green-200';
-      case 'SERVICE_PROVIDER': return 'bg-orange-50 border-orange-200';
+      case 'BUSINESS': return 'bg-green-50 border-green-200';
       default: return 'bg-gray-100 border-gray-200';
     }
   };
 
   const formatFeature = (key: string, value: any) => {
     const featureNames: Record<string, string> = {
-      listingLimit: 'Property Listings',
-      photosPerListing: 'Photos per Listing',
-      analytics: 'Analytics Dashboard',
-      heroSlots: 'Hero Carousel Slots',
-      priorityRanking: 'Priority Search Ranking',
-      leadManager: 'Lead Management',
-      directoryListing: 'Service Directory Listing',
-      bookingWidget: 'Booking Widget'
+      LISTING_LIMIT: 'Property Listings',
+      PHOTO_LIMIT: 'Photos per Listing',
+      ANALYTICS: 'Analytics Dashboard',
+      HERO_SLOTS: 'Hero Carousel Slots',
+      PRIORITY_RANK: 'Priority Search Ranking',
+      LEAD_MANAGER: 'Lead Management',
+      DIRECTORY: 'Service Directory Listing',
+      BOOKING: 'Booking Widget'
     };
 
-    const name = featureNames[key] || key;
+    const name = featureNames[key] || key.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, l => l.toUpperCase());
 
-    if (typeof value === 'boolean') {
-      return value ? name : null;
+    if (value === 'true') {
+      return name;
     }
 
-    if (value === -1) {
-      return `Unlimited ${name}`;
-    }
-
-    if (value === 0) {
+    if (value === 'false' || !value) {
       return null;
+    }
+
+    if (value === 'unlimited') {
+      return `Unlimited ${name}`;
     }
 
     return `${value} ${name}`;
@@ -177,6 +175,9 @@ const PricingPage = () => {
             const isPopular = plan.code === 'LISTER_PREMIUM';
             const isBusiness = plan.code === 'BUSINESS';
             const isPremium = plan.code === 'LISTER_PREMIUM';
+            
+            // Parse features if they're stored as JSON string
+            const features = typeof plan.features === 'string' ? JSON.parse(plan.features) : plan.features;
 
             return (
               <motion.div
@@ -216,7 +217,7 @@ const PricingPage = () => {
 
                 {/* Features */}
                 <div className="space-y-3 mb-6">
-                  {Object.entries(plan.features).map(([key, value]) => {
+                  {Object.entries(features).map(([key, value]) => {
                     const feature = formatFeature(key, value);
                     if (!feature) return null;
 
