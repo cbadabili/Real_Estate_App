@@ -50,8 +50,10 @@ const LoginPage = () => {
     
     try {
       if (isLogin) {
+        console.log('LoginPage: Attempting login...');
         // Use AuthContext login function
         await login(trimmedEmail, trimmedPassword);
+        console.log('LoginPage: Login successful!');
         toast.success('Login successful!');
         navigate(redirectPath);
       } else {
@@ -89,7 +91,13 @@ const LoginPage = () => {
       }
     } catch (error) {
       console.error('Auth error:', error);
-      toast.error('An error occurred. Please try again.');
+      
+      // Show specific error messages
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error('An error occurred. Please try again.');
+      }
     } finally {
       setIsLoading(false);
     }

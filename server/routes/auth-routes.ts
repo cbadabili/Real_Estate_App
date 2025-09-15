@@ -66,40 +66,85 @@ export function registerAuthRoutes(app: Express) {
     try {
       const { email, password } = req.body;
 
+      // Validate input
       if (!email || !password) {
+        console.log('Login failed: Missing email or password');
         return res.status(400).json({ message: "Email and password are required" });
       }
 
-      console.log('Login attempt for email:', email);
-      const user = await storage.getUserByEmail(email);
+      // Trim whitespace
+      const trimmedEmail = email.trim().toLowerCase();
+      const trimmedPassword = password.trim();
+
+      console.log('Login attempt for email:', trimmedEmail);
+      
+      const user = await storage.getUserByEmail(trimmedEmail);
 
       if (!user) {
-        console.log('User not found for email:', email);
+        console.log('User not found for email:', trimmedEmail);
         return res.status(401).json({ message: "Invalid credentials" });
       }
 
-      const isValidPassword = await bcrypt.compare(password, user.password);
+      // Check if user is active
+      if (!user.isActive) {
+        console.log('Inactive user attempted login:', trimmedEmail);
+        return res.status(401).json({ message: "Account is inactive" });
+      }
+
+      console.log('User found, comparing password...');
+      
+      // Compare password
+      let isValidPassword = false;
+      try {
+        isValidPassword = await bcrypt.compare(trimmedPassword, user.password);
+        console.log('Password comparison result:', isValidPassword);
+      } catch (bcryptError) {
+        console.error('Bcrypt comparison error:', bcryptError);
+        return res.status(500).json({ message: "Authentication error" });
+      }
 
       if (!isValidPassword) {
-        console.log('Password mismatch');
+        console.log('Password mismatch for user:', trimmedEmail);
         return res.status(401).json({ message: "Invalid credentials" });
       }
 
-      console.log('Password match successful');
+      console.log('Password match successful for user:', trimmedEmail);
 
+      // Update last login time
       try {
         const loginTimestamp = Math.floor(Date.now() / 1000);
         await storage.updateUser(user.id, { lastLoginAt: loginTimestamp });
-      } catch (error) {
-        console.error('Error updating last login:', error);
+        console.log('Updated last login time for user:', user.id);
+      } catch (updateError) {
+        console.error('Error updating last login:', updateError);
+        // Don't fail login for this
       }
 
-      const { password: _, ...userResponse } = user;
-      console.log('Login successful for user:', userResponse.email);
+      // Prepare user response (remove sensitive data)
+      const userResponse = {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        phone: user.phone,
+        userType: user.userType,
+        role: user.role,
+        permissions: Array.isArray(user.permissions) ? user.permissions : [],
+        avatar: user.avatar,
+        bio: user.bio,
+        isVerified: Boolean(user.isVerified),
+        isActive: Boolean(user.isActive),
+        reacNumber: user.reacNumber,
+        lastLoginAt: user.lastLoginAt,
+        createdAt: user.createdAt
+      };
+
+      console.log('Login successful for user:', userResponse.email, 'with ID:', userResponse.id);
       res.json(userResponse);
     } catch (error) {
       console.error("Login error:", error);
-      res.status(500).json({ message: "Login failed" });
+      res.status(500).json({ message: "Login failed. Please try again." });
     }
   });
 }

@@ -24,7 +24,7 @@ export const queryClient = new QueryClient({
 });
 
 // API request helper for mutations (POST, PUT, DELETE)
-export const apiRequest = async (url: string, options: RequestInit = {}) => {
+export const apiRequest = async (url: string, options: RequestInit = {}): Promise<any> => {
   const authToken = typeof window !== 'undefined' ? localStorage.getItem('authToken') : null;
 
   const config: RequestInit = {
@@ -36,20 +36,37 @@ export const apiRequest = async (url: string, options: RequestInit = {}) => {
     },
   };
 
-  const response = await fetch(url, config);
+  console.log('API Request:', url, config.method || 'GET');
+
+  let response: Response;
+  try {
+    response = await fetch(url, config);
+  } catch (error) {
+    console.error('Network error:', error);
+    throw new Error('Network error. Please check your connection.');
+  }
+
+  console.log('API Response status:', response.status);
 
   if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-
-    // Handle authentication errors
-    if (response.status === 401 && typeof window !== 'undefined') {
-      localStorage.removeItem('authToken');
-      window.location.href = '/login';
-      return;
+    let errorData;
+    try {
+      errorData = await response.json();
+    } catch (parseError) {
+      console.error('Error parsing error response:', parseError);
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
 
+    console.error('API Error:', errorData);
     throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
   }
 
-  return response.json();
+  try {
+    const data = await response.json();
+    console.log('API Response data received');
+    return data;
+  } catch (parseError) {
+    console.error('Error parsing response:', parseError);
+    throw new Error('Invalid response format');
+  }
 };

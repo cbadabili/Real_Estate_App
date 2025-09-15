@@ -107,13 +107,29 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     
     setIsLoading(true);
     try {
+      console.log('Attempting login for:', email.trim());
+      
       const response = await apiRequest('/api/users/login', {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
         body: JSON.stringify({ 
-          email: email.trim(), 
+          email: email.trim().toLowerCase(), 
           password: password.trim() 
         })
       });
+
+      console.log('Login response received:', { 
+        id: response.id, 
+        email: response.email, 
+        userType: response.userType 
+      });
+
+      // Validate response
+      if (!response.id || !response.email) {
+        throw new Error('Invalid login response from server');
+      }
 
       // Set user data
       setUser(response);
@@ -121,12 +137,29 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       // Create a token that the middleware can understand
       const token = response.id.toString();
       setAuthToken(token);
+      
       if (typeof window !== 'undefined') {
         localStorage.setItem('authToken', token);
+        console.log('Auth token stored:', token);
       }
     } catch (error) {
       console.error('Login failed:', error);
-      throw error;
+      
+      // Clear any existing auth state on login failure
+      setUser(null);
+      setAuthToken(null);
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('authToken');
+      }
+      
+      // Re-throw with more specific error message
+      if (error.message?.includes('Invalid credentials')) {
+        throw new Error('Invalid email or password');
+      } else if (error.message?.includes('Account is inactive')) {
+        throw new Error('Your account has been deactivated. Please contact support.');
+      } else {
+        throw new Error('Login failed. Please check your connection and try again.');
+      }
     } finally {
       setIsLoading(false);
     }

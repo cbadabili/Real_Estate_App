@@ -29,7 +29,9 @@ export class UserRepository implements IUserRepository {
 
   async getUserByEmail(email: string): Promise<User | undefined> {
     try {
-      const [user] = await db.select().from(users).where(eq(users.email, email));
+      console.log('Repository: Looking up user by email:', email);
+      const [user] = await db.select().from(users).where(eq(users.email, email.toLowerCase()));
+      console.log('Repository: User lookup result:', user ? `Found user ${user.id}` : 'No user found');
       return user || undefined;
     } catch (error) {
       console.error("Error fetching user by email:", error);
