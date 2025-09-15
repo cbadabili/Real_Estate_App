@@ -18,7 +18,11 @@
     "test:lighthouse": "vitest run tests/performance/lighthouse.test.ts",
     "health-check": "npx tsx scripts/health-check.ts",
     "lint": "eslint . --ext .ts,.tsx",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "db:push": "drizzle-kit push",
+    "db:push:locations": "drizzle-kit push --config=./drizzle.location.config.ts",
+    "db:migrate:locations": "drizzle-kit migrate --config=./drizzle.location.config.ts",
+    "seed:locations": "npx tsx server/location-data-import.ts"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.4",
@@ -64,7 +68,7 @@
     "cors": "^2.8.5",
     "date-fns": "^3.6.0",
     "dotenv": "^17.2.2",
-    "drizzle-orm": "^0.39.1",
+    "drizzle-orm": "^0.44.5",
     "drizzle-zod": "^0.7.0",
     "embla-carousel-react": "^8.6.0",
     "express": "^4.21.2",
@@ -123,7 +127,7 @@
     "@types/ws": "^8.5.10",
     "@vitejs/plugin-react": "^4.2.1",
     "autoprefixer": "^10.4.19",
-    "drizzle-kit": "^0.20.14",
+    "drizzle-kit": "^0.30.0",
     "esbuild": "^0.20.2",
     "eslint": "^8.57.0",
     "eslint-plugin-react-hooks": "^4.6.0",

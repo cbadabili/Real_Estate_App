@@ -1006,3 +1006,125 @@ export const heroSlotsRelations = relations(hero_slots, ({ one }) => ({
     references: [users.id],
   }),
 }));
+
+// ==========================================
+// COMPREHENSIVE BOTSWANA LOCATION SYSTEM
+// Based on 2022 Population and Housing Census
+// Hierarchy: District → Settlement (City/Town/Village) → Ward → Plot
+// ==========================================
+
+// Districts table - 28 Census Districts
+export const districts = pgTable("districts", {
+  id: serial("id").primaryKey(),
+  code: text("code").notNull().unique(), // Census district codes like "01", "02", etc.
+  name: text("name").notNull().unique(),
+  type: text("type").notNull(), // 'city', 'town', 'rural_district'
+  region: text("region"), // Northern, Central, Eastern, Southern, etc.
+  population: integer("population"), // 2022 Census population
+  area_km2: doublePrecision("area_km2"), // Area in square kilometers
+  population_density: doublePrecision("population_density"), // People per km2
+  created_at: timestamp("created_at").defaultNow(),
+  updated_at: timestamp("updated_at").defaultNow(),
+});
+
+// Settlements table - Cities, Towns, Villages within Districts
+export const settlements = pgTable("settlements", {
+  id: serial("id").primaryKey(),
+  district_id: integer("district_id").references(() => districts.id).notNull(),
+  name: text("name").notNull(),
+  type: text("type").notNull(), // 'city', 'town', 'village'
+  population: integer("population"), // 2022 Census population
+  growth_rate: doublePrecision("growth_rate"), // Population growth rate
+  latitude: doublePrecision("latitude"),
+  longitude: doublePrecision("longitude"),
+  post_code: text("post_code"),
+  is_major: boolean("is_major").default(false), // Major settlements (population >= 5000)
+  created_at: timestamp("created_at").defaultNow(),
+  updated_at: timestamp("updated_at").defaultNow(),
+});
+
+// Wards table - Administrative divisions within settlements
+export const wards = pgTable("wards", {
+  id: serial("id").primaryKey(),
+  settlement_id: integer("settlement_id").references(() => settlements.id).notNull(),
+  name: text("name").notNull(),
+  ward_number: text("ward_number"), // Official ward number if available
+  constituency: text("constituency"), // Parliamentary constituency
+  population: integer("population"),
+  area_description: text("area_description"), // Description of ward boundaries
+  created_at: timestamp("created_at").defaultNow(),
+  updated_at: timestamp("updated_at").defaultNow(),
+});
+
+// Plots table - Specific addresses/plots within wards
+export const plots = pgTable("plots", {
+  id: serial("id").primaryKey(),
+  ward_id: integer("ward_id").references(() => wards.id),
+  settlement_id: integer("settlement_id").references(() => settlements.id), // Allow direct settlement reference for areas without defined wards
+  plot_number: text("plot_number"),
+  street_name: text("street_name"),
+  street_number: text("street_number"),
+  block_name: text("block_name"), // For areas like "Mogoditshane Block 5"
+  full_address: text("full_address").notNull(),
+  latitude: doublePrecision("latitude"),
+  longitude: doublePrecision("longitude"),
+  created_at: timestamp("created_at").defaultNow(),
+  updated_at: timestamp("updated_at").defaultNow(),
+});
+
+// Location Relations
+export const districtsRelations = relations(districts, ({ many }) => ({
+  settlements: many(settlements),
+}));
+
+export const settlementsRelations = relations(settlements, ({ one, many }) => ({
+  district: one(districts, {
+    fields: [settlements.district_id],
+    references: [districts.id],
+  }),
+  wards: many(wards),
+  plots: many(plots), // Direct plots for areas without defined wards
+}));
+
+export const wardsRelations = relations(wards, ({ one, many }) => ({
+  settlement: one(settlements, {
+    fields: [wards.settlement_id],
+    references: [settlements.id],
+  }),
+  plots: many(plots),
+}));
+
+export const plotsRelations = relations(plots, ({ one }) => ({
+  ward: one(wards, {
+    fields: [plots.ward_id],
+    references: [wards.id],
+  }),
+  settlement: one(settlements, {
+    fields: [plots.settlement_id],
+    references: [settlements.id],
+  }),
+}));
+
+// Location search indexes for performance
+// These will be created via database migrations
+export const locationIndexes = [
+  // District lookups
+  "CREATE INDEX IF NOT EXISTS idx_districts_code ON districts(code)",
+  "CREATE INDEX IF NOT EXISTS idx_districts_name ON districts(name)",
+  
+  // Settlement lookups
+  "CREATE INDEX IF NOT EXISTS idx_settlements_district ON settlements(district_id)",
+  "CREATE INDEX IF NOT EXISTS idx_settlements_name ON settlements(name)",
+  "CREATE INDEX IF NOT EXISTS idx_settlements_type ON settlements(type)",
+  "CREATE INDEX IF NOT EXISTS idx_settlements_population ON settlements(population DESC)",
+  
+  // Ward lookups
+  "CREATE INDEX IF NOT EXISTS idx_wards_settlement ON wards(settlement_id)",
+  "CREATE INDEX IF NOT EXISTS idx_wards_name ON wards(name)",
+  
+  // Plot lookups
+  "CREATE INDEX IF NOT EXISTS idx_plots_ward ON plots(ward_id)",
+  "CREATE INDEX IF NOT EXISTS idx_plots_settlement ON plots(settlement_id)",
+  "CREATE INDEX IF NOT EXISTS idx_plots_address ON plots(full_address)",
+  "CREATE INDEX IF NOT EXISTS idx_plots_location ON plots(latitude, longitude)",
+];
