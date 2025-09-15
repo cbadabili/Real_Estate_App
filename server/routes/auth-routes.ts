@@ -85,6 +85,14 @@ export function registerAuthRoutes(app: Express) {
         return res.status(401).json({ message: "Invalid credentials" });
       }
 
+      console.log('User found:', {
+        id: user.id,
+        email: user.email,
+        isActive: user.isActive,
+        hasPassword: !!user.password,
+        passwordLength: user.password ? user.password.length : 0
+      });
+
       // Check if user is active
       if (!user.isActive) {
         console.log('Inactive user attempted login:', trimmedEmail);
@@ -92,12 +100,29 @@ export function registerAuthRoutes(app: Express) {
       }
 
       console.log('User found, comparing password...');
+      console.log('Stored password hash:', user.password?.substring(0, 20) + '...');
+      console.log('Input password length:', trimmedPassword.length);
       
       // Compare password
       let isValidPassword = false;
       try {
+        if (!user.password) {
+          console.error('User has no password set');
+          return res.status(401).json({ message: "Invalid credentials" });
+        }
+
         isValidPassword = await bcrypt.compare(trimmedPassword, user.password);
         console.log('Password comparison result:', isValidPassword);
+        
+        // Additional debug info
+        if (!isValidPassword) {
+          console.log('Password mismatch details:', {
+            inputPasswordLength: trimmedPassword.length,
+            storedHashLength: user.password.length,
+            inputPasswordPrefix: trimmedPassword.substring(0, 3),
+            hashPrefix: user.password.substring(0, 10)
+          });
+        }
       } catch (bcryptError) {
         console.error('Bcrypt comparison error:', bcryptError);
         return res.status(500).json({ message: "Authentication error" });

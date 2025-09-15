@@ -52,8 +52,16 @@ export const apiRequest = async (url: string, options: RequestInit = {}): Promis
     let errorData;
     try {
       errorData = await response.json();
+      console.error('API Error Response:', {
+        status: response.status,
+        statusText: response.statusText,
+        url: url,
+        method: config.method || 'GET',
+        errorData
+      });
     } catch (parseError) {
       console.error('Error parsing error response:', parseError);
+      console.error('Raw response status:', response.status, response.statusText);
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
