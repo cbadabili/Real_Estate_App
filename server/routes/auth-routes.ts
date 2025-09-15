@@ -137,7 +137,7 @@ export function registerAuthRoutes(app: Express) {
 
       // Update last login time
       try {
-        const loginTimestamp = Math.floor(Date.now() / 1000);
+        const loginTimestamp = new Date();
         await storage.updateUser(user.id, { lastLoginAt: loginTimestamp });
         console.log('Updated last login time for user:', user.id);
       } catch (updateError) {

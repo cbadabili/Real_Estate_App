@@ -57,11 +57,11 @@ export class UserRepository implements IUserRepository {
         if (processedUpdates[field] !== undefined) {
           const value = processedUpdates[field];
           if (value instanceof Date) {
-            processedUpdates[field] = Math.floor(value.getTime() / 1000);
+            processedUpdates[field] = value; // Keep as Date for PostgreSQL
           } else if (typeof value === 'number') {
-            if (value > 1000000000000) {
-              processedUpdates[field] = Math.floor(value / 1000);
-            }
+            // Convert Unix timestamp to Date object
+            const timestamp = value > 1000000000000 ? value : value * 1000;
+            processedUpdates[field] = new Date(timestamp);
           }
         }
       }
@@ -70,7 +70,7 @@ export class UserRepository implements IUserRepository {
         .update(users)
         .set({ 
           ...processedUpdates, 
-          updatedAt: Math.floor(Date.now() / 1000) 
+          updatedAt: new Date() // Use Date object for PostgreSQL
         })
         .where(eq(users.id, id))
         .returning();

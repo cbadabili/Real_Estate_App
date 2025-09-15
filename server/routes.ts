@@ -45,6 +45,82 @@ export async function registerRoutes(app: Express): Promise<Server> {
   registerUserRoutes(app);
   registerPropertyRoutes(app);
 
+  // Buyer dashboard stats
+  app.get("/api/dashboard/buyer-stats", async (req, res) => {
+    try {
+      const stats = {
+        savedProperties: 0,
+        viewedProperties: 5,
+        scheduledViewings: 2,
+        activeAlerts: 3
+      };
+      res.json(stats);
+    } catch (error) {
+      console.error("Error fetching buyer stats:", error);
+      res.status(500).json({ error: "Failed to fetch buyer stats" });
+    }
+  });
+
+  // Dashboard routes for different user types
+  app.get("/api/dashboard/stats", authenticate, async (req, res) => {
+    try {
+      const user = req.user!;
+      let stats: any;
+
+      switch (user.role) {
+        case UserRole.BUYER:
+          // Placeholder for buyer-specific stats
+          stats = {
+            propertiesViewed: 10,
+            savedSearches: 5,
+            inquiriesSent: 3
+          };
+          break;
+        case UserRole.SELLER:
+          // Placeholder for seller-specific stats
+          const propertyStats = await storage.getSellerStats(user.id);
+          stats = {
+            listedProperties: propertyStats.listed,
+            soldProperties: propertyStats.sold,
+            pendingOffers: propertyStats.pending,
+            totalValue: propertyStats.totalValue
+          };
+          break;
+        case UserRole.AGENT:
+          // Placeholder for agent-specific stats
+          const agentStats = await storage.getAgentStats(user.id);
+          stats = {
+            propertiesManaged: agentStats.managed,
+            clients: agentStats.clients,
+            appointmentsScheduled: agentStats.appointments,
+            totalCommission: agentStats.commission
+          };
+          break;
+        case UserRole.ADMIN:
+          // Placeholder for admin-specific stats
+          const [userCount, propertyCount, reviewCount] = await Promise.all([
+            storage.countUsers(),
+            storage.countProperties(),
+            reviewStorage.countReviews()
+          ]);
+          stats = {
+            totalUsers: userCount,
+            totalProperties: propertyCount,
+            totalReviews: reviewCount,
+            pendingReviews: await reviewStorage.countReviews({ status: 'pending' })
+          };
+          break;
+        default:
+          stats = { message: "No specific dashboard stats available for this role." };
+          break;
+      }
+      res.json(stats);
+    } catch (error) {
+      console.error("Error fetching dashboard stats:", error);
+      res.status(500).json({ error: "Failed to fetch dashboard stats" });
+    }
+  });
+
   // Property Management
   app.get("/api/properties", async (req, res) => {
     try {

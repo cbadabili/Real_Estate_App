@@ -45,9 +45,9 @@ export const users = pgTable("users", {
   isVerified: integer("is_verified").default(0),
   isActive: integer("is_active").default(1),
   reacNumber: text("reac_number"), // For certified agents
-  lastLoginAt: timestamp("last_login_at"),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
+  lastLoginAt: timestamp("last_login_at", { mode: 'date' }),
+  createdAt: timestamp("created_at", { mode: 'date' }).defaultNow(),
+  updatedAt: timestamp("updated_at", { mode: 'date' }).defaultNow(),
 });
 
 // Properties table
@@ -130,7 +130,7 @@ export const savedProperties = pgTable("saved_properties", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").references(() => users.id).notNull(),
   propertyId: integer("property_id").references(() => properties.id).notNull(),
-  createdAt: timestamp("created_at").defaultNow(),
+  createdAt: timestamp("created_at", { mode: 'date' }).defaultNow(),
 });
 
 // Property reviews and ratings
@@ -140,7 +140,7 @@ export const propertyReviews = pgTable("property_reviews", {
   reviewerId: integer("reviewer_id").references(() => users.id).notNull(),
   rating: integer("rating").notNull(), // 1-5 stars
   review: text("review"),
-  createdAt: timestamp("created_at").defaultNow(),
+  createdAt: timestamp("created_at", { mode: 'date' }).defaultNow(),
 });
 
 // Agent reviews and ratings
@@ -151,7 +151,7 @@ export const agentReviews = pgTable("agent_reviews", {
   rating: integer("rating").notNull(), // 1-5 stars
   review: text("review"),
   transactionType: text("transaction_type"), // 'buy', 'sell', 'rent'
-  createdAt: timestamp("created_at").defaultNow(),
+  createdAt: timestamp("created_at", { mode: 'date' }).defaultNow(),
 });
 
 // User reviews and ratings (for all user types)
