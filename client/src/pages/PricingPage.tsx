@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Check, Star, Zap, Users, Award, Package } from 'lucide-react';
@@ -46,7 +45,7 @@ const PricingPage = () => {
     }
 
     setSelectedPlan(planCode);
-    
+
     try {
       const response = await fetch('/api/billing/subscribe', {
         method: 'POST',
@@ -60,7 +59,7 @@ const PricingPage = () => {
       });
 
       const data = await response.json();
-      
+
       if (data.success) {
         if (data.data.plan.price_bwp === 0) {
           alert('Free plan activated successfully!');
@@ -83,16 +82,16 @@ const PricingPage = () => {
   const showPaymentModal = (instructions: any) => {
     const modalContent = `
       Payment Instructions:
-      
+
       Amount: BWP ${instructions.amount}
       Reference: ${instructions.reference}
-      
+
       Bank Details:
       ${instructions.details.bankName}
       Account: ${instructions.details.accountName}
       Number: ${instructions.details.accountNumber}
       Branch: ${instructions.details.branchCode}
-      
+
       Please transfer the amount and your subscription will be activated within 24 hours.
     `;
     alert(modalContent);
@@ -133,19 +132,19 @@ const PricingPage = () => {
     };
 
     const name = featureNames[key] || key;
-    
+
     if (typeof value === 'boolean') {
       return value ? name : null;
     }
-    
+
     if (value === -1) {
       return `Unlimited ${name}`;
     }
-    
+
     if (value === 0) {
       return null;
     }
-    
+
     return `${value} ${name}`;
   };
 
@@ -176,7 +175,9 @@ const PricingPage = () => {
             const Icon = getPlanIcon(plan.code);
             const colorClass = getPlanColor(plan.code);
             const isPopular = plan.code === 'LISTER_PREMIUM';
-            
+            const isBusiness = plan.code === 'BUSINESS';
+            const isPremium = plan.code === 'LISTER_PREMIUM';
+
             return (
               <motion.div
                 key={plan.id}
@@ -185,10 +186,10 @@ const PricingPage = () => {
                 transition={{ delay: 0.1 * plan.id }}
                 className={`relative bg-white rounded-lg border ${colorClass} p-6 shadow-sm hover:shadow-md transition-shadow`}
               >
-                {isPopular && (
+                {(isPopular || isBusiness || isPremium) && (
                   <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
                     <span className="bg-purple-500 text-white px-3 py-1 rounded-full text-sm font-medium">
-                      Most Popular
+                      {plan.badge || 'Most Popular'}
                     </span>
                   </div>
                 )}
@@ -218,7 +219,7 @@ const PricingPage = () => {
                   {Object.entries(plan.features).map(([key, value]) => {
                     const feature = formatFeature(key, value);
                     if (!feature) return null;
-                    
+
                     return (
                       <div key={key} className="flex items-center">
                         <Check className="h-4 w-4 text-green-500 mr-3 flex-shrink-0" />

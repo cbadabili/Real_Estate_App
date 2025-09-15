@@ -1,4 +1,3 @@
-
 import { db } from "./db";
 import { plans } from "../shared/schema";
 
@@ -12,92 +11,65 @@ export async function seedBilling() {
     return;
   }
 
-  // Define plan features and pricing
+  // Plans v2 – simple pricing & clear value
   const planData = [
     {
+      id: 1,
       code: 'LISTER_FREE',
-      name: 'Free Lister',
-      description: 'Perfect for first-time property listers',
+      name: 'Free',
+      description: 'Basic plan for individual listers',
       price_bwp: 0,
-      interval: 'monthly',
       features: JSON.stringify({
-        listingLimit: 1,
-        photosPerListing: 5,
-        analytics: false,
-        heroSlots: 0,
-        priorityRanking: false,
-        leadManager: false,
-        directoryListing: false,
-        bookingWidget: false
-      })
+        LISTING_LIMIT: '1',
+        PHOTO_LIMIT: '5',
+        PRIORITY_RANK: '0'
+      }),
+      is_active: true
     },
     {
+      id: 2,
       code: 'LISTER_PRO',
-      name: 'Pro Lister',
-      description: 'For casual property listers who want more exposure',
+      name: 'Pro',
+      description: 'Professional plan for active listers',
       price_bwp: 100,
-      interval: 'monthly',
       features: JSON.stringify({
-        listingLimit: 5,
-        photosPerListing: 20,
-        analytics: true,
-        heroSlots: 0,
-        priorityRanking: true,
-        leadManager: false,
-        directoryListing: false,
-        bookingWidget: false
-      })
+        LISTING_LIMIT: '5',
+        PHOTO_LIMIT: '20',
+        ANALYTICS: 'true',
+        PRIORITY_RANK: '0'
+      }),
+      is_active: true
     },
     {
-      code: 'LISTER_PREMIUM',
-      name: 'Premium Lister',
-      description: 'For serious sellers and landlords who want maximum visibility',
-      price_bwp: 200,
-      interval: 'monthly',
-      features: JSON.stringify({
-        listingLimit: -1, // unlimited
-        photosPerListing: 50,
-        analytics: true,
-        heroSlots: 1,
-        priorityRanking: true,
-        leadManager: false,
-        directoryListing: false,
-        bookingWidget: false
-      })
-    },
-    {
-      code: 'AGENT',
-      name: 'Real Estate Agent',
-      description: 'Professional tools for real estate agents',
+      id: 3,
+      code: 'BUSINESS',
+      name: 'Business',
+      description: 'Business plan for agents and service providers',
       price_bwp: 150,
-      interval: 'monthly',
       features: JSON.stringify({
-        listingLimit: -1, // unlimited
-        photosPerListing: 50,
-        analytics: true,
-        heroSlots: 2,
-        priorityRanking: true,
-        leadManager: true,
-        directoryListing: true,
-        bookingWidget: true
-      })
+        LISTING_LIMIT: 'unlimited',
+        PHOTO_LIMIT: '50',
+        DIRECTORY: 'true',
+        BOOKING: 'true',
+        LEAD_MANAGER: 'true',
+        PRIORITY_RANK: '1'
+      }),
+      is_active: true
     },
     {
-      code: 'SERVICE_PROVIDER',
-      name: 'Service Provider',
-      description: 'For contractors, artisans, and property service providers',
-      price_bwp: 100,
-      interval: 'monthly',
+      id: 4,
+      code: 'LISTER_PREMIUM',
+      name: 'Premium',
+      description: 'Premium plan with hero slots and maximum visibility',
+      price_bwp: 200,
       features: JSON.stringify({
-        listingLimit: 0, // no property listings
-        photosPerListing: 0,
-        analytics: false,
-        heroSlots: 0,
-        priorityRanking: false,
-        leadManager: false,
-        directoryListing: true,
-        bookingWidget: true
-      })
+        LISTING_LIMIT: 'unlimited',
+        PHOTO_LIMIT: '50',
+        ANALYTICS: 'true',
+        HERO_SLOTS: '1',
+        PRIORITY_RANK: '2'
+      }),
+      is_active: true
     }
   ];
 

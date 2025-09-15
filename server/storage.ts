@@ -336,7 +336,7 @@ export class DatabaseStorage implements IStorage {
     return appointment || undefined;
   }
 
-  async getPropertyAppointments(propertyId: number): Promise<Appointment[]> {
+  async getPropertyAppointments(propertyId: number): Promise<Appointment[]>{
     return await db
       .select()
       .from(appointments)

@@ -1,4 +1,3 @@
-
 import 'dotenv/config';
 
 function get(name: string, fallback?: string) {
@@ -20,4 +19,14 @@ export const env = {
   REALESTATEINTEL_SUGGEST_URL: process.env.REALESTATEINTEL_SUGGEST_URL ?? '',
   REALESTATEINTEL_API_KEY: process.env.REALESTATEINTEL_API_KEY ?? '',
   OPENAI_API_KEY: process.env.OPENAI_API_KEY ?? '',
+};
+
+export const config = {
+  port: process.env.PORT || 3001,
+  nodeEnv: process.env.NODE_ENV || 'development',
+  dbPath: process.env.DATABASE_URL || './beedab.db',
+  jwtSecret: process.env.JWT_SECRET || 'your-secret-key-change-in-production',
+  openaiApiKey: process.env.OPENAI_API_KEY,
+  mapboxToken: process.env.MAPBOX_TOKEN,
+  rankingV2: process.env.RANKING_V2 === 'true'
 };
