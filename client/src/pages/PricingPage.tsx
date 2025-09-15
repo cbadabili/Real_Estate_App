@@ -28,7 +28,9 @@ const PricingPage = () => {
     try {
       const response = await fetch('/api/billing/plans');
       const data = await response.json();
+      console.log('Fetched plans data:', data);
       if (data.success) {
+        console.log('Plans:', data.data);
         setPlans(data.data);
       }
     } catch (error) {
@@ -118,6 +120,8 @@ const PricingPage = () => {
   };
 
   const formatFeature = (key: string, value: any) => {
+    console.log(`Formatting feature: ${key} = ${value} (type: ${typeof value})`);
+    
     const featureNames: Record<string, string> = {
       LISTING_LIMIT: 'Property Listings',
       PHOTO_LIMIT: 'Photos per Listing',
@@ -131,16 +135,27 @@ const PricingPage = () => {
 
     const name = featureNames[key] || key.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, l => l.toUpperCase());
 
-    if (value === 'true') {
+    // Handle boolean values
+    if (value === true || value === 'true') {
       return name;
     }
 
-    if (value === 'false' || !value) {
+    // Handle false or empty values
+    if (value === false || value === 'false' || !value || value === '0') {
       return null;
     }
 
-    if (value === 'unlimited') {
+    // Handle unlimited
+    if (value === 'unlimited' || value === -1) {
       return `Unlimited ${name}`;
+    }
+
+    // Handle numeric values
+    if (typeof value === 'number' || !isNaN(Number(value))) {
+      const num = Number(value);
+      if (num === 0) return null;
+      if (num === -1) return `Unlimited ${name}`;
+      return `${num} ${name}`;
     }
 
     return `${value} ${name}`;
@@ -178,6 +193,7 @@ const PricingPage = () => {
             
             // Parse features if they're stored as JSON string
             const features = typeof plan.features === 'string' ? JSON.parse(plan.features) : plan.features;
+            console.log(`Plan ${plan.code} features:`, features);
 
             return (
               <motion.div
