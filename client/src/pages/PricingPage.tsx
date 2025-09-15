@@ -218,7 +218,7 @@ const PricingPage = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 * plan.id }}
-                className={`relative bg-white rounded-lg border ${colorClass} p-6 shadow-sm hover:shadow-md transition-shadow`}
+                className={`relative bg-white rounded-lg border ${colorClass} p-6 shadow-sm hover:shadow-md transition-shadow flex flex-col h-full min-h-[600px]`}
               >
                 {(isPopular || isBusiness) && (
                   <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
@@ -251,7 +251,7 @@ const PricingPage = () => {
                 </div>
 
                 {/* Features */}
-                <div className="space-y-3 mb-6">
+                <div className="space-y-3 mb-6 flex-grow">
                   {Object.entries(features).map(([key, value]) => {
                     const feature = formatFeature(key, value);
                     if (!feature) return null;
@@ -266,15 +266,16 @@ const PricingPage = () => {
                 </div>
 
                 {/* CTA Button */}
-                <button
-                  onClick={() => handleSubscribe(plan.code)}
-                  disabled={selectedPlan === plan.code}
-                  className={`w-full py-3 px-4 rounded-lg font-medium transition-colors ${
-                    isPopular
-                      ? 'bg-purple-600 text-white hover:bg-purple-700'
-                      : 'bg-beedab-blue text-white hover:bg-beedab-darkblue'
-                  } disabled:opacity-50 disabled:cursor-not-allowed`}
-                >
+                <div className="mt-auto">
+                  <button
+                    onClick={() => handleSubscribe(plan.code)}
+                    disabled={selectedPlan === plan.code}
+                    className={`w-full py-3 px-4 rounded-lg font-medium transition-colors ${
+                      isPopular
+                        ? 'bg-purple-600 text-white hover:bg-purple-700'
+                        : 'bg-beedab-blue text-white hover:bg-beedab-darkblue'
+                    } disabled:opacity-50 disabled:cursor-not-allowed`}
+                  >
                   {selectedPlan === plan.code ? (
                     <span className="flex items-center justify-center">
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
@@ -285,7 +286,8 @@ const PricingPage = () => {
                   ) : (
                     'Subscribe Now'
                   )}
-                </button>
+                  </button>
+                </div>
               </motion.div>
             );
           })}
