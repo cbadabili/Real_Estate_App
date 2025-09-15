@@ -1,0 +1,277 @@
+BeeDab Real Estate Platform – Comprehensive Test Plan
+
+This test plan maps to the user stories provided for BeeDab’s real‑estate marketplace. It covers the main roles (visitors, buyers, sellers/agents, landlords, tenants, service providers, and admins) and ensures that browsing is open to unregistered visitors while interactive features require registration and, where appropriate, a paid subscription. Tests also verify that entitlements (e.g., listing limits, hero slots) are enforced.
+
+1. General Users & Authentication
+1.1 Property search & filters
+
+Search with valid filters – Set price range, property type, bedroom count and city; verify that only matching listings appear and that removing filters broadens results.
+
+Search with no filters – Perform a search without filters; confirm that default sorting (e.g. by newest) is applied.
+
+Invalid filter values – Enter negative price, zero bedrooms, or unsupported city; confirm that validation errors are shown and no results return.
+
+Pagination / infinite scroll – For large result sets, navigate through pages or infinite scroll; ensure new results load and previously loaded ones remain accessible.
+
+1.2 Property details page
+
+View details – From the results list, click a property and verify that the detail page shows description, photos, location map, price, agent/seller contact info, and any embedded videos or 3D tours.
+
+Breadcrumbs & navigation – Ensure back navigation returns to the search results with the same filter state.
+
+Unavailable listing – Navigate to a removed or expired listing URL; expect a 404 or message that the property is no longer available.
+
+1.3 Registration & login
+
+Register with valid data – Create an account (email, password, name); expect a success message and redirection to dashboard. Check that a confirmation email (if implemented) is sent.
+
+Duplicate email – Attempt to register with an existing email; the system should display an error without creating another account.
+
+Weak password – Register with a too‑short or simple password; expect a validation error with password requirements.
+
+Login with correct credentials – Use a registered email and password; expect successful authentication and access to the dashboard.
+
+Login with incorrect credentials – Attempt to log in with a wrong password; expect an error and no access.
+
+Password reset flow – Request a password reset; receive a reset email; complete the process; verify ability to log in with the new password.
+
+1.4 Visitor access & plan visibility
+
+Browse without login – Ensure visitors can search, view listings and read static pages (FAQs, pricing, tenant rights) without creating an account.
+
+Prompt for plan on interactive actions – For actions like saving a property or posting a listing, confirm that the platform prompts the user to register and choose a plan rather than silently failing; this reflects UX guidance that users should be aware of subscription requirements early
+ux.stackexchange.com
+.
+
+2. Buyer / Authenticated User
+2.1 Save properties to favourites
+
+Add to favourites – From a listing page or search results, click “Save”; verify that the property appears in the user’s favourites list in the dashboard.
+
+Remove from favourites – Remove a property from favourites and ensure it no longer appears in the saved list.
+
+Attempt to save when unauthenticated – As a visitor, click “Save”; expect the registration/plan selection prompt.
+
+2.2 Inquiries
+
+Send inquiry with valid message – Fill the inquiry form with a message; confirm that a success message displays and an entry appears under “My Inquiries”.
+
+Missing required fields – Try to send an inquiry without a message or contact info; expect validation errors.
+
+View inquiry status – After sending, visit the dashboard to check that the inquiry status is “pending”; simulate a seller response (via admin or seller account) and verify that the status updates to “replied”.
+
+2.3 Schedule viewings
+
+Schedule appointment – Choose a date and time on the listing page; confirm that the appointment shows under “My Viewings” and the seller receives a notification.
+
+Prevent double booking – Attempt to schedule a slot that’s already taken; expect an error and a list of available slots.
+
+Reschedule or cancel – Modify or cancel an existing appointment; confirm the change reflects in both buyer and seller dashboards.
+
+2.4 Mortgage calculator
+
+Calculate payments – Enter loan amount, interest rate and term; verify the monthly payment displayed matches the correct formula.
+
+Invalid inputs – Input non‑numeric characters, negative amounts or zero interest; expect validation messages preventing calculation.
+
+Different loan types – Test fixed vs. adjustable rates (if supported) and confirm results differ accordingly.
+
+2.5 Buyer dashboard
+
+Summary view – Log in and verify that the dashboard shows totals of saved properties, inquiries, scheduled viewings and (if applicable) purchase applications.
+
+Navigation – Ensure each dashboard item links to the full list (e.g. “View All Inquiries”).
+
+3. Seller / Agent / FSBO
+3.1 Create listing with location validation
+
+Valid listing – Create a new listing with title, description, address, price, photos and other required data; on submission, verify geolocation resolves correctly and the listing appears in search.
+
+Missing fields – Omit required fields; expect the form to highlight missing fields and block submission.
+
+Address validation – Enter an invalid or non‑existent address; the system should display an error or suggest corrections.
+
+Plan gating – Users on a Free plan can create only one listing; attempt a second listing and verify that the platform blocks it with an upgrade prompt. Pro and Premium plans allow 5 and unlimited listings, respectively.
+
+3.2 Update or delete listings
+
+Edit listing – Change price, description or photos; verify updates appear in the listing and search results after saving.
+
+Delete listing – Delete a listing; confirm it no longer appears for buyers and is removed from the seller’s dashboard.
+
+3.3 View inquiries
+
+Inquiry list – From the seller dashboard, view all inquiries on each listing; ensure contact details and messages are visible.
+
+Reply to buyer – Respond to an inquiry and confirm that the buyer sees the response status update.
+
+3.4 Hero slot purchase
+
+Eligible plan – From the seller dashboard, select a Premium listing and choose “Feature in hero carousel”; confirm that a payment instruction is generated, a pending hero slot record appears and, after admin approval, the listing appears in the hero carousel.
+
+Exceeding hero slots – Attempt to feature a listing when the user’s hero slot entitlement is consumed (e.g. Premium plan includes only one active slot); ensure the system offers to purchase an add‑on or declines.
+
+Expired slot – After the hero period ends, verify that the listing is automatically removed from the carousel and that the entitlement slot becomes available again.
+
+4. Landlord
+4.1 Maintenance requests
+
+View requests – As a landlord, log in and navigate to maintenance requests; confirm that requests are listed with details (tenant name, unit, issue, date submitted).
+
+Update status – Change a request status from “new” to “in progress” or “completed” and verify the update shows for both landlord and tenant.
+
+Add comments/attachments – Attach receipts or comments to a request; ensure tenants can view the update.
+
+4.2 Rent collection data
+
+View rent summary – Navigate to “Rent Collection”; verify that paid and outstanding amounts display per property and tenant.
+
+Time ranges – Filter by month or date range; check that totals update accordingly.
+
+4.3 Record rent payments
+
+Add payment – Input payment amount, date and tenant; confirm that outstanding balance decreases.
+
+Invalid data – Attempt to record a payment that exceeds the balance or with a future date; expect validation errors.
+
+5. Renter / Tenant
+5.1 Rental search & application
+
+Search rentals – Use filters like location, price range, bedrooms, and amenities; verify results match criteria and can be sorted.
+
+Submit application – Fill out an online rental application (personal info, employment, references); confirm success message and that the landlord/agent receives the application.
+
+Incomplete application – Leave required fields blank; ensure the system prompts to complete them.
+
+5.2 Tenant resources & rights
+
+View resources – Navigate to the tenant resources section; confirm that rights and obligations are displayed and accessible without login.
+
+Download legal documents – If download options exist, verify that files open correctly.
+
+5.3 Support tickets / complaints
+
+Submit complaint – Enter subject, description and optionally photos; submit and confirm that a ticket number is generated and visible in tenant dashboard.
+
+Ticket follow‑up – Update or add comments to the ticket; expect the status to update to “in progress” or “resolved” when addressed by the landlord or admin.
+
+5.4 View rental agreements
+
+Access agreements – Navigate to the tenant’s documents section; confirm that all uploaded rental agreements are listed and downloadable.
+
+Incorrect permissions – Attempt to view another tenant’s agreement by manipulating the URL; ensure access is denied.
+
+5.5 Maintenance requests (tenant)
+
+Submit maintenance request – Fill in issue type, description and photos; confirm that the request appears in both tenant and landlord dashboards.
+
+Validation – Omit required fields; expect error messages.
+
+Status updates – Check that status changes made by the landlord are reflected in the tenant view.
+
+5.6 Rent payments & history
+
+Make payment – Using the platform’s payment channel (e.g. mobile money); submit payment and verify a success message and updated balance.
+
+Insufficient funds – Attempt to pay with an invalid or insufficient payment; expect a failed transaction message.
+
+View history – Access the rent payment history; confirm that all past payments with dates, amounts and confirmation numbers appear.
+
+6. Service Provider & Marketplace
+6.1 Browse providers & categories
+
+Filter search – Filter service providers by category, city, rating and price (if applicable); verify that the list updates correctly and sorting (rating/price) works.
+
+Pagination – Ensure that more providers load as the user scrolls or pages through results.
+
+6.2 Provider registration & profiles
+
+Create profile – As a service provider, sign up (Business plan) and fill in business name, category, location, services offered and contact information; verify that the profile appears in search results.
+
+Update profile – Edit business description or services and confirm that changes are saved.
+
+Invalid inputs – Attempt to submit with missing required fields; expect validation errors.
+
+6.3 View categories & providers
+
+Category listing – Navigate to marketplace home; ensure that top categories display and link to provider lists.
+
+Provider detail page – Click a provider; verify that the page shows service description, pricing, photo gallery, ratings and reviews, and contact/book buttons.
+
+6.4 Reviews & ratings for providers
+
+Submit review – As an authenticated user who used a service, write a review and rating; confirm that it appears on the provider’s profile and adjusts the average rating.
+
+Update review – Edit the review and rating; confirm the change.
+
+Delete review – Remove the review; ensure it disappears from the provider profile.
+
+Unauthenticated user – Attempt to post a review without logging in; ensure the platform prompts for registration.
+
+7. Reviews & Ratings for Users
+7.1 User‑to‑user reviews
+
+Post review – After a completed transaction (purchase/rent/maintenance), submit a review about another user (e.g., a buyer rates a seller); confirm that the review appears on the user’s profile.
+
+Update & delete – Edit and delete the review; ensure the changes are reflected or removed accordingly.
+
+Permission checks – Attempt to review a user without a valid transaction; expect the system to reject the review.
+
+8. Property Promotion
+8.1 View featured hero listings
+
+Carousel display – On the home page, confirm that hero listings rotate smoothly, show up to the configured number, and link to the property details page.
+
+Eligibility – Ensure only listings with active hero slots appear; expired or removed listings should not display.
+
+9. Billing & Subscriptions
+9.1 View plans
+
+Pricing page – Confirm that Free, Pro, Business and Premium plans are listed with price, listing limits, hero slots and other features; check for clarity and mobile responsiveness.
+
+9.2 Subscribe & pay
+
+Free plan – Select the Free plan during registration; verify that the account is created and entitlements set (1 listing, 5 photos).
+
+Paid plan (manual payment) – Select Pro, Premium or Business; expect display of payment instructions (bank/mobile money). A pending payment record should be created.
+
+Incorrect plan code – Manipulate the API request with an invalid plan code; expect an error and no subscription.
+
+Admin approval – Log in as admin, view pending payments and approve; verify that the user’s subscription status changes to active and entitlements are granted (listing limits, hero slots, directory access etc.).
+
+9.3 View subscription & entitlements
+
+User dashboard – After subscription activation, check that current plan, renewal date and entitlements (listing count used vs. limit, hero slots, directory access) display correctly.
+
+Upgrade/downgrade – Change from Free to Pro, Pro to Premium or Business; confirm entitlements update accordingly and that a new payment is requested if moving to a higher tier.
+
+Over‑limit attempts – Attempt to create more listings than allowed; verify that the system blocks the action and suggests an upgrade.
+
+10. Administrative Controls
+10.1 Manage hero slots
+
+View & reorder slots – As admin, view all active hero slots; move a listing to a different position in the carousel and confirm that the front end updates accordingly.
+
+Remove slot – Remove a slot before expiry; confirm the listing leaves the carousel and the user’s hero entitlement is restored (if applicable).
+
+10.2 Moderate reviews
+
+List reviews – Admin views all user and provider reviews; sort/filter by rating, date or flagged status.
+
+Delete or hide review – Delete an inappropriate review; confirm it is removed from the public profile and the reviewer is notified (if implemented).
+
+Restore review – If soft deletion is supported, restore a previously removed review and confirm it reappears.
+
+Notes & assumptions
+
+The plan assumes the monetisation rules discussed earlier: the Free plan allows one listing, Pro allows five, Premium allows unlimited and one hero slot, and Business is for agents/providers. Tests must verify that entitlements correspond to the latest features.
+
+Payment flows are manual; thus testers should simulate admin approval to activate subscriptions and hero slots.
+
+Cross‑device testing (desktop, tablet, mobile) is recommended to ensure responsive design and usability across devices.
+
+References
+
+User experience research recommends making subscription requirements clear early in the onboarding process to avoid surprising users and causing frustration
+ux.stackexchange.com
+; this test plan verifies that plan prompts appear when users attempt restricted actions rather than after they have invested time.
