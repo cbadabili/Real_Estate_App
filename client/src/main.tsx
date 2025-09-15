@@ -10,11 +10,21 @@ import './index.css';
 // Handle unhandled promise rejections
 window.addEventListener('unhandledrejection', (event) => {
   // Suppress browser extension related errors
-  if (event.reason?.message?.includes('message channel')) {
+  if (event.reason?.message?.includes('message channel') || 
+      event.reason?.message?.includes('listener indicated an asynchronous response')) {
     event.preventDefault();
     return;
   }
   console.error('Unhandled promise rejection:', event.reason);
+});
+
+// Handle general errors from browser extensions
+window.addEventListener('error', (event) => {
+  if (event.message?.includes('listener indicated an asynchronous response') ||
+      event.message?.includes('message channel closed')) {
+    event.preventDefault();
+    return;
+  }
 });
 
 createRoot(document.getElementById('root')!).render(
