@@ -176,8 +176,8 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
       return res.status(401).json({ error: 'User not found or inactive' });
     }
 
-    // Update last login time
-    await storage.updateUser(user.id, { lastLoginAt: new Date() });
+    // Update last login time (Unix timestamp)
+    await storage.updateUser(user.id, { lastLoginAt: Math.floor(Date.now() / 1000) });
 
     req.user = user;
     next();

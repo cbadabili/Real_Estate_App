@@ -57,14 +57,14 @@ export class UserRepository implements IUserRepository {
         if (processedUpdates[field] !== undefined) {
           const value = processedUpdates[field];
           if (value instanceof Date) {
-            processedUpdates[field] = value; // Keep as Date for PostgreSQL
+            // Convert Date to Unix timestamp for bigint storage
+            processedUpdates[field] = Math.floor(value.getTime() / 1000);
           } else if (typeof value === 'number') {
-            // Convert Unix timestamp to Date object
-            const timestamp = value > 1000000000000 ? value : value * 1000;
-            processedUpdates[field] = new Date(timestamp);
+            // Keep Unix timestamp as-is for bigint storage
+            processedUpdates[field] = Math.floor(value);
           } else if (typeof value === 'string') {
-            // Handle ISO string dates
-            processedUpdates[field] = new Date(value);
+            // Convert ISO string dates to Unix timestamp
+            processedUpdates[field] = Math.floor(new Date(value).getTime() / 1000);
           }
         }
       }
@@ -73,7 +73,7 @@ export class UserRepository implements IUserRepository {
         .update(users)
         .set({ 
           ...processedUpdates, 
-          updatedAt: new Date() // Use Date object for PostgreSQL
+          updatedAt: Math.floor(Date.now() / 1000) // Unix timestamp for bigint storage
         })
         .where(eq(users.id, id))
         .returning();

@@ -1,0 +1,64 @@
+﻿
+chunk-WERSD76P.js?v=d013e86e:21551 Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+4
+create-listing:1 Uncaught (in promise) Error: A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received
+
+LoginPage.tsx:53 LoginPage: Attempting login...
+AuthContext.tsx:119 Attempting login for: cbadabili@gmail.com
+queryClient.ts:39 API Request: /api/users/login POST
+queryClient.ts:49 API Response status: 200
+queryClient.ts:74 API Response data received
+AuthContext.tsx:132 Login response received: 
+{id: 11, email: 'cbadabili@gmail.com', userType: 'buyer'}
+AuthContext.tsx:152 Auth token stored: 11
+LoginPage.tsx:56 LoginPage: Login successful!
+queryClient.ts:39 API Request: /api/users/11 GET
+DashboardPage.tsx:361 Fetching dashboard stats...
+DashboardPage.tsx:361 Fetching dashboard stats...
+queryClient.ts:49 API Response status: 200
+queryClient.ts:74 API Response data received
+DashboardPage.tsx:361 Fetching dashboard stats...
+DashboardPage.tsx:362 
+ GET https://331c9cdc-a1e3-4369-9dda-5ae35b395e48-00-21ptexpix7co9.worf.replit.dev/api/dashboard/stats 500 (Internal Server Error)
+DashboardPage.tsx:371 Dashboard API error: 500 {"error":"Authentication failed"}
+DashboardPage.tsx:416 Error fetching dashboard data: Error: HTTP error! status: 500
+    at fetchDashboardData (DashboardPage.tsx:372:15)
+queryClient.ts:39 API Request: /api/billing/me GET
+DashboardPage.tsx:362 
+ GET https://331c9cdc-a1e3-4369-9dda-5ae35b395e48-00-21ptexpix7co9.worf.replit.dev/api/dashboard/stats 500 (Internal Server Error)
+DashboardPage.tsx:371 Dashboard API error: 500 {"error":"Authentication failed"}
+DashboardPage.tsx:416 Error fetching dashboard data: Error: HTTP error! status: 500
+    at fetchDashboardData (DashboardPage.tsx:372:15)
+queryClient.ts:43 
+ GET https://331c9cdc-a1e3-4369-9dda-5ae35b395e48-00-21ptexpix7co9.worf.replit.dev/api/billing/me 500 (Internal Server Error)
+queryClient.ts:49 API Response status: 500
+queryClient.ts:55 API Error Response: 
+{status: 500, statusText: 'Internal Server Error', url: '/api/billing/me', method: 'GET', errorData: {…}}
+queryClient.ts:68 API Error: 
+{error: 'Authentication failed'}
+AuthContext.tsx:246 Error fetching billing data: Error: HTTP error! status: 500
+    at apiRequest (queryClient.ts:69:11)
+    at async refreshBilling (AuthContext.tsx:234:24)
+DashboardPage.tsx:362 
+ GET https://331c9cdc-a1e3-4369-9dda-5ae35b395e48-00-21ptexpix7co9.worf.replit.dev/api/dashboard/stats 500 (Internal Server Error)
+DashboardPage.tsx:371 Dashboard API error: 500 {"error":"Authentication failed"}
+DashboardPage.tsx:416 Error fetching dashboard data: Error: HTTP error! status: 500
+    at fetchDashboardData (DashboardPage.tsx:372:15)
+7
+Refused to create a worker from 'blob:<URL>' because it violates the following Content Security Policy directive: "script-src 'self' 'unsafe-inline' <URL> <URL>". Note that 'worker-src' was not explicitly set, so 'script-src' is used as a fallback.
+CreateListingPage.tsx:218 Form submitted: 
+{listingType: 'fsbo', propertyType: 'farm', title: '', price: '', plotSize: '40000', …}
+CreateListingPage.tsx:251 Transformed property data: 
+{title: '', description: '', price: '0', address: 'Ramotswa, South-East', city: 'Ramotswa', …}
+CreateListingPage.tsx:253 
+ POST https://331c9cdc-a1e3-4369-9dda-5ae35b395e48-00-21ptexpix7co9.worf.replit.dev/api/properties 400 (Bad Request)
+CreateListingPage.tsx:281 Error creating property: Error: Failed to create property listing
+    at onSubmit (CreateListingPage.tsx:262:15)
+CreateListingPage.tsx:218 Form submitted: 
+{listingType: 'fsbo', propertyType: 'farm', title: '', price: '', plotSize: '40000', …}
+CreateListingPage.tsx:251 Transformed property data: 
+{title: '', description: '', price: '0', address: 'Ramotswa, South-East', city: 'Ramotswa', …}
+CreateListingPage.tsx:253 
+ POST https://331c9cdc-a1e3-4369-9dda-5ae35b395e48-00-21ptexpix7co9.worf.replit.dev/api/properties 400 (Bad Request)
+CreateListingPage.tsx:281 Error creating property: Error: Failed to create property listing
+    at onSubmit (CreateListingPage.tsx:262:15)

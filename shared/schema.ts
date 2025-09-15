@@ -45,9 +45,9 @@ export const users = pgTable("users", {
   isVerified: integer("is_verified").default(0),
   isActive: integer("is_active").default(1),
   reacNumber: text("reac_number"), // For certified agents
-  lastLoginAt: timestamp("last_login_at", { mode: 'date' }),
-  createdAt: timestamp("created_at", { mode: 'date' }).defaultNow(),
-  updatedAt: timestamp("updated_at", { mode: 'date' }).defaultNow(),
+  lastLoginAt: integer("last_login_at"), // Unix timestamp
+  createdAt: integer("created_at").default(sql`extract(epoch from now())`),
+  updatedAt: integer("updated_at").default(sql`extract(epoch from now())`),
 });
 
 // Properties table

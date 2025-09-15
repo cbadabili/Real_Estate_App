@@ -67,7 +67,7 @@ export function registerPropertyRoutes(app: Express) {
   });
 
   // Create property
-  app.post("/api/properties", async (req, res) => {
+  app.post("/api/properties", authenticate, async (req, res) => {
     try {
       console.log("Create property request body:", req.body);
       
@@ -87,6 +87,7 @@ export function registerPropertyRoutes(app: Express) {
 
       const propertyData = {
         ...rest,
+        ownerId: req.user?.id, // Use authenticated user's ID
         areaText: areaText || null,
         placeName: placeName || null,
         placeId: placeId || null,
