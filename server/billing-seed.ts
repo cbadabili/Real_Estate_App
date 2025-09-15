@@ -1,24 +1,18 @@
 import { db } from "./db";
 import { plans } from "../shared/schema";
+import { sql } from "drizzle-orm";
 
 export async function seedBilling() {
-  console.log('Seeding billing plans...');
+  console.log('🎯 Seeding billing plans (idempotent)...');
 
-  // Check if plans already exist
-  const existingPlans = await db.select().from(plans).limit(1);
-  if (existingPlans.length > 0) {
-    console.log('✅ Billing plans already exist, skipping...');
-    return;
-  }
-
-  // Plans v2 – simple pricing & clear value
-  const planData = [
+  // Plans v2 – simple pricing & clear value (CANONICAL PLANS ONLY)
+  const CANONICAL_PLANS = [
     {
-      id: 1,
       code: 'LISTER_FREE',
       name: 'Free',
-      description: 'Basic plan for individual listers',
+      description: 'Perfect for first-time property listers',
       price_bwp: 0,
+      interval: 'monthly',
       features: JSON.stringify({
         LISTING_LIMIT: '1',
         PHOTO_LIMIT: '5',
@@ -27,11 +21,11 @@ export async function seedBilling() {
       is_active: true
     },
     {
-      id: 2,
       code: 'LISTER_PRO',
       name: 'Pro',
-      description: 'Professional plan for active listers',
+      description: 'For casual property listers who want more exposure',
       price_bwp: 100,
+      interval: 'monthly',
       features: JSON.stringify({
         LISTING_LIMIT: '5',
         PHOTO_LIMIT: '20',
@@ -41,11 +35,11 @@ export async function seedBilling() {
       is_active: true
     },
     {
-      id: 3,
       code: 'BUSINESS',
       name: 'Business',
-      description: 'Business plan for agents and service providers',
+      description: 'For contractors, artisans, and property service providers',
       price_bwp: 150,
+      interval: 'monthly',
       features: JSON.stringify({
         LISTING_LIMIT: 'unlimited',
         PHOTO_LIMIT: '50',
@@ -57,11 +51,11 @@ export async function seedBilling() {
       is_active: true
     },
     {
-      id: 4,
       code: 'LISTER_PREMIUM',
       name: 'Premium',
-      description: 'Premium plan with hero slots and maximum visibility',
+      description: 'For serious sellers and investors who want maximum visibility',
       price_bwp: 200,
+      interval: 'monthly',
       features: JSON.stringify({
         LISTING_LIMIT: 'unlimited',
         PHOTO_LIMIT: '50',
@@ -73,8 +67,32 @@ export async function seedBilling() {
     }
   ];
 
-  // Insert plans
-  await db.insert(plans).values(planData);
+  // Upsert canonical plans (idempotent)
+  for (const plan of CANONICAL_PLANS) {
+    await db
+      .insert(plans)
+      .values(plan)
+      .onConflictDoUpdate({
+        target: plans.code,
+        set: {
+          name: plan.name,
+          description: plan.description,
+          price_bwp: plan.price_bwp,
+          interval: plan.interval,
+          features: plan.features,
+          is_active: plan.is_active
+        }
+      });
+  }
 
-  console.log('✅ Billing plans seeded successfully');
+  // Deactivate any non-canonical plans (legacy cleanup)
+  const canonicalCodes = CANONICAL_PLANS.map(p => p.code);
+  const result = await db
+    .update(plans)
+    .set({ is_active: false })
+    .where(sql`code NOT IN ('${canonicalCodes.join("', '")}')`);
+
+  console.log('✅ Billing plans synchronized successfully');
+  console.log(`   - ${CANONICAL_PLANS.length} canonical plans active`);
+  console.log(`   - Legacy plans deactivated`);
 }
