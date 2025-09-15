@@ -584,24 +584,34 @@ router.get('/marketplace/training-providers', async (req, res) => {
   try {
     const { category, location, search, page = 1, limit = 12 } = req.query;
 
+    // Safe parameter parsing with defaults
     const filters = {
-      category: category as string,
-      location: location as string,
-      search: search as string,
-      page: parseInt(page as string),
-      limit: parseInt(limit as string)
+      category: category ? String(category) : undefined,
+      location: location ? String(location) : undefined,
+      search: search ? String(search) : undefined,
+      page: page ? Math.max(1, parseInt(String(page)) || 1) : 1,
+      limit: limit ? Math.max(1, Math.min(50, parseInt(String(limit)) || 12)) : 12
     };
 
+    console.log('Training providers request with filters:', filters);
+
     const trainingProviders = await getTrainingProviders(filters);
+    
+    console.log(`Returning ${trainingProviders.length} training providers`);
+    
     res.json({
       success: true,
-      providers: trainingProviders
+      providers: trainingProviders,
+      total: trainingProviders.length,
+      page: filters.page,
+      limit: filters.limit
     });
   } catch (error) {
     console.error('Error fetching training providers:', error);
     res.status(500).json({
       success: false,
-      error: 'Failed to fetch training providers'
+      error: 'Failed to fetch training providers',
+      message: error instanceof Error ? error.message : 'Unknown error'
     });
   }
 });
@@ -732,81 +742,91 @@ async function getProviderReviews(
 }
 
 async function getTrainingProviders(filters: any) {
-  // Mock training providers data
-  const trainingProviders = [
-    {
-      id: 1,
-      name: 'Real Estate Academy Botswana',
-      category: 'Professional Development',
-      description: 'Comprehensive real estate training and certification programs',
-      rating: 4.9,
-      reviews: 234,
-      location: 'Gaborone',
-      phone: '+267 318 7000',
-      email: 'info@reacademy.co.bw',
-      courses: ['Real Estate Fundamentals', 'Property Valuation', 'Real Estate Law', 'Marketing & Sales'],
-      verified: true,
-      accreditation: 'BQA Certified',
-      duration: '6 months',
-      price: 'P8,500'
-    },
-    {
-      id: 2,
-      name: 'Property Management Institute',
-      category: 'Certification Programs',
-      description: 'Professional property management certification and ongoing education',
-      rating: 4.7,
-      reviews: 156,
-      location: 'Francistown',
-      phone: '+267 241 3456',
-      email: 'training@pmi.bw',
-      courses: ['Property Management Basics', 'Tenant Relations', 'Maintenance Management', 'Financial Management'],
-      verified: true,
-      accreditation: 'PMI Certified',
-      duration: '3 months',
-      price: 'P5,200'
-    },
-    {
-      id: 3,
-      name: 'Skills Academy Botswana',
-      category: 'Skills Training',
-      description: 'Practical skills training for construction and property maintenance',
-      rating: 4.5,
-      reviews: 89,
-      location: 'Maun',
-      phone: '+267 686 2345',
-      email: 'courses@skillsacademy.bw',
-      courses: ['Plumbing Basics', 'Electrical Systems', 'Building Maintenance', 'Customer Service'],
-      verified: true,
-      accreditation: 'HRDC Certified',
-      duration: '8 weeks',
-      price: 'P3,200'
+  try {
+    // Mock training providers data
+    const trainingProviders = [
+      {
+        id: 1,
+        name: 'Real Estate Academy Botswana',
+        category: 'Professional Development',
+        description: 'Comprehensive real estate training and certification programs',
+        rating: 4.9,
+        reviews: 234,
+        location: 'Gaborone',
+        phone: '+267 318 7000',
+        email: 'info@reacademy.co.bw',
+        courses: ['Real Estate Fundamentals', 'Property Valuation', 'Real Estate Law', 'Marketing & Sales'],
+        verified: true,
+        accreditation: 'BQA Certified',
+        duration: '6 months',
+        price: 'P8,500'
+      },
+      {
+        id: 2,
+        name: 'Property Management Institute',
+        category: 'Certification Programs',
+        description: 'Professional property management certification and ongoing education',
+        rating: 4.7,
+        reviews: 156,
+        location: 'Francistown',
+        phone: '+267 241 3456',
+        email: 'training@pmi.bw',
+        courses: ['Property Management Basics', 'Tenant Relations', 'Maintenance Management', 'Financial Management'],
+        verified: true,
+        accreditation: 'PMI Certified',
+        duration: '3 months',
+        price: 'P5,200'
+      },
+      {
+        id: 3,
+        name: 'Skills Academy Botswana',
+        category: 'Skills Training',
+        description: 'Practical skills training for construction and property maintenance',
+        rating: 4.5,
+        reviews: 89,
+        location: 'Maun',
+        phone: '+267 686 2345',
+        email: 'courses@skillsacademy.bw',
+        courses: ['Plumbing Basics', 'Electrical Systems', 'Building Maintenance', 'Customer Service'],
+        verified: true,
+        accreditation: 'HRDC Certified',
+        duration: '8 weeks',
+        price: 'P3,200'
+      }
+    ];
+
+    let filtered = [...trainingProviders];
+
+    // Safe filtering with null checks
+    if (filters && filters.category && filters.category !== 'all' && typeof filters.category === 'string') {
+      filtered = filtered.filter(provider => 
+        provider.category && provider.category.toLowerCase().includes(filters.category.toLowerCase())
+      );
     }
-  ];
 
-  let filtered = trainingProviders;
+    if (filters && filters.location && typeof filters.location === 'string') {
+      filtered = filtered.filter(provider => 
+        provider.location && provider.location.toLowerCase().includes(filters.location.toLowerCase())
+      );
+    }
 
-  if (filters.category && filters.category !== 'all') {
-    filtered = filtered.filter(provider => 
-      provider.category.toLowerCase().includes(filters.category.toLowerCase())
-    );
+    if (filters && filters.search && typeof filters.search === 'string') {
+      filtered = filtered.filter(provider =>
+        (provider.name && provider.name.toLowerCase().includes(filters.search.toLowerCase())) ||
+        (provider.description && provider.description.toLowerCase().includes(filters.search.toLowerCase())) ||
+        (provider.courses && Array.isArray(provider.courses) && 
+         provider.courses.some((course: string) => 
+           course && course.toLowerCase().includes(filters.search.toLowerCase())
+         ))
+      );
+    }
+
+    const limit = filters && filters.limit && typeof filters.limit === 'number' ? filters.limit : 12;
+    return filtered.slice(0, limit);
+  } catch (error) {
+    console.error('Error in getTrainingProviders:', error);
+    return [];
   }
-
-  if (filters.location) {
-    filtered = filtered.filter(provider => 
-      provider.location.toLowerCase().includes(filters.location.toLowerCase())
-    );
-  }
-
-  if (filters.search) {
-    filtered = filtered.filter(provider =>
-      provider.name.toLowerCase().includes(filters.search.toLowerCase()) ||
-      provider.description.toLowerCase().includes(filters.search.toLowerCase()) ||
-      provider.courses.some((course: string) => course.toLowerCase().includes(filters.search.toLowerCase()))
-    );
-  }
-
-  return filtered.slice(0, filters.limit || 12);
 }
 
 export default router;
