@@ -42,7 +42,7 @@ const AgentNetworkPage = () => {
       yearsExperience: 8,
       propertiesSold: 156,
       languages: ['English', 'Setswana'],
-      certifications: ['REAC Licensed', 'Property Valuation'],
+      certifications: ['Licensed Agent', 'Property Valuation'],
       about: 'Specializing in residential properties across Gaborone with over 8 years of experience.',
       recentSales: 12,
       responseTime: '< 2 hours',
@@ -62,7 +62,7 @@ const AgentNetworkPage = () => {
       yearsExperience: 6,
       propertiesSold: 89,
       languages: ['English', 'Setswana', 'Kalanga'],
-      certifications: ['REAC Licensed', 'Commercial Real Estate'],
+      certifications: ['Licensed Agent', 'Commercial Real Estate'],
       about: 'Expert in commercial real estate with focus on retail and office spaces.',
       recentSales: 8,
       responseTime: '< 4 hours',
@@ -82,7 +82,7 @@ const AgentNetworkPage = () => {
       yearsExperience: 12,
       propertiesSold: 203,
       languages: ['English', 'Setswana'],
-      certifications: ['REAC Licensed', 'Land Development', 'Agricultural Land'],
+      certifications: ['Licensed Agent', 'Land Development', 'Agricultural Land'],
       about: 'Leading land specialist in Northern Botswana with extensive knowledge of plot development.',
       recentSales: 15,
       responseTime: '< 1 hour',
@@ -102,7 +102,7 @@ const AgentNetworkPage = () => {
       yearsExperience: 10,
       propertiesSold: 134,
       languages: ['English', 'Setswana'],
-      certifications: ['REAC Licensed', 'Luxury Property Specialist'],
+      certifications: ['Licensed Agent', 'Luxury Property Specialist'],
       about: 'Luxury home specialist serving high-end residential market in Gaborone.',
       recentSales: 7,
       responseTime: '< 3 hours',
@@ -128,15 +128,27 @@ const AgentNetworkPage = () => {
     setShowContactModal(true);
   };
 
+  const handlePhoneCall = (phone) => {
+    window.open(`tel:${phone}`, '_self');
+  };
+
+  const handleWhatsApp = (phone) => {
+    window.open(`https://wa.me/267${phone.replace(/\D/g, '')}`, '_blank');
+  };
+
+  const handleEmail = (email) => {
+    window.open(`mailto:${email}`, '_self');
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <section className="bg-beedab-darkblue text-white py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h1 className="text-4xl font-bold mb-4">REAC Agent Network</h1>
+            <h1 className="text-4xl font-bold mb-4">Agent Network</h1>
             <p className="text-xl text-beedab-lightblue mb-6 max-w-2xl mx-auto">
-              Connect with certified REAC agents across Botswana and access professional real estate services
+              Connect with professional real estate agents across Botswana and access quality real estate services
             </p>
           </div>
         </div>
@@ -301,7 +313,10 @@ const AgentNetworkPage = () => {
                       <Phone className="h-4 w-4 mr-1" />
                       Contact
                     </button>
-                    <button className="bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center text-sm">
+                    <button 
+                      onClick={() => handleWhatsApp(agent.phone)}
+                      className="bg-green-600 text-white px-3 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center text-sm"
+                    >
                       <MessageCircle className="h-4 w-4 mr-1" />
                       WhatsApp
                     </button>
@@ -336,7 +351,7 @@ const AgentNetworkPage = () => {
       <section className="py-12 bg-beedab-darkblue text-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-bold mb-4">
-            Are You a REAC Certified Agent?
+            Are You a Professional Real Estate Agent?
           </h2>
           <p className="text-xl text-beedab-lightblue mb-6">
             Join our network and connect with buyers and sellers across Botswana
@@ -404,17 +419,26 @@ const AgentNetworkPage = () => {
                 </div>
 
                 <div className="pt-4 border-t space-y-2">
-                  <button className="w-full bg-beedab-blue text-white py-3 rounded-lg hover:bg-beedab-darkblue transition-colors flex items-center justify-center">
+                  <button 
+                    onClick={() => handlePhoneCall(selectedAgent.phone)}
+                    className="w-full bg-beedab-blue text-white py-3 rounded-lg hover:bg-beedab-darkblue transition-colors flex items-center justify-center"
+                  >
                     <Phone className="h-5 w-5 mr-2" />
                     Call Now
                   </button>
-                  <button className="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center">
+                  <button 
+                    onClick={() => handleWhatsApp(selectedAgent.phone)}
+                    className="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center"
+                  >
                     <MessageCircle className="h-5 w-5 mr-2" />
                     WhatsApp
                   </button>
-                  <button className="w-full bg-gray-100 text-gray-700 py-3 rounded-lg hover:bg-gray-200 transition-colors flex items-center justify-center">
+                  <button 
+                    onClick={() => handleEmail(selectedAgent.email)}
+                    className="w-full bg-gray-100 text-gray-700 py-3 rounded-lg hover:bg-gray-200 transition-colors flex items-center justify-center"
+                  >
                     <Calendar className="h-5 w-5 mr-2" />
-                    Schedule Meeting
+                    Email Agent
                   </button>
                 </div>
               </div>

@@ -11,7 +11,7 @@ const AgentRegistrationPage: React.FC = () => {
     location: '',
     experience: '',
     specialization: '',
-    reacNumber: '',
+    licenseNumber: '',
     companyName: '',
     bio: '',
     profileImage: null as File | null
@@ -78,7 +78,7 @@ const AgentRegistrationPage: React.FC = () => {
         >
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold text-gray-900 mb-2">Join Our Agent Network</h1>
-            <p className="text-gray-600">Register as a REAC certified agent and grow your business</p>
+            <p className="text-gray-600">Register as a professional real estate agent and grow your business</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -197,15 +197,15 @@ const AgentRegistrationPage: React.FC = () => {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  REAC Registration Number *
+                  Professional License Number
                 </label>
                 <input
                   type="text"
-                  name="reacNumber"
-                  value={formData.reacNumber}
+                  name="licenseNumber"
+                  value={formData.licenseNumber || ''}
                   onChange={handleChange}
-                  required
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
+                  placeholder="Optional - if you have a professional license"
                 />
               </div>
             </div>
