@@ -92,7 +92,13 @@ const PricingPage = () => {
       Number: ${instructions.details.accountNumber}
       Branch: ${instructions.details.branchCode}
 
-      Please transfer the amount and your subscription will be activated within 24 hours.
+      IMPORTANT: 
+      1. Include the reference number in your payment
+      2. After payment, our admin team will verify and approve your transaction
+      3. Your subscription will be activated within 24 hours of approval
+      4. You will receive email confirmation once activated
+
+      For questions, contact support with your reference number.
     `;
     alert(modalContent);
   };

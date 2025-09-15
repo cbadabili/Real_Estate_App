@@ -53,6 +53,46 @@ interface AuditLogEntry {
   createdAt: string;
 }
 
+interface PendingPayment {
+  id: number;
+  user_id: number;
+  plan_id: number;
+  amount_bwp: number;
+  payment_method: string;
+  payment_reference?: string;
+  status: string;
+  created_at: string;
+  plan: {
+    name: string;
+    code: string;
+  };
+  user: {
+    id: number;
+    username: string;
+    email: string;
+    firstName: string;
+    lastName: string;
+  };
+}
+
+interface BillingStats {
+  overview: {
+    total_payments: number;
+    pending_payments: number;
+    approved_payments: number;
+    rejected_payments: number;
+    total_revenue: number;
+    pending_revenue: number;
+    active_subscriptions: number;
+  };
+  plan_distribution: Array<{
+    plan_name: string;
+    plan_code: string;
+    subscription_count: number;
+    revenue: number;
+  }>;
+}
+
 export default function AdminPage() {
   const { user, isAdmin } = useAuth();
   const { toast } = useToast();
@@ -92,6 +132,66 @@ export default function AdminPage() {
   const { data: auditLog = [], isLoading: auditLoading } = useQuery({
     queryKey: ['/api/admin/audit-log'],
     queryFn: () => apiRequest('/api/admin/audit-log?limit=50'),
+  });
+
+  // Fetch pending payments
+  const { data: pendingPayments = [], isLoading: paymentsLoading } = useQuery({
+    queryKey: ['/api/billing/payments/pending'],
+    queryFn: () => apiRequest('/api/billing/payments/pending'),
+  });
+
+  // Fetch billing statistics
+  const { data: billingStats, isLoading: statsLoading } = useQuery({
+    queryKey: ['/api/billing/admin/stats'],
+    queryFn: () => apiRequest('/api/billing/admin/stats'),
+  });
+
+  // Payment approval mutation
+  const approvePaymentMutation = useMutation({
+    mutationFn: (data: { paymentId: number; notes?: string }) =>
+      apiRequest(`/api/billing/payments/${data.paymentId}/approve`, {
+        method: 'POST',
+        body: JSON.stringify({ notes: data.notes }),
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/billing/payments/pending'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/billing/admin/stats'] });
+      toast({
+        title: 'Success',
+        description: 'Payment approved successfully',
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: 'Error',
+        description: `Failed to approve payment: ${error.message}`,
+        variant: 'destructive',
+      });
+    },
+  });
+
+  // Payment rejection mutation
+  const rejectPaymentMutation = useMutation({
+    mutationFn: (data: { paymentId: number; reason: string }) =>
+      apiRequest(`/api/billing/payments/${data.paymentId}/reject`, {
+        method: 'POST',
+        body: JSON.stringify({ reason: data.reason }),
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/billing/payments/pending'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/billing/admin/stats'] });
+      toast({
+        title: 'Success',
+        description: 'Payment rejected successfully',
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: 'Error',
+        description: `Failed to reject payment: ${error.message}`,
+        variant: 'destructive',
+      });
+    },
   });
 
   // Update user mutation
@@ -158,6 +258,24 @@ export default function AdminPage() {
     moderateReviewMutation.mutate({ reviewId, status });
   };
 
+  const handlePaymentApproval = (paymentId: number) => {
+    const notes = prompt('Optional approval notes:');
+    approvePaymentMutation.mutate({ paymentId, notes: notes || undefined });
+  };
+
+  const handlePaymentRejection = (paymentId: number) => {
+    const reason = prompt('Rejection reason (required):');
+    if (reason && reason.trim()) {
+      rejectPaymentMutation.mutate({ paymentId, reason: reason.trim() });
+    } else {
+      toast({
+        title: 'Error',
+        description: 'Rejection reason is required',
+        variant: 'destructive',
+      });
+    }
+  };
+
   const getRoleBadgeColor = (role: string) => {
     const colors = {
       super_admin: 'bg-red-100 text-red-800',
@@ -188,9 +306,10 @@ export default function AdminPage() {
       </div>
 
       <Tabs defaultValue="users" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="users">Users</TabsTrigger>
           <TabsTrigger value="reviews">Reviews</TabsTrigger>
+          <TabsTrigger value="billing">Billing</TabsTrigger>
           <TabsTrigger value="audit">Audit Log</TabsTrigger>
           <TabsTrigger value="stats">Statistics</TabsTrigger>
         </TabsList>
@@ -272,6 +391,170 @@ export default function AdminPage() {
               )}
             </CardContent>
           </Card>
+        </TabsContent>
+
+        {/* Billing Management */}
+        <TabsContent value="billing">
+          <div className="space-y-6">
+            {/* Billing Overview */}
+            {billingStats && (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm font-medium">Pending Payments</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold text-orange-600">
+                      {billingStats.overview.pending_payments}
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      BWP {billingStats.overview.pending_revenue.toLocaleString()} pending
+                    </p>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold text-green-600">
+                      BWP {billingStats.overview.total_revenue.toLocaleString()}
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      {billingStats.overview.approved_payments} approved payments
+                    </p>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm font-medium">Active Subscriptions</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold text-blue-600">
+                      {billingStats.overview.active_subscriptions}
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Currently active
+                    </p>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm font-medium">Rejected Payments</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold text-red-600">
+                      {billingStats.overview.rejected_payments}
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Failed transactions
+                    </p>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
+
+            {/* Pending Payments */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <UserIcon className="w-5 h-5" />
+                  Pending Payment Approvals
+                </CardTitle>
+                <CardDescription>
+                  Review and approve customer payments for plan subscriptions
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {paymentsLoading ? (
+                  <div className="text-center py-8">Loading payments...</div>
+                ) : pendingPayments.length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    No pending payments to review
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {pendingPayments.map((payment: PendingPayment) => (
+                      <div key={payment.id} className="border rounded-lg p-4">
+                        <div className="flex items-center justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-3 mb-2">
+                              <h3 className="font-semibold">
+                                {payment.user.firstName} {payment.user.lastName}
+                              </h3>
+                              <Badge variant="outline">
+                                {payment.plan.name}
+                              </Badge>
+                              <Badge variant="secondary">
+                                BWP {payment.amount_bwp.toLocaleString()}
+                              </Badge>
+                            </div>
+                            <p className="text-sm text-muted-foreground mb-1">
+                              @{payment.user.username} • {payment.user.email}
+                            </p>
+                            <p className="text-sm text-muted-foreground mb-1">
+                              Payment Method: {payment.payment_method.replace('_', ' ')}
+                              {payment.payment_reference && ` • Ref: ${payment.payment_reference}`}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              Submitted: {new Date(payment.created_at).toLocaleString()}
+                            </p>
+                          </div>
+                          <div className="flex gap-2">
+                            <Button
+                              size="sm"
+                              onClick={() => handlePaymentApproval(payment.id)}
+                              disabled={approvePaymentMutation.isPending}
+                            >
+                              Approve
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              onClick={() => handlePaymentRejection(payment.id)}
+                              disabled={rejectPaymentMutation.isPending}
+                            >
+                              Reject
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Plan Distribution */}
+            {billingStats && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Plan Distribution</CardTitle>
+                  <CardDescription>
+                    Active subscriptions and revenue by plan
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {billingStats.plan_distribution.map((plan) => (
+                      <div key={plan.plan_code} className="flex items-center justify-between p-3 border rounded">
+                        <div>
+                          <h4 className="font-medium">{plan.plan_name}</h4>
+                          <p className="text-sm text-muted-foreground">
+                            {plan.subscription_count} active subscriptions
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-medium">BWP {plan.revenue.toLocaleString()}</p>
+                          <p className="text-sm text-muted-foreground">Total revenue</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </div>
         </TabsContent>
 
         {/* Reviews Moderation */}
@@ -435,38 +718,40 @@ export default function AdminPage() {
             </Card>
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">Pending Reviews</CardTitle>
+                <CardTitle className="text-sm font-medium">Active Subscriptions</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                  {reviews.filter((r: AdminReview) => r.status === 'pending').length}
+                  {billingStats?.overview.active_subscriptions || 0}
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Awaiting moderation
+                  Paying customers
                 </p>
               </CardContent>
             </Card>
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">Verified Users</CardTitle>
+                <CardTitle className="text-sm font-medium">Pending Approvals</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">
-                  {users.filter((u: AdminUser) => u.isVerified).length}
+                <div className="text-2xl font-bold text-orange-600">
+                  {(billingStats?.overview.pending_payments || 0) + reviews.filter((r: AdminReview) => r.status === 'pending').length}
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Verified accounts
+                  Payments & reviews
                 </p>
               </CardContent>
             </Card>
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">System Actions</CardTitle>
+                <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{auditLog.length}</div>
+                <div className="text-2xl font-bold text-green-600">
+                  BWP {billingStats?.overview.total_revenue.toLocaleString() || '0'}
+                </div>
                 <p className="text-xs text-muted-foreground">
-                  Recent admin actions
+                  Lifetime revenue
                 </p>
               </CardContent>
             </Card>
