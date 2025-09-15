@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Check, Star, Zap, Users, Award } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { RegistrationModal } from '../components/auth/RegistrationModal';
 
 interface Plan {
   id: number;
@@ -18,6 +19,8 @@ const PricingPage = () => {
   const [plans, setPlans] = useState<Plan[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
+  const [showRegistrationModal, setShowRegistrationModal] = useState(false);
+  const [modalPlanCode, setModalPlanCode] = useState<string>('');
   const { user } = useAuth();
 
   useEffect(() => {
@@ -40,7 +43,8 @@ const PricingPage = () => {
 
   const handleSubscribe = async (planCode: string) => {
     if (!user) {
-      window.location.href = '/login';
+      setModalPlanCode(planCode);
+      setShowRegistrationModal(true);
       return;
     }
 
@@ -331,6 +335,17 @@ const PricingPage = () => {
             </div>
           </div>
         </div>
+
+        {/* Registration Modal */}
+        <RegistrationModal
+          isOpen={showRegistrationModal}
+          onClose={() => setShowRegistrationModal(false)}
+          triggerAction="get_started"
+          plans={plans.map(plan => ({
+            ...plan,
+            code: modalPlanCode && plan.code === modalPlanCode ? modalPlanCode : plan.code
+          }))}
+        />
       </div>
     </div>
   );

@@ -25,6 +25,7 @@ import {
   CheckCircle
 } from 'lucide-react';
 import HeroCarousel from '../components/HeroCarousel';
+import { UpgradeGuard } from '../components/auth/UpgradeGuard';
 
 const HomePage = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -493,12 +494,17 @@ const HomePage = () => {
                 Get Started Today
                 <ArrowRight className="ml-2 h-5 w-5" />
               </button>
-              <Link
-                to="/create-listing"
-                className="inline-flex items-center justify-center px-8 py-4 bg-transparent border-2 border-white text-white font-semibold rounded-xl hover:bg-white hover:text-beedab-darkblue transition-colors"
+              <UpgradeGuard
+                action="list_property"
+                requiredFeature="LISTING_LIMIT"
               >
-                List Your Property
-              </Link>
+                <Link
+                  to="/create-listing"
+                  className="inline-flex items-center justify-center px-8 py-4 bg-transparent border-2 border-white text-white font-semibold rounded-xl hover:bg-white hover:text-beedab-darkblue transition-colors"
+                >
+                  List Your Property
+                </Link>
+              </UpgradeGuard>
             </div>
           </motion.div>
         </div>

@@ -22,6 +22,8 @@ interface User {
 
 interface AuthContextType {
   user: User | null;
+  subscription: any | null;
+  entitlements: Record<string, any> | null;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
@@ -30,6 +32,7 @@ interface AuthContextType {
   hasPermission: (permission: string) => boolean;
   isAdmin: () => boolean;
   isModerator: () => boolean;
+  refreshBilling: () => Promise<void>;
 }
 
 interface RegisterData {
@@ -60,6 +63,8 @@ interface AuthProviderProps {
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [subscription, setSubscription] = useState<any | null>(null);
+  const [entitlements, setEntitlements] = useState<Record<string, any> | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [authToken, setAuthToken] = useState<string | null>(
     typeof window !== 'undefined' ? localStorage.getItem('authToken') : null
@@ -86,6 +91,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           }
         });
         setUser(userData);
+        // Fetch billing data after setting user
+        setTimeout(() => {
+          refreshBilling();
+        }, 100);
       } catch (error) {
         console.error('Auth check failed:', error);
         if (typeof window !== 'undefined') {
@@ -104,11 +113,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     if (!email || !password) {
       throw new Error('Email and password are required');
     }
-    
+
     setIsLoading(true);
     try {
       console.log('Attempting login for:', email.trim());
-      
+
       const response = await apiRequest('/api/users/login', {
         method: 'POST',
         headers: {
@@ -133,25 +142,28 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       // Set user data
       setUser(response);
-      
+
       // Create a token that the middleware can understand
       const token = response.id.toString();
       setAuthToken(token);
-      
+
       if (typeof window !== 'undefined') {
         localStorage.setItem('authToken', token);
         console.log('Auth token stored:', token);
       }
+
+      // Fetch billing data after login
+      setTimeout(() => refreshBilling(), 100);
     } catch (error) {
       console.error('Login failed:', error);
-      
+
       // Clear any existing auth state on login failure
       setUser(null);
       setAuthToken(null);
       if (typeof window !== 'undefined') {
         localStorage.removeItem('authToken');
       }
-      
+
       // Re-throw with more specific error message
       if (error.message?.includes('Invalid credentials')) {
         throw new Error('Invalid email or password');
@@ -167,6 +179,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const logout = () => {
     setUser(null);
+    setSubscription(null);
+    setEntitlements(null);
     setAuthToken(null);
     if (typeof window !== 'undefined') {
       localStorage.removeItem('authToken');
@@ -212,8 +226,32 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     return ['moderator', 'admin', 'super_admin'].includes(user.role) || user.userType === 'admin';
   };
 
+  const refreshBilling = async () => {
+    const token = localStorage.getItem('authToken'); // Use authToken state
+    if (!token || !user) return;
+
+    try {
+      const response = await apiRequest('/api/billing/me', {
+        headers: { 'Authorization': `Bearer ${token}` },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          setSubscription(data.data.subscription);
+          setEntitlements(data.data.entitlements);
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching billing data:', error);
+    }
+  };
+
+
   const value: AuthContextType = {
     user,
+    subscription,
+    entitlements,
     isLoading,
     login,
     logout,
@@ -221,7 +259,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     updateUser,
     hasPermission,
     isAdmin,
-    isModerator
+    isModerator,
+    refreshBilling,
   };
 
   return (
