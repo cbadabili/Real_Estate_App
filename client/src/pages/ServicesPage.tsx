@@ -239,6 +239,9 @@ const ServicesPage: React.FC = () => {
     { id: 'moving', name: 'Moving', icon: Truck },
     { id: 'cleaning', name: 'Cleaning', icon: Home },
     { id: 'maintenance', name: 'Maintenance', icon: Wrench },
+    { id: 'architectural', name: 'Architectural Services', icon: Building },
+    { id: 'quantity-surveying', name: 'Quantity Surveying', icon: Calculator },
+    { id: 'structural-engineering', name: 'Structural Engineering', icon: Wrench },
   ];
 
   const serviceCategories = [
@@ -250,7 +253,10 @@ const ServicesPage: React.FC = () => {
     { name: 'Construction', icon: '🏗️', description: 'General construction and specialized trades' },
     { name: 'Moving', icon: '🚚', description: 'Professional moving and relocation services' },
     { name: 'Cleaning', icon: '🧹', description: 'Move-in, move-out, and deep cleaning' },
-    { name: 'Maintenance', icon: '🔧', description: 'Property maintenance and repair services' }
+    { name: 'Maintenance', icon: '🔧', description: 'Property maintenance and repair services' },
+    { name: 'Architectural Services', icon: '🏛️', description: 'Building design and architectural planning' },
+    { name: 'Quantity Surveying', icon: '📏', description: 'Cost estimation and project management' },
+    { name: 'Structural Engineering', icon: '🏗️', description: 'Structural analysis and engineering design' }
   ];
 
   return (

@@ -1,4 +1,3 @@
-
 import { db } from "./db";
 import { serviceProviders, serviceAds, serviceReviews } from "../shared/services-schema";
 
@@ -55,6 +54,68 @@ export async function seedServices() {
       featured: true,
       reacCertified: false,
       dateJoined: new Date()
+    },
+    {
+      companyName: "ProFix Maintenance",
+      serviceCategory: "Maintenance",
+      contactPerson: "Thabo Marumo",
+      phoneNumber: "72098765",
+      email: "thabo@profix.bw",
+      description: "Comprehensive property maintenance including garden, pool, and security services.",
+      address: "Plot 789, Maun",
+      city: "Maun",
+      rating: 4.5,
+      verified: true,
+      featured: false,
+      dateJoined: new Date('2023-03-01'),
+    },
+    {
+      companyName: "Botswana Architectural Solutions",
+      serviceCategory: "Architectural Services",
+      contactPerson: "Dr. Keabetswe Moeti",
+      phoneNumber: "72555666",
+      email: "info@bwarchitects.bw",
+      websiteUrl: "https://bwarchitects.bw",
+      description: "Professional architectural services specializing in residential and commercial building design with focus on sustainable architecture for Botswana's climate.",
+      address: "Plot 1234, CBD Square",
+      city: "Gaborone",
+      rating: 4.9,
+      verified: true,
+      featured: true,
+      reacCertified: true,
+      dateJoined: new Date('2022-01-15'),
+    },
+    {
+      companyName: "Premier Quantity Surveyors",
+      serviceCategory: "Quantity Surveying",
+      contactPerson: "Mpho Sebego",
+      phoneNumber: "71777888",
+      email: "mpho@premierqs.bw",
+      websiteUrl: "https://premierqs.bw",
+      description: "Expert quantity surveying services providing accurate cost estimation, project management, and contract administration for construction projects across Botswana.",
+      address: "Plot 567, Industrial Area",
+      city: "Francistown",
+      rating: 4.7,
+      verified: true,
+      featured: false,
+      reacCertified: false,
+      dateJoined: new Date('2022-06-20'),
+    },
+    {
+      companyName: "Structural Engineering Consultants BW",
+      serviceCategory: "Structural Engineering",
+      contactPerson: "Eng. Goitse Modise",
+      phoneNumber: "73999000",
+      email: "goitse@structuraleng.bw",
+      websiteUrl: "https://structuraleng.bw",
+      description: "Professional structural engineering services including structural analysis, foundation design, and building assessment for residential and commercial projects.",
+      address: "Plot 890, Extension 6",
+      city: "Gaborone",
+      rating: 4.8,
+      verified: true,
+      featured: true,
+      reacCertified: false,
+      dateJoined: new Date('2022-03-10'),
     }
   ];
 

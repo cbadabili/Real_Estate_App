@@ -16,7 +16,9 @@ const MarketplaceHub = () => {
     { id: 'professionals', name: 'Professionals', icon: Award, count: 0 },
     { id: 'suppliers', name: 'Suppliers', icon: Package, count: 0 },
     { id: 'artisans', name: 'Artisans', icon: Wrench, count: 0 },
-    { id: 'training', name: 'Training', icon: GraduationCap, count: 0 }
+    { id: 'training', name: 'Training', icon: GraduationCap, count: 0 },
+    { id: 'architectural', name: 'Architectural', icon: Award, count: 0 },
+    { id: 'engineering', name: 'Engineering', icon: Wrench, count: 0 }
   ];
 
   useEffect(() => {

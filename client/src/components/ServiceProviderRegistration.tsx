@@ -87,7 +87,10 @@ const ServiceProviderRegistration: React.FC<ServiceProviderRegistrationProps> = 
     'Construction': ['HVAC', 'Plumbing', 'Electrical', 'Roofing', 'Flooring', 'Painting'],
     'Moving': [],
     'Cleaning': [],
-    'Maintenance': ['Garden', 'Pool', 'Security']
+    'Maintenance': ['Garden', 'Pool', 'Security'],
+    'Architectural Services': ['Building Design', 'Interior Design', 'Urban Planning', 'Landscape Architecture'],
+    'Quantity Surveying': ['Cost Estimation', 'Project Management', 'Procurement', 'Contract Administration'],
+    'Structural Engineering': ['Structural Analysis', 'Foundation Design', 'Steel Design', 'Concrete Design']
   };
 
   const getAllCategories = () => {

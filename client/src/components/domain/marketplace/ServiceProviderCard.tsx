@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Star, MapPin, Phone, Mail, Shield, Clock } from 'lucide-react';
 
 interface ServiceProviderCardProps {
@@ -102,23 +103,18 @@ export const ServiceProviderCard: React.FC<ServiceProviderCardProps> = ({
 
       {/* Contact Actions */}
       <div className="flex space-x-2">
-        <button
-          onClick={() => onContact(provider)}
-          className="flex-1 bg-beedab-blue text-white py-2 px-3 rounded-lg text-sm font-medium hover:bg-beedab-darkblue transition-colors"
+        <Link 
+          to={`/services/provider/${provider.id}`}
+          className="flex-1 bg-beedab-blue text-white py-2 px-4 rounded-lg hover:bg-beedab-darkblue transition-colors flex items-center justify-center text-center"
         >
-          Contact
-        </button>
-        <button
-          onClick={() => window.location.href = `tel:${provider.phone}`}
-          className="p-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+          View Profile
+        </Link>
+        <button 
+          onClick={() => window.location.href = `tel:+267${provider.phoneNumber || provider.phone}`}
+          className="flex-1 bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center"
         >
-          <Phone className="h-4 w-4" />
-        </button>
-        <button
-          onClick={() => window.location.href = `mailto:${provider.email}`}
-          className="p-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
-        >
-          <Mail className="h-4 w-4" />
+          <Phone className="h-4 w-4 mr-2" />
+          Call
         </button>
       </div>
     </div>

@@ -83,6 +83,8 @@ import InvestmentAnalyticsPage from './pages/InvestmentAnalyticsPage';
 import MarketInsightsHub from './pages/MarketInsightsHub';
 import LegalTransactionsHub from './pages/LegalTransactionsHub';
 import ServiceProviderDirectory from './pages/ServiceProviderDirectory';
+import ServiceProviderDetailsPage from './pages/marketplace/ServiceProviderDetailsPage';
+import MarketplaceHub from './pages/marketplace/MarketplaceHub';
 
 import BuyMapPage from './pages/BuyMapPage';
 import TestMapPage from './pages/TestMapPage'; // Assuming this is a missing import
@@ -145,7 +147,13 @@ function App() {
             <Route path="/map-search" element={<MapSearchPage />} />
             <Route path="/enhanced-search" element={<EnhancedSearchPage />} />
             <Route path="/services" element={<ServicesPage />} />
-            <Route path="/marketplace" element={<MarketplacePage />} />
+            <Route path="/services/provider/:id" element={<ServiceProviderDetailsPage />} />
+            <Route path="/marketplace/*" element={<MarketplacePage />} />
+            <Route path="/marketplace/professionals" element={<ProfessionalsPage />} />
+            <Route path="/marketplace/suppliers" element={<SuppliersPage />} />
+            <Route path="/marketplace/artisans" element={<ArtisansPage />} />
+            <Route path="/marketplace/training" element={<TrainingProvidersPage />} />
+            <Route path="/marketplace/hub" element={<MarketplaceHub />} />
             <Route path="/schedule-viewing/:id" element={<ProtectedRoute><ScheduleViewingPage /></ProtectedRoute>} />
             <Route path="/contact-agent/:id" element={<ProtectedRoute><ContactAgentPage /></ProtectedRoute>} />
             <Route path="/handle-offers" element={<ProtectedRoute><HandleOffersPage /></ProtectedRoute>} />

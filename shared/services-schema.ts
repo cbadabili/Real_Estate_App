@@ -98,7 +98,10 @@ export const insertServiceProviderSchema = createInsertSchema(serviceProviders).
       "Construction",
       "Moving",
       "Cleaning",
-      "Maintenance"
+      "Maintenance",
+      "Architectural Services",
+      "Quantity Surveying",
+      "Structural Engineering"
     ])
 });
 
