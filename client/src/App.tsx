@@ -177,6 +177,7 @@ function App() {
             <Route path="/tenant-support" element={<TenantSupportPage />} />
             <Route path="/services/tenant-support" element={<TenantSupportPage />} />
             <Route path="/offers" element={<ProtectedRoute><OffersPage /></ProtectedRoute>} />
+            <Route path="/buyer-journey/offers" element={<ProtectedRoute><OffersPage /></ProtectedRoute>} />
             <Route path="/planning" element={<PlanningPage />} />
             <Route path="/buyer-journey/planning" element={<PlanningPage />} />
             <Route path="/searching" element={<SearchingPage />} />
