@@ -177,7 +177,7 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
     }
 
     // Update last login time
-    await storage.updateUser(user.id, { lastLoginAt: Math.floor(Date.now() / 1000) });
+    await storage.updateUser(user.id, { lastLoginAt: new Date() });
 
     req.user = user;
     next();

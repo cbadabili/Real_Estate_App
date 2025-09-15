@@ -5,7 +5,7 @@ import {
   type InsertUser
 } from "../../shared/schema";
 import { db } from "../db";
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 
 export interface IUserRepository {
   getUser(id: number): Promise<User | undefined>;
@@ -62,6 +62,9 @@ export class UserRepository implements IUserRepository {
             // Convert Unix timestamp to Date object
             const timestamp = value > 1000000000000 ? value : value * 1000;
             processedUpdates[field] = new Date(timestamp);
+          } else if (typeof value === 'string') {
+            // Handle ISO string dates
+            processedUpdates[field] = new Date(value);
           }
         }
       }
