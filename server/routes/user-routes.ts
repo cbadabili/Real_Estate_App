@@ -41,41 +41,78 @@ export function registerUserRoutes(app: Express) {
   // Dashboard statistics endpoint
   app.get("/api/dashboard/stats", authenticate, async (req, res) => {
     try {
-      const userId = req.user!.id;
+      if (!req.user) {
+        return res.status(401).json({ message: "Authentication required" });
+      }
+
+      const userId = req.user.id;
+      console.log('Dashboard stats request for user:', userId);
       
-      const savedProperties = await storage.getSavedProperties(userId);
-      const savedPropertiesCount = savedProperties.length;
-      
-      const userInquiries = await storage.getUserInquiries(userId);
-      const inquiriesSentCount = userInquiries.length;
-      
-      const userAppointments = await storage.getUserAppointments(userId);
-      const viewingsScheduledCount = userAppointments.length;
-      
-      const userProperties = await storage.getUserProperties(userId);
-      const activeListingsCount = userProperties.filter(p => p.status === 'active').length;
-      
-      const totalViews = userProperties.reduce((sum, property) => sum + (property.views || 0), 0);
-      
-      const totalInquiries = userProperties.length > 0 ? 
-        (await Promise.all(userProperties.map(p => storage.getPropertyInquiries(p.id)))).flat().length : 0;
-      
-      const propertiesViewedCount = Math.min(savedPropertiesCount * 3 + inquiriesSentCount, 50);
-      
-      const stats = {
-        savedProperties: savedPropertiesCount,
-        propertiesViewed: propertiesViewedCount,
-        inquiriesSent: inquiriesSentCount,
-        viewingsScheduled: viewingsScheduledCount,
-        activeListings: activeListingsCount,
-        totalViews: totalViews,
-        totalInquiries: totalInquiries
+      // Initialize stats with default values
+      let stats = {
+        savedProperties: 0,
+        propertiesViewed: 0,
+        inquiriesSent: 0,
+        viewingsScheduled: 0,
+        activeListings: 0,
+        totalViews: 0,
+        totalInquiries: 0
       };
-      
+
+      try {
+        // Try to fetch saved properties
+        const savedProperties = await storage.getSavedProperties(userId);
+        stats.savedProperties = savedProperties ? savedProperties.length : 0;
+      } catch (error) {
+        console.warn('Error fetching saved properties:', error.message);
+      }
+
+      try {
+        // Try to fetch user inquiries
+        const userInquiries = await storage.getUserInquiries(userId);
+        stats.inquiriesSent = userInquiries ? userInquiries.length : 0;
+      } catch (error) {
+        console.warn('Error fetching user inquiries:', error.message);
+      }
+
+      try {
+        // Try to fetch user appointments
+        const userAppointments = await storage.getUserAppointments(userId);
+        stats.viewingsScheduled = userAppointments ? userAppointments.length : 0;
+      } catch (error) {
+        console.warn('Error fetching user appointments:', error.message);
+      }
+
+      try {
+        // Try to fetch user properties
+        const userProperties = await storage.getUserProperties(userId);
+        if (userProperties && userProperties.length > 0) {
+          stats.activeListings = userProperties.filter(p => p.status === 'active').length;
+          stats.totalViews = userProperties.reduce((sum, property) => sum + (property.views || 0), 0);
+          
+          try {
+            const inquiriesPromises = userProperties.map(p => storage.getPropertyInquiries(p.id));
+            const allInquiries = await Promise.all(inquiriesPromises);
+            stats.totalInquiries = allInquiries.flat().length;
+          } catch (error) {
+            console.warn('Error fetching property inquiries:', error.message);
+          }
+        }
+      } catch (error) {
+        console.warn('Error fetching user properties:', error.message);
+      }
+
+      // Calculate properties viewed based on available data
+      stats.propertiesViewed = Math.min(stats.savedProperties * 3 + stats.inquiriesSent, 50);
+
+      console.log('Dashboard stats computed:', stats);
       res.json(stats);
     } catch (error) {
       console.error("Dashboard stats error:", error);
-      res.status(500).json({ message: "Failed to fetch dashboard statistics" });
+      res.status(500).json({ 
+        message: "Failed to fetch dashboard statistics",
+        error: process.env.NODE_ENV === 'development' ? error.message : undefined
+      });
     }
   });
 

@@ -345,9 +345,20 @@ const DashboardPage = () => {
       const authToken = localStorage.getItem('authToken');
       if (!authToken) {
         console.error('No auth token found');
+        // Set default stats instead of returning
+        setStats({
+          savedProperties: 0,
+          propertiesViewed: 0,
+          inquiriesSent: 0,
+          viewingsScheduled: 0,
+          activeListings: 0,
+          totalViews: 0,
+          totalInquiries: 0
+        });
         return;
       }
 
+      console.log('Fetching dashboard stats...');
       const response = await fetch('/api/dashboard/stats', {
         headers: {
           'Authorization': `Bearer ${authToken}`,
@@ -356,10 +367,13 @@ const DashboardPage = () => {
       });
 
       if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Dashboard API error:', response.status, errorText);
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       const statsData = await response.json();
+      console.log('Dashboard stats received:', statsData);
       setStats(statsData);
       
       // Generate realistic activity based on actual stats
