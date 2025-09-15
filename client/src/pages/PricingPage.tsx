@@ -28,9 +28,7 @@ const PricingPage = () => {
     try {
       const response = await fetch('/api/billing/plans');
       const data = await response.json();
-      console.log('Fetched plans data:', data);
       if (data.success) {
-        console.log('Plans:', data.data);
         setPlans(data.data);
       }
     } catch (error) {
@@ -120,8 +118,6 @@ const PricingPage = () => {
   };
 
   const formatFeature = (key: string, value: any) => {
-    console.log(`Formatting feature: ${key} = ${value} (type: ${typeof value})`);
-    
     const featureNames: Record<string, string> = {
       LISTING_LIMIT: 'Property Listings',
       PHOTO_LIMIT: 'Photos per Listing',
@@ -193,7 +189,6 @@ const PricingPage = () => {
             
             // Parse features if they're stored as JSON string
             const features = typeof plan.features === 'string' ? JSON.parse(plan.features) : plan.features;
-            console.log(`Plan ${plan.code} features:`, features);
 
             return (
               <motion.div
