@@ -579,6 +579,33 @@ router.post('/marketplace/providers/:id/reviews', authenticate, async (req, res)
   }
 });
 
+// GET /api/marketplace/training-providers
+router.get('/marketplace/training-providers', async (req, res) => {
+  try {
+    const { category, location, search, page = 1, limit = 12 } = req.query;
+
+    const filters = {
+      category: category as string,
+      location: location as string,
+      search: search as string,
+      page: parseInt(page as string),
+      limit: parseInt(limit as string)
+    };
+
+    const trainingProviders = await getTrainingProviders(filters);
+    res.json({
+      success: true,
+      providers: trainingProviders
+    });
+  } catch (error) {
+    console.error('Error fetching training providers:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch training providers'
+    });
+  }
+});
+
 // GET /api/marketplace/providers/:id/reviews
 router.get('/marketplace/providers/:id/reviews', async (req, res) => {
   try {
@@ -702,6 +729,84 @@ async function getProviderReviews(
   const allReviews = providerReviews[providerId] ?? [];
   const start = (page - 1) * limit;
   return allReviews.slice(start, start + limit);
+}
+
+async function getTrainingProviders(filters: any) {
+  // Mock training providers data
+  const trainingProviders = [
+    {
+      id: 1,
+      name: 'Real Estate Academy Botswana',
+      category: 'Professional Development',
+      description: 'Comprehensive real estate training and certification programs',
+      rating: 4.9,
+      reviews: 234,
+      location: 'Gaborone',
+      phone: '+267 318 7000',
+      email: 'info@reacademy.co.bw',
+      courses: ['Real Estate Fundamentals', 'Property Valuation', 'Real Estate Law', 'Marketing & Sales'],
+      verified: true,
+      accreditation: 'BQA Certified',
+      duration: '6 months',
+      price: 'P8,500'
+    },
+    {
+      id: 2,
+      name: 'Property Management Institute',
+      category: 'Certification Programs',
+      description: 'Professional property management certification and ongoing education',
+      rating: 4.7,
+      reviews: 156,
+      location: 'Francistown',
+      phone: '+267 241 3456',
+      email: 'training@pmi.bw',
+      courses: ['Property Management Basics', 'Tenant Relations', 'Maintenance Management', 'Financial Management'],
+      verified: true,
+      accreditation: 'PMI Certified',
+      duration: '3 months',
+      price: 'P5,200'
+    },
+    {
+      id: 3,
+      name: 'Skills Academy Botswana',
+      category: 'Skills Training',
+      description: 'Practical skills training for construction and property maintenance',
+      rating: 4.5,
+      reviews: 89,
+      location: 'Maun',
+      phone: '+267 686 2345',
+      email: 'courses@skillsacademy.bw',
+      courses: ['Plumbing Basics', 'Electrical Systems', 'Building Maintenance', 'Customer Service'],
+      verified: true,
+      accreditation: 'HRDC Certified',
+      duration: '8 weeks',
+      price: 'P3,200'
+    }
+  ];
+
+  let filtered = trainingProviders;
+
+  if (filters.category && filters.category !== 'all') {
+    filtered = filtered.filter(provider => 
+      provider.category.toLowerCase().includes(filters.category.toLowerCase())
+    );
+  }
+
+  if (filters.location) {
+    filtered = filtered.filter(provider => 
+      provider.location.toLowerCase().includes(filters.location.toLowerCase())
+    );
+  }
+
+  if (filters.search) {
+    filtered = filtered.filter(provider =>
+      provider.name.toLowerCase().includes(filters.search.toLowerCase()) ||
+      provider.description.toLowerCase().includes(filters.search.toLowerCase()) ||
+      provider.courses.some((course: string) => course.toLowerCase().includes(filters.search.toLowerCase()))
+    );
+  }
+
+  return filtered.slice(0, filters.limit || 12);
 }
 
 export default router;
