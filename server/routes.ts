@@ -12,6 +12,7 @@ import { searchAggregator } from './search-aggregator';
 import { registerAuthRoutes } from "./routes/auth-routes";
 import { registerUserRoutes } from "./routes/user-routes";
 import { registerPropertyRoutes } from "./routes/property-routes";
+import { registerLocationRoutes } from "./location-routes";
 import {
   authenticate,
   optionalAuthenticate,
@@ -44,6 +45,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   registerAuthRoutes(app);
   registerUserRoutes(app);
   registerPropertyRoutes(app);
+  registerLocationRoutes(app);
 
   // Buyer dashboard stats
   app.get("/api/dashboard/buyer-stats", async (req, res) => {
