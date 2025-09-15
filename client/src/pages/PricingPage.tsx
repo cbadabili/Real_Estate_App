@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Check, Star, Zap, Users, Award, Package } from 'lucide-react';
+import { Check, Star, Zap, Users, Award } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
 interface Plan {
@@ -97,6 +97,21 @@ const PricingPage = () => {
     alert(modalContent);
   };
 
+  const getUpdatedDescription = (planCode: string) => {
+    switch (planCode) {
+      case 'LISTER_FREE':
+        return 'Perfect for first-time property listers';
+      case 'LISTER_PRO':
+        return 'For casual property listers who want more exposure';
+      case 'BUSINESS':
+        return 'For contractors, artisans, and property service providers';
+      case 'LISTER_PREMIUM':
+        return 'For serious sellers and investors who want maximum visibility';
+      default:
+        return 'Select your plan';
+    }
+  };
+
   const getPlanIcon = (planCode: string) => {
     switch (planCode) {
       case 'LISTER_FREE': return Star;
@@ -179,7 +194,7 @@ const PricingPage = () => {
         </div>
 
         {/* Plans Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
           {plans.map((plan) => {
             const Icon = getPlanIcon(plan.code);
             const colorClass = getPlanColor(plan.code);
@@ -190,6 +205,13 @@ const PricingPage = () => {
             // Parse features if they're stored as JSON string
             const features = typeof plan.features === 'string' ? JSON.parse(plan.features) : plan.features;
 
+            // Get badge text based on plan
+            const getBadge = () => {
+              if (isPremium) return 'Best for visibility';
+              if (isBusiness) return 'Best for teams & tools';
+              return null;
+            };
+
             return (
               <motion.div
                 key={plan.id}
@@ -198,10 +220,10 @@ const PricingPage = () => {
                 transition={{ delay: 0.1 * plan.id }}
                 className={`relative bg-white rounded-lg border ${colorClass} p-6 shadow-sm hover:shadow-md transition-shadow`}
               >
-                {(isPopular || isBusiness || isPremium) && (
+                {(isPopular || isBusiness) && (
                   <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                    <span className="bg-purple-500 text-white px-3 py-1 rounded-full text-sm font-medium">
-                      {plan.badge || 'Most Popular'}
+                    <span className={`${isPremium ? 'bg-purple-500' : 'bg-green-500'} text-white px-3 py-1 rounded-full text-sm font-medium`}>
+                      {getBadge()}
                     </span>
                   </div>
                 )}
@@ -212,9 +234,11 @@ const PricingPage = () => {
                   </div>
                   <h3 className="text-xl font-semibold text-gray-900 mb-2">
                     {plan.name}
+                    {(plan.code === 'LISTER_FREE' || plan.code === 'LISTER_PRO' || plan.code === 'LISTER_PREMIUM') && ' (Lister)'}
+                    {plan.code === 'BUSINESS' && ' (Agents & Providers)'}
                   </h3>
                   <p className="text-gray-600 text-sm mb-4">
-                    {plan.description}
+                    {getUpdatedDescription(plan.code)}
                   </p>
                   <div className="text-3xl font-bold text-gray-900">
                     BWP {plan.price_bwp}

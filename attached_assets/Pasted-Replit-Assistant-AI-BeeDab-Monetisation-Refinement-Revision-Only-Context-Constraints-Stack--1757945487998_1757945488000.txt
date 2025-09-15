@@ -1,0 +1,210 @@
+Replit Assistant AI — BeeDab Monetisation Refinement (Revision Only)
+
+Context / Constraints
+
+Stack: React 18 + Tailwind, Express + Drizzle + Postgres, shared TS schemas.
+
+Monetisation already implemented: plans, subscriptions, entitlements, payments, hero_slots (or equivalents) exist.
+
+Goal: Simplify pricing & clarify value:
+
+Free (Lister): 1 listing, 5 photos.
+
+Pro (Lister): BWP 100/mo — 5 listings, 20 photos, basic analytics, PRIORITY_RANK=0.
+
+Business (Agents/Providers): BWP 150/mo — unlimited listings, 50 photos, directory + booking + lead manager, PRIORITY_RANK=1, no Hero included (can buy add-on).
+
+Premium (Lister): BWP 200/mo — unlimited listings, 50 photos, analytics, HERO_SLOTS=1, PRIORITY_RANK=2.
+
+Payments remain manual for now (bank/mobile money) using existing provider abstraction.
+
+0) Safety & Rollback
+
+Create a git branch: chore/monetisation-refine-v2.
+
+Wrap ranking change behind feature flag RANKING_V2=true (env/Config).
+
+1) Seed & Feature Revisions (idempotent upserts)
+
+Edit server/billing-seed.ts (or wherever you seed plans). Update to idempotent upserts with the new feature map. Keep the same plan codes you already use; if different, map accordingly.
+
++ // Plans v2 – simple pricing & clear value
++ const PLAN_UPSERTS = [
++   {
++     code: "LISTER_FREE",
++     name: "Free",
++     priceBwp: 0,
++     features: { LISTING_LIMIT: "1", PHOTO_LIMIT: "5", PRIORITY_RANK: "0" }
++   },
++   {
++     code: "LISTER_PRO",
++     name: "Pro",
++     priceBwp: 100,
++     features: { LISTING_LIMIT: "5", PHOTO_LIMIT: "20", ANALYTICS: "true", PRIORITY_RANK: "0" }
++   },
++   {
++     code: "BUSINESS",
++     name: "Business",
++     priceBwp: 150,
++     features: { LISTING_LIMIT: "unlimited", PHOTO_LIMIT: "50", DIRECTORY: "true", BOOKING: "true", LEAD_MANAGER: "true", PRIORITY_RANK: "1" }
++   },
++   {
++     code: "LISTER_PREMIUM",
++     name: "Premium",
++     priceBwp: 200,
++     features: { LISTING_LIMIT: "unlimited", PHOTO_LIMIT: "50", ANALYTICS: "true", HERO_SLOTS: "1", PRIORITY_RANK: "2" }
++   }
++ ];
++
++ // upsert logic (keep your existing db helper)
++ for (const p of PLAN_UPSERTS) {
++   await db
++     .insert(plans)
++     .values(p)
++     .onConflictDoUpdate({ target: plans.code, set: { name: p.name, priceBwp: p.priceBwp, features: p.features } });
++ }
+
+2) Entitlement Sync (align subscribers to new features)
+
+Edit server/entitlements.service.ts (or equivalent). Ensure applyPlanToUser overwrites keys with new values (idempotent) and supports "unlimited".
+
+- // existing loop writing entitlements...
++ // overwrite each key to match plan.features exactly
++ for (const [key, value] of Object.entries(feats)) {
++   await db.insert(entitlements).values({ userId, key, value: String(value) })
++     .onConflictDoUpdate({
++       target: [entitlements.userId, entitlements.key],
++       set: { value: String(value) }
++     });
++ }
+
+
+Add a one-time script scripts/sync-entitlements-v2.ts to re-apply plan features to all active subscribers:
+
+// Run once after deploy: node scripts/sync-entitlements-v2.ts
+const subs = await db.select().from(subscriptions).where(eq(subscriptions.status, "active"));
+for (const s of subs) {
+  const plan = await db.query.plans.findFirst({ where: (p, { eq }) => eq(p.id, s.planId) });
+  if (plan) await applyPlanToUser(s.userId, plan.code); // idempotent
+}
+
+
+If any Business users currently have HERO_SLOTS>0 from legacy plans, either (a) leave until expiry, or (b) set to "0". If (b), optionally credit them an equivalent one-off hero add-on.
+
+3) Hero logic: Premium includes 1 slot; Business buys add-on
+
+Edit server/hero-routes.ts (or equivalent) to enforce:
+
+Premium users: may use their included HERO_SLOTS (≥1) to feature a listing.
+
+Business users: no included HERO_SLOTS. If you already support one-off hero purchases, keep that path; else add minimal add-on purchase that creates a payments record with productType="hero" and manual activation by admin.
+
+- // existing check for HERO_SLOTS...
++ // read entitlement
++ const e = await getEntitlement(userId, "HERO_SLOTS"); // helper
++ const slots = e ? Number(e.value) : 0;
++ if (Number.isFinite(slots) && slots > 0) {
++   // allow, and (optionally) decrement if you treat it as consumable
++ } else {
++   return res.status(402).json({ error: "No Hero slots. Premium includes 1; Business can purchase an add-on." });
++ }
+
+
+Optional: /api/hero/addon/purchase (if not present) → creates payments(pending); admin activates; on success, grant a temporary HERO_SLOTS_TEMP="1" or create a hero_slots row directly for N days.
+
+4) Search ranking: reflect PRIORITY_RANK
+
+If you sort listings today by recency only, fold in PRIORITY_RANK for an easy boost.
+
+Edit backend search (e.g., server/storage.ts or search-aggregator.ts):
+
+- ORDER BY p.created_at DESC
++ -- join users/entitlements (or denormalized field) to compute rank
++ -- simplest: persist a numeric `priority_rank` on listings at write-time, or join entitlements on the fly.
++ ORDER BY priority_rank DESC, p.created_at DESC
+
+
+If you can’t join on every request, denormalise priority_rank on the listing record when the owner’s entitlements change (e.g., set 0/1/2), and backfill once via a script.
+
+5) UI — Pricing page & Upgrade copy
+
+Edit client/src/pages/PricingPage.tsx (or equivalent). Order and copy:
+
+Free (Lister) — “Get Started Free”
+
+Pro (Lister) — BWP 100/mo
+
+Business (Agents & Service Providers) — BWP 150/mo, no Hero included (badge: “Best for teams & tools”)
+
+Premium (Lister) — BWP 200/mo, includes 1 Hero Slot (badge: “Best for visibility”)
+
+Edit client/src/components/paywall/UpgradeGuard.tsx:
+
+If LISTING_LIMIT reached → “Upgrade to Pro (5) or Premium (Unlimited + Hero)”.
+
+On Hero CTA when not eligible → “Premium includes 1 Hero; Business can buy a Hero add-on.”
+
+6) Admin — fast manual activation
+
+In your existing admin page:
+
+Add filter: productType in ('subscription','hero') AND status='pending'.
+
+Action “Activate” → sets payments.status='succeeded', re-applies plan entitlements or inserts hero_slots.
+
+7) Feature flag + rollout
+
+Add RANKING_V2 env. If false, keep old ordering.
+
+Deploy, run scripts/sync-entitlements-v2.ts.
+
+Toggle RANKING_V2=true, validate search ordering in prod preview.
+
+8) Acceptance tests (manual)
+
+Pricing page shows 4 plans with new copy/order.
+
+New Pro subscriber can create up to 5 listings; 6th prompts upgrade.
+
+Business subscriber: unlimited listings, no Hero; Hero CTA shows add-on path.
+
+Premium subscriber: can feature 1 listing in Hero; appears in carousel.
+
+Search results: Premium > Business > Pro ordering (tie-break by recency).
+
+Admin: pending payments → “Activate” updates entitlements and/or hero slot immediately.
+
+Small Helpers (if missing)
+
+Get entitlement helper
+
+export async function getEntitlement(userId: number, key: string) {
+  return db.query.entitlements.findFirst({ where: (e, { and, eq }) => and(eq(e.userId, userId), eq(e.key, key)) });
+}
+
+
+Normalise “unlimited”
+
+Treat "unlimited" as Infinity in checks:
+
+function asLimit(v?: string) {
+  if (!v) return 0;
+  return v === "unlimited" ? Number.POSITIVE_INFINITY : Number(v);
+}
+
+
+Deliverables for this task
+
+Plan upsert code applied.
+
+Entitlement sync script executed.
+
+Hero gating logic updated.
+
+Ranking V2 flag and ORDER BY change in place.
+
+Pricing/Upgrade copy updated.
+
+Admin “Activate” flow covers subscriptions and hero add-ons.
+
+Keep code changes minimal; do not add new tables. Reuse existing provider abstraction (manual for now).
