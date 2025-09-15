@@ -1,0 +1,76 @@
+To streamline BeeDab’s onboarding and subscription flow, you want to avoid asking people to “sign up twice” (once for an account and again for a plan) while still giving casual visitors a chance to browse without a login. The key is to set expectations early and unify registration and subscription when the user needs to act. Below is an optimized workflow and implementation notes, with evidence drawn from UX research on when to introduce paid plans.
+
+UX Principles for gating registration + subscription
+
+Don’t hide subscription requirements. If users sign up thinking it’s free and then find they can’t use core features until they pay, they feel misled
+ux.stackexchange.com
+. Show plan options up front or at the point of action.
+
+Separate tasks but set expectations. A common pattern is to let users create an account and then present the payment step as a higher‑commitment task
+ux.stackexchange.com
+. You still capture their email for follow‑up, but they aren’t surprised by a sudden paywall.
+
+Expose plan features before registration. Many SaaS sites (e.g., Figma, Zendesk) let visitors view pricing and pick a plan before they sign up
+ux.stackexchange.com
+. This simplifies decision‑making and reduces friction when they do register.
+
+Let users experience value. Giving a limited free tier or trial helps users see the product’s benefits before committing to a paid plan
+ux.stackexchange.com
+.
+
+Proposed workflow for BeeDab
+
+Public browsing:
+• Anyone can browse listings, see property details and explore sections like FAQ, pricing and “How It Works” without logging in.
+• The pricing page clearly shows Free, Pro, Business and Premium tiers and the benefits of each.
+
+Trigger to register:
+When a visitor clicks “List my property,” “Contact agent,” “Save listing,” or any other interactive action, show a modal explaining that an account is required. The modal highlights the available plans (Free for a single listing, Business for agents/service providers, Premium for unlimited listings/hero slot, etc.) and invites them to continue.
+
+Unified sign‑up + plan selection:
+The sign‑up form asks only for essential info (email, name, password, phone) and simultaneously lets the user pick a plan. This follows the “unify tasks but set expectations” guideline
+ux.stackexchange.com
+. Key points:
+
+If they choose Free, they can immediately list one property (or start their first action).
+
+If they pick Pro/Business/Premium, the form notes the price and instructs them to complete payment via bank/mobile‑money. A “pending” subscription record is created, and the admin can verify payment manually.
+
+The system stores entitlements (listing limits, hero slots, directory access) as soon as the subscription becomes active.
+
+Post‑registration navigation:
+After registering, users land on their dashboard. If they chose a paid plan but payment isn’t verified yet, show a reminder with payment instructions and limit actions to “pending” mode. Once payment is confirmed, entitlements update automatically.
+
+Upgrade prompts (in‑app paywalls):
+Throughout the app, check entitlements before each action. If a user with a Free plan tries to list a second property or a Business user clicks “Feature in Hero,” show a contextual upgrade prompt (“Upgrade to Premium to get a Hero slot”). Because users already have accounts, converting to a paid plan is just a click away.
+
+Avoid duplicate sign‑ups:
+Users only fill out the registration form once. Plan changes happen within the dashboard; the system updates entitlements without re‑entering personal information.
+
+Implementation outline
+
+Front end:
+
+Modify the sign‑up modal to include plan selection.
+
+Add plan summaries in the modal; if Free is selected, skip payment instructions.
+
+Add UpgradeGuard checks in components like CreateListingPage and FeatureHeroButton to prompt upgrades.
+
+Back end:
+
+When creating a user, accept a planCode and create a pending payment record if the plan is paid.
+
+Use a status field (pending, active) on subscriptions to control access.
+
+On admin confirmation, call applyPlanToUser() to write entitlements.
+
+UX copy:
+
+On the pricing page and in modals, make it clear what each plan enables (e.g., “Unlimited listings + 1 Hero slot”).
+
+Remind users that they can browse and inspect listings for free, but posting or contacting requires an account.
+
+By merging registration and plan selection only when the user decides to interact and by clearly signalling plan requirements early, you reduce friction and avoid redundant steps, while following industry‑backed onboarding principles
+ux.stackexchange.com
+.
