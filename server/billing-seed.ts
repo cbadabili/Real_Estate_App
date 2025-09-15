@@ -10,7 +10,7 @@ export async function seedBilling() {
     {
       code: 'LISTER_FREE',
       name: 'Free',
-      description: 'Perfect for first-time property listers',
+      description: 'Perfect for first-time property listings',
       price_bwp: 0,
       interval: 'monthly',
       features: JSON.stringify({
@@ -23,7 +23,7 @@ export async function seedBilling() {
     {
       code: 'LISTER_PRO',
       name: 'Pro',
-      description: 'For casual property listers who want more exposure',
+      description: 'For casual property listings with more exposure',
       price_bwp: 100,
       interval: 'monthly',
       features: JSON.stringify({

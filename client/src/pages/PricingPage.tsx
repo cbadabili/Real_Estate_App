@@ -100,9 +100,9 @@ const PricingPage = () => {
   const getUpdatedDescription = (planCode: string) => {
     switch (planCode) {
       case 'LISTER_FREE':
-        return 'Perfect for first-time property listers';
+        return 'Perfect for first-time property listings';
       case 'LISTER_PRO':
-        return 'For casual property listers who want more exposure';
+        return 'For casual property listings with more exposure';
       case 'BUSINESS':
         return 'For contractors, artisans, and property service providers';
       case 'LISTER_PREMIUM':
@@ -234,7 +234,7 @@ const PricingPage = () => {
                   </div>
                   <h3 className="text-xl font-semibold text-gray-900 mb-2">
                     {plan.name}
-                    {(plan.code === 'LISTER_FREE' || plan.code === 'LISTER_PRO' || plan.code === 'LISTER_PREMIUM') && ' (Lister)'}
+                    {(plan.code === 'LISTER_FREE' || plan.code === 'LISTER_PRO' || plan.code === 'LISTER_PREMIUM') && ' (Plan)'}
                     {plan.code === 'BUSINESS' && ' (Agents & Providers)'}
                   </h3>
                   <p className="text-gray-600 text-sm mb-4">
