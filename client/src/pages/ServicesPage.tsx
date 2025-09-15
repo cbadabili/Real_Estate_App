@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Star, MapPin, Clock, DollarSign, Filter, Search, MessageCircle, Phone, Camera, Gavel, Home, Wrench, Calculator, Shield, Award, Users, FileCheck, ArrowRight, CheckCircle, FileText, Truck } from 'lucide-react';
+import { Star, MapPin, Clock, DollarSign, Filter, Search, MessageCircle, Phone, Camera, Gavel, Home, Wrench, Calculator, Shield, Award, Users, FileCheck, ArrowRight, CheckCircle, FileText, Truck, Building } from 'lucide-react';
 import ServiceProviderRegistration from '../components/ServiceProviderRegistration';
 
 interface Professional {
