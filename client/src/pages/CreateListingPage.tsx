@@ -221,28 +221,34 @@ const CreateListingPage = () => {
       const propertyData = {
         title: data.title,
         description: data.description,
-        price: data.price.toString(), // Convert to string to match schema
-        address: locationData.area_text || 'Address not specified',
+        price: data.price ? data.price.toString() : '0', // Convert to string to match schema
+        address: locationData.area_text || `${formData.city || 'Gaborone'}, ${formData.state || 'South-East'}`,
         city: formData.city || 'Gaborone',
         state: formData.state || 'South-East',
         zipCode: data.zipCode || '00000',
         // New location fields
-        areaText: locationData.area_text,
-        placeName: locationData.place_name,
-        placeId: locationData.place_id,
-        latitude: locationData.latitude,
-        longitude: locationData.longitude,
-        locationSource: locationData.location_source,
+        areaText: locationData.area_text || null,
+        placeName: locationData.place_name || null,
+        placeId: locationData.place_id || null,
+        latitude: locationData.latitude || null,
+        longitude: locationData.longitude || null,
+        locationSource: locationData.location_source || 'geocode',
         propertyType: data.propertyType,
-        listingType: data.listingType === 'fsbo' ? 'owner' : 'agent',
+        listingType: data.listingType === 'fsbo' ? 'owner' : (data.listingType === 'agent' ? 'agent' : data.listingType),
         bedrooms: data.bedrooms ? parseInt(data.bedrooms) : null,
         bathrooms: data.bathrooms ? data.bathrooms.toString() : null,
         squareFeet: data.buildingSize ? parseInt(data.buildingSize) : (data.plotSize ? parseInt(data.plotSize) : null),
         yearBuilt: data.yearBuilt ? parseInt(data.yearBuilt) : null,
         ownerId: 1, // Default owner ID - in real app this would come from auth
-        features: data.amenities ? JSON.stringify(data.amenities) : null,
-        images: uploadedImages.length > 0 ? JSON.stringify(uploadedImages) : null
+        features: data.amenities ? data.amenities : null,
+        images: uploadedImages.length > 0 ? uploadedImages : null,
+        // Auction-specific fields
+        auctionHouse: data.auctionHouse || null,
+        // Additional fields that may be expected
+        status: 'active'
       };
+
+      console.log('Transformed property data:', propertyData);
 
       const response = await fetch('/api/properties', {
         method: 'POST',

@@ -69,9 +69,12 @@ export function registerPropertyRoutes(app: Express) {
   // Create property
   app.post("/api/properties", async (req, res) => {
     try {
+      console.log("Create property request body:", req.body);
+      
       const {
         areaText, placeName, placeId,
         latitude, longitude, locationSource,
+        features, images,
         ...rest
       } = req.body;
 
@@ -89,8 +92,12 @@ export function registerPropertyRoutes(app: Express) {
         placeId: placeId || null,
         latitude: isNum(latitude) ? latitude : null,
         longitude: isNum(longitude) ? longitude : null,
-        locationSource: locationSource || 'geocode'
+        locationSource: locationSource || 'geocode',
+        features: features ? (typeof features === 'string' ? features : JSON.stringify(features)) : null,
+        images: images ? (typeof images === 'string' ? images : JSON.stringify(images)) : null
       };
+
+      console.log("Processed property data:", propertyData);
 
       const validatedData = insertPropertySchema.parse(propertyData);
       const property = await storage.createProperty(validatedData);
@@ -98,12 +105,13 @@ export function registerPropertyRoutes(app: Express) {
     } catch (error) {
       console.error("Create property error:", error);
       if (error.name === 'ZodError') {
+        console.error("Validation errors:", error.errors);
         return res.status(400).json({ 
           message: "Invalid property data", 
           details: error.errors 
         });
       }
-      res.status(400).json({ message: "Invalid property data" });
+      res.status(400).json({ message: "Invalid property data", error: error.message });
     }
   });
 
