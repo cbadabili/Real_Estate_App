@@ -324,6 +324,7 @@ const LoginPage = () => {
                 </>
               )}
             </button>
+            </form>
 
             {/* Browse Plans Button */}
             <div className="mt-4">
