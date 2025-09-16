@@ -44,7 +44,13 @@ const PricingPage = () => {
 
   const handleSubscribe = async (planCode: string) => {
     if (!user) {
-      // Store the selected plan and show registration modal with this plan locked
+      // For Business plan (agents), redirect to agent registration page
+      if (planCode === 'BUSINESS') {
+        window.location.href = '/agent-registration';
+        return;
+      }
+      
+      // For other plans, store the selected plan and show registration modal with this plan locked
       setModalPlanCode(planCode);
       setShowRegistrationModal(true);
       return;
