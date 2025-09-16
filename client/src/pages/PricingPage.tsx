@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Check, Star, Zap, Users, Award } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { RegistrationModal } from '../components/auth/RegistrationModal';
+import { apiRequest } from '../lib/queryClient';
 
 interface Plan {
   id: number;
@@ -52,18 +53,13 @@ const PricingPage = () => {
     setSelectedPlan(planCode);
 
     try {
-      const response = await fetch('/api/billing/subscribe', {
+      const data = await apiRequest('/api/billing/subscribe', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify({
           planCode,
           paymentMethod: 'bank_transfer'
         }),
       });
-
-      const data = await response.json();
 
       if (data.success) {
         if (data.data.plan.price_bwp === 0) {
