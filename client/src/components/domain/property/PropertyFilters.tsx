@@ -34,23 +34,27 @@ const PropertyFilters: React.FC<PropertyFiltersProps> = ({ onFiltersChange, init
   };
 
   return (
-    <div className="bg-white p-4 rounded-lg shadow-sm border">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold flex items-center">
-          <Filter className="h-5 w-5 mr-2" />
-          Filters
-        </h3>
-        <button
-          onClick={clearFilters}
-          className="text-sm text-gray-500 hover:text-gray-700"
-        >
-          Clear all
-        </button>
+    <div className="bg-white rounded-lg shadow-sm border">
+      <div className="p-4 border-b border-gray-200">
+        <div className="flex items-center justify-between">
+          <h3 className="text-lg font-semibold flex items-center text-gray-900">
+            <Filter className="h-5 w-5 mr-2 text-beedab-blue" />
+            Filters
+          </h3>
+          <button
+            onClick={clearFilters}
+            className="text-sm text-gray-500 hover:text-gray-700 flex items-center"
+          >
+            Clear all
+          </button>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="p-4 space-y-6">
+
+      {/* Property Type */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-gray-700 mb-3">
             Property Type
           </label>
           <select
@@ -66,6 +70,73 @@ const PropertyFilters: React.FC<PropertyFiltersProps> = ({ onFiltersChange, init
             <option value="land">Land</option>
             <option value="commercial">Commercial</option>
           </select>
+        </div>
+
+        {/* Price Range */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-3">
+            Price Range (BWP)
+          </label>
+          <div className="space-y-3">
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <label className="block text-xs text-gray-500 mb-1">Minimum</label>
+                <input
+                  type="number"
+                  value={filters.minPrice || ''}
+                  onChange={(e) => handleFilterChange('minPrice', e.target.value ? Number(e.target.value) : null)}
+                  placeholder="Min price"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-gray-500 mb-1">Maximum</label>
+                <input
+                  type="number"
+                  value={filters.maxPrice || ''}
+                  onChange={(e) => handleFilterChange('maxPrice', e.target.value ? Number(e.target.value) : null)}
+                  placeholder="Max price"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Location */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-3">
+            Location
+          </label>
+          <input
+            type="text"
+            value={locationSearch}
+            onChange={(e) => setLocationSearch(e.target.value)}
+            placeholder="Search location..."
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
+          />
+        </div>
+
+        {/* Bedrooms */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-3">
+            Bedrooms
+          </label>
+          <div className="flex flex-wrap gap-2">
+            {['any', '1', '2', '3', '4', '5+'].map((bedroom) => (
+              <button
+                key={bedroom}
+                onClick={() => handleFilterChange('bedrooms', bedroom === 'any' ? '' : bedroom)}
+                className={`px-3 py-2 text-sm rounded-lg border transition-colors ${
+                  (filters.bedrooms || 'any') === bedroom
+                    ? 'border-beedab-blue bg-beedab-blue text-white'
+                    : 'border-gray-300 text-gray-700 hover:border-beedab-blue hover:text-beedab-blue'
+                }`}
+              >
+                {bedroom === 'any' ? 'Any' : bedroom}
+              </button>
+            ))}
+          </div>
         </div>
 
         <div>
@@ -242,26 +313,97 @@ const PropertyFilters: React.FC<PropertyFiltersProps> = ({ onFiltersChange, init
             </select>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Bathrooms
-            </label>
-            <select
-              value={filters.bathrooms || ''}
-              onChange={(e) => handleFilterChange('bathrooms', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
-            >
-              <option value="">Any</option>
-              <option value="1">1+</option>
-              <option value="2">2+</option>
-              <option value="3">3+</option>
-              <option value="4">4+</option>
-            </select>
+          {/* Bathrooms */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-3">
+            Bathrooms
+          </label>
+          <div className="flex flex-wrap gap-2">
+            {['any', '1', '2', '3', '4+'].map((bathroom) => (
+              <button
+                key={bathroom}
+                onClick={() => handleFilterChange('bathrooms', bathroom === 'any' ? '' : bathroom)}
+                className={`px-3 py-2 text-sm rounded-lg border transition-colors ${
+                  (filters.bathrooms || 'any') === bathroom
+                    ? 'border-beedab-blue bg-beedab-blue text-white'
+                    : 'border-gray-300 text-gray-700 hover:border-beedab-blue hover:text-beedab-blue'
+                }`}
+              >
+                {bathroom === 'any' ? 'Any' : bathroom}
+              </button>
+            ))}
           </div>
         </div>
-      )}
+
+        {/* Listing Type */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-3">
+            Listing Type
+          </label>
+          <div className="space-y-2">
+            {[
+              { value: '', label: 'All Listings' },
+              { value: 'sale', label: 'For Sale' },
+              { value: 'rent', label: 'For Rent' },
+              { value: 'auction', label: 'Auction' }
+            ].map((type) => (
+              <label key={type.value} className="flex items-center cursor-pointer">
+                <input
+                  type="radio"
+                  name="listingType"
+                  value={type.value}
+                  checked={(filters.listingType || '') === type.value}
+                  onChange={(e) => handleFilterChange('listingType', e.target.value)}
+                  className="h-4 w-4 text-beedab-blue focus:ring-beedab-blue border-gray-300"
+                />
+                <span className="ml-2 text-sm text-gray-700">{type.label}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+
+        {/* Advanced Filters Toggle */}
+        <div className="pt-4 border-t border-gray-200">
+          <button
+            onClick={() => setShowAdvanced(!showAdvanced)}
+            className="text-sm text-beedab-blue hover:text-beedab-darkblue flex items-center"
+          >
+            {showAdvanced ? 'Hide' : 'Show'} Advanced Filters
+          </button>
+        </div>
+
+        {/* Advanced Filters */}
+        {showAdvanced && (
+          <div className="space-y-4 pt-4 border-t border-gray-200">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Features
+              </label>
+              <div className="space-y-2">
+                {['Pool', 'Garage', 'Garden', 'Security', 'Furnished'].map((feature) => (
+                  <label key={feature} className="flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={filters.features?.includes(feature) || false}
+                      onChange={(e) => {
+                        const currentFeatures = filters.features || [];
+                        const newFeatures = e.target.checked
+                          ? [...currentFeatures, feature]
+                          : currentFeatures.filter(f => f !== feature);
+                        handleFilterChange('features', newFeatures);
+                      }}
+                      className="h-4 w-4 text-beedab-blue focus:ring-beedab-blue border-gray-300 rounded"
+                    />
+                    <span className="ml-2 text-sm text-gray-700">{feature}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
 
-export default PropertyFilters;
+export default PropertyFilters;lters;
