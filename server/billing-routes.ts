@@ -1,4 +1,3 @@
-
 import { Router } from 'express';
 import { z } from 'zod';
 import { authenticate } from './auth-middleware';
@@ -45,7 +44,7 @@ router.post('/subscribe', authenticate, async (req, res) => {
     if (!req.user) {
       return res.status(401).json({ 
         success: false,
-        error: 'Authentication required' 
+        error: 'Authentication required. Please log in to subscribe to a plan.' 
       });
     }
 
@@ -83,7 +82,7 @@ router.post('/subscribe', authenticate, async (req, res) => {
     // For free plans, auto-activate
     if (plan.price_bwp === 0) {
       await activateSubscription(req.user.id, plan.id, payment.id);
-      
+
       res.status(201).json({
         success: true,
         data: { payment, plan },
@@ -505,7 +504,7 @@ async function logAdminAction(adminId: number, action: string, targetType: strin
   try {
     // Import the audit log schema
     const { adminAuditLog } = await import('../shared/schema');
-    
+
     await db.insert(adminAuditLog).values({
       adminId,
       action,

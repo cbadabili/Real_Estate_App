@@ -20,6 +20,16 @@ export const queryClient = new QueryClient({
       staleTime: 1000 * 60 * 5, // 5 minutes
       gcTime: 1000 * 60 * 30, // 30 minutes
     },
+    mutations: {
+      retry: (failureCount, error: any) => {
+        // Don't retry authentication errors
+        if (error?.response?.status === 401 || error?.response?.status === 403) {
+          return false;
+        }
+        return failureCount < 1;
+      },
+      retryDelay: 1000,
+    },
   },
 });
 

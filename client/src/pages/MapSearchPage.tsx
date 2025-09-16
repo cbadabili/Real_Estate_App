@@ -48,11 +48,11 @@ const MapSearchPage = () => {
         // Convert coordinates to numbers and validate
         let lat = property.latitude;
         let lng = property.longitude;
-        
+
         // If coordinates are strings, try to parse them
         if (typeof lat === 'string') lat = parseFloat(lat);
         if (typeof lng === 'string') lng = parseFloat(lng);
-        
+
         // If coordinates are missing or invalid, assign default Gaborone area coordinates
         if (!lat || !lng || isNaN(lat) || isNaN(lng)) {
           // Generate random coordinates around Gaborone for demo purposes
@@ -60,9 +60,9 @@ const MapSearchPage = () => {
           lng = 25.9231 + (Math.random() - 0.5) * 0.1;
           console.warn(`Property ${property.id} "${property.title}" has invalid coordinates, using demo coordinates: ${lat}, ${lng}`);
         }
-        
+
         console.log(`Property ${property.id}: lat=${lat}, lng=${lng}`);
-        
+
         return {
           id: property.id,
           title: property.title,
@@ -79,7 +79,7 @@ const MapSearchPage = () => {
       });
 
       console.log(`Fetched ${propertiesWithCoords.length} properties for map display`);
-      
+
       // If no properties with valid coordinates, add some demo properties
       if (propertiesWithCoords.length === 0) {
         console.log('No properties from API, adding demo properties for map display');
@@ -146,7 +146,7 @@ const MapSearchPage = () => {
     // Apply filters to properties
     const queryParams = new URLSearchParams();
     queryParams.append('status', 'active');
-    
+
     Object.entries(newFilters).forEach(([key, value]) => {
       if (value !== undefined && value !== null && value !== '' && value !== 'all' && value !== 'any') {
         if (key === 'priceRange' && Array.isArray(value)) {
@@ -167,16 +167,16 @@ const MapSearchPage = () => {
           // Process coordinates same as in fetchProperties
           let lat = property.latitude;
           let lng = property.longitude;
-          
+
           if (typeof lat === 'string') lat = parseFloat(lat);
           if (typeof lng === 'string') lng = parseFloat(lng);
-          
+
           if (!lat || !lng || isNaN(lat) || isNaN(lng)) {
             lat = -24.6282 + (Math.random() - 0.5) * 0.1;
             lng = 25.9231 + (Math.random() - 0.5) * 0.1;
             console.warn(`Filtered property ${property.id} has invalid coordinates, using demo coordinates`);
           }
-          
+
           return {
             id: property.id,
             title: property.title,
@@ -191,7 +191,7 @@ const MapSearchPage = () => {
             description: property.description
           };
         });
-        
+
         if (propertiesWithCoords.length === 0) {
           console.log('No filtered properties found, keeping existing properties');
         } else {

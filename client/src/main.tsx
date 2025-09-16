@@ -10,8 +10,11 @@ import './index.css';
 // Handle unhandled promise rejections
 window.addEventListener('unhandledrejection', (event) => {
   // Suppress browser extension related errors
-  if (event.reason?.message?.includes('message channel') || 
-      event.reason?.message?.includes('listener indicated an asynchronous response')) {
+  const errorMessage = event.reason?.message || '';
+  if (errorMessage.includes('message channel') || 
+      errorMessage.includes('listener indicated an asynchronous response') ||
+      errorMessage.includes('Extension context invalidated') ||
+      errorMessage.includes('Could not establish connection')) {
     event.preventDefault();
     return;
   }
@@ -20,8 +23,12 @@ window.addEventListener('unhandledrejection', (event) => {
 
 // Handle general errors from browser extensions
 window.addEventListener('error', (event) => {
-  if (event.message?.includes('listener indicated an asynchronous response') ||
-      event.message?.includes('message channel closed')) {
+  const errorMessage = event.message || '';
+  if (errorMessage.includes('listener indicated an asynchronous response') ||
+      errorMessage.includes('message channel closed') ||
+      errorMessage.includes('Extension context invalidated') ||
+      errorMessage.includes('script-src') ||
+      errorMessage.includes('worker-src')) {
     event.preventDefault();
     return;
   }
