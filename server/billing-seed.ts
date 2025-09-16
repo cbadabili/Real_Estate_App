@@ -41,7 +41,7 @@ export async function seedBilling() {
       price_bwp: 150,
       interval: 'monthly',
       features: JSON.stringify({
-        LISTING_LIMIT: 'unlimited',
+        LISTING_LIMIT: '50',
         PHOTO_LIMIT: '50',
         DIRECTORY: 'true',
         BOOKING: 'true',
@@ -57,7 +57,7 @@ export async function seedBilling() {
       price_bwp: 200,
       interval: 'monthly',
       features: JSON.stringify({
-        LISTING_LIMIT: 'unlimited',
+        LISTING_LIMIT: '50',
         PHOTO_LIMIT: '50',
         ANALYTICS: 'true',
         HERO_SLOTS: '1',

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Check, Star, Zap, Users, Award } from 'lucide-react';
+import { Check, Star, Zap, Users, Award, Phone, Mail, MessageCircle } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { RegistrationModal } from '../components/auth/RegistrationModal';
 import { apiRequest } from '../lib/queryClient';
@@ -301,6 +301,103 @@ const PricingPage = () => {
           })}
         </div>
 
+        {/* Enterprise/Bulk Listing Section */}
+        <div className="mt-16 max-w-4xl mx-auto">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">
+              Need More Than 50 Listings?
+            </h2>
+            <p className="text-xl text-gray-600">
+              Let's grow together! We offer custom plans for high-volume users with bulk listing needs.
+            </p>
+          </div>
+
+          <div className="bg-gradient-to-r from-beedab-blue to-beedab-darkblue rounded-xl p-8 text-white relative overflow-hidden">
+            <div className="relative z-10">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                <div>
+                  <h3 className="text-2xl font-bold mb-4">Enterprise Solutions</h3>
+                  <ul className="space-y-3 mb-6">
+                    <li className="flex items-center">
+                      <Check className="h-5 w-5 mr-3 flex-shrink-0" />
+                      <span>Unlimited listings with bulk discounts</span>
+                    </li>
+                    <li className="flex items-center">
+                      <Check className="h-5 w-5 mr-3 flex-shrink-0" />
+                      <span>Priority support and dedicated account manager</span>
+                    </li>
+                    <li className="flex items-center">
+                      <Check className="h-5 w-5 mr-3 flex-shrink-0" />
+                      <span>Custom integrations and API access</span>
+                    </li>
+                    <li className="flex items-center">
+                      <Check className="h-5 w-5 mr-3 flex-shrink-0" />
+                      <span>Enhanced visibility across all search functions</span>
+                    </li>
+                    <li className="flex items-center">
+                      <Check className="h-5 w-5 mr-3 flex-shrink-0" />
+                      <span>White-label solutions available</span>
+                    </li>
+                  </ul>
+                  <p className="text-blue-100 text-sm">
+                    Perfect for real estate agencies, property developers, and institutional investors.
+                  </p>
+                </div>
+
+                <div className="bg-white/10 backdrop-blur rounded-lg p-6">
+                  <h4 className="text-xl font-semibold mb-4">Get a Custom Quote</h4>
+                  <div className="space-y-4">
+                    <a 
+                      href="mailto:enterprise@beedab.co.bw?subject=Bulk Listing Inquiry" 
+                      className="flex items-center p-3 bg-white/20 backdrop-blur rounded-lg hover:bg-white/30 transition-colors cursor-pointer"
+                    >
+                      <Mail className="h-5 w-5 mr-3" />
+                      <div>
+                        <div className="font-medium">Email Us</div>
+                        <div className="text-sm text-blue-100">enterprise@beedab.co.bw</div>
+                      </div>
+                    </a>
+                    
+                    <a 
+                      href="tel:+26775123456" 
+                      className="flex items-center p-3 bg-white/20 backdrop-blur rounded-lg hover:bg-white/30 transition-colors cursor-pointer"
+                    >
+                      <Phone className="h-5 w-5 mr-3" />
+                      <div>
+                        <div className="font-medium">Call Us</div>
+                        <div className="text-sm text-blue-100">+267 75 123 456</div>
+                      </div>
+                    </a>
+
+                    <a 
+                      href="https://wa.me/26775123456?text=Hi%20BeeDab%2C%20I'm%20interested%20in%20bulk%20listing%20solutions" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="flex items-center p-3 bg-white/20 backdrop-blur rounded-lg hover:bg-white/30 transition-colors cursor-pointer"
+                    >
+                      <MessageCircle className="h-5 w-5 mr-3" />
+                      <div>
+                        <div className="font-medium">WhatsApp</div>
+                        <div className="text-sm text-blue-100">Quick chat about your needs</div>
+                      </div>
+                    </a>
+                  </div>
+
+                  <div className="mt-6 p-4 bg-white/10 rounded-lg">
+                    <p className="text-sm text-center">
+                      <strong>Ready to scale?</strong> Tell us about your listing volume and we'll create a plan that works for your business.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            {/* Decorative elements */}
+            <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -mr-16 -mt-16"></div>
+            <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full -ml-12 -mb-12"></div>
+          </div>
+        </div>
+
         {/* FAQ Section */}
         <div className="mt-16 max-w-3xl mx-auto">
           <h2 className="text-2xl font-bold text-gray-900 text-center mb-8">
@@ -329,6 +426,14 @@ const PricingPage = () => {
               </h3>
               <p className="text-gray-600">
                 Free plans are activated immediately. Paid plans are activated within 24 hours of payment verification.
+              </p>
+            </div>
+            <div className="bg-white rounded-lg p-6 shadow-sm">
+              <h3 className="font-semibold text-gray-900 mb-2">
+                What if I need more than 50 listings?
+              </h3>
+              <p className="text-gray-600">
+                Our Business and Premium plans include 50 listings each. For bulk listing needs above 50, we offer custom Enterprise solutions with unlimited listings, bulk discounts, and enhanced features. Contact us for a personalized quote.
               </p>
             </div>
           </div>
