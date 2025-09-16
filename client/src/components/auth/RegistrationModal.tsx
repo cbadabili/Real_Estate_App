@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Check, Star, Zap, Users, Award } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
@@ -34,6 +34,13 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
   const { login } = useAuth();
   const [step, setStep] = useState<'register' | 'payment'>('register');
   const [selectedPlan, setSelectedPlan] = useState<string>(preSelectedPlan || 'LISTER_FREE');
+
+  // Update selectedPlan when preSelectedPlan changes
+  useEffect(() => {
+    if (preSelectedPlan) {
+      setSelectedPlan(preSelectedPlan);
+    }
+  }, [preSelectedPlan]);
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
