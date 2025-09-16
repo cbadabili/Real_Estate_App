@@ -20,6 +20,7 @@ interface RegistrationModalProps {
   triggerAction?: string; // e.g., "list_property", "contact_agent", "save_listing"
   plans: Plan[];
   preSelectedPlan?: string;
+  planLocked?: boolean; // When true, user cannot change the selected plan
 }
 
 export const RegistrationModal: React.FC<RegistrationModalProps> = ({
@@ -27,7 +28,8 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
   onClose,
   triggerAction = "get_started",
   plans,
-  preSelectedPlan
+  preSelectedPlan,
+  planLocked = false
 }) => {
   const { login } = useAuth();
   const [step, setStep] = useState<'register' | 'payment'>('register');
@@ -280,10 +282,12 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
 
                   {/* Plan Selection */}
                   <div className="space-y-4">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Choose Your Plan</h3>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                      {planLocked ? 'Your Selected Plan' : 'Choose Your Plan'}
+                    </h3>
                     
                     <div className="space-y-3">
-                      {plans.map((plan) => {
+                      {(planLocked ? plans.filter(plan => plan.code === selectedPlan) : plans).map((plan) => {
                         const Icon = getPlanIcon(plan.code);
                         const features = typeof plan.features === 'string' ? JSON.parse(plan.features) : plan.features;
                         const isSelected = selectedPlan === plan.code;
@@ -291,12 +295,16 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                         return (
                           <div
                             key={plan.id}
-                            className={`border-2 rounded-lg p-4 cursor-pointer transition-all ${
-                              isSelected 
-                                ? 'border-beedab-blue bg-blue-50' 
-                                : 'border-gray-200 hover:border-gray-300'
+                            className={`border-2 rounded-lg p-4 transition-all ${
+                              planLocked 
+                                ? 'border-beedab-blue bg-blue-50 cursor-default'
+                                : `cursor-pointer ${
+                                    isSelected 
+                                      ? 'border-beedab-blue bg-blue-50' 
+                                      : 'border-gray-200 hover:border-gray-300'
+                                  }`
                             }`}
-                            onClick={() => setSelectedPlan(plan.code)}
+                            onClick={() => !planLocked && setSelectedPlan(plan.code)}
                           >
                             <div className="flex items-start space-x-3">
                               <div className={`mt-1 w-4 h-4 rounded-full border-2 ${
@@ -310,6 +318,11 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                                   <span className="text-sm text-gray-600">
                                     {plan.price_bwp === 0 ? 'Free' : `BWP ${plan.price_bwp}/${plan.interval}`}
                                   </span>
+                                  {planLocked && (
+                                    <span className="text-xs bg-beedab-blue text-white px-2 py-1 rounded-full">
+                                      Selected
+                                    </span>
+                                  )}
                                 </div>
                                 
                                 <p className="text-sm text-gray-600 mb-2">{plan.description}</p>
@@ -333,6 +346,20 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                         );
                       })}
                     </div>
+
+                    {planLocked && (
+                      <div className="text-center">
+                        <button
+                          onClick={() => {
+                            onClose();
+                            window.location.href = '/pricing';
+                          }}
+                          className="text-sm text-beedab-blue hover:text-beedab-darkblue underline"
+                        >
+                          Want to change your plan? View all plans
+                        </button>
+                      </div>
+                    )}
                   </div>
 
                   <div className="lg:col-span-2 pt-4 border-t">
