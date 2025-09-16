@@ -7,6 +7,49 @@ import { authenticate, optionalAuthenticate } from "../auth-middleware";
 export function registerPropertyRoutes(app: Express) {
   // Get all properties
   app.get("/api/properties", async (req, res) => {
+
+  // Search suggestions endpoint
+  app.get("/api/suggest", async (req, res) => {
+    try {
+      const query = (req.query.q as string)?.toLowerCase().trim();
+      
+      if (!query || query.length < 2) {
+        return res.json([]);
+      }
+
+      // Generate suggestions based on common Botswana locations and property types
+      const locationSuggestions = [
+        'Gaborone', 'Francistown', 'Molepolole', 'Kanye', 'Serowe',
+        'Mahalapye', 'Mogoditshane', 'Mochudi', 'Maun', 'Lobatse',
+        'Block 8', 'Block 9', 'Block 10', 'G-West', 'Phakalane',
+        'Riverwalk', 'Airport Junction', 'Phase 4', 'Extension 2'
+      ];
+
+      const propertyTypeSuggestions = [
+        'house in Gaborone', 'apartment in Francistown', 'townhouse in Phakalane',
+        'land in Mogoditshane', 'commercial property', '3 bedroom house',
+        '2 bedroom apartment', 'plot for sale', 'residential property'
+      ];
+
+      // Filter suggestions based on query
+      const filteredLocations = locationSuggestions
+        .filter(loc => loc.toLowerCase().includes(query))
+        .map(loc => `Properties in ${loc}`);
+
+      const filteredTypes = propertyTypeSuggestions
+        .filter(type => type.toLowerCase().includes(query));
+
+      // Combine and limit suggestions
+      const suggestions = [...filteredLocations, ...filteredTypes].slice(0, 8);
+
+      res.json(suggestions);
+    } catch (error) {
+      console.error("Suggestions error:", error);
+      res.json([]);
+    }
+  });
+
+
     try {
       const filters = {
         minPrice: req.query.minPrice ? parseFloat(req.query.minPrice as string) : undefined,

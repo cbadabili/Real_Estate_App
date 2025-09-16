@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Grid, List, Map, Filter } from 'lucide-react';
 import SmartSearchBar from '../../components/search/SmartSearchBar';
@@ -15,7 +15,7 @@ const PropertySearchPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [properties, setProperties] = useState([]);
   const [viewMode, setViewMode] = useState<'grid' | 'list' | 'map'>('grid');
-  const [showFilters, setShowFilters] = useState(false);
+  const [showFilters, setShowFilters] = useState(true);
   const [filters, setFilters] = useState({
     priceRange: [0, 5000000] as [number, number],
     propertyType: 'all',
@@ -29,28 +29,45 @@ const PropertySearchPage = () => {
   const [showComparison, setShowComparison] = useState(false);
   const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
 
-  useEffect(() => {
-    searchProperties();
-  }, [filters, sortBy, searchQuery]);
-
-  const searchProperties = async () => {
+  // Fetch properties with current filters
+  const fetchProperties = useCallback(async () => {
     setIsLoading(true);
     try {
       const queryParams = new URLSearchParams();
       
-      if (searchQuery) queryParams.set('location', searchQuery);
-      if (filters.propertyType !== 'all') queryParams.set('type', filters.propertyType);
-      if (filters.bedrooms !== 'any') queryParams.set('bedrooms', filters.bedrooms);
-      if (filters.bathrooms !== 'any') queryParams.set('bathrooms', filters.bathrooms);
-      if (filters.listingType !== 'all') queryParams.set('listingType', filters.listingType);
+      // Add search query
+      if (searchQuery) {
+        queryParams.set('location', searchQuery);
+      }
       
+      // Add filters
+      if (filters.propertyType !== 'all') {
+        queryParams.set('propertyType', filters.propertyType);
+      }
+      if (filters.bedrooms !== 'any') {
+        queryParams.set('minBedrooms', filters.bedrooms === '5+' ? '5' : filters.bedrooms);
+      }
+      if (filters.bathrooms !== 'any') {
+        queryParams.set('minBathrooms', filters.bathrooms === '4+' ? '4' : filters.bathrooms);
+      }
+      if (filters.listingType !== 'all') {
+        queryParams.set('listingType', filters.listingType);
+      }
+      
+      // Add price range
       queryParams.set('minPrice', filters.priceRange[0].toString());
       queryParams.set('maxPrice', filters.priceRange[1].toString());
+      
+      // Add sorting
       queryParams.set('sortBy', sortBy);
+      queryParams.set('status', 'active');
+
+      console.log('Fetching with params:', queryParams.toString());
 
       const response = await fetch(`/api/properties?${queryParams}`);
       if (response.ok) {
         const data = await response.json();
+        console.log('Received properties:', data.length);
         setProperties(Array.isArray(data) ? data : []);
       } else {
         console.error('Search request failed:', response.status, response.statusText);
@@ -62,13 +79,31 @@ const PropertySearchPage = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [searchQuery, filters, sortBy]);
 
+  // Load properties on mount and when dependencies change
+  useEffect(() => {
+    fetchProperties();
+  }, [fetchProperties]);
+
+  // Handle search from SmartSearchBar
   const handleSearch = (query: string) => {
     setSearchQuery(query);
-    setSearchParams({ q: query });
+    setSearchParams(query ? { q: query } : {});
   };
 
+  // Handle filter changes
+  const handleFiltersChange = (newFilters: typeof filters) => {
+    console.log('Filters changed:', newFilters);
+    setFilters(newFilters);
+  };
+
+  // Handle sort change
+  const handleSortChange = (newSortBy: string) => {
+    setSortBy(newSortBy);
+  };
+
+  // Handle comparison
   const handleAddToComparison = (property: any) => {
     if (comparisonProperties.length < 4 && !comparisonProperties.find(p => p.id === property.id)) {
       setComparisonProperties([...comparisonProperties, property]);
@@ -79,10 +114,15 @@ const PropertySearchPage = () => {
     setComparisonProperties(comparisonProperties.filter(p => p.id !== propertyId));
   };
 
+  // Handle saved search loading
   const handleLoadSearch = (savedSearch: any) => {
-    setFilters(savedSearch.filters);
-    setSearchQuery(savedSearch.query);
-    setSearchParams({ q: savedSearch.query });
+    if (savedSearch.filters) {
+      setFilters(savedSearch.filters);
+    }
+    if (savedSearch.query) {
+      setSearchQuery(savedSearch.query);
+      setSearchParams({ q: savedSearch.query });
+    }
   };
 
   return (
@@ -102,12 +142,12 @@ const PropertySearchPage = () => {
         </div>
 
         <div className="flex gap-8">
-          {/* Sidebar */}
+          {/* Sidebar - Always show on desktop */}
           <div className="w-80 flex-shrink-0 space-y-6">
             {/* Filters */}
             <PropertyFilters
               filters={filters}
-              onFiltersChange={setFilters}
+              onFiltersChange={handleFiltersChange}
               propertyCount={properties.length}
             />
 
@@ -125,7 +165,7 @@ const PropertySearchPage = () => {
             <SearchResultsHeader
               propertyCount={properties.length}
               sortBy={sortBy}
-              onSortChange={setSortBy}
+              onSortChange={handleSortChange}
               viewMode={viewMode}
               onViewModeChange={setViewMode}
               showFilters={showFilters}

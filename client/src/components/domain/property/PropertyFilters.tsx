@@ -136,9 +136,9 @@ export const PropertyFilters: React.FC<PropertyFiltersProps> = ({
           >
             <option value="all">All Types</option>
             <option value="house">Houses</option>
-            <option value="apartment">Apartments</option>
+            <option value="condo">Apartments/Condos</option>
             <option value="townhouse">Townhouses</option>
-            <option value="land_plot">Land/Plot</option>
+            <option value="land">Land/Plot</option>
             <option value="commercial">Commercial</option>
             <option value="farm">Farm</option>
           </select>
