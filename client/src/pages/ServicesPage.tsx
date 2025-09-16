@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Star, MapPin, Clock, DollarSign, Filter, Search, MessageCircle, Phone, Camera, Gavel, Home, Wrench, Calculator, Shield, Award, Users, FileCheck, ArrowRight, CheckCircle, FileText, Truck, Building } from 'lucide-react';
 import ServiceProviderRegistration from '../components/ServiceProviderRegistration';
+import { Link } from 'react-router-dom'; // Assuming react-router-dom is used for navigation
 
 interface Professional {
   id: number;
@@ -413,17 +414,18 @@ const ServicesPage: React.FC = () => {
           <p className="text-blue-100 mb-6">
             Join our network of verified professionals and grow your business
           </p>
-          <button 
-            className="bg-white text-beedab-blue px-8 py-3 rounded-lg font-medium hover:bg-neutral-100 transition-colors"
-            onClick={() => setShowRegistration(true)}
+          <Link
+            to="/pricing"
+            className="bg-white text-beedab-blue px-8 py-3 rounded-lg text-lg font-semibold hover:bg-neutral-100 transition-colors flex items-center space-x-2"
           >
-            Register as a service provider
-          </button>
+            <Award className="h-5 w-5" />
+            <span>Register as Service Provider</span>
+          </Link>
         </div>
 
         {/* Registration Modal */}
         {showRegistration && (
-          <ServiceProviderRegistration 
+          <ServiceProviderRegistration
             onClose={() => setShowRegistration(false)}
             onSuccess={() => {
               setShowRegistration(false);

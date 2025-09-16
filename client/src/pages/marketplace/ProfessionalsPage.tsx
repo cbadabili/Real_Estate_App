@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
   Search, 
@@ -299,6 +300,20 @@ const ProfessionalsPage: React.FC = () => {
               ))}
             </div>
           )}
+        </div>
+
+        {/* Register as Professional CTA */}
+        <div className="mt-12 bg-gradient-to-r from-purple-600 to-purple-700 rounded-2xl p-8 text-center text-white">
+          <h2 className="text-2xl font-bold mb-4">Are you a Professional?</h2>
+          <p className="text-purple-100 mb-6">
+            Join our network of verified professionals and expand your business reach
+          </p>
+          <Link 
+            to="/pricing"
+            className="bg-white text-purple-600 px-8 py-3 rounded-lg font-medium hover:bg-neutral-100 transition-colors inline-block"
+          >
+            Register as Professional
+          </Link>
         </div>
       </section>
     </div>

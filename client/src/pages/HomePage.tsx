@@ -494,17 +494,12 @@ const HomePage = () => {
                 Get Started Today
                 <ArrowRight className="ml-2 h-5 w-5" />
               </button>
-              <UpgradeGuard
-                action="list_property"
-                requiredFeature="LISTING_LIMIT"
+              <Link
+                to="/pricing"
+                className="inline-flex items-center justify-center px-8 py-4 bg-transparent border-2 border-white text-white font-semibold rounded-xl hover:bg-white hover:text-beedab-darkblue transition-colors"
               >
-                <Link
-                  to="/create-listing"
-                  className="inline-flex items-center justify-center px-8 py-4 bg-transparent border-2 border-white text-white font-semibold rounded-xl hover:bg-white hover:text-beedab-darkblue transition-colors"
-                >
-                  List Your Property
-                </Link>
-              </UpgradeGuard>
+                List Your Property
+              </Link>
             </div>
           </motion.div>
         </div>

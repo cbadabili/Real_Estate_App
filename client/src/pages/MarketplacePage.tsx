@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { Search, Filter, MapPin, Star, Clock, Phone, Mail, Globe, Shield, Award, Package, Wrench, GraduationCap, UserPlus, Plus } from 'lucide-react';
 import ServiceProviderCard from '../components/domain/marketplace/ServiceProviderCard';
 import RegisterProvider from '../components/marketplace/RegisterProvider';
@@ -159,13 +160,13 @@ const MarketplacePage: React.FC<MarketplacePageProps> = () => {
               Connect with trusted professionals, suppliers, and training providers 
               for all your real estate and construction needs.
             </p>
-            <button
-              onClick={() => setShowRegisterModal(true)}
+            <Link
+              to="/pricing"
               className="inline-flex items-center px-6 py-3 bg-beedab-blue text-white rounded-lg hover:bg-blue-700 transition-colors"
             >
               <UserPlus className="h-5 w-5 mr-2" />
               Join as Service Provider
-            </button>
+            </Link>
           </div>
         </div>
       </div>

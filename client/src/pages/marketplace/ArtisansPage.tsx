@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { Search, MapPin, Star, Wrench, Shield, CheckCircle } from 'lucide-react';
 import ServiceProviderCard from '../../components/domain/marketplace/ServiceProviderCard';
 import RegisterProvider from '../../components/marketplace/RegisterProvider';
@@ -143,12 +144,12 @@ const ArtisansPage: React.FC = () => {
           <p className="text-orange-100 mb-6">
             Join our network of verified artisans and expand your business reach
           </p>
-          <button 
-            className="bg-white text-orange-600 px-8 py-3 rounded-lg font-medium hover:bg-neutral-100 transition-colors"
-            onClick={() => setShowRegistration(true)}
+          <Link 
+            to="/pricing"
+            className="bg-white text-orange-600 px-8 py-3 rounded-lg font-medium hover:bg-neutral-100 transition-colors inline-block"
           >
             Register as Artisan
-          </button>
+          </Link>
         </div>
 
         {/* Registration Modal */}

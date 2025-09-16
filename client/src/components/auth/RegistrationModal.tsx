@@ -19,17 +19,19 @@ interface RegistrationModalProps {
   onClose: () => void;
   triggerAction?: string; // e.g., "list_property", "contact_agent", "save_listing"
   plans: Plan[];
+  preSelectedPlan?: string;
 }
 
 export const RegistrationModal: React.FC<RegistrationModalProps> = ({
   isOpen,
   onClose,
   triggerAction = "get_started",
-  plans
+  plans,
+  preSelectedPlan
 }) => {
   const { login } = useAuth();
   const [step, setStep] = useState<'register' | 'payment'>('register');
-  const [selectedPlan, setSelectedPlan] = useState<string>('LISTER_FREE');
+  const [selectedPlan, setSelectedPlan] = useState<string>(preSelectedPlan || 'LISTER_FREE');
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',

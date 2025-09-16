@@ -43,6 +43,7 @@ const PricingPage = () => {
 
   const handleSubscribe = async (planCode: string) => {
     if (!user) {
+      // Store the selected plan and show registration modal with this plan pre-selected
       setModalPlanCode(planCode);
       setShowRegistrationModal(true);
       return;
@@ -341,10 +342,8 @@ const PricingPage = () => {
           isOpen={showRegistrationModal}
           onClose={() => setShowRegistrationModal(false)}
           triggerAction="get_started"
-          plans={plans.map(plan => ({
-            ...plan,
-            code: modalPlanCode && plan.code === modalPlanCode ? modalPlanCode : plan.code
-          }))}
+          plans={plans}
+          preSelectedPlan={modalPlanCode}
         />
       </div>
     </div>

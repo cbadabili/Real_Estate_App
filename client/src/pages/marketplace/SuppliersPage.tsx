@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
   Search, 
@@ -303,12 +304,12 @@ const SuppliersPage: React.FC = () => {
         <p className="text-blue-100 mb-6">
           Join our network of verified suppliers and reach more customers
         </p>
-        <button 
-          className="bg-white text-beedab-blue px-8 py-3 rounded-lg font-medium hover:bg-neutral-100 transition-colors"
-          onClick={() => setShowRegistration(true)}
+        <Link 
+          to="/pricing"
+          className="bg-white text-beedab-blue px-8 py-3 rounded-lg font-medium hover:bg-neutral-100 transition-colors inline-block"
         >
           Register as Supplier
-        </button>
+        </Link>
       </div>
 
       {/* Registration Modal */}
