@@ -136,7 +136,8 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
         if (subscribeData.data.plan.price_bwp === 0) {
           // Free plan - immediate access
           onClose();
-          window.location.reload();
+          // Redirect to pricing/dashboard instead of reloading
+          window.location.href = '/pricing';
         } else {
           // Paid plan - show payment instructions
           setStep('payment');
@@ -378,10 +379,13 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                 </div>
                 
                 <button
-                  onClick={onClose}
+                  onClick={() => {
+                    onClose();
+                    window.location.href = '/pricing';
+                  }}
                   className="mt-6 bg-beedab-blue text-white py-2 px-6 rounded-lg hover:bg-beedab-darkblue transition-colors"
                 >
-                  Continue to Dashboard
+                  Continue to Plans
                 </button>
               </div>
             </div>

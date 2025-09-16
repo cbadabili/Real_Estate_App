@@ -14,7 +14,8 @@ import {
   Building,
   UserCheck,
   Users,
-  Briefcase
+  Briefcase,
+  ArrowRight
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import toast from 'react-hot-toast';
@@ -84,9 +85,7 @@ const LoginPage = () => {
         if (response.ok) {
           toast.success('Registration successful! Redirecting to plans...');
           // Redirect to pricing page after successful registration
-          setTimeout(() => {
-            navigate('/pricing');
-          }, 1500);
+          navigate('/pricing');
         } else {
           const errorMessage = result.message || 'Registration failed. Please try again.';
           toast.error(errorMessage);
