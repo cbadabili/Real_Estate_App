@@ -357,10 +357,10 @@ const AgentNetworkPage = () => {
             Join our network and connect with buyers and sellers across Botswana
           </p>
           <Link
-            to="/agent-registration"
+            to="/pricing"
             className="inline-flex items-center px-8 py-4 bg-white text-beedab-darkblue font-semibold rounded-xl hover:bg-gray-100 transition-colors"
           >
-            Register as Agent
+            Choose Agent Plan
             <ArrowRight className="ml-2 h-5 w-5" />
           </Link>
         </div>

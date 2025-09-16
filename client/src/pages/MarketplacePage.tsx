@@ -165,7 +165,7 @@ const MarketplacePage: React.FC<MarketplacePageProps> = () => {
               className="inline-flex items-center px-6 py-3 bg-beedab-blue text-white rounded-lg hover:bg-blue-700 transition-colors"
             >
               <UserPlus className="h-5 w-5 mr-2" />
-              Join as Service Provider
+              Choose Provider Plan
             </Link>
           </div>
         </div>
@@ -228,13 +228,13 @@ const MarketplacePage: React.FC<MarketplacePageProps> = () => {
                 </select>
               </div>
 
-              <button
-                onClick={() => setShowRegisterModal(true)}
+              <Link
+                to="/pricing"
                 className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
               >
                 <Plus className="h-4 w-4 mr-2" />
-                Register
-              </button>
+                Choose Plan
+              </Link>
             </div>
           </div>
         </div>
@@ -361,13 +361,7 @@ const MarketplacePage: React.FC<MarketplacePageProps> = () => {
         )}
       </div>
 
-      {/* Register Provider Modal */}
-      {showRegisterModal && (
-        <RegisterProvider
-          onClose={() => setShowRegisterModal(false)}
-          onSubmit={handleRegisterProvider}
-        />
-      )}
+      
     </div>
   );
 };

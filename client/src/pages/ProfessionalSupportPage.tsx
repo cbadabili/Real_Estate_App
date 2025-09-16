@@ -190,11 +190,11 @@ const ProfessionalSupportPage = () => {
                 Find Professionals
               </Link>
               <Link
-                to="/register-provider"
+                to="/pricing"
                 className="inline-flex items-center px-8 py-4 bg-transparent border-2 border-white text-white font-semibold rounded-xl hover:bg-white hover:text-purple-700 transition-colors"
               >
                 <Shield className="mr-2 h-5 w-5" />
-                Join as Professional
+                Choose Professional Plan
               </Link>
             </div>
           </motion.div>
@@ -413,10 +413,10 @@ const ProfessionalSupportPage = () => {
               Are you a certified real estate professional? Join our platform to connect with clients and grow your business.
             </p>
             <Link
-              to="/register-provider"
+              to="/pricing"
               className="inline-flex items-center px-8 py-4 bg-purple-600 text-white font-semibold rounded-xl hover:bg-purple-700 transition-colors"
             >
-              Register as Professional
+              Choose Professional Plan
               <ArrowRight className="ml-2 h-5 w-5" />
             </Link>
           </motion.div>

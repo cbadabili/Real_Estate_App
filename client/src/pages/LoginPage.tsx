@@ -29,11 +29,31 @@ const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [showRegistrationModal, setShowRegistrationModal] = useState(false);
+  const [plans, setPlans] = useState([]);
 
   const { register, handleSubmit, watch, formState: { errors } } = useForm();
   const password = watch('password');
 
   const redirectPath = new URLSearchParams(location.search).get('redirect') || '/dashboard';
+
+  useEffect(() => {
+    if (!isLogin) {
+      fetchPlans();
+    }
+  }, [isLogin]);
+
+  const fetchPlans = async () => {
+    try {
+      const response = await fetch('/api/billing/plans');
+      const data = await response.json();
+      if (data.success) {
+        setPlans(data.data);
+      }
+    } catch (error) {
+      console.error('Error fetching plans:', error);
+    }
+  };
 
   const onSubmit = async (data: any) => {
     setIsLoading(true);
@@ -58,38 +78,9 @@ const LoginPage = () => {
         toast.success('Login successful!');
         navigate(redirectPath);
       } else {
-        // Registration
-        const response = await fetch('/api/users/register', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            firstName: data.firstName,
-            lastName: data.lastName,
-            username: data.email.split('@')[0], // Generate username from email
-            email: data.email,
-            password: data.password,
-            phone: data.phone,
-            dateOfBirth: data.dateOfBirth,
-            address: data.address,
-            city: data.city,
-            state: data.state,
-            zipCode: data.zipCode,
-            isActive: true,
-          }),
-        });
-
-        const result = await response.json();
-
-        if (response.ok) {
-          toast.success('Registration successful! Redirecting to plans...');
-          // Redirect to pricing page after successful registration
-          navigate('/pricing');
-        } else {
-          const errorMessage = result.message || 'Registration failed. Please try again.';
-          toast.error(errorMessage);
-        }
+        // Registration - redirect to plans instead of registering directly
+        toast.success('Please select a plan to complete your registration');
+        navigate('/pricing');
       }
     } catch (error) {
       console.error('Auth error:', error);
@@ -351,18 +342,11 @@ const LoginPage = () => {
               {isLogin ? (
                 <>
                   Don't have an account?{' '}
-                  <button
-                    onClick={() => setIsLogin(false)}
-                    className="text-beedab-blue hover:text-beedab-darkblue font-medium"
-                  >
-                    Register here
-                  </button>
-                  {' or '}
                   <Link
                     to="/pricing"
                     className="text-beedab-blue hover:text-beedab-darkblue font-medium"
                   >
-                    View Plans
+                    Choose a plan to register
                   </Link>
                 </>
               ) : (

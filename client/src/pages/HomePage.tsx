@@ -488,14 +488,14 @@ const HomePage = () => {
                 to="/pricing"
                 className="inline-flex items-center justify-center px-8 py-4 bg-white text-beedab-darkblue font-semibold rounded-xl hover:bg-gray-100 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
               >
-                Get Started Today
+                Choose Your Plan
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
               <Link
                 to="/pricing"
                 className="inline-flex items-center justify-center px-8 py-4 bg-transparent border-2 border-white text-white font-semibold rounded-xl hover:bg-white hover:text-beedab-darkblue transition-colors"
               >
-                List Your Property
+                Start Listing Today
               </Link>
             </div>
           </motion.div>

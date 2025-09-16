@@ -192,11 +192,12 @@ const PricingPage = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+          <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
             Choose Your Plan
           </h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Select the perfect plan for your real estate needs. Upgrade or downgrade anytime.
+            Select the perfect plan for your real estate journey in Botswana. 
+            Choose your plan first, then complete your registration.
           </p>
         </div>
 
@@ -208,7 +209,7 @@ const PricingPage = () => {
             const isPopular = plan.code === 'LISTER_PREMIUM';
             const isBusiness = plan.code === 'BUSINESS';
             const isPremium = plan.code === 'LISTER_PREMIUM';
-            
+
             // Parse features if they're stored as JSON string
             const features = typeof plan.features === 'string' ? JSON.parse(plan.features) : plan.features;
 

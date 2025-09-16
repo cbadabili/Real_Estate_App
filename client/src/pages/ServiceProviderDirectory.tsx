@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Search, Filter, Star, MapPin, Phone, Mail, Wrench, Briefcase, Truck, GraduationCap } from 'lucide-react';
 
@@ -203,9 +204,12 @@ const ServiceProviderDirectory = () => {
           <p className="text-blue-100 mb-6">
             Join our directory and connect with property owners and real estate professionals
           </p>
-          <button className="bg-white text-beedab-blue px-6 py-3 rounded-md font-medium hover:bg-gray-100 transition-colors">
-            Register as Provider
-          </button>
+          <Link 
+            to="/pricing"
+            className="bg-white text-beedab-blue px-6 py-3 rounded-md font-medium hover:bg-gray-100 transition-colors inline-block"
+          >
+            Choose Provider Plan
+          </Link>
         </div>
       </div>
     </motion.div>

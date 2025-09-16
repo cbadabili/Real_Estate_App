@@ -711,121 +711,104 @@ const Navbar = () => {
           {/* User Profile Avatar */}
           <div className="flex items-center space-x-2 md:space-x-4 flex-shrink-0">
             {user ? (
-              <div className="relative">
-                <button
-                  onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
-                  className="h-10 w-10 bg-beedab-blue rounded-full flex items-center justify-center text-white font-semibold hover:bg-beedab-darkblue transition-colors"
+              <div className="flex items-center space-x-4">
+                <NotificationCenter />
+
+                {/* User Menu */}
+                <div
+                  className="relative"
+                  onMouseEnter={() => setProfileDropdownOpen(true)}
+                  onMouseLeave={() => setProfileDropdownOpen(false)}
                 >
-                  {user.firstName && user.lastName
-                    ? user.firstName.charAt(0).toUpperCase() + user.lastName.charAt(0).toUpperCase()
-                    : user.email.charAt(0).toUpperCase()}
-                </button>
+                  <button className="flex items-center space-x-2 text-neutral-600 hover:text-neutral-900">
+                    <User className="h-5 w-5" />
+                    <span className="hidden md:inline">{user.firstName}</span>
+                    <ChevronDown className="h-4 w-4" />
+                  </button>
 
-                <AnimatePresence>
-                  {profileDropdownOpen && (
-                    <motion.div
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                      className="absolute top-full right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-neutral-200 z-[9999]" style={{ zIndex: 9999 }}>
-                      <div className="px-4 py-3 border-b border-neutral-100">
-                        <p className="text-sm font-medium text-neutral-900">
-                          {user.firstName} {user.lastName}
-                        </p>
-                        <p className="text-xs text-neutral-500">{user.email}</p>
-                        <p className="text-xs text-neutral-400 capitalize">
-                          {user.userType} • {user.role}
-                        </p>
-                      </div>
-                      {/* Role-based navigation items */}
-                      <RoleBasedComponent allowedRoles={['user', 'moderator', 'admin', 'super_admin']}>
-                        <Link
-                          to="/dashboard"
-                          className="flex items-center px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100"
-                          onClick={() => setProfileDropdownOpen(false)}
-                        >
-                          <Building className="h-4 w-4 mr-2 text-beedab-blue" />
-                          My Dashboard
-                        </Link>
-                      </RoleBasedComponent>
-
-                      <RoleBasedComponent allowedRoles={['seller', 'agent', 'fsbo']}>
-                        <Link
-                          to="/my-properties"
-                          className="flex items-center px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100"
-                          onClick={() => setProfileDropdownOpen(false)}
-                        >
-                          <Building className="h-4 w-4 mr-2 text-beedab-blue" />
-                          My Properties
-                        </Link>
-                      </RoleBasedComponent>
-
-                      <RoleBasedComponent allowedRoles={['agent']}>
-                        <Link
-                          to="/agent-dashboard"
-                          className="flex items-center px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100"
-                          onClick={() => setProfileDropdownOpen(false)}
-                        >
-                          <UserCheck className="h-4 w-4 mr-2 text-beedab-blue" />
-                          Agent Tools
-                        </Link>
-                      </RoleBasedComponent>
-
-                      <RoleBasedComponent requireModerator>
-                        <Link
-                          to="/moderation"
-                          className="flex items-center px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100"
-                          onClick={() => setProfileDropdownOpen(false)}
-                        >
-                          <Shield className="h-4 w-4 mr-2 text-beedab-blue" />
-                          Moderation
-                        </Link>
-                      </RoleBasedComponent>
-
-                      <RoleBasedComponent requireAdmin>
-                        <Link
-                          to="/admin"
-                          className="flex items-center px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100"
-                          onClick={() => setProfileDropdownOpen(false)}
-                        >
-                          <Gavel className="h-4 w-4 mr-2 text-beedab-blue" />
-                          Admin Panel
-                        </Link>
-                      </RoleBasedComponent>
-
-                      <Link
-                        to="/profile"
-                        className="flex items-center px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100"
-                        onClick={() => setProfileDropdownOpen(false)}
+                  <AnimatePresence>
+                    {profileDropdownOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        className="absolute right-0 top-full mt-2 w-64 bg-white rounded-md shadow-lg border border-neutral-200 z-[9999]"
                       >
-                        <Settings className="h-4 w-4 mr-2 text-beedab-blue" />
-                        Account Settings
-                      </Link>
-                      <button
-                        onClick={() => {
-                          logout();
-                          setProfileDropdownOpen(false);
-                        }}
-                        className="flex items-center w-full px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100 border-t border-neutral-100"
-                      >
-                        <LogOut className="h-4 w-4 mr-2 text-beedab-blue" />
-                        Sign Out
-                      </button>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+                        <div className="p-3 border-b">
+                          <p className="font-medium text-neutral-900">{user.firstName} {user.lastName}</p>
+                          <p className="text-sm text-neutral-600">{user.email}</p>
+                          <p className="text-xs text-neutral-500 capitalize">{user.userType}</p>
+                        </div>
+
+                        <div className="py-2">
+                          <Link
+                            to="/dashboard"
+                            className="flex items-center px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100"
+                            onClick={() => setProfileDropdownOpen(false)}
+                          >
+                            <User className="h-4 w-4 mr-3" />
+                            Dashboard
+                          </Link>
+
+                          <Link
+                            to="/profile"
+                            className="flex items-center px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100"
+                            onClick={() => setProfileDropdownOpen(false)}
+                          >
+                            <Settings className="h-4 w-4 mr-3" />
+                            Profile Settings
+                          </Link>
+
+                          <Link
+                            to="/my-properties"
+                            className="flex items-center px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100"
+                            onClick={() => setProfileDropdownOpen(false)}
+                          >
+                            <Building className="h-4 w-4 mr-3" />
+                            My Properties
+                          </Link>
+
+                          {/* Admin/Moderator Links */}
+                          <RoleBasedComponent requiredRole="moderator">
+                            <Link
+                              to="/admin"
+                              className="flex items-center px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100"
+                              onClick={() => setProfileDropdownOpen(false)}
+                            >
+                              <Shield className="h-4 w-4 mr-3" />
+                              Admin Panel
+                            </Link>
+                          </RoleBasedComponent>
+
+                          <div className="border-t my-2"></div>
+
+                          <button
+                            onClick={() => {
+                              logout();
+                              setProfileDropdownOpen(false);
+                            }}
+                            className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                          >
+                            <LogOut className="h-4 w-4 mr-3" />
+                            Sign Out
+                          </button>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
               </div>
             ) : (
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-4">
                 <Link
                   to="/login"
-                  className="text-sm font-medium text-neutral-600 hover:text-neutral-900"
+                  className="text-neutral-600 hover:text-neutral-900 font-medium"
                 >
                   Sign In
                 </Link>
                 <Link
                   to="/pricing"
-                  className="inline-flex items-center px-4 py-2 bg-beedab-blue text-white font-medium rounded-lg hover:bg-beedab-darkblue transition-colors"
+                  className="bg-beedab-blue text-white px-6 py-2 rounded-lg hover:bg-beedab-darkblue transition-colors font-medium"
                 >
                   Get Started
                 </Link>
