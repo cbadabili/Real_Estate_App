@@ -25,35 +25,12 @@ const LoginPage = () => {
   const location = useLocation();
   const { login } = useAuth();
 
-  const [isLogin, setIsLogin] = useState(location.pathname === '/login');
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [showRegistrationModal, setShowRegistrationModal] = useState(false);
-  const [plans, setPlans] = useState([]);
 
-  const { register, handleSubmit, watch, formState: { errors } } = useForm();
-  const password = watch('password');
+  const { register, handleSubmit, formState: { errors } } = useForm();
 
   const redirectPath = new URLSearchParams(location.search).get('redirect') || '/dashboard';
-
-  useEffect(() => {
-    if (!isLogin) {
-      fetchPlans();
-    }
-  }, [isLogin]);
-
-  const fetchPlans = async () => {
-    try {
-      const response = await fetch('/api/billing/plans');
-      const data = await response.json();
-      if (data.success) {
-        setPlans(data.data);
-      }
-    } catch (error) {
-      console.error('Error fetching plans:', error);
-    }
-  };
 
   const onSubmit = async (data: any) => {
     setIsLoading(true);
@@ -70,18 +47,12 @@ const LoginPage = () => {
     }
 
     try {
-      if (isLogin) {
-        console.log('LoginPage: Attempting login...');
-        // Use AuthContext login function
-        await login(trimmedEmail, trimmedPassword);
-        console.log('LoginPage: Login successful!');
-        toast.success('Login successful!');
-        navigate(redirectPath);
-      } else {
-        // Registration - redirect to plans instead of registering directly
-        toast.success('Please select a plan to complete your registration');
-        navigate('/pricing');
-      }
+      console.log('LoginPage: Attempting login...');
+      // Use AuthContext login function
+      await login(trimmedEmail, trimmedPassword);
+      console.log('LoginPage: Login successful!');
+      toast.success('Login successful!');
+      navigate(redirectPath);
     } catch (error) {
       console.error('Auth error:', error);
 
@@ -125,95 +96,12 @@ const LoginPage = () => {
             {/* Header */}
             <div className="text-center mb-8">
               <div className="flex items-center justify-center mb-4">
-                <h1 className="text-2xl font-bold text-neutral-900">
-                  {isLogin ? 'Welcome Back' : (
-                    <div className="flex items-end">
-                      Join <img src="/logo.png" alt="BeeDaB" className="h-10 w-auto ml-2" />
-                    </div>
-                  )}
-                </h1>
+                <h1 className="text-2xl font-bold text-neutral-900">Welcome Back</h1>
               </div>
-              <p className="text-neutral-600">
-                {isLogin 
-                  ? 'Sign in to your account' 
-                  : 'Create your account to get started'
-                }
-              </p>
-            </div>
-
-            {/* Toggle Buttons */}
-            <div className="flex mb-6 bg-neutral-100 rounded-lg p-1">
-              <button
-                onClick={() => setIsLogin(true)}
-                className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-                  isLogin 
-                    ? 'bg-white text-beedab-blue shadow-sm' 
-                    : 'text-neutral-600 hover:text-neutral-900'
-                }`}
-              >
-                Login
-              </button>
-              <button
-                onClick={() => setIsLogin(false)}
-                className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-                  !isLogin 
-                    ? 'bg-white text-beedab-blue shadow-sm' 
-                    : 'text-neutral-600 hover:text-neutral-900'
-                }`}
-              >
-                Register
-              </button>
+              <p className="text-neutral-600">Sign in to your account</p>
             </div>
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-              {/* Registration Fields */}
-              {!isLogin && (
-                <>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-neutral-700 mb-1">
-                        First Name *
-                      </label>
-                      <input
-                        type="text"
-                        {...register('firstName', { required: 'First name is required' })}
-                        className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
-                        placeholder="John"
-                      />
-                      {errors.firstName && (
-                        <p className="text-red-600 text-sm mt-1">{errors.firstName.message as string}</p>
-                      )}
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-neutral-700 mb-1">
-                        Last Name *
-                      </label>
-                      <input
-                        type="text"
-                        {...register('lastName', { required: 'Last name is required' })}
-                        className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
-                        placeholder="Doe"
-                      />
-                      {errors.lastName && (
-                        <p className="text-red-600 text-sm mt-1">{errors.lastName.message as string}</p>
-                      )}
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-neutral-700 mb-1">
-                      Phone Number
-                    </label>
-                    <input
-                      type="tel"
-                      {...register('phone')}
-                      className="w-full px-3 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
-                      placeholder="+267 1234 5678"
-                    />
-                  </div>
-                </>
-              )}
-
               {/* Email Field */}
               <div>
                 <label className="block text-sm font-medium text-neutral-700 mb-1">
@@ -271,37 +159,6 @@ const LoginPage = () => {
                 )}
               </div>
 
-              {/* Confirm Password (Registration only) */}
-              {!isLogin && (
-                <div>
-                  <label className="block text-sm font-medium text-neutral-700 mb-1">
-                    Confirm Password *
-                  </label>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-2.5 h-5 w-5 text-neutral-400" />
-                    <input
-                      type={showConfirmPassword ? 'text' : 'password'}
-                      {...register('confirmPassword', { 
-                        required: 'Please confirm your password',
-                        validate: value => value === password || 'Passwords do not match'
-                      })}
-                      className="w-full pl-10 pr-10 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
-                      placeholder="Confirm your password"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      className="absolute right-3 top-2.5 text-neutral-400 hover:text-neutral-600"
-                    >
-                      {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                    </button>
-                  </div>
-                  {errors.confirmPassword && (
-                    <p className="text-red-600 text-sm mt-1">{errors.confirmPassword.message as string}</p>
-                  )}
-                </div>
-              )}
-
               {/* Submit Button */}
             <button
               type="submit"
@@ -311,16 +168,12 @@ const LoginPage = () => {
               {isLoading ? (
                 <>
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                  {isLogin ? 'Signing in...' : 'Proceeding to plans...'}
+                  Signing in...
                 </>
               ) : (
                 <>
-                  {isLogin ? (
-                    <CheckCircle className="h-4 w-4 mr-2" />
-                  ) : (
-                    <ArrowRight className="h-4 w-4 mr-2" />
-                  )}
-                  {isLogin ? 'Sign In' : 'Select Plan & Register'}
+                  <CheckCircle className="h-4 w-4 mr-2" />
+                  Sign In
                 </>
               )}
             </button>
@@ -339,34 +192,13 @@ const LoginPage = () => {
 
             {/* Footer */}
             <div className="mt-6 text-center text-sm text-neutral-600">
-              {isLogin ? (
-                <>
-                  Don't have an account?{' '}
-                  <Link
-                    to="/pricing"
-                    className="text-beedab-blue hover:text-beedab-darkblue font-medium"
-                  >
-                    Choose a plan to register
-                  </Link>
-                </>
-              ) : (
-                <>
-                  Already have an account?{' '}
-                  <button
-                    onClick={() => setIsLogin(true)}
-                    className="text-beedab-blue hover:text-beedab-darkblue font-medium"
-                  >
-                    Back to Login
-                  </button>
-                  {' or '}
-                  <Link
-                    to="/pricing"
-                    className="text-beedab-blue hover:text-beedab-darkblue font-medium"
-                  >
-                    View Plans
-                  </Link>
-                </>
-              )}
+              Don't have an account?{' '}
+              <Link
+                to="/pricing"
+                className="text-beedab-blue hover:text-beedab-darkblue font-medium"
+              >
+                Choose a plan to register
+              </Link>
             </div>
           </motion.div>
         </div>
