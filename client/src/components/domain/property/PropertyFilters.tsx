@@ -51,8 +51,7 @@ const PropertyFilters: React.FC<PropertyFiltersProps> = ({ onFiltersChange, init
       </div>
 
       <div className="p-4 space-y-6">
-
-      {/* Property Type */}
+        {/* Property Type */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-3">
             Property Type
@@ -104,60 +103,8 @@ const PropertyFilters: React.FC<PropertyFiltersProps> = ({ onFiltersChange, init
         </div>
 
         {/* Location */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-3">
-            Location
-          </label>
-          <input
-            type="text"
-            value={locationSearch}
-            onChange={(e) => setLocationSearch(e.target.value)}
-            placeholder="Search location..."
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
-          />
-        </div>
-
-        {/* Bedrooms */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-3">
-            Bedrooms
-          </label>
-          <div className="flex flex-wrap gap-2">
-            {['any', '1', '2', '3', '4', '5+'].map((bedroom) => (
-              <button
-                key={bedroom}
-                onClick={() => handleFilterChange('bedrooms', bedroom === 'any' ? '' : bedroom)}
-                className={`px-3 py-2 text-sm rounded-lg border transition-colors ${
-                  (filters.bedrooms || 'any') === bedroom
-                    ? 'border-beedab-blue bg-beedab-blue text-white'
-                    : 'border-gray-300 text-gray-700 hover:border-beedab-blue hover:text-beedab-blue'
-                }`}
-              >
-                {bedroom === 'any' ? 'Any' : bedroom}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Price Range
-          </label>
-          <select
-            value={filters.priceRange || ''}
-            onChange={(e) => handleFilterChange('priceRange', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
-          >
-            <option value="">Any Price</option>
-            <option value="0-500000">Under BWP 500K</option>
-            <option value="500000-1000000">BWP 500K - 1M</option>
-            <option value="1000000-2000000">BWP 1M - 2M</option>
-            <option value="2000000+">BWP 2M+</option>
-          </select>
-        </div>
-
         <div className="relative">
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-gray-700 mb-3">
             <MapPin className="inline h-4 w-4 mr-1" />
             Location
           </label>
@@ -284,36 +231,30 @@ const PropertyFilters: React.FC<PropertyFiltersProps> = ({ onFiltersChange, init
             </div>
           )}
         </div>
-      </div>
 
-      <button
-        onClick={() => setShowAdvanced(!showAdvanced)}
-        className="mt-4 flex items-center text-sm text-beedab-blue hover:text-beedab-darkblue"
-      >
-        <SlidersHorizontal className="h-4 w-4 mr-1" />
-        {showAdvanced ? 'Hide' : 'Show'} Advanced Filters
-      </button>
-
-      {showAdvanced && (
-        <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Bedrooms
-            </label>
-            <select
-              value={filters.bedrooms || ''}
-              onChange={(e) => handleFilterChange('bedrooms', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
-            >
-              <option value="">Any</option>
-              <option value="1">1+</option>
-              <option value="2">2+</option>
-              <option value="3">3+</option>
-              <option value="4">4+</option>
-            </select>
+        {/* Bedrooms */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-3">
+            Bedrooms
+          </label>
+          <div className="flex flex-wrap gap-2">
+            {['any', '1', '2', '3', '4', '5+'].map((bedroom) => (
+              <button
+                key={bedroom}
+                onClick={() => handleFilterChange('bedrooms', bedroom === 'any' ? '' : bedroom)}
+                className={`px-3 py-2 text-sm rounded-lg border transition-colors ${
+                  (filters.bedrooms || 'any') === bedroom
+                    ? 'border-beedab-blue bg-beedab-blue text-white'
+                    : 'border-gray-300 text-gray-700 hover:border-beedab-blue hover:text-beedab-blue'
+                }`}
+              >
+                {bedroom === 'any' ? 'Any' : bedroom}
+              </button>
+            ))}
           </div>
+        </div>
 
-          {/* Bathrooms */}
+        {/* Bathrooms */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-3">
             Bathrooms
@@ -368,6 +309,7 @@ const PropertyFilters: React.FC<PropertyFiltersProps> = ({ onFiltersChange, init
             onClick={() => setShowAdvanced(!showAdvanced)}
             className="text-sm text-beedab-blue hover:text-beedab-darkblue flex items-center"
           >
+            <SlidersHorizontal className="h-4 w-4 mr-1" />
             {showAdvanced ? 'Hide' : 'Show'} Advanced Filters
           </button>
         </div>
@@ -406,4 +348,4 @@ const PropertyFilters: React.FC<PropertyFiltersProps> = ({ onFiltersChange, init
   );
 };
 
-export default PropertyFilters;lters;
+export default PropertyFilters;
