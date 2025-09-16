@@ -57,18 +57,18 @@ const LoginPage = () => {
 
   const onSubmit = async (data: any) => {
     setIsLoading(true);
-    
+
     // Trim whitespace from inputs
     const trimmedEmail = data.email?.trim();
     const trimmedPassword = data.password?.trim();
-    
+
     // Validate required fields
     if (!trimmedEmail || !trimmedPassword) {
       toast.error('Email and password are required');
       setIsLoading(false);
       return;
     }
-    
+
     try {
       if (isLogin) {
         console.log('LoginPage: Attempting login...');
@@ -84,7 +84,7 @@ const LoginPage = () => {
       }
     } catch (error) {
       console.error('Auth error:', error);
-      
+
       // Show specific error messages
       if (error instanceof Error) {
         toast.error(error.message);
@@ -303,28 +303,27 @@ const LoginPage = () => {
               )}
 
               {/* Submit Button */}
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="w-full bg-beedab-blue text-white py-2 px-4 rounded-lg font-medium hover:bg-beedab-darkblue transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-              >
-                {isLoading ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                    {isLogin ? 'Signing in...' : 'Creating account...'}
-                  </>
-                ) : (
-                  <>
-                    {isLogin ? (
-                      <CheckCircle className="h-4 w-4 mr-2" />
-                    ) : (
-                      <UserCheck className="h-4 w-4 mr-2" />
-                    )}
-                    {isLogin ? 'Sign In' : 'Create Account'}
-                  </>
-                )}
-              </button>
-            </form>
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="w-full bg-beedab-blue text-white py-2 px-4 rounded-lg font-medium hover:bg-beedab-darkblue transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+            >
+              {isLoading ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  {isLogin ? 'Signing in...' : 'Proceeding to plans...'}
+                </>
+              ) : (
+                <>
+                  {isLogin ? (
+                    <CheckCircle className="h-4 w-4 mr-2" />
+                  ) : (
+                    <ArrowRight className="h-4 w-4 mr-2" />
+                  )}
+                  {isLogin ? 'Sign In' : 'Select Plan & Register'}
+                </>
+              )}
+            </button>
 
             {/* Browse Plans Button */}
             <div className="mt-4">
