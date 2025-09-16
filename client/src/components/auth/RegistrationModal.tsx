@@ -47,7 +47,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
     contact_agent: "Contact an Agent", 
     save_listing: "Save This Listing",
     schedule_viewing: "Schedule a Viewing",
-    get_started: "Get Started with BeeDab"
+    get_started: "Choose Your Plan & Get Started"
   };
 
   const actionDescriptions = {
@@ -55,7 +55,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
     contact_agent: "To contact agents and save your conversations, you'll need an account.",
     save_listing: "To save listings and get personalized recommendations, you'll need an account.",
     schedule_viewing: "To schedule viewings and manage your appointments, you'll need an account.",
-    get_started: "Choose the perfect plan for your real estate needs."
+    get_started: "Create your account and choose the perfect plan for your real estate journey."
   };
 
   const getPlanIcon = (planCode: string) => {

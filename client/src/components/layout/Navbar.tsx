@@ -716,7 +716,7 @@ const Navbar = () => {
                   onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
                   className="h-10 w-10 bg-beedab-blue rounded-full flex items-center justify-center text-white font-semibold hover:bg-beedab-darkblue transition-colors"
                 >
-                  {user.firstName && user.lastName 
+                  {user.firstName && user.lastName
                     ? user.firstName.charAt(0).toUpperCase() + user.lastName.charAt(0).toUpperCase()
                     : user.email.charAt(0).toUpperCase()}
                 </button>
@@ -824,8 +824,8 @@ const Navbar = () => {
                   Sign In
                 </Link>
                 <Link
-                  to="/register"
-                  className="bg-beedab-blue text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-beedab-darkblue transition-colors"
+                  to="/pricing"
+                  className="inline-flex items-center px-4 py-2 bg-beedab-blue text-white font-medium rounded-lg hover:bg-beedab-darkblue transition-colors"
                 >
                   Get Started
                 </Link>
@@ -963,7 +963,7 @@ const Navbar = () => {
                     Sign In
                   </Link>
                   <Link
-                    to="/register"
+                    to="/pricing"
                     onClick={() => setIsOpen(false)}
                     className="block px-3 py-2 text-sm font-medium bg-beedab-blue text-white rounded hover:bg-beedab-darkblue"
                   >

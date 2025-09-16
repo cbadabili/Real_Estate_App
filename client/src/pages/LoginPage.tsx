@@ -82,8 +82,11 @@ const LoginPage = () => {
         const result = await response.json();
 
         if (response.ok) {
-          toast.success('Registration successful! Please login.');
-          setIsLogin(true);
+          toast.success('Registration successful! Redirecting to plans...');
+          // Redirect to pricing page after successful registration
+          setTimeout(() => {
+            navigate('/pricing');
+          }, 1500);
         } else {
           const errorMessage = result.message || 'Registration failed. Please try again.';
           toast.error(errorMessage);
@@ -333,6 +336,17 @@ const LoginPage = () => {
               </button>
             </form>
 
+            {/* Browse Plans Button */}
+            <div className="mt-4">
+              <Link
+                to="/pricing"
+                className="w-full bg-gray-100 text-beedab-blue py-2 px-4 rounded-lg font-medium hover:bg-gray-200 transition-colors flex items-center justify-center"
+              >
+                Browse Plans First
+                <ArrowRight className="h-4 w-4 ml-2" />
+              </Link>
+            </div>
+
             {/* Footer */}
             <div className="mt-6 text-center text-sm text-neutral-600">
               {isLogin ? (
@@ -344,6 +358,13 @@ const LoginPage = () => {
                   >
                     Register here
                   </button>
+                  {' or '}
+                  <Link
+                    to="/pricing"
+                    className="text-beedab-blue hover:text-beedab-darkblue font-medium"
+                  >
+                    View Plans
+                  </Link>
                 </>
               ) : (
                 <>
@@ -354,6 +375,13 @@ const LoginPage = () => {
                   >
                     Back to Login
                   </button>
+                  {' or '}
+                  <Link
+                    to="/pricing"
+                    className="text-beedab-blue hover:text-beedab-darkblue font-medium"
+                  >
+                    View Plans
+                  </Link>
                 </>
               )}
             </div>

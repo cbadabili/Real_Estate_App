@@ -486,8 +486,8 @@ const HomePage = () => {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button
                 onClick={() => {
-                  // Navigate to properties page with smooth scrolling
-                  window.location.href = '/properties';
+                  // Navigate to pricing page
+                  window.location.href = '/pricing';
                 }}
                 className="inline-flex items-center justify-center px-8 py-4 bg-white text-beedab-darkblue font-semibold rounded-xl hover:bg-gray-100 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
               >
