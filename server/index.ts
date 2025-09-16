@@ -353,11 +353,7 @@ app.get('/api/health', (_req: Request, res: Response) => {
   // this serves both the API and the client.
   // It is the only port that is not firewalled.
   const port = 5000; // Force port 5000 for consistency with Vite proxy
-  server.listen({
-    port,
-    host: "0.0.0.0",
-    reusePort: true,
-  }, () => {
+  server.listen(port, "0.0.0.0", () => {
     log(`serving on port ${port}`);
   });
 })();
