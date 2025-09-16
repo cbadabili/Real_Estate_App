@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import jwt from 'jsonwebtoken';
 import { User, UserRole, UserType, Permission } from '../shared/schema';
 import { storage } from './storage';
 
@@ -147,6 +148,41 @@ export class AuthService {
   }
 }
 
+// JWT utilities
+const JWT_SECRET = process.env.JWT_SECRET || 'beedab-secret-key-change-in-production';
+const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '24h';
+
+export interface JWTPayload {
+  userId: number;
+  email: string;
+  userType: string;
+  role: string;
+  iat?: number;
+  exp?: number;
+}
+
+export const generateToken = (user: User): string => {
+  const payload: JWTPayload = {
+    userId: user.id,
+    email: user.email,
+    userType: user.userType,
+    role: user.role
+  };
+  
+  return jwt.sign(payload, JWT_SECRET, { 
+    expiresIn: JWT_EXPIRES_IN,
+    issuer: 'beedab-api',
+    audience: 'beedab-client'
+  });
+};
+
+export const verifyToken = (token: string): JWTPayload => {
+  return jwt.verify(token, JWT_SECRET, {
+    issuer: 'beedab-api',
+    audience: 'beedab-client'
+  }) as JWTPayload;
+};
+
 // Authentication middleware
 export const authenticate = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -157,18 +193,23 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
 
     const token = authHeader.substring(7);
 
-    // Extract user ID from token
+    // Try JWT first, then fall back to legacy simple token
     let userId: number;
-    if (token.startsWith('user_')) {
-      // Handle legacy token format
-      userId = parseInt(token.split('_')[1]);
-    } else {
-      // Handle simple numeric token
-      userId = parseInt(token);
-    }
+    try {
+      // Verify JWT token
+      const payload = verifyToken(token);
+      userId = payload.userId;
+    } catch (jwtError) {
+      // Fall back to legacy token format for backwards compatibility
+      if (token.startsWith('user_')) {
+        userId = parseInt(token.split('_')[1]);
+      } else {
+        userId = parseInt(token);
+      }
 
-    if (isNaN(userId)) {
-      return res.status(401).json({ error: 'Invalid token format' });
+      if (isNaN(userId)) {
+        return res.status(401).json({ error: 'Invalid token format' });
+      }
     }
 
     const user = await storage.getUser(userId);
@@ -183,6 +224,11 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
     next();
   } catch (error) {
     console.error('Authentication error:', error);
+    if (error.name === 'TokenExpiredError') {
+      return res.status(401).json({ error: 'Token expired' });
+    } else if (error.name === 'JsonWebTokenError') {
+      return res.status(401).json({ error: 'Invalid token' });
+    }
     return res.status(500).json({ error: 'Authentication failed' });
   }
 };

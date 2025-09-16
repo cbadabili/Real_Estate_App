@@ -2,6 +2,7 @@
 import type { Express } from "express";
 import { storage } from "../storage";
 import { insertUserSchema } from "../../shared/schema";
+import { generateToken } from "../auth-middleware";
 import bcrypt from 'bcrypt';
 
 export function registerAuthRoutes(app: Express) {
@@ -145,6 +146,9 @@ export function registerAuthRoutes(app: Express) {
         // Don't fail login for this
       }
 
+      // Generate JWT token
+      const token = generateToken(user);
+
       // Prepare user response (remove sensitive data)
       const userResponse = {
         id: user.id,
@@ -162,7 +166,8 @@ export function registerAuthRoutes(app: Express) {
         isActive: Boolean(user.isActive),
         reacNumber: user.reacNumber,
         lastLoginAt: user.lastLoginAt,
-        createdAt: user.createdAt
+        createdAt: user.createdAt,
+        token: token // Include the JWT token
       };
 
       console.log('Login successful for user:', userResponse.email, 'with ID:', userResponse.id);

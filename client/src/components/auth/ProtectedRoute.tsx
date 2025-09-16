@@ -150,3 +150,15 @@ export const RoleBasedComponent: React.FC<RoleBasedComponentProps> = ({
 
   return <>{children}</>;
 };
+
+// Utility component for property creation authorization
+export const PropertyCreationGuard: React.FC<{ children: React.ReactNode; fallback?: React.ReactNode }> = ({ 
+  children, 
+  fallback = null 
+}) => {
+  const { user } = useAuth();
+  
+  const canCreateProperty = user && ['seller', 'agent', 'fsbo', 'admin'].includes(user.userType);
+  
+  return canCreateProperty ? <>{children}</> : fallback;
+};

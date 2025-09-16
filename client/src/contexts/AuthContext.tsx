@@ -143,8 +143,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       // Set user data
       setUser(response);
 
-      // Create a token that the middleware can understand
-      const token = response.id.toString();
+      // Use the JWT token returned from the server, or fall back to simple ID token
+      const token = response.token || response.id.toString();
       setAuthToken(token);
 
       if (typeof window !== 'undefined') {

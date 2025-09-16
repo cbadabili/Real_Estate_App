@@ -1,8 +1,8 @@
 
 import type { Express } from "express";
 import { storage } from "../storage";
-import { insertPropertySchema } from "../../shared/schema";
-import { authenticate, optionalAuthenticate } from "../auth-middleware";
+import { insertPropertySchema, UserType } from "../../shared/schema";
+import { authenticate, optionalAuthenticate, requireUserType } from "../auth-middleware";
 
 export function registerPropertyRoutes(app: Express) {
   // Get all properties
@@ -109,8 +109,8 @@ export function registerPropertyRoutes(app: Express) {
     }
   });
 
-  // Create property
-  app.post("/api/properties", authenticate, async (req, res) => {
+  // Create property - only sellers, agents, fsbo, and admin users can create properties
+  app.post("/api/properties", authenticate, requireUserType(UserType.SELLER, UserType.AGENT, UserType.FSBO, UserType.ADMIN), async (req, res) => {
     try {
       console.log("Create property request body:", req.body);
       

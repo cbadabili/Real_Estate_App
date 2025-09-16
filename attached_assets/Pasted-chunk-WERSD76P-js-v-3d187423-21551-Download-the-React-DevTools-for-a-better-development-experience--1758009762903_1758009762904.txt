@@ -1,0 +1,51 @@
+chunk-WERSD76P.js?v=3d187423:21551 Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+PropertySearchPage.tsx:65 Fetching with params: minPrice=0&maxPrice=5000000&sortBy=newest&status=active
+queryClient.ts:39 API Request: /api/users/11 GET
+PropertySearchPage.tsx:65 Fetching with params: minPrice=0&maxPrice=5000000&sortBy=newest&status=active
+queryClient.ts:39 API Request: /api/users/11 GET
+PropertySearchPage.tsx:70 Received properties: 9
+queryClient.ts:49 API Response status: 200
+queryClient.ts:74 API Response data received
+PropertySearchPage.tsx:70 Received properties: 9
+queryClient.ts:49 API Response status: 200
+queryClient.ts:74 API Response data received
+3properties?type=commercial:1 Uncaught (in promise) Error: A listener indicated an asynchronous response by returning true, but the message channel closed before a response was receivedUnderstand this error
+queryClient.ts:39 API Request: /api/users/11 GET
+queryClient.ts:49 API Response status: 200
+queryClient.ts:74 API Response data received
+queryClient.ts:39 API Request: /api/billing/me GET
+queryClient.ts:49 API Response status: 200
+queryClient.ts:74 API Response data received
+MapSearchPage.tsx:44 Raw API response: Array(11)
+MapSearchPage.tsx:61 Property 35 "Test Property" has invalid coordinates, using demo coordinates: -24.600273469250496, 25.93014066356133
+(anonymous) @ MapSearchPage.tsx:61Understand this warning
+MapSearchPage.tsx:64 Property 35: lat=-24.600273469250496, lng=25.93014066356133
+MapSearchPage.tsx:64 Property 24: lat=-21.167, lng=27.5084
+MapSearchPage.tsx:64 Property 25: lat=-19.9833, lng=23.4167
+MapSearchPage.tsx:64 Property 26: lat=-17.8167, lng=25.15
+MapSearchPage.tsx:64 Property 27: lat=-24.6282, lng=25.9231
+MapSearchPage.tsx:64 Property 22: lat=-24.6282, lng=25.9231
+MapSearchPage.tsx:64 Property 28: lat=-24.6892, lng=25.8544
+MapSearchPage.tsx:64 Property 29: lat=-24.5892, lng=25.9544
+MapSearchPage.tsx:64 Property 30: lat=-21.167, lng=27.5084
+MapSearchPage.tsx:64 Property 23: lat=-24.6282, lng=25.9231
+MapSearchPage.tsx:64 Property 31: lat=-24.55, lng=25.91
+MapSearchPage.tsx:81 Fetched 11 properties for map display
+7Refused to create a worker from 'blob:<URL>' because it violates the following Content Security Policy directive: "script-src 'self' 'unsafe-inline' <URL> <URL>". Note that 'worker-src' was not explicitly set, so 'script-src' is used as a fallback.
+Understand this error
+MapSearchPage.tsx:44 Raw API response: Array(11)
+MapSearchPage.tsx:61 Property 35 "Test Property" has invalid coordinates, using demo coordinates: -24.664319993651862, 25.931484683544326
+(anonymous) @ MapSearchPage.tsx:61Understand this warning
+MapSearchPage.tsx:64 Property 35: lat=-24.664319993651862, lng=25.931484683544326
+MapSearchPage.tsx:64 Property 24: lat=-21.167, lng=27.5084
+MapSearchPage.tsx:64 Property 25: lat=-19.9833, lng=23.4167
+MapSearchPage.tsx:64 Property 26: lat=-17.8167, lng=25.15
+MapSearchPage.tsx:64 Property 27: lat=-24.6282, lng=25.9231
+MapSearchPage.tsx:64 Property 22: lat=-24.6282, lng=25.9231
+MapSearchPage.tsx:64 Property 28: lat=-24.6892, lng=25.8544
+MapSearchPage.tsx:64 Property 29: lat=-24.5892, lng=25.9544
+MapSearchPage.tsx:64 Property 30: lat=-21.167, lng=27.5084
+MapSearchPage.tsx:64 Property 23: lat=-24.6282, lng=25.9231
+MapSearchPage.tsx:64 Property 31: lat=-24.55, lng=25.91
+MapSearchPage.tsx:81 Fetched 11 properties for map display
+api/billing/subscribe:1  Failed to load resource: the server responded with a status of 401 (Unauthorized)
