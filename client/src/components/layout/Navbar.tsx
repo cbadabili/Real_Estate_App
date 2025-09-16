@@ -7,7 +7,6 @@ import {
   Home,
   Search,
   MapPin,
-  Gavel,
   User,
   ChevronDown,
   Menu,
@@ -28,11 +27,9 @@ import {
   PlusCircle,
   Calendar,
   Settings,
-  LogOut,
-  UserCheck
+  LogOut
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
-import { AISearchBar } from '../search/AISearchBar';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -41,9 +38,8 @@ const Navbar = () => {
   const [rentDropdownOpen, setRentDropdownOpen] = useState(false);
   const [servicesDropdownOpen, setServicesDropdownOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
-  const [priceRange, setPriceRange] = useState([100000, 2000000]);
   const location = useLocation();
-  const { user, logout, isAdmin, isModerator } = useAuth();
+  const { user, logout } = useAuth();
 
   const postDropdownNavigation = [
     { name: 'Map Search', href: '/map-search', icon: MapPin },
@@ -696,8 +692,8 @@ const Navbar = () => {
           <div className="flex items-center space-x-2 md:space-x-4 flex-shrink-0">
             {user ? (
               <div className="flex items-center space-x-4">
-                <NotificationCenter />
-
+                {/* TODO: Add notification bell icon - NotificationCenter needs props */}
+                
                 {/* User Menu */}
                 <div
                   className="relative"
@@ -753,7 +749,7 @@ const Navbar = () => {
                           </Link>
 
                           {/* Admin/Moderator Links */}
-                          <RoleBasedComponent requiredRole="moderator">
+                          <RoleBasedComponent requireModerator>
                             <Link
                               to="/admin"
                               className="flex items-center px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100"

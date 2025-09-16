@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
@@ -7,14 +7,8 @@ import {
   Lock, 
   Eye, 
   EyeOff, 
-  User, 
   ArrowLeft,
-  AlertCircle,
   CheckCircle,
-  Building,
-  UserCheck,
-  Users,
-  Briefcase,
   ArrowRight
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
