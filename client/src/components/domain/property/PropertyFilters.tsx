@@ -356,3 +356,5 @@ export const PropertyFilters: React.FC<PropertyFiltersProps> = ({
     </div>
   );
 };
+
+export default PropertyFilters;
