@@ -31,7 +31,7 @@ app.use(helmet({
     directives: {
       defaultSrc: ["'self'"],
       styleSrc: ["'self'", "'unsafe-inline'", "https://api.mapbox.com", "https://fonts.googleapis.com"],
-      scriptSrc: ["'self'", "'unsafe-inline'", "https://api.mapbox.com", "https://replit.com"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://api.mapbox.com", "https://replit.com"],
       imgSrc: ["'self'", "data:", "https:", "blob:"],
       connectSrc: ["'self'", "https://api.mapbox.com", "https://events.mapbox.com", "wss:", "ws:"],
       fontSrc: ["'self'", "'unsafe-inline'", "data:", "https://fonts.gstatic.com", "https://fonts.googleapis.com"],
