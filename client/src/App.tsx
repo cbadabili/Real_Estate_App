@@ -128,6 +128,7 @@ function App() {
             <Route path="/renter-dashboard" element={<ProtectedRoute><RenterDashboard /></ProtectedRoute>} />
             <Route path="/properties" element={<PropertySearchPage />} />
             <Route path="/properties/:id" element={<PropertyDetailsPage />} />
+            <Route path="/properties/:id/schedule-viewing" element={<ScheduleViewingPage />} />
             <Route path="/create-listing" element={<ProtectedRoute><CreateListingPage /></ProtectedRoute>} />
             <Route path="/my-properties" element={<ProtectedRoute><MyPropertiesPage /></ProtectedRoute>} />
             <Route path="/rent" element={<RentPage />} />

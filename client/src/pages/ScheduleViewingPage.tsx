@@ -34,9 +34,25 @@ const ScheduleViewingPage = () => {
       try {
         const response = await fetch(`/api/properties/${id}`);
         if (!response.ok) {
-          throw new Error('Property not found');
+          if (response.status === 404) {
+            throw new Error('Property not found');
+          }
+          throw new Error('Failed to load property');
         }
         const propertyData = await response.json();
+        
+        // Parse images safely
+        let images = ['/api/placeholder/600/400'];
+        if (propertyData.images) {
+          try {
+            images = Array.isArray(propertyData.images) 
+              ? propertyData.images 
+              : JSON.parse(propertyData.images);
+          } catch (e) {
+            console.warn('Failed to parse property images:', e);
+          }
+        }
+
         setProperty({
           id: propertyData.id,
           title: propertyData.title,
@@ -44,7 +60,7 @@ const ScheduleViewingPage = () => {
           price: `P${parseFloat(propertyData.price || 0).toLocaleString()}`,
           bedrooms: propertyData.bedrooms,
           bathrooms: propertyData.bathrooms,
-          images: propertyData.images ? (Array.isArray(propertyData.images) ? propertyData.images : JSON.parse(propertyData.images)) : ['/api/placeholder/600/400'],
+          images: images,
           agent: {
             name: 'Sarah Johnson',
             phone: '+267 1234 5678',
@@ -53,15 +69,22 @@ const ScheduleViewingPage = () => {
         });
       } catch (error) {
         console.error('Error fetching property:', error);
-        toast.error('Failed to load property details');
-        navigate('/properties');
+        toast.error(error.message || 'Failed to load property details');
+        // Don't redirect immediately, let user see the error
+        setTimeout(() => {
+          navigate('/properties');
+        }, 3000);
       } finally {
         setLoading(false);
       }
     };
 
-    if (id) {
+    if (id && !isNaN(parseInt(id))) {
       fetchProperty();
+    } else {
+      setLoading(false);
+      toast.error('Invalid property ID');
+      navigate('/properties');
     }
   }, [id, navigate]);
 

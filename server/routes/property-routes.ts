@@ -205,4 +205,30 @@ export function registerPropertyRoutes(app: Express) {
       res.status(500).json({ message: "Failed to delete property" });
     }
   });
+
+  // Create appointment for property viewing
+  app.post("/api/appointments", async (req, res) => {
+    try {
+      const appointmentData = req.body;
+      
+      // Basic validation
+      if (!appointmentData.propertyId || !appointmentData.buyerId || !appointmentData.appointmentDate) {
+        return res.status(400).json({ message: "Missing required fields" });
+      }
+
+      // For now, we'll just return a success response
+      // In a real implementation, you'd save to database
+      const appointment = {
+        id: Date.now(), // Mock ID
+        ...appointmentData,
+        status: 'pending',
+        createdAt: new Date().toISOString()
+      };
+
+      res.status(201).json(appointment);
+    } catch (error) {
+      console.error("Create appointment error:", error);
+      res.status(500).json({ message: "Failed to create appointment" });
+    }
+  });
 }

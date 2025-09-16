@@ -22,14 +22,14 @@ export async function seedProperties() {
     .from(users)
     .where(inArray(users.userType, ['agent', 'fsbo', 'seller', 'buyer']))
     .orderBy(asc(users.id));
-    
+
   if (eligibleUsers.length === 0) {
     console.log('❌ No eligible users found for property ownership');
     return;
   }
-  
+
   console.log(`Found ${eligibleUsers.length} eligible users with IDs: ${eligibleUsers.map(u => u.id).join(', ')}`);
-  
+
   const getOwnerId = (i: number) => eligibleUsers[i % eligibleUsers.length].id;
   const getAgentId = (i: number) => {
     const agents = eligibleUsers.filter(u => u.userType === 'agent');
@@ -286,7 +286,54 @@ export async function seedProperties() {
       propertyTaxes: '12000',
       hoaFees: '500',
       ownerId: getOwnerId(1),
-    }
+    },
+    {
+      title: "Luxury Villa with Pool",
+      description: "Stunning 5-bedroom villa with swimming pool and garden in prime location.",
+      propertyType: "house",
+      listingType: "agent",
+      price: "4500000",
+      bedrooms: 5,
+      bathrooms: 4,
+      squareFeet: 450,
+      yearBuilt: 2018,
+      city: "Gaborone",
+      state: "South East",
+      zipCode: "0000",
+      status: "active",
+      images: JSON.stringify(["/api/placeholder/600/400", "/api/placeholder/600/401", "/api/placeholder/600/402"]),
+      features: JSON.stringify(["Swimming Pool", "Garden", "Garage", "Air Conditioning", "Security System"]),
+      latitude: -24.6282,
+      longitude: 25.9231,
+      ownerId: 2,
+      views: Math.floor(Math.random() * 500) + 50,
+      createdAt: Math.floor(Date.now() / 1000) - Math.floor(Math.random() * 30) * 24 * 60 * 60,
+      updatedAt: Math.floor(Date.now() / 1000) - Math.floor(Math.random() * 7) * 24 * 60 * 60
+    },
+    {
+      title: "Modern Family Home in Phakalane",
+      description: "Beautiful 4-bedroom family home with modern amenities in sought-after Phakalane Estate.",
+      propertyType: "house",
+      listingType: "fsbo",
+      price: "3200000",
+      bedrooms: 4,
+      bathrooms: 3,
+      squareFeet: 320,
+      yearBuilt: 2020,
+      city: "Gaborone",
+      state: "South East",
+      zipCode: "0000",
+      address: "Plot 123, Phakalane Estate",
+      status: "active",
+      images: JSON.stringify(["/api/placeholder/600/400", "/api/placeholder/600/401", "/api/placeholder/600/402"]),
+      features: JSON.stringify(["Modern Kitchen", "Master En-suite", "Double Garage", "Solar Geyser", "Alarm System"]),
+      latitude: -24.5974,
+      longitude: 25.9063,
+      ownerId: 1,
+      views: Math.floor(Math.random() * 300) + 25,
+      createdAt: Math.floor(Date.now() / 1000) - Math.floor(Math.random() * 20) * 24 * 60 * 60,
+      updatedAt: Math.floor(Date.now() / 1000) - Math.floor(Math.random() * 5) * 24 * 60 * 60
+    },
   ];
 
   try {
