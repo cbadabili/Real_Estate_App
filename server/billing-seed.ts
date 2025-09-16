@@ -1,6 +1,6 @@
 import { db } from "./db";
 import { plans } from "../shared/schema";
-import { sql } from "drizzle-orm";
+import { sql, notInArray } from "drizzle-orm";
 
 export async function seedBilling() {
   console.log('🎯 Seeding billing plans (idempotent)...');
@@ -87,10 +87,12 @@ export async function seedBilling() {
 
   // Deactivate any non-canonical plans (legacy cleanup)
   const canonicalCodes = CANONICAL_PLANS.map(p => p.code);
-  const result = await db
-    .update(plans)
-    .set({ is_active: false })
-    .where(sql`code NOT IN ('${canonicalCodes.join("', '")}')`);
+  if (canonicalCodes.length > 0) {
+    const result = await db
+      .update(plans)
+      .set({ is_active: false })
+      .where(notInArray(plans.code, canonicalCodes));
+  }
 
   console.log('✅ Billing plans synchronized successfully');
   console.log(`   - ${CANONICAL_PLANS.length} canonical plans active`);
