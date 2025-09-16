@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
-import { Search, Filter, SlidersHorizontal, X } from 'lucide-react';
+import { Search, Filter, SlidersHorizontal, X, MapPin, Loader2 } from 'lucide-react';
+import { useDistricts, useLocationSearch } from '../../../hooks/useLocations';
 
 interface PropertyFiltersProps {
   onFiltersChange: (filters: any) => void;
@@ -10,6 +11,16 @@ interface PropertyFiltersProps {
 const PropertyFilters: React.FC<PropertyFiltersProps> = ({ onFiltersChange, initialFilters = {} }) => {
   const [filters, setFilters] = useState(initialFilters);
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [locationSearch, setLocationSearch] = useState('');
+  const [showLocationSuggestions, setShowLocationSuggestions] = useState(false);
+
+  // API hooks for location data
+  const { data: districtsData, isLoading: loadingDistricts } = useDistricts();
+  const { data: locationSearchData } = useLocationSearch(
+    locationSearch.length >= 2 ? locationSearch : '', 
+    'all', 
+    10
+  );
 
   const handleFilterChange = (key: string, value: any) => {
     const newFilters = { ...filters, [key]: value };
@@ -74,21 +85,133 @@ const PropertyFilters: React.FC<PropertyFiltersProps> = ({ onFiltersChange, init
           </select>
         </div>
 
-        <div>
+        <div className="relative">
           <label className="block text-sm font-medium text-gray-700 mb-1">
+            <MapPin className="inline h-4 w-4 mr-1" />
             Location
           </label>
-          <select
-            value={filters.city || ''}
-            onChange={(e) => handleFilterChange('city', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
-          >
-            <option value="">All Locations</option>
-            <option value="Gaborone">Gaborone</option>
-            <option value="Francistown">Francistown</option>
-            <option value="Maun">Maun</option>
-            <option value="Kasane">Kasane</option>
-          </select>
+          <div className="relative">
+            <input
+              type="text"
+              value={locationSearch || filters.city || ''}
+              onChange={(e) => {
+                setLocationSearch(e.target.value);
+                setShowLocationSuggestions(true);
+                if (e.target.value === '') {
+                  handleFilterChange('city', '');
+                  handleFilterChange('state', '');
+                }
+              }}
+              onFocus={() => setShowLocationSuggestions(true)}
+              onBlur={() => {
+                setTimeout(() => setShowLocationSuggestions(false), 200);
+              }}
+              placeholder="Search districts, cities, towns..."
+              className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
+            />
+            {loadingDistricts && (
+              <Loader2 className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 animate-spin text-gray-400" />
+            )}
+          </div>
+
+          {/* Location Suggestions Dropdown */}
+          {showLocationSuggestions && locationSearchData && (
+            <div className="absolute z-20 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+              {/* Districts */}
+              {locationSearchData.data.districts.length > 0 && (
+                <div className="border-b border-gray-100">
+                  <div className="px-3 py-2 bg-gray-50 text-xs font-medium text-gray-500 uppercase tracking-wide">
+                    Districts
+                  </div>
+                  {locationSearchData.data.districts.map((district) => (
+                    <button
+                      key={`district-${district.id}`}
+                      onClick={() => {
+                        handleFilterChange('city', district.name);
+                        handleFilterChange('state', district.name);
+                        setLocationSearch(district.name);
+                        setShowLocationSuggestions(false);
+                      }}
+                      className="w-full text-left px-4 py-2 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="font-medium">{district.name}</span>
+                        <span className="text-sm text-gray-500">
+                          {district.type} • {district.region}
+                        </span>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+              
+              {/* Settlements */}
+              {locationSearchData.data.settlements.length > 0 && (
+                <div className="border-b border-gray-100">
+                  <div className="px-3 py-2 bg-gray-50 text-xs font-medium text-gray-500 uppercase tracking-wide">
+                    Cities & Towns
+                  </div>
+                  {locationSearchData.data.settlements.map((item) => (
+                    <button
+                      key={`settlement-${item.settlement.id}`}
+                      onClick={() => {
+                        handleFilterChange('city', item.settlement.name);
+                        handleFilterChange('state', item.district.name);
+                        setLocationSearch(item.settlement.name);
+                        setShowLocationSuggestions(false);
+                      }}
+                      className="w-full text-left px-4 py-2 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="font-medium">{item.settlement.name}</span>
+                        <span className="text-sm text-gray-500">
+                          {item.settlement.type} • {item.district.name}
+                        </span>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+              
+              {/* Wards */}
+              {locationSearchData.data.wards.length > 0 && (
+                <div>
+                  <div className="px-3 py-2 bg-gray-50 text-xs font-medium text-gray-500 uppercase tracking-wide">
+                    Wards & Areas
+                  </div>
+                  {locationSearchData.data.wards.map((item) => (
+                    <button
+                      key={`ward-${item.ward.id}`}
+                      onClick={() => {
+                        handleFilterChange('city', item.settlement.name);
+                        handleFilterChange('state', item.district.name);
+                        handleFilterChange('ward', item.ward.name);
+                        setLocationSearch(`${item.ward.name}, ${item.settlement.name}`);
+                        setShowLocationSuggestions(false);
+                      }}
+                      className="w-full text-left px-4 py-2 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="font-medium">{item.ward.name}</span>
+                        <span className="text-sm text-gray-500">
+                          {item.settlement.name} • {item.district.name}
+                        </span>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+              
+              {/* No results */}
+              {locationSearchData.data.districts.length === 0 && 
+               locationSearchData.data.settlements.length === 0 && 
+               locationSearchData.data.wards.length === 0 && (
+                <div className="px-4 py-3 text-sm text-gray-500 text-center">
+                  No locations found for "{locationSearch}"
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
 

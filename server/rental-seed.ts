@@ -1,7 +1,8 @@
 
 import { db } from "./db";
 import { rental_listings, users } from "../shared/schema";
-import { getAllTowns } from '../client/src/data/botswanaGeography';
+// Note: Location data is now provided via API, not static imports
+// We'll use predefined coordinates for seeding since this is a one-time operation
 import { inArray, asc } from 'drizzle-orm';
 
 export async function seedRentals() {
@@ -34,7 +35,17 @@ export async function seedRentals() {
   
   const getLandlordId = (i: number) => landlords[i % landlords.length].id;
 
-  const towns = getAllTowns();
+  // Predefined town coordinates for seeding (since location data is now API-based)
+  const towns = [
+    { name: 'Gaborone', coordinates: { lat: -24.6282, lng: 25.9231 } },
+    { name: 'Francistown', coordinates: { lat: -21.1670, lng: 27.5080 } },
+    { name: 'Maun', coordinates: { lat: -19.9833, lng: 23.4167 } },
+    { name: 'Kasane', coordinates: { lat: -17.8167, lng: 25.1500 } },
+    { name: 'Serowe', coordinates: { lat: -22.3833, lng: 26.7167 } },
+    { name: 'Lobatse', coordinates: { lat: -25.2270, lng: 25.6689 } },
+    { name: 'Palapye', coordinates: { lat: -22.5500, lng: 27.1333 } },
+    { name: 'Kanye', coordinates: { lat: -24.9667, lng: 25.3333 } }
+  ];
 
   const baseRentals = [
     {

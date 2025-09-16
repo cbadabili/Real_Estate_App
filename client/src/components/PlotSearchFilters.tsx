@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Search, MapPin, Ruler, Zap, Droplets } from 'lucide-react';
+import { Search, MapPin, Ruler, Zap, Droplets, Loader2 } from 'lucide-react';
+import { useDistricts, useLocationSearch } from '../hooks/useLocations';
 
 interface PlotSearchFiltersProps {
   onFiltersChange: (filters: PlotFilters) => void;
@@ -42,18 +43,17 @@ export const PlotSearchFilters: React.FC<PlotSearchFiltersProps> = ({
     serviced: null
   });
 
-  const popularLocations = [
-    'Mogoditshane Block 5',
-    'Manyana Plateau', 
-    'Mahalapye',
-    'Pitsane',
-    'Gaborone',
-    'Francistown',
-    'Lobatse',
-    'Kanye',
-    'Serowe',
-    'Maun'
-  ];
+  // State for location search
+  const [locationSearch, setLocationSearch] = useState('');
+  const [showLocationSuggestions, setShowLocationSuggestions] = useState(false);
+
+  // API hooks for location data
+  const { data: districtsData, isLoading: loadingDistricts } = useDistricts();
+  const { data: locationSearchData } = useLocationSearch(
+    locationSearch.length >= 2 ? locationSearch : '', 
+    'all', 
+    15
+  );
 
   const updateFilters = (newFilters: Partial<PlotFilters>) => {
     const updated = { ...filters, ...newFilters };
@@ -69,21 +69,156 @@ export const PlotSearchFilters: React.FC<PlotSearchFiltersProps> = ({
       </div>
 
       {/* Location Filter */}
-      <div>
+      <div className="relative">
         <label className="block text-sm font-medium text-gray-700 mb-2">
           <MapPin className="inline h-4 w-4 mr-1" />
           Location
         </label>
-        <select
-          value={filters.location}
-          onChange={(e) => updateFilters({ location: e.target.value })}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
-        >
-          <option value="">All Locations</option>
-          {popularLocations.map(location => (
-            <option key={location} value={location}>{location}</option>
-          ))}
-        </select>
+        <div className="relative">
+          <input
+            type="text"
+            value={locationSearch || filters.location}
+            onChange={(e) => {
+              setLocationSearch(e.target.value);
+              setShowLocationSuggestions(true);
+              if (e.target.value === '') {
+                updateFilters({ location: '' });
+              }
+            }}
+            onFocus={() => setShowLocationSuggestions(true)}
+            onBlur={() => {
+              setTimeout(() => setShowLocationSuggestions(false), 200);
+            }}
+            placeholder="Search districts, cities, towns, wards..."
+            className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
+          />
+          {loadingDistricts && (
+            <Loader2 className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 animate-spin text-gray-400" />
+          )}
+        </div>
+
+        {/* Location Suggestions Dropdown */}
+        {showLocationSuggestions && locationSearchData && (
+          <div className="absolute z-20 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+            {/* Districts */}
+            {locationSearchData.data.districts.length > 0 && (
+              <div className="border-b border-gray-100">
+                <div className="px-3 py-2 bg-gray-50 text-xs font-medium text-gray-500 uppercase tracking-wide">
+                  Districts
+                </div>
+                {locationSearchData.data.districts.map((district) => (
+                  <button
+                    key={`district-${district.id}`}
+                    onClick={() => {
+                      updateFilters({ location: district.name });
+                      setLocationSearch(district.name);
+                      setShowLocationSuggestions(false);
+                    }}
+                    className="w-full text-left px-4 py-2 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="font-medium">{district.name}</span>
+                      <span className="text-sm text-gray-500">
+                        {district.type} • {district.region}
+                      </span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+            
+            {/* Settlements */}
+            {locationSearchData.data.settlements.length > 0 && (
+              <div className="border-b border-gray-100">
+                <div className="px-3 py-2 bg-gray-50 text-xs font-medium text-gray-500 uppercase tracking-wide">
+                  Cities & Towns
+                </div>
+                {locationSearchData.data.settlements.map((item) => (
+                  <button
+                    key={`settlement-${item.settlement.id}`}
+                    onClick={() => {
+                      updateFilters({ location: item.settlement.name });
+                      setLocationSearch(item.settlement.name);
+                      setShowLocationSuggestions(false);
+                    }}
+                    className="w-full text-left px-4 py-2 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="font-medium">{item.settlement.name}</span>
+                      <span className="text-sm text-gray-500">
+                        {item.settlement.type} • {item.district.name}
+                      </span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+            
+            {/* Wards */}
+            {locationSearchData.data.wards.length > 0 && (
+              <div className="border-b border-gray-100">
+                <div className="px-3 py-2 bg-gray-50 text-xs font-medium text-gray-500 uppercase tracking-wide">
+                  Wards & Areas
+                </div>
+                {locationSearchData.data.wards.map((item) => (
+                  <button
+                    key={`ward-${item.ward.id}`}
+                    onClick={() => {
+                      updateFilters({ location: `${item.ward.name}, ${item.settlement.name}` });
+                      setLocationSearch(`${item.ward.name}, ${item.settlement.name}`);
+                      setShowLocationSuggestions(false);
+                    }}
+                    className="w-full text-left px-4 py-2 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="font-medium">{item.ward.name}</span>
+                      <span className="text-sm text-gray-500">
+                        {item.settlement.name} • {item.district.name}
+                      </span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+            
+            {/* Plots with specific addresses */}
+            {locationSearchData.data.plots.length > 0 && (
+              <div>
+                <div className="px-3 py-2 bg-gray-50 text-xs font-medium text-gray-500 uppercase tracking-wide">
+                  Specific Areas
+                </div>
+                {locationSearchData.data.plots.slice(0, 5).map((item) => (
+                  <button
+                    key={`plot-${item.plot.id}`}
+                    onClick={() => {
+                      updateFilters({ location: item.plot.full_address });
+                      setLocationSearch(item.plot.full_address);
+                      setShowLocationSuggestions(false);
+                    }}
+                    className="w-full text-left px-4 py-2 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="font-medium text-sm">{item.plot.full_address}</span>
+                      <span className="text-xs text-gray-500">
+                        {item.ward.name}
+                      </span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+            
+            {/* No results */}
+            {locationSearchData.data.districts.length === 0 && 
+             locationSearchData.data.settlements.length === 0 && 
+             locationSearchData.data.wards.length === 0 && 
+             locationSearchData.data.plots.length === 0 && (
+              <div className="px-4 py-3 text-sm text-gray-500 text-center">
+                No locations found for "{locationSearch}"
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Plot Size Filter */}

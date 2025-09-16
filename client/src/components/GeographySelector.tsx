@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronDown, MapPin } from 'lucide-react';
+import { ChevronDown, MapPin, Loader2 } from 'lucide-react';
 import { 
-  botswanaDistricts, 
-  getCityByName, 
-  getWardsByCity,
-  getAllCities,
-  getDistrictNames 
-} from '../data/botswanaGeography';
+  useDistricts, 
+  useSettlements, 
+  useWards, 
+  useLocationSearch,
+  District,
+  Settlement,
+  Ward
+} from '../hooks/useLocations';
 
 interface GeographySelectorProps {
   onLocationChange: (location: {
@@ -29,98 +31,146 @@ const GeographySelector: React.FC<GeographySelectorProps> = ({
   placeholder = {},
   showWards = true
 }) => {
-  const [selectedCity, setSelectedCity] = useState('');
-  const [selectedState, setSelectedState] = useState('');
-  const [selectedWard, setSelectedWard] = useState('');
+  // State for selected values
+  const [selectedDistrict, setSelectedDistrict] = useState<District | null>(null);
+  const [selectedSettlement, setSelectedSettlement] = useState<Settlement | null>(null);
+  const [selectedWard, setSelectedWard] = useState<Ward | null>(null);
 
-  const [availableWards, setAvailableWards] = useState<string[]>([]);
-
-  const [citySearch, setCitySearch] = useState('');
-  const [showCitySuggestions, setShowCitySuggestions] = useState(false);
-  const [filteredCities, setFilteredCities] = useState<string[]>([]);
-
-  const [stateSearch, setStateSearch] = useState('');
-  const [showStateSuggestions, setShowStateSuggestions] = useState(false);
-  const [filteredStates, setFilteredStates] = useState<string[]>([]);
-
+  // State for search inputs
+  const [districtSearch, setDistrictSearch] = useState('');
+  const [settlementSearch, setSettlementSearch] = useState('');
   const [wardSearch, setWardSearch] = useState('');
 
+  // State for dropdown visibility
+  const [showDistrictSuggestions, setShowDistrictSuggestions] = useState(false);
+  const [showSettlementSuggestions, setShowSettlementSuggestions] = useState(false);
+  const [showWardSuggestions, setShowWardSuggestions] = useState(false);
 
-  // Filter cities based on search input
+  // API hooks
+  const { data: districtsData, isLoading: loadingDistricts } = useDistricts();
+  const { data: settlementsData, isLoading: loadingSettlements } = useSettlements(selectedDistrict?.id);
+  const { data: wardsData, isLoading: loadingWards } = useWards(selectedSettlement?.id);
+
+  // Search hooks for auto-suggestions
+  const { data: districtSearchData } = useLocationSearch(
+    districtSearch.length >= 2 ? districtSearch : '', 
+    'district', 
+    10
+  );
+  const { data: settlementSearchData } = useLocationSearch(
+    settlementSearch.length >= 2 ? settlementSearch : '', 
+    'settlement', 
+    10
+  );
+  const { data: wardSearchData } = useLocationSearch(
+    wardSearch.length >= 2 ? wardSearch : '', 
+    'ward', 
+    10
+  );
+
+  // Get filtered suggestions
+  const filteredDistricts = districtSearchData?.data.districts || [];
+  const filteredSettlements = settlementSearchData?.data.settlements.map(s => s.settlement) || [];
+  const filteredWards = wardSearchData?.data.wards.map(w => w.ward) || [];
+
+  // Reset dependent selections when parent changes
   useEffect(() => {
-    if (citySearch.trim()) {
-      const filtered = getAllCities().filter(city =>
-        city.name.toLowerCase().includes(citySearch.toLowerCase())
-      ).map(city => city.name);
-      setFilteredCities(filtered.slice(0, 10)); // Limit to 10 suggestions
-    } else {
-      setFilteredCities([]);
+    if (selectedDistrict) {
+      setSelectedSettlement(null);
+      setSettlementSearch('');
+      setSelectedWard(null);
+      setWardSearch('');
     }
-  }, [citySearch]);
+  }, [selectedDistrict]);
 
-  // Filter districts based on search input
   useEffect(() => {
-    if (stateSearch.trim()) {
-      const filtered = getDistrictNames().filter(district =>
-        district.toLowerCase().includes(stateSearch.toLowerCase())
-      );
-      setFilteredStates(filtered.slice(0, 10)); // Limit to 10 suggestions
-    } else {
-      setFilteredStates([]);
+    if (selectedSettlement) {
+      setSelectedWard(null);
+      setWardSearch('');
     }
-  }, [stateSearch]);
+  }, [selectedSettlement]);
 
-  // Auto-populate when city is selected
+  // Notify parent component of changes
   useEffect(() => {
-    if (selectedCity) {
-      const cityData = getCityByName(selectedCity);
-      if (cityData) {
-        setSelectedState(cityData.district);
-        setStateSearch(cityData.district);
-        setAvailableWards(getWardsByCity(selectedCity));
-      }
-    } else {
-      setSelectedState('');
-      setStateSearch('');
-      setAvailableWards([]);
-      setSelectedWard('');
-    }
-  }, [selectedCity]);
-
-  // Notify parent component of changes - prevent infinite loops
-  useEffect(() => {
-    // Only notify when we have meaningful data
-    if (selectedCity && selectedState) {
+    if (selectedDistrict && selectedSettlement) {
       onLocationChange({
-        city: selectedCity,
-        state: selectedState,
-        ward: selectedWard
+        state: selectedDistrict.name,
+        city: selectedSettlement.name,
+        ward: selectedWard?.name || ''
       });
     }
-  }, [selectedCity, selectedState, selectedWard]);
+  }, [selectedDistrict, selectedSettlement, selectedWard, onLocationChange]);
 
-  const handleCitySelect = (city: string) => {
-    setSelectedCity(city);
-    setCitySearch(city);
-    setShowCitySuggestions(false);
+  // Handle district selection
+  const handleDistrictSelect = (district: District) => {
+    setSelectedDistrict(district);
+    setDistrictSearch(district.name);
+    setShowDistrictSuggestions(false);
   };
 
-  const handleCityInputChange = (value: string) => {
-    setCitySearch(value);
-    setSelectedCity(value);
-    setShowCitySuggestions(true);
+  const handleDistrictInputChange = (value: string) => {
+    setDistrictSearch(value);
+    setShowDistrictSuggestions(true);
+    
+    // If the value exactly matches a district, select it
+    const exactMatch = districtsData?.data.find(d => 
+      d.name.toLowerCase() === value.toLowerCase()
+    );
+    if (exactMatch) {
+      setSelectedDistrict(exactMatch);
+    } else {
+      setSelectedDistrict(null);
+    }
   };
 
-  const handleStateSelect = (state: string) => {
-    setSelectedState(state);
-    setStateSearch(state);
-    setShowStateSuggestions(false);
+  // Handle settlement selection
+  const handleSettlementSelect = (settlement: Settlement) => {
+    setSelectedSettlement(settlement);
+    setSettlementSearch(settlement.name);
+    setShowSettlementSuggestions(false);
+
+    // Auto-select the district if not already selected
+    if (!selectedDistrict && settlementsData?.data.district) {
+      setSelectedDistrict(settlementsData.data.district);
+      setDistrictSearch(settlementsData.data.district.name);
+    }
   };
 
-  const handleStateInputChange = (value: string) => {
-    setStateSearch(value);
-    setSelectedState(value);
-    setShowStateSuggestions(true);
+  const handleSettlementInputChange = (value: string) => {
+    setSettlementSearch(value);
+    setShowSettlementSuggestions(true);
+    
+    // If the value exactly matches a settlement, select it
+    const exactMatch = settlementsData?.data.settlements.find(s => 
+      s.name.toLowerCase() === value.toLowerCase()
+    );
+    if (exactMatch) {
+      setSelectedSettlement(exactMatch);
+    } else {
+      setSelectedSettlement(null);
+    }
+  };
+
+  // Handle ward selection
+  const handleWardSelect = (ward: Ward) => {
+    setSelectedWard(ward);
+    setWardSearch(ward.name);
+    setShowWardSuggestions(false);
+  };
+
+  const handleWardInputChange = (value: string) => {
+    setWardSearch(value);
+    setShowWardSuggestions(true);
+    
+    // If the value exactly matches a ward, select it
+    const exactMatch = wardsData?.data.wards.find(w => 
+      w.name.toLowerCase() === value.toLowerCase()
+    );
+    if (exactMatch) {
+      setSelectedWard(exactMatch);
+    } else {
+      setSelectedWard(null);
+    }
   };
 
   return (
@@ -130,37 +180,41 @@ const GeographySelector: React.FC<GeographySelectorProps> = ({
         <h3 className="text-lg font-medium text-gray-900">Property Location</h3>
       </div>
 
-      {/* City Input with Auto-suggestions */}
+      {/* District Input with Auto-suggestions */}
       <div className="relative">
         <label className="block text-sm font-medium text-neutral-700 mb-2">
-          City *
+          District *
         </label>
-        <input
-          type="text"
-          value={citySearch}
-          onChange={(e) => handleCityInputChange(e.target.value)}
-          onFocus={() => setShowCitySuggestions(true)}
-          onBlur={() => {
-            // Delay hiding to allow click on suggestions
-            setTimeout(() => setShowCitySuggestions(false), 200);
-          }}
-          className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-          placeholder={placeholder.city || "Search cities..."}
-        />
+        <div className="relative">
+          <input
+            type="text"
+            value={districtSearch}
+            onChange={(e) => handleDistrictInputChange(e.target.value)}
+            onFocus={() => setShowDistrictSuggestions(true)}
+            onBlur={() => {
+              setTimeout(() => setShowDistrictSuggestions(false), 200);
+            }}
+            className="w-full px-4 py-3 pr-10 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            placeholder={placeholder.state || "Search districts..."}
+          />
+          {loadingDistricts && (
+            <Loader2 className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 animate-spin text-gray-400" />
+          )}
+        </div>
 
-        {/* City Suggestions Dropdown */}
-        {showCitySuggestions && filteredCities.length > 0 && (
+        {/* District Suggestions Dropdown */}
+        {showDistrictSuggestions && filteredDistricts.length > 0 && (
           <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
-            {filteredCities.map((city) => (
+            {filteredDistricts.map((district) => (
               <button
-                key={city}
-                onClick={() => handleCitySelect(city)}
+                key={district.id}
+                onClick={() => handleDistrictSelect(district)}
                 className="w-full text-left px-4 py-2 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
               >
                 <div className="flex items-center justify-between">
-                  <span className="font-medium">{city}</span>
+                  <span className="font-medium">{district.name}</span>
                   <span className="text-sm text-gray-500">
-                    {getCityByName(city)?.district}
+                    {district.type} • {district.region}
                   </span>
                 </div>
               </button>
@@ -169,34 +223,61 @@ const GeographySelector: React.FC<GeographySelectorProps> = ({
         )}
       </div>
 
-      {/* State/District - Auto-populated but now editable */}
+      {/* Settlement/City Input */}
       <div className="relative">
         <label className="block text-sm font-medium text-neutral-700 mb-2">
-          District *
+          City/Town/Village *
         </label>
-        <input
-          type="text"
-          value={stateSearch}
-          onChange={(e) => handleStateInputChange(e.target.value)}
-          onFocus={() => setShowStateSuggestions(true)}
-          onBlur={() => {
-            // Delay hiding to allow click on suggestions
-            setTimeout(() => setShowStateSuggestions(false), 200);
-          }}
-          className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-          placeholder={placeholder.state || "Search districts..."}
-        />
+        <div className="relative">
+          <input
+            type="text"
+            value={settlementSearch}
+            onChange={(e) => handleSettlementInputChange(e.target.value)}
+            onFocus={() => setShowSettlementSuggestions(true)}
+            onBlur={() => {
+              setTimeout(() => setShowSettlementSuggestions(false), 200);
+            }}
+            className="w-full px-4 py-3 pr-10 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            placeholder={placeholder.city || "Search cities, towns, villages..."}
+            disabled={!selectedDistrict}
+          />
+          {loadingSettlements && (
+            <Loader2 className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 animate-spin text-gray-400" />
+          )}
+        </div>
 
-        {/* State Suggestions Dropdown */}
-        {showStateSuggestions && filteredStates.length > 0 && (
+        {/* Settlement Suggestions Dropdown */}
+        {showSettlementSuggestions && (
           <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
-            {filteredStates.map((state) => (
+            {/* Show district settlements if we have them */}
+            {settlementsData?.data.settlements.map((settlement) => (
               <button
-                key={state}
-                onClick={() => handleStateSelect(state)}
+                key={settlement.id}
+                onClick={() => handleSettlementSelect(settlement)}
                 className="w-full text-left px-4 py-2 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
               >
-                <span className="font-medium">{state}</span>
+                <div className="flex items-center justify-between">
+                  <span className="font-medium">{settlement.name}</span>
+                  <span className="text-sm text-gray-500">
+                    {settlement.type} • Pop: {settlement.population.toLocaleString()}
+                  </span>
+                </div>
+              </button>
+            ))}
+            
+            {/* Show search results if we have them */}
+            {filteredSettlements.map((settlement) => (
+              <button
+                key={`search-${settlement.id}`}
+                onClick={() => handleSettlementSelect(settlement)}
+                className="w-full text-left px-4 py-2 hover:bg-gray-100 focus:bg-gray-100 focus:outline-none border-t border-gray-100"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="font-medium">{settlement.name}</span>
+                  <span className="text-sm text-gray-500">
+                    {settlement.type} • Pop: {settlement.population.toLocaleString()}
+                  </span>
+                </div>
               </button>
             ))}
           </div>
@@ -204,54 +285,84 @@ const GeographySelector: React.FC<GeographySelectorProps> = ({
       </div>
 
       {/* Ward/Suburb Selection */}
-        {showWards && (
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Ward/Suburb
-            </label>
-            <div className="relative">
-              <input
-                type="text"
-                value={wardSearch}
-                onChange={(e) => setWardSearch(e.target.value)}
-                placeholder={placeholder.ward || "Search wards..."}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              />
-              {wardSearch && availableWards.length > 0 && (
-                <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-40 overflow-y-auto">
-                  {availableWards
-                    .filter(ward => ward.toLowerCase().includes(wardSearch.toLowerCase()))
-                    .slice(0, 5)
-                    .map((ward) => (
-                      <button
-                        key={ward}
-                        onClick={() => {
-                          setSelectedWard(ward);
-                          setWardSearch(ward);
-                        }}
-                        className="w-full px-4 py-2 text-left hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
-                      >
-                        {ward}
-                      </button>
-                    ))}
-                </div>
-              )}
-            </div>
+      {showWards && (
+        <div className="relative">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Ward/Suburb
+          </label>
+          <div className="relative">
+            <input
+              type="text"
+              value={wardSearch}
+              onChange={(e) => handleWardInputChange(e.target.value)}
+              onFocus={() => setShowWardSuggestions(true)}
+              onBlur={() => {
+                setTimeout(() => setShowWardSuggestions(false), 200);
+              }}
+              placeholder={placeholder.ward || "Search wards..."}
+              className="w-full px-4 py-3 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              disabled={!selectedSettlement}
+            />
+            {loadingWards && (
+              <Loader2 className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 animate-spin text-gray-400" />
+            )}
           </div>
-        )}
+
+          {/* Ward Suggestions Dropdown */}
+          {showWardSuggestions && (
+            <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-40 overflow-y-auto">
+              {/* Show settlement wards if we have them */}
+              {wardsData?.data.wards.map((ward) => (
+                <button
+                  key={ward.id}
+                  onClick={() => handleWardSelect(ward)}
+                  className="w-full px-4 py-2 text-left hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="font-medium">{ward.name}</span>
+                    <span className="text-sm text-gray-500">{ward.ward_number}</span>
+                  </div>
+                </button>
+              ))}
+              
+              {/* Show search results if we have them */}
+              {filteredWards.map((ward) => (
+                <button
+                  key={`search-${ward.id}`}
+                  onClick={() => handleWardSelect(ward)}
+                  className="w-full px-4 py-2 text-left hover:bg-gray-100 focus:bg-gray-100 focus:outline-none border-t border-gray-100"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="font-medium">{ward.name}</span>
+                    <span className="text-sm text-gray-500">{ward.ward_number}</span>
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Location Preview */}
-      {selectedCity && selectedState && (
+      {selectedDistrict && selectedSettlement && (
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
           <p className="text-sm text-blue-800">
             <strong>Selected Location:</strong><br />
-            {selectedWard && `${selectedWard}, `}{selectedCity}, {selectedState}
+            {selectedWard && `${selectedWard.name}, `}{selectedSettlement.name}, {selectedDistrict.name}
           </p>
-          {!selectedCity.trim() || !selectedState.trim() ? (
-            <p className="text-sm text-red-600 mt-1">
-              Please ensure all location fields are properly filled.
+          {selectedSettlement && (
+            <p className="text-xs text-blue-600 mt-1">
+              {selectedSettlement.type} • Population: {selectedSettlement.population.toLocaleString()} • {selectedDistrict.region}
             </p>
-          ) : null}
+          )}
+        </div>
+      )}
+
+      {/* Loading state */}
+      {loadingDistricts && (
+        <div className="flex items-center justify-center py-4">
+          <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
+          <span className="ml-2 text-gray-600">Loading districts...</span>
         </div>
       )}
     </div>
