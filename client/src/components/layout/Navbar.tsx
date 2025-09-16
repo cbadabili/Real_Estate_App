@@ -47,7 +47,6 @@ const Navbar = () => {
 
   const postDropdownNavigation = [
     { name: 'Map Search', href: '/map-search', icon: MapPin },
-    { name: 'Auctions', href: '/auctions', icon: Handshake },
   ];
 
   return (
@@ -679,33 +678,18 @@ const Navbar = () => {
               </AnimatePresence>
             </div>
 
-            {/* Pricing Link */}
-            <Link
-              to="/pricing"
-              className="text-neutral-700 hover:text-beedab-blue px-3 py-2 rounded-md text-sm font-medium transition-colors"
-            >
-              Pricing
-            </Link>
-
             {/* Post-dropdown Navigation */}
-            {postDropdownNavigation.map((item) => {
-              const Icon = item.icon;
-              const isActive = location.pathname === item.href;
-              return (
-                <Link
-                  key={item.name}
-                  to={item.href}
-                  className={`flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                    isActive
-                      ? 'bg-beedab-blue/10 text-beedab-blue'
-                      : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100'
-                  }`}
-                >
-                  <Icon className="h-4 w-4 text-beedab-blue" />
-                  <span>{item.name}</span>
-                </Link>
-              );
-            })}
+            <Link
+              to="/map-search"
+              className={`flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                location.pathname === '/map-search'
+                  ? 'bg-beedab-blue/10 text-beedab-blue'
+                  : 'text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100'
+              }`}
+            >
+              <MapPin className="h-4 w-4 text-beedab-blue" />
+              <span>Map Search</span>
+            </Link>
           </div>
 
           {/* User Profile Avatar */}

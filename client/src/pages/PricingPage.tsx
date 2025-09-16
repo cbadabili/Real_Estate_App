@@ -301,100 +301,194 @@ const PricingPage = () => {
           })}
         </div>
 
-        {/* Enterprise/Bulk Listing Section */}
-        <div className="mt-16 max-w-4xl mx-auto">
-          <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              Need More Than 50 Listings?
+        {/* Enterprise Solutions Section */}
+        <div className="mt-16 max-w-7xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-bold text-gray-900 mb-6">
+              Enterprise & Bulk Solutions
             </h2>
-            <p className="text-xl text-gray-600">
-              Let's grow together! We offer custom plans for high-volume users with bulk listing needs.
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Let's grow together! We offer custom solutions for high-volume users, agencies, and specialized needs.
             </p>
           </div>
 
-          <div className="bg-gradient-to-r from-beedab-blue to-beedab-darkblue rounded-xl p-8 text-white relative overflow-hidden">
-            <div className="relative z-10">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-                <div>
-                  <h3 className="text-2xl font-bold mb-4">Enterprise Solutions</h3>
-                  <ul className="space-y-3 mb-6">
-                    <li className="flex items-center">
-                      <Check className="h-5 w-5 mr-3 flex-shrink-0" />
-                      <span>Unlimited listings with bulk discounts</span>
-                    </li>
-                    <li className="flex items-center">
-                      <Check className="h-5 w-5 mr-3 flex-shrink-0" />
-                      <span>Priority support and dedicated account manager</span>
-                    </li>
-                    <li className="flex items-center">
-                      <Check className="h-5 w-5 mr-3 flex-shrink-0" />
-                      <span>Custom integrations and API access</span>
-                    </li>
-                    <li className="flex items-center">
-                      <Check className="h-5 w-5 mr-3 flex-shrink-0" />
-                      <span>Enhanced visibility across all search functions</span>
-                    </li>
-                    <li className="flex items-center">
-                      <Check className="h-5 w-5 mr-3 flex-shrink-0" />
-                      <span>White-label solutions available</span>
-                    </li>
-                  </ul>
-                  <p className="text-blue-100 text-sm">
-                    Perfect for real estate agencies, property developers, and institutional investors.
-                  </p>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Bulk Listing for Agencies */}
+            <div className="bg-gradient-to-br from-blue-600 to-beedab-blue rounded-xl p-8 text-white relative overflow-hidden">
+              <div className="relative z-10">
+                <div className="flex items-center mb-6">
+                  <Users className="h-8 w-8 mr-3" />
+                  <h3 className="text-2xl font-bold">Agency Solutions</h3>
                 </div>
+                
+                <p className="text-blue-100 mb-6 text-lg">
+                  Perfect for real estate agencies, property developers, and institutional investors who need more than 50 listings.
+                </p>
+
+                <ul className="space-y-3 mb-8">
+                  <li className="flex items-center">
+                    <Check className="h-5 w-5 mr-3 flex-shrink-0" />
+                    <span>Unlimited property listings with bulk discounts</span>
+                  </li>
+                  <li className="flex items-center">
+                    <Check className="h-5 w-5 mr-3 flex-shrink-0" />
+                    <span>Priority search ranking for all your properties</span>
+                  </li>
+                  <li className="flex items-center">
+                    <Check className="h-5 w-5 mr-3 flex-shrink-0" />
+                    <span>Dedicated account manager & priority support</span>
+                  </li>
+                  <li className="flex items-center">
+                    <Check className="h-5 w-5 mr-3 flex-shrink-0" />
+                    <span>Custom integrations and API access</span>
+                  </li>
+                  <li className="flex items-center">
+                    <Check className="h-5 w-5 mr-3 flex-shrink-0" />
+                    <span>White-label solutions available</span>
+                  </li>
+                  <li className="flex items-center">
+                    <Check className="h-5 w-5 mr-3 flex-shrink-0" />
+                    <span>Enhanced analytics and reporting dashboard</span>
+                  </li>
+                </ul>
 
                 <div className="bg-white/10 backdrop-blur rounded-lg p-6">
-                  <h4 className="text-xl font-semibold mb-4">Get a Custom Quote</h4>
-                  <div className="space-y-4">
+                  <h4 className="text-xl font-semibold mb-4">Get Your Custom Quote</h4>
+                  <div className="space-y-3">
                     <a 
-                      href="mailto:enterprise@beedab.co.bw?subject=Bulk Listing Inquiry" 
+                      href="mailto:agencies@beedab.co.bw?subject=Agency Bulk Listing Solutions" 
                       className="flex items-center p-3 bg-white/20 backdrop-blur rounded-lg hover:bg-white/30 transition-colors cursor-pointer"
                     >
-                      <Mail className="h-5 w-5 mr-3" />
+                      <Mail className="h-4 w-4 mr-3" />
                       <div>
-                        <div className="font-medium">Email Us</div>
-                        <div className="text-sm text-blue-100">enterprise@beedab.co.bw</div>
+                        <div className="font-medium">agencies@beedab.co.bw</div>
+                        <div className="text-xs text-blue-100">Email for agency solutions</div>
                       </div>
                     </a>
                     
                     <a 
-                      href="tel:+26775123456" 
-                      className="flex items-center p-3 bg-white/20 backdrop-blur rounded-lg hover:bg-white/30 transition-colors cursor-pointer"
-                    >
-                      <Phone className="h-5 w-5 mr-3" />
-                      <div>
-                        <div className="font-medium">Call Us</div>
-                        <div className="text-sm text-blue-100">+267 75 123 456</div>
-                      </div>
-                    </a>
-
-                    <a 
-                      href="https://wa.me/26775123456?text=Hi%20BeeDab%2C%20I'm%20interested%20in%20bulk%20listing%20solutions" 
+                      href="https://wa.me/26775123456?text=Hi%20BeeDab%2C%20I'm%20interested%20in%20agency%20bulk%20listing%20solutions" 
                       target="_blank" 
                       rel="noopener noreferrer"
                       className="flex items-center p-3 bg-white/20 backdrop-blur rounded-lg hover:bg-white/30 transition-colors cursor-pointer"
                     >
-                      <MessageCircle className="h-5 w-5 mr-3" />
+                      <MessageCircle className="h-4 w-4 mr-3" />
                       <div>
-                        <div className="font-medium">WhatsApp</div>
-                        <div className="text-sm text-blue-100">Quick chat about your needs</div>
+                        <div className="font-medium">WhatsApp Us</div>
+                        <div className="text-xs text-blue-100">Quick chat about your needs</div>
                       </div>
                     </a>
                   </div>
-
-                  <div className="mt-6 p-4 bg-white/10 rounded-lg">
-                    <p className="text-sm text-center">
-                      <strong>Ready to scale?</strong> Tell us about your listing volume and we'll create a plan that works for your business.
-                    </p>
-                  </div>
                 </div>
               </div>
+              
+              <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -mr-16 -mt-16"></div>
             </div>
-            
-            {/* Decorative elements */}
-            <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -mr-16 -mt-16"></div>
-            <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full -ml-12 -mb-12"></div>
+
+            {/* Auction Bulk Solutions */}
+            <div className="bg-gradient-to-br from-purple-600 to-purple-800 rounded-xl p-8 text-white relative overflow-hidden">
+              <div className="relative z-10">
+                <div className="flex items-center mb-6">
+                  <Award className="h-8 w-8 mr-3" />
+                  <h3 className="text-2xl font-bold">Auction Solutions</h3>
+                </div>
+                
+                <p className="text-purple-100 mb-6 text-lg">
+                  Specialized solutions for banks, auctioneers, and institutions with high-volume auction needs.
+                </p>
+
+                <ul className="space-y-3 mb-8">
+                  <li className="flex items-center">
+                    <Check className="h-5 w-5 mr-3 flex-shrink-0" />
+                    <span>Bulk auction listings with live bidding support</span>
+                  </li>
+                  <li className="flex items-center">
+                    <Check className="h-5 w-5 mr-3 flex-shrink-0" />
+                    <span>Real-time auction management tools</span>
+                  </li>
+                  <li className="flex items-center">
+                    <Check className="h-5 w-5 mr-3 flex-shrink-0" />
+                    <span>Automated bidder registration system</span>
+                  </li>
+                  <li className="flex items-center">
+                    <Check className="h-5 w-5 mr-3 flex-shrink-0" />
+                    <span>Custom auction house branding</span>
+                  </li>
+                  <li className="flex items-center">
+                    <Check className="h-5 w-5 mr-3 flex-shrink-0" />
+                    <span>Integrated payment processing</span>
+                  </li>
+                  <li className="flex items-center">
+                    <Check className="h-5 w-5 mr-3 flex-shrink-0" />
+                    <span>Compliance and legal documentation support</span>
+                  </li>
+                </ul>
+
+                <div className="bg-white/10 backdrop-blur rounded-lg p-6">
+                  <h4 className="text-xl font-semibold mb-4">Schedule a Demo</h4>
+                  <div className="space-y-3">
+                    <a 
+                      href="mailto:auctions@beedab.co.bw?subject=Auction Platform Solutions" 
+                      className="flex items-center p-3 bg-white/20 backdrop-blur rounded-lg hover:bg-white/30 transition-colors cursor-pointer"
+                    >
+                      <Mail className="h-4 w-4 mr-3" />
+                      <div>
+                        <div className="font-medium">auctions@beedab.co.bw</div>
+                        <div className="text-xs text-purple-100">Email for auction solutions</div>
+                      </div>
+                    </a>
+                    
+                    <a 
+                      href="tel:+26775654321" 
+                      className="flex items-center p-3 bg-white/20 backdrop-blur rounded-lg hover:bg-white/30 transition-colors cursor-pointer"
+                    >
+                      <Phone className="h-4 w-4 mr-3" />
+                      <div>
+                        <div className="font-medium">+267 75 654 321</div>
+                        <div className="text-xs text-purple-100">Direct auction solutions line</div>
+                      </div>
+                    </a>
+                  </div>
+                </div>
+
+                <div className="mt-6 p-4 bg-white/10 rounded-lg">
+                  <p className="text-sm">
+                    <strong>Note:</strong> Auction listings count towards your plan's listing limit. 
+                    Bulk solutions provide unlimited auction listings with custom pricing.
+                  </p>
+                </div>
+              </div>
+              
+              <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full -ml-12 -mb-12"></div>
+            </div>
+          </div>
+
+          {/* Contact Section */}
+          <div className="mt-12 bg-gray-100 rounded-xl p-8">
+            <div className="text-center">
+              <h3 className="text-2xl font-bold text-gray-900 mb-4">
+                Ready to Scale Your Business?
+              </h3>
+              <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
+                Whether you're a large agency needing bulk listings or an auction house requiring specialized tools, 
+                we'll create a solution that grows with your business while maintaining priority visibility for your properties.
+              </p>
+              
+              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                <a 
+                  href="mailto:enterprise@beedab.co.bw?subject=Enterprise Solutions Inquiry" 
+                  className="bg-beedab-blue text-white px-8 py-3 rounded-lg font-medium hover:bg-beedab-darkblue transition-colors"
+                >
+                  Get Started Today
+                </a>
+                <a 
+                  href="tel:+26775123456" 
+                  className="text-beedab-blue font-medium hover:underline"
+                >
+                  Or call us at +267 75 123 456
+                </a>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -434,6 +528,14 @@ const PricingPage = () => {
               </h3>
               <p className="text-gray-600">
                 Our Business and Premium plans include 50 listings each. For bulk listing needs above 50, we offer custom Enterprise solutions with unlimited listings, bulk discounts, and enhanced features. Contact us for a personalized quote.
+              </p>
+            </div>
+            <div className="bg-white rounded-lg p-6 shadow-sm">
+              <h3 className="font-semibold text-gray-900 mb-2">
+                How do auction listings work with my plan?
+              </h3>
+              <p className="text-gray-600">
+                Auction listings count towards your plan's listing limit just like regular property listings. For high-volume auction needs, we offer specialized bulk auction solutions with unlimited listings, live bidding tools, and custom pricing.
               </p>
             </div>
           </div>
