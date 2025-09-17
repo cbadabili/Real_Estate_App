@@ -103,7 +103,7 @@ export default function SmartSearchBar({ onSearch, initial = "", suggest }: Prop
 
   function doSearch(term: string) {
     const value = term.trim();
-    if (!value) return;
+    if (!value) return; // Ensure search term is not empty
     saveRecent(value);
     setRecents(loadRecents());
     onSearch(value);
@@ -113,8 +113,7 @@ export default function SmartSearchBar({ onSearch, initial = "", suggest }: Prop
 
   function onSubmit(e?: React.FormEvent) {
     e?.preventDefault();
-    if (!q.trim()) return;
-    doSearch(q);
+    doSearch(q); // Pass q directly to doSearch, which handles trimming and validation
   }
 
   function onPick(item: string) {

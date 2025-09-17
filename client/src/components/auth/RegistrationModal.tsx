@@ -119,10 +119,18 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
       });
 
       if (!registerResponse.ok) {
-        throw new Error('Registration failed');
+        const errorText = await registerResponse.text();
+        console.error('Registration failed:', errorText);
+        throw new Error(`Registration failed: ${registerResponse.status}`);
       }
 
-      const userData = await registerResponse.json();
+      const registerData = await registerResponse.json();
+      
+      if (!registerData.success) {
+        throw new Error('Registration failed');
+      }
+      
+      const userData = registerData.user;
       
       // Login the user
       await login(formData.email, formData.password);

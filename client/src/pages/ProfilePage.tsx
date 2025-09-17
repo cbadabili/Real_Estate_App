@@ -90,21 +90,44 @@ const ProfilePage = () => {
         bio: userInfo.bio
       };
       
+      const token = localStorage.getItem('token');
+      if (!token) {
+        alert('Please log in again to save changes.');
+        return;
+      }
+      
       const response = await fetch(`/api/users/${user.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify(updates)
       });
       
       if (!response.ok) {
-        throw new Error('Failed to update profile');
+        const errorData = await response.text();
+        console.error('Update failed:', errorData);
+        throw new Error(`Failed to update profile: ${response.status}`);
       }
       
       const updatedUser = await response.json();
-      updateUser(updatedUser);
+      
+      // Update the user context with new data
+      updateUser({
+        ...user,
+        firstName: updates.firstName,
+        lastName: updates.lastName,
+        phone: updates.phone,
+        bio: updates.bio
+      });
+      
+      // Update local state
+      setUserInfo({
+        ...userInfo,
+        name: `${updates.firstName} ${updates.lastName}`.trim()
+      });
+      
       setIsEditing(false);
       
       // Show success message

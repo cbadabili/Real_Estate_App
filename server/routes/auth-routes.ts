@@ -69,7 +69,16 @@ export function registerAuthRoutes(app: Express) {
       console.log('User created successfully');
 
       const { password: _, ...userResponse } = user;
-      res.status(201).json(userResponse);
+      res.status(201).json({
+      success: true,
+      user: {
+        id: user.id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        userType: user.userType
+      }
+    });
     } catch (error) {
       console.error("Registration error:", error);
       res.status(500).json({ message: "Registration failed" });

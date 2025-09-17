@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { motion } from 'framer-motion';
 import { 
@@ -68,25 +67,25 @@ const MarketIntelligencePage = () => {
   const fetchRealMarketData = async () => {
     try {
       setLoading(true);
-      
+
       // Fetch real properties data
       const propertiesResponse = await fetch('/api/properties?limit=100&status=active');
       if (!propertiesResponse.ok) {
         throw new Error('Failed to fetch properties');
       }
       const properties = await propertiesResponse.json();
-      
+
       // Calculate real market metrics from actual data
       const realMarketData = calculateMarketMetrics(properties);
       setMarketData(realMarketData);
-      
+
       // Get regional breakdown
       const regional = calculateRegionalData(properties);
       setRegionalData(regional);
-      
+
       // Generate AI-enhanced market insights using real data
       await fetchAIMarketInsights(properties);
-      
+
     } catch (error) {
       console.error('Error fetching market data:', error);
       // Use minimal fallback data
@@ -122,7 +121,7 @@ const MarketIntelligencePage = () => {
     }).filter(p => p > 0);
 
     const averagePrice = prices.length > 0 ? prices.reduce((a, b) => a + b, 0) / prices.length : 0;
-    
+
     const daysOnMarket = properties
       .map(p => p.daysOnMarket || 0)
       .filter(d => d > 0);
@@ -146,16 +145,16 @@ const MarketIntelligencePage = () => {
 
   const calculateRegionalData = (properties: any[]): RegionalData[] => {
     const cityData: { [key: string]: { prices: number[], count: number } } = {};
-    
+
     properties.forEach(property => {
       const city = property.city || 'Unknown';
       const priceStr = property.price?.toString() || '0';
       const price = parseFloat(priceStr.replace(/[^\d.]/g, '')) || 0;
-      
+
       if (!cityData[city]) {
         cityData[city] = { prices: [], count: 0 };
       }
-      
+
       if (price > 0) {
         cityData[city].prices.push(price);
       }
@@ -166,7 +165,7 @@ const MarketIntelligencePage = () => {
       const avgPrice = data.prices.length > 0 ? 
         data.prices.reduce((a, b) => a + b, 0) / data.prices.length : 0;
       const growth = (Math.random() * 10 - 2).toFixed(1); // AI-generated growth rate
-      
+
       return {
         area: city,
         price: `P ${(avgPrice / 1000000).toFixed(1)}M`,
@@ -200,7 +199,7 @@ const MarketIntelligencePage = () => {
       const recentActivityData = properties.slice(0, 3).map((property, index) => {
         const priceNum = parseFloat(property.price?.toString().replace(/[^\d.]/g, '')) || 0;
         const estimate = priceNum > 0 ? `P ${(priceNum / 1000000).toFixed(1)}M` : 'Price on request';
-        
+
         return {
           address: property.address || `Property in ${property.city}`,
           estimate,
@@ -220,7 +219,7 @@ const MarketIntelligencePage = () => {
             query: `Analyze the Botswana real estate market with ${properties.length} properties. Average price range and trends.` 
           })
         });
-        
+
         if (aiResponse.ok) {
           const aiData = await aiResponse.json();
           console.log('AI market insights:', aiData);

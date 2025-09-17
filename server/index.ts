@@ -22,6 +22,10 @@ import rateLimit from 'express-rate-limit';
 import morgan from 'morgan';
 import billingRoutes from './billing-routes';
 import heroRoutes from './hero-routes';
+import { registerPropertyRoutes } from "./routes/property-routes";
+import { registerUserRoutes } from "./routes/user-routes";
+import { registerAuthRoutes } from "./routes/auth-routes";
+import { registerMarketIntelligenceRoutes } from "./market-intelligence-routes";
 
 const app = express();
 
@@ -128,6 +132,12 @@ app.get('/api/health', (_req: Request, res: Response) => {
   // OpenAI-powered Intel adapter routes
   app.post('/intel/search', intelSearch);
   app.get('/intel/suggest', intelSuggest);
+
+  // Register other routes
+  registerPropertyRoutes(app);
+  registerUserRoutes(app);
+  registerAuthRoutes(app);
+  registerMarketIntelligenceRoutes(app);
 
   // Search aggregator route
   app.get('/api/search', async (req, res) => {

@@ -148,6 +148,10 @@ function App() {
             <Route path="/map-search" element={<MapSearchPage />} />
             <Route path="/enhanced-search" element={<EnhancedSearchPage />} />
             <Route path="/services" element={<ServicesPage />} />
+            <Route path="/services/financing" element={<FinancingPage />} />
+            <Route path="/services/property-management" element={<PropertyManagementPage />} />
+            <Route path="/services/tenant-support" element={<TenantSupportPage />} />
+            <Route path="/services/legal" element={<LegalServicesPage />} />
             <Route path="/services/provider/:id" element={<ServiceProviderDetailsPage />} />
             <Route path="/marketplace/*" element={<MarketplacePage />} />
             <Route path="/marketplace/professionals" element={<ProfessionalsPage />} />
