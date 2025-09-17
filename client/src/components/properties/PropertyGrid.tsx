@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { PropertyCard } from '../PropertyCard';
+import { PropertyCard } from '../shared/PropertyCard';
 import { SearchResultsSkeleton } from '../ui/EnhancedLoadingSpinner';
 
 interface Property {

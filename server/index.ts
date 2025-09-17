@@ -134,9 +134,9 @@ app.get('/api/health', (_req: Request, res: Response) => {
   app.get('/intel/suggest', intelSuggest);
 
   // Register other routes
-  registerAuthRoutes(app);
-  registerUserRoutes(app);
-  registerPropertyRoutes(app);
+  // Use unified routes registration
+  const { registerAllRoutes } = await import('./routes');
+  registerAllRoutes(app);
 
   // Search aggregator route
   app.get('/api/search', async (req, res) => {

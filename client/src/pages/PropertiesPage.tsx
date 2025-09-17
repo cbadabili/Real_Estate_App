@@ -2,8 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 // Removed framer-motion for better compatibility
 import { Filter, Search, Grid, List as ListIcon, SlidersHorizontal, AlertCircle, MapPin, Map, BarChart3 } from 'lucide-react';
-import { PropertyCard } from '../components/PropertyCard';
-import { PropertyFilters } from '../components/properties/PropertyFilters';
+import { PropertyCard, PropertyFilters } from '../components/shared';
 import { PropertyGrid } from '../components/properties/PropertyGrid';
 import PropertyMap from '../components/properties/PropertyMap';
 import { PropertyComparison } from '../components/properties/PropertyComparison';
