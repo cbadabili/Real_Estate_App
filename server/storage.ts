@@ -198,8 +198,24 @@ export class DatabaseStorage implements IStorage {
 
     const results = await query;
 
+    // Filter out properties with invalid coordinates before processing
+    const validResults = results.filter(prop => {
+      const hasValidCoords = prop.latitude !== null && 
+                           prop.longitude !== null && 
+                           prop.latitude !== '' && 
+                           prop.longitude !== '' &&
+                           !isNaN(parseFloat(prop.latitude)) && 
+                           !isNaN(parseFloat(prop.longitude));
+      
+      if (!hasValidCoords) {
+        console.log(`Filtering out property ${prop.id} "${prop.title}" - invalid coordinates: lat=${prop.latitude}, lng=${prop.longitude}`);
+      }
+      
+      return hasValidCoords;
+    });
+
     // Parse JSON strings back to arrays and add debug logging
-    const processedResults = results.map(prop => {
+    const processedResults = validResults.map(prop => {
       const processed = {
         ...prop,
         images: prop.images ? JSON.parse(prop.images) : [],
@@ -215,7 +231,7 @@ export class DatabaseStorage implements IStorage {
       return processed;
     });
 
-    console.log(`Retrieved ${processedResults.length} properties from database`);
+    console.log(`Retrieved ${processedResults.length} valid properties from database (filtered from ${results.length} total)`);
     return processedResults;
   }
 

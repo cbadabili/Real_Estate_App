@@ -43,8 +43,20 @@ const MapSearchPage = () => {
       const data = await response.json();
       console.log('Raw API response:', data);
 
+      // Filter out properties with null/invalid coordinates first
+      const validProperties = data.filter((property: any) => 
+        property.latitude !== null && 
+        property.longitude !== null && 
+        property.latitude !== '' && 
+        property.longitude !== '' &&
+        !isNaN(parseFloat(property.latitude)) && 
+        !isNaN(parseFloat(property.longitude))
+      );
+
+      console.log(`Received ${data.length} properties, ${validProperties.length} have valid coordinates`);
+
       // Process coordinates and ensure they are valid numbers
-      const propertiesWithCoords = data.map((property: any) => {
+      const propertiesWithCoords = validProperties.map((property: any) => {
         // Convert coordinates to numbers and validate
         let lat = property.latitude;
         let lng = property.longitude;

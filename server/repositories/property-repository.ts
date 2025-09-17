@@ -118,7 +118,23 @@ export class PropertyRepository implements IPropertyRepository {
 
     const results = await query;
 
-    const processedResults = results.map(prop => {
+    // Filter out properties with invalid coordinates
+    const validResults = results.filter(prop => {
+      const hasValidCoords = prop.latitude !== null && 
+                           prop.longitude !== null && 
+                           prop.latitude !== '' && 
+                           prop.longitude !== '' &&
+                           !isNaN(parseFloat(prop.latitude)) && 
+                           !isNaN(parseFloat(prop.longitude));
+      
+      if (!hasValidCoords) {
+        console.log(`Filtering out property ${prop.id} "${prop.title}" - invalid coordinates: lat=${prop.latitude}, lng=${prop.longitude}`);
+      }
+      
+      return hasValidCoords;
+    });
+
+    const processedResults = validResults.map(prop => {
       const processed = {
         ...prop,
         images: prop.images ? JSON.parse(prop.images) : [],
@@ -133,7 +149,7 @@ export class PropertyRepository implements IPropertyRepository {
       return processed;
     });
 
-    console.log(`Retrieved ${processedResults.length} properties from database`);
+    console.log(`Retrieved ${processedResults.length} valid properties from database (filtered from ${results.length} total)`);
     return processedResults;
   }
 
