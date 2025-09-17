@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { storage } from "../storage";
 import { insertUserSchema } from "../../shared/schema";
-import { generateToken } from "../auth-middleware";
+import { generateToken, authenticate } from "../auth-middleware";
 import bcrypt from 'bcrypt';
 
 export function registerAuthRoutes(app: Express) {
@@ -163,6 +163,53 @@ export function registerAuthRoutes(app: Express) {
     } catch (error) {
       console.error("Login error:", error);
       res.status(500).json({ message: "Login failed. Please try again." });
+    }
+  });
+
+  // Get current user (for JWT validation)
+  app.get("/api/auth/user", authenticate, async (req, res) => {
+    try {
+      const userId = (req as any).userId;
+      
+      if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
+      }
+
+      const user = await storage.getUserById(userId);
+      
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Check if user is active
+      if (!user.isActive) {
+        return res.status(401).json({ message: "Account is inactive" });
+      }
+
+      // Prepare user response (remove sensitive data)
+      const userResponse = {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        phone: user.phone,
+        userType: user.userType,
+        role: user.role,
+        permissions: Array.isArray(user.permissions) ? user.permissions : [],
+        avatar: user.avatar,
+        bio: user.bio,
+        isVerified: Boolean(user.isVerified),
+        isActive: Boolean(user.isActive),
+        reacNumber: user.reacNumber,
+        lastLoginAt: user.lastLoginAt,
+        createdAt: user.createdAt
+      };
+
+      res.json(userResponse);
+    } catch (error) {
+      console.error("Get current user error:", error);
+      res.status(500).json({ message: "Failed to get user data" });
     }
   });
 }

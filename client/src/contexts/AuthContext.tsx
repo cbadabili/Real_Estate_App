@@ -79,17 +79,32 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
 
       try {
-        // The token is simply the user ID
-        const userId = authToken;
-        if (!userId || isNaN(Number(userId))) {
-          throw new Error('Invalid token format');
-        }
-
-        const userData = await apiRequest(`/api/users/${userId}`, {
-          headers: {
-            Authorization: `Bearer ${authToken}`
+        let userData;
+        
+        // Check if token is a JWT (has 3 parts separated by dots)
+        const isJWT = authToken.split('.').length === 3;
+        
+        if (isJWT) {
+          // For JWT tokens, use the auth/user endpoint
+          userData = await apiRequest('/api/auth/user', {
+            headers: {
+              Authorization: `Bearer ${authToken}`
+            }
+          });
+        } else {
+          // Legacy numeric token fallback
+          const userId = authToken;
+          if (!userId || isNaN(Number(userId))) {
+            throw new Error('Invalid legacy token format');
           }
-        });
+          
+          userData = await apiRequest(`/api/users/${userId}`, {
+            headers: {
+              Authorization: `Bearer ${authToken}`
+            }
+          });
+        }
+        
         setUser(userData);
         // Fetch billing data after setting user
         setTimeout(() => {
@@ -97,10 +112,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         }, 100);
       } catch (error) {
         console.error('Auth check failed:', error);
-        if (typeof window !== 'undefined') {
-          localStorage.removeItem('authToken');
+        
+        // Only clear token if server explicitly rejects it (401/403)
+        // Don't clear for network errors or other issues
+        if (error.message?.includes('401') || error.message?.includes('403') || 
+            error.message?.includes('Unauthorized') || error.message?.includes('Forbidden')) {
+          console.log('Server rejected token, clearing from storage');
+          if (typeof window !== 'undefined') {
+            localStorage.removeItem('authToken');
+          }
+          setAuthToken(null);
+        } else {
+          console.log('Auth check failed due to network/other error, keeping token');
         }
-        setAuthToken(null);
       } finally {
         setIsLoading(false);
       }
@@ -227,12 +251,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const refreshBilling = async () => {
-    const token = localStorage.getItem('authToken'); // Use authToken state
-    if (!token || !user) return;
+    if (!authToken || !user) return;
 
     try {
       const response = await apiRequest('/api/billing/me', {
-        headers: { 'Authorization': `Bearer ${token}` },
+        headers: { 'Authorization': `Bearer ${authToken}` },
       });
 
       if (response.ok) {
