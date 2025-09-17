@@ -66,64 +66,54 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [subscription, setSubscription] = useState<any | null>(null);
   const [entitlements, setEntitlements] = useState<Record<string, any> | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [authToken, setAuthToken] = useState<string | null>(
-    typeof window !== 'undefined' ? localStorage.getItem('authToken') : null
+  const [isAuthenticated, setIsAuthenticated] = useState(false); // Added to track authentication status
+  const [token, setToken] = useState<string | null>(
+    typeof window !== 'undefined' ? localStorage.getItem('token') : null
+  );
+  const [userId, setUserId] = useState<string | null>(
+    typeof window !== 'undefined' ? localStorage.getItem('userId') : null
   );
 
   // Check authentication status on mount
   useEffect(() => {
     const checkAuth = async () => {
-      if (!authToken) {
-        setIsLoading(false);
-        return;
-      }
-
       try {
-        let userData;
-        
-        // Check if token is a JWT (has 3 parts separated by dots)
-        const isJWT = authToken.split('.').length === 3;
-        
-        if (isJWT) {
-          // For JWT tokens, use the auth/user endpoint
-          userData = await apiRequest('/api/auth/user', {
-            headers: {
-              Authorization: `Bearer ${authToken}`
-            }
-          });
-        } else {
-          // Legacy numeric token fallback
-          const userId = authToken;
-          if (!userId || isNaN(Number(userId))) {
-            throw new Error('Invalid legacy token format');
-          }
-          
-          userData = await apiRequest(`/api/users/${userId}`, {
-            headers: {
-              Authorization: `Bearer ${authToken}`
-            }
-          });
+        const token = localStorage.getItem('token');
+        const userId = localStorage.getItem('userId');
+
+        if (!token || !userId) {
+          setIsAuthenticated(false);
+          setUser(null);
+          return;
         }
-        
+
+        console.log('Checking auth with token:', token.substring(0, 20) + '...');
+
+        // Validate token with server
+        const userData = await apiRequest('/api/auth/user', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        console.log('Auth check successful:', userData.email);
         setUser(userData);
-        // Fetch billing data after setting user
-        setTimeout(() => {
-          refreshBilling();
-        }, 100);
+        setIsAuthenticated(true);
       } catch (error) {
         console.error('Auth check failed:', error);
-        
-        // Only clear token if server explicitly rejects it (401/403)
-        // Don't clear for network errors or other issues
-        if (error.message?.includes('401') || error.message?.includes('403') || 
-            error.message?.includes('Unauthorized') || error.message?.includes('Forbidden')) {
-          console.log('Server rejected token, clearing from storage');
-          if (typeof window !== 'undefined') {
-            localStorage.removeItem('authToken');
-          }
-          setAuthToken(null);
+
+        // Only clear token if it's actually invalid (401), not for network errors
+        if (error?.message === 'User not authenticated' || error?.status === 401) {
+          console.log('Clearing invalid token');
+          localStorage.removeItem('token');
+          localStorage.removeItem('userId');
+          setUser(null);
+          setIsAuthenticated(false);
         } else {
           console.log('Auth check failed due to network/other error, keeping token');
+          // Don't clear the token for network errors, user might be offline
         }
       } finally {
         setIsLoading(false);
@@ -131,71 +121,39 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     };
 
     checkAuth();
-  }, [authToken]);
+  }, []); // Dependency array is empty to run only once on mount
 
   const login = async (email: string, password: string) => {
-    if (!email || !password) {
-      throw new Error('Email and password are required');
-    }
-
-    setIsLoading(true);
     try {
-      console.log('Attempting login for:', email.trim());
+      setIsLoading(true);
+      setError(null); // Assuming setError is a state variable managed elsewhere, or a placeholder
 
       const response = await apiRequest('/api/users/login', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ 
-          email: email.trim().toLowerCase(), 
-          password: password.trim() 
-        })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
       });
 
-      console.log('Login response received:', { 
-        id: response.id, 
-        email: response.email, 
-        userType: response.userType 
-      });
+      if (response.token && response.id) {
+        // Store the JWT token - this is the key fix
+        localStorage.setItem('token', response.token);
+        localStorage.setItem('userId', response.id.toString());
 
-      // Validate response
-      if (!response.id || !response.email) {
-        throw new Error('Invalid login response from server');
-      }
+        // Set user state and authentication status
+        setUser(response);
+        setIsAuthenticated(true);
+        setToken(response.token); // Update local state
+        setUserId(response.id.toString()); // Update local state
 
-      // Set user data
-      setUser(response);
-
-      // Use the JWT token returned from the server, or fall back to simple ID token
-      const token = response.token || response.id.toString();
-      setAuthToken(token);
-
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('authToken', token);
-        console.log('Auth token stored:', token);
-      }
-
-      // Fetch billing data after login
-      setTimeout(() => refreshBilling(), 100);
-    } catch (error) {
-      console.error('Login failed:', error);
-
-      // Clear any existing auth state on login failure
-      setUser(null);
-      setAuthToken(null);
-      if (typeof window !== 'undefined') {
-        localStorage.removeItem('authToken');
-      }
-
-      // Re-throw with more specific error message
-      if (error.message?.includes('Invalid credentials')) {
-        throw new Error('Invalid email or password');
-      } else if (error.message?.includes('Account is inactive')) {
-        throw new Error('Your account has been deactivated. Please contact support.');
+        console.log('Login successful, token stored:', response.token.substring(0, 20) + '...');
+        return response;
       } else {
-        throw new Error('Login failed. Please check your connection and try again.');
+        throw new Error('Invalid login response: missing token or user ID');
       }
+    } catch (err: any) {
+      const errorMessage = err?.message || 'Login failed';
+      setError(errorMessage); // Assuming setError is a state variable managed elsewhere
+      throw new Error(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -205,10 +163,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setUser(null);
     setSubscription(null);
     setEntitlements(null);
-    setAuthToken(null);
+    setToken(null);
+    setUserId(null);
     if (typeof window !== 'undefined') {
-      localStorage.removeItem('authToken');
+      localStorage.removeItem('token');
+      localStorage.removeItem('userId');
     }
+    setIsAuthenticated(false);
   };
 
   const register = async (userData: RegisterData) => {
@@ -251,19 +212,24 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const refreshBilling = async () => {
-    if (!authToken || !user) return;
+    if (!token || !user) return; // Use token state
 
     try {
+      // Assuming apiRequest handles the Authorization header correctly if not passed explicitly
       const response = await apiRequest('/api/billing/me', {
-        headers: { 'Authorization': `Bearer ${authToken}` },
+        headers: { 'Authorization': `Bearer ${token}` }, // Use token state
       });
 
-      if (response.ok) {
+      // Assuming apiRequest returns the response object directly, and we need to check its status
+      if (response && response.ok) { // Check if response is valid and has 'ok' property
         const data = await response.json();
         if (data.success) {
           setSubscription(data.data.subscription);
           setEntitlements(data.data.entitlements);
         }
+      } else {
+        // Handle cases where response.ok is false or response is null/undefined
+        console.error('Failed to fetch billing data:', response);
       }
     } catch (error) {
       console.error('Error fetching billing data:', error);

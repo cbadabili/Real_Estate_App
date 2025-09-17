@@ -28,16 +28,7 @@ export function registerUserRoutes(app: Express) {
     }
   });
 
-  // Auth verification endpoint
-  app.get("/api/auth/user", authenticate, async (req, res) => {
-    try {
-      const { password, ...userResponse } = req.user!;
-      res.json(userResponse);
-    } catch (error) {
-      console.error("Auth verification error:", error);
-      res.status(500).json({ message: "Authentication verification failed" });
-    }
-  });
+  // Auth verification endpoint removed - handled by auth-routes.ts
 
   // Dashboard statistics endpoint
   app.get("/api/dashboard/stats", authenticate, async (req, res) => {

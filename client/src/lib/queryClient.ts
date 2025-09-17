@@ -35,22 +35,33 @@ export const queryClient = new QueryClient({
 
 // API request helper for mutations (POST, PUT, DELETE)
 export const apiRequest = async (url: string, options: RequestInit = {}): Promise<any> => {
-  const authToken = typeof window !== 'undefined' ? localStorage.getItem('authToken') : null;
+  const baseUrl = import.meta.env.VITE_API_URL || '';
+  const fullUrl = `${baseUrl}${url}`;
+
+  // Get token from localStorage if not provided in headers
+  const token = localStorage.getItem('token');
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    ...(options.headers || {}),
+  };
+
+  // Add Authorization header if token exists and not already present
+  if (token && !headers['Authorization'] && !headers['authorization']) {
+    headers['Authorization'] = `Bearer ${token}`;
+    console.log('Adding auth header with token:', token.substring(0, 20) + '...');
+  }
 
   const config: RequestInit = {
     ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...(authToken && { Authorization: `Bearer ${authToken}` }),
-      ...options.headers,
-    },
+    headers,
+    url: fullUrl, // Include the full URL in the config
   };
 
-  console.log('API Request:', url, config.method || 'GET');
+  console.log('API Request:', config.method || 'GET', fullUrl);
 
   let response: Response;
   try {
-    response = await fetch(url, config);
+    response = await fetch(fullUrl, config);
   } catch (error) {
     console.error('Network error:', error);
     throw new Error('Network error. Please check your connection.');
@@ -65,7 +76,7 @@ export const apiRequest = async (url: string, options: RequestInit = {}): Promis
       console.error('API Error Response:', {
         status: response.status,
         statusText: response.statusText,
-        url: url,
+        url: fullUrl,
         method: config.method || 'GET',
         errorData
       });
