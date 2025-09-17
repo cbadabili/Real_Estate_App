@@ -4,7 +4,7 @@ import { storage } from "../storage";
 import { authenticate, optionalAuthenticate, AuthService } from "../auth-middleware";
 
 export function registerUserRoutes(app: Express) {
-  // Get user by ID
+  // Get user by ID - requires authentication
   app.get("/api/users/:id", authenticate, async (req, res) => {
     try {
       const userId = parseInt(req.params.id);
@@ -211,10 +211,15 @@ export function registerUserRoutes(app: Express) {
     }
   });
 
-  app.post("/api/users/:userId/saved-properties/:propertyId", async (req, res) => {
+  app.post("/api/users/:userId/saved-properties/:propertyId", authenticate, async (req, res) => {
     try {
       const userId = parseInt(req.params.userId);
       const propertyId = parseInt(req.params.propertyId);
+
+      // Only allow users to save properties to their own account or admins
+      if (req.user!.id !== userId && !AuthService.isAdmin(req.user!)) {
+        return res.status(403).json({ message: "Access denied" });
+      }
 
       const saved = await storage.saveProperty(userId, propertyId);
       res.status(201).json(saved);
@@ -224,10 +229,15 @@ export function registerUserRoutes(app: Express) {
     }
   });
 
-  app.delete("/api/users/:userId/saved-properties/:propertyId", async (req, res) => {
+  app.delete("/api/users/:userId/saved-properties/:propertyId", authenticate, async (req, res) => {
     try {
       const userId = parseInt(req.params.userId);
       const propertyId = parseInt(req.params.propertyId);
+
+      // Only allow users to unsave from their own account or admins
+      if (req.user!.id !== userId && !AuthService.isAdmin(req.user!)) {
+        return res.status(403).json({ message: "Access denied" });
+      }
 
       const unsaved = await storage.unsaveProperty(userId, propertyId);
       if (!unsaved) {
@@ -241,10 +251,15 @@ export function registerUserRoutes(app: Express) {
     }
   });
 
-  app.get("/api/users/:userId/saved-properties/:propertyId/check", async (req, res) => {
+  app.get("/api/users/:userId/saved-properties/:propertyId/check", authenticate, async (req, res) => {
     try {
       const userId = parseInt(req.params.userId);
       const propertyId = parseInt(req.params.propertyId);
+
+      // Only allow users to check their own saved properties or admins
+      if (req.user!.id !== userId && !AuthService.isAdmin(req.user!)) {
+        return res.status(403).json({ message: "Access denied" });
+      }
 
       const isSaved = await storage.isPropertySaved(userId, propertyId);
       res.json({ isSaved });

@@ -1,8 +1,8 @@
-
 import type { Express } from "express";
 import { storage } from "../storage";
 import { insertPropertySchema, UserType } from "../../shared/schema";
 import { authenticate, optionalAuthenticate, requireUserType } from "../auth-middleware";
+import { AuthService } from "../auth-service"; // Assuming AuthService is available for isAdmin check
 
 export function registerPropertyRoutes(app: Express) {
   // Get all properties
@@ -12,7 +12,7 @@ export function registerPropertyRoutes(app: Express) {
   app.get("/api/suggest", async (req, res) => {
     try {
       const query = (req.query.q as string)?.toLowerCase().trim();
-      
+
       if (!query || query.length < 2) {
         return res.json([]);
       }
@@ -86,10 +86,10 @@ export function registerPropertyRoutes(app: Express) {
   });
 
   // Get single property
-  app.get("/api/properties/:id", async (req, res) => {
+  app.get("/api/properties/:id", optionalAuthenticate, async (req, res) => { // Changed to optionalAuthenticate for public view
     try {
       const propertyId = parseInt(req.params.id);
-      
+
       // Validate that propertyId is a valid number
       if (isNaN(propertyId) || propertyId <= 0) {
         return res.status(400).json({ message: "Invalid property ID" });
@@ -113,7 +113,7 @@ export function registerPropertyRoutes(app: Express) {
   app.post("/api/properties", authenticate, requireUserType(UserType.SELLER, UserType.AGENT, UserType.FSBO, UserType.ADMIN), async (req, res) => {
     try {
       console.log("Create property request body:", req.body);
-      
+
       const {
         areaText, placeName, placeId,
         latitude, longitude, locationSource,
@@ -150,26 +150,39 @@ export function registerPropertyRoutes(app: Express) {
       console.error("Create property error:", error);
       if (error.name === 'ZodError') {
         console.error("Validation errors:", error.errors);
-        return res.status(400).json({ 
-          message: "Invalid property data", 
-          details: error.errors 
+        return res.status(400).json({
+          message: "Invalid property data",
+          details: error.errors
         });
       }
       res.status(400).json({ message: "Invalid property data", error: error.message });
     }
   });
 
-  // Update property
-  app.put("/api/properties/:id", async (req, res) => {
+  // Update property - requires authentication and ownership or admin
+  app.put("/api/properties/:id", authenticate, async (req, res) => {
     try {
       const propertyId = parseInt(req.params.id);
-      
+
       // Validate that propertyId is a valid number
       if (isNaN(propertyId) || propertyId <= 0) {
         return res.status(400).json({ message: "Invalid property ID" });
       }
 
       const updates = req.body;
+
+      // Check if user owns the property or is admin
+      const existingProperty = await storage.getProperty(propertyId);
+      if (!existingProperty) {
+        return res.status(404).json({ message: "Property not found" });
+      }
+
+      const isOwner = existingProperty.ownerId === req.user!.id;
+      const isAdmin = AuthService.isAdmin(req.user!);
+
+      if (!isOwner && !isAdmin) {
+        return res.status(403).json({ message: "Not authorized to update this property" });
+      }
 
       const property = await storage.updateProperty(propertyId, updates);
       if (!property) {
@@ -183,14 +196,22 @@ export function registerPropertyRoutes(app: Express) {
     }
   });
 
-  // Delete property
-  app.delete("/api/properties/:id", async (req, res) => {
+  // Delete property - requires authentication and ownership or admin
+  app.delete("/api/properties/:id", authenticate, async (req, res) => {
     try {
       const propertyId = parseInt(req.params.id);
-      
-      // Validate that propertyId is a valid number
-      if (isNaN(propertyId) || propertyId <= 0) {
-        return res.status(400).json({ message: "Invalid property ID" });
+
+      // Check if user owns the property or is admin
+      const existingProperty = await storage.getProperty(propertyId);
+      if (!existingProperty) {
+        return res.status(404).json({ message: "Property not found" });
+      }
+
+      const isOwner = existingProperty.ownerId === req.user!.id;
+      const isAdmin = AuthService.isAdmin(req.user!);
+
+      if (!isOwner && !isAdmin) {
+        return res.status(403).json({ message: "Not authorized to delete this property" });
       }
 
       const deleted = await storage.deleteProperty(propertyId);
@@ -207,10 +228,10 @@ export function registerPropertyRoutes(app: Express) {
   });
 
   // Create appointment for property viewing
-  app.post("/api/appointments", async (req, res) => {
+  app.post("/api/appointments", authenticate, async (req, res) => { // Added authenticate
     try {
       const appointmentData = req.body;
-      
+
       // Basic validation
       if (!appointmentData.propertyId || !appointmentData.buyerId || !appointmentData.appointmentDate) {
         return res.status(400).json({ message: "Missing required fields" });

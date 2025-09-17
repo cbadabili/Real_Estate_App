@@ -43,27 +43,21 @@ export function registerAuthRoutes(app: Express) {
       // Generate username if not provided
       const finalUsername = username || `${firstName.toLowerCase()}_${lastName.toLowerCase()}_${Date.now()}`;
 
-      // Validate allowed user types
-      const allowedUserTypes = ['buyer', 'seller', 'agent', 'fsbo'];
-      const userType = req.body.userType && allowedUserTypes.includes(req.body.userType)
-        ? req.body.userType
-        : 'buyer';
-
-      // Create user data with secure defaults
-      const userData: any = { // Using 'any' for simplicity as InsertUser type is not fully defined in this snippet
+      // Create user data with secure defaults - ignore client-provided security flags
+      const userData: any = {
         username: finalUsername,
-        email: email.toLowerCase(), // Normalize email
+        email: email.toLowerCase(), // Normalize email consistently
         password: hashedPassword,
         firstName,
         lastName,
         phone,
-        userType, // Validated user type
-        role: 'user', // Always default to user role
+        userType: 'buyer', // Always default to buyer, admin upgrades require manual approval
+        role: 'user', // Always default to user role, never allow client to set admin roles
         permissions: JSON.stringify([]), // Default empty permissions
         bio,
         reacNumber,
-        isActive: false, // Always require activation
-        isVerified: false, // Always require verification
+        isActive: true, // Allow immediate activation for basic users
+        isVerified: false, // Always require email verification
         createdAt: Math.floor(Date.now() / 1000),
         updatedAt: Math.floor(Date.now() / 1000)
       };
@@ -93,39 +87,33 @@ export function registerAuthRoutes(app: Express) {
         return res.status(400).json({ message: "Email and password are required" });
       }
 
-      // Trim whitespace
-      const trimmedEmail = email.trim().toLowerCase();
+      // Normalize email casing consistently
+      const normalizedEmail = email.trim().toLowerCase();
       const trimmedPassword = password.trim();
 
-      console.log('Login attempt received');
+      console.log('Login attempt for email domain:', normalizedEmail.split('@')[1]);
 
-      const user = await storage.getUserByEmail(trimmedEmail);
+      const user = await storage.getUserByEmail(normalizedEmail);
 
       if (!user) {
-        console.log('Login failed: user not found');
+        console.log('Login failed: user not found for domain:', normalizedEmail.split('@')[1]);
         return res.status(401).json({ message: "Invalid credentials" });
       }
 
-      console.log('User found:', {
-        id: user.id,
-        email: user.email,
-        isActive: user.isActive
-      });
-
       // Check if user is active
       if (!user.isActive) {
-        console.log('Login failed: account inactive');
+        console.log('Login failed: account inactive for user:', user.id);
         return res.status(401).json({ message: "Account is inactive" });
       }
 
       const isValidPassword = await bcrypt.compare(trimmedPassword, user.password);
 
       if (!isValidPassword) {
-        console.log('Login failed: invalid credentials');
+        console.log('Login failed: invalid credentials for user:', user.id);
         return res.status(401).json({ message: "Invalid credentials" });
       }
 
-      console.log('Login successful');
+      console.log('Login successful for user:', user.id);
 
       // Update last login time
       try {

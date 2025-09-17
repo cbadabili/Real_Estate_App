@@ -186,16 +186,22 @@ export const verifyToken = (token: string): JWTPayload => {
 // Authentication middleware
 export const authenticate = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
-    const token = req.headers.authorization?.replace('Bearer ', '');
+    const authHeader = req.headers.authorization;
+    
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ message: 'No valid token provided' });
+    }
 
+    const token = authHeader.replace('Bearer ', '').trim();
+    
     if (!token) {
       return res.status(401).json({ message: 'No token provided' });
     }
 
     try {
-      // Only accept valid JWT tokens
-      const decoded = jwt.verify(token, JWT_SECRET) as { userId: number };
-      const user = await storage.getUser(decoded.userId); // Assuming storage.getUser is available
+      // ONLY accept valid JWT tokens - no fallback to numeric IDs
+      const decoded = verifyToken(token);
+      const user = await storage.getUser(decoded.userId);
 
       if (!user || !user.isActive) {
         return res.status(401).json({ message: 'Invalid token or inactive user' });
@@ -204,7 +210,8 @@ export const authenticate = async (req: AuthenticatedRequest, res: Response, nex
       req.user = user;
       return next();
     } catch (jwtError) {
-      return res.status(401).json({ message: 'Invalid token' });
+      console.error('JWT verification failed:', jwtError.message);
+      return res.status(401).json({ message: 'Invalid or expired token' });
     }
   } catch (error) {
     console.error('Authentication error:', error);
@@ -215,22 +222,29 @@ export const authenticate = async (req: AuthenticatedRequest, res: Response, nex
 // Optional authentication (for public endpoints that can benefit from user context)
 export const optionalAuthenticate = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
-    const token = req.headers.authorization?.replace('Bearer ', '');
+    const authHeader = req.headers.authorization;
+    
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return next();
+    }
 
+    const token = authHeader.replace('Bearer ', '').trim();
+    
     if (!token) {
       return next();
     }
 
     try {
-      // Only accept valid JWT tokens
-      const decoded = jwt.verify(token, JWT_SECRET) as { userId: number };
-      const user = await storage.getUser(decoded.userId); // Assuming storage.getUser is available
+      // ONLY accept valid JWT tokens - no numeric ID fallback
+      const decoded = verifyToken(token);
+      const user = await storage.getUser(decoded.userId);
 
       if (user && user.isActive) {
         req.user = user;
       }
     } catch (jwtError) {
-      // Token is invalid, continue without authentication
+      // Invalid JWT, continue without authentication
+      console.debug('Optional auth: Invalid JWT provided');
     }
 
     return next();
