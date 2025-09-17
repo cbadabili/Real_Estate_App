@@ -1,0 +1,54 @@
+Summary
+The authentication middleware still trusts any numeric or user_ bearer token, and the optional guard just parseInts whatever arrives, so forged headers can impersonate arbitrary users without a valid JWT.
+
+Critical user and listing mutation endpoints are exposed without authentication or authorization, letting attackers overwrite profiles, toggle saved properties, or edit/delete listings for other accounts.
+
+Registration/login logic allows clients to self-activate administrative user types, logs password material, and mismatches email casing, undermining both account security and sign-in reliability.
+
+Issues
+The authenticate middleware falls back to parsing numeric IDs (or user_ prefixes) when JWT verification fails, and optionalAuthenticate unconditionally trusts any numeric bearer string. An attacker can therefore send Authorization: Bearer 1 (or similar) to hijack another account.
+
+Suggested task
+Require verified JWTs in auth middleware
+
+Start task
+PUT /api/users/:id is completely unauthenticated and pipes the entire request body into storage.updateUser, so anyone can flip role, userType, permissions, or isActive for any account.
+
+Suggested task
+Protect user update endpoint
+
+Start task
+GET /api/users/:id only uses optionalAuthenticate; if no token (or an attacker-supplied numeric header) is present, the handler still returns the full profile, including email and phone, for any user ID.
+
+Suggested task
+Require auth for user detail retrieval
+
+Start task
+During registration the server accepts client-provided userType and isActive flags, so a new account can self-register as an active admin-level user without oversight.
+
+Suggested task
+Enforce safe defaults in registration
+
+Start task
+The login flow logs the stored password hash prefix, the raw password length, and even the first three characters of the submitted password, leaking sensitive credential data to application logs.
+
+Suggested task
+Scrub sensitive logging from login handler
+
+Start task
+Emails are stored exactly as submitted during registration, but login lowercases the input and getUserByEmail lowercases the lookup. Registering with mixed-case email therefore prevents later logins.
+
+Suggested task
+Normalize email casing consistently
+
+Start task
+PUT and DELETE /api/properties/:id are exposed without any authentication or ownership checks, allowing anonymous callers to rewrite or remove any listing.
+
+Suggested task
+Lock down property mutation routes
+
+Start task
+All saved-property endpoints (POST, DELETE, and status check) accept path parameters without authentication, so anyone can tamper with any user’s shortlist by guessing their ID.
+
+Suggested task
+Secure saved-property APIs

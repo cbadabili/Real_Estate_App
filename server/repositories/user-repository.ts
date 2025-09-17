@@ -40,9 +40,15 @@ export class UserRepository implements IUserRepository {
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
+    // Normalize email before storing
+    const normalizedUser = {
+      ...insertUser,
+      email: insertUser.email?.toLowerCase()
+    };
+    
     const [user] = await db
       .insert(users)
-      .values(insertUser)
+      .values(normalizedUser)
       .returning();
     return user;
   }
@@ -50,6 +56,11 @@ export class UserRepository implements IUserRepository {
   async updateUser(id: number, updates: Partial<InsertUser>): Promise<User | undefined> {
     try {
       const processedUpdates = { ...updates };
+
+      // Normalize email if being updated
+      if (processedUpdates.email) {
+        processedUpdates.email = processedUpdates.email.toLowerCase();
+      }
 
       const timestampFields = ['lastLoginAt', 'createdAt', 'updatedAt'];
 

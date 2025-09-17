@@ -47,7 +47,8 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
     email: '',
     password: '',
     phone: '',
-    userType: 'buyer'
+    userType: 'buyer',
+    bio: ''
   });
   const [loading, setLoading] = useState(false);
 
@@ -285,20 +286,20 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                         <option value="fsbo">FSBO (For Sale By Owner)</option>
                       </select>
                     </div>
-                  </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Tell us about yourself
-                    </label>
-                    <textarea
-                      name="bio"
-                      value={formData.bio || ''}
-                      onChange={handleChange}
-                      rows={3}
-                      placeholder="What are you looking for? What's your property goal?"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
-                    />
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Tell us about yourself
+                      </label>
+                      <textarea
+                        name="bio"
+                        value={formData.bio || ''}
+                        onChange={handleChange}
+                        rows={3}
+                        placeholder="What are you looking for? What's your property goal?"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
+                      />
+                    </div>
                   </div>
 
                   {/* Plan Selection */}

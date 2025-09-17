@@ -5,11 +5,12 @@ import { authenticate, optionalAuthenticate, AuthService } from "../auth-middlew
 
 export function registerUserRoutes(app: Express) {
   // Get user by ID
-  app.get("/api/users/:id", optionalAuthenticate, async (req, res) => {
+  app.get("/api/users/:id", authenticate, async (req, res) => {
     try {
       const userId = parseInt(req.params.id);
 
-      if (req.user && (req.user.id !== userId && !AuthService.isAdmin(req.user))) {
+      // Only allow users to view their own profile, or admins to view any profile
+      if (req.user!.id !== userId && !AuthService.isAdmin(req.user!)) {
         return res.status(403).json({ message: "Access denied" });
       }
 
@@ -117,12 +118,39 @@ export function registerUserRoutes(app: Express) {
   });
 
   // Update user
-  app.put("/api/users/:id", async (req, res) => {
+  app.put("/api/users/:id", authenticate, async (req, res) => {
     try {
       const userId = parseInt(req.params.id);
       const updates = req.body;
 
-      const user = await storage.updateUser(userId, updates);
+      // Only allow users to update their own profile, or admins to update any profile
+      if (req.user!.id !== userId && !AuthService.isAdmin(req.user!)) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      // Restrict which fields can be updated
+      const allowedFields = ['firstName', 'lastName', 'phone', 'bio'];
+      const adminOnlyFields = ['role', 'userType', 'permissions', 'isActive', 'isVerified'];
+
+      const filteredUpdates: any = {};
+      
+      // Allow basic fields for all users
+      allowedFields.forEach(field => {
+        if (updates[field] !== undefined) {
+          filteredUpdates[field] = updates[field];
+        }
+      });
+
+      // Allow admin-only fields for admins
+      if (AuthService.isAdmin(req.user!)) {
+        adminOnlyFields.forEach(field => {
+          if (updates[field] !== undefined) {
+            filteredUpdates[field] = updates[field];
+          }
+        });
+      }
+
+      const user = await storage.updateUser(userId, filteredUpdates);
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }

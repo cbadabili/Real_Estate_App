@@ -1,4 +1,3 @@
-
 import type { Express } from "express";
 import { storage } from "../storage";
 import { insertUserSchema } from "../../shared/schema";
@@ -9,56 +8,77 @@ export function registerAuthRoutes(app: Express) {
   // User registration
   app.post("/api/users/register", async (req, res) => {
     try {
-      const processedData = {
-        firstName: req.body.firstName,
-        lastName: req.body.lastName,
-        username: req.body.username,
-        email: req.body.email,
-        password: req.body.password,
-        phone: req.body.phone || null,
-        userType: req.body.userType || 'buyer',
-        isActive: req.body.isActive === true ? 1 : 0,
-        dateOfBirth: req.body.dateOfBirth || null,
-        address: req.body.address || null,
-        city: req.body.city || null,
-        state: req.body.state || null,
-        zipCode: req.body.zipCode || null,
+      console.log('Registration request received');
+
+      const { username, email, password, firstName, lastName, phone, bio, reacNumber } = req.body;
+
+      if (!email || !password || !firstName || !lastName) {
+        return res.status(400).json({
+          message: "Email, password, first name, and last name are required"
+        });
+      }
+
+      // Validate email format
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        return res.status(400).json({ message: "Invalid email format" });
+      }
+
+      // Validate password strength
+      if (password.length < 6) {
+        return res.status(400).json({ message: "Password must be at least 6 characters long" });
+      }
+
+      // Check if user already exists
+      const existingUser = await storage.getUserByEmail(email.toLowerCase());
+      if (existingUser) {
+        return res.status(400).json({
+          message: "User with this email already exists"
+        });
+      }
+
+      // Hash password
+      const hashedPassword = await bcrypt.hash(password, 10);
+
+      // Generate username if not provided
+      const finalUsername = username || `${firstName.toLowerCase()}_${lastName.toLowerCase()}_${Date.now()}`;
+
+      // Validate allowed user types
+      const allowedUserTypes = ['buyer', 'seller', 'agent', 'fsbo'];
+      const userType = req.body.userType && allowedUserTypes.includes(req.body.userType)
+        ? req.body.userType
+        : 'buyer';
+
+      // Create user data with secure defaults
+      const userData: any = { // Using 'any' for simplicity as InsertUser type is not fully defined in this snippet
+        username: finalUsername,
+        email: email.toLowerCase(), // Normalize email
+        password: hashedPassword,
+        firstName,
+        lastName,
+        phone,
+        userType, // Validated user type
+        role: 'user', // Always default to user role
+        permissions: JSON.stringify([]), // Default empty permissions
+        bio,
+        reacNumber,
+        isActive: false, // Always require activation
+        isVerified: false, // Always require verification
+        createdAt: Math.floor(Date.now() / 1000),
+        updatedAt: Math.floor(Date.now() / 1000)
       };
-      
-      const userData = insertUserSchema.parse(processedData);
 
-      console.log('Registration attempt for email:', userData.email, 'username:', userData.username);
+      console.log('Creating user with secure defaults');
 
-      const existingUserByEmail = await storage.getUserByEmail(userData.email);
-      if (existingUserByEmail) {
-        return res.status(400).json({ message: "User already exists with this email" });
-      }
+      const user = await storage.createUser(userData);
 
-      const existingUserByUsername = await storage.getUserByUsername(userData.username);
-      if (existingUserByUsername) {
-        return res.status(400).json({ message: "Username already taken. Please choose a different username." });
-      }
+      console.log('User created successfully');
 
-      const saltRounds = 12;
-      const hashedPassword = await bcrypt.hash(userData.password, saltRounds);
-
-      const user = await storage.createUser({...userData, password: hashedPassword});
-      const { password, ...userResponse } = user;
-      console.log('Registration successful for user:', userData.email);
+      const { password: _, ...userResponse } = user;
       res.status(201).json(userResponse);
     } catch (error) {
-      console.error("Register error:", error);
-
-      if (error.code === 'SQLITE_CONSTRAINT_UNIQUE') {
-        if (error.message.includes('users.email')) {
-          return res.status(400).json({ message: "Email address already registered" });
-        } else if (error.message.includes('users.username')) {
-          return res.status(400).json({ message: "Username already taken. Please choose a different username." });
-        }
-        return res.status(400).json({ message: "Registration failed: duplicate information" });
-      }
-
-      res.status(400).json({ message: "Registration failed. Please check your information and try again." });
+      console.error("Registration error:", error);
+      res.status(500).json({ message: "Registration failed" });
     }
   });
 
@@ -77,64 +97,35 @@ export function registerAuthRoutes(app: Express) {
       const trimmedEmail = email.trim().toLowerCase();
       const trimmedPassword = password.trim();
 
-      console.log('Login attempt for email:', trimmedEmail);
-      
+      console.log('Login attempt received');
+
       const user = await storage.getUserByEmail(trimmedEmail);
 
       if (!user) {
-        console.log('User not found for email:', trimmedEmail);
+        console.log('Login failed: user not found');
         return res.status(401).json({ message: "Invalid credentials" });
       }
 
       console.log('User found:', {
         id: user.id,
         email: user.email,
-        isActive: user.isActive,
-        hasPassword: !!user.password,
-        passwordLength: user.password ? user.password.length : 0
+        isActive: user.isActive
       });
 
       // Check if user is active
       if (!user.isActive) {
-        console.log('Inactive user attempted login:', trimmedEmail);
+        console.log('Login failed: account inactive');
         return res.status(401).json({ message: "Account is inactive" });
       }
 
-      console.log('User found, comparing password...');
-      console.log('Stored password hash:', user.password?.substring(0, 20) + '...');
-      console.log('Input password length:', trimmedPassword.length);
-      
-      // Compare password
-      let isValidPassword = false;
-      try {
-        if (!user.password) {
-          console.error('User has no password set');
-          return res.status(401).json({ message: "Invalid credentials" });
-        }
-
-        isValidPassword = await bcrypt.compare(trimmedPassword, user.password);
-        console.log('Password comparison result:', isValidPassword);
-        
-        // Additional debug info
-        if (!isValidPassword) {
-          console.log('Password mismatch details:', {
-            inputPasswordLength: trimmedPassword.length,
-            storedHashLength: user.password.length,
-            inputPasswordPrefix: trimmedPassword.substring(0, 3),
-            hashPrefix: user.password.substring(0, 10)
-          });
-        }
-      } catch (bcryptError) {
-        console.error('Bcrypt comparison error:', bcryptError);
-        return res.status(500).json({ message: "Authentication error" });
-      }
+      const isValidPassword = await bcrypt.compare(trimmedPassword, user.password);
 
       if (!isValidPassword) {
-        console.log('Password mismatch for user:', trimmedEmail);
+        console.log('Login failed: invalid credentials');
         return res.status(401).json({ message: "Invalid credentials" });
       }
 
-      console.log('Password match successful for user:', trimmedEmail);
+      console.log('Login successful');
 
       // Update last login time
       try {

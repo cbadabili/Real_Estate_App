@@ -3,16 +3,16 @@ import jwt from 'jsonwebtoken';
 import { User, UserRole, UserType, Permission } from '../shared/schema';
 import { storage } from './storage';
 
+// Define AuthenticatedRequest to include the user property
+interface AuthenticatedRequest extends Request {
+  user?: User;
+}
+
 // Extend Express Request interface to include user
 declare global {
   namespace Express {
-    interface User {
-      id: number;
-      email: string;
-      name?: string;
-      role?: string;
-      userType?: string;
-      permissions?: string[];
+    interface Request {
+      user?: User;
     }
   }
 }
@@ -66,8 +66,8 @@ const ROLE_PERMISSIONS: Record<UserRole, Permission[]> = {
 const USER_TYPE_PERMISSIONS: Record<UserType, Permission[]> = {
   [UserType.BUYER]: [Permission.VIEW_PROPERTY, Permission.CREATE_REVIEW],
   [UserType.SELLER]: [
-    Permission.CREATE_PROPERTY, 
-    Permission.UPDATE_PROPERTY, 
+    Permission.CREATE_PROPERTY,
+    Permission.UPDATE_PROPERTY,
     Permission.VIEW_PROPERTY,
     Permission.RESPOND_TO_REVIEW
   ],
@@ -168,8 +168,8 @@ export const generateToken = (user: User): string => {
     userType: user.userType,
     role: user.role
   };
-  
-  return jwt.sign(payload, JWT_SECRET, { 
+
+  return jwt.sign(payload, JWT_SECRET, {
     expiresIn: JWT_EXPIRES_IN,
     issuer: 'beedab-api',
     audience: 'beedab-client'
@@ -184,89 +184,74 @@ export const verifyToken = (token: string): JWTPayload => {
 };
 
 // Authentication middleware
-export const authenticate = async (req: Request, res: Response, next: NextFunction) => {
+export const authenticate = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
-    const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return res.status(401).json({ error: 'Authentication required' });
+    const token = req.headers.authorization?.replace('Bearer ', '');
+
+    if (!token) {
+      return res.status(401).json({ message: 'No token provided' });
     }
 
-    const token = authHeader.substring(7);
-
-    // Try JWT first, then fall back to legacy simple token
-    let userId: number;
     try {
-      // Verify JWT token
-      const payload = verifyToken(token);
-      userId = payload.userId;
+      // Only accept valid JWT tokens
+      const decoded = jwt.verify(token, JWT_SECRET) as { userId: number };
+      const user = await storage.getUser(decoded.userId); // Assuming storage.getUser is available
+
+      if (!user || !user.isActive) {
+        return res.status(401).json({ message: 'Invalid token or inactive user' });
+      }
+
+      req.user = user;
+      return next();
     } catch (jwtError) {
-      // Fall back to legacy token format for backwards compatibility
-      if (token.startsWith('user_')) {
-        userId = parseInt(token.split('_')[1]);
-      } else {
-        userId = parseInt(token);
-      }
-
-      if (isNaN(userId)) {
-        return res.status(401).json({ error: 'Invalid token format' });
-      }
+      return res.status(401).json({ message: 'Invalid token' });
     }
-
-    const user = await storage.getUser(userId);
-    if (!user || !user.isActive) {
-      return res.status(401).json({ error: 'User not found or inactive' });
-    }
-
-    // Update last login time (Unix timestamp)
-    await storage.updateUser(user.id, { lastLoginAt: Math.floor(Date.now() / 1000) });
-
-    req.user = user;
-    next();
   } catch (error) {
     console.error('Authentication error:', error);
-    if (error.name === 'TokenExpiredError') {
-      return res.status(401).json({ error: 'Token expired' });
-    } else if (error.name === 'JsonWebTokenError') {
-      return res.status(401).json({ error: 'Invalid token' });
-    }
-    return res.status(500).json({ error: 'Authentication failed' });
+    return res.status(500).json({ message: 'Authentication failed' });
   }
 };
 
 // Optional authentication (for public endpoints that can benefit from user context)
-export const optionalAuthenticate = async (req: Request, res: Response, next: NextFunction) => {
+export const optionalAuthenticate = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
-    const authHeader = req.headers.authorization;
-    if (authHeader && authHeader.startsWith('Bearer ')) {
-      const token = authHeader.substring(7);
-      const userId = parseInt(token);
+    const token = req.headers.authorization?.replace('Bearer ', '');
 
-      if (!isNaN(userId)) {
-        const user = await storage.getUser(userId);
-        if (user && user.isActive) {
-          req.user = user;
-        }
-      }
+    if (!token) {
+      return next();
     }
-    next();
+
+    try {
+      // Only accept valid JWT tokens
+      const decoded = jwt.verify(token, JWT_SECRET) as { userId: number };
+      const user = await storage.getUser(decoded.userId); // Assuming storage.getUser is available
+
+      if (user && user.isActive) {
+        req.user = user;
+      }
+    } catch (jwtError) {
+      // Token is invalid, continue without authentication
+    }
+
+    return next();
   } catch (error) {
     console.error('Optional authentication error:', error);
-    next(); // Continue without authentication
+    return next();
   }
 };
 
 // Authorization middleware factory
 export const authorize = (...permissions: Permission[]) => {
-  return (req: Request, res: Response, next: NextFunction) => {
+  return (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     if (!req.user) {
       return res.status(401).json({ error: 'Authentication required' });
     }
 
-    const hasPermission = permissions.length === 0 || 
+    const hasPermission = permissions.length === 0 ||
                          AuthService.hasAnyPermission(req.user, permissions);
 
     if (!hasPermission) {
-      return res.status(403).json({ 
+      return res.status(403).json({
         error: 'Insufficient permissions',
         required: permissions,
         user_permissions: AuthService.getUserPermissions(req.user)
@@ -279,14 +264,14 @@ export const authorize = (...permissions: Permission[]) => {
 
 // Role-based authorization
 export const requireRole = (...roles: UserRole[]) => {
-  return (req: Request, res: Response, next: NextFunction) => {
+  return (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     if (!req.user) {
       return res.status(401).json({ error: 'Authentication required' });
     }
 
     const hasRole = roles.includes(req.user.role as UserRole);
     if (!hasRole) {
-      return res.status(403).json({ 
+      return res.status(403).json({
         error: 'Insufficient role',
         required: roles,
         user_role: req.user.role
@@ -299,14 +284,14 @@ export const requireRole = (...roles: UserRole[]) => {
 
 // User type authorization
 export const requireUserType = (...userTypes: UserType[]) => {
-  return (req: Request, res: Response, next: NextFunction) => {
+  return (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     if (!req.user) {
       return res.status(401).json({ error: 'Authentication required' });
     }
 
     const hasUserType = userTypes.includes(req.user.userType as UserType);
     if (!hasUserType) {
-      return res.status(403).json({ 
+      return res.status(403).json({
         error: 'Insufficient user type',
         required: userTypes,
         user_type: req.user.userType
@@ -325,7 +310,7 @@ export const requireModerator = requireRole(UserRole.MODERATOR, UserRole.ADMIN, 
 
 // Owner or admin middleware (for resource ownership)
 export const requireOwnerOrAdmin = (getResourceOwnerId: (req: Request) => Promise<number>) => {
-  return async (req: Request, res: Response, next: NextFunction) => {
+  return async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     if (!req.user) {
       return res.status(401).json({ error: 'Authentication required' });
     }
@@ -348,7 +333,7 @@ export const requireOwnerOrAdmin = (getResourceOwnerId: (req: Request) => Promis
 };
 
 export function requirePermission(permission: Permission) {
-  return (req: Request, res: Response, next: NextFunction) => {
+  return (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     if (!req.user) {
       return res.status(401).json({ error: 'Unauthorized' });
     }
