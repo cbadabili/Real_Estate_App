@@ -287,6 +287,20 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
                     </div>
                   </div>
 
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Tell us about yourself
+                    </label>
+                    <textarea
+                      name="bio"
+                      value={formData.bio || ''}
+                      onChange={handleChange}
+                      rows={3}
+                      placeholder="What are you looking for? What's your property goal?"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
+                    />
+                  </div>
+
                   {/* Plan Selection */}
                   <div className="space-y-4">
                     <h3 className="text-lg font-semibold text-gray-900 mb-4">

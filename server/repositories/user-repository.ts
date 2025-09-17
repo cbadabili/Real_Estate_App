@@ -69,6 +69,11 @@ export class UserRepository implements IUserRepository {
         }
       }
 
+      // Handle bio field specifically
+      if (processedUpdates.bio !== undefined) {
+        processedUpdates.bio = processedUpdates.bio || null;
+      }
+
       const [user] = await db
         .update(users)
         .set({ 

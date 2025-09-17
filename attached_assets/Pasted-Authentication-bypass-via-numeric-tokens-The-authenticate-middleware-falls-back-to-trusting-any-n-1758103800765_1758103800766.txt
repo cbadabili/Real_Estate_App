@@ -1,0 +1,43 @@
+Authentication bypass via numeric “tokens”
+The authenticate middleware falls back to trusting any numeric or user_<id> bearer token if JWT verification fails, and optionalAuthenticate only does a parseInt check. A caller can therefore impersonate any active account simply by sending Authorization: Bearer 1, completely bypassing signature checks.
+
+Suggested task
+Require real token validation in auth middleware
+
+Start task
+2. Unauthenticated user profile mutation
+PUT /api/users/:id does not require authentication, yet forwards the entire request body to storage.updateUser. An unauthenticated caller can flip role, userType, permissions, or isActive on any user record, gaining administrative privileges or disabling other accounts.
+
+Suggested task
+Lock down user update endpoint
+
+Start task
+3. Personally identifiable information leak in user lookup
+GET /api/users/:id is guarded only by optionalAuthenticate; without a token, req.user is undefined and the handler returns the full profile (email, phone, etc.) of any account to the public internet.
+
+Suggested task
+Require authentication for user detail retrieval
+
+Start task
+4. Client-controlled account activation and privilege escalation on registration
+During registration the server accepts client-provided userType and isActive fields, defaulting isActive to 0 unless the client explicitly sends true. Attackers can sign up as userType: 'admin' to gain every permission defined for administrators and mark the account active immediately, all without staff approval.
+
+Suggested task
+Harden registration defaults and validation
+
+Start task
+5. Sensitive credential data written to logs
+The login handler logs the stored password hash prefix, the raw password length, and even the first three characters of the user’s submitted password when validation fails. These details are highly sensitive and should never enter logs.
+
+Suggested task
+Remove sensitive logging from login flow
+
+Start task
+6. Case-sensitivity bug in email lookup
+getUserByEmail lowercases the lookup value without normalizing stored addresses; registering with John.Doe@Example.com stores the mixed-case string, so subsequent login attempts using the lowercased email fail.
+
+Suggested task
+Normalize emails consistently for authentication
+
+Start task
+Testing

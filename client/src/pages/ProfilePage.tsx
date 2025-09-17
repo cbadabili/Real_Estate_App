@@ -1,17 +1,63 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { User, Mail, Phone, MapPin, Edit, Save, Camera, Settings, Home, Heart } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
+import { apiRequest } from '../lib/queryClient';
 
 const ProfilePage = () => {
+  const { user, updateUser } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
-  const [userInfo, setUserInfo] = useState({
-    name: 'John Doe',
-    email: 'john.doe@example.com',
-    phone: '+267 7123 4567',
-    location: 'Gaborone, Botswana',
-    type: 'buyer',
-    bio: 'Looking for a family home in Gaborone area with good schools nearby.'
+  const [stats, setStats] = useState({
+    savedProperties: 0,
+    propertiesViewed: 0,
+    inquiriesSent: 0,
+    activeListings: 0
   });
+  const [savedProperties, setSavedProperties] = useState([]);
+  const [userInfo, setUserInfo] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    location: '',
+    type: '',
+    bio: ''
+  });
+
+  useEffect(() => {
+    if (user) {
+      setUserInfo({
+        name: `${user.firstName} ${user.lastName}`,
+        email: user.email,
+        phone: user.phone || '',
+        location: 'Gaborone, Botswana', // Default location
+        type: user.userType,
+        bio: user.bio || ''
+      });
+      
+      // Fetch user stats
+      fetchUserStats();
+      fetchSavedProperties();
+    }
+  }, [user]);
+
+  const fetchUserStats = async () => {
+    try {
+      const response = await apiRequest('/api/dashboard/stats');
+      setStats(response);
+    } catch (error) {
+      console.error('Failed to fetch user stats:', error);
+    }
+  };
+
+  const fetchSavedProperties = async () => {
+    if (!user) return;
+    try {
+      const response = await apiRequest(`/api/users/${user.id}/saved-properties`);
+      setSavedProperties(response || []);
+    } catch (error) {
+      console.error('Failed to fetch saved properties:', error);
+    }
+  };
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -32,9 +78,27 @@ const ProfilePage = () => {
     }
   };
 
-  const handleSave = () => {
-    setIsEditing(false);
-    // Here you would save the data to your backend
+  const handleSave = async () => {
+    if (!user) return;
+    
+    try {
+      const updates = {
+        firstName: userInfo.name.split(' ')[0],
+        lastName: userInfo.name.split(' ').slice(1).join(' '),
+        phone: userInfo.phone,
+        bio: userInfo.bio
+      };
+      
+      await apiRequest(`/api/users/${user.id}`, {
+        method: 'PUT',
+        body: JSON.stringify(updates)
+      });
+      
+      updateUser(updates);
+      setIsEditing(false);
+    } catch (error) {
+      console.error('Failed to update profile:', error);
+    }
   };
 
   return (
@@ -49,10 +113,24 @@ const ProfilePage = () => {
         <motion.div variants={itemVariants} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
           <div className="flex items-start space-x-6">
             <div className="relative">
-              <div className="w-24 h-24 bg-beedab-blue rounded-full flex items-center justify-center text-white text-2xl font-bold">
-                {userInfo.name.split(' ').map(n => n[0]).join('')}
-              </div>
-              <button className="absolute -bottom-2 -right-2 w-8 h-8 bg-white rounded-full shadow-lg border border-gray-200 flex items-center justify-center text-gray-600 hover:text-beedab-blue">
+              {user?.avatar ? (
+                <img 
+                  src={user.avatar} 
+                  alt={userInfo.name}
+                  className="w-24 h-24 rounded-full object-cover"
+                />
+              ) : (
+                <div className="w-24 h-24 bg-beedab-blue rounded-full flex items-center justify-center text-white text-2xl font-bold">
+                  {userInfo.name ? userInfo.name.split(' ').map(n => n[0]).join('') : 'U'}
+                </div>
+              )}
+              <button 
+                onClick={() => {
+                  // TODO: Implement photo upload functionality
+                  alert('Photo upload functionality coming soon!');
+                }}
+                className="absolute -bottom-2 -right-2 w-8 h-8 bg-white rounded-full shadow-lg border border-gray-200 flex items-center justify-center text-gray-600 hover:text-beedab-blue"
+              >
                 <Camera className="h-4 w-4" />
               </button>
             </div>
@@ -147,7 +225,7 @@ const ProfilePage = () => {
                   <p className="font-medium text-gray-900">Properties Listed</p>
                   <p className="text-sm text-gray-600">Active listings</p>
                 </div>
-                <span className="text-2xl font-bold text-beedab-blue">3</span>
+                <span className="text-2xl font-bold text-beedab-blue">{stats.activeListings}</span>
               </div>
               
               <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
@@ -155,7 +233,7 @@ const ProfilePage = () => {
                   <p className="font-medium text-gray-900">Saved Properties</p>
                   <p className="text-sm text-gray-600">Favorites</p>
                 </div>
-                <span className="text-2xl font-bold text-beedab-blue">7</span>
+                <span className="text-2xl font-bold text-beedab-blue">{stats.savedProperties}</span>
               </div>
               
               <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
@@ -163,11 +241,14 @@ const ProfilePage = () => {
                   <p className="font-medium text-gray-900">Inquiries Sent</p>
                   <p className="text-sm text-gray-600">This month</p>
                 </div>
-                <span className="text-2xl font-bold text-beedab-blue">12</span>
+                <span className="text-2xl font-bold text-beedab-blue">{stats.inquiriesSent}</span>
               </div>
             </div>
             
-            <button className="w-full mt-4 px-4 py-2 border border-beedab-blue text-beedab-blue rounded-lg hover:bg-beedab-blue hover:text-white transition-colors">
+            <button 
+              onClick={() => window.location.href = '/dashboard'}
+              className="w-full mt-4 px-4 py-2 border border-beedab-blue text-beedab-blue rounded-lg hover:bg-beedab-blue hover:text-white transition-colors"
+            >
               View All Activity
             </button>
           </motion.div>
@@ -180,36 +261,40 @@ const ProfilePage = () => {
             </h2>
             
             <div className="space-y-3">
-              {[
-                {
-                  title: 'Modern Family Home',
-                  location: 'Gaborone West',
-                  price: 'P2,500,000',
-                  image: 'https://images.unsplash.com/photo-1605146769289-440113cc3d00?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80'
-                },
-                {
-                  title: 'Luxury Apartment',
-                  location: 'Francistown CBD',
-                  price: 'P1,800,000',
-                  image: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80'
-                }
-              ].map((property, index) => (
-                <div key={index} className="flex items-center space-x-3 p-2 hover:bg-gray-50 rounded-lg cursor-pointer">
+              {savedProperties.length > 0 ? savedProperties.slice(0, 2).map((property, index) => (
+                <div 
+                  key={index} 
+                  className="flex items-center space-x-3 p-2 hover:bg-gray-50 rounded-lg cursor-pointer"
+                  onClick={() => window.location.href = `/property/${property.id}`}
+                >
                   <img
-                    src={property.image}
+                    src={property.imageUrl || 'https://images.unsplash.com/photo-1605146769289-440113cc3d00?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80'}
                     alt={property.title}
                     className="w-12 h-12 object-cover rounded-lg"
                   />
                   <div className="flex-1">
                     <p className="font-medium text-gray-900 text-sm">{property.title}</p>
                     <p className="text-xs text-gray-600">{property.location}</p>
-                    <p className="text-sm font-semibold text-beedab-blue">{property.price}</p>
+                    <p className="text-sm font-semibold text-beedab-blue">P{property.price?.toLocaleString()}</p>
                   </div>
                 </div>
-              ))}
+              )) : (
+                <div className="text-center py-4 text-gray-500">
+                  <p className="text-sm">No saved properties yet</p>
+                  <button 
+                    onClick={() => window.location.href = '/buy'}
+                    className="text-beedab-blue text-sm hover:underline mt-1"
+                  >
+                    Start browsing properties
+                  </button>
+                </div>
+              )}
             </div>
             
-            <button className="w-full mt-4 px-4 py-2 border border-beedab-blue text-beedab-blue rounded-lg hover:bg-beedab-blue hover:text-white transition-colors">
+            <button 
+              onClick={() => window.location.href = '/my-properties?tab=saved'}
+              className="w-full mt-4 px-4 py-2 border border-beedab-blue text-beedab-blue rounded-lg hover:bg-beedab-blue hover:text-white transition-colors"
+            >
               View All Saved
             </button>
           </motion.div>
@@ -223,24 +308,45 @@ const ProfilePage = () => {
           </h2>
           
           <div className="grid md:grid-cols-2 gap-4">
-            <button className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-beedab-blue hover:bg-beedab-blue/5 transition-colors">
+            <button 
+              onClick={() => alert('Notification preferences coming soon!')}
+              className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-beedab-blue hover:bg-beedab-blue/5 transition-colors"
+            >
               <span className="font-medium text-gray-900">Notification Preferences</span>
               <span className="text-gray-400">→</span>
             </button>
             
-            <button className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-beedab-blue hover:bg-beedab-blue/5 transition-colors">
+            <button 
+              onClick={() => alert('Privacy settings coming soon!')}
+              className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-beedab-blue hover:bg-beedab-blue/5 transition-colors"
+            >
               <span className="font-medium text-gray-900">Privacy Settings</span>
               <span className="text-gray-400">→</span>
             </button>
             
-            <button className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-beedab-blue hover:bg-beedab-blue/5 transition-colors">
+            <button 
+              onClick={() => {
+                const newPassword = prompt('Enter new password:');
+                if (newPassword) {
+                  alert('Password change functionality coming soon!');
+                }
+              }}
+              className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-beedab-blue hover:bg-beedab-blue/5 transition-colors"
+            >
               <span className="font-medium text-gray-900">Change Password</span>
               <span className="text-gray-400">→</span>
             </button>
             
-            <button className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-beedab-blue hover:bg-beedab-blue/5 transition-colors">
-              <span className="font-medium text-gray-900">Delete Account</span>
-              <span className="text-gray-400">→</span>
+            <button 
+              onClick={() => {
+                if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+                  alert('Account deletion functionality coming soon!');
+                }
+              }}
+              className="flex items-center justify-between p-4 border border-red-200 rounded-lg hover:border-red-500 hover:bg-red-50 transition-colors"
+            >
+              <span className="font-medium text-red-600">Delete Account</span>
+              <span className="text-red-400">→</span>
             </button>
           </div>
         </motion.div>
