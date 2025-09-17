@@ -260,20 +260,6 @@ export function registerUserRoutes(app: Express) {
     }
   });
 }
-import type { Express } from "express";
-import { storage } from "../storage";
-import { authenticate, AuthService } from "../auth-middleware";
-import { z } from "zod";
-
-// Safe fields that users can update themselves
-const safeUserUpdateSchema = z.object({
-  firstName: z.string().min(1).max(50).optional(),
-  lastName: z.string().min(1).max(50).optional(),
-  phone: z.string().max(20).optional(),
-  bio: z.string().max(500).optional(),
-  avatar: z.string().url().optional(),
-  reacNumber: z.string().max(20).optional()
-});
 
 export function registerUserRoutes(app: Express) {
   // Get user profile (public, but limited info for non-owners)
