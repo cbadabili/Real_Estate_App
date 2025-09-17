@@ -15,7 +15,7 @@ import {
   Hammer,
   Paintbrush
 } from 'lucide-react';
-import RegisterProvider from '../../components/RegisterProvider';
+import RegisterProvider from '../../components/shared/RegisterProvider';
 
 interface Supplier {
   id: number;

@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, MapPin, Star, Wrench, Shield, CheckCircle } from 'lucide-react';
 import ServiceProviderCard from '../../components/domain/marketplace/ServiceProviderCard';
-import RegisterProvider from '../../components/marketplace/RegisterProvider';
+import RegisterProvider from '../../components/shared/RegisterProvider';
 
 interface Artisan {
   id: number;

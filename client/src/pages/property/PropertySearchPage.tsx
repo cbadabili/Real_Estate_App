@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { Grid, List, Map, Filter } from 'lucide-react';
 import SmartSearchBar from '../../components/search/SmartSearchBar';
 import PropertyGrid from '../../components/domain/property/PropertyGrid';
-import PropertyFilters from '../../components/domain/property/PropertyFilters';
+import { PropertyFilters } from '../../components/properties/PropertyFilters';
 import PropertyMap from '../../components/properties/PropertyMap';
 import { PropertyComparison } from '../../components/properties/PropertyComparison';
 import { SavedSearches } from '../../components/properties/SavedSearches';
