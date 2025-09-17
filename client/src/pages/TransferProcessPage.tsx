@@ -154,6 +154,46 @@ const TransferProcessPage = () => {
     return totalItems > 0 ? (completedItems / totalItems) * 100 : 0;
   };
 
+  const downloadChecklist = () => {
+    const content = `PROPERTY TRANSFER CHECKLIST\n\n${
+      selectedProperty ? `Property: ${properties.find(p => p.id === selectedProperty)?.title}\n\n` : ''
+    }TRANSFER STEPS:\n\n${transferSteps.map((step, index) => 
+      `${index + 1}. ${step.title}\n${step.description}\n${step.items.map((item, itemIndex) => 
+        `   ${checkedItems[`step-${index}-item-${itemIndex}`] ? '✓' : '☐'} ${item}`
+      ).join('\n')}\n`
+    ).join('\n')}\n\nREQUIRED DOCUMENTS:\n\n${requiredDocuments.map(category => 
+      `${category.category}:\n${category.items.map((item, itemIndex) => 
+        `   ${checkedItems[`${category.category}-${itemIndex}`] ? '✓' : '☐'} ${item}`
+      ).join('\n')}\n`
+    ).join('\n')}`;
+
+    const blob = new Blob([content], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'transfer-checklist.txt';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const openDocumentManager = () => {
+    window.open('/documents', '_blank');
+  };
+
+  const contactLegalSupport = () => {
+    window.open('/legal-services', '_blank');
+  };
+
+  const contactLawyer = () => {
+    window.open('tel:+2673951234');
+  };
+
+  const sendMessage = () => {
+    window.open('mailto:info@kagiso-law.co.bw?subject=Property Transfer Support&body=Hello, I need assistance with my property transfer process.');
+  };
+
   return (
     <div className="min-h-screen bg-neutral-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -317,15 +357,25 @@ const TransferProcessPage = () => {
               <div className="bg-white rounded-lg shadow-sm border border-neutral-200 p-6 mb-6">
                 <h3 className="text-lg font-semibold text-neutral-900 mb-4">Quick Actions</h3>
                 <div className="space-y-3">
-                  <button className="w-full bg-beedab-blue text-white py-3 px-4 rounded-lg hover:bg-beedab-darkblue transition-colors flex items-center justify-center">
+                  <button 
+                    onClick={downloadChecklist}
+                    disabled={!selectedProperty}
+                    className="w-full bg-beedab-blue text-white py-3 px-4 rounded-lg hover:bg-beedab-darkblue transition-colors flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
                     <Download className="h-4 w-4 mr-2" />
                     Download Checklist
                   </button>
-                  <button className="w-full bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center">
+                  <button 
+                    onClick={openDocumentManager}
+                    className="w-full bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center"
+                  >
                     <FileText className="h-4 w-4 mr-2" />
                     Document Manager
                   </button>
-                  <button className="w-full bg-purple-600 text-white py-3 px-4 rounded-lg hover:bg-purple-700 transition-colors flex items-center justify-center">
+                  <button 
+                    onClick={contactLegalSupport}
+                    className="w-full bg-purple-600 text-white py-3 px-4 rounded-lg hover:bg-purple-700 transition-colors flex items-center justify-center"
+                  >
                     <Scale className="h-4 w-4 mr-2" />
                     Legal Support
                   </button>
@@ -340,11 +390,17 @@ const TransferProcessPage = () => {
                     <Users className="h-4 w-4 mr-2 text-neutral-600" />
                     <span className="text-neutral-700">Kagiso Law Firm</span>
                   </div>
-                  <button className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center">
+                  <button 
+                    onClick={contactLawyer}
+                    className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center"
+                  >
                     <Phone className="h-4 w-4 mr-2" />
                     Contact Lawyer
                   </button>
-                  <button className="w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center">
+                  <button 
+                    onClick={sendMessage}
+                    className="w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center"
+                  >
                     <MessageCircle className="h-4 w-4 mr-2" />
                     Send Message
                   </button>
