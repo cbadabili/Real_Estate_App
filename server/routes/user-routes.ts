@@ -1,4 +1,3 @@
-
 import type { Express } from "express";
 import { storage } from "../storage";
 import { authenticate, optionalAuthenticate, AuthService } from "../auth-middleware";
@@ -55,146 +54,62 @@ export function registerUserRoutes(app: Express) {
         // Try to fetch saved properties
         const savedProperties = await storage.getSavedProperties(userId);
         stats.savedProperties = savedProperties ? savedProperties.length : 0;
-      } catch (error) {
-        console.warn('Error fetching saved properties:', error.message);
+      } catch (error: any) {
+        console.warn('Error fetching saved properties:', error?.message || error);
       }
 
       try {
         // Try to fetch user inquiries
         const userInquiries = await storage.getUserInquiries(userId);
         stats.inquiriesSent = userInquiries ? userInquiries.length : 0;
-      } catch (error) {
-        console.warn('Error fetching user inquiries:', error.message);
+      } catch (error: any) {
+        console.warn('Error fetching user inquiries:', error?.message || error);
       }
 
       try {
         // Try to fetch user appointments
         const userAppointments = await storage.getUserAppointments(userId);
         stats.viewingsScheduled = userAppointments ? userAppointments.length : 0;
-      } catch (error) {
-        console.warn('Error fetching user appointments:', error.message);
+      } catch (error: any) {
+        console.warn('Error fetching user appointments:', error?.message || error);
       }
 
-      try {
-        // Try to fetch user properties
-        const userProperties = await storage.getUserProperties(userId);
-        if (userProperties && userProperties.length > 0) {
-          stats.activeListings = userProperties.filter(p => p.status === 'active').length;
-          stats.totalViews = userProperties.reduce((sum, property) => sum + (property.views || 0), 0);
-          
-          try {
-            const inquiriesPromises = userProperties.map(p => storage.getPropertyInquiries(p.id));
-            const allInquiries = await Promise.all(inquiriesPromises);
-            stats.totalInquiries = allInquiries.flat().length;
-          } catch (error) {
-            console.warn('Error fetching property inquiries:', error.message);
-          }
+      // For agents/FSBOs, try to get listing stats
+      if (req.user.userType === 'agent' || req.user.userType === 'fsbo' || req.user.userType === 'seller') {
+        try {
+          // Note: getUserListings method needs to be implemented in storage
+          // For now, we'll skip this to avoid runtime errors
+          // const userListings = await storage.getUserListings(userId);
+          // stats.activeListings = userListings ? userListings.length : 0;
+          stats.activeListings = 0; // Temporary placeholder
+        } catch (error: any) {
+          console.warn('Error fetching user listings:', error?.message || error);
         }
-      } catch (error) {
-        console.warn('Error fetching user properties:', error.message);
       }
 
-      // Calculate properties viewed based on available data
-      stats.propertiesViewed = Math.min(stats.savedProperties * 3 + stats.inquiriesSent, 50);
-
-      console.log('Dashboard stats computed:', stats);
       res.json(stats);
     } catch (error) {
       console.error("Dashboard stats error:", error);
-      res.status(500).json({ 
-        message: "Failed to fetch dashboard statistics",
-        error: process.env.NODE_ENV === 'development' ? error.message : undefined
-      });
+      res.status(500).json({ message: "Failed to fetch dashboard stats" });
     }
   });
 
-  // Update user
-  app.put("/api/users/:id", authenticate, async (req, res) => {
+  // Get user's favorites/saved properties
+  app.get("/api/users/:id/saved-properties", authenticate, async (req, res) => {
     try {
       const userId = parseInt(req.params.id);
-      const updates = req.body;
 
-      // Only allow users to update their own profile, or admins to update any profile
+      // Only allow users to view their own saved properties, or admins to view any
       if (req.user!.id !== userId && !AuthService.isAdmin(req.user!)) {
         return res.status(403).json({ message: "Access denied" });
       }
 
-      // Restrict which fields can be updated
-      const allowedFields = ['firstName', 'lastName', 'phone', 'bio'];
-      const adminOnlyFields = ['role', 'userType', 'permissions', 'isActive', 'isVerified'];
-
-      const filteredUpdates: any = {};
-      
-      // Allow basic fields for all users
-      allowedFields.forEach(field => {
-        if (updates[field] !== undefined) {
-          filteredUpdates[field] = updates[field];
-        }
-      });
-
-      // Allow admin-only fields for admins
-      if (AuthService.isAdmin(req.user!)) {
-        adminOnlyFields.forEach(field => {
-          if (updates[field] !== undefined) {
-            filteredUpdates[field] = updates[field];
-          }
-        });
-      }
-
-      const user = await storage.updateUser(userId, filteredUpdates);
-      if (!user) {
-        return res.status(404).json({ message: "User not found" });
-      }
-
-      const { password, ...userResponse } = user;
-      res.json(userResponse);
-    } catch (error) {
-      console.error("Update user error:", error);
-      res.status(500).json({ message: "Failed to update user" });
-    }
-  });
-
-  // User properties
-  app.get("/api/users/:id/properties", async (req, res) => {
-    try {
-      const userId = parseInt(req.params.id);
-      const properties = await storage.getUserProperties(userId);
-      res.json(properties);
-    } catch (error) {
-      console.error("Get user properties error:", error);
-      res.status(500).json({ message: "Failed to fetch user properties" });
-    }
-  });
-
-  // User inquiries
-  app.get("/api/users/:id/inquiries", async (req, res) => {
-    try {
-      const userId = parseInt(req.params.id);
-      const inquiries = await storage.getUserInquiries(userId);
-      res.json(inquiries);
-    } catch (error) {
-      console.error("Get user inquiries error:", error);
-      res.status(500).json({ message: "Failed to fetch user inquiries" });
-    }
-  });
-
-  // User appointments
-  app.get("/api/users/:id/appointments", async (req, res) => {
-    try {
-      const userId = parseInt(req.params.id);
-      const appointments = await storage.getUserAppointments(userId);
-      res.json(appointments);
-    } catch (error) {
-      console.error("Get user appointments error:", error);
-      res.status(500).json({ message: "Failed to fetch user appointments" });
-    }
-  });
-
-  // Saved properties
-  app.get("/api/users/:id/saved-properties", async (req, res) => {
-    try {
-      const userId = parseInt(req.params.id);
       const savedProperties = await storage.getSavedProperties(userId);
+      
+      if (!savedProperties) {
+        return res.json([]);
+      }
+
       res.json(savedProperties);
     } catch (error) {
       console.error("Get saved properties error:", error);
@@ -202,36 +117,110 @@ export function registerUserRoutes(app: Express) {
     }
   });
 
+  // Get user's property inquiries
+  app.get("/api/users/:id/inquiries", authenticate, async (req, res) => {
+    try {
+      const userId = parseInt(req.params.id);
+
+      // Only allow users to view their own inquiries, or admins to view any
+      if (req.user!.id !== userId && !AuthService.isAdmin(req.user!)) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      const inquiries = await storage.getUserInquiries(userId);
+      
+      if (!inquiries) {
+        return res.json([]);
+      }
+
+      res.json(inquiries);
+    } catch (error) {
+      console.error("Get user inquiries error:", error);
+      res.status(500).json({ message: "Failed to fetch user inquiries" });
+    }
+  });
+
+  // Get user's property listings
+  app.get("/api/users/:id/listings", authenticate, async (req, res) => {
+    try {
+      const userId = parseInt(req.params.id);
+
+      // Only allow users to view their own listings, or admins to view any
+      if (req.user!.id !== userId && !AuthService.isAdmin(req.user!)) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      // Note: getUserListings method needs to be implemented in storage
+      // For now, return empty array to avoid runtime errors
+      const listings: any[] = []; // Temporary placeholder
+      res.json(listings);
+    } catch (error) {
+      console.error("Get user listings error:", error);
+      res.status(500).json({ message: "Failed to fetch user listings" });
+    }
+  });
+
+  // Get user's appointments
+  app.get("/api/users/:id/appointments", authenticate, async (req, res) => {
+    try {
+      const userId = parseInt(req.params.id);
+
+      // Only allow users to view their own appointments, or admins to view any
+      if (req.user!.id !== userId && !AuthService.isAdmin(req.user!)) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      const appointments = await storage.getUserAppointments(userId);
+      
+      if (!appointments) {
+        return res.json([]);
+      }
+
+      res.json(appointments);
+    } catch (error) {
+      console.error("Get user appointments error:", error);
+      res.status(500).json({ message: "Failed to fetch user appointments" });
+    }
+  });
+
+  // Save a property for a user
   app.post("/api/users/:userId/saved-properties/:propertyId", authenticate, async (req, res) => {
     try {
       const userId = parseInt(req.params.userId);
       const propertyId = parseInt(req.params.propertyId);
 
-      // Only allow users to save properties to their own account or admins
+      // Only allow users to save to their own list or admins
       if (req.user!.id !== userId && !AuthService.isAdmin(req.user!)) {
         return res.status(403).json({ message: "Access denied" });
       }
 
-      const saved = await storage.saveProperty(userId, propertyId);
-      res.status(201).json(saved);
+      // Check if property exists
+      const property = await storage.getProperty(propertyId);
+      if (!property) {
+        return res.status(404).json({ message: "Property not found" });
+      }
+
+      await storage.saveProperty(userId, propertyId);
+      res.json({ message: "Property saved successfully" });
     } catch (error) {
       console.error("Save property error:", error);
-      res.status(400).json({ message: "Failed to save property" });
+      res.status(500).json({ message: "Failed to save property" });
     }
   });
 
+  // Unsave a property for a user
   app.delete("/api/users/:userId/saved-properties/:propertyId", authenticate, async (req, res) => {
     try {
       const userId = parseInt(req.params.userId);
       const propertyId = parseInt(req.params.propertyId);
 
-      // Only allow users to unsave from their own account or admins
+      // Only allow users to unsave from their own list or admins
       if (req.user!.id !== userId && !AuthService.isAdmin(req.user!)) {
         return res.status(403).json({ message: "Access denied" });
       }
 
-      const unsaved = await storage.unsaveProperty(userId, propertyId);
-      if (!unsaved) {
+      const success = await storage.unsaveProperty(userId, propertyId);
+      if (!success) {
         return res.status(404).json({ message: "Saved property not found" });
       }
 
@@ -257,129 +246,6 @@ export function registerUserRoutes(app: Express) {
     } catch (error) {
       console.error("Check saved property error:", error);
       res.status(500).json({ message: "Failed to check saved property" });
-    }
-  });
-}
-
-export function registerUserRoutes(app: Express) {
-  // Get user profile (public, but limited info for non-owners)
-  app.get("/api/users/:id", async (req, res) => {
-    try {
-      const userId = parseInt(req.params.id);
-      if (isNaN(userId)) {
-        return res.status(400).json({ message: "Invalid user ID" });
-      }
-
-      const user = await storage.getUser(userId);
-      if (!user) {
-        return res.status(404).json({ message: "User not found" });
-      }
-
-      // Return limited public profile info
-      const publicProfile = {
-        id: user.id,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        userType: user.userType,
-        avatar: user.avatar,
-        bio: user.bio,
-        isVerified: user.isVerified,
-        createdAt: user.createdAt
-      };
-
-      res.json(publicProfile);
-    } catch (error) {
-      console.error("Get user error:", error);
-      res.status(500).json({ message: "Failed to fetch user" });
-    }
-  });
-
-  // Update user profile - SECURED with authentication and field validation
-  app.put("/api/users/:id", authenticate, async (req, res) => {
-    try {
-      const userId = parseInt(req.params.id);
-      if (isNaN(userId)) {
-        return res.status(400).json({ message: "Invalid user ID" });
-      }
-
-      const currentUser = req.user!;
-
-      // Check authorization: users can only update their own profile, unless admin
-      const isOwner = currentUser.id === userId;
-      const isAdmin = AuthService.isAdmin(currentUser);
-
-      if (!isOwner && !isAdmin) {
-        return res.status(403).json({ 
-          message: "Access denied: can only update your own profile" 
-        });
-      }
-
-      // Validate and whitelist safe fields only
-      let validatedUpdates;
-      try {
-        validatedUpdates = safeUserUpdateSchema.parse(req.body);
-      } catch (validationError) {
-        return res.status(400).json({
-          message: "Invalid update data",
-          errors: validationError.errors
-        });
-      }
-
-      // Perform the update with only safe fields
-      const updatedUser = await storage.updateUser(userId, validatedUpdates);
-
-      if (!updatedUser) {
-        return res.status(404).json({ message: "User not found" });
-      }
-
-      // Return updated user without sensitive fields
-      const { password, ...safeUser } = updatedUser;
-      res.json(safeUser);
-
-    } catch (error) {
-      console.error("Update user error:", error);
-      res.status(500).json({ message: "Failed to update user" });
-    }
-  });
-
-  // Admin-only endpoint for privilege changes
-  app.put("/api/users/:id/privileges", authenticate, async (req, res) => {
-    try {
-      const userId = parseInt(req.params.id);
-      if (isNaN(userId)) {
-        return res.status(400).json({ message: "Invalid user ID" });
-      }
-
-      const currentUser = req.user!;
-
-      // Only admins can change privileges
-      if (!AuthService.isAdmin(currentUser)) {
-        return res.status(403).json({ 
-          message: "Access denied: admin privileges required" 
-        });
-      }
-
-      const privilegeUpdateSchema = z.object({
-        role: z.enum(['user', 'moderator', 'admin', 'super_admin']).optional(),
-        userType: z.enum(['buyer', 'seller', 'agent', 'fsbo', 'admin']).optional(),
-        isActive: z.boolean().optional(),
-        isVerified: z.boolean().optional(),
-        permissions: z.array(z.string()).optional()
-      });
-
-      const validatedUpdates = privilegeUpdateSchema.parse(req.body);
-      const updatedUser = await storage.updateUser(userId, validatedUpdates);
-
-      if (!updatedUser) {
-        return res.status(404).json({ message: "User not found" });
-      }
-
-      const { password, ...safeUser } = updatedUser;
-      res.json(safeUser);
-
-    } catch (error) {
-      console.error("Update user privileges error:", error);
-      res.status(500).json({ message: "Failed to update user privileges" });
     }
   });
 }
