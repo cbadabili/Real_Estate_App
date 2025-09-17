@@ -73,6 +73,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [userId, setUserId] = useState<string | null>(
     typeof window !== 'undefined' ? localStorage.getItem('userId') : null
   );
+  const [error, setError] = useState<string | null>(null);
 
   // Check authentication status on mount
   useEffect(() => {
