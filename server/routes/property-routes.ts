@@ -1,8 +1,7 @@
 import type { Express } from "express";
 import { storage } from "../storage";
 import { insertPropertySchema, UserType } from "../../shared/schema";
-import { authenticate, optionalAuthenticate, requireUserType } from "../auth-middleware";
-import { AuthService } from "../auth-service"; // Assuming AuthService is available for isAdmin check
+import { authenticate, optionalAuthenticate, requireUserType, AuthService } from "../auth-middleware";
 
 export function registerPropertyRoutes(app: Express) {
   // Get all properties
