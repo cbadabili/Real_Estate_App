@@ -169,22 +169,11 @@ export function registerAuthRoutes(app: Express) {
   // Get current user (for JWT validation)
   app.get("/api/auth/user", authenticate, async (req, res) => {
     try {
-      const userId = (req as any).userId;
-      
-      if (!userId) {
+      if (!req.user) {
         return res.status(401).json({ message: "User not authenticated" });
       }
 
-      const user = await storage.getUserById(userId);
-      
-      if (!user) {
-        return res.status(404).json({ message: "User not found" });
-      }
-
-      // Check if user is active
-      if (!user.isActive) {
-        return res.status(401).json({ message: "Account is inactive" });
-      }
+      const user = req.user;
 
       // Prepare user response (remove sensitive data)
       const userResponse = {

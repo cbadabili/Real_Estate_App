@@ -1,0 +1,88 @@
+queryClient.ts:53  GET https://331c9cdc-a1e3-4369-9dda-5ae35b395e48-00-21ptexpix7co9.worf.replit.dev/api/auth/user 401 (Unauthorized)
+apiRequest @ queryClient.ts:53
+checkAuth @ AuthContext.tsx:89
+(anonymous) @ AuthContext.tsx:133
+commitHookEffectListMount @ chunk-WERSD76P.js?v=84a76bc7:16915
+commitPassiveMountOnFiber @ chunk-WERSD76P.js?v=84a76bc7:18156
+commitPassiveMountEffects_complete @ chunk-WERSD76P.js?v=84a76bc7:18129
+commitPassiveMountEffects_begin @ chunk-WERSD76P.js?v=84a76bc7:18119
+commitPassiveMountEffects @ chunk-WERSD76P.js?v=84a76bc7:18109
+flushPassiveEffectsImpl @ chunk-WERSD76P.js?v=84a76bc7:19490
+flushPassiveEffects @ chunk-WERSD76P.js?v=84a76bc7:19447
+performSyncWorkOnRoot @ chunk-WERSD76P.js?v=84a76bc7:18868
+flushSyncCallbacks @ chunk-WERSD76P.js?v=84a76bc7:9119
+commitRootImpl @ chunk-WERSD76P.js?v=84a76bc7:19432
+commitRoot @ chunk-WERSD76P.js?v=84a76bc7:19277
+finishConcurrentRender @ chunk-WERSD76P.js?v=84a76bc7:18805
+performConcurrentWorkOnRoot @ chunk-WERSD76P.js?v=84a76bc7:18718
+workLoop @ chunk-WERSD76P.js?v=84a76bc7:197
+flushWork @ chunk-WERSD76P.js?v=84a76bc7:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=84a76bc7:384Understand this error
+queryClient.ts:59 API Response status: 401
+queryClient.ts:65 API Error Response: {status: 401, statusText: 'Unauthorized', url: '/api/auth/user', method: 'GET', errorData: {…}}
+apiRequest @ queryClient.ts:65
+await in apiRequest
+checkAuth @ AuthContext.tsx:89
+(anonymous) @ AuthContext.tsx:133
+commitHookEffectListMount @ chunk-WERSD76P.js?v=84a76bc7:16915
+commitPassiveMountOnFiber @ chunk-WERSD76P.js?v=84a76bc7:18156
+commitPassiveMountEffects_complete @ chunk-WERSD76P.js?v=84a76bc7:18129
+commitPassiveMountEffects_begin @ chunk-WERSD76P.js?v=84a76bc7:18119
+commitPassiveMountEffects @ chunk-WERSD76P.js?v=84a76bc7:18109
+flushPassiveEffectsImpl @ chunk-WERSD76P.js?v=84a76bc7:19490
+flushPassiveEffects @ chunk-WERSD76P.js?v=84a76bc7:19447
+performSyncWorkOnRoot @ chunk-WERSD76P.js?v=84a76bc7:18868
+flushSyncCallbacks @ chunk-WERSD76P.js?v=84a76bc7:9119
+commitRootImpl @ chunk-WERSD76P.js?v=84a76bc7:19432
+commitRoot @ chunk-WERSD76P.js?v=84a76bc7:19277
+finishConcurrentRender @ chunk-WERSD76P.js?v=84a76bc7:18805
+performConcurrentWorkOnRoot @ chunk-WERSD76P.js?v=84a76bc7:18718
+workLoop @ chunk-WERSD76P.js?v=84a76bc7:197
+flushWork @ chunk-WERSD76P.js?v=84a76bc7:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=84a76bc7:384Understand this error
+queryClient.ts:78 API Error: {message: 'User not authenticated'}
+apiRequest @ queryClient.ts:78
+await in apiRequest
+checkAuth @ AuthContext.tsx:89
+(anonymous) @ AuthContext.tsx:133
+commitHookEffectListMount @ chunk-WERSD76P.js?v=84a76bc7:16915
+commitPassiveMountOnFiber @ chunk-WERSD76P.js?v=84a76bc7:18156
+commitPassiveMountEffects_complete @ chunk-WERSD76P.js?v=84a76bc7:18129
+commitPassiveMountEffects_begin @ chunk-WERSD76P.js?v=84a76bc7:18119
+commitPassiveMountEffects @ chunk-WERSD76P.js?v=84a76bc7:18109
+flushPassiveEffectsImpl @ chunk-WERSD76P.js?v=84a76bc7:19490
+flushPassiveEffects @ chunk-WERSD76P.js?v=84a76bc7:19447
+performSyncWorkOnRoot @ chunk-WERSD76P.js?v=84a76bc7:18868
+flushSyncCallbacks @ chunk-WERSD76P.js?v=84a76bc7:9119
+commitRootImpl @ chunk-WERSD76P.js?v=84a76bc7:19432
+commitRoot @ chunk-WERSD76P.js?v=84a76bc7:19277
+finishConcurrentRender @ chunk-WERSD76P.js?v=84a76bc7:18805
+performConcurrentWorkOnRoot @ chunk-WERSD76P.js?v=84a76bc7:18718
+workLoop @ chunk-WERSD76P.js?v=84a76bc7:197
+flushWork @ chunk-WERSD76P.js?v=84a76bc7:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=84a76bc7:384Understand this error
+AuthContext.tsx:114 Auth check failed: Error: User not authenticated
+    at apiRequest (queryClient.ts:79:11)
+    at async checkAuth (AuthContext.tsx:89:22)
+checkAuth @ AuthContext.tsx:114
+await in checkAuth
+(anonymous) @ AuthContext.tsx:133
+commitHookEffectListMount @ chunk-WERSD76P.js?v=84a76bc7:16915
+commitPassiveMountOnFiber @ chunk-WERSD76P.js?v=84a76bc7:18156
+commitPassiveMountEffects_complete @ chunk-WERSD76P.js?v=84a76bc7:18129
+commitPassiveMountEffects_begin @ chunk-WERSD76P.js?v=84a76bc7:18119
+commitPassiveMountEffects @ chunk-WERSD76P.js?v=84a76bc7:18109
+flushPassiveEffectsImpl @ chunk-WERSD76P.js?v=84a76bc7:19490
+flushPassiveEffects @ chunk-WERSD76P.js?v=84a76bc7:19447
+performSyncWorkOnRoot @ chunk-WERSD76P.js?v=84a76bc7:18868
+flushSyncCallbacks @ chunk-WERSD76P.js?v=84a76bc7:9119
+commitRootImpl @ chunk-WERSD76P.js?v=84a76bc7:19432
+commitRoot @ chunk-WERSD76P.js?v=84a76bc7:19277
+finishConcurrentRender @ chunk-WERSD76P.js?v=84a76bc7:18805
+performConcurrentWorkOnRoot @ chunk-WERSD76P.js?v=84a76bc7:18718
+workLoop @ chunk-WERSD76P.js?v=84a76bc7:197
+flushWork @ chunk-WERSD76P.js?v=84a76bc7:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=84a76bc7:384Understand this error
+AuthContext.tsx:126 Auth check failed due to network/other error, keeping token
+DashboardPage.tsx:376 Dashboard stats received: {savedProperties: 0, propertiesViewed: 0, inquiriesSent: 0, viewingsScheduled: 0, activeListings: 1, …}
+DashboardPage.tsx:376 Dashboard stats received: {savedProperties: 0, propertiesViewed: 0, inquiriesSent: 0, viewingsScheduled: 0, activeListings: 1, …}

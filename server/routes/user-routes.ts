@@ -269,3 +269,140 @@ export function registerUserRoutes(app: Express) {
     }
   });
 }
+import type { Express } from "express";
+import { storage } from "../storage";
+import { authenticate, AuthService } from "../auth-middleware";
+import { z } from "zod";
+
+// Safe fields that users can update themselves
+const safeUserUpdateSchema = z.object({
+  firstName: z.string().min(1).max(50).optional(),
+  lastName: z.string().min(1).max(50).optional(),
+  phone: z.string().max(20).optional(),
+  bio: z.string().max(500).optional(),
+  avatar: z.string().url().optional(),
+  reacNumber: z.string().max(20).optional()
+});
+
+export function registerUserRoutes(app: Express) {
+  // Get user profile (public, but limited info for non-owners)
+  app.get("/api/users/:id", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.id);
+      if (isNaN(userId)) {
+        return res.status(400).json({ message: "Invalid user ID" });
+      }
+
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Return limited public profile info
+      const publicProfile = {
+        id: user.id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        userType: user.userType,
+        avatar: user.avatar,
+        bio: user.bio,
+        isVerified: user.isVerified,
+        createdAt: user.createdAt
+      };
+
+      res.json(publicProfile);
+    } catch (error) {
+      console.error("Get user error:", error);
+      res.status(500).json({ message: "Failed to fetch user" });
+    }
+  });
+
+  // Update user profile - SECURED with authentication and field validation
+  app.put("/api/users/:id", authenticate, async (req, res) => {
+    try {
+      const userId = parseInt(req.params.id);
+      if (isNaN(userId)) {
+        return res.status(400).json({ message: "Invalid user ID" });
+      }
+
+      const currentUser = req.user!;
+
+      // Check authorization: users can only update their own profile, unless admin
+      const isOwner = currentUser.id === userId;
+      const isAdmin = AuthService.isAdmin(currentUser);
+
+      if (!isOwner && !isAdmin) {
+        return res.status(403).json({ 
+          message: "Access denied: can only update your own profile" 
+        });
+      }
+
+      // Validate and whitelist safe fields only
+      let validatedUpdates;
+      try {
+        validatedUpdates = safeUserUpdateSchema.parse(req.body);
+      } catch (validationError) {
+        return res.status(400).json({
+          message: "Invalid update data",
+          errors: validationError.errors
+        });
+      }
+
+      // Perform the update with only safe fields
+      const updatedUser = await storage.updateUser(userId, validatedUpdates);
+
+      if (!updatedUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Return updated user without sensitive fields
+      const { password, ...safeUser } = updatedUser;
+      res.json(safeUser);
+
+    } catch (error) {
+      console.error("Update user error:", error);
+      res.status(500).json({ message: "Failed to update user" });
+    }
+  });
+
+  // Admin-only endpoint for privilege changes
+  app.put("/api/users/:id/privileges", authenticate, async (req, res) => {
+    try {
+      const userId = parseInt(req.params.id);
+      if (isNaN(userId)) {
+        return res.status(400).json({ message: "Invalid user ID" });
+      }
+
+      const currentUser = req.user!;
+
+      // Only admins can change privileges
+      if (!AuthService.isAdmin(currentUser)) {
+        return res.status(403).json({ 
+          message: "Access denied: admin privileges required" 
+        });
+      }
+
+      const privilegeUpdateSchema = z.object({
+        role: z.enum(['user', 'moderator', 'admin', 'super_admin']).optional(),
+        userType: z.enum(['buyer', 'seller', 'agent', 'fsbo', 'admin']).optional(),
+        isActive: z.boolean().optional(),
+        isVerified: z.boolean().optional(),
+        permissions: z.array(z.string()).optional()
+      });
+
+      const validatedUpdates = privilegeUpdateSchema.parse(req.body);
+      const updatedUser = await storage.updateUser(userId, validatedUpdates);
+
+      if (!updatedUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const { password, ...safeUser } = updatedUser;
+      res.json(safeUser);
+
+    } catch (error) {
+      console.error("Update user privileges error:", error);
+      res.status(500).json({ message: "Failed to update user privileges" });
+    }
+  });
+}
