@@ -70,7 +70,10 @@ const MarketIntelligencePage = () => {
       setLoading(true);
       
       // Fetch real properties data
-      const propertiesResponse = await fetch('/api/properties?limit=100');
+      const propertiesResponse = await fetch('/api/properties?limit=100&status=active');
+      if (!propertiesResponse.ok) {
+        throw new Error('Failed to fetch properties');
+      }
       const properties = await propertiesResponse.json();
       
       // Calculate real market metrics from actual data
@@ -81,20 +84,21 @@ const MarketIntelligencePage = () => {
       const regional = calculateRegionalData(properties);
       setRegionalData(regional);
       
-      // Generate AI-enhanced market insights
-      await fetchAIMarketInsights();
+      // Generate AI-enhanced market insights using real data
+      await fetchAIMarketInsights(properties);
       
     } catch (error) {
       console.error('Error fetching market data:', error);
-      // Fallback to basic calculations if API fails
+      // Use minimal fallback data
       setMarketData({
-        averagePrice: 2450000,
-        monthlyGrowth: 3.2,
-        totalListings: 8, // We know from logs there are 8 properties
-        averageDaysOnMarket: 45,
-        priceChangeRate: -2.1,
-        inventoryMonths: 3.2
+        averagePrice: 0,
+        monthlyGrowth: 0,
+        totalListings: 0,
+        averageDaysOnMarket: 0,
+        priceChangeRate: 0,
+        inventoryMonths: 0
       });
+      setRegionalData([]);
     } finally {
       setLoading(false);
     }
@@ -173,52 +177,67 @@ const MarketIntelligencePage = () => {
     }).slice(0, 4); // Show top 4 areas
   };
 
-  const fetchAIMarketInsights = async () => {
+  const fetchAIMarketInsights = async (properties: any[]) => {
     try {
-      // Use AI to generate market insights
-      const aiResponse = await fetch('/api/search/ai', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          query: 'Generate market insights for Botswana real estate including recent sales activity and price trends' 
-        })
+      // Calculate market activity from real data
+      const activeProperties = properties.filter(p => p.status === 'active');
+      const soldProperties = properties.filter(p => p.status === 'sold');
+      const recentProperties = properties.filter(p => {
+        const createdDate = new Date(p.createdAt);
+        const weekAgo = new Date();
+        weekAgo.setDate(weekAgo.getDate() - 7);
+        return createdDate >= weekAgo;
       });
-      
-      if (aiResponse.ok) {
-        const aiData = await aiResponse.json();
-        
-        // Process AI response for market activity
-        setMarketActivity({
-          soldThisMonth: Math.floor(Math.random() * 100) + 50,
-          newListingsThisWeek: Math.floor(Math.random() * 50) + 20,
-          priceReductionRate: Math.floor(Math.random() * 20) + 5,
-          listToSaleRatio: Math.floor(Math.random() * 20) + 80
-        });
 
-        // Generate recent activity from AI insights
-        setRecentActivity([
-          {
-            address: 'AI-Generated Property Location 1',
-            estimate: `P ${(Math.random() * 2 + 1.5).toFixed(1)}M`,
-            change: `+${(Math.random() * 10 + 1).toFixed(1)}%`,
-            date: '2 days ago'
-          },
-          {
-            address: 'AI-Generated Property Location 2', 
-            estimate: `P ${(Math.random() * 2 + 1.5).toFixed(1)}M`,
-            change: `+${(Math.random() * 10 + 1).toFixed(1)}%`,
-            date: '1 week ago'
-          },
-          {
-            address: 'AI-Generated Property Location 3',
-            estimate: `P ${(Math.random() * 3 + 2).toFixed(1)}M`,
-            change: `+${(Math.random() * 15 + 5).toFixed(1)}%`,
-            date: '2 weeks ago'
-          }
-        ]);
+      setMarketActivity({
+        soldThisMonth: soldProperties.length,
+        newListingsThisWeek: recentProperties.length,
+        priceReductionRate: Math.round((properties.filter(p => p.priceChangeRate && p.priceChangeRate < 0).length / properties.length) * 100),
+        listToSaleRatio: activeProperties.length > 0 ? Math.round((soldProperties.length / activeProperties.length) * 100) : 0
+      });
+
+      // Generate recent activity from real property data
+      const recentActivityData = properties.slice(0, 3).map((property, index) => {
+        const priceNum = parseFloat(property.price?.toString().replace(/[^\d.]/g, '')) || 0;
+        const estimate = priceNum > 0 ? `P ${(priceNum / 1000000).toFixed(1)}M` : 'Price on request';
+        
+        return {
+          address: property.address || `Property in ${property.city}`,
+          estimate,
+          change: property.priceChangeRate ? `${property.priceChangeRate > 0 ? '+' : ''}${property.priceChangeRate.toFixed(1)}%` : '+2.5%',
+          date: new Date(property.createdAt).toLocaleDateString()
+        };
+      });
+
+      setRecentActivity(recentActivityData);
+
+      // Try to get AI-enhanced insights
+      try {
+        const aiResponse = await fetch('/api/search/ai', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            query: `Analyze the Botswana real estate market with ${properties.length} properties. Average price range and trends.` 
+          })
+        });
+        
+        if (aiResponse.ok) {
+          const aiData = await aiResponse.json();
+          console.log('AI market insights:', aiData);
+        }
+      } catch (aiError) {
+        console.warn('AI insights unavailable:', aiError);
       }
     } catch (error) {
-      console.error('Error fetching AI insights:', error);
+      console.error('Error generating market insights:', error);
+      // Fallback to basic market activity
+      setMarketActivity({
+        soldThisMonth: 0,
+        newListingsThisWeek: 0,
+        priceReductionRate: 0,
+        listToSaleRatio: 0
+      });
+      setRecentActivity([]);
     }
   };
 

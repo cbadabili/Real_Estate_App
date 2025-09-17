@@ -100,8 +100,7 @@ const PropertySearchPage = () => {
   }, [fetchProperties]);
 
   // Handle search from SmartSearchBar
-  // Renamed parameters to match the new structure in the changes
-  const handleSearch = async (searchQueryParam: string, searchFiltersParam: object) => {
+  const handleSearch = async (searchQueryParam: string, searchFiltersParam?: object) => {
     setIsLoading(true);
     try {
       const queryParams = new URLSearchParams();
@@ -219,10 +218,8 @@ const PropertySearchPage = () => {
         {/* Search Bar */}
         <div className="mb-8">
           <SmartSearchBar 
-            onSearch={handleSearch}
+            onSearch={(query) => handleSearch(query)}
             initial={searchQuery}
-            // Pass current filters to SmartSearchBar if it needs them for its internal logic or autocomplete
-            // initialFilters={filters} 
           />
         </div>
 

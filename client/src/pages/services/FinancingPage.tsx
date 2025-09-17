@@ -22,6 +22,30 @@ import {
 const FinancingPage = () => {
   const navigate = useNavigate();
   const [selectedCalculator, setSelectedCalculator] = useState('affordability');
+  const [propertyPrice, setPropertyPrice] = useState(500000);
+  const [downPayment, setDownPayment] = useState(50000);
+  const [interestRate, setInterestRate] = useState(10.5);
+  const [loanTerm, setLoanTerm] = useState(25);
+
+  const calculateMortgage = () => {
+    const principal = propertyPrice - downPayment;
+    const monthlyRate = (interestRate / 100) / 12;
+    const numPayments = loanTerm * 12;
+    
+    if (principal <= 0 || monthlyRate <= 0) {
+      return { monthlyPayment: 0, totalInterest: 0 };
+    }
+    
+    const monthlyPayment = principal * (monthlyRate * Math.pow(1 + monthlyRate, numPayments)) / (Math.pow(1 + monthlyRate, numPayments) - 1);
+    const totalInterest = (monthlyPayment * numPayments) - principal;
+    
+    return {
+      monthlyPayment: Math.round(monthlyPayment),
+      totalInterest: Math.round(totalInterest)
+    };
+  };
+
+  const mortgageCalculation = calculateMortgage();
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -133,6 +157,8 @@ const FinancingPage = () => {
                     <input
                       type="number"
                       placeholder="500,000"
+                      value={propertyPrice}
+                      onChange={(e) => setPropertyPrice(Number(e.target.value) || 0)}
                       className="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
                     />
                   </div>
@@ -144,24 +170,55 @@ const FinancingPage = () => {
                     <input
                       type="number"
                       placeholder="50,000"
+                      value={downPayment}
+                      onChange={(e) => setDownPayment(Number(e.target.value) || 0)}
                       className="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
                     />
                   </div>
                 </div>
-                <button className="w-full bg-beedab-blue text-white py-3 rounded-lg font-medium hover:bg-beedab-darkblue transition-colors">
-                  Calculate Payment
-                </button>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Interest Rate (%)</label>
+                  <input
+                    type="number"
+                    step="0.1"
+                    placeholder="10.5"
+                    value={interestRate}
+                    onChange={(e) => setInterestRate(Number(e.target.value) || 10.5)}
+                    className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Loan Term (years)</label>
+                  <select
+                    value={loanTerm}
+                    onChange={(e) => setLoanTerm(Number(e.target.value))}
+                    className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
+                  >
+                    <option value={15}>15 years</option>
+                    <option value={20}>20 years</option>
+                    <option value={25}>25 years</option>
+                    <option value={30}>30 years</option>
+                  </select>
+                </div>
               </div>
               <div className="bg-gray-50 rounded-lg p-6">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">Monthly Payment Breakdown</h3>
                 <div className="space-y-3">
                   <div className="flex justify-between">
+                    <span className="text-gray-600">Loan Amount:</span>
+                    <span className="font-medium">P {(propertyPrice - downPayment).toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between">
                     <span className="text-gray-600">Monthly Payment:</span>
-                    <span className="font-semibold text-beedab-blue">P 4,852</span>
+                    <span className="font-semibold text-beedab-blue">P {mortgageCalculation.monthlyPayment.toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Total Interest:</span>
-                    <span className="font-medium">P 614,800</span>
+                    <span className="font-medium">P {mortgageCalculation.totalInterest.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Total Payment:</span>
+                    <span className="font-medium">P {(mortgageCalculation.monthlyPayment * loanTerm * 12).toLocaleString()}</span>
                   </div>
                 </div>
               </div>

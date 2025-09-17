@@ -82,22 +82,36 @@ const ProfilePage = () => {
     if (!user) return;
     
     try {
+      const nameParts = userInfo.name.split(' ');
       const updates = {
-        firstName: userInfo.name.split(' ')[0],
-        lastName: userInfo.name.split(' ').slice(1).join(' '),
+        firstName: nameParts[0] || '',
+        lastName: nameParts.slice(1).join(' ') || '',
         phone: userInfo.phone,
         bio: userInfo.bio
       };
       
-      await apiRequest(`/api/users/${user.id}`, {
+      const response = await fetch(`/api/users/${user.id}`, {
         method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
         body: JSON.stringify(updates)
       });
       
-      updateUser(updates);
+      if (!response.ok) {
+        throw new Error('Failed to update profile');
+      }
+      
+      const updatedUser = await response.json();
+      updateUser(updatedUser);
       setIsEditing(false);
+      
+      // Show success message
+      alert('Profile updated successfully!');
     } catch (error) {
       console.error('Failed to update profile:', error);
+      alert('Failed to update profile. Please try again.');
     }
   };
 
@@ -138,7 +152,16 @@ const ProfilePage = () => {
             <div className="flex-1">
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <h1 className="text-2xl font-bold text-gray-900">{userInfo.name}</h1>
+                  {isEditing ? (
+                    <input
+                      type="text"
+                      value={userInfo.name}
+                      onChange={(e) => setUserInfo({...userInfo, name: e.target.value})}
+                      className="text-2xl font-bold text-gray-900 border border-gray-300 rounded px-2 py-1 mb-2"
+                    />
+                  ) : (
+                    <h1 className="text-2xl font-bold text-gray-900">{userInfo.name}</h1>
+                  )}
                   <span className="inline-block px-2 py-1 bg-beedab-blue/10 text-beedab-blue text-sm rounded-full capitalize">
                     {userInfo.type}
                   </span>
@@ -161,6 +184,8 @@ const ProfilePage = () => {
                       value={userInfo.email}
                       onChange={(e) => setUserInfo({...userInfo, email: e.target.value})}
                       className="flex-1 px-2 py-1 border border-gray-300 rounded text-sm"
+                      disabled
+                      title="Email cannot be changed"
                     />
                   ) : (
                     <span>{userInfo.email}</span>
