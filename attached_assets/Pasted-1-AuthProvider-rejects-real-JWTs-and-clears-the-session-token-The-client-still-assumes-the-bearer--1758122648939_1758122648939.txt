@@ -1,0 +1,36 @@
+1. AuthProvider rejects real JWTs and clears the session token
+The client still assumes the bearer token is a numeric user ID, immediately rejecting JWTs and deleting them from storage. That makes every login ephemeral: the persisted token is purged on the next render, forcing another authentication attempt.
+Suggested taskHandle JWT auth tokens in AuthContext without clearing them
+1. In `client/src/contexts/AuthContext.tsx`, replace the numeric `isNaN(Number(authToken))` guard with logic that accepts JWTs (e.g., check for three segments and decode them) while still tolerating legacy numeric IDs if needed. 2. When a JWT is present, call `/api/auth/user` (or another verified endpoint) using the token in the `Authorization` header instead of inferring a numeric `/api/users/:id` path. 3. Update logout/login flows to store only verified tokens and add a regression test (or manual QA script) covering login → reload → session persists with a JWT.
+
+2. Authentication middleware trusts forged numeric tokens
+If JWT verification fails, the middleware simply parses the bearer string as an integer (or user_<id>), and optionalAuthenticate does the same. An attacker can therefore send Authorization: Bearer 1 to impersonate any active account without a signed token.
+Suggested taskRequire verified JWTs throughout auth middleware
+1. In `server/auth-middleware.ts`, delete the numeric/`user_` fallback in `authenticate` so requests only proceed when `verifyToken` succeeds. 2. Refactor `optionalAuthenticate` to reuse safe JWT decoding and ignore failures instead of trusting raw numbers. 3. Add tests demonstrating that forged numeric tokens are rejected while valid JWTs continue to work.
+3. PUT /api/users/:id allows unauthenticated profile overwrites
+The update route lacks any authentication or field validation, meaning anyone can post arbitrary JSON to change another user’s record, including privilege fields like role, userType, or isActive.
+Suggested taskProtect and validate the user update endpoint
+1. Add `authenticate` (and an owner/admin check) to `PUT /api/users/:id` in `server/routes/user-routes.ts`. 2. Replace the blanket spread with a whitelist of safe profile fields, explicitly excluding `role`, `userType`, `permissions`, `isActive`, etc. 3. Create tests covering legitimate self-updates and rejected cross-account or privilege-escalation attempts.
+4. GET /api/users/:id leaks full profiles without authentication
+This endpoint only uses optionalAuthenticate, so unauthenticated callers receive complete user records—including email and phone—by guessing IDs.
+Suggested taskRequire auth (and sanitization) for user detail lookups
+1. Swap `optionalAuthenticate` for `authenticate` on `GET /api/users/:id` in `server/routes/user-routes.ts`. 2. After authenticating, return either the full record for the owner/admin or a sanitized public profile for others. 3. Add tests confirming unauthenticated requests are rejected and unauthorized users see only approved data.
+5. Saved-property APIs permit cross-account tampering
+All saved-property routes (save, unsave, status check) are unauthenticated and accept arbitrary userId parameters, so anyone can modify another user’s shortlist.
+Suggested taskSecure saved-property endpoints with ownership checks
+1. Add `authenticate` to the saved-property routes in `server/routes/user-routes.ts`. 2. Derive `userId` from `req.user.id` (and optionally allow admins) rather than trusting the URL parameter. 3. Write tests that cover valid saves/unsaves and ensure cross-account attempts are blocked.
+6. Property update/delete routes are open to anonymous callers
+The property edit and delete endpoints have no authentication, allowing anyone on the internet to rewrite or remove listings by ID.
+Suggested taskLock down property mutation routes
+1. Apply `authenticate` and an ownership/admin authorization check to `PUT`/`DELETE /api/properties/:id` in `server/routes/property-routes.ts`. 2. Whitelist mutable property fields so callers cannot overwrite server-managed data. 3. Add tests proving unauthorized users cannot edit or delete properties they don’t own.
+7. Registration lets users self-activate and grant themselves admin privileges
+The registration handler blindly accepts client-supplied userType and isActive, so a new signup can set userType: 'admin' (which yields every permission) and isActive: true to bypass any approval workflow.
+Suggested taskEnforce safe defaults during registration
+1. In `server/routes/auth-routes.ts`, ignore `userType`, `role`, `permissions`, and `isActive` from the request body—set them to safe server-defined defaults. 2. Introduce schema validation that rejects unrecognized fields and trims/normalizes required inputs. 3. Extend auth tests to confirm privilege escalation is impossible and new accounts start with the intended default activation state.
+8. Login handler logs sensitive password details
+Failed logins dump hash prefixes, password lengths, and even the first three characters of the submitted password to the logs, leaking secrets into observability systems.
+Suggested taskRemove sensitive credential data from login logging
+1. Strip the detailed password/hash logging from the login flow in `server/routes/auth-routes.ts`, leaving only high-level success/failure messages. 2. Audit related auth logging for similar leaks. 3. Add a regression test (or log assertion) ensuring failed logins no longer emit password material.
+9. Email casing inconsistency breaks sign-in
+Registration stores the email exactly as provided, but login lowercases the credential and the repository lookup searches for the lowercased value, so mixed-case registrations can never log in afterwards.
+Suggested taskNormalize email addresses consistently 1. During registration (and any profile updates), lowercase and trim the email before persisting it. 2. Ensure lookup queries use the same normalized value and update unique constraints if necessary. 3. Add tests covering mixed-case registration/login to prevent regressions.

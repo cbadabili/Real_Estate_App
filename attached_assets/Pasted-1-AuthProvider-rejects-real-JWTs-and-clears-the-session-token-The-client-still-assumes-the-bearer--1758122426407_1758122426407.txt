@@ -1,0 +1,61 @@
+1. AuthProvider rejects real JWTs and clears the session token
+The client still assumes the bearer token is a numeric user ID, immediately rejecting JWTs and deleting them from storage. That makes every login ephemeral: the persisted token is purged on the next render, forcing another authentication attempt.
+
+Suggested task
+Handle JWT auth tokens in AuthContext without clearing them
+
+Start task
+2. Authentication middleware trusts forged numeric tokens
+If JWT verification fails, the middleware simply parses the bearer string as an integer (or user_<id>), and optionalAuthenticate does the same. An attacker can therefore send Authorization: Bearer 1 to impersonate any active account without a signed token.
+
+Suggested task
+Require verified JWTs throughout auth middleware
+
+Start task
+3. PUT /api/users/:id allows unauthenticated profile overwrites
+The update route lacks any authentication or field validation, meaning anyone can post arbitrary JSON to change another user’s record, including privilege fields like role, userType, or isActive.
+
+Suggested task
+Protect and validate the user update endpoint
+
+Start task
+4. GET /api/users/:id leaks full profiles without authentication
+This endpoint only uses optionalAuthenticate, so unauthenticated callers receive complete user records—including email and phone—by guessing IDs.
+
+Suggested task
+Require auth (and sanitization) for user detail lookups
+
+Start task
+5. Saved-property APIs permit cross-account tampering
+All saved-property routes (save, unsave, status check) are unauthenticated and accept arbitrary userId parameters, so anyone can modify another user’s shortlist.
+
+Suggested task
+Secure saved-property endpoints with ownership checks
+
+Start task
+6. Property update/delete routes are open to anonymous callers
+The property edit and delete endpoints have no authentication, allowing anyone on the internet to rewrite or remove listings by ID.
+
+Suggested task
+Lock down property mutation routes
+
+Start task
+7. Registration lets users self-activate and grant themselves admin privileges
+The registration handler blindly accepts client-supplied userType and isActive, so a new signup can set userType: 'admin' (which yields every permission) and isActive: true to bypass any approval workflow.
+
+Suggested task
+Enforce safe defaults during registration
+
+Start task
+8. Login handler logs sensitive password details
+Failed logins dump hash prefixes, password lengths, and even the first three characters of the submitted password to the logs, leaking secrets into observability systems.
+
+Suggested task
+Remove sensitive credential data from login logging
+
+Start task
+9. Email casing inconsistency breaks sign-in
+Registration stores the email exactly as provided, but login lowercases the credential and the repository lookup searches for the lowercased value, so mixed-case registrations can never log in afterwards.
+
+Suggested task
+Normalize email addresses consistently
