@@ -248,7 +248,7 @@ const PropertyDetailsPage: React.FC = () => {
 
           {/* Property Images */}
           <div className="bg-white rounded-lg shadow-sm overflow-hidden mb-6">
-            <div className="relative h-64 md:h-80">
+            <div className="relative h-32 md:h-40">
               <img
                 src={images.length > 0 ? images[currentImageIndex] : '/api/placeholder/800/600'}
                 alt={property.title}
