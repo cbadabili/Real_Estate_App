@@ -248,15 +248,19 @@ const CreateListingPage = () => {
       console.log('Transformed property data:', propertyData);
 
       const token = localStorage.getItem('authToken');
+      
+      // Ensure proper token format
       if (!token) {
-        throw new Error('Please log in to create a property listing');
+        throw new Error('No authentication token available');
       }
+
+      const authHeader = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
 
       const response = await fetch('/api/properties', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
+          'Authorization': authHeader,
         },
         body: JSON.stringify(propertyData),
       });
@@ -264,7 +268,7 @@ const CreateListingPage = () => {
       if (!response.ok) {
         const errorData = await response.text();
         console.error('Property creation failed:', response.status, errorData);
-        
+
         if (response.status === 401) {
           throw new Error('Please log in to create a property listing');
         } else if (response.status === 403) {
@@ -291,7 +295,7 @@ const CreateListingPage = () => {
 
     } catch (error) {
       console.error('Error creating property:', error);
-      
+
       if (error.message.includes('log in')) {
         toast.error('Please log in to create a property listing');
       } else if (error.message.includes('permission')) {

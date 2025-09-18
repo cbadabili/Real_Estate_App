@@ -1,0 +1,40 @@
+❌ Database initialization failed: DrizzleQueryError: Failed query: -- Add check constraint for geocode completeness
+ALTER TABLE properties ADD CONSTRAINT check_geocode_completeness 
+  CHECK (for_map = false OR (latitude IS NOT NULL AND longitude IS NOT NULL))
+params: 
+    at NodePgPreparedQuery.queryWithCache (/home/runner/workspace/node_modules/src/pg-core/session.ts:73:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async MigrationManager.runMigration (/home/runner/workspace/server/migration-manager.ts:64:9)
+    at async MigrationManager.runAllPendingMigrations (/home/runner/workspace/server/migration-manager.ts:91:7)
+    at async <anonymous> (/home/runner/workspace/server/index.ts:382:7) {
+  query: '-- Add check constraint for geocode completeness\n' +
+    'ALTER TABLE properties ADD CONSTRAINT check_geocode_completeness \n' +
+    '  CHECK (for_map = false OR (latitude IS NOT NULL AND longitude IS NOT NULL))',
+  params: [],
+  cause: error: check constraint "check_geocode_completeness" of relation "properties" is violated by some row
+      at /home/runner/workspace/node_modules/pg-pool/index.js:45:11
+      at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+      at async <anonymous> (/home/runner/workspace/node_modules/src/node-postgres/session.ts:149:14)
+      at async NodePgPreparedQuery.queryWithCache (/home/runner/workspace/node_modules/src/pg-core/session.ts:71:12)
+      at async MigrationManager.runMigration (/home/runner/workspace/server/migration-manager.ts:64:9)
+      at async MigrationManager.runAllPendingMigrations (/home/runner/workspace/server/migration-manager.ts:91:7)
+      at async <anonymous> (/home/runner/workspace/server/index.ts:382:7) {
+    length: 205,
+    severity: 'ERROR',
+    code: '23514',
+    detail: undefined,
+    hint: undefined,
+    position: undefined,
+    internalPosition: undefined,
+    internalQuery: undefined,
+    where: undefined,
+    schema: 'public',
+    table: 'properties',
+    column: undefined,
+    dataType: undefined,
+    constraint: 'check_geocode_completeness',
+    file: 'tablecmds.c',
+    line: '6128',
+    routine: 'ATRewriteTable'
+  }
+}

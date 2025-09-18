@@ -15,6 +15,9 @@ CREATE INDEX IF NOT EXISTS idx_refresh_tokens_expires_at ON refresh_tokens(expir
 -- Add for_map column to properties table for geocode enforcement
 ALTER TABLE properties ADD COLUMN IF NOT EXISTS for_map BOOLEAN DEFAULT true;
 
+-- Update existing properties with null coordinates to have for_map = false
+UPDATE properties SET for_map = false WHERE latitude IS NULL OR longitude IS NULL;
+
 -- Add check constraint for geocode completeness
 ALTER TABLE properties ADD CONSTRAINT check_geocode_completeness 
   CHECK (for_map = false OR (latitude IS NOT NULL AND longitude IS NOT NULL));

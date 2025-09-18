@@ -1,11 +1,4 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-// Temporary staged migration helper:
-// 1. We switch to pg-core import.
-// 2. We re-export a pgTable alias that points to the old sqliteTable so the
-//    remainder of the file compiles until each table is migrated.
-// 3. Incrementally convert tables from sqliteTable → pgTable with proper
-//    column types.
-
 import {
   pgTable,
   text,
@@ -17,21 +10,8 @@ import {
   timestamp,
   jsonb,
   serial,
-  varchar, // Added varchar for better type safety
-  // Assuming userTypeEnum and roleEnum are defined elsewhere or should be defined here
-  // For demonstration, I'll assume they are simple text types for now if not provided.
-  // If they are actual enums from drizzle-orm, their import would be needed.
+  varchar,
 } from "drizzle-orm/pg-core";
-
-// Placeholder for enums if they are not imported from elsewhere.
-// In a real scenario, these would likely be defined using drizzle-orm's enum functionality
-// or imported from a shared types file.
-const userTypeEnum = text; // Placeholder
-const roleEnum = text; // Placeholder
-
-// For rapid migration, we'll temporarily use pgTable for all sqliteTable references
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const sqliteTable = pgTable as any;
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 import { relations, sql } from "drizzle-orm";
@@ -47,17 +27,17 @@ export const users = pgTable("users", {
   firstName: varchar("first_name", { length: 50 }).notNull(),
   lastName: varchar("last_name", { length: 50 }).notNull(),
   phone: varchar("phone", { length: 20 }),
-  userType: userTypeEnum("user_type").notNull(), // 'buyer', 'seller', 'agent', 'fsbo', 'admin'
-  role: roleEnum("role").default('user').notNull(), // 'user', 'moderator', 'admin', 'super_admin'
-  permissions: text("permissions").array().default(sql`'{}'::text[]`), // JSON string of permission array
+  userType: text("user_type").notNull(), // 'buyer', 'seller', 'agent', 'fsbo', 'admin'
+  role: text("role").default('user').notNull(), // 'user', 'moderator', 'admin', 'super_admin'
+  permissions: text("permissions").array().default(sql`'{}'::text[]`), // JSON array of permissions
   avatar: text("avatar"),
   bio: text("bio"),
-  isVerified: integer("is_verified").default(0),
-  isActive: integer("is_active").default(1),
+  isVerified: boolean("is_verified").default(false),
+  isActive: boolean("is_active").default(true),
   reacNumber: varchar("reac_number", { length: 20 }), // For certified agents
-  lastLoginAt: integer("last_login_at"), // Unix timestamp
-  createdAt: integer("created_at").default(sql`extract(epoch from now())`),
-  updatedAt: integer("updated_at").default(sql`extract(epoch from now())`),
+  lastLoginAt: timestamp("last_login_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 // Refresh tokens table for JWT security
@@ -105,6 +85,7 @@ export const properties = pgTable("properties", {
   agentId: integer("agent_id").references(() => users.id),
   views: integer("views").default(0),
   daysOnMarket: integer("days_on_market").default(0),
+  forMap: boolean("for_map").default(true), // For geocode enforcement
   // Auction-specific fields
   auctionDate: integer("auction_date"),
   auctionTime: text("auction_time"),
@@ -192,7 +173,7 @@ export const userReviews = pgTable("user_reviews", {
 });
 
 // Review responses (for business replies)
-export const reviewResponses = sqliteTable("review_responses", {
+export const reviewResponses = pgTable("review_responses", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   reviewId: integer("review_id").references(() => userReviews.id).notNull(),
   responderId: integer("responder_id").references(() => users.id).notNull(),
@@ -202,7 +183,7 @@ export const reviewResponses = sqliteTable("review_responses", {
 });
 
 // Review helpful votes
-export const reviewHelpful = sqliteTable("review_helpful", {
+export const reviewHelpful = pgTable("review_helpful", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   reviewId: integer("review_id").references(() => userReviews.id).notNull(),
   userId: integer("user_id").references(() => users.id).notNull(),
@@ -211,7 +192,7 @@ export const reviewHelpful = sqliteTable("review_helpful", {
 });
 
 // User permissions and roles
-export const userPermissions = sqliteTable("user_permissions", {
+export const userPermissions = pgTable("user_permissions", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   userId: integer("user_id").references(() => users.id).notNull(),
   permission: text("permission").notNull(),
@@ -221,7 +202,7 @@ export const userPermissions = sqliteTable("user_permissions", {
 });
 
 // Admin audit log
-export const adminAuditLog = sqliteTable("admin_audit_log", {
+export const adminAuditLog = pgTable("admin_audit_log", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   adminId: integer("admin_id").references(() => users.id).notNull(),
   action: text("action").notNull(), // 'user_ban', 'review_moderate', 'property_approve', etc.
@@ -233,7 +214,7 @@ export const adminAuditLog = sqliteTable("admin_audit_log", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
-export const saved_searches = sqliteTable('saved_searches', {
+export const saved_searches = pgTable('saved_searches', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   user_id: integer('user_id').references(() => users.id, { onDelete: 'cascade' }),
   search_criteria: text('search_criteria', { mode: 'json' }),
@@ -564,7 +545,7 @@ export enum Permission {
 // Marketplace tables for comprehensive property ecosystem
 
 // Professional service categories
-export const service_categories = sqliteTable('service_categories', {
+export const service_categories = pgTable('service_categories', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   name: text('name').notNull(),
   journey_type: text('journey_type').notNull(), // 'transaction', 'development', 'ownership', 'skills'
@@ -576,7 +557,7 @@ export const service_categories = sqliteTable('service_categories', {
 });
 
 // Expanded service providers for all marketplace segments
-export const marketplace_providers = sqliteTable('marketplace_providers', {
+export const marketplace_providers = pgTable('marketplace_providers', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   user_id: integer('user_id').references(() => users.id),
   provider_type: text('provider_type').notNull(), // 'professional', 'supplier', 'artisan', 'training_provider'
@@ -622,7 +603,7 @@ export const marketplace_providers = sqliteTable('marketplace_providers', {
 });
 
 // Skills and certifications for artisans
-export const artisan_skills = sqliteTable('artisan_skills', {
+export const artisan_skills = pgTable('artisan_skills', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   provider_id: integer('provider_id').references(() => marketplace_providers.id),
   skill_name: text('skill_name').notNull(),
@@ -637,7 +618,7 @@ export const artisan_skills = sqliteTable('artisan_skills', {
 });
 
 // Training programs and courses
-export const training_programs = sqliteTable('training_programs', {
+export const training_programs = pgTable('training_programs', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   provider_id: integer('provider_id').references(() => marketplace_providers.id),
   program_name: text('program_name').notNull(),
@@ -676,7 +657,7 @@ export const training_programs = sqliteTable('training_programs', {
 });
 
 // Project requests from property owners
-export const project_requests = sqliteTable('project_requests', {
+export const project_requests = pgTable('project_requests', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   client_id: integer('client_id').references(() => users.id),
   property_id: integer('property_id').references(() => properties.id),
@@ -710,7 +691,7 @@ export const project_requests = sqliteTable('project_requests', {
   updated_at: integer('updated_at').default(sql`(cast((julianday('now') - 2440587.5)*86400000 as integer))`),});
 
 // Proposals from service providers
-export const project_proposals = sqliteTable('project_proposals', {
+export const project_proposals = pgTable('project_proposals', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   project_id: integer('project_id').references(() => project_requests.id),
   provider_id: integer('provider_id').references(() => marketplace_providers.id),
@@ -734,7 +715,7 @@ export const project_proposals = sqliteTable('project_proposals', {
 });
 
 // Marketplace reviews and ratings
-export const marketplace_reviews = sqliteTable('marketplace_reviews', {
+export const marketplace_reviews = pgTable('marketplace_reviews', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   provider_id: integer('provider_id').references(() => marketplace_providers.id),
   client_id: integer('client_id').references(() => users.id),
@@ -765,7 +746,7 @@ export const marketplace_reviews = sqliteTable('marketplace_reviews', {
 });
 
 // Building materials and supplies
-export const building_materials = sqliteTable('building_materials', {
+export const building_materials = pgTable('building_materials', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   supplier_id: integer('supplier_id').references(() => marketplace_providers.id),
 
@@ -805,7 +786,7 @@ export const building_materials = sqliteTable('building_materials', {
 });
 
 // Material orders
-export const material_orders = sqliteTable('material_orders', {
+export const material_orders = pgTable('material_orders', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   customer_id: integer('customer_id').references(() => users.id),
   supplier_id: integer('supplier_id').references(() => marketplace_providers.id),
@@ -830,7 +811,7 @@ export const material_orders = sqliteTable('material_orders', {
 });
 
 // Job opportunities for skilled workers
-export const job_opportunities = sqliteTable('job_opportunities', {
+export const job_opportunities = pgTable('job_opportunities', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   employer_id: integer('employer_id').references(() => users.id),
 
@@ -910,7 +891,7 @@ export const PropertyType = {
 } as const;
 
 // Billing and subscription tables
-export const plans = sqliteTable('plans', {
+export const plans = pgTable('plans', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   code: text('code').notNull().unique(),
   name: text('name').notNull(),
@@ -923,7 +904,7 @@ export const plans = sqliteTable('plans', {
   updated_at: integer('updated_at').default(sql`(cast((julianday('now') - 2440587.5)*86400000 as integer))`),
 });
 
-export const subscriptions = sqliteTable('subscriptions', {
+export const subscriptions = pgTable('subscriptions', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   user_id: integer('user_id').notNull().references(() => users.id),
   plan_id: integer('plan_id').notNull().references(() => plans.id),
@@ -935,7 +916,7 @@ export const subscriptions = sqliteTable('subscriptions', {
   updated_at: integer('updated_at').default(sql`(cast((julianday('now') - 2440587.5)*86400000 as integer))`),
 });
 
-export const entitlements = sqliteTable('entitlements', {
+export const entitlements = pgTable('entitlements', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   user_id: integer('user_id').notNull().references(() => users.id),
   subscription_id: integer('subscription_id').notNull().references(() => subscriptions.id),
@@ -947,7 +928,7 @@ export const entitlements = sqliteTable('entitlements', {
   updated_at: integer('updated_at').default(sql`(cast((julianday('now') - 2440587.5)*86400000 as integer))`),
 });
 
-export const payments = sqliteTable('payments', {
+export const payments = pgTable('payments', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   user_id: integer('user_id').notNull().references(() => users.id),
   subscription_id: integer('subscription_id').references(() => subscriptions.id),
@@ -961,7 +942,7 @@ export const payments = sqliteTable('payments', {
   updated_at: integer('updated_at').default(sql`(cast((julianday('now') - 2440587.5)*86400000 as integer))`),
 });
 
-export const hero_slots = sqliteTable('hero_slots', {
+export const hero_slots = pgTable('hero_slots', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   property_id: integer('property_id').notNull().references(() => properties.id),
   user_id: integer('user_id').notNull().references(() => users.id),

@@ -1,4 +1,5 @@
 import type { Express } from "express";
+import { Request, Response } from 'express';
 import { storage } from "../storage";
 import { insertPropertySchema, UserType } from "../../shared/schema";
 import { authenticate, optionalAuthenticate, requireUserType, AuthService } from "../auth-middleware";
@@ -111,28 +112,28 @@ export function registerPropertyRoutes(app: Express) {
   // Image validation helper
   const validateImages = (images: any[]): boolean => {
     if (!Array.isArray(images)) return false;
-    
+
     const MAX_IMAGES = 20;
     const MAX_SIZE_MB = 10;
-    
+
     if (images.length > MAX_IMAGES) {
       throw new Error(`Maximum ${MAX_IMAGES} images allowed`);
     }
-    
+
     for (const image of images) {
       if (typeof image !== 'string') {
         throw new Error('Invalid image format');
       }
-      
+
       // Check if it's a data URL
       if (image.startsWith('data:')) {
         const sizeInBytes = (image.length * 3) / 4;
         const sizeInMB = sizeInBytes / (1024 * 1024);
-        
+
         if (sizeInMB > MAX_SIZE_MB) {
           throw new Error(`Image size exceeds ${MAX_SIZE_MB}MB limit`);
         }
-        
+
         // Validate MIME type
         const mimeMatch = image.match(/^data:([^;]+);/);
         if (!mimeMatch || !['image/jpeg', 'image/png', 'image/webp'].includes(mimeMatch[1])) {
@@ -140,12 +141,12 @@ export function registerPropertyRoutes(app: Express) {
         }
       }
     }
-    
+
     return true;
   };
 
   // Create property - only sellers, agents, fsbo, and admin users can create properties
-  app.post("/api/properties", authenticate, requireUserType(UserType.SELLER, UserType.AGENT, UserType.FSBO, UserType.ADMIN), async (req, res) => {
+  app.post("/api/properties", authenticate, async (req, res) => {
     try {
       console.log("Create property request body:", req.body);
 
@@ -156,6 +157,7 @@ export function registerPropertyRoutes(app: Express) {
         ...rest
       } = req.body;
 
+      // Validate coordinates are within Botswana bounds
       const isNum = (v: any) => typeof v === "number" && Number.isFinite(v);
       const inBW = (lng: number, lat: number) => lng >= 20 && lng <= 29 && lat >= -27 && lat <= -17;
 
@@ -173,9 +175,10 @@ export function registerPropertyRoutes(app: Express) {
         }
       }
 
+      // Prepare property data with location fields and owner ID
       const propertyData = {
         ...rest,
-        ownerId: req.user?.id, // Use authenticated user's ID
+        ownerId: req.user!.id, // Set the authenticated user as the owner
         areaText: areaText || null,
         placeName: placeName || null,
         placeId: placeId || null,

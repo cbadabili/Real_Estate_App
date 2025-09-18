@@ -199,19 +199,26 @@ export const authenticate = async (req: AuthenticatedRequest, res: Response, nex
     }
 
     try {
-      // ONLY accept valid JWT tokens - no fallback to numeric IDs
+      // Verify JWT token
       const decoded = verifyToken(token);
       const user = await storage.getUser(decoded.userId);
 
-      if (!user || !user.isActive) {
-        return res.status(401).json({ message: 'Invalid token or inactive user' });
+      if (!user) {
+        return res.status(401).json({ message: 'User not found' });
+      }
+
+      if (!user.isActive) {
+        return res.status(401).json({ message: 'User account is inactive' });
       }
 
       req.user = user;
       return next();
-    } catch (jwtError) {
+    } catch (jwtError: any) {
       console.error('JWT verification failed:', jwtError.message);
-      return res.status(401).json({ message: 'Invalid or expired token' });
+      if (jwtError.name === 'TokenExpiredError') {
+        return res.status(401).json({ message: 'Token expired' });
+      }
+      return res.status(401).json({ message: 'Invalid token' });
     }
   } catch (error) {
     console.error('Authentication error:', error);

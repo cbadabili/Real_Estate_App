@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { apiRequest } from '@/lib/queryClient';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface User {
   id: number;
@@ -68,18 +69,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false); // Added to track authentication status
   const [token, setToken] = useState<string | null>(
-    typeof window !== 'undefined' ? localStorage.getItem('authToken') : null
+    typeof window !== 'undefined' ? localStorage.getItem('token') : null // Changed to 'token'
   );
   const [userId, setUserId] = useState<string | null>(
     typeof window !== 'undefined' ? localStorage.getItem('userId') : null
   );
   const [error, setError] = useState<string | null>(null);
+  const queryClient = useQueryClient();
 
   // Check authentication status on mount
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const token = localStorage.getItem('authToken');
+        const token = localStorage.getItem('token'); // Changed to 'token'
         const userId = localStorage.getItem('userId');
 
         if (!token || !userId) {
@@ -102,16 +104,23 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         console.log('Auth check successful:', userData.email);
         setUser(userData);
         setIsAuthenticated(true);
+        // Ensure token state is also updated if it was retrieved from local storage
+        if (token) {
+          setToken(token);
+        }
+        // Store user data using react-query
+        queryClient.setQueryData(['user'], userData);
       } catch (error) {
         console.error('Auth check failed:', error);
 
         // Only clear token if it's actually invalid (401), not for network errors
         if (error?.message === 'User not authenticated' || error?.status === 401) {
           console.log('Clearing invalid token');
-          localStorage.removeItem('authToken');
+          localStorage.removeItem('token'); // Changed to 'token'
           localStorage.removeItem('userId');
           setUser(null);
           setIsAuthenticated(false);
+          setToken(null); // Also clear token state
         } else {
           console.log('Auth check failed due to network/other error, keeping token');
           // Don't clear the token for network errors, user might be offline
@@ -122,37 +131,43 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     };
 
     checkAuth();
-  }, []); // Dependency array is empty to run only once on mount
+  }, [queryClient]); // Add queryClient to dependency array
 
   const login = async (email: string, password: string) => {
     try {
       setIsLoading(true);
-
-      const response = await apiRequest('/api/users/login', {
+      const response = await fetch('/api/users/login', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify({ email, password }),
       });
 
-      if (response.token && response.id) {
-        // Store the JWT token with correct key
-        localStorage.setItem('authToken', response.token);
-        localStorage.setItem('userId', response.id.toString());
-
-        // Set user state and authentication status
-        setUser(response);
-        setIsAuthenticated(true);
-        setToken(response.token);
-        setUserId(response.id.toString());
-
-        console.log('Login successful, token stored:', response.token.substring(0, 20) + '...');
-        return response;
-      } else {
-        throw new Error('Invalid login response: missing token or user ID');
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Login failed');
       }
-    } catch (err: any) {
-      const errorMessage = err?.message || 'Login failed';
-      throw new Error(errorMessage);
+
+      const data = await response.json();
+
+      if (data.token && data.user) {
+        // Store the raw token (without Bearer prefix in storage)
+        const cleanToken = data.token.replace('Bearer ', '');
+        localStorage.setItem('token', cleanToken); // Changed to 'token'
+        queryClient.setQueryData(['user'], data.user);
+        setUser(data.user);
+        setToken(cleanToken); // Use cleaned token
+        setUserId(data.user.id.toString()); // Set userId state
+        localStorage.setItem('userId', data.user.id.toString()); // Store userId
+        setIsAuthenticated(true); // Set authenticated status
+        return data.user;
+      } else {
+        throw new Error('Invalid response from server');
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      throw error;
     } finally {
       setIsLoading(false);
     }
@@ -165,10 +180,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setToken(null);
     setUserId(null);
     if (typeof window !== 'undefined') {
-      localStorage.removeItem('authToken');
+      localStorage.removeItem('token'); // Changed to 'token'
       localStorage.removeItem('userId');
     }
     setIsAuthenticated(false);
+    // Invalidate user query on logout
+    queryClient.invalidateQueries(['user']);
   };
 
   const register = async (userData: RegisterData) => {
@@ -191,7 +208,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const updateUser = (updates: Partial<User>) => {
     if (user) {
-      setUser({ ...user, ...updates });
+      const updatedUser = { ...user, ...updates };
+      setUser(updatedUser);
+      // Update react-query cache as well
+      queryClient.setQueryData(['user'], updatedUser);
     }
   };
 
