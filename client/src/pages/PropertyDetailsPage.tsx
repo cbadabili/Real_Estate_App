@@ -256,7 +256,7 @@ const PropertyDetailsPage: React.FC = () => {
               <img
                 src={images.length > 0 ? images[currentImageIndex] : 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800&h=600&fit=crop&auto=format'}
                 alt={property.title}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-contain bg-gray-100"
                 onError={(e) => {
                   console.log('Image failed to load:', images[currentImageIndex]);
                   // Try a different fallback if the first one fails
