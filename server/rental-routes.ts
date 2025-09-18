@@ -207,6 +207,24 @@ export function createRentalRoutes(): express.Router {
     }
   });
 
+  // Get user's rental listings
+  router.get('/user', async (req, res) => {
+    try {
+      // This would need user authentication middleware
+      // For now, return empty array
+      res.json({
+        success: true,
+        data: []
+      });
+    } catch (error) {
+      console.error('Error fetching user rentals:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to fetch user rentals'
+      });
+    }
+  });
+
   // Get rental applications
   router.get('/:id/applications', async (req, res) => {
     try {

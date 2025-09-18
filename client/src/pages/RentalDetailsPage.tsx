@@ -136,11 +136,11 @@ const RentalDetailsPage = () => {
           <div className="lg:col-span-2">
             {/* Image Gallery */}
             <div className="relative bg-white rounded-lg overflow-hidden shadow-sm mb-6">
-              <div className="relative h-64 md:h-80"></div>
+              <div className="relative h-64 md:h-80">
                 <img
                   src={images[currentImageIndex]}
                   alt={property.title}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-contain bg-gray-100"
                 />
                 
                 {images.length > 1 && (

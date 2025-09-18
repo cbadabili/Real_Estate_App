@@ -1,14 +1,14 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Search, 
-  Filter, 
-  MapPin, 
-  Bed, 
-  Bath, 
-  Home, 
-  Car, 
-  Wifi, 
+import {
+  Search,
+  Filter,
+  MapPin,
+  Bed,
+  Bath,
+  Home,
+  Car,
+  Wifi,
   Heart,
   Star,
   Calendar,
@@ -123,43 +123,61 @@ const RentPage = () => {
     }
   };
 
-  // Fetch user's applications
+  // Fetch user's rental applications
   const fetchApplications = async () => {
     if (!user) return;
 
     try {
-      const response = await fetch('/api/renter/applications', {
+      const token = localStorage.getItem('authToken') || localStorage.getItem('token');
+      const response = await fetch('/api/rental-applications/user', {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
         }
       });
-      const data = await response.json();
 
+      if (!response.ok) {
+        console.warn('Applications endpoint not available:', response.status);
+        setApplications([]);
+        return;
+      }
+
+      const data = await response.json();
       if (data.success) {
-        setApplications(data.data);
+        setApplications(data.data || []);
       }
     } catch (error) {
       console.error('Error fetching applications:', error);
+      setApplications([]);
     }
   };
 
-  // Fetch landlord's listings
+  // Fetch user's rental listings (for landlords)
   const fetchMyListings = async () => {
     if (!user) return;
 
     try {
-      const response = await fetch('/api/landlord/rentals', {
+      const token = localStorage.getItem('authToken') || localStorage.getItem('token');
+      const response = await fetch('/api/rentals/user', {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
         }
       });
-      const data = await response.json();
 
+      if (!response.ok) {
+        console.warn('My listings endpoint not available:', response.status);
+        setMyListings([]);
+        return;
+      }
+
+      const data = await response.json();
       if (data.success) {
-        setMyListings(data.data);
+        setMyListings(data.data || []);
       }
     } catch (error) {
       console.error('Error fetching listings:', error);
+      setMyListings([]);
     }
   };
 
@@ -310,7 +328,7 @@ const RentPage = () => {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Bedrooms</label>
-                    <select 
+                    <select
                       value={filters.bedrooms}
                       onChange={(e) => setFilters(prev => ({ ...prev, bedrooms: e.target.value }))}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-beedab-blue focus:border-beedab-blue"
@@ -325,7 +343,7 @@ const RentPage = () => {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Type</label>
-                    <select 
+                    <select
                       value={filters.propertyType}
                       onChange={(e) => setFilters(prev => ({ ...prev, propertyType: e.target.value }))}
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-beedab-blue focus:border-beedab-blue"
@@ -339,7 +357,7 @@ const RentPage = () => {
                     </select>
                   </div>
                   </div>
-                  
+
                   {/* Search Button */}
                   <div className="flex justify-center">
                     <button
@@ -540,8 +558,8 @@ const RentPage = () => {
                               P{listing.monthly_rent.toLocaleString()}/month
                             </span>
                             <span className={`px-2 py-1 rounded text-xs ${
-                              listing.status === 'active' 
-                                ? 'bg-green-100 text-green-600' 
+                              listing.status === 'active'
+                                ? 'bg-green-100 text-green-600'
                                 : 'bg-gray-100 text-gray-600'
                             }`}>
                               {listing.status}
