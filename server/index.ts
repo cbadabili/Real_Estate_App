@@ -20,6 +20,7 @@ import helmet from 'helmet';
 import cors from 'cors';
 import rateLimit from 'express-rate-limit';
 import morgan from 'morgan';
+import { addRequestId, structuredLogger } from './middleware/logging';
 import billingRoutes from './billing-routes';
 import heroRoutes from './hero-routes';
 import { registerPropertyRoutes } from "./routes/property-routes";
@@ -34,15 +35,24 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'", "https://api.mapbox.com", "https://fonts.googleapis.com"],
-      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://api.mapbox.com", "https://replit.com"],
+      styleSrc: ["'self'", "https://api.mapbox.com", "https://fonts.googleapis.com"],
+      scriptSrc: ["'self'", "https://api.mapbox.com"],
       imgSrc: ["'self'", "data:", "https:", "blob:"],
       connectSrc: ["'self'", "https://api.mapbox.com", "https://events.mapbox.com", "wss:", "ws:"],
-      fontSrc: ["'self'", "'unsafe-inline'", "data:", "https://fonts.gstatic.com", "https://fonts.googleapis.com"],
+      fontSrc: ["'self'", "data:", "https://fonts.gstatic.com", "https://fonts.googleapis.com"],
       objectSrc: ["'none'"],
       upgradeInsecureRequests: [],
     },
   },
+  referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
+  permittedCrossDomainPolicies: false,
+  crossOriginOpenerPolicy: { policy: 'same-origin' },
+  permissionsPolicy: {
+    camera: ['self'],
+    microphone: [],
+    geolocation: ['self'],
+    fullscreen: ['self']
+  }
 }));
 
 app.use(cors({
@@ -50,7 +60,9 @@ app.use(cors({
   credentials: true,
 }));
 
-app.use(morgan('combined'));
+// Add request ID and structured logging
+app.use(addRequestId);
+app.use(structuredLogger);
 
 // Rate limiting for auth and write endpoints
 const authWriteLimiter = rateLimit({
@@ -59,6 +71,33 @@ const authWriteLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: 'Too many requests, please try again later' }
+});
+
+// General API rate limiting
+const generalApiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 1000, // More generous for general API usage
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'API rate limit exceeded' }
+});
+
+// Write operations rate limiting
+const writeApiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 50,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many write requests, please try again later' }
+});
+
+// Search rate limiting
+const searchLimiter = rateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minute
+  max: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Search rate limit exceeded' }
 });
 
 app.use(express.json({ limit: '10mb' }));
@@ -113,6 +152,18 @@ app.get('/api/health', (_req: Request, res: Response) => {
   // Apply rate limiting to sensitive endpoints BEFORE registering routes
   app.use('/api/users/login', authWriteLimiter);
   app.use('/api/users/register', authWriteLimiter);
+  
+  // Apply general rate limiting to all API routes
+  app.use('/api', generalApiLimiter);
+  
+  // Apply write limiting to write operations
+  app.use('/api/properties', writeApiLimiter);
+  app.use('/api/services', writeApiLimiter);
+  app.use('/api/rentals', writeApiLimiter);
+  
+  // Apply search limiting
+  app.use('/api/search', searchLimiter);
+  app.use('/api/suggest', searchLimiter);
 
   const server = await registerRoutes(app);
 

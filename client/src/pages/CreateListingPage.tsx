@@ -248,11 +248,15 @@ const CreateListingPage = () => {
       console.log('Transformed property data:', propertyData);
 
       const token = localStorage.getItem('authToken');
+      if (!token) {
+        throw new Error('Please log in to create a property listing');
+      }
+
       const response = await fetch('/api/properties', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': token ? `Bearer ${token}` : '',
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify(propertyData),
       });

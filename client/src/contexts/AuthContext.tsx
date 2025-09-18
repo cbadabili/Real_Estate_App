@@ -68,7 +68,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false); // Added to track authentication status
   const [token, setToken] = useState<string | null>(
-    typeof window !== 'undefined' ? localStorage.getItem('token') : null
+    typeof window !== 'undefined' ? localStorage.getItem('authToken') : null
   );
   const [userId, setUserId] = useState<string | null>(
     typeof window !== 'undefined' ? localStorage.getItem('userId') : null
@@ -79,7 +79,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('authToken');
         const userId = localStorage.getItem('userId');
 
         if (!token || !userId) {
@@ -108,7 +108,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         // Only clear token if it's actually invalid (401), not for network errors
         if (error?.message === 'User not authenticated' || error?.status === 401) {
           console.log('Clearing invalid token');
-          localStorage.removeItem('token');
+          localStorage.removeItem('authToken');
           localStorage.removeItem('userId');
           setUser(null);
           setIsAuthenticated(false);
@@ -127,7 +127,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const login = async (email: string, password: string) => {
     try {
       setIsLoading(true);
-      setError(null); // Assuming setError is a state variable managed elsewhere, or a placeholder
 
       const response = await apiRequest('/api/users/login', {
         method: 'POST',
@@ -136,15 +135,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       });
 
       if (response.token && response.id) {
-        // Store the JWT token - this is the key fix
-        localStorage.setItem('token', response.token);
+        // Store the JWT token with correct key
+        localStorage.setItem('authToken', response.token);
         localStorage.setItem('userId', response.id.toString());
 
         // Set user state and authentication status
         setUser(response);
         setIsAuthenticated(true);
-        setToken(response.token); // Update local state
-        setUserId(response.id.toString()); // Update local state
+        setToken(response.token);
+        setUserId(response.id.toString());
 
         console.log('Login successful, token stored:', response.token.substring(0, 20) + '...');
         return response;
@@ -153,7 +152,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
     } catch (err: any) {
       const errorMessage = err?.message || 'Login failed';
-      setError(errorMessage); // Assuming setError is a state variable managed elsewhere
       throw new Error(errorMessage);
     } finally {
       setIsLoading(false);
@@ -167,7 +165,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setToken(null);
     setUserId(null);
     if (typeof window !== 'undefined') {
-      localStorage.removeItem('token');
+      localStorage.removeItem('authToken');
       localStorage.removeItem('userId');
     }
     setIsAuthenticated(false);

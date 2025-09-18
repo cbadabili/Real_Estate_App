@@ -34,68 +34,45 @@ export const queryClient = new QueryClient({
 });
 
 // API request helper for mutations (POST, PUT, DELETE)
-export const apiRequest = async (url: string, options: RequestInit = {}): Promise<any> => {
-  const baseUrl = import.meta.env.VITE_API_URL || '';
-  const fullUrl = `${baseUrl}${url}`;
-
-  // Get token from localStorage if not provided in headers
-  const token = localStorage.getItem('token');
-  const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
-    ...(options.headers || {}),
-  };
-
-  // Add Authorization header if token exists and not already present
-  if (token && !headers['Authorization'] && !headers['authorization']) {
-    headers['Authorization'] = `Bearer ${token}`;
-    console.log('Adding auth header with token:', token.substring(0, 20) + '...');
-  }
+export async function apiRequest(url: string, options: RequestInit = {}) {
+  const token = localStorage.getItem('authToken');
 
   const config: RequestInit = {
     ...options,
-    headers,
-    url: fullUrl, // Include the full URL in the config
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token && { Authorization: `Bearer ${token}` }),
+      ...options.headers,
+    },
   };
 
-  console.log('API Request:', config.method || 'GET', fullUrl);
-
-  let response: Response;
-  try {
-    response = await fetch(fullUrl, config);
-  } catch (error) {
-    console.error('Network error:', error);
-    throw new Error('Network error. Please check your connection.');
-  }
-
-  console.log('API Response status:', response.status);
+  const response = await fetch(url, config);
 
   if (!response.ok) {
-    let errorData;
+    const errorText = await response.text();
+    let errorMessage: string;
+
     try {
-      errorData = await response.json();
-      console.error('API Error Response:', {
-        status: response.status,
-        statusText: response.statusText,
-        url: fullUrl,
-        method: config.method || 'GET',
-        errorData
-      });
-    } catch (parseError) {
-      console.error('Error parsing error response:', parseError);
-      console.error('Raw response status:', response.status, response.statusText);
-      throw new Error(`HTTP error! status: ${response.status}`);
+      const errorJson = JSON.parse(errorText);
+      errorMessage = errorJson.message || errorJson.error || `HTTP ${response.status}`;
+    } catch {
+      errorMessage = errorText || `HTTP ${response.status}`;
     }
 
-    console.error('API Error:', errorData);
-    throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+    if (response.status === 401) {
+      // Clear invalid token and redirect to login
+      localStorage.removeItem('authToken');
+      window.location.href = '/login';
+      throw new Error('User not authenticated');
+    }
+
+    throw new Error(errorMessage);
   }
 
-  try {
-    const data = await response.json();
-    console.log('API Response data received');
-    return data;
-  } catch (parseError) {
-    console.error('Error parsing response:', parseError);
-    throw new Error('Invalid response format');
+  const contentType = response.headers.get('content-type');
+  if (contentType && contentType.includes('application/json')) {
+    return response.json();
   }
-};
+
+  return response.text();
+}
