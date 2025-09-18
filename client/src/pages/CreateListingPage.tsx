@@ -66,20 +66,17 @@ const CreateListingPage = () => {
     { 
       value: 'fsbo', 
       label: 'Owner Seller', 
-      description: 'Sell directly without an agent',
-      price: 'Starting at P99'
+      description: 'Sell directly without an agent'
     },
     { 
       value: 'agent', 
       label: 'List with Agent', 
-      description: 'Work with a certified agent',
-      price: 'Commission based'
+      description: 'Work with a certified agent'
     },
     { 
       value: 'auction', 
       label: 'Auction Listing', 
-      description: 'List property for auction sale',
-      price: 'Auction fees apply'
+      description: 'List property for auction sale'
     }
   ];
 
@@ -345,17 +342,12 @@ const CreateListingPage = () => {
                             ? 'border-beedab-blue bg-beedab-blue shadow-md' 
                             : 'border-beedab-blue/30 hover:border-beedab-blue hover:bg-beedab-blue/5'
                         }`}>
-                          <div className="flex justify-between items-start mb-4">
+                          <div className="mb-4">
                             <h3 className={`text-lg font-semibold ${
                               watchedListingType === type.value 
                                 ? 'text-white' 
                                 : 'text-neutral-900'
                             }`}>{type.label}</h3>
-                            <span className={`text-sm font-medium ${
-                              watchedListingType === type.value 
-                                ? 'text-white/90' 
-                                : 'text-beedab-blue'
-                            }`}>{type.price}</span>
                           </div>
                           <p className={`mb-4 ${
                             watchedListingType === type.value 
