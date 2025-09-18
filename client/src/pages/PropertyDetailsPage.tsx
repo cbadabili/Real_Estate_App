@@ -73,6 +73,35 @@ const PropertyDetailsPage: React.FC = () => {
   const { toggleFavorite, isFavorite } = useFavorites();
   const { user } = useAuth();
 
+  // Get coordinates safely with proper null checks - MOVED TO TOP
+  const coordinates = React.useMemo(() => {
+    if (!property?.coordinates) return null;
+    
+    // Handle different coordinate formats
+    if (Array.isArray(property.coordinates) && property.coordinates.length >= 2) {
+      return [parseFloat(property.coordinates[0]), parseFloat(property.coordinates[1])];
+    }
+    
+    // Handle string coordinates (lat,lng format)
+    if (typeof property.coordinates === 'string') {
+      try {
+        const coords = property.coordinates.split(',').map(coord => parseFloat(coord.trim()));
+        if (coords.length >= 2 && !isNaN(coords[0]) && !isNaN(coords[1])) {
+          return coords;
+        }
+      } catch (e) {
+        console.warn('Failed to parse coordinates:', property.coordinates);
+      }
+    }
+    
+    // Handle object coordinates {lat, lng}
+    if (typeof property.coordinates === 'object' && property.coordinates.lat && property.coordinates.lng) {
+      return [parseFloat(property.coordinates.lat), parseFloat(property.coordinates.lng)];
+    }
+    
+    return null;
+  }, [property?.coordinates]);
+
   useEffect(() => {
     if (id) {
       fetchProperty(id);
@@ -167,35 +196,6 @@ const PropertyDetailsPage: React.FC = () => {
       </div>
     );
   }
-
-  // Get coordinates safely with proper null checks
-  const coordinates = React.useMemo(() => {
-    if (!property?.coordinates) return null;
-    
-    // Handle different coordinate formats
-    if (Array.isArray(property.coordinates) && property.coordinates.length >= 2) {
-      return [parseFloat(property.coordinates[0]), parseFloat(property.coordinates[1])];
-    }
-    
-    // Handle string coordinates (lat,lng format)
-    if (typeof property.coordinates === 'string') {
-      try {
-        const coords = property.coordinates.split(',').map(coord => parseFloat(coord.trim()));
-        if (coords.length >= 2 && !isNaN(coords[0]) && !isNaN(coords[1])) {
-          return coords;
-        }
-      } catch (e) {
-        console.warn('Failed to parse coordinates:', property.coordinates);
-      }
-    }
-    
-    // Handle object coordinates {lat, lng}
-    if (typeof property.coordinates === 'object' && property.coordinates.lat && property.coordinates.lng) {
-      return [parseFloat(property.coordinates.lat), parseFloat(property.coordinates.lng)];
-    }
-    
-    return null;
-  }, [property?.coordinates]);
 
   return (
     <div className="min-h-screen bg-neutral-50">
