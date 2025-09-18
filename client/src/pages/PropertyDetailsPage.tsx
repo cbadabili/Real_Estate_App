@@ -73,6 +73,23 @@ const PropertyDetailsPage: React.FC = () => {
   const { toggleFavorite, isFavorite } = useFavorites();
   const { user } = useAuth();
 
+  // Parse images safely
+  const images = React.useMemo(() => {
+    if (!property?.images) return [];
+    
+    try {
+      if (typeof property.images === 'string') {
+        return JSON.parse(property.images);
+      } else if (Array.isArray(property.images)) {
+        return property.images;
+      }
+    } catch (error) {
+      console.warn('Failed to parse property images:', error);
+    }
+    
+    return [];
+  }, [property?.images]);
+
   // Get coordinates safely with proper null checks - MOVED TO TOP
   const coordinates = React.useMemo(() => {
     if (!property?.coordinates) return null;
@@ -233,13 +250,13 @@ const PropertyDetailsPage: React.FC = () => {
           <div className="bg-white rounded-lg shadow-sm overflow-hidden mb-6">
             <div className="relative aspect-video">
               <img
-                src={property.images && property.images.length > 0 ? property.images[currentImageIndex] : '/api/placeholder/800/600'}
+                src={images.length > 0 ? images[currentImageIndex] : '/api/placeholder/800/600'}
                 alt={property.title}
                 className="w-full h-full object-cover"
               />
-              {property.images && property.images.length > 1 && (
+              {images.length > 1 && (
                 <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
-                  {property.images.map((_, index) => (
+                  {images.map((_, index) => (
                     <button
                       key={index}
                       onClick={() => setCurrentImageIndex(index)}
