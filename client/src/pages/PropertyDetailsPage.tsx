@@ -23,7 +23,6 @@ import {
 import { useFavorites } from '../hooks/useFavorites';
 import { useAuth } from '../contexts/AuthContext';
 import { analytics } from '../lib/analytics';
-import { MortgageCalculator } from '../components/MortgageCalculator';
 
 // Placeholder for a LoadingSpinner component, assuming it exists elsewhere
 const LoadingSpinner = () => (
@@ -71,22 +70,17 @@ const PropertyDetailsPage: React.FC = () => {
   const [error, setError] = useState<Error | null>(null); // Added error state
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [showContactForm, setShowContactForm] = useState(false);
-  const [showMortgageCalculator, setShowMortgageCalculator] = useState(false);
   const { toggleFavorite, isFavorite } = useFavorites();
   const { user } = useAuth();
 
   // Parse images safely
   const images = React.useMemo(() => {
-    console.log('Raw property.images:', property?.images);
     if (!property?.images) return [];
     
     try {
       if (typeof property.images === 'string') {
-        const parsed = JSON.parse(property.images);
-        console.log('Parsed images from string:', parsed);
-        return parsed;
+        return JSON.parse(property.images);
       } else if (Array.isArray(property.images)) {
-        console.log('Images already array:', property.images);
         return property.images;
       }
     } catch (error) {
@@ -173,14 +167,6 @@ const PropertyDetailsPage: React.FC = () => {
     setShowContactForm(true);
   };
 
-  const handleMortgageCalculator = () => {
-    setShowMortgageCalculator(!showMortgageCalculator);
-  };
-
-  const handleScheduleViewing = () => {
-    navigate(`/schedule-viewing/${id}`);
-  };
-
   // Render loading state
   if (isLoading) {
     return (
@@ -262,18 +248,11 @@ const PropertyDetailsPage: React.FC = () => {
 
           {/* Property Images */}
           <div className="bg-white rounded-lg shadow-sm overflow-hidden mb-6">
-            <div className="relative h-64 md:h-96 lg:h-[500px]">
+            <div className="relative h-32 md:h-40">
               <img
-                src={images.length > 0 ? images[currentImageIndex] : 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800&h=600&fit=crop&auto=format'}
+                src={images.length > 0 ? images[currentImageIndex] : '/api/placeholder/800/600'}
                 alt={property.title}
-                className="w-full h-full object-contain bg-gray-100"
-                onError={(e) => {
-                  console.log('Image failed to load:', images[currentImageIndex]);
-                  // Try a different fallback if the first one fails
-                  if (e.currentTarget.src !== 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800&h=600&fit=crop&auto=format') {
-                    e.currentTarget.src = 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800&h=600&fit=crop&auto=format';
-                  }
-                }}
+                className="w-full h-full object-cover"
               />
               {images.length > 1 && (
                 <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
@@ -408,17 +387,11 @@ const PropertyDetailsPage: React.FC = () => {
 
                 {/* Quick Actions */}
                 <div className="space-y-3">
-                  <button 
-                    onClick={handleMortgageCalculator}
-                    className="w-full bg-neutral-100 text-neutral-700 py-2 px-4 rounded-lg hover:bg-neutral-200 transition-colors flex items-center justify-center"
-                  >
+                  <button className="w-full bg-neutral-100 text-neutral-700 py-2 px-4 rounded-lg hover:bg-neutral-200 transition-colors flex items-center justify-center">
                     <Calculator className="w-4 h-4 mr-2" />
                     Mortgage Calculator
                   </button>
-                  <button 
-                    onClick={handleScheduleViewing}
-                    className="w-full bg-neutral-100 text-neutral-700 py-2 px-4 rounded-lg hover:bg-neutral-200 transition-colors flex items-center justify-center"
-                  >
+                  <button className="w-full bg-neutral-100 text-neutral-700 py-2 px-4 rounded-lg hover:bg-neutral-200 transition-colors flex items-center justify-center">
                     <Calendar className="w-4 h-4 mr-2" />
                     Schedule Viewing
                   </button>
@@ -427,20 +400,7 @@ const PropertyDetailsPage: React.FC = () => {
             </div>
           </div>
 
-          {/* Mortgage Calculator Section */}
-          {showMortgageCalculator && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              className="mt-6"
-            >
-              <MortgageCalculator 
-                propertyPrice={property.price}
-                className="w-full"
-              />
-            </motion.div>
-          )}
+          
         </motion.div>
       </div>
     </div>
