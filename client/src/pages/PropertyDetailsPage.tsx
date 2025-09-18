@@ -169,9 +169,33 @@ const PropertyDetailsPage: React.FC = () => {
   }
 
   // Get coordinates safely with proper null checks
-  const coordinates = property?.coordinates && Array.isArray(property.coordinates) && property.coordinates.length >= 2
-    ? [parseFloat(property.coordinates[0]), parseFloat(property.coordinates[1])]
-    : null;
+  const coordinates = React.useMemo(() => {
+    if (!property?.coordinates) return null;
+    
+    // Handle different coordinate formats
+    if (Array.isArray(property.coordinates) && property.coordinates.length >= 2) {
+      return [parseFloat(property.coordinates[0]), parseFloat(property.coordinates[1])];
+    }
+    
+    // Handle string coordinates (lat,lng format)
+    if (typeof property.coordinates === 'string') {
+      try {
+        const coords = property.coordinates.split(',').map(coord => parseFloat(coord.trim()));
+        if (coords.length >= 2 && !isNaN(coords[0]) && !isNaN(coords[1])) {
+          return coords;
+        }
+      } catch (e) {
+        console.warn('Failed to parse coordinates:', property.coordinates);
+      }
+    }
+    
+    // Handle object coordinates {lat, lng}
+    if (typeof property.coordinates === 'object' && property.coordinates.lat && property.coordinates.lng) {
+      return [parseFloat(property.coordinates.lat), parseFloat(property.coordinates.lng)];
+    }
+    
+    return null;
+  }, [property?.coordinates]);
 
   return (
     <div className="min-h-screen bg-neutral-50">
@@ -209,13 +233,13 @@ const PropertyDetailsPage: React.FC = () => {
           <div className="bg-white rounded-lg shadow-sm overflow-hidden mb-6">
             <div className="relative aspect-video">
               <img
-                src={property.images.length > 0 ? property.images[currentImageIndex] : '/api/placeholder/800/600'}
+                src={property.images && property.images.length > 0 ? property.images[currentImageIndex] : '/api/placeholder/800/600'}
                 alt={property.title}
                 className="w-full h-full object-cover"
               />
-              {property.images.length > 1 && (
+              {property.images && property.images.length > 1 && (
                 <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
-                  {property.images.map((_, index) => (
+                  {property.images && property.images.map((_, index) => (
                     <button
                       key={index}
                       onClick={() => setCurrentImageIndex(index)}
@@ -223,7 +247,126 @@ const PropertyDetailsPage: React.FC = () => {
                         index === currentImageIndex ? 'bg-white' : 'bg-white/50'
                       }`}
                     />
-                  ))}
+                  ))}</div>
+              )}
+            </div>
+          </div>
+
+          {/* Property Details */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2">
+              <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+                <h1 className="text-3xl font-bold text-neutral-900 mb-2">{property.title}</h1>
+                <p className="text-2xl font-bold text-beedab-blue mb-4">
+                  P {property.price.toLocaleString()}
+                </p>
+                <div className="flex items-center text-neutral-600 mb-6">
+                  <MapPin className="w-5 h-5 mr-2" />
+                  {property.location}
+                </div>
+
+                {/* Property Features */}
+                <div className="flex flex-wrap gap-4 mb-6">
+                  {property.bedrooms !== undefined && (
+                    <div className="flex items-center">
+                      <Bed className="w-5 h-5 mr-2 text-neutral-500" />
+                      <span>{property.bedrooms} Bedrooms</span>
+                    </div>
+                  )}
+                  {property.bathrooms !== undefined && (
+                    <div className="flex items-center">
+                      <Bath className="w-5 h-5 mr-2 text-neutral-500" />
+                      <span>{property.bathrooms} Bathrooms</span>
+                    </div>
+                  )}
+                  {property.area !== undefined && (
+                    <div className="flex items-center">
+                      <Square className="w-5 h-5 mr-2 text-neutral-500" />
+                      <span>{property.area} m²</span>
+                    </div>
+                  )}
+                  {property.parking && (
+                    <div className="flex items-center">
+                      <Car className="w-5 h-5 mr-2 text-neutral-500" />
+                      <span>Parking</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Description */}
+                <div className="mb-6">
+                  <h3 className="text-lg font-semibold mb-3">Description</h3>
+                  <p className="text-neutral-600 leading-relaxed">{property.description}</p>
+                </div>
+
+                {/* Features */}
+                {property.features && property.features.length > 0 && (
+                  <div>
+                    <h3 className="text-lg font-semibold mb-3">Features</h3>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                      {property.features.map((feature, index) => (
+                        <div key={index} className="flex items-center">
+                          <CheckCircle className="w-4 h-4 mr-2 text-green-500" />
+                          <span className="text-sm text-neutral-600">{feature}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Sidebar */}
+            <div className="lg:col-span-1">
+              <div className="bg-white rounded-lg shadow-sm p-6 sticky top-8">
+                {/* Agent Info */}
+                <div className="mb-6">
+                  <h3 className="text-lg font-semibold mb-4">Listed By</h3>
+                  <div className="flex items-center mb-4">
+                    <img
+                      src={property.agent.photo || '/api/placeholder/60/60'}
+                      alt={property.agent.name}
+                      className="w-12 h-12 rounded-full mr-4"
+                    />
+                    <div>
+                      <h4 className="font-semibold text-neutral-900">{property.agent.name}</h4>
+                      {property.agent.verified && (
+                        <div className="flex items-center">
+                          <CheckCircle className="w-4 h-4 mr-1 text-green-500" />
+                          <span className="text-sm text-green-600">Verified Agent</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <button
+                      onClick={handleContactAgent}
+                      className="w-full bg-beedab-blue text-white py-2 px-4 rounded-lg hover:bg-beedab-darkblue transition-colors flex items-center justify-center"
+                    >
+                      <MessageCircle className="w-4 h-4 mr-2" />
+                      Contact Agent
+                    </button>
+                    <a
+                      href={`tel:${property.agent.phone}`}
+                      className="w-full bg-neutral-100 text-neutral-700 py-2 px-4 rounded-lg hover:bg-neutral-200 transition-colors flex items-center justify-center"
+                    >
+                      <Phone className="w-4 h-4 mr-2" />
+                      Call Now
+                    </a>
+                  </div>
+                </div>
+
+                {/* Quick Actions */}
+                <div className="space-y-3">
+                  <button className="w-full bg-neutral-100 text-neutral-700 py-2 px-4 rounded-lg hover:bg-neutral-200 transition-colors flex items-center justify-center">
+                    <Calculator className="w-4 h-4 mr-2" />
+                    Mortgage Calculator
+                  </button>
+                  <button className="w-full bg-neutral-100 text-neutral-700 py-2 px-4 rounded-lg hover:bg-neutral-200 transition-colors flex items-center justify-center">
+                    <Calendar className="w-4 h-4 mr-2" />
+                    Schedule Viewing
+                  </button>
                 </div>
               )}
             </div>

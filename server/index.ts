@@ -119,12 +119,15 @@ app.use((req, res, next) => {
   res.setHeader('Content-Security-Policy', [
     "default-src 'self'",
     "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://api.mapbox.com https://replit.com",
+    "script-src-elem 'self' 'unsafe-inline' https://api.mapbox.com https://replit.com",
     "style-src 'self' 'unsafe-inline' https://api.mapbox.com https://fonts.googleapis.com",
-    "font-src 'self' data: https://fonts.gstatic.com",
+    "font-src 'self' data: https://fonts.gstatic.com https://fonts.googleapis.com",
     "img-src 'self' data: https: blob:",
     "connect-src 'self' https://api.mapbox.com https://events.mapbox.com",
     "worker-src 'self' blob:",
-    "child-src 'self'"
+    "child-src 'self'",
+    "base-uri 'self'",
+    "form-action 'self'"
   ].join('; '));
 
   next();

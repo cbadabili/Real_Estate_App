@@ -1,0 +1,735 @@
+themeContext-e2709bf1.js:1 Refused to load the font 'data:application/octet-stream;base64,d09GMgABAAAAAPUcABQAAAACTcwAAPSkAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGpQ+G4GCAByMSj9IVkFSlR8/TVZBUoE+BmA/U1RBVIIiJ0gAhQwvgSQRCAqBgSjmQwuEHgAwhrRmATYCJAOIOAQgBYd0B4k4W+08ciQaIvPIC7OSzq4RzVwSsKn8n7dC5rabJIGNMXkENwC1rm5SwY69CDgPIJHu/wqz////c5MNGetA/wA25zQzLa3XaaY5DBaEw2FZauTUSkXzzDLPM0ug9wRjdiW752JIXymC5CNdOIitiw76Joq056xOkqzstNwz+mtA2+SB9UxMXqoItcnEGzVQayY8FXO9Tyw9uO8FGTB4ER6W4Q3v3fyl+4wP5XEsJBiOfpUSmNWLDw5eqJHaTfXj4crGdmgdPtb5J77K740osow36et4vdxehS+CwmEi/uW1oakfTCjDKTaFUdGJS3...RCYiRBUjjqpVdehwWShTwUSFiGkpwFW3Z2oGzmYJMeK0gwFELJ7PM/4UTEMiwQIkyv0zrt1+WANu2OO4EmDFWoORKoV+crX/qayXz31DjmP0Jhat1Qps3TCnCMbHe2dhx3LinKqm7arh/GaV7Wbf/g8Oj45PTs/OLy6vrm9u7+4fHp+cVpUN+Ym3GGIE2B+VRtlfQr6QI6A9EC/dOvupLOctxQQns5jZLK+KnujLbsNKU6WRaxpQEcLWJFxmDIujEnqcRJQDhxyboDVhInrU6Lu82xQq9aAi3hk77wwZMoc4SMxd3zbEVvi9BlEWtNwoQYmXmJY/tDia9mU2DtK3MydhzqVTJDjlZHACNuR1YrYnyMzFcEmMg7YbDaQEmuGdk5fN2alKY9dhjT44n67nuNceEY7zqGwwHeXyoHr0A4eWqfmxweApr3zqxQx5sHWbEultwddsQ7gWDpUOmv8Aac8LoRJi5v392WymSrIA9fVxzjXy7wQHo/ZuwCHBIO' because it violates the following Content Security Policy directive: "default-src 'self'". Note that 'font-src' was not explicitly set, so 'default-src' is used as a fallback.
+
+(anonymous) @ themeContext-e2709bf1.js:1
+qa @ localStorage-e41904e9.js:38
+U.useState @ localStorage-e41904e9.js:9
+X @ themeContext-e2709bf1.js:1
+Y @ themeContext-e2709bf1.js:1
+ie @ themeContext-e2709bf1.js:1
+Qo @ localStorage-e41904e9.js:38
+Id @ localStorage-e41904e9.js:40
+Cd @ localStorage-e41904e9.js:40
+dh @ localStorage-e41904e9.js:40
+ol @ localStorage-e41904e9.js:40
+kd @ localStorage-e41904e9.js:40
+N @ localStorage-e41904e9.js:25
+Jn @ localStorage-e41904e9.js:25Understand this error
+/properties/36:1 Refused to load the script 'https://replit.com/public/js/replit-dev-banner.js' because it violates the following Content Security Policy directive: "script-src 'self' 'unsafe-inline' 'unsafe-eval'". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback.
+Understand this error
+chunk-WERSD76P.js?v=e3379111:21551 Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+AuthContext.tsx:93 Checking auth with token: eyJhbGciOiJIUzI1NiIs...
+AuthContext.tsx:93 Checking auth with token: eyJhbGciOiJIUzI1NiIs...
+analytics.ts:47 Analytics Event: Object
+analytics.ts:47 Analytics Event: Object
+PropertyDetailsPage.tsx:212 Uncaught TypeError: Cannot read properties of null (reading 'length')
+    at PropertyDetailsPage (PropertyDetailsPage.tsx:212:38)
+    at renderWithHooks (chunk-WERSD76P.js?v=e3379111:11548:26)
+    at updateFunctionComponent (chunk-WERSD76P.js?v=e3379111:14582:28)
+    at beginWork (chunk-WERSD76P.js?v=e3379111:15924:22)
+    at HTMLUnknownElement.callCallback2 (chunk-WERSD76P.js?v=e3379111:3674:22)
+    at Object.invokeGuardedCallbackDev (chunk-WERSD76P.js?v=e3379111:3699:24)
+    at invokeGuardedCallback (chunk-WERSD76P.js?v=e3379111:3733:39)
+    at beginWork$1 (chunk-WERSD76P.js?v=e3379111:19765:15)
+    at performUnitOfWork (chunk-WERSD76P.js?v=e3379111:19198:20)
+    at workLoopSync (chunk-WERSD76P.js?v=e3379111:19137:13)
+PropertyDetailsPage @ PropertyDetailsPage.tsx:212
+renderWithHooks @ chunk-WERSD76P.js?v=e3379111:11548
+updateFunctionComponent @ chunk-WERSD76P.js?v=e3379111:14582
+beginWork @ chunk-WERSD76P.js?v=e3379111:15924
+callCallback2 @ chunk-WERSD76P.js?v=e3379111:3674
+invokeGuardedCallbackDev @ chunk-WERSD76P.js?v=e3379111:3699
+invokeGuardedCallback @ chunk-WERSD76P.js?v=e3379111:3733
+beginWork$1 @ chunk-WERSD76P.js?v=e3379111:19765
+performUnitOfWork @ chunk-WERSD76P.js?v=e3379111:19198
+workLoopSync @ chunk-WERSD76P.js?v=e3379111:19137
+renderRootSync @ chunk-WERSD76P.js?v=e3379111:19116
+performConcurrentWorkOnRoot @ chunk-WERSD76P.js?v=e3379111:18678
+workLoop @ chunk-WERSD76P.js?v=e3379111:197
+flushWork @ chunk-WERSD76P.js?v=e3379111:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=e3379111:384Understand this error
+PropertyDetailsPage.tsx:212 Uncaught TypeError: Cannot read properties of null (reading 'length')
+    at PropertyDetailsPage (PropertyDetailsPage.tsx:212:38)
+    at renderWithHooks (chunk-WERSD76P.js?v=e3379111:11548:26)
+    at updateFunctionComponent (chunk-WERSD76P.js?v=e3379111:14582:28)
+    at beginWork (chunk-WERSD76P.js?v=e3379111:15924:22)
+    at HTMLUnknownElement.callCallback2 (chunk-WERSD76P.js?v=e3379111:3674:22)
+    at Object.invokeGuardedCallbackDev (chunk-WERSD76P.js?v=e3379111:3699:24)
+    at invokeGuardedCallback (chunk-WERSD76P.js?v=e3379111:3733:39)
+    at beginWork$1 (chunk-WERSD76P.js?v=e3379111:19765:15)
+    at performUnitOfWork (chunk-WERSD76P.js?v=e3379111:19198:20)
+    at workLoopSync (chunk-WERSD76P.js?v=e3379111:19137:13)
+PropertyDetailsPage @ PropertyDetailsPage.tsx:212
+renderWithHooks @ chunk-WERSD76P.js?v=e3379111:11548
+updateFunctionComponent @ chunk-WERSD76P.js?v=e3379111:14582
+beginWork @ chunk-WERSD76P.js?v=e3379111:15924
+callCallback2 @ chunk-WERSD76P.js?v=e3379111:3674
+invokeGuardedCallbackDev @ chunk-WERSD76P.js?v=e3379111:3699
+invokeGuardedCallback @ chunk-WERSD76P.js?v=e3379111:3733
+beginWork$1 @ chunk-WERSD76P.js?v=e3379111:19765
+performUnitOfWork @ chunk-WERSD76P.js?v=e3379111:19198
+workLoopSync @ chunk-WERSD76P.js?v=e3379111:19137
+renderRootSync @ chunk-WERSD76P.js?v=e3379111:19116
+recoverFromConcurrentError @ chunk-WERSD76P.js?v=e3379111:18736
+performConcurrentWorkOnRoot @ chunk-WERSD76P.js?v=e3379111:18684
+workLoop @ chunk-WERSD76P.js?v=e3379111:197
+flushWork @ chunk-WERSD76P.js?v=e3379111:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=e3379111:384Understand this error
+chunk-WERSD76P.js?v=e3379111:14032 The above error occurred in the <PropertyDetailsPage> component:
+
+    at PropertyDetailsPage (https://331c9cdc-a1e3-4369-9dda-5ae35b395e48-00-21ptexpix7co9.worf.replit.dev/src/pages/PropertyDetailsPage.tsx?t=1758180700294:48:18)
+    at RenderedRoute (https://331c9cdc-a1e3-4369-9dda-5ae35b395e48-00-21ptexpix7co9.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/react-router-dom.js?v=e3379111:4088:5)
+    at Routes (https://331c9cdc-a1e3-4369-9dda-5ae35b395e48-00-21ptexpix7co9.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/react-router-dom.js?v=e3379111:4558:5)
+    at div
+    at PropertyProvider (https://331c9cdc-a1e3-4369-9dda-5ae35b395e48-00-21ptexpix7co9.worf.replit.dev/src/contexts/PropertyContext.tsx:29:36)
+    at AuthProvider (https://331c9cdc-a1e3-4369-9dda-5ae35b395e48-00-21ptexpix7co9.worf.replit.dev/src/contexts/AuthContext.tsx:31:32)
+    at ToastProvider (https://331c9cdc-a1e3-4369-9dda-5ae35b395e48-00-21ptexpix7co9.worf.replit.dev/src/components/ui/Toast.tsx:32:3)
+    at QueryClientProvider (https://331c9cdc-a1e3-4369-9dda-5ae35b395e48-00-21ptexpix7co9.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=e3379111:2933:3)
+    at ErrorBoundary (https://331c9cdc-a1e3-4369-9dda-5ae35b395e48-00-21ptexpix7co9.worf.replit.dev/src/components/ui/ErrorBoundary.tsx:8:5)
+    at App
+    at QueryClientProvider (https://331c9cdc-a1e3-4369-9dda-5ae35b395e48-00-21ptexpix7co9.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=e3379111:2933:3)
+    at Router (https://331c9cdc-a1e3-4369-9dda-5ae35b395e48-00-21ptexpix7co9.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/react-router-dom.js?v=e3379111:4501:15)
+    at BrowserRouter (https://331c9cdc-a1e3-4369-9dda-5ae35b395e48-00-21ptexpix7co9.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/react-router-dom.js?v=e3379111:5247:5)
+
+React will try to recreate this component tree from scratch using the error boundary you provided, ErrorBoundary.
+logCapturedError @ chunk-WERSD76P.js?v=e3379111:14032
+callback @ chunk-WERSD76P.js?v=e3379111:14078
+callCallback @ chunk-WERSD76P.js?v=e3379111:11248
+commitUpdateQueue @ chunk-WERSD76P.js?v=e3379111:11265
+commitLayoutEffectOnFiber @ chunk-WERSD76P.js?v=e3379111:17075
+commitLayoutMountEffects_complete @ chunk-WERSD76P.js?v=e3379111:17980
+commitLayoutEffects_begin @ chunk-WERSD76P.js?v=e3379111:17969
+commitLayoutEffects @ chunk-WERSD76P.js?v=e3379111:17920
+commitRootImpl @ chunk-WERSD76P.js?v=e3379111:19353
+commitRoot @ chunk-WERSD76P.js?v=e3379111:19277
+finishConcurrentRender @ chunk-WERSD76P.js?v=e3379111:18760
+performConcurrentWorkOnRoot @ chunk-WERSD76P.js?v=e3379111:18718
+workLoop @ chunk-WERSD76P.js?v=e3379111:197
+flushWork @ chunk-WERSD76P.js?v=e3379111:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=e3379111:384Understand this error
+ErrorBoundary.tsx:30 ErrorBoundary caught an error: TypeError: Cannot read properties of null (reading 'length')
+    at PropertyDetailsPage (PropertyDetailsPage.tsx:212:38)
+    at renderWithHooks (chunk-WERSD76P.js?v=e3379111:11548:26)
+    at updateFunctionComponent (chunk-WERSD76P.js?v=e3379111:14582:28)
+    at beginWork (chunk-WERSD76P.js?v=e3379111:15924:22)
+    at beginWork$1 (chunk-WERSD76P.js?v=e3379111:19753:22)
+    at performUnitOfWork (chunk-WERSD76P.js?v=e3379111:19198:20)
+    at workLoopSync (chunk-WERSD76P.js?v=e3379111:19137:13)
+    at renderRootSync (chunk-WERSD76P.js?v=e3379111:19116:15)
+    at recoverFromConcurrentError (chunk-WERSD76P.js?v=e3379111:18736:28)
+    at performConcurrentWorkOnRoot (chunk-WERSD76P.js?v=e3379111:18684:30) Object
+componentDidCatch @ ErrorBoundary.tsx:30
+callback @ chunk-WERSD76P.js?v=e3379111:14084
+callCallback @ chunk-WERSD76P.js?v=e3379111:11248
+commitUpdateQueue @ chunk-WERSD76P.js?v=e3379111:11265
+commitLayoutEffectOnFiber @ chunk-WERSD76P.js?v=e3379111:17075
+commitLayoutMountEffects_complete @ chunk-WERSD76P.js?v=e3379111:17980
+commitLayoutEffects_begin @ chunk-WERSD76P.js?v=e3379111:17969
+commitLayoutEffects @ chunk-WERSD76P.js?v=e3379111:17920
+commitRootImpl @ chunk-WERSD76P.js?v=e3379111:19353
+commitRoot @ chunk-WERSD76P.js?v=e3379111:19277
+finishConcurrentRender @ chunk-WERSD76P.js?v=e3379111:18760
+performConcurrentWorkOnRoot @ chunk-WERSD76P.js?v=e3379111:18718
+workLoop @ chunk-WERSD76P.js?v=e3379111:197
+flushWork @ chunk-WERSD76P.js?v=e3379111:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=e3379111:384Understand this error
+analytics.ts:47 Analytics Event: Object
+analytics.ts:47 Analytics Event: Object
+2AuthContext.tsx:104 Auth check successful: cbadabili@gmail.com
+client:560 [vite] server connection lost. Polling for restart...
+/src/pages/PropertyDetailsPage.tsx?t=1758180896390:1  Failed to load resource: the server responded with a status of 502 (Bad Gateway)Understand this error
+/src/index.css?t=1758180896390&v=liilac19uhm:1  Failed to load resource: the server responded with a status of 502 (Bad Gateway)Understand this error
+client:176 [hmr] Failed to reload /src/pages/PropertyDetailsPage.tsx. This could be due to syntax errors or importing non-existent modules. (see errors above)
+warnFailedUpdate @ client:176
+fetchUpdate @ client:213Understand this error
+client:176 [hmr] Failed to reload /src/index.css?v=liilac19uhm. This could be due to syntax errors or importing non-existent modules. (see errors above)
+warnFailedUpdate @ client:176
+fetchUpdate @ client:213Understand this error
+331c9cdc-a1e3-4369-9dda-5ae35b395e48-00-21ptexpix7co9.worf.replit.dev/:1  Failed to load resource: the server responded with a status of 502 (Bad Gateway)Understand this error
+/favicon.ico:1  GET https://331c9cdc-a1e3-4369-9dda-5ae35b395e48-00-21ptexpix7co9.worf.replit.dev/favicon.ico 502 (Bad Gateway)Understand this error
+favicon.png:1  GET https://331c9cdc-a1e3-4369-9dda-5ae35b395e48-00-21ptexpix7co9.worf.replit.dev/favicon.png 502 (Bad Gateway)Understand this error
+favicon.ico:1  GET https://331c9cdc-a1e3-4369-9dda-5ae35b395e48-00-21ptexpix7co9.worf.replit.dev/favicon.ico 502 (Bad Gateway)Understand this error
+AuthContext.tsx:93 Checking auth with token: eyJhbGciOiJIUzI1NiIs...
+AuthContext.tsx:93 Checking auth with token: eyJhbGciOiJIUzI1NiIs...
+analytics.ts:37  POST https://331c9cdc-a1e3-4369-9dda-5ae35b395e48-00-21ptexpix7co9.worf.replit.dev/api/analytics/events 502 (Bad Gateway)
+sendEvent @ analytics.ts:37
+pageViewed @ analytics.ts:164
+(anonymous) @ PropertyDetailsPage.tsx:80
+commitHookEffectListMount @ chunk-WERSD76P.js?v=e3379111:16915
+commitPassiveMountOnFiber @ chunk-WERSD76P.js?v=e3379111:18156
+commitPassiveMountEffects_complete @ chunk-WERSD76P.js?v=e3379111:18129
+commitPassiveMountEffects_begin @ chunk-WERSD76P.js?v=e3379111:18119
+commitPassiveMountEffects @ chunk-WERSD76P.js?v=e3379111:18109
+flushPassiveEffectsImpl @ chunk-WERSD76P.js?v=e3379111:19490
+flushPassiveEffects @ chunk-WERSD76P.js?v=e3379111:19447
+commitRootImpl @ chunk-WERSD76P.js?v=e3379111:19416
+commitRoot @ chunk-WERSD76P.js?v=e3379111:19277
+performSyncWorkOnRoot @ chunk-WERSD76P.js?v=e3379111:18895
+flushSyncCallbacks @ chunk-WERSD76P.js?v=e3379111:9119
+(anonymous) @ chunk-WERSD76P.js?v=e3379111:18627Understand this error
+analytics.ts:47 Analytics Event: {event: 'page_viewed', properties: {…}, userId: '11', timestamp: 1758180971365, sessionId: 'cjdjir150zl72nkdiloec', …}
+analytics.ts:37  POST https://331c9cdc-a1e3-4369-9dda-5ae35b395e48-00-21ptexpix7co9.worf.replit.dev/api/analytics/events 502 (Bad Gateway)
+sendEvent @ analytics.ts:37
+pageViewed @ analytics.ts:164
+(anonymous) @ PropertyDetailsPage.tsx:80
+commitHookEffectListMount @ chunk-WERSD76P.js?v=e3379111:16915
+invokePassiveEffectMountInDEV @ chunk-WERSD76P.js?v=e3379111:18324
+invokeEffectsInDev @ chunk-WERSD76P.js?v=e3379111:19701
+commitDoubleInvokeEffectsInDEV @ chunk-WERSD76P.js?v=e3379111:19686
+flushPassiveEffectsImpl @ chunk-WERSD76P.js?v=e3379111:19503
+flushPassiveEffects @ chunk-WERSD76P.js?v=e3379111:19447
+commitRootImpl @ chunk-WERSD76P.js?v=e3379111:19416
+commitRoot @ chunk-WERSD76P.js?v=e3379111:19277
+performSyncWorkOnRoot @ chunk-WERSD76P.js?v=e3379111:18895
+flushSyncCallbacks @ chunk-WERSD76P.js?v=e3379111:9119
+(anonymous) @ chunk-WERSD76P.js?v=e3379111:18627Understand this error
+analytics.ts:47 Analytics Event: {event: 'page_viewed', properties: {…}, userId: '11', timestamp: 1758180971366, sessionId: 'cjdjir150zl72nkdiloec', …}
+PropertyDetailsPage.tsx:88  GET https://331c9cdc-a1e3-4369-9dda-5ae35b395e48-00-21ptexpix7co9.worf.replit.dev/api/properties/36 502 (Bad Gateway)
+fetchProperty @ PropertyDetailsPage.tsx:88
+(anonymous) @ PropertyDetailsPage.tsx:78
+commitHookEffectListMount @ chunk-WERSD76P.js?v=e3379111:16915
+commitPassiveMountOnFiber @ chunk-WERSD76P.js?v=e3379111:18156
+commitPassiveMountEffects_complete @ chunk-WERSD76P.js?v=e3379111:18129
+commitPassiveMountEffects_begin @ chunk-WERSD76P.js?v=e3379111:18119
+commitPassiveMountEffects @ chunk-WERSD76P.js?v=e3379111:18109
+flushPassiveEffectsImpl @ chunk-WERSD76P.js?v=e3379111:19490
+flushPassiveEffects @ chunk-WERSD76P.js?v=e3379111:19447
+commitRootImpl @ chunk-WERSD76P.js?v=e3379111:19416
+commitRoot @ chunk-WERSD76P.js?v=e3379111:19277
+performSyncWorkOnRoot @ chunk-WERSD76P.js?v=e3379111:18895
+flushSyncCallbacks @ chunk-WERSD76P.js?v=e3379111:9119
+(anonymous) @ chunk-WERSD76P.js?v=e3379111:18627Understand this error
+queryClient.ts:49  GET https://331c9cdc-a1e3-4369-9dda-5ae35b395e48-00-21ptexpix7co9.worf.replit.dev/api/auth/user 502 (Bad Gateway)
+apiRequest @ queryClient.ts:49
+checkAuth @ AuthContext.tsx:96
+(anonymous) @ AuthContext.tsx:133
+commitHookEffectListMount @ chunk-WERSD76P.js?v=e3379111:16915
+commitPassiveMountOnFiber @ chunk-WERSD76P.js?v=e3379111:18156
+commitPassiveMountEffects_complete @ chunk-WERSD76P.js?v=e3379111:18129
+commitPassiveMountEffects_begin @ chunk-WERSD76P.js?v=e3379111:18119
+commitPassiveMountEffects @ chunk-WERSD76P.js?v=e3379111:18109
+flushPassiveEffectsImpl @ chunk-WERSD76P.js?v=e3379111:19490
+flushPassiveEffects @ chunk-WERSD76P.js?v=e3379111:19447
+commitRootImpl @ chunk-WERSD76P.js?v=e3379111:19416
+commitRoot @ chunk-WERSD76P.js?v=e3379111:19277
+performSyncWorkOnRoot @ chunk-WERSD76P.js?v=e3379111:18895
+flushSyncCallbacks @ chunk-WERSD76P.js?v=e3379111:9119
+(anonymous) @ chunk-WERSD76P.js?v=e3379111:18627Understand this error
+AuthContext.tsx:114 Auth check failed: Error: <!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>Hmm... We couldn&#39;t reach this app</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans">
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #1c2333;
+      font-family: "IBM Plex Sans", "sans";
+      color: #f5f9fc;
+    }
+
+    .title-box {
+      font-size: 12px;
+      inline-size: max-content;
+      max-width: 100%;
+    }
+
+    .description-box {
+      font-size: 10px;
+      inline-size: max-content;
+      max-width: 100%;
+    }
+
+    .err-box {
+      padding: 1em;
+      width: 100vw;
+      max-width: 100vw;
+      overflow: hidden;
+    }
+
+    .message {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .ascii {
+      font-size: 6px;
+      text-align: center;
+      opacity: .8;
+    }
+
+    .eval-bot {
+      margin: 4em;
+    }
+
+    @media (max-width: 500px) {
+      .title-box {
+        font-size: 10px;
+      }
+
+      .description-box {
+        font-size: 8px;
+      }
+
+      .eval-bot {
+        margin: 1em;
+      }
+
+      .eval-bot svg {
+        width: 200px;
+      }
+
+      .message {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .repl-links {
+        font-size: 14px;
+      }
+    }
+
+    .console {
+      background-color: #0e1628;
+      color: #fff;
+      font-family: "IBM Plex Sans", "sans";
+      padding: 1em;
+      margin: 1em;
+    }
+
+    .footer-item {
+      margin: 1em;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .link-icon {
+      margin-right: 8px;
+      margin-top: 4px;
+    }
+
+    a {
+      color: #c2c8cc;
+    }
+  </style>
+
+  <script>
+    var reload_timeout = setTimeout(function () {
+      window.location.reload();
+    }, 60000);
+  </script>
+</head>
+
+<body>
+  <div class="err-box">
+    <div class="message">
+      <div class="eval-bot">
+        <pre class="ascii">
+                                  :::.                                                    
+                                :+++***++:..                                              
+                      :-=+=..:-=+**=======---:                                            
+                     -+++****+====-::-=====-::. ..   ..       ::                          
+                    .=++++++=::----------::-::::::--------===--:.:::::.                   
+                   :--==+++=-::----------======----------:-===-:::::::.                   
+                   ::--==+++-----=+++=+++++====----======--==------::                     
+                  ::::-====+++++++*************+==========---------::..                   
+                 ..:::---==++*****************+++++++++=------------:::::..               
+                ....:::-=+**********************++++++=--==========--:.....               
+                 ..:::-++*********+**************+++++++--+***++++==:      .::..          
+                :=+*+=+++****++==+++*+++++++***+++++++++***********+=. .::-====-::--:     
+             .:-=++=====+++*++====++++++++++++++++++=+++*************+=======++++==--.    
+           .--==-----=====++=============+=+++=====++++****************+=+=========--:.   
+     . .  :--====------=======--==========+++=====++++****+*****+****++===------====-.    
+  ...::::::::---====----------::::::-----========++++++++++***++++++++===--:::::-----.    
+   ...::::::..:::::---::::::::::...::::::::-----=++++++++++****+++++++===-:::::::::---:   
+      .::::.....:::::::::::................:::::=++++++++++*****++++++=====---:::::---::. 
+         ......   .........     ...............::=+==++++++++++++++============-----::...:
+                                    ........::---===-===============------=---:::::::::...
+                                    .......................::::::::---------:.   ..       
+                                            ....................::::::--:::::.            
+                                                             ...........                  
+                                                                                          
+          </pre>
+      </div>
+      <div class="title-box">
+        <h1>Hmm... We couldn&#39;t reach this app</h1>
+      </div>
+      <div class="description-box">
+        <h2>Make sure this app has a port open and is ready to receive HTTP traffic.</h2>
+      </div>
+    </div>
+    
+    <div>
+      <div class="footer-item">
+        <div class="link-icon">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M6.66668 8.66666C6.95298 9.04942 7.31825 9.36612 7.73771 9.59529C8.15717 9.82446 8.62102 9.96074 9.09778 9.99489C9.57454 10.029 10.0531 9.96024 10.5009 9.79319C10.9487 9.62613 11.3554 9.36471 11.6933 9.02666L13.6933 7.02666C14.3005 6.39799 14.6365 5.55598 14.6289 4.68199C14.6213 3.808 14.2708 2.97196 13.6527 2.35394C13.0347 1.73591 12.1987 1.38535 11.3247 1.37775C10.4507 1.37016 9.60869 1.70614 8.98001 2.31333L7.83334 3.45333M9.33334 7.33333C9.04704 6.95058 8.68177 6.63388 8.26231 6.4047C7.84285 6.17553 7.37901 6.03925 6.90224 6.00511C6.42548 5.97096 5.94695 6.03975 5.49911 6.20681C5.05128 6.37387 4.6446 6.63528 4.30668 6.97333L2.30668 8.97333C1.69948 9.602 1.3635 10.444 1.3711 11.318C1.37869 12.192 1.72926 13.028 2.34728 13.6461C2.96531 14.2641 3.80135 14.6147 4.67534 14.6222C5.54933 14.6298 6.39134 14.2939 7.02001 13.6867L8.16001 12.5467"
+              stroke="#C2C8CC" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </div>
+        <div class="repl-links">
+          <a href="https://replit.com">Go to Replit</a>
+        </div>
+      </div>
+
+      <div class="footer-item">
+        <div class="link-icon">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M6.66668 8.66666C6.95298 9.04942 7.31825 9.36612 7.73771 9.59529C8.15717 9.82446 8.62102 9.96074 9.09778 9.99489C9.57454 10.029 10.0531 9.96024 10.5009 9.79319C10.9487 9.62613 11.3554 9.36471 11.6933 9.02666L13.6933 7.02666C14.3005 6.39799 14.6365 5.55598 14.6289 4.68199C14.6213 3.808 14.2708 2.97196 13.6527 2.35394C13.0347 1.73591 12.1987 1.38535 11.3247 1.37775C10.4507 1.37016 9.60869 1.70614 8.98001 2.31333L7.83334 3.45333M9.33334 7.33333C9.04704 6.95058 8.68177 6.63388 8.26231 6.4047C7.84285 6.17553 7.37901 6.03925 6.90224 6.00511C6.42548 5.97096 5.94695 6.03975 5.49911 6.20681C5.05128 6.37387 4.6446 6.63528 4.30668 6.97333L2.30668 8.97333C1.69948 9.602 1.3635 10.444 1.3711 11.318C1.37869 12.192 1.72926 13.028 2.34728 13.6461C2.96531 14.2641 3.80135 14.6147 4.67534 14.6222C5.54933 14.6298 6.39134 14.2939 7.02001 13.6867L8.16001 12.5467"
+              stroke="#C2C8CC" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </div>
+        <div class="repl-links">
+          <a href="https://replit.com/site/hosting">Learn more about hosting on Replit</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>
+
+    at apiRequest (queryClient.ts:69:11)
+    at async checkAuth (AuthContext.tsx:96:26)
+checkAuth @ AuthContext.tsx:114
+await in checkAuth
+(anonymous) @ AuthContext.tsx:133
+commitHookEffectListMount @ chunk-WERSD76P.js?v=e3379111:16915
+commitPassiveMountOnFiber @ chunk-WERSD76P.js?v=e3379111:18156
+commitPassiveMountEffects_complete @ chunk-WERSD76P.js?v=e3379111:18129
+commitPassiveMountEffects_begin @ chunk-WERSD76P.js?v=e3379111:18119
+commitPassiveMountEffects @ chunk-WERSD76P.js?v=e3379111:18109
+flushPassiveEffectsImpl @ chunk-WERSD76P.js?v=e3379111:19490
+flushPassiveEffects @ chunk-WERSD76P.js?v=e3379111:19447
+commitRootImpl @ chunk-WERSD76P.js?v=e3379111:19416
+commitRoot @ chunk-WERSD76P.js?v=e3379111:19277
+performSyncWorkOnRoot @ chunk-WERSD76P.js?v=e3379111:18895
+flushSyncCallbacks @ chunk-WERSD76P.js?v=e3379111:9119
+(anonymous) @ chunk-WERSD76P.js?v=e3379111:18627Understand this error
+AuthContext.tsx:125 Auth check failed due to network/other error, keeping token
+logo.png:1  GET https://331c9cdc-a1e3-4369-9dda-5ae35b395e48-00-21ptexpix7co9.worf.replit.dev/logo.png 502 (Bad Gateway)
+Image
+commitMount @ chunk-WERSD76P.js?v=e3379111:8412
+commitLayoutEffectOnFiber @ chunk-WERSD76P.js?v=e3379111:17102
+commitLayoutMountEffects_complete @ chunk-WERSD76P.js?v=e3379111:17980
+commitLayoutEffects_begin @ chunk-WERSD76P.js?v=e3379111:17969
+commitLayoutEffects @ chunk-WERSD76P.js?v=e3379111:17920
+commitRootImpl @ chunk-WERSD76P.js?v=e3379111:19353
+commitRoot @ chunk-WERSD76P.js?v=e3379111:19277
+performSyncWorkOnRoot @ chunk-WERSD76P.js?v=e3379111:18895
+flushSyncCallbacks @ chunk-WERSD76P.js?v=e3379111:9119
+(anonymous) @ chunk-WERSD76P.js?v=e3379111:18627Understand this error
+Navbar.tsx:60 Logo failed to load from /logo.png
+onError @ Navbar.tsx:60
+callCallback2 @ chunk-WERSD76P.js?v=e3379111:3674
+invokeGuardedCallbackDev @ chunk-WERSD76P.js?v=e3379111:3699
+invokeGuardedCallback @ chunk-WERSD76P.js?v=e3379111:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-WERSD76P.js?v=e3379111:3736
+executeDispatch @ chunk-WERSD76P.js?v=e3379111:7014
+processDispatchQueueItemsInOrder @ chunk-WERSD76P.js?v=e3379111:7034
+processDispatchQueue @ chunk-WERSD76P.js?v=e3379111:7043
+dispatchEventsForPlugins @ chunk-WERSD76P.js?v=e3379111:7051
+(anonymous) @ chunk-WERSD76P.js?v=e3379111:7174
+batchedUpdates$1 @ chunk-WERSD76P.js?v=e3379111:18913
+batchedUpdates @ chunk-WERSD76P.js?v=e3379111:3579
+dispatchEventForPluginEventSystem @ chunk-WERSD76P.js?v=e3379111:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-WERSD76P.js?v=e3379111:5478
+dispatchEvent @ chunk-WERSD76P.js?v=e3379111:5472Understand this error
+PropertyDetailsPage.tsx:88  GET https://331c9cdc-a1e3-4369-9dda-5ae35b395e48-00-21ptexpix7co9.worf.replit.dev/api/properties/36 502 (Bad Gateway)
+fetchProperty @ PropertyDetailsPage.tsx:88
+(anonymous) @ PropertyDetailsPage.tsx:78
+commitHookEffectListMount @ chunk-WERSD76P.js?v=e3379111:16915
+invokePassiveEffectMountInDEV @ chunk-WERSD76P.js?v=e3379111:18324
+invokeEffectsInDev @ chunk-WERSD76P.js?v=e3379111:19701
+commitDoubleInvokeEffectsInDEV @ chunk-WERSD76P.js?v=e3379111:19686
+flushPassiveEffectsImpl @ chunk-WERSD76P.js?v=e3379111:19503
+flushPassiveEffects @ chunk-WERSD76P.js?v=e3379111:19447
+commitRootImpl @ chunk-WERSD76P.js?v=e3379111:19416
+commitRoot @ chunk-WERSD76P.js?v=e3379111:19277
+performSyncWorkOnRoot @ chunk-WERSD76P.js?v=e3379111:18895
+flushSyncCallbacks @ chunk-WERSD76P.js?v=e3379111:9119
+(anonymous) @ chunk-WERSD76P.js?v=e3379111:18627Understand this error
+queryClient.ts:49  GET https://331c9cdc-a1e3-4369-9dda-5ae35b395e48-00-21ptexpix7co9.worf.replit.dev/api/auth/user 502 (Bad Gateway)
+apiRequest @ queryClient.ts:49
+checkAuth @ AuthContext.tsx:96
+(anonymous) @ AuthContext.tsx:133
+commitHookEffectListMount @ chunk-WERSD76P.js?v=e3379111:16915
+invokePassiveEffectMountInDEV @ chunk-WERSD76P.js?v=e3379111:18324
+invokeEffectsInDev @ chunk-WERSD76P.js?v=e3379111:19701
+commitDoubleInvokeEffectsInDEV @ chunk-WERSD76P.js?v=e3379111:19686
+flushPassiveEffectsImpl @ chunk-WERSD76P.js?v=e3379111:19503
+flushPassiveEffects @ chunk-WERSD76P.js?v=e3379111:19447
+commitRootImpl @ chunk-WERSD76P.js?v=e3379111:19416
+commitRoot @ chunk-WERSD76P.js?v=e3379111:19277
+performSyncWorkOnRoot @ chunk-WERSD76P.js?v=e3379111:18895
+flushSyncCallbacks @ chunk-WERSD76P.js?v=e3379111:9119
+(anonymous) @ chunk-WERSD76P.js?v=e3379111:18627Understand this error
+AuthContext.tsx:114 Auth check failed: Error: <!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>Hmm... We couldn&#39;t reach this app</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=IBM+Plex+Sans">
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #1c2333;
+      font-family: "IBM Plex Sans", "sans";
+      color: #f5f9fc;
+    }
+
+    .title-box {
+      font-size: 12px;
+      inline-size: max-content;
+      max-width: 100%;
+    }
+
+    .description-box {
+      font-size: 10px;
+      inline-size: max-content;
+      max-width: 100%;
+    }
+
+    .err-box {
+      padding: 1em;
+      width: 100vw;
+      max-width: 100vw;
+      overflow: hidden;
+    }
+
+    .message {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .ascii {
+      font-size: 6px;
+      text-align: center;
+      opacity: .8;
+    }
+
+    .eval-bot {
+      margin: 4em;
+    }
+
+    @media (max-width: 500px) {
+      .title-box {
+        font-size: 10px;
+      }
+
+      .description-box {
+        font-size: 8px;
+      }
+
+      .eval-bot {
+        margin: 1em;
+      }
+
+      .eval-bot svg {
+        width: 200px;
+      }
+
+      .message {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .repl-links {
+        font-size: 14px;
+      }
+    }
+
+    .console {
+      background-color: #0e1628;
+      color: #fff;
+      font-family: "IBM Plex Sans", "sans";
+      padding: 1em;
+      margin: 1em;
+    }
+
+    .footer-item {
+      margin: 1em;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .link-icon {
+      margin-right: 8px;
+      margin-top: 4px;
+    }
+
+    a {
+      color: #c2c8cc;
+    }
+  </style>
+
+  <script>
+    var reload_timeout = setTimeout(function () {
+      window.location.reload();
+    }, 60000);
+  </script>
+</head>
+
+<body>
+  <div class="err-box">
+    <div class="message">
+      <div class="eval-bot">
+        <pre class="ascii">
+                                  :::.                                                    
+                                :+++***++:..                                              
+                      :-=+=..:-=+**=======---:                                            
+                     -+++****+====-::-=====-::. ..   ..       ::                          
+                    .=++++++=::----------::-::::::--------===--:.:::::.                   
+                   :--==+++=-::----------======----------:-===-:::::::.                   
+                   ::--==+++-----=+++=+++++====----======--==------::                     
+                  ::::-====+++++++*************+==========---------::..                   
+                 ..:::---==++*****************+++++++++=------------:::::..               
+                ....:::-=+**********************++++++=--==========--:.....               
+                 ..:::-++*********+**************+++++++--+***++++==:      .::..          
+                :=+*+=+++****++==+++*+++++++***+++++++++***********+=. .::-====-::--:     
+             .:-=++=====+++*++====++++++++++++++++++=+++*************+=======++++==--.    
+           .--==-----=====++=============+=+++=====++++****************+=+=========--:.   
+     . .  :--====------=======--==========+++=====++++****+*****+****++===------====-.    
+  ...::::::::---====----------::::::-----========++++++++++***++++++++===--:::::-----.    
+   ...::::::..:::::---::::::::::...::::::::-----=++++++++++****+++++++===-:::::::::---:   
+      .::::.....:::::::::::................:::::=++++++++++*****++++++=====---:::::---::. 
+         ......   .........     ...............::=+==++++++++++++++============-----::...:
+                                    ........::---===-===============------=---:::::::::...
+                                    .......................::::::::---------:.   ..       
+                                            ....................::::::--:::::.            
+                                                             ...........                  
+                                                                                          
+          </pre>
+      </div>
+      <div class="title-box">
+        <h1>Hmm... We couldn&#39;t reach this app</h1>
+      </div>
+      <div class="description-box">
+        <h2>Make sure this app has a port open and is ready to receive HTTP traffic.</h2>
+      </div>
+    </div>
+    
+    <div>
+      <div class="footer-item">
+        <div class="link-icon">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M6.66668 8.66666C6.95298 9.04942 7.31825 9.36612 7.73771 9.59529C8.15717 9.82446 8.62102 9.96074 9.09778 9.99489C9.57454 10.029 10.0531 9.96024 10.5009 9.79319C10.9487 9.62613 11.3554 9.36471 11.6933 9.02666L13.6933 7.02666C14.3005 6.39799 14.6365 5.55598 14.6289 4.68199C14.6213 3.808 14.2708 2.97196 13.6527 2.35394C13.0347 1.73591 12.1987 1.38535 11.3247 1.37775C10.4507 1.37016 9.60869 1.70614 8.98001 2.31333L7.83334 3.45333M9.33334 7.33333C9.04704 6.95058 8.68177 6.63388 8.26231 6.4047C7.84285 6.17553 7.37901 6.03925 6.90224 6.00511C6.42548 5.97096 5.94695 6.03975 5.49911 6.20681C5.05128 6.37387 4.6446 6.63528 4.30668 6.97333L2.30668 8.97333C1.69948 9.602 1.3635 10.444 1.3711 11.318C1.37869 12.192 1.72926 13.028 2.34728 13.6461C2.96531 14.2641 3.80135 14.6147 4.67534 14.6222C5.54933 14.6298 6.39134 14.2939 7.02001 13.6867L8.16001 12.5467"
+              stroke="#C2C8CC" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </div>
+        <div class="repl-links">
+          <a href="https://replit.com">Go to Replit</a>
+        </div>
+      </div>
+
+      <div class="footer-item">
+        <div class="link-icon">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M6.66668 8.66666C6.95298 9.04942 7.31825 9.36612 7.73771 9.59529C8.15717 9.82446 8.62102 9.96074 9.09778 9.99489C9.57454 10.029 10.0531 9.96024 10.5009 9.79319C10.9487 9.62613 11.3554 9.36471 11.6933 9.02666L13.6933 7.02666C14.3005 6.39799 14.6365 5.55598 14.6289 4.68199C14.6213 3.808 14.2708 2.97196 13.6527 2.35394C13.0347 1.73591 12.1987 1.38535 11.3247 1.37775C10.4507 1.37016 9.60869 1.70614 8.98001 2.31333L7.83334 3.45333M9.33334 7.33333C9.04704 6.95058 8.68177 6.63388 8.26231 6.4047C7.84285 6.17553 7.37901 6.03925 6.90224 6.00511C6.42548 5.97096 5.94695 6.03975 5.49911 6.20681C5.05128 6.37387 4.6446 6.63528 4.30668 6.97333L2.30668 8.97333C1.69948 9.602 1.3635 10.444 1.3711 11.318C1.37869 12.192 1.72926 13.028 2.34728 13.6461C2.96531 14.2641 3.80135 14.6147 4.67534 14.6222C5.54933 14.6298 6.39134 14.2939 7.02001 13.6867L8.16001 12.5467"
+              stroke="#C2C8CC" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </div>
+        <div class="repl-links">
+          <a href="https://replit.com/site/hosting">Learn more about hosting on Replit</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>
+
+    at apiRequest (queryClient.ts:69:11)
+    at async checkAuth (AuthContext.tsx:96:26)
+checkAuth @ AuthContext.tsx:114
+await in checkAuth
+(anonymous) @ AuthContext.tsx:133
+commitHookEffectListMount @ chunk-WERSD76P.js?v=e3379111:16915
+invokePassiveEffectMountInDEV @ chunk-WERSD76P.js?v=e3379111:18324
+invokeEffectsInDev @ chunk-WERSD76P.js?v=e3379111:19701
+commitDoubleInvokeEffectsInDEV @ chunk-WERSD76P.js?v=e3379111:19686
+flushPassiveEffectsImpl @ chunk-WERSD76P.js?v=e3379111:19503
+flushPassiveEffects @ chunk-WERSD76P.js?v=e3379111:19447
+commitRootImpl @ chunk-WERSD76P.js?v=e3379111:19416
+commitRoot @ chunk-WERSD76P.js?v=e3379111:19277
+performSyncWorkOnRoot @ chunk-WERSD76P.js?v=e3379111:18895
+flushSyncCallbacks @ chunk-WERSD76P.js?v=e3379111:9119
+(anonymous) @ chunk-WERSD76P.js?v=e3379111:18627Understand this error
+AuthContext.tsx:125 Auth check failed due to network/other error, keeping token
+PropertySearchPage.tsx:75 Fetching with params: minPrice=0&maxPrice=5000000&sortBy=newest&status=active
+PropertySearchPage.tsx:75 Fetching with params: minPrice=0&maxPrice=5000000&sortBy=newest&status=active
+favicon.ico:1  GET https://331c9cdc-a1e3-4369-9dda-5ae35b395e48-00-21ptexpix7co9.worf.replit.dev/favicon.ico 502 (Bad Gateway)Understand this error
+PropertySearchPage.tsx:77  GET https://331c9cdc-a1e3-4369-9dda-5ae35b395e48-00-21ptexpix7co9.worf.replit.dev/api/properties?minPrice=0&maxPrice=5000000&sortBy=newest&status=active 502 (Bad Gateway)
+(anonymous) @ PropertySearchPage.tsx:77
+(anonymous) @ PropertySearchPage.tsx:99
+commitHookEffectListMount @ chunk-WERSD76P.js?v=e3379111:16915
+commitPassiveMountOnFiber @ chunk-WERSD76P.js?v=e3379111:18156
+commitPassiveMountEffects_complete @ chunk-WERSD76P.js?v=e3379111:18129
+commitPassiveMountEffects_begin @ chunk-WERSD76P.js?v=e3379111:18119
+commitPassiveMountEffects @ chunk-WERSD76P.js?v=e3379111:18109
+flushPassiveEffectsImpl @ chunk-WERSD76P.js?v=e3379111:19490
+flushPassiveEffects @ chunk-WERSD76P.js?v=e3379111:19447
+(anonymous) @ chunk-WERSD76P.js?v=e3379111:19328
+workLoop @ chunk-WERSD76P.js?v=e3379111:197
+flushWork @ chunk-WERSD76P.js?v=e3379111:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=e3379111:384Understand this error
+PropertySearchPage.tsx:84 Search request failed: 502 Bad Gateway
+(anonymous) @ PropertySearchPage.tsx:84
+await in (anonymous)
+(anonymous) @ PropertySearchPage.tsx:99
+commitHookEffectListMount @ chunk-WERSD76P.js?v=e3379111:16915
+commitPassiveMountOnFiber @ chunk-WERSD76P.js?v=e3379111:18156
+commitPassiveMountEffects_complete @ chunk-WERSD76P.js?v=e3379111:18129
+commitPassiveMountEffects_begin @ chunk-WERSD76P.js?v=e3379111:18119
+commitPassiveMountEffects @ chunk-WERSD76P.js?v=e3379111:18109
+flushPassiveEffectsImpl @ chunk-WERSD76P.js?v=e3379111:19490
+flushPassiveEffects @ chunk-WERSD76P.js?v=e3379111:19447
+(anonymous) @ chunk-WERSD76P.js?v=e3379111:19328
+workLoop @ chunk-WERSD76P.js?v=e3379111:197
+flushWork @ chunk-WERSD76P.js?v=e3379111:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=e3379111:384Understand this error
+favicon.png:1  GET https://331c9cdc-a1e3-4369-9dda-5ae35b395e48-00-21ptexpix7co9.worf.replit.dev/favicon.png 502 (Bad Gateway)Understand this error
+PropertySearchPage.tsx:77  GET https://331c9cdc-a1e3-4369-9dda-5ae35b395e48-00-21ptexpix7co9.worf.replit.dev/api/properties?minPrice=0&maxPrice=5000000&sortBy=newest&status=active 502 (Bad Gateway)
+(anonymous) @ PropertySearchPage.tsx:77
+(anonymous) @ PropertySearchPage.tsx:99
+commitHookEffectListMount @ chunk-WERSD76P.js?v=e3379111:16915
+invokePassiveEffectMountInDEV @ chunk-WERSD76P.js?v=e3379111:18324
+invokeEffectsInDev @ chunk-WERSD76P.js?v=e3379111:19701
+commitDoubleInvokeEffectsInDEV @ chunk-WERSD76P.js?v=e3379111:19686
+flushPassiveEffectsImpl @ chunk-WERSD76P.js?v=e3379111:19503
+flushPassiveEffects @ chunk-WERSD76P.js?v=e3379111:19447
+(anonymous) @ chunk-WERSD76P.js?v=e3379111:19328
+workLoop @ chunk-WERSD76P.js?v=e3379111:197
+flushWork @ chunk-WERSD76P.js?v=e3379111:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=e3379111:384Understand this error
+PropertySearchPage.tsx:84 Search request failed: 502 Bad Gateway
+(anonymous) @ PropertySearchPage.tsx:84
+await in (anonymous)
+(anonymous) @ PropertySearchPage.tsx:99
+commitHookEffectListMount @ chunk-WERSD76P.js?v=e3379111:16915
+invokePassiveEffectMountInDEV @ chunk-WERSD76P.js?v=e3379111:18324
+invokeEffectsInDev @ chunk-WERSD76P.js?v=e3379111:19701
+commitDoubleInvokeEffectsInDEV @ chunk-WERSD76P.js?v=e3379111:19686
+flushPassiveEffectsImpl @ chunk-WERSD76P.js?v=e3379111:19503
+flushPassiveEffects @ chunk-WERSD76P.js?v=e3379111:19447
+(anonymous) @ chunk-WERSD76P.js?v=e3379111:19328
+workLoop @ chunk-WERSD76P.js?v=e3379111:197
+flushWork @ chunk-WERSD76P.js?v=e3379111:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=e3379111:384Understand this error
+favicon.ico:1  GET https://331c9cdc-a1e3-4369-9dda-5ae35b395e48-00-21ptexpix7co9.worf.replit.dev/favicon.ico 502 (Bad Gateway)
