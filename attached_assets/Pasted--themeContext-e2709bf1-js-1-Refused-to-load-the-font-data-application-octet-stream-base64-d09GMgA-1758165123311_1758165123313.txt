@@ -1,0 +1,131 @@
+﻿
+themeContext-e2709bf1.js:1 Refused to load the font 'data:application/octet-stream;base64,d09GMgABAAAAAPUcABQAAAACTcwAAPSkAAEAAA…r3zqxQx5sHWbEultwddsQ7gWDpUOmv8Aac8LoRJi5v392WymSrIA9fVxzjXy7wQHo/ZuwCHBIO' because it violates the following Content Security Policy directive: "default-src 'self'". Note that 'font-src' was not explicitly set, so 'default-src' is used as a fallback.
+
+create-listing:1 Refused to load the script 'https://replit.com/public/js/replit-dev-banner.js' because it violates the following Content Security Policy directive: "script-src 'self' 'unsafe-inline' 'unsafe-eval'". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback.
+chunk-WERSD76P.js?v=84a76bc7:21551 Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+AuthContext.tsx:91 Checking auth with token: eyJhbGciOiJIUzI1NiIs...
+queryClient.ts:60 API Request: GET /api/auth/user
+AuthContext.tsx:91 Checking auth with token: eyJhbGciOiJIUzI1NiIs...
+queryClient.ts:60 API Request: GET /api/auth/user
+queryClient.ts:70 API Response status: 200
+queryClient.ts:95 API Response data received
+AuthContext.tsx:102 Auth check successful: cbadabili@gmail.com
+queryClient.ts:70 API Response status: 200
+queryClient.ts:95 API Response data received
+AuthContext.tsx:102 Auth check successful: cbadabili@gmail.com
+2
+DashboardPage.tsx:361 Fetching dashboard stats...
+DashboardPage.tsx:376 Dashboard stats received: 
+Object
+DashboardPage.tsx:376 Dashboard stats received: 
+Object
+2
+PropertySearchPage.tsx:75 Fetching with params: minPrice=0&maxPrice=5000000&sortBy=newest&status=active
+2
+PropertySearchPage.tsx:80 Received properties: 8
+PropertySearchPage.tsx:136 Fetching with params: location=Francistown&minPrice=0&maxPrice=5000000&sortBy=newest&status=active
+PropertySearchPage.tsx:75 Fetching with params: minPrice=0&maxPrice=5000000&sortBy=newest&status=active
+PropertySearchPage.tsx:16 Analytics: Search Performed 
+Object
+PropertySearchPage.tsx:80 Received properties: 8
+2
+DashboardPage.tsx:361 Fetching dashboard stats...
+DashboardPage.tsx:376 Dashboard stats received: 
+Object
+DashboardPage.tsx:376 Dashboard stats received: 
+Object
+2
+PropertySearchPage.tsx:75 Fetching with params: minPrice=0&maxPrice=5000000&sortBy=newest&status=active
+2
+PropertySearchPage.tsx:80 Received properties: 8
+queryClient.ts:51 Adding auth header with token: eyJhbGciOiJIUzI1NiIs...
+queryClient.ts:60 API Request: GET /api/dashboard/stats
+queryClient.ts:51 Adding auth header with token: eyJhbGciOiJIUzI1NiIs...
+queryClient.ts:60 API Request: GET /api/users/11/saved-properties
+queryClient.ts:51 Adding auth header with token: eyJhbGciOiJIUzI1NiIs...
+queryClient.ts:60 API Request: GET /api/dashboard/stats
+queryClient.ts:51 Adding auth header with token: eyJhbGciOiJIUzI1NiIs...
+queryClient.ts:60 API Request: GET /api/users/11/saved-properties
+api/users/11/saved-properties:1 
+ Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+queryClient.ts:70 API Response status: 500
+queryClient.ts:76 API Error Response: 
+Object
+queryClient.ts:89 API Error: 
+Object
+ProfilePage.tsx:58 Failed to fetch saved properties: Error: Failed to fetch saved properties
+    at apiRequest (queryClient.ts:90:11)
+    at async fetchSavedProperties (ProfilePage.tsx:55:24)
+queryClient.ts:70 API Response status: 200
+queryClient.ts:95 API Response data received
+api/users/11/saved-properties:1 
+ Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+queryClient.ts:70 API Response status: 500
+queryClient.ts:76 API Error Response: 
+Object
+queryClient.ts:89 API Error: 
+Object
+ProfilePage.tsx:58 Failed to fetch saved properties: Error: Failed to fetch saved properties
+    at apiRequest (queryClient.ts:90:11)
+    at async fetchSavedProperties (ProfilePage.tsx:55:24)
+queryClient.ts:70 API Response status: 200
+queryClient.ts:95 API Response data received
+13
+Refused to create a worker from 'blob:<URL>' because it violates the following Content Security Policy directive: "script-src 'self' 'unsafe-inline' 'unsafe-eval' <URL> <URL>". Note that 'worker-src' was not explicitly set, so 'script-src' is used as a fallback.
+client:560 [vite] server connection lost. Polling for restart...
+331c9cdc-a1e3-4369-9….worf.replit.dev/:1 
+ Failed to load resource: the server responded with a status of 502 (Bad Gateway)
+favicon.ico:1 
+ Failed to load resource: the server responded with a status of 502 (Bad Gateway)
+favicon.png:1 
+ Failed to load resource: the server responded with a status of 502 (Bad Gateway)
+favicon.ico:1 
+ Failed to load resource: the server responded with a status of 502 (Bad Gateway)
+CreateListingPage.tsx:215 Form submitted: 
+Object
+CreateListingPage.tsx:248 Transformed property data: 
+Object
+api/properties:1 
+ Failed to load resource: the server responded with a status of 502 (Bad Gateway)
+CreateListingPage.tsx:278 Error creating property: Error: Failed to create property listing
+    at onSubmit (CreateListingPage.tsx:259:15)
+CreateListingPage.tsx:215 Form submitted: 
+Object
+CreateListingPage.tsx:248 Transformed property data: 
+Object
+api/properties:1 
+ Failed to load resource: the server responded with a status of 502 (Bad Gateway)
+CreateListingPage.tsx:278 Error creating property: Error: Failed to create property listing
+    at onSubmit (CreateListingPage.tsx:259:15)
+CreateListingPage.tsx:215 Form submitted: 
+Object
+CreateListingPage.tsx:248 Transformed property data: 
+Object
+api/properties:1 
+ Failed to load resource: the server responded with a status of 502 (Bad Gateway)
+CreateListingPage.tsx:278 Error creating property: Error: Failed to create property listing
+    at onSubmit (CreateListingPage.tsx:259:15)
+CreateListingPage.tsx:215 Form submitted: 
+Object
+CreateListingPage.tsx:248 Transformed property data: 
+Object
+api/properties:1 
+ Failed to load resource: the server responded with a status of 502 (Bad Gateway)
+CreateListingPage.tsx:278 Error creating property: Error: Failed to create property listing
+    at onSubmit (CreateListingPage.tsx:259:15)
+CreateListingPage.tsx:215 Form submitted: 
+Object
+CreateListingPage.tsx:248 Transformed property data: 
+Object
+api/properties:1 
+ Failed to load resource: the server responded with a status of 401 (Unauthorized)
+CreateListingPage.tsx:278 Error creating property: Error: Failed to create property listing
+    at onSubmit (CreateListingPage.tsx:259:15)
+CreateListingPage.tsx:215 Form submitted: 
+Object
+CreateListingPage.tsx:248 Transformed property data: 
+Object
+api/properties:1 
+ Failed to load resource: the server responded with a status of 401 (Unauthorized)
+CreateListingPage.tsx:278 Error creating property: Error: Failed to create property listing
+    at onSubmit (CreateListingPage.tsx:259:15)
