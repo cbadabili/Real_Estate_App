@@ -1,0 +1,338 @@
+let’s refactor the whole “Basic Property Information” step so the form and the map work together cleanly:
+
+clear order: District → Area (city/town/village) → Map (auto-center + draggable pin)
+
+strong validation (React Hook Form + Zod)
+
+tidy numeric fields (price/size), sensible ranges (year built), and accessible errors
+
+Next disabled until district, area, and lat/lng are set
+
+Below is a drop-in TypeScript React step that you can paste in (uses shadcn/ui + Mapbox GL). It replaces your current step 2.
+
+set VITE_MAPBOX_TOKEN and (optionally) move the LOCATIONS_BW object to a JSON if you prefer.
+
+// src/pages/CreateListingStep2.tsx
+import React, { useEffect, useMemo, useRef } from "react";
+import mapboxgl, { LngLatLike } from "mapbox-gl";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+// shadcn/ui (adjust import paths if your alias differs)
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+
+// --- Mapbox token ---
+mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN as string;
+
+// --- Minimal Botswana locations (move to /public/data if you want) ---
+type Area = { name: string; center: [number, number]; bbox?: [number, number, number, number] };
+type DistrictAreas = Record<string, Area[]>;
+const LOCATIONS_BW: DistrictAreas = {
+  "South-East": [
+    { name: "Gaborone", center: [25.9231, -24.6282], bbox: [25.80, -24.72, 26.02, -24.55] },
+    { name: "Tlokweng", center: [25.9433, -24.6542], bbox: [25.90, -24.70, 26.00, -24.62] },
+    { name: "Mogoditshane", center: [25.8650, -24.6210], bbox: [25.80, -24.67, 25.92, -24.58] }
+  ],
+  Central: [
+    { name: "Serowe", center: [26.7108, -22.3875] },
+    { name: "Palapye", center: [27.1287, -22.5461] }
+  ]
+};
+
+// --- Validation schema ---
+const THIS_YEAR = new Date().getFullYear();
+const FormSchema = z.object({
+  title: z.string().min(5, "Please enter a descriptive title"),
+  price_bwp: z.coerce.number().positive("Price must be > 0").max(1_000_000_000, "Unusually large price"),
+  district: z.string().min(1, "Select a district"),
+  area: z.string().min(1, "Select an area"),
+  lat: z.number({ invalid_type_error: "Set a pin on the map" })
+        .gte(-90, "Latitude invalid").lte(90, "Latitude invalid"),
+  lng: z.number({ invalid_type_error: "Set a pin on the map" })
+        .gte(-180, "Longitude invalid").lte(180, "Longitude invalid"),
+  land_size_sqm: z.coerce.number().min(0, "Must be ≥ 0").optional(),
+  building_size_sqm: z.coerce.number().min(0, "Must be ≥ 0").optional(),
+  bedrooms: z.coerce.number().int().min(0).max(20),
+  bathrooms: z.coerce.number().int().min(0).max(20),
+  year_built: z.coerce.number().int().min(1900, "Year too small").max(THIS_YEAR, "Year cannot be in the future").optional(),
+  address_line: z.string().optional()
+});
+type FormValues = z.infer<typeof FormSchema>;
+
+type Props = {
+  defaultValues?: Partial<FormValues>;
+  onPrev: () => void;
+  onNext: (values: FormValues) => void;
+};
+
+export default function CreateListingStep2({ defaultValues, onPrev, onNext }: Props) {
+  const {
+    register,
+    handleSubmit,
+    watch,
+    setValue,
+    formState: { errors, isValid }
+  } = useForm<FormValues>({
+    resolver: zodResolver(FormSchema),
+    mode: "onChange",
+    defaultValues: {
+      title: "",
+      price_bwp: undefined as unknown as number,
+      district: "",
+      area: "",
+      lat: undefined as unknown as number,
+      lng: undefined as unknown as number,
+      land_size_sqm: undefined,
+      building_size_sqm: undefined,
+      bedrooms: 0,
+      bathrooms: 0,
+      year_built: undefined,
+      address_line: "",
+      ...defaultValues
+    }
+  });
+
+  const district = watch("district");
+  const areaName = watch("area");
+  const lat = watch("lat");
+  const lng = watch("lng");
+
+  // options
+  const districts = useMemo(() => Object.keys(LOCATIONS_BW).sort(), []);
+  const areas = useMemo(() => (district ? LOCATIONS_BW[district] || [] : []), [district]);
+
+  // --- Map init ---
+  const mapRef = useRef<mapboxgl.Map | null>(null);
+  const markerRef = useRef<mapboxgl.Marker | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (mapRef.current || !containerRef.current) return;
+    const m = new mapboxgl.Map({
+      container: containerRef.current,
+      style: "mapbox://styles/mapbox/streets-v12",
+      center: [25.915, -24.65],
+      zoom: 9
+    });
+    m.addControl(new mapboxgl.NavigationControl({ visualizePitch: true }), "top-right");
+    m.on("click", (e) => placeMarker([e.lngLat.lng, e.lngLat.lat]));
+    mapRef.current = m;
+    // cleanup
+    return () => { m.remove(); mapRef.current = null; };
+  }, []);
+
+  // center on selected area and drop a pin
+  useEffect(() => {
+    if (!mapRef.current || !district || !areaName) return;
+    const area = areas.find(a => a.name === areaName);
+    if (!area) return;
+    const map = mapRef.current;
+
+    if (area.bbox) {
+      map.fitBounds(area.bbox, { padding: 40, duration: 600 });
+      const center: [number, number] = [
+        (area.bbox[0] + area.bbox[2]) / 2,
+        (area.bbox[1] + area.bbox[3]) / 2,
+      ];
+      placeMarker(center);
+    } else {
+      map.easeTo({ center: area.center as LngLatLike, zoom: 12, duration: 600 });
+      placeMarker(area.center);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [district, areaName]);
+
+  const placeMarker = (lngLat: [number, number]) => {
+    const map = mapRef.current; if (!map) return;
+    if (!markerRef.current) {
+      markerRef.current = new mapboxgl.Marker({ draggable: true }).setLngLat(lngLat).addTo(map);
+      markerRef.current.on("dragend", () => {
+        const p = markerRef.current!.getLngLat();
+        setValue("lng", p.lng, { shouldValidate: true });
+        setValue("lat", p.lat, { shouldValidate: true });
+      });
+    } else { markerRef.current.setLngLat(lngLat); }
+    setValue("lng", lngLat[0], { shouldValidate: true });
+    setValue("lat", lngLat[1], { shouldValidate: true });
+  };
+
+  // helpers
+  const numberError = (msg?: string) => msg && <p className="text-sm text-red-600 mt-1">{msg}</p>;
+
+  return (
+    <form
+      className="space-y-6"
+      onSubmit={handleSubmit((values) => onNext(values))}
+    >
+      <div>
+        <h1 className="text-xl font-semibold">Create New Listing</h1>
+        <p className="text-sm text-muted-foreground">Step 2 of 5 • Basic Property Information</p>
+      </div>
+
+      {/* Title + Price */}
+      <div className="grid md:grid-cols-2 gap-4">
+        <div>
+          <Label htmlFor="title">Property Title *</Label>
+          <Input id="title" placeholder="Beautiful Home in Gabs" {...register("title")} />
+          {errors.title && <p className="text-sm text-red-600 mt-1">{errors.title.message}</p>}
+        </div>
+        <div>
+          <Label htmlFor="price_bwp">Price (BWP) *</Label>
+          <Input id="price_bwp" type="number" inputMode="numeric" step="1" placeholder="650000"
+                 {...register("price_bwp")} />
+          {numberError(errors.price_bwp?.message)}
+        </div>
+      </div>
+
+      {/* District → Area */}
+      <div className="grid md:grid-cols-2 gap-4">
+        <div>
+          <Label>District *</Label>
+          <Select
+            value={district || ""}
+            onValueChange={(v) => {
+              // reset area and pin when district changes
+              setValue("district", v, { shouldValidate: true });
+              setValue("area", "", { shouldValidate: true });
+              setValue("lat", undefined as unknown as number, { shouldValidate: true });
+              setValue("lng", undefined as unknown as number, { shouldValidate: true });
+            }}
+          >
+            <SelectTrigger><SelectValue placeholder="Select district…" /></SelectTrigger>
+            <SelectContent>
+              {districts.map(d => <SelectItem key={d} value={d}>{d}</SelectItem>)}
+            </SelectContent>
+          </Select>
+          {errors.district && <p className="text-sm text-red-600 mt-1">{errors.district.message}</p>}
+        </div>
+
+        <div>
+          <Label>Area (City/Town/Village) *</Label>
+          <Select
+            disabled={!district}
+            value={areaName || ""}
+            onValueChange={(v) => setValue("area", v, { shouldValidate: true })}
+          >
+            <SelectTrigger><SelectValue placeholder={district ? "Select area…" : "Select a district first"} /></SelectTrigger>
+            <SelectContent>
+              {areas.map(a => <SelectItem key={a.name} value={a.name}>{a.name}</SelectItem>)}
+            </SelectContent>
+          </Select>
+          {errors.area && <p className="text-sm text-red-600 mt-1">{errors.area.message}</p>}
+        </div>
+      </div>
+
+      {/* Map */}
+      <div className="rounded-md border p-3">
+        <div className="flex items-center justify-between mb-2">
+          <Label>Set exact location on map *</Label>
+          <Badge variant="outline">{lat && lng ? `📍 ${lat.toFixed(5)}, ${lng.toFixed(5)}` : "Pin not set"}</Badge>
+        </div>
+        <div ref={containerRef} className="w-full h-80 rounded-md" />
+        <p className="text-xs text-muted-foreground mt-2">
+          After you choose an area, the map centers there. Click the map or drag the pin to the street/plot.
+        </p>
+        {(errors.lat || errors.lng) && <p className="text-sm text-red-600 mt-1">Set the pin on the map.</p>}
+      </div>
+
+      {/* Sizes */}
+      <div className="grid md:grid-cols-2 gap-4">
+        <div>
+          <Label htmlFor="land_size_sqm">Land Size</Label>
+          <div className="flex gap-2">
+            <Input id="land_size_sqm" type="number" inputMode="numeric" placeholder="1000" {...register("land_size_sqm")} />
+            <div className="grid place-items-center px-2 rounded-md border bg-muted">sqm</div>
+          </div>
+          {numberError(errors.land_size_sqm?.message)}
+        </div>
+        <div>
+          <Label htmlFor="building_size_sqm">Building Size</Label>
+          <div className="flex gap-2">
+            <Input id="building_size_sqm" type="number" inputMode="numeric" placeholder="250" {...register("building_size_sqm")} />
+            <div className="grid place-items-center px-2 rounded-md border bg-muted">sqm</div>
+          </div>
+          {numberError(errors.building_size_sqm?.message)}
+        </div>
+      </div>
+
+      {/* Beds / Baths */}
+      <div className="grid md:grid-cols-3 gap-4">
+        <div>
+          <Label>Bedrooms</Label>
+          <Select value={String(watch("bedrooms") ?? 0)} onValueChange={(v) => setValue("bedrooms", Number(v), { shouldValidate: true })}>
+            <SelectTrigger><SelectValue /></SelectTrigger>
+            <SelectContent>
+              {Array.from({ length: 11 }, (_, i) => i).map(n => <SelectItem key={n} value={String(n)}>{n} {n===1?"bedroom":"bedrooms"}</SelectItem>)}
+            </SelectContent>
+          </Select>
+        </div>
+        <div>
+          <Label>Bathrooms</Label>
+          <Select value={String(watch("bathrooms") ?? 0)} onValueChange={(v) => setValue("bathrooms", Number(v), { shouldValidate: true })}>
+            <SelectTrigger><SelectValue /></SelectTrigger>
+            <SelectContent>
+              {Array.from({ length: 11 }, (_, i) => i).map(n => <SelectItem key={n} value={String(n)}>{n} {n===1?"bathroom":"bathrooms"}</SelectItem>)}
+            </SelectContent>
+          </Select>
+        </div>
+        <div>
+          <Label htmlFor="year_built">Year Built</Label>
+          <Input id="year_built" type="number" inputMode="numeric" placeholder="2020" {...register("year_built")} />
+          {numberError(errors.year_built?.message)}
+        </div>
+      </div>
+
+      {/* Address line (optional) */}
+      <div>
+        <Label htmlFor="address_line">Address / Street (optional)</Label>
+        <Input id="address_line" placeholder="Plot/Street, Ward" {...register("address_line")} />
+      </div>
+
+      {/* Footer buttons */}
+      <div className="flex items-center justify-between">
+        <Button type="button" variant="outline" onClick={onPrev}>Previous</Button>
+        <Button type="submit" disabled={!isValid || !district || !areaName || !lat || !lng}>Next Step</Button>
+      </div>
+    </form>
+  );
+}
+
+What this fixes in the form (not just the map)
+
+Order & lock-step: Area dropdown is disabled until District is chosen.
+
+Validation everywhere: title/price required, year range, numeric sizes, lat/lng must be set; inline error copy.
+
+Next button only enables when required fields are valid and a pin is placed.
+
+Units (“sqm”) rendered consistently next to numeric inputs.
+
+Accessible labels and small helper text for the map.
+
+Sane defaults (0 beds/baths; optional sizes/year/address).
+
+Server-side guardrails (add in API/DB)
+
+To keep data clean in prod, mirror the client rules:
+
+-- Listings must have geo if publishable
+ALTER TABLE listings
+  ADD CONSTRAINT chk_geo_required CHECK (latitude IS NOT NULL AND longitude IS NOT NULL);
+
+-- Basic sanity on numbers
+ALTER TABLE listings
+  ALTER COLUMN price_bwp SET NOT NULL,
+  ADD CONSTRAINT chk_price_positive CHECK (price_bwp > 0),
+  ADD CONSTRAINT chk_year_built CHECK (year_built IS NULL OR (year_built BETWEEN 1900 AND EXTRACT(YEAR FROM NOW())::int));
+
+// In your create-listing endpoint: validate with zod before insert
+import { z } from "zod";
+const CreateListingDTO = FormSchema; // reuse the exact schema
+
+
+If you want this wired into your wizard container (step routing, persistence between steps, and a tiny reducer/store), say the word and I’ll drop that in too.
