@@ -214,15 +214,16 @@ export const authenticate = async (req: AuthenticatedRequest, res: Response, nex
       req.user = user;
       return next();
     } catch (jwtError: any) {
-      // Only log non-malformed token errors to reduce noise
-      if (jwtError.name !== 'JsonWebTokenError' || !jwtError.message.includes('malformed')) {
-        console.error('JWT verification failed:', jwtError.message);
-      }
-      
+      // Reduce console noise for common JWT errors
       if (jwtError.name === 'TokenExpiredError') {
         return res.status(401).json({ message: 'Token expired' });
+      } else if (jwtError.name === 'JsonWebTokenError') {
+        // Don't log malformed token errors - they're common and not actionable
+        return res.status(401).json({ message: 'Invalid token' });
+      } else {
+        console.error('JWT verification failed:', jwtError.message);
+        return res.status(401).json({ message: 'Authentication failed' });
       }
-      return res.status(401).json({ message: 'Invalid token' });
     }
   } catch (error) {
     console.error('Authentication error:', error);
