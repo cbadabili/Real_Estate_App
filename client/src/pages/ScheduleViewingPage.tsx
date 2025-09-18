@@ -101,6 +101,12 @@ const ScheduleViewingPage = () => {
       const appointmentDateTime = new Date(`${selectedDate}T${selectedTime}:00`);
       const appointmentTimestamp = Math.floor(appointmentDateTime.getTime() / 1000);
 
+      // Get the authentication token
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('Please log in to schedule a viewing');
+      }
+
       const appointmentData = {
         propertyId: parseInt(id!),
         buyerId: 1, // Mock user ID - should be actual logged-in user
@@ -114,6 +120,7 @@ const ScheduleViewingPage = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify(appointmentData),
       });
