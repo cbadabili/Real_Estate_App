@@ -23,6 +23,7 @@ import {
 import { useFavorites } from '../hooks/useFavorites';
 import { useAuth } from '../contexts/AuthContext';
 import { analytics } from '../lib/analytics';
+import { MortgageCalculator } from '../components/MortgageCalculator';
 
 // Placeholder for a LoadingSpinner component, assuming it exists elsewhere
 const LoadingSpinner = () => (
@@ -70,6 +71,7 @@ const PropertyDetailsPage: React.FC = () => {
   const [error, setError] = useState<Error | null>(null); // Added error state
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [showContactForm, setShowContactForm] = useState(false);
+  const [showMortgageCalculator, setShowMortgageCalculator] = useState(false);
   const { toggleFavorite, isFavorite } = useFavorites();
   const { user } = useAuth();
 
@@ -169,6 +171,14 @@ const PropertyDetailsPage: React.FC = () => {
       return;
     }
     setShowContactForm(true);
+  };
+
+  const handleMortgageCalculator = () => {
+    setShowMortgageCalculator(!showMortgageCalculator);
+  };
+
+  const handleScheduleViewing = () => {
+    navigate(`/schedule-viewing/${id}`);
   };
 
   // Render loading state
@@ -398,11 +408,17 @@ const PropertyDetailsPage: React.FC = () => {
 
                 {/* Quick Actions */}
                 <div className="space-y-3">
-                  <button className="w-full bg-neutral-100 text-neutral-700 py-2 px-4 rounded-lg hover:bg-neutral-200 transition-colors flex items-center justify-center">
+                  <button 
+                    onClick={handleMortgageCalculator}
+                    className="w-full bg-neutral-100 text-neutral-700 py-2 px-4 rounded-lg hover:bg-neutral-200 transition-colors flex items-center justify-center"
+                  >
                     <Calculator className="w-4 h-4 mr-2" />
                     Mortgage Calculator
                   </button>
-                  <button className="w-full bg-neutral-100 text-neutral-700 py-2 px-4 rounded-lg hover:bg-neutral-200 transition-colors flex items-center justify-center">
+                  <button 
+                    onClick={handleScheduleViewing}
+                    className="w-full bg-neutral-100 text-neutral-700 py-2 px-4 rounded-lg hover:bg-neutral-200 transition-colors flex items-center justify-center"
+                  >
                     <Calendar className="w-4 h-4 mr-2" />
                     Schedule Viewing
                   </button>
@@ -411,7 +427,20 @@ const PropertyDetailsPage: React.FC = () => {
             </div>
           </div>
 
-          
+          {/* Mortgage Calculator Section */}
+          {showMortgageCalculator && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="mt-6"
+            >
+              <MortgageCalculator 
+                propertyPrice={property.price}
+                className="w-full"
+              />
+            </motion.div>
+          )}
         </motion.div>
       </div>
     </div>
