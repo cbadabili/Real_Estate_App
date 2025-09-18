@@ -27,6 +27,7 @@ describe('Security Headers', () => {
       expect(response.headers['referrer-policy']).toBe('strict-origin-when-cross-origin');
       expect(response.headers['cross-origin-opener-policy']).toBe('same-origin');
       expect(response.headers['permissions-policy']).toBeDefined();
+      expect(response.headers['x-request-id']).toBeDefined();
     });
   });
 

@@ -51,7 +51,12 @@ app.use(helmet({
     camera: ['self'],
     microphone: [],
     geolocation: ['self'],
-    fullscreen: ['self']
+    fullscreen: ['self'],
+    payment: [],
+    usb: [],
+    magnetometer: [],
+    accelerometer: [],
+    gyroscope: []
   }
 }));
 
@@ -160,6 +165,9 @@ app.get('/api/health', (_req: Request, res: Response) => {
   app.use('/api/properties', writeApiLimiter);
   app.use('/api/services', writeApiLimiter);
   app.use('/api/rentals', writeApiLimiter);
+  app.use('/api/inquiries', writeApiLimiter);
+  app.use('/api/appointments', writeApiLimiter);
+  app.use('/api/hero', writeApiLimiter);
   
   // Apply search limiting
   app.use('/api/search', searchLimiter);

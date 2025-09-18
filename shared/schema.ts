@@ -17,7 +17,17 @@ import {
   timestamp,
   jsonb,
   serial,
+  varchar, // Added varchar for better type safety
+  // Assuming userTypeEnum and roleEnum are defined elsewhere or should be defined here
+  // For demonstration, I'll assume they are simple text types for now if not provided.
+  // If they are actual enums from drizzle-orm, their import would be needed.
 } from "drizzle-orm/pg-core";
+
+// Placeholder for enums if they are not imported from elsewhere.
+// In a real scenario, these would likely be defined using drizzle-orm's enum functionality
+// or imported from a shared types file.
+const userTypeEnum = text; // Placeholder
+const roleEnum = text; // Placeholder
 
 // For rapid migration, we'll temporarily use pgTable for all sqliteTable references
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -28,27 +38,37 @@ import { relations, sql } from "drizzle-orm";
 
 
 
-// Users table  
+// Users table
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
-  username: text("username").notNull().unique(),
-  email: text("email").notNull().unique(),
-  password: text("password").notNull(),
-  firstName: text("first_name").notNull(),
-  lastName: text("last_name").notNull(),
-  phone: text("phone"),
-  userType: text("user_type").notNull(), // 'buyer', 'seller', 'agent', 'fsbo', 'admin'
-  role: text("role").notNull().default("user"), // 'user', 'moderator', 'admin', 'super_admin'
+  username: varchar("username", { length: 50 }).notNull().unique(),
+  email: varchar("email", { length: 100 }).notNull().unique(),
+  password: varchar("password", { length: 255 }).notNull(),
+  firstName: varchar("first_name", { length: 50 }).notNull(),
+  lastName: varchar("last_name", { length: 50 }).notNull(),
+  phone: varchar("phone", { length: 20 }),
+  userType: userTypeEnum("user_type").notNull(), // 'buyer', 'seller', 'agent', 'fsbo', 'admin'
+  role: roleEnum("role").default('user').notNull(), // 'user', 'moderator', 'admin', 'super_admin'
   permissions: text("permissions").array().default(sql`'{}'::text[]`), // JSON string of permission array
   avatar: text("avatar"),
   bio: text("bio"),
   isVerified: integer("is_verified").default(0),
   isActive: integer("is_active").default(1),
-  reacNumber: text("reac_number"), // For certified agents
+  reacNumber: varchar("reac_number", { length: 20 }), // For certified agents
   lastLoginAt: integer("last_login_at"), // Unix timestamp
   createdAt: integer("created_at").default(sql`extract(epoch from now())`),
   updatedAt: integer("updated_at").default(sql`extract(epoch from now())`),
 });
+
+// Refresh tokens table for JWT security
+export const refreshTokens = pgTable('refresh_tokens', {
+  id: varchar('id', { length: 36 }).primaryKey(), // UUID as primary key
+  userId: integer('user_id').references(() => users.id, { onDelete: 'cascade' }).notNull(),
+  token: text('token').notNull(), // The actual refresh token
+  expiresAt: timestamp('expires_at').notNull(), // Expiration timestamp
+  createdAt: timestamp('created_at').defaultNow(), // Creation timestamp
+});
+
 
 // Properties table
 export const properties = pgTable("properties", {
@@ -450,6 +470,7 @@ export type Appointment = typeof appointments.$inferSelect;
 export type InsertAppointment = z.infer<typeof insertAppointmentSchema>;
 export type SavedProperty = typeof savedProperties.$inferSelect;
 export type InsertSavedProperty = z.infer<typeof insertSavedPropertySchema>;
+export type RefreshToken = typeof refreshTokens.$inferSelect; // Type for refresh token
 
 // Review system insert schemas
 export const insertUserReviewSchema = createInsertSchema(userReviews).omit({
@@ -686,7 +707,7 @@ export const project_requests = sqliteTable('project_requests', {
   proposals_count: integer('proposals_count').default(0),
 
   created_at: integer('created_at').default(sql`(cast((julianday('now') - 2440587.5)*86400000 as integer))`),
-  updated_at: integer('updated_at').default(sql`(cast((julianday('now') - 2440587.5)*864000 as integer))`),});
+  updated_at: integer('updated_at').default(sql`(cast((julianday('now') - 2440587.5)*86400000 as integer))`),});
 
 // Proposals from service providers
 export const project_proposals = sqliteTable('project_proposals', {
@@ -1111,17 +1132,17 @@ export const locationIndexes = [
   // District lookups
   "CREATE INDEX IF NOT EXISTS idx_districts_code ON districts(code)",
   "CREATE INDEX IF NOT EXISTS idx_districts_name ON districts(name)",
-  
+
   // Settlement lookups
   "CREATE INDEX IF NOT EXISTS idx_settlements_district ON settlements(district_id)",
   "CREATE INDEX IF NOT EXISTS idx_settlements_name ON settlements(name)",
   "CREATE INDEX IF NOT EXISTS idx_settlements_type ON settlements(type)",
   "CREATE INDEX IF NOT EXISTS idx_settlements_population ON settlements(population DESC)",
-  
+
   // Ward lookups
   "CREATE INDEX IF NOT EXISTS idx_wards_settlement ON wards(settlement_id)",
   "CREATE INDEX IF NOT EXISTS idx_wards_name ON wards(name)",
-  
+
   // Plot lookups
   "CREATE INDEX IF NOT EXISTS idx_plots_ward ON plots(ward_id)",
   "CREATE INDEX IF NOT EXISTS idx_plots_settlement ON plots(settlement_id)",

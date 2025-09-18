@@ -59,6 +59,10 @@ A comprehensive real estate platform built with React, TypeScript, Node.js, and 
 - **Compliance**: Legal requirements and process tracking
 - **Analytics**: Property valuations and market trends
 
+## Architecture
+
+For detailed system architecture, components, and deployment information, see [Architecture Documentation](docs/architecture.md).
+
 ## Getting Started
 
 ### Prerequisites
