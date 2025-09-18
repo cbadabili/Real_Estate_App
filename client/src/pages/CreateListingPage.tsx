@@ -681,12 +681,12 @@ const CreateListingPage = () => {
                     {(watchedPropertyType === 'house' || watchedPropertyType === 'apartment' || watchedPropertyType === 'townhouse' || watchedPropertyType === 'commercial') && (
                       <div>
                         <label className="block text-sm font-medium text-neutral-700 mb-2">
-                          Building Size *
+                          Building Size
                         </label>
                         <div className="flex items-center space-x-2">
                           <input
                             type="number"
-                            {...register('buildingSize', { required: 'Building size is required', min: 1 })}
+                            {...register('buildingSize', { min: 1 })}
                             className="flex-1 px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent transition-all"
                             placeholder="150"
                           />
