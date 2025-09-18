@@ -247,16 +247,27 @@ const CreateListingPage = () => {
 
       console.log('Transformed property data:', propertyData);
 
+      const token = localStorage.getItem('authToken');
       const response = await fetch('/api/properties', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': token ? `Bearer ${token}` : '',
         },
         body: JSON.stringify(propertyData),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to create property listing');
+        const errorData = await response.text();
+        console.error('Property creation failed:', response.status, errorData);
+        
+        if (response.status === 401) {
+          throw new Error('Please log in to create a property listing');
+        } else if (response.status === 403) {
+          throw new Error('You do not have permission to create property listings');
+        } else {
+          throw new Error(`Failed to create property listing: ${response.status}`);
+        }
       }
 
       const createdProperty = await response.json();
@@ -276,7 +287,16 @@ const CreateListingPage = () => {
 
     } catch (error) {
       console.error('Error creating property:', error);
-      toast.error('Failed to create property listing. Please try again.');
+      
+      if (error.message.includes('log in')) {
+        toast.error('Please log in to create a property listing');
+      } else if (error.message.includes('permission')) {
+        toast.error('You do not have permission to create property listings');
+      } else if (error.message.includes('401')) {
+        toast.error('Authentication required. Please log in again.');
+      } else {
+        toast.error(error.message || 'Failed to create property listing. Please try again.');
+      }
     } finally {
       setIsSubmitting(false);
     }
