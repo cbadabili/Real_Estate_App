@@ -34,10 +34,20 @@ const MapSearchPage = () => {
       setLoading(true);
       setError(null);
 
-      const response = await fetch('/api/properties?status=active');
+      console.log('Fetching properties from /api/properties?status=active');
+      const response = await fetch('/api/properties?status=active', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+
+      console.log('Response status:', response.status);
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const errorText = await response.text();
+        console.error('API Error Response:', errorText);
+        throw new Error(`HTTP error! status: ${response.status}. Response: ${errorText}`);
       }
 
       const data = await response.json();
@@ -142,7 +152,40 @@ const MapSearchPage = () => {
       }
     } catch (err) {
       console.error('Error fetching properties:', err);
-      setError('Failed to load properties. Please try again.');
+      
+      // If API is down, set some demo properties to keep the map functional
+      console.log('API unavailable, using demo properties for map display');
+      const demoProperties = [
+        {
+          id: 9999,
+          title: 'Demo Property - Gaborone CBD',
+          price: 1250000,
+          latitude: -24.6541,
+          longitude: 25.9087,
+          bedrooms: 3,
+          bathrooms: 2,
+          location: 'Gaborone CBD',
+          city: 'Gaborone',
+          propertyType: 'apartment',
+          description: 'Modern apartment in the heart of Gaborone CBD (Demo data - API unavailable)'
+        },
+        {
+          id: 9998,
+          title: 'Demo House - Phakalane',
+          price: 850000,
+          latitude: -24.6282,
+          longitude: 25.9231,
+          bedrooms: 4,
+          bathrooms: 3,
+          location: 'Phakalane',
+          city: 'Gaborone',
+          propertyType: 'house',
+          description: 'Family home in quiet residential area (Demo data - API unavailable)'
+        }
+      ];
+      
+      setProperties(demoProperties);
+      setError('API temporarily unavailable. Showing demo properties. Please refresh to try again.');
     } finally {
       setLoading(false);
     }
