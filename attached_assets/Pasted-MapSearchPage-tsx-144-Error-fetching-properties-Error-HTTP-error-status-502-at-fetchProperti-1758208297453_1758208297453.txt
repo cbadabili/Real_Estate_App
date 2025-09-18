@@ -1,0 +1,65 @@
+MapSearchPage.tsx:144 Error fetching properties: Error: HTTP error! status: 502
+    at fetchProperties (MapSearchPage.tsx:40:15)
+fetchProperties @ MapSearchPage.tsx:144
+await in fetchProperties
+(anonymous) @ MapSearchPage.tsx:152
+commitHookEffectListMount @ chunk-WERSD76P.js?v=e3379111:16915
+commitPassiveMountOnFiber @ chunk-WERSD76P.js?v=e3379111:18156
+commitPassiveMountEffects_complete @ chunk-WERSD76P.js?v=e3379111:18129
+commitPassiveMountEffects_begin @ chunk-WERSD76P.js?v=e3379111:18119
+commitPassiveMountEffects @ chunk-WERSD76P.js?v=e3379111:18109
+flushPassiveEffectsImpl @ chunk-WERSD76P.js?v=e3379111:19490
+flushPassiveEffects @ chunk-WERSD76P.js?v=e3379111:19447
+(anonymous) @ chunk-WERSD76P.js?v=e3379111:19328
+workLoop @ chunk-WERSD76P.js?v=e3379111:197
+flushWork @ chunk-WERSD76P.js?v=e3379111:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=e3379111:384Understand this error
+favicon.png:1  GET https://331c9cdc-a1e3-4369-9dda-5ae35b395e48-00-21ptexpix7co9.worf.replit.dev/favicon.png 502 (Bad Gateway)Understand this error
+MapSearchPage.tsx:37  GET https://331c9cdc-a1e3-4369-9dda-5ae35b395e48-00-21ptexpix7co9.worf.replit.dev/api/properties?status=active 502 (Bad Gateway)
+fetchProperties @ MapSearchPage.tsx:37
+(anonymous) @ MapSearchPage.tsx:152
+commitHookEffectListMount @ chunk-WERSD76P.js?v=e3379111:16915
+invokePassiveEffectMountInDEV @ chunk-WERSD76P.js?v=e3379111:18324
+invokeEffectsInDev @ chunk-WERSD76P.js?v=e3379111:19701
+commitDoubleInvokeEffectsInDEV @ chunk-WERSD76P.js?v=e3379111:19686
+flushPassiveEffectsImpl @ chunk-WERSD76P.js?v=e3379111:19503
+flushPassiveEffects @ chunk-WERSD76P.js?v=e3379111:19447
+(anonymous) @ chunk-WERSD76P.js?v=e3379111:19328
+workLoop @ chunk-WERSD76P.js?v=e3379111:197
+flushWork @ chunk-WERSD76P.js?v=e3379111:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=e3379111:384Understand this error
+MapSearchPage.tsx:144 Error fetching properties: Error: HTTP error! status: 502
+    at fetchProperties (MapSearchPage.tsx:40:15)
+fetchProperties @ MapSearchPage.tsx:144
+await in fetchProperties
+(anonymous) @ MapSearchPage.tsx:152
+commitHookEffectListMount @ chunk-WERSD76P.js?v=e3379111:16915
+invokePassiveEffectMountInDEV @ chunk-WERSD76P.js?v=e3379111:18324
+invokeEffectsInDev @ chunk-WERSD76P.js?v=e3379111:19701
+commitDoubleInvokeEffectsInDEV @ chunk-WERSD76P.js?v=e3379111:19686
+flushPassiveEffectsImpl @ chunk-WERSD76P.js?v=e3379111:19503
+flushPassiveEffects @ chunk-WERSD76P.js?v=e3379111:19447
+(anonymous) @ chunk-WERSD76P.js?v=e3379111:19328
+workLoop @ chunk-WERSD76P.js?v=e3379111:197
+flushWork @ chunk-WERSD76P.js?v=e3379111:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=e3379111:384Understand this error
+favicon.ico:1  GET https://331c9cdc-a1e3-4369-9dda-5ae35b395e48-00-21ptexpix7co9.worf.replit.dev/favicon.ico 502 (Bad Gateway)Understand this error
+MapSearchPage.tsx:37  GET https://331c9cdc-a1e3-4369-9dda-5ae35b395e48-00-21ptexpix7co9.worf.replit.dev/api/properties?status=active 502 (Bad Gateway)
+fetchProperties @ MapSearchPage.tsx:37
+callCallback2 @ chunk-WERSD76P.js?v=e3379111:3674
+invokeGuardedCallbackDev @ chunk-WERSD76P.js?v=e3379111:3699
+invokeGuardedCallback @ chunk-WERSD76P.js?v=e3379111:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-WERSD76P.js?v=e3379111:3736
+executeDispatch @ chunk-WERSD76P.js?v=e3379111:7014
+processDispatchQueueItemsInOrder @ chunk-WERSD76P.js?v=e3379111:7034
+processDispatchQueue @ chunk-WERSD76P.js?v=e3379111:7043
+dispatchEventsForPlugins @ chunk-WERSD76P.js?v=e3379111:7051
+(anonymous) @ chunk-WERSD76P.js?v=e3379111:7174
+batchedUpdates$1 @ chunk-WERSD76P.js?v=e3379111:18913
+batchedUpdates @ chunk-WERSD76P.js?v=e3379111:3579
+dispatchEventForPluginEventSystem @ chunk-WERSD76P.js?v=e3379111:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-WERSD76P.js?v=e3379111:5478
+dispatchEvent @ chunk-WERSD76P.js?v=e3379111:5472
+dispatchDiscreteEvent @ chunk-WERSD76P.js?v=e3379111:5449Understand this error
+MapSearchPage.tsx:144 Error fetching properties: Error: HTTP error! status: 502
+    at fetchProperties (MapSearchPage.tsx:40:15)
