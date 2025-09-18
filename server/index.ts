@@ -109,31 +109,23 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 app.use((req, res, next) => {
-  const start = Date.now();
-  const path = req.path;
-  let capturedJsonResponse: Record<string, any> | undefined = undefined;
+  // Security headers
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
 
-  const originalResJson = res.json;
-  res.json = function (bodyJson, ...args) {
-    capturedJsonResponse = bodyJson;
-    return originalResJson.apply(res, [bodyJson, ...args]);
-  };
-
-  res.on("finish", () => {
-    const duration = Date.now() - start;
-    if (path.startsWith("/api")) {
-      let logLine = `${req.method} ${path} ${res.statusCode} in ${duration}ms`;
-      if (capturedJsonResponse) {
-        logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
-      }
-
-      if (logLine.length > 80) {
-        logLine = logLine.slice(0, 79) + "…";
-      }
-
-      log(logLine);
-    }
-  });
+  // Content Security Policy - Updated to allow necessary inline content
+  res.setHeader('Content-Security-Policy', [
+    "default-src 'self'",
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://api.mapbox.com https://replit.com",
+    "style-src 'self' 'unsafe-inline' https://api.mapbox.com https://fonts.googleapis.com",
+    "font-src 'self' data: https://fonts.gstatic.com",
+    "img-src 'self' data: https: blob:",
+    "connect-src 'self' https://api.mapbox.com https://events.mapbox.com",
+    "worker-src 'self' blob:",
+    "child-src 'self'"
+  ].join('; '));
 
   next();
 });
@@ -157,10 +149,10 @@ app.get('/api/health', (_req: Request, res: Response) => {
   // Apply rate limiting to sensitive endpoints BEFORE registering routes
   app.use('/api/users/login', authWriteLimiter);
   app.use('/api/users/register', authWriteLimiter);
-  
+
   // Apply general rate limiting to all API routes
   app.use('/api', generalApiLimiter);
-  
+
   // Apply write limiting to write operations
   app.use('/api/properties', writeApiLimiter);
   app.use('/api/services', writeApiLimiter);
@@ -168,7 +160,7 @@ app.get('/api/health', (_req: Request, res: Response) => {
   app.use('/api/inquiries', writeApiLimiter);
   app.use('/api/appointments', writeApiLimiter);
   app.use('/api/hero', writeApiLimiter);
-  
+
   // Apply search limiting
   app.use('/api/search', searchLimiter);
   app.use('/api/suggest', searchLimiter);
