@@ -1,0 +1,133 @@
+AuthContext.tsx:93 Checking auth with token: eyJhbGciOiJIUzI1NiIs...
+AuthContext.tsx:93 Checking auth with token: eyJhbGciOiJIUzI1NiIs...
+analytics.ts:47 Analytics Event: {event: 'page_viewed', properties: {…}, userId: '11', timestamp: 1758180607466, sessionId: 'cjdjir150zl72nkdiloec', …}
+analytics.ts:47 Analytics Event: {event: 'page_viewed', properties: {…}, userId: '11', timestamp: 1758180607470, sessionId: 'cjdjir150zl72nkdiloec', …}
+AuthContext.tsx:104 Auth check successful: cbadabili@gmail.com
+PropertyDetailsPage.tsx:173 Uncaught TypeError: Cannot read properties of null (reading '0')
+    at PropertyDetailsPage (PropertyDetailsPage.tsx:173:31)
+    at renderWithHooks (chunk-WERSD76P.js?v=e3379111:11548:26)
+    at updateFunctionComponent (chunk-WERSD76P.js?v=e3379111:14582:28)
+    at beginWork (chunk-WERSD76P.js?v=e3379111:15924:22)
+    at HTMLUnknownElement.callCallback2 (chunk-WERSD76P.js?v=e3379111:3674:22)
+    at Object.invokeGuardedCallbackDev (chunk-WERSD76P.js?v=e3379111:3699:24)
+    at invokeGuardedCallback (chunk-WERSD76P.js?v=e3379111:3733:39)
+    at beginWork$1 (chunk-WERSD76P.js?v=e3379111:19765:15)
+    at performUnitOfWork (chunk-WERSD76P.js?v=e3379111:19198:20)
+    at workLoopSync (chunk-WERSD76P.js?v=e3379111:19137:13)
+PropertyDetailsPage @ PropertyDetailsPage.tsx:173
+renderWithHooks @ chunk-WERSD76P.js?v=e3379111:11548
+updateFunctionComponent @ chunk-WERSD76P.js?v=e3379111:14582
+beginWork @ chunk-WERSD76P.js?v=e3379111:15924
+callCallback2 @ chunk-WERSD76P.js?v=e3379111:3674
+invokeGuardedCallbackDev @ chunk-WERSD76P.js?v=e3379111:3699
+invokeGuardedCallback @ chunk-WERSD76P.js?v=e3379111:3733
+beginWork$1 @ chunk-WERSD76P.js?v=e3379111:19765
+performUnitOfWork @ chunk-WERSD76P.js?v=e3379111:19198
+workLoopSync @ chunk-WERSD76P.js?v=e3379111:19137
+renderRootSync @ chunk-WERSD76P.js?v=e3379111:19116
+performConcurrentWorkOnRoot @ chunk-WERSD76P.js?v=e3379111:18678
+workLoop @ chunk-WERSD76P.js?v=e3379111:197
+flushWork @ chunk-WERSD76P.js?v=e3379111:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=e3379111:384Understand this error
+PropertyDetailsPage.tsx:173 Uncaught TypeError: Cannot read properties of null (reading '0')
+    at PropertyDetailsPage (PropertyDetailsPage.tsx:173:31)
+    at renderWithHooks (chunk-WERSD76P.js?v=e3379111:11548:26)
+    at updateFunctionComponent (chunk-WERSD76P.js?v=e3379111:14582:28)
+    at beginWork (chunk-WERSD76P.js?v=e3379111:15924:22)
+    at HTMLUnknownElement.callCallback2 (chunk-WERSD76P.js?v=e3379111:3674:22)
+    at Object.invokeGuardedCallbackDev (chunk-WERSD76P.js?v=e3379111:3699:24)
+    at invokeGuardedCallback (chunk-WERSD76P.js?v=e3379111:3733:39)
+    at beginWork$1 (chunk-WERSD76P.js?v=e3379111:19765:15)
+    at performUnitOfWork (chunk-WERSD76P.js?v=e3379111:19198:20)
+    at workLoopSync (chunk-WERSD76P.js?v=e3379111:19137:13)
+PropertyDetailsPage @ PropertyDetailsPage.tsx:173
+renderWithHooks @ chunk-WERSD76P.js?v=e3379111:11548
+updateFunctionComponent @ chunk-WERSD76P.js?v=e3379111:14582
+beginWork @ chunk-WERSD76P.js?v=e3379111:15924
+callCallback2 @ chunk-WERSD76P.js?v=e3379111:3674
+invokeGuardedCallbackDev @ chunk-WERSD76P.js?v=e3379111:3699
+invokeGuardedCallback @ chunk-WERSD76P.js?v=e3379111:3733
+beginWork$1 @ chunk-WERSD76P.js?v=e3379111:19765
+performUnitOfWork @ chunk-WERSD76P.js?v=e3379111:19198
+workLoopSync @ chunk-WERSD76P.js?v=e3379111:19137
+renderRootSync @ chunk-WERSD76P.js?v=e3379111:19116
+recoverFromConcurrentError @ chunk-WERSD76P.js?v=e3379111:18736
+performConcurrentWorkOnRoot @ chunk-WERSD76P.js?v=e3379111:18684
+workLoop @ chunk-WERSD76P.js?v=e3379111:197
+flushWork @ chunk-WERSD76P.js?v=e3379111:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=e3379111:384Understand this error
+chunk-WERSD76P.js?v=e3379111:14032 The above error occurred in the <PropertyDetailsPage> component:
+
+    at PropertyDetailsPage (https://331c9cdc-a1e3-4369-9dda-5ae35b395e48-00-21ptexpix7co9.worf.replit.dev/src/pages/PropertyDetailsPage.tsx:41:18)
+    at RenderedRoute (https://331c9cdc-a1e3-4369-9dda-5ae35b395e48-00-21ptexpix7co9.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/react-router-dom.js?v=e3379111:4088:5)
+    at Routes (https://331c9cdc-a1e3-4369-9dda-5ae35b395e48-00-21ptexpix7co9.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/react-router-dom.js?v=e3379111:4558:5)
+    at div
+    at PropertyProvider (https://331c9cdc-a1e3-4369-9dda-5ae35b395e48-00-21ptexpix7co9.worf.replit.dev/src/contexts/PropertyContext.tsx:29:36)
+    at AuthProvider (https://331c9cdc-a1e3-4369-9dda-5ae35b395e48-00-21ptexpix7co9.worf.replit.dev/src/contexts/AuthContext.tsx:31:32)
+    at ToastProvider (https://331c9cdc-a1e3-4369-9dda-5ae35b395e48-00-21ptexpix7co9.worf.replit.dev/src/components/ui/Toast.tsx:32:3)
+    at QueryClientProvider (https://331c9cdc-a1e3-4369-9dda-5ae35b395e48-00-21ptexpix7co9.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=e3379111:2933:3)
+    at ErrorBoundary (https://331c9cdc-a1e3-4369-9dda-5ae35b395e48-00-21ptexpix7co9.worf.replit.dev/src/components/ui/ErrorBoundary.tsx:8:5)
+    at App
+    at QueryClientProvider (https://331c9cdc-a1e3-4369-9dda-5ae35b395e48-00-21ptexpix7co9.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=e3379111:2933:3)
+    at Router (https://331c9cdc-a1e3-4369-9dda-5ae35b395e48-00-21ptexpix7co9.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/react-router-dom.js?v=e3379111:4501:15)
+    at BrowserRouter (https://331c9cdc-a1e3-4369-9dda-5ae35b395e48-00-21ptexpix7co9.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/react-router-dom.js?v=e3379111:5247:5)
+
+React will try to recreate this component tree from scratch using the error boundary you provided, ErrorBoundary.
+logCapturedError @ chunk-WERSD76P.js?v=e3379111:14032
+callback @ chunk-WERSD76P.js?v=e3379111:14078
+callCallback @ chunk-WERSD76P.js?v=e3379111:11248
+commitUpdateQueue @ chunk-WERSD76P.js?v=e3379111:11265
+commitLayoutEffectOnFiber @ chunk-WERSD76P.js?v=e3379111:17075
+commitLayoutMountEffects_complete @ chunk-WERSD76P.js?v=e3379111:17980
+commitLayoutEffects_begin @ chunk-WERSD76P.js?v=e3379111:17969
+commitLayoutEffects @ chunk-WERSD76P.js?v=e3379111:17920
+commitRootImpl @ chunk-WERSD76P.js?v=e3379111:19353
+commitRoot @ chunk-WERSD76P.js?v=e3379111:19277
+finishConcurrentRender @ chunk-WERSD76P.js?v=e3379111:18760
+performConcurrentWorkOnRoot @ chunk-WERSD76P.js?v=e3379111:18718
+workLoop @ chunk-WERSD76P.js?v=e3379111:197
+flushWork @ chunk-WERSD76P.js?v=e3379111:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=e3379111:384Understand this error
+ErrorBoundary.tsx:30 ErrorBoundary caught an error: TypeError: Cannot read properties of null (reading '0')
+    at PropertyDetailsPage (PropertyDetailsPage.tsx:173:31)
+    at renderWithHooks (chunk-WERSD76P.js?v=e3379111:11548:26)
+    at updateFunctionComponent (chunk-WERSD76P.js?v=e3379111:14582:28)
+    at beginWork (chunk-WERSD76P.js?v=e3379111:15924:22)
+    at beginWork$1 (chunk-WERSD76P.js?v=e3379111:19753:22)
+    at performUnitOfWork (chunk-WERSD76P.js?v=e3379111:19198:20)
+    at workLoopSync (chunk-WERSD76P.js?v=e3379111:19137:13)
+    at renderRootSync (chunk-WERSD76P.js?v=e3379111:19116:15)
+    at recoverFromConcurrentError (chunk-WERSD76P.js?v=e3379111:18736:28)
+    at performConcurrentWorkOnRoot (chunk-WERSD76P.js?v=e3379111:18684:30) {componentStack: '\n    at PropertyDetailsPage (https://331c9cdc-a1e3….vite/deps/react-router-dom.js?v=e3379111:5247:5)'}
+componentDidCatch @ ErrorBoundary.tsx:30
+callback @ chunk-WERSD76P.js?v=e3379111:14084
+callCallback @ chunk-WERSD76P.js?v=e3379111:11248
+commitUpdateQueue @ chunk-WERSD76P.js?v=e3379111:11265
+commitLayoutEffectOnFiber @ chunk-WERSD76P.js?v=e3379111:17075
+commitLayoutMountEffects_complete @ chunk-WERSD76P.js?v=e3379111:17980
+commitLayoutEffects_begin @ chunk-WERSD76P.js?v=e3379111:17969
+commitLayoutEffects @ chunk-WERSD76P.js?v=e3379111:17920
+commitRootImpl @ chunk-WERSD76P.js?v=e3379111:19353
+commitRoot @ chunk-WERSD76P.js?v=e3379111:19277
+finishConcurrentRender @ chunk-WERSD76P.js?v=e3379111:18760
+performConcurrentWorkOnRoot @ chunk-WERSD76P.js?v=e3379111:18718
+workLoop @ chunk-WERSD76P.js?v=e3379111:197
+flushWork @ chunk-WERSD76P.js?v=e3379111:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=e3379111:384Understand this error
+useFavorites.ts:33  GET https://331c9cdc-a1e3-4369-9dda-5ae35b395e48-00-21ptexpix7co9.worf.replit.dev/api/users/favorites 401 (Unauthorized)
+loadFavorites @ useFavorites.ts:33
+(anonymous) @ useFavorites.ts:25
+commitHookEffectListMount @ chunk-WERSD76P.js?v=e3379111:16915
+commitPassiveMountOnFiber @ chunk-WERSD76P.js?v=e3379111:18156
+commitPassiveMountEffects_complete @ chunk-WERSD76P.js?v=e3379111:18129
+commitPassiveMountEffects_begin @ chunk-WERSD76P.js?v=e3379111:18119
+commitPassiveMountEffects @ chunk-WERSD76P.js?v=e3379111:18109
+flushPassiveEffectsImpl @ chunk-WERSD76P.js?v=e3379111:19490
+flushPassiveEffects @ chunk-WERSD76P.js?v=e3379111:19447
+(anonymous) @ chunk-WERSD76P.js?v=e3379111:19328
+workLoop @ chunk-WERSD76P.js?v=e3379111:197
+flushWork @ chunk-WERSD76P.js?v=e3379111:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=e3379111:384Understand this error
+AuthContext.tsx:104 Auth check successful: cbadabili@gmail.com
+analytics.ts:47 Analytics Event: {event: 'pdp_viewed', properties: {…}, userId: '11', timestamp: 1758180607932, sessionId: 'cjdjir150zl72nkdiloec', …}
+analytics.ts:47 Analytics Event: {event: 'pdp_viewed', properties: {…}, userId: '11', timestamp: 1758180608219, sessionId: 'cjdjir150zl72nkdiloec', …}
