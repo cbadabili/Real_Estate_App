@@ -102,15 +102,19 @@ const PropertySearchPage = () => {
   // Handle search from SmartSearchBar
   const handleSearch = async (searchQueryParam: string, searchFiltersParam?: object) => {
     setIsLoading(true);
+    setSearchQuery(searchQueryParam); // Update the search query state
+    
     try {
       const queryParams = new URLSearchParams();
 
       // Use the combined search query and filters from SmartSearchBar
       if (searchQueryParam) {
         queryParams.set('location', searchQueryParam);
+        // Also search in city and address fields
+        queryParams.set('city', searchQueryParam);
       }
 
-      // Apply filters from searchFiltersParam (assuming it matches the structure of filters state)
+      // Apply filters from searchFiltersParam or use current filters
       const currentFilters = { ...filters, ...searchFiltersParam };
       setFilters(currentFilters); // Update local state with new filters
 
@@ -133,7 +137,7 @@ const PropertySearchPage = () => {
       queryParams.set('sortBy', sortBy);
       queryParams.set('status', 'active');
 
-      console.log('Fetching with params:', queryParams.toString());
+      console.log('Searching with params:', queryParams.toString());
 
       const response = await fetch(`/api/properties?${queryParams}`);
       const data = await response.json();
@@ -143,13 +147,19 @@ const PropertySearchPage = () => {
         setProperties(results);
         setResultCount(results.length);
 
+        // Update URL with search query
+        if (searchQueryParam) {
+          setSearchParams({ q: searchQueryParam });
+        }
+
         // Track search analytics
         analytics.searchPerformed(
           searchQueryParam || '',
-          { ...currentFilters, query: searchQueryParam }, // Include all search params for analytics
+          { ...currentFilters, query: searchQueryParam },
           results.length
         );
       } else {
+        console.error('Search failed:', response.status, response.statusText);
         setProperties([]);
         setResultCount(0);
         // Track search error

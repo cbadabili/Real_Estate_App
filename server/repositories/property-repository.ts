@@ -18,6 +18,7 @@ export interface PropertyFilters {
   city?: string;
   state?: string;
   zipCode?: string;
+  location?: string;
   listingType?: string;
   status?: string;
   limit?: number;
@@ -67,11 +68,14 @@ export class PropertyRepository implements IPropertyRepository {
     if (filters.maxSquareFeet) {
       conditions.push(lte(properties.squareFeet, filters.maxSquareFeet));
     }
-    if (filters.city) {
+    if (filters.city || filters.location) {
+      const searchTerm = filters.location || filters.city;
       conditions.push(
         or(
-          like(properties.city, `%${filters.city}%`),
-          like(properties.address, `%${filters.city}%`)
+          like(properties.city, `%${searchTerm}%`),
+          like(properties.address, `%${searchTerm}%`),
+          like(properties.title, `%${searchTerm}%`),
+          like(properties.description, `%${searchTerm}%`)
         )
       );
     }

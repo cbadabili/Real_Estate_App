@@ -109,11 +109,18 @@ export default function SmartSearchBar({ onSearch, initial = "", suggest }: Prop
     onSearch(value);
     setOpen(false);
     setHighlight(-1);
+    // Clear input focus after search
+    if (inputRef.current) {
+      inputRef.current.blur();
+    }
   }
 
   function onSubmit(e?: React.FormEvent) {
     e?.preventDefault();
-    doSearch(q); // Pass q directly to doSearch, which handles trimming and validation
+    const searchTerm = q.trim();
+    if (searchTerm) {
+      doSearch(searchTerm); // Pass trimmed q to doSearch
+    }
   }
 
   function onPick(item: string) {
