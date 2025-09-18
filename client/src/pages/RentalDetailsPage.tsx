@@ -138,7 +138,7 @@ const RentalDetailsPage = () => {
           <div className="lg:col-span-2">
             {/* Image Gallery */}
             <div className="relative bg-white rounded-lg overflow-hidden shadow-sm mb-6">
-              <div className="relative h-96">
+              <div className="relative h-64 md:h-80"></div>
                 <img
                   src={images[currentImageIndex]}
                   alt={property.title}

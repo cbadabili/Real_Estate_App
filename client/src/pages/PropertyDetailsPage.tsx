@@ -248,12 +248,12 @@ const PropertyDetailsPage: React.FC = () => {
 
           {/* Property Images */}
           <div className="bg-white rounded-lg shadow-sm overflow-hidden mb-6">
-            <div className="relative aspect-video">
+            <div className="relative h-64 md:h-80">
               <img
                 src={images.length > 0 ? images[currentImageIndex] : '/api/placeholder/800/600'}
                 alt={property.title}
                 className="w-full h-full object-cover"
-              />
+              /></div>
               {images.length > 1 && (
                 <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
                   {images.map((_, index) => (

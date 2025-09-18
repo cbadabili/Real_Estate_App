@@ -215,8 +215,8 @@ const ScheduleViewingPage = () => {
               <img
                 src={property.images[0]}
                 alt={property.title}
-                className="w-full h-48 object-cover rounded-lg mb-4"
-              />
+                className="w-full h-32 md:h-40 object-cover rounded-lg mb-4"
+              /></div>
               
               <h3 className="text-lg font-semibold text-neutral-900 mb-2">
                 {property.title}
