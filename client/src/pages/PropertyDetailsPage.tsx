@@ -75,12 +75,16 @@ const PropertyDetailsPage: React.FC = () => {
 
   // Parse images safely
   const images = React.useMemo(() => {
+    console.log('Raw property.images:', property?.images);
     if (!property?.images) return [];
     
     try {
       if (typeof property.images === 'string') {
-        return JSON.parse(property.images);
+        const parsed = JSON.parse(property.images);
+        console.log('Parsed images from string:', parsed);
+        return parsed;
       } else if (Array.isArray(property.images)) {
+        console.log('Images already array:', property.images);
         return property.images;
       }
     } catch (error) {
@@ -248,11 +252,18 @@ const PropertyDetailsPage: React.FC = () => {
 
           {/* Property Images */}
           <div className="bg-white rounded-lg shadow-sm overflow-hidden mb-6">
-            <div className="relative h-32 md:h-40">
+            <div className="relative h-64 md:h-96 lg:h-[500px]">
               <img
-                src={images.length > 0 ? images[currentImageIndex] : '/api/placeholder/800/600'}
+                src={images.length > 0 ? images[currentImageIndex] : 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800&h=600&fit=crop&auto=format'}
                 alt={property.title}
                 className="w-full h-full object-cover"
+                onError={(e) => {
+                  console.log('Image failed to load:', images[currentImageIndex]);
+                  // Try a different fallback if the first one fails
+                  if (e.currentTarget.src !== 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800&h=600&fit=crop&auto=format') {
+                    e.currentTarget.src = 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800&h=600&fit=crop&auto=format';
+                  }
+                }}
               />
               {images.length > 1 && (
                 <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
