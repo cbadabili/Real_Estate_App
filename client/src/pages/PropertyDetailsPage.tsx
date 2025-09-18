@@ -301,7 +301,7 @@ const PropertyDetailsPage: React.FC = () => {
                 </div>
 
                 {/* Features */}
-                {property.features && property.features.length > 0 && (
+                {Array.isArray(property.features) && property.features.length > 0 && (
                   <div>
                     <h3 className="text-lg font-semibold mb-3">Features</h3>
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
