@@ -1,0 +1,40 @@
+1.	Architecture documentation lacks diagrams and asset inventory covering runtime services, data stores, and environments.
+Suggested taskAdd end-to-end architecture diagrams and asset inventory
+Start task 1. Create `docs/architecture.md` (or similar) that enumerates the Express API, Vite build output, PostgreSQL instance, image storage, any queues/cron jobs, CDN/WAF layers, and dev/stage/prod environments with ownership and endpoints. 2. Generate a Mermaid or PlantUML diagram showing request flow (browser → CDN → Express → PostgreSQL/storage/external APIs) and commit the source plus rendered image under `docs/`. 3. Link the new document from `README.md` so contributors can find the architecture view quickly.
+
+2.	Secrets are sourced via dotenv with hard-coded fallbacks instead of a secrets manager, preventing rotation and centralized control.
+Suggested taskAdopt managed secrets with rotation
+Start task 1. Replace the `import 'dotenv/config'` pattern in `server/utils/env.ts` with a loader that reads from AWS SSM or Secrets Manager (e.g., using `@aws-sdk/client-ssm`) and caches values at startup. 2. Remove default fallback secrets (`dev-secret-change-in-production`, etc.) and fail fast if secrets are missing. 3. Document rotation procedures (frequency, responsible team) in a new `docs/security/secrets.md`.
+
+3.	The CSP permits unsafe-inline/unsafe-eval scripts and no complementary headers (Permissions-Policy, Referrer-Policy), leaving the app exposed to script injection and clickjacking.
+Suggested taskHarden security headers
+Start task 1. Update the `helmet` configuration in `server/index.ts` to remove `unsafe-inline`/`unsafe-eval` from `scriptSrc`/`styleSrc`, whitelisting only hashed or self-hosted assets. 2. Add explicit `helmet.referrerPolicy`, `helmet.permittedCrossDomainPolicies`, `helmet.crossOriginOpenerPolicy`, and `helmet.permissionsPolicy` calls with production-safe directives. 3. Add integration tests under `tests/backend/security-headers.test.ts` to assert expected headers on `/api/health` and representative HTML responses.
+
+4.	Rate limiting is applied only to login and registration endpoints, leaving the rest of the API without abuse controls or per-IP throttling.
+Suggested taskBroaden abuse-rate protections
+Start task 1. In `server/index.ts`, introduce a general-purpose limiter (e.g., 429 threshold) applied to write APIs (`/api/properties`, `/api/inquiries`, `/api/hero`, etc.) using route-level middleware. 2. Add IP-based burst throttles for high-risk flows (lead submission, search) and CAPTCHA gating for repeated failures. 3. Update monitoring/alerting docs to track limiter hit rates and surface potential abuse.
+
+5.	Property creation accepts an images payload that is stored as-is without validating size/type, re-encoding, EXIF stripping, or watermarking.
+Suggested taskImplement secure media pipeline
+Start task 1. Replace the `images` JSON handling in `server/routes/property-routes.ts` with a presigned-upload workflow; store only signed object keys. 2. Add a new service (e.g., `server/storage/image-processor.ts`) that uses Sharp/Imagemagick to validate MIME type, enforce max dimensions/size, strip EXIF, and apply watermarks before persisting. 3. Update the schema and front-end uploader to expect processed URLs and add tests covering rejection of oversized/invalid files.
+
+6.	JWTs have a fixed 24-hour lifetime with a static secret and no refresh/rotation strategy, enabling long-lived token reuse.
+Suggested taskAdd short-lived access tokens with rotation
+Start task 1. Introduce refresh tokens stored in an httpOnly, secure cookie (or server-side session store) and shorten access token TTL in `server/auth-middleware.ts`. 2. Add `/api/auth/refresh` and `/api/auth/logout` routes enforcing token rotation and revocation lists. 3. Update the client auth flow to renew tokens before expiry and clear them on logout, adding integration tests in `tests/e2e` for refresh failure scenarios.
+
+7.	Latitude and longitude are optional columns, so map-eligible listings can lack geocodes, violating data quality requirements.
+Suggested taskEnforce geocode completeness
+Start task 1. Add a `for_map` (boolean) flag to the `properties` table via Drizzle migration under `migrations/` and update `shared/schema.ts`. 2. In the same migration, add a CHECK constraint ensuring `latitude` and `longitude` are NOT NULL when `for_map` is true. 3. Update `server/routes/property-routes.ts` validation to set `for_map` based on listing type and reject submissions missing geocodes.
+
+8.	Logging uses morgan plus a custom string without structured JSON or correlation IDs, preventing traceability and metrics-friendly ingestion.
+Suggested taskAdopt structured logging with correlation IDs
+Start task 1. Introduce `pino`/`pino-http` in `server/index.ts`, generating a UUID per request and attaching it to `req`/`res` (see suggested snippet in project notes). 2. Emit logs as JSON with fields for request ID, route, duration, status, and sanitized payload metadata. 3. Document log schemas and retention policy in `docs/observability/logging.md`, updating monitoring pipelines to parse the new format.
+
+9.	There is no privacy policy or consent artifact in the public assets, leaving Botswana DPA obligations unmet.
+Suggested taskPublish privacy policy and consent logging
+Start task 1. Add a `client/src/pages/PrivacyPolicy.tsx` (and static fallback in `public/privacy-policy.html`) outlining data collection, lawful basis, retention, and Botswana-specific rights. 2. Implement a cookie/consent banner component that records consent choices (e.g., via `localStorage` and an API audit trail) with backend storage for evidence. 3. Document data subject request procedures and incident response in `docs/privacy/`.
+
+10.	The repository lacks containerization or SBOM generation (no Dockerfile/SBOM scripts), blocking reproducible builds and mandatory scanning.
+Suggested taskEstablish reproducible container builds and SBOM scanning
+1. Add a multi-stage `Dockerfile` at the repo root (builder for install/build, runtime stage using distroless or alpine) covering both Express API and Vite static assets. 2. Create `scripts/generate-sbom.sh` that runs `npx @cyclonedx/cyclonedx-npm` and integrate it plus `trivy` scans into CI. 3. Update deployment docs to reference the container image workflow, including how to build, scan, and publish artifacts.
+
