@@ -1,0 +1,137 @@
+themeContext-e2709bf1.js:1 Refused to load the font 'data:application/octet-stream;base64,d09GMgABAAAAAPUcABQAAAACTcwAAPSkAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGpQ+G4GCAByMSj9IVkFSlR8/TVZBUoE+BmA/U1RBVIIiJ0gAhQwvgSQRCAqBgSjmQwuEHgAwhrRmATYCJAOIOAQgBYd0B4k4W+08ciQaIvPIC7OSzq4RzVwSsKn8n7dC5rabJIGNMXkENwC1rm5SwY69CDgPIJHu/wqz////c5MNGetA/wA25zQzLa3XaaY5DBaEw2FZauTUSkXzzDLPM0ug9wRjdiW752JIXymC5CNdOIitiw76Joq056xOkqzstNwz+mtA2+SB9UxMXqoItcnEGzVQayY8FXO9Tyw9uO8FGTB4ER6W4Q3v3fyl+4wP5XEsJBiOfpUSmNWLDw5eqJHaTfXj4crGdmgdPtb5J77K740osow36et4vdxehS+CwmEi/uW1oakfTCjDKTaFUdGJS3...RCYiRBUjjqpVdehwWShTwUSFiGkpwFW3Z2oGzmYJMeK0gwFELJ7PM/4UTEMiwQIkyv0zrt1+WANu2OO4EmDFWoORKoV+crX/qayXz31DjmP0Jhat1Qps3TCnCMbHe2dhx3LinKqm7arh/GaV7Wbf/g8Oj45PTs/OLy6vrm9u7+4fHp+cVpUN+Ym3GGIE2B+VRtlfQr6QI6A9EC/dOvupLOctxQQns5jZLK+KnujLbsNKU6WRaxpQEcLWJFxmDIujEnqcRJQDhxyboDVhInrU6Lu82xQq9aAi3hk77wwZMoc4SMxd3zbEVvi9BlEWtNwoQYmXmJY/tDia9mU2DtK3MydhzqVTJDjlZHACNuR1YrYnyMzFcEmMg7YbDaQEmuGdk5fN2alKY9dhjT44n67nuNceEY7zqGwwHeXyoHr0A4eWqfmxweApr3zqxQx5sHWbEultwddsQ7gWDpUOmv8Aac8LoRJi5v392WymSrIA9fVxzjXy7wQHo/ZuwCHBIO' because it violates the following Content Security Policy directive: "default-src 'self'". Note that 'font-src' was not explicitly set, so 'default-src' is used as a fallback.
+
+(anonymous) @ themeContext-e2709bf1.js:1
+qa @ localStorage-e41904e9.js:38
+U.useState @ localStorage-e41904e9.js:9
+X @ themeContext-e2709bf1.js:1
+Y @ themeContext-e2709bf1.js:1
+ie @ themeContext-e2709bf1.js:1
+Qo @ localStorage-e41904e9.js:38
+Id @ localStorage-e41904e9.js:40
+Cd @ localStorage-e41904e9.js:40
+dh @ localStorage-e41904e9.js:40
+ol @ localStorage-e41904e9.js:40
+kd @ localStorage-e41904e9.js:40
+N @ localStorage-e41904e9.js:25
+Jn @ localStorage-e41904e9.js:25Understand this error
+36:1 Refused to load the script 'https://replit.com/public/js/replit-dev-banner.js' because it violates the following Content Security Policy directive: "script-src 'self' 'unsafe-inline' 'unsafe-eval'". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback.
+Understand this error
+chunk-WERSD76P.js?v=e3379111:21551 Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+AuthContext.tsx:93 Checking auth with token: eyJhbGciOiJIUzI1NiIs...
+AuthContext.tsx:93 Checking auth with token: eyJhbGciOiJIUzI1NiIs...
+analytics.ts:47 Analytics Event: {event: 'page_viewed', properties: {…}, userId: '11', timestamp: 1758180708833, sessionId: 'cjdjir150zl72nkdiloec', …}
+analytics.ts:47 Analytics Event: {event: 'page_viewed', properties: {…}, userId: '11', timestamp: 1758180708837, sessionId: 'cjdjir150zl72nkdiloec', …}
+PropertyDetailsPage.tsx:212 Uncaught TypeError: Cannot read properties of null (reading 'length')
+    at PropertyDetailsPage (PropertyDetailsPage.tsx:212:38)
+    at renderWithHooks (chunk-WERSD76P.js?v=e3379111:11548:26)
+    at updateFunctionComponent (chunk-WERSD76P.js?v=e3379111:14582:28)
+    at beginWork (chunk-WERSD76P.js?v=e3379111:15924:22)
+    at HTMLUnknownElement.callCallback2 (chunk-WERSD76P.js?v=e3379111:3674:22)
+    at Object.invokeGuardedCallbackDev (chunk-WERSD76P.js?v=e3379111:3699:24)
+    at invokeGuardedCallback (chunk-WERSD76P.js?v=e3379111:3733:39)
+    at beginWork$1 (chunk-WERSD76P.js?v=e3379111:19765:15)
+    at performUnitOfWork (chunk-WERSD76P.js?v=e3379111:19198:20)
+    at workLoopSync (chunk-WERSD76P.js?v=e3379111:19137:13)
+PropertyDetailsPage @ PropertyDetailsPage.tsx:212
+renderWithHooks @ chunk-WERSD76P.js?v=e3379111:11548
+updateFunctionComponent @ chunk-WERSD76P.js?v=e3379111:14582
+beginWork @ chunk-WERSD76P.js?v=e3379111:15924
+callCallback2 @ chunk-WERSD76P.js?v=e3379111:3674
+invokeGuardedCallbackDev @ chunk-WERSD76P.js?v=e3379111:3699
+invokeGuardedCallback @ chunk-WERSD76P.js?v=e3379111:3733
+beginWork$1 @ chunk-WERSD76P.js?v=e3379111:19765
+performUnitOfWork @ chunk-WERSD76P.js?v=e3379111:19198
+workLoopSync @ chunk-WERSD76P.js?v=e3379111:19137
+renderRootSync @ chunk-WERSD76P.js?v=e3379111:19116
+performConcurrentWorkOnRoot @ chunk-WERSD76P.js?v=e3379111:18678
+workLoop @ chunk-WERSD76P.js?v=e3379111:197
+flushWork @ chunk-WERSD76P.js?v=e3379111:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=e3379111:384Understand this error
+PropertyDetailsPage.tsx:212 Uncaught TypeError: Cannot read properties of null (reading 'length')
+    at PropertyDetailsPage (PropertyDetailsPage.tsx:212:38)
+    at renderWithHooks (chunk-WERSD76P.js?v=e3379111:11548:26)
+    at updateFunctionComponent (chunk-WERSD76P.js?v=e3379111:14582:28)
+    at beginWork (chunk-WERSD76P.js?v=e3379111:15924:22)
+    at HTMLUnknownElement.callCallback2 (chunk-WERSD76P.js?v=e3379111:3674:22)
+    at Object.invokeGuardedCallbackDev (chunk-WERSD76P.js?v=e3379111:3699:24)
+    at invokeGuardedCallback (chunk-WERSD76P.js?v=e3379111:3733:39)
+    at beginWork$1 (chunk-WERSD76P.js?v=e3379111:19765:15)
+    at performUnitOfWork (chunk-WERSD76P.js?v=e3379111:19198:20)
+    at workLoopSync (chunk-WERSD76P.js?v=e3379111:19137:13)
+PropertyDetailsPage @ PropertyDetailsPage.tsx:212
+renderWithHooks @ chunk-WERSD76P.js?v=e3379111:11548
+updateFunctionComponent @ chunk-WERSD76P.js?v=e3379111:14582
+beginWork @ chunk-WERSD76P.js?v=e3379111:15924
+callCallback2 @ chunk-WERSD76P.js?v=e3379111:3674
+invokeGuardedCallbackDev @ chunk-WERSD76P.js?v=e3379111:3699
+invokeGuardedCallback @ chunk-WERSD76P.js?v=e3379111:3733
+beginWork$1 @ chunk-WERSD76P.js?v=e3379111:19765
+performUnitOfWork @ chunk-WERSD76P.js?v=e3379111:19198
+workLoopSync @ chunk-WERSD76P.js?v=e3379111:19137
+renderRootSync @ chunk-WERSD76P.js?v=e3379111:19116
+recoverFromConcurrentError @ chunk-WERSD76P.js?v=e3379111:18736
+performConcurrentWorkOnRoot @ chunk-WERSD76P.js?v=e3379111:18684
+workLoop @ chunk-WERSD76P.js?v=e3379111:197
+flushWork @ chunk-WERSD76P.js?v=e3379111:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=e3379111:384Understand this error
+chunk-WERSD76P.js?v=e3379111:14032 The above error occurred in the <PropertyDetailsPage> component:
+
+    at PropertyDetailsPage (https://331c9cdc-a1e3-4369-9dda-5ae35b395e48-00-21ptexpix7co9.worf.replit.dev/src/pages/PropertyDetailsPage.tsx?t=1758180700294:48:18)
+    at RenderedRoute (https://331c9cdc-a1e3-4369-9dda-5ae35b395e48-00-21ptexpix7co9.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/react-router-dom.js?v=e3379111:4088:5)
+    at Routes (https://331c9cdc-a1e3-4369-9dda-5ae35b395e48-00-21ptexpix7co9.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/react-router-dom.js?v=e3379111:4558:5)
+    at div
+    at PropertyProvider (https://331c9cdc-a1e3-4369-9dda-5ae35b395e48-00-21ptexpix7co9.worf.replit.dev/src/contexts/PropertyContext.tsx:29:36)
+    at AuthProvider (https://331c9cdc-a1e3-4369-9dda-5ae35b395e48-00-21ptexpix7co9.worf.replit.dev/src/contexts/AuthContext.tsx:31:32)
+    at ToastProvider (https://331c9cdc-a1e3-4369-9dda-5ae35b395e48-00-21ptexpix7co9.worf.replit.dev/src/components/ui/Toast.tsx:32:3)
+    at QueryClientProvider (https://331c9cdc-a1e3-4369-9dda-5ae35b395e48-00-21ptexpix7co9.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=e3379111:2933:3)
+    at ErrorBoundary (https://331c9cdc-a1e3-4369-9dda-5ae35b395e48-00-21ptexpix7co9.worf.replit.dev/src/components/ui/ErrorBoundary.tsx:8:5)
+    at App
+    at QueryClientProvider (https://331c9cdc-a1e3-4369-9dda-5ae35b395e48-00-21ptexpix7co9.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=e3379111:2933:3)
+    at Router (https://331c9cdc-a1e3-4369-9dda-5ae35b395e48-00-21ptexpix7co9.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/react-router-dom.js?v=e3379111:4501:15)
+    at BrowserRouter (https://331c9cdc-a1e3-4369-9dda-5ae35b395e48-00-21ptexpix7co9.worf.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/react-router-dom.js?v=e3379111:5247:5)
+
+React will try to recreate this component tree from scratch using the error boundary you provided, ErrorBoundary.
+logCapturedError @ chunk-WERSD76P.js?v=e3379111:14032
+callback @ chunk-WERSD76P.js?v=e3379111:14078
+callCallback @ chunk-WERSD76P.js?v=e3379111:11248
+commitUpdateQueue @ chunk-WERSD76P.js?v=e3379111:11265
+commitLayoutEffectOnFiber @ chunk-WERSD76P.js?v=e3379111:17075
+commitLayoutMountEffects_complete @ chunk-WERSD76P.js?v=e3379111:17980
+commitLayoutEffects_begin @ chunk-WERSD76P.js?v=e3379111:17969
+commitLayoutEffects @ chunk-WERSD76P.js?v=e3379111:17920
+commitRootImpl @ chunk-WERSD76P.js?v=e3379111:19353
+commitRoot @ chunk-WERSD76P.js?v=e3379111:19277
+finishConcurrentRender @ chunk-WERSD76P.js?v=e3379111:18760
+performConcurrentWorkOnRoot @ chunk-WERSD76P.js?v=e3379111:18718
+workLoop @ chunk-WERSD76P.js?v=e3379111:197
+flushWork @ chunk-WERSD76P.js?v=e3379111:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=e3379111:384Understand this error
+ErrorBoundary.tsx:30 ErrorBoundary caught an error: TypeError: Cannot read properties of null (reading 'length')
+    at PropertyDetailsPage (PropertyDetailsPage.tsx:212:38)
+    at renderWithHooks (chunk-WERSD76P.js?v=e3379111:11548:26)
+    at updateFunctionComponent (chunk-WERSD76P.js?v=e3379111:14582:28)
+    at beginWork (chunk-WERSD76P.js?v=e3379111:15924:22)
+    at beginWork$1 (chunk-WERSD76P.js?v=e3379111:19753:22)
+    at performUnitOfWork (chunk-WERSD76P.js?v=e3379111:19198:20)
+    at workLoopSync (chunk-WERSD76P.js?v=e3379111:19137:13)
+    at renderRootSync (chunk-WERSD76P.js?v=e3379111:19116:15)
+    at recoverFromConcurrentError (chunk-WERSD76P.js?v=e3379111:18736:28)
+    at performConcurrentWorkOnRoot (chunk-WERSD76P.js?v=e3379111:18684:30) {componentStack: '\n    at PropertyDetailsPage (https://331c9cdc-a1e3….vite/deps/react-router-dom.js?v=e3379111:5247:5)'}
+componentDidCatch @ ErrorBoundary.tsx:30
+callback @ chunk-WERSD76P.js?v=e3379111:14084
+callCallback @ chunk-WERSD76P.js?v=e3379111:11248
+commitUpdateQueue @ chunk-WERSD76P.js?v=e3379111:11265
+commitLayoutEffectOnFiber @ chunk-WERSD76P.js?v=e3379111:17075
+commitLayoutMountEffects_complete @ chunk-WERSD76P.js?v=e3379111:17980
+commitLayoutEffects_begin @ chunk-WERSD76P.js?v=e3379111:17969
+commitLayoutEffects @ chunk-WERSD76P.js?v=e3379111:17920
+commitRootImpl @ chunk-WERSD76P.js?v=e3379111:19353
+commitRoot @ chunk-WERSD76P.js?v=e3379111:19277
+finishConcurrentRender @ chunk-WERSD76P.js?v=e3379111:18760
+performConcurrentWorkOnRoot @ chunk-WERSD76P.js?v=e3379111:18718
+workLoop @ chunk-WERSD76P.js?v=e3379111:197
+flushWork @ chunk-WERSD76P.js?v=e3379111:176
+performWorkUntilDeadline @ chunk-WERSD76P.js?v=e3379111:384Understand this error
+analytics.ts:47 Analytics Event: {event: 'pdp_viewed', properties: {…}, userId: '11', timestamp: 1758180711689, sessionId: 'cjdjir150zl72nkdiloec', …}
+analytics.ts:47 Analytics Event: {event: 'pdp_viewed', properties: {…}, userId: '11', timestamp: 1758180711985, sessionId: 'cjdjir150zl72nkdiloec', …}
+2AuthContext.tsx:104 Auth check successful: cbadabili@gmail.com

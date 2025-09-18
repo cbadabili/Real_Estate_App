@@ -214,7 +214,11 @@ export const authenticate = async (req: AuthenticatedRequest, res: Response, nex
       req.user = user;
       return next();
     } catch (jwtError: any) {
-      console.error('JWT verification failed:', jwtError.message);
+      // Only log non-malformed token errors to reduce noise
+      if (jwtError.name !== 'JsonWebTokenError' || !jwtError.message.includes('malformed')) {
+        console.error('JWT verification failed:', jwtError.message);
+      }
+      
       if (jwtError.name === 'TokenExpiredError') {
         return res.status(401).json({ message: 'Token expired' });
       }

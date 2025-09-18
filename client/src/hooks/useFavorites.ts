@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { analytics } from '../lib/analytics';
@@ -35,11 +34,17 @@ export const useFavorites = () => {
             'Authorization': `Bearer ${user.token}`,
           },
         });
-        
+
         if (response.ok) {
           const data = await response.json();
           setFavorites(data.favoriteIds || []);
           setFavoriteProperties(data.properties || []);
+        } else if (response.status === 401) {
+          // Handle unauthorized access - clear local favorites and redirect or show message
+          setFavorites([]);
+          setFavoriteProperties([]);
+          // Optionally, you could redirect to login or show an error message
+          console.warn('Unauthorized access to favorites. User token might be invalid.');
         }
       } else {
         // Load from localStorage for guest users
@@ -55,6 +60,9 @@ export const useFavorites = () => {
       }
     } catch (error) {
       console.error('Error loading favorites:', error);
+      // Ensure state is reset if an error occurs during loading
+      setFavorites([]);
+      setFavoriteProperties([]);
     } finally {
       setIsLoading(false);
     }
@@ -69,7 +77,7 @@ export const useFavorites = () => {
         },
         body: JSON.stringify({ ids: favoriteIds }),
       });
-      
+
       if (response.ok) {
         const properties = await response.json();
         setFavoriteProperties(properties);
@@ -101,7 +109,7 @@ export const useFavorites = () => {
 
       // Track analytics
       analytics.propertyFavorited(propertyId, 'add');
-      
+
       // Refresh favorite properties
       await loadFavorites();
     } catch (error) {
@@ -131,7 +139,7 @@ export const useFavorites = () => {
 
       // Track analytics
       analytics.propertyFavorited(propertyId, 'remove');
-      
+
       // Update favorite properties
       setFavoriteProperties(props => props.filter(p => p.id !== propertyId));
     } catch (error) {

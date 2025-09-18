@@ -24,6 +24,11 @@ import { useFavorites } from '../hooks/useFavorites';
 import { useAuth } from '../contexts/AuthContext';
 import { analytics } from '../lib/analytics';
 
+// Placeholder for a LoadingSpinner component, assuming it exists elsewhere
+const LoadingSpinner = () => (
+  <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-beedab-blue"></div>
+);
+
 interface Property {
   id: string;
   title: string;
@@ -61,7 +66,8 @@ const PropertyDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [property, setProperty] = useState<Property | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true); // Renamed from 'loading' to 'isLoading' for clarity
+  const [error, setError] = useState<Error | null>(null); // Added error state
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [showContactForm, setShowContactForm] = useState(false);
   const { toggleFavorite, isFavorite } = useFavorites();
@@ -77,13 +83,14 @@ const PropertyDetailsPage: React.FC = () => {
 
   const fetchProperty = async (propertyId: string) => {
     try {
-      setLoading(true);
+      setIsLoading(true);
+      setError(null); // Reset error state before fetching
       const response = await fetch(`/api/properties/${propertyId}`);
-      
+
       if (response.ok) {
         const propertyData = await response.json();
         setProperty(propertyData);
-        
+
         // Track property view
         analytics.propertyViewed(
           propertyData.id,
@@ -92,12 +99,17 @@ const PropertyDetailsPage: React.FC = () => {
           propertyData.location
         );
       } else {
-        console.error('Failed to fetch property');
+        // Handle non-OK responses, e.g., 404 Not Found
+        const errorData = await response.json().catch(() => ({ message: 'An unknown error occurred.' }));
+        setError(new Error(errorData.message || `Failed to fetch property with status: ${response.status}`));
+        setProperty(null); // Ensure property is null if fetch fails
       }
-    } catch (error) {
-      console.error('Error fetching property:', error);
+    } catch (err) {
+      console.error('Error fetching property:', err);
+      setError(err instanceof Error ? err : new Error('An unexpected error occurred during fetch.'));
+      setProperty(null); // Ensure property is null if fetch fails
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -109,20 +121,24 @@ const PropertyDetailsPage: React.FC = () => {
     setShowContactForm(true);
   };
 
-  if (loading) {
+  // Render loading state
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-neutral-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-beedab-blue"></div>
+        <LoadingSpinner />
       </div>
     );
   }
 
-  if (!property) {
+  // Render error state
+  if (error) {
     return (
       <div className="min-h-screen bg-neutral-50 flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-neutral-900 mb-2">Property Not Found</h2>
-          <p className="text-neutral-600 mb-4">The property you're looking for doesn't exist.</p>
+          <AlertCircle className="w-16 h-16 text-red-600 mx-auto mb-4" />
+          <h2 className="text-2xl font-bold text-neutral-900 mb-2">Error Loading Property</h2>
+          <p className="text-neutral-600 mb-4">Could not retrieve property details.</p>
+          <p className="text-red-600 mb-4 text-sm">{error.message}</p>
           <button 
             onClick={() => navigate('/properties')}
             className="bg-beedab-blue text-white px-6 py-2 rounded-lg hover:bg-beedab-darkblue transition-colors"
@@ -133,6 +149,29 @@ const PropertyDetailsPage: React.FC = () => {
       </div>
     );
   }
+
+  // Render "Not Found" state if property is null and not loading/error
+  if (!property) {
+    return (
+      <div className="min-h-screen bg-neutral-50 flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-neutral-900 mb-2">Property Not Found</h2>
+          <p className="text-neutral-600 mb-4">The property you're looking for doesn't exist or couldn't be loaded.</p>
+          <button 
+            onClick={() => navigate('/properties')}
+            className="bg-beedab-blue text-white px-6 py-2 rounded-lg hover:bg-beedab-darkblue transition-colors"
+          >
+            Back to Properties
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Get coordinates safely with proper null checks
+  const coordinates = property?.coordinates && Array.isArray(property.coordinates) && property.coordinates.length >= 2
+    ? [parseFloat(property.coordinates[0]), parseFloat(property.coordinates[1])]
+    : null;
 
   return (
     <div className="min-h-screen bg-neutral-50">
@@ -170,7 +209,7 @@ const PropertyDetailsPage: React.FC = () => {
           <div className="bg-white rounded-lg shadow-sm overflow-hidden mb-6">
             <div className="relative aspect-video">
               <img
-                src={property.images[currentImageIndex] || '/api/placeholder/800/600'}
+                src={property.images.length > 0 ? property.images[currentImageIndex] : '/api/placeholder/800/600'}
                 alt={property.title}
                 className="w-full h-full object-cover"
               />
@@ -205,19 +244,19 @@ const PropertyDetailsPage: React.FC = () => {
 
                 {/* Property Features */}
                 <div className="flex flex-wrap gap-4 mb-6">
-                  {property.bedrooms && (
+                  {property.bedrooms !== undefined && (
                     <div className="flex items-center">
                       <Bed className="w-5 h-5 mr-2 text-neutral-500" />
                       <span>{property.bedrooms} Bedrooms</span>
                     </div>
                   )}
-                  {property.bathrooms && (
+                  {property.bathrooms !== undefined && (
                     <div className="flex items-center">
                       <Bath className="w-5 h-5 mr-2 text-neutral-500" />
                       <span>{property.bathrooms} Bathrooms</span>
                     </div>
                   )}
-                  {property.area && (
+                  {property.area !== undefined && (
                     <div className="flex items-center">
                       <Square className="w-5 h-5 mr-2 text-neutral-500" />
                       <span>{property.area} m²</span>
@@ -276,7 +315,7 @@ const PropertyDetailsPage: React.FC = () => {
                       )}
                     </div>
                   </div>
-                  
+
                   <div className="space-y-2">
                     <button
                       onClick={handleContactAgent}
