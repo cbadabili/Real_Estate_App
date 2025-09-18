@@ -323,39 +323,49 @@ const PropertyDetailsPage: React.FC = () => {
                 {/* Agent Info */}
                 <div className="mb-6">
                   <h3 className="text-lg font-semibold mb-4">Listed By</h3>
-                  <div className="flex items-center mb-4">
-                    <img
-                      src={property.agent.photo || '/api/placeholder/60/60'}
-                      alt={property.agent.name}
-                      className="w-12 h-12 rounded-full mr-4"
-                    />
-                    <div>
-                      <h4 className="font-semibold text-neutral-900">{property.agent.name}</h4>
-                      {property.agent.verified && (
-                        <div className="flex items-center">
-                          <CheckCircle className="w-4 h-4 mr-1 text-green-500" />
-                          <span className="text-sm text-green-600">Verified Agent</span>
+                  {property.agent ? (
+                    <>
+                      <div className="flex items-center mb-4">
+                        <img
+                          src={property.agent.photo || '/api/placeholder/60/60'}
+                          alt={property.agent.name || 'Agent'}
+                          className="w-12 h-12 rounded-full mr-4"
+                        />
+                        <div>
+                          <h4 className="font-semibold text-neutral-900">{property.agent.name || 'Unknown Agent'}</h4>
+                          {property.agent.verified && (
+                            <div className="flex items-center">
+                              <CheckCircle className="w-4 h-4 mr-1 text-green-500" />
+                              <span className="text-sm text-green-600">Verified Agent</span>
+                            </div>
+                          )}
                         </div>
-                      )}
-                    </div>
-                  </div>
+                      </div>
 
-                  <div className="space-y-2">
-                    <button
-                      onClick={handleContactAgent}
-                      className="w-full bg-beedab-blue text-white py-2 px-4 rounded-lg hover:bg-beedab-darkblue transition-colors flex items-center justify-center"
-                    >
-                      <MessageCircle className="w-4 h-4 mr-2" />
-                      Contact Agent
-                    </button>
-                    <a
-                      href={`tel:${property.agent.phone}`}
-                      className="w-full bg-neutral-100 text-neutral-700 py-2 px-4 rounded-lg hover:bg-neutral-200 transition-colors flex items-center justify-center"
-                    >
-                      <Phone className="w-4 h-4 mr-2" />
-                      Call Now
-                    </a>
-                  </div>
+                      <div className="space-y-2">
+                        <button
+                          onClick={handleContactAgent}
+                          className="w-full bg-beedab-blue text-white py-2 px-4 rounded-lg hover:bg-beedab-darkblue transition-colors flex items-center justify-center"
+                        >
+                          <MessageCircle className="w-4 h-4 mr-2" />
+                          Contact Agent
+                        </button>
+                        {property.agent.phone && (
+                          <a
+                            href={`tel:${property.agent.phone}`}
+                            className="w-full bg-neutral-100 text-neutral-700 py-2 px-4 rounded-lg hover:bg-neutral-200 transition-colors flex items-center justify-center"
+                          >
+                            <Phone className="w-4 h-4 mr-2" />
+                            Call Now
+                          </a>
+                        )}
+                      </div>
+                    </>
+                  ) : (
+                    <div className="text-center p-4 bg-neutral-100 rounded-lg">
+                      <p className="text-neutral-600">Agent information not available</p>
+                    </div>
+                  )}
                 </div>
 
                 {/* Quick Actions */}
