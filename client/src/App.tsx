@@ -12,7 +12,7 @@ import PropertySearchPage from './pages/property/PropertySearchPage';
 import PropertyDetailsPage from './pages/PropertyDetailsPage';
 import { PlotsPage } from './pages/PlotsPage';
 import RentPage from './pages/RentPage';
-import RentalDetailsPage from './pages/RentalDetailsPage';
+// import RentalDetailsPage from './pages/RentalDetailsPage';
 import BuyerSellerPlatformPage from './pages/BuyerSellerPlatformPage';
 import MarketIntelligencePage from './pages/MarketIntelligencePage';
 import SecureTransactionsPage from './pages/SecureTransactionsPage';
@@ -132,7 +132,7 @@ function App() {
             <Route path="/create-listing" element={<ProtectedRoute><CreateListingPage /></ProtectedRoute>} />
             <Route path="/my-properties" element={<ProtectedRoute><MyPropertiesPage /></ProtectedRoute>} />
             <Route path="/rent" element={<RentPage />} />
-            <Route path="/rent/:id" element={<RentalDetailsPage />} />
+            {/* <Route path="/rent/:id" element={<RentalDetailsPage />} /> */}
             <Route path="/rental-listing-wizard" element={<ProtectedRoute><RentalListingWizard /></ProtectedRoute>} />
             <Route path="/sell-listing-wizard" element={<ProtectedRoute><SellListingWizard /></ProtectedRoute>} />
             <Route path="/plots" element={<PlotsPage />} />

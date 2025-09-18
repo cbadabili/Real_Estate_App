@@ -84,8 +84,6 @@ const RentalDetailsPage = () => {
     setShowApplicationForm(false);
   };
 
-  
-
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -336,14 +334,14 @@ const RentalDetailsPage = () => {
         </div>
       </div>
 
-      {/* Application Form Modal */}
-      {showApplicationForm && (
+      {/* Application Form Modal - Temporarily commented out */}
+      {/* {showApplicationForm && (
         <RentalApplicationForm
           rentalId={property.id}
           onClose={() => setShowApplicationForm(false)}
           onSubmit={handleApplicationSubmit}
         />
-      )}
+      )} */}
     </div>
   );
 };
