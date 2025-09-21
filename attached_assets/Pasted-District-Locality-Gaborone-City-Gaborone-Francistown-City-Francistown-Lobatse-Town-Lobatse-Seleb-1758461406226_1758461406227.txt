@@ -1,0 +1,346 @@
+District,Locality
+Gaborone City,Gaborone
+Francistown City,Francistown
+Lobatse Town,Lobatse
+Selebi-Phikwe Town,Selebi-Phikwe
+Jwaneng Town,Jwaneng
+Orapa Town,Orapa
+Sowa Town,Sowa
+Goodhope,Goodhope
+Goodhope,Mabule
+Goodhope,Pitsane
+Goodhope,Metlojane
+Goodhope,Madingwane
+Goodhope,Logagane
+Goodhope,Hebron
+Goodhope,Ramatlabama
+Goodhope,Tswaanyaneng
+Goodhope,Mogobewakgomo
+Goodhope,Mogwalale
+Goodhope,Borobadilepe
+Goodhope,Matasalalo
+Goodhope,Papatlo
+Goodhope,Makokwe
+Goodhope,Phihetswane
+Goodhope,Marojane
+Goodhope,Kgoro
+Goodhope,Gamokoto
+Goodhope,Dinatshana
+Goodhope,Bethele
+Goodhope,Pitsane Potlokwe
+Goodhope,Malokaganyane
+Goodhope,Mmathethe
+Goodhope,Molapowabojang
+Goodhope,Digawana
+Goodhope,Lejwana
+Goodhope,Rakhuna
+Goodhope,Metlobo
+Kanye,Kanye
+Kanye,Selokolela
+Kanye,Gasita
+Kanye,Lorolwane
+Kanye,Masoke
+Kanye,Maunyele
+Kanye,Gasethebe
+Kanye,Letlapana
+Moshupa,Moshupa
+Moshupa,Manyana
+Moshupa,Lotlhakane West
+Moshupa,Ralekgetho
+Moshupa,Pitseng
+Moshupa,Seherelela
+Moshupa,Sesung
+Moshupa,Bikwe
+Moshupa,Ranaka (Ntlhantlhe)
+Moshupa,Lekgolobotlo
+Moshupa,Kgomokasitwa
+Moshupa,Magotlhwane
+Moshupa,Mogonye
+Moshupa,Moshaneng
+Moshupa,Diabo
+Moshupa,Dipotsana
+Moshupa,Segwagwa
+Mabutsane,Mabutsane
+Mabutsane,Sekoma
+Mabutsane,Khakhea
+Mabutsane,Kokong
+Mabutsane,Keng
+Mabutsane,Morwamosu
+Mabutsane,Samane
+Mabutsane,Mahotshwane
+Mabutsane,Kanaku
+Mabutsane,Kutuku
+Mabutsane,Itholoke
+Mabutsane,Khonkhwa
+Mabutsane,Tsonyane
+Mabutsane,Betesankwe
+Mabutsane,Maokane
+Mabutsane,Sese
+Kweneng East,Molepolole
+Kweneng East,Gabane
+Kweneng East,Kopong
+Kweneng East,Thamaga
+Kweneng East,Mmankgodi
+Kweneng East,Boatlaname
+Kweneng East,Lentsweletau
+Kweneng East,Lephepe
+Kweneng East,Sojwe
+Kweneng East,Shadishadi
+Kweneng East,Ditshukudu
+Kweneng East,Medie
+Kweneng East,Kgope
+Kweneng East,Dikgatlhong
+Kweneng East,Mahetlwe
+Kweneng East,Mogonono
+Kweneng East,Sorilatholo
+Kweneng East,Malwelwe
+Kweneng East,Ngware
+Kweneng East,Diphuduhudu
+Kweneng East,Mantshwabisi
+Letlhakeng,Letlhakeng
+Letlhakeng,Maboane
+Letlhakeng,Takatokwane
+Letlhakeng,Dutlwe
+Letlhakeng,Tshwaane
+Letlhakeng,Khekhenye
+Letlhakeng,Motokwe
+Letlhakeng,Tsetseng
+Letlhakeng,Ditshegwane
+Letlhakeng,Sesung
+Letlhakeng,Khudumelapye
+Letlhakeng,Salajwe
+Letlhakeng,Kaudwane
+Letlhakeng,Monwane
+Letlhakeng,Metsibotlhoko
+Letlhakeng,Xaxa (remote)
+Mogoditshane,Mogoditshane
+Mogoditshane,Mmopane
+Mogoditshane,Metsimotlhabe
+Kgatleng,Mochudi
+Kgatleng,Oodi
+Kgatleng,Bokaa
+Kgatleng,Artesia
+Kgatleng,Modipane
+Kgatleng,Mmathubudukwane
+Kgatleng,Malolwane
+Kgatleng,Matebeleng
+Kgatleng,Dikgonnye
+Kgatleng,Dikwididi
+Kgatleng,Kgomodiatshaba
+Kgatleng,Khurutshe
+Kgatleng,Leshibitse
+Kgatleng,Mabalane
+Kgatleng,Malotwana Siding
+Kgatleng,Morwa
+Kgatleng,Pilane
+Kgatleng,Ramonaka
+Kgatleng,Ramotlabaki
+Kgatleng,Rasesa
+Kgatleng,Sikwane
+Kgatleng,Oliphant's Drift
+North-East,Masunga
+North-East,Mapoka
+North-East,Botalaote
+North-East,Moroka
+North-East,Nlakhwane
+North-East,Tshesebe
+North-East,Jackalas No.1
+North-East,Jackalas No.2
+North-East,Themashanga
+North-East,Senyawe
+North-East,Siviya
+North-East,Pole (Tshamataka)
+North-East,Sekakangwe
+North-East,Kalakamati
+North-East,Gulubane
+North-East,Mbalambi
+North-East,Mabudzane
+North-East,Masingwaneng
+North-East,Makaleng
+North-East,Tati Siding
+North-East,Matshelagabedi
+North-East,Matsiloje
+North-East,Ditladi
+North-East,Patayamatebele
+North-East,Ramokgwebana
+North-East,Mowana (Mupane)
+North-East,Mulambakwena
+North-East,Gungwe
+North-East,Gambule
+North-East,Masukwane (Sechele)
+North-East,Vukwi
+North-East,Zwenshambe
+Tutume,Tutume
+Tutume,Maitengwe
+Tutume,Nkange
+Tutume,Nata
+Tutume,Maposa
+Tutume,Sepako
+Tutume,Manxotae
+Tutume,Gweta
+Tutume,Zoroga
+Tutume,Tsokatshaa
+Tutume,Dukwi
+Tutume,Makalaka
+Tutume,Mosetse
+Tutume,Majwaneng (Goshwe)
+Tutume,Mathangwane
+Tonota,Tonota
+Tonota,Shashe Bridge
+Tonota,Mandunyane
+Tonota,Chadibe
+Tonota,Borolong
+Tonota,Mathangwane
+Tonota,Makobo
+Tonota,Natale
+Tonota,Mabesekwa
+Tonota,Semotswane
+Tonota,Makaleng
+Tonota,Matenge
+Tonota,Masingwaneng
+Tonota,Gulubane
+Tonota,Marapong
+Palapye,Palapye
+Palapye,Malaka
+Palapye,Lecheng
+Palapye,Radisele
+Palapye,Maunatlala
+Palapye,Lerala
+Palapye,Mogapi
+Palapye,Pilikwe
+Palapye,Kalamare
+Palapye,Topisi
+Palapye,Moreomabele
+Palapye,Khurumela
+Mahalapye,Mahalapye
+Mahalapye,Shoshong
+Mahalapye,Sefhare
+Mahalapye,Ramokgonami
+Mahalapye,Pilikwe
+Mahalapye,Kalamare
+Mahalapye,Mookane
+Mahalapye,Otse (Mahalapye)
+Mahalapye,Tewane
+Mahalapye,Mogorosi
+Mahalapye,Thabala
+Mahalapye,Moiyabana
+Mahalapye,Lorogorogoro (tiny)
+Serowe (Central),Serowe
+Serowe (Central),Paje
+Serowe (Central),Mmashoro
+Serowe (Central),Mabeleapodi
+Serowe (Central),Tshimoyapula
+Serowe (Central),Majwanaadipitse
+Serowe (Central),Moiyabana
+Serowe (Central),Damuchojenaa
+Serowe (Central),Dichwe
+Serowe (Central),Malatswai
+Boteti,Boteti (Rakops)
+Boteti,Letlhakane
+Boteti,Khumaga
+Boteti,Rakops
+Boteti,Mopipi
+Boteti,Xhumo
+Boteti,Mokoboxane
+Boteti,Kedia
+Boteti,Xere
+Boteti,Mmatshumo
+Boteti,Mmea
+Boteti,Mokubilo
+Boteti,Makgaba
+Boteti,Mosu
+Boteti,Moreomaoto
+Boteti,Motopi
+Boteti,Phuduhudu
+Boteti,Toromoja
+Boteti,Mmadikola
+Boteti,Malatswai
+Boteti,Orapa (town)
+Boteti,Makalamabedi
+Okavango,Gumare
+Okavango,Shakawe
+Okavango,Etsha 6
+Okavango,Etsha 13
+Okavango,Ngarange
+Okavango,Seronga
+Okavango,Beetsha
+Okavango,Gudigwa
+Okavango,Gunotsoga
+Okavango,Eretsha
+Okavango,Kauxwi
+Okavango,Mbiroba (Xakao)
+Okavango,Mogotho
+Okavango,Sekondomboro
+Okavango,Tubu
+Okavango,Habu
+Okavango,Nxamasere
+Okavango,Mohembo East
+Okavango,Mohembo West
+Okavango,Ndundu
+Okavango,Xaxaba
+Okavango,Ditshiping
+Okavango,Xakanaxa
+North-West,Maun
+North-West,Sehithwa
+North-West,Toteng
+North-West,Kareng
+North-West,Tsao
+North-West,Nxaraga
+North-West,Komana
+North-West,Chanoga
+North-West,Khwai
+North-West,Mababe
+North-West,Sankuyo
+North-West,Phuduhudu (to Boteti)
+North-West,Pandamatenga (to Chobe)
+Chobe,Kasane
+Chobe,Kazungula
+Chobe,Pandamatenga
+Chobe,Kachikau
+Chobe,Kavimba
+Chobe,Parakarungu
+Chobe,Satau
+Chobe,Mabele
+Chobe,Lesoma
+Ghanzi,Ghanzi
+Ghanzi,D'Kar
+Ghanzi,Kuke
+Ghanzi,Qabo
+Ghanzi,Grootlaagte
+Ghanzi,New Xade
+Ghanzi,East Hanahai
+Ghanzi,West Hanahai
+Ghanzi,Kacgae
+Ghanzi,Bere
+Ghanzi,Metsiamanong (CKGR)
+Ghanzi,Molapo (CKGR)
+Ghanzi,Mothomelo (CKGR)
+Ghanzi,Gugamma (CKGR)
+Charleshill,Charles Hill
+Charleshill,Ncojane
+Charleshill,Karakubis
+Charleshill,Kole
+Charleshill,Makunda
+Charleshill,New Xanagas
+Charleshill,Xanagas
+Charleshill,Kalkfontein
+Charleshill,Chobokwane
+Charleshill,West Hanahai
+Charleshill,Metsimantle
+Kgalagadi North,Hukuntsi
+Kgalagadi North,Lehututu
+Kgalagadi North,Tshane
+Kgalagadi North,Lokgwabe
+Kgalagadi North,Monong
+Kgalagadi North,Khawa
+Kgalagadi South,Tsabong
+Kgalagadi South,Werda
+Kgalagadi South,Makopong
+Kgalagadi South,Middlepits
+Kgalagadi South,Bokspits
+Kgalagadi South,Vaalhoek
+Kgalagadi South,Struizendam
+Kgalagadi South,Khuis
+Kgalagadi South,Omaweneno
+Kgalagadi South,Gachibana
+Kgalagadi South,Ukwi
