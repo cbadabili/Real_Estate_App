@@ -34,19 +34,17 @@ export const queryClient = new QueryClient({
 });
 
 // API request helper for mutations (POST, PUT, DELETE)
-export async function apiRequest(url: string, options: RequestInit = {}) {
-  const token = localStorage.getItem('authToken');
+export const apiRequest = async (url: string, options: RequestInit = {}) => {
+  const token = TokenStorage.getToken();
 
-  const config: RequestInit = {
+  const response = await fetch(url, {
     ...options,
     headers: {
       'Content-Type': 'application/json',
       ...(token && { Authorization: `Bearer ${token}` }),
       ...options.headers,
     },
-  };
-
-  const response = await fetch(url, config);
+  });
 
   if (!response.ok) {
     const errorText = await response.text();
@@ -61,7 +59,7 @@ export async function apiRequest(url: string, options: RequestInit = {}) {
 
     if (response.status === 401) {
       // Clear invalid token and redirect to login
-      localStorage.removeItem('authToken');
+      TokenStorage.removeToken();
       window.location.href = '/login';
       throw new Error('User not authenticated');
     }
@@ -75,4 +73,4 @@ export async function apiRequest(url: string, options: RequestInit = {}) {
   }
 
   return response.text();
-}
+};

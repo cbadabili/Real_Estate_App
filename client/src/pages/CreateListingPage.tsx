@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import PropertyLocationStep from '../components/properties/PropertyLocationStep';
+import { TokenStorage } from '../lib/storage';
 
 const CreateListingPage = () => {
   const navigate = useNavigate();
@@ -247,20 +248,16 @@ const CreateListingPage = () => {
 
       console.log('Transformed property data:', propertyData);
 
-      const token = localStorage.getItem('token');
-      
-      // Ensure proper token format
-      if (!token) {
-        throw new Error('No authentication token available');
+      // Check if user is authenticated before making request
+      if (!TokenStorage.hasToken()) {
+        throw new Error('Please log in to create a property listing');
       }
-
-      const authHeader = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
 
       const response = await fetch('/api/properties', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': authHeader,
+          'Authorization': `Bearer ${TokenStorage.getToken()}`,
         },
         body: JSON.stringify(propertyData),
       });
