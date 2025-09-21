@@ -1,0 +1,34 @@
+Summary
+•	Price-based filtering in the property search API is currently comparing the text-valued price column lexicographically, so range queries can include properties outside the requested budget.
+•	The AI search aggregator never enforces the price constraints it parses from natural-language queries, leaving phrases like “under 900k” ineffective.
+Issues Found
+1.	/api/properties compares price strings lexicographically
+Because properties.price is stored as text, getProperties compares stringified numbers (gte/lte) instead of numeric values. A listing priced at “1200000” will still satisfy maxPrice=950000 since '1' < '9' lexicographically, producing inaccurate results for both upper and lower bounds.
+Suggested taskFix price filtering to compare numerically
+Start task 1. In `server/storage.ts`, update the `getProperties` filters so `properties.price` is cast to a numeric expression (for example, via `sql\`(${properties.price})::double precision\``) before applying `gte`/`lte\`, ensuring numeric comparison semantics. 2. Reuse that numeric expression for any other price-based ordering or filtering in the same function to keep behavior consistent. 3. Add regression coverage (unit or integration) that hits `/api/properties` with seeded data to prove a 1,200,000 listing is excluded by `maxPrice=950000` and included when `minPrice=500000`.
+
+2.	AI search ignores price filters parsed from queries
+parseFreeText multiplies by 1 even when the user types “500k”, because the captured group omits the “k”, and queryDB never applies the parsed minPrice/maxPrice to the SQL filters. As a result, the aggregator responds with high-priced homes even when the user explicitly limits the budget.
+Suggested taskApply price limits in AI search aggregator
+Start task 1. 1. In `server/search-aggregator.ts`, adjust `parseFreeText` so the regex captures suffixes like `k` (and ideally `m`) and scales the numeric values appropriately, including handling one-sided ranges such as “under 900k”. 2. Extend `queryDB` in the same file to add `gte`/`lte` constraints on a numerically cast version of `properties.price` whenever `derived.minPrice` or `derived.maxPrice` is present. 3. Add a regression test that calls `/api/search` with a phrase like “homes under 900k in Gaborone” and verifies the response excludes properties above the limit.
+
+Testing
+•	⚠️ Tests not run (QA review only)
+I think we need to look at search holistically across the platform because its not functioning optimally 1. Case in point when I type something and hit enter it doesnt respond 2. I clear the search and the filter does not do back to showing all properties
+Copy
+Summary
+•	The keyboard handler in SmartSearchBar exits before processing Enter when there are no AI suggestions or recents, leaving manual searches unresponsive.
+•	The same component refuses to dispatch empty-string searches, so clearing the field never reloads the default property list.
+Issues Found
+1.	Manual Enter search blocked with no suggestions
+When the suggestion list is empty, onKeyDown returns immediately and the Enter case never fires, so onSearch is never called for typed queries without suggestions or recents.
+Suggested taskAllow Enter submissions when no suggestions are visible
+Start task 1. In `client/src/components/search/SmartSearchBar.tsx`, update `onKeyDown` so the early `return` only applies to Arrow key navigation and still calls `onSubmit` for Enter presses when `visibleList.length === 0`. 2. Add a focused test (React Testing Library or equivalent) that renders `SmartSearchBar` without suggestions, types a query, presses Enter, and asserts that `onSearch` fires once with the trimmed input.
+
+2.	Clearing query never resets property list
+doSearch short-circuits on blank values and the submit button stays disabled for empty strings, preventing onSearch('') from ever firing—so deleting the query leaves old filters applied instead of reloading all properties.
+Suggested taskPermit blank searches to reset property filters
+Start task 1. In `client/src/components/search/SmartSearchBar.tsx`, let `doSearch` call `onSearch` even when the trimmed term is empty (while skipping `saveRecent`), and adjust `onSubmit`/button disabling so clearing the field and submitting dispatches `onSearch('')`. 2. Add a regression test that clears the input and submits, verifying `onSearch` receives an empty string exactly once.
+
+Testing
+•	⚠️ Tests not run (QA review only)
