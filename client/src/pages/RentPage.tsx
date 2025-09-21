@@ -106,11 +106,14 @@ const RentPage = () => {
       if (filters.bedrooms) params.append('bedrooms', filters.bedrooms);
       if (filters.propertyType) params.append('propertyType', filters.propertyType);
 
+      console.log('Searching rentals with params:', params.toString());
+
       const response = await fetch(`/api/rentals/search?${params}`);
       const data = await response.json();
 
       if (response.ok && data.success) {
         setRentals(data.data || []);
+        console.log('Found rentals:', data.data?.length || 0);
       } else {
         console.error('Failed to fetch rentals:', data.error);
         setRentals([]);
@@ -372,10 +375,112 @@ const RentPage = () => {
                 </form>
               </div>
 
+              {/* Search Results Header */}
+              {!loading && (
+                <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900">
+                        {rentals.length > 0 ? `${rentals.length} Properties Found` : 'No Properties Found'}
+                      </h3>
+                      {searchQuery && (
+                        <p className="text-sm text-gray-600 mt-1">
+                          {rentals.length > 0 
+                            ? `Results for "${searchQuery}"` 
+                            : `No results found for "${searchQuery}"`
+                          }
+                        </p>
+                      )}
+                      {(filters.minPrice || filters.maxPrice || filters.bedrooms || filters.propertyType) && (
+                        <div className="flex flex-wrap gap-2 mt-2">
+                          {filters.minPrice && (
+                            <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded">
+                              Min: P{filters.minPrice}
+                            </span>
+                          )}
+                          {filters.maxPrice && (
+                            <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded">
+                              Max: P{filters.maxPrice}
+                            </span>
+                          )}
+                          {filters.bedrooms && (
+                            <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded">
+                              {filters.bedrooms}+ bedrooms
+                            </span>
+                          )}
+                          {filters.propertyType && (
+                            <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded">
+                              {filters.propertyType}
+                            </span>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                    {(searchQuery || filters.minPrice || filters.maxPrice || filters.bedrooms || filters.propertyType) && (
+                      <button
+                        onClick={() => {
+                          setSearchQuery('');
+                          setFilters({
+                            minPrice: '',
+                            maxPrice: '',
+                            bedrooms: '',
+                            propertyType: '',
+                            city: ''
+                          });
+                        }}
+                        className="text-sm text-gray-500 hover:text-gray-700 underline"
+                      >
+                        Clear all filters
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
+
               {/* Property Grid */}
               {loading ? (
-                <div className="flex justify-center py-8">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-beedab-blue"></div>
+                <div className="bg-white rounded-lg shadow-sm p-8">
+                  <div className="flex flex-col items-center justify-center py-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-beedab-blue mb-4"></div>
+                    <p className="text-gray-600">Searching for rental properties...</p>
+                  </div>
+                </div>
+              ) : rentals.length === 0 ? (
+                <div className="bg-white rounded-lg shadow-sm p-8">
+                  <div className="text-center py-8">
+                    <div className="mx-auto w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                      <Home className="h-8 w-8 text-gray-400" />
+                    </div>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                      {searchQuery || filters.minPrice || filters.maxPrice || filters.bedrooms || filters.propertyType
+                        ? 'No rentals match your search'
+                        : 'No rental properties available'
+                      }
+                    </h3>
+                    <p className="text-gray-600 mb-6">
+                      {searchQuery || filters.minPrice || filters.maxPrice || filters.bedrooms || filters.propertyType
+                        ? 'Try adjusting your search criteria or filters to see more results.'
+                        : 'Check back later for new rental listings.'
+                      }
+                    </p>
+                    {(searchQuery || filters.minPrice || filters.maxPrice || filters.bedrooms || filters.propertyType) && (
+                      <button
+                        onClick={() => {
+                          setSearchQuery('');
+                          setFilters({
+                            minPrice: '',
+                            maxPrice: '',
+                            bedrooms: '',
+                            propertyType: '',
+                            city: ''
+                          });
+                        }}
+                        className="bg-beedab-blue text-white px-4 py-2 rounded-lg hover:bg-beedab-darkblue transition-colors"
+                      >
+                        Clear all filters
+                      </button>
+                    )}
+                  </div>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
