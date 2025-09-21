@@ -136,6 +136,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const login = async (email: string, password: string) => {
     try {
       setIsLoading(true);
+      console.log('Attempting login for:', email);
+      
       const response = await fetch('/api/users/login', {
         method: 'POST',
         headers: {
@@ -144,26 +146,48 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         body: JSON.stringify({ email, password }),
       });
 
+      console.log('Login response status:', response.status);
+
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Login failed');
+        const errorText = await response.text();
+        console.error('Login failed with response:', errorText);
+        let errorMessage = 'Login failed';
+        try {
+          const errorData = JSON.parse(errorText);
+          errorMessage = errorData.message || errorMessage;
+        } catch (e) {
+          errorMessage = `Server error: ${response.status}`;
+        }
+        throw new Error(errorMessage);
       }
 
       const data = await response.json();
+      console.log('Login response data keys:', Object.keys(data));
 
-      if (data.token && data.user) {
+      // More flexible response handling
+      if (data.success === false) {
+        throw new Error(data.message || 'Login failed');
+      }
+
+      // Check for token and user in various response formats
+      const token = data.token || data.accessToken;
+      const user = data.user || data.data?.user || data;
+
+      if (token && user && user.id) {
         // Store the raw token (without Bearer prefix in storage)
-        const cleanToken = data.token.replace('Bearer ', '');
-        localStorage.setItem('token', cleanToken); // Changed to 'token'
-        queryClient.setQueryData(['user'], data.user);
-        setUser(data.user);
-        setToken(cleanToken); // Use cleaned token
-        setUserId(data.user.id.toString()); // Set userId state
-        localStorage.setItem('userId', data.user.id.toString()); // Store userId
-        setIsAuthenticated(true); // Set authenticated status
-        return data.user;
+        const cleanToken = token.replace('Bearer ', '');
+        localStorage.setItem('token', cleanToken);
+        queryClient.setQueryData(['user'], user);
+        setUser(user);
+        setToken(cleanToken);
+        setUserId(user.id.toString());
+        localStorage.setItem('userId', user.id.toString());
+        setIsAuthenticated(true);
+        console.log('Login successful for user:', user.email);
+        return user;
       } else {
-        throw new Error('Invalid response from server');
+        console.error('Invalid response structure:', { token: !!token, user: !!user, userId: user?.id });
+        throw new Error('Invalid response from server - missing token or user data');
       }
     } catch (error) {
       console.error('Login error:', error);

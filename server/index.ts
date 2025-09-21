@@ -123,11 +123,12 @@ app.use((req, res, next) => {
     "style-src 'self' 'unsafe-inline' https://api.mapbox.com https://fonts.googleapis.com",
     "font-src 'self' data: https://fonts.gstatic.com https://fonts.googleapis.com",
     "img-src 'self' data: https: blob:",
-    "connect-src 'self' https://api.mapbox.com https://events.mapbox.com",
+    "connect-src 'self' https://api.mapbox.com https://events.mapbox.com wss: ws:",
     "worker-src 'self' blob:",
     "child-src 'self'",
     "base-uri 'self'",
-    "form-action 'self'"
+    "form-action 'self'",
+    "object-src 'none'"
   ].join('; '));
 
   next();

@@ -1,6 +1,10 @@
 import type { Express } from "express";
 import { storage } from "../storage";
 import { authenticate, optionalAuthenticate, AuthService } from "../auth-middleware";
+import jwt from 'jsonwebtoken';
+
+// Assuming JWT_SECRET is defined elsewhere, e.g., in an environment variables file
+const JWT_SECRET = process.env.JWT_SECRET || 'your-fallback-secret'; // Replace with your actual secret or env variable
 
 export function registerUserRoutes(app: Express) {
   // Get user by ID - requires authentication
@@ -38,7 +42,7 @@ export function registerUserRoutes(app: Express) {
 
       const userId = req.user.id;
       console.log('Dashboard stats request for user:', userId);
-      
+
       // Initialize stats with default values
       let stats = {
         savedProperties: 0,
@@ -105,7 +109,7 @@ export function registerUserRoutes(app: Express) {
       }
 
       const savedProperties = await storage.getSavedProperties(userId);
-      
+
       if (!savedProperties) {
         return res.json([]);
       }
@@ -128,7 +132,7 @@ export function registerUserRoutes(app: Express) {
       }
 
       const inquiries = await storage.getUserInquiries(userId);
-      
+
       if (!inquiries) {
         return res.json([]);
       }
@@ -171,7 +175,7 @@ export function registerUserRoutes(app: Express) {
       }
 
       const appointments = await storage.getUserAppointments(userId);
-      
+
       if (!appointments) {
         return res.json([]);
       }
