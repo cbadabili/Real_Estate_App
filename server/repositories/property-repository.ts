@@ -1,5 +1,4 @@
-
-import { 
+import {
   properties,
   type Property,
   type InsertProperty
@@ -18,7 +17,7 @@ export interface PropertyFilters {
   city?: string;
   state?: string;
   zipCode?: string;
-  location?: string;
+  location?: string; // General location search parameter
   listingType?: string;
   status?: string;
   limit?: number;
@@ -124,17 +123,17 @@ export class PropertyRepository implements IPropertyRepository {
 
     // Filter out properties with invalid coordinates
     const validResults = results.filter(prop => {
-      const hasValidCoords = prop.latitude !== null && 
-                           prop.longitude !== null && 
-                           prop.latitude !== '' && 
+      const hasValidCoords = prop.latitude !== null &&
+                           prop.longitude !== null &&
+                           prop.latitude !== '' &&
                            prop.longitude !== '' &&
-                           !isNaN(parseFloat(prop.latitude)) && 
+                           !isNaN(parseFloat(prop.latitude)) &&
                            !isNaN(parseFloat(prop.longitude));
-      
+
       if (!hasValidCoords) {
         console.log(`Filtering out property ${prop.id} "${prop.title}" - invalid coordinates: lat=${prop.latitude}, lng=${prop.longitude}`);
       }
-      
+
       return hasValidCoords;
     });
 
@@ -143,7 +142,7 @@ export class PropertyRepository implements IPropertyRepository {
         ...prop,
         images: prop.images ? JSON.parse(prop.images) : [],
         features: prop.features ? (
-          Array.isArray(JSON.parse(prop.features)) ? JSON.parse(prop.features) : 
+          Array.isArray(JSON.parse(prop.features)) ? JSON.parse(prop.features) :
           typeof JSON.parse(prop.features) === 'string' ? [JSON.parse(prop.features)] : []
         ) : [],
       };

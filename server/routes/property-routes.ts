@@ -7,6 +7,41 @@ import { authenticate, optionalAuthenticate, requireUserType, AuthService } from
 export function registerPropertyRoutes(app: Express) {
   // Get all properties
   app.get("/api/properties", async (req, res) => {
+    try {
+      const filters = {
+        minPrice: req.query.minPrice ? parseFloat(req.query.minPrice as string) : undefined,
+        maxPrice: req.query.maxPrice ? parseFloat(req.query.maxPrice as string) : undefined,
+        propertyType: req.query.propertyType as string,
+        minBedrooms: req.query.minBedrooms ? parseInt(req.query.minBedrooms as string) : undefined,
+        minBathrooms: req.query.minBathrooms ? parseFloat(req.query.minBathrooms as string) : undefined,
+        minSquareFeet: req.query.minSquareFeet ? parseInt(req.query.minSquareFeet as string) : undefined,
+        maxSquareFeet: req.query.maxSquareFeet ? parseInt(req.query.maxSquareFeet as string) : undefined,
+        city: req.query.city as string,
+        state: req.query.state as string,
+        zipCode: req.query.zipCode as string,
+        location: req.query.location as string, // Add location search parameter
+        listingType: req.query.listingType as string,
+        status: req.query.status as string || 'active',
+        limit: req.query.limit ? parseInt(req.query.limit as string) : undefined,
+        offset: req.query.offset ? parseInt(req.query.offset as string) : undefined,
+        sortBy: req.query.sortBy as 'price' | 'date' | 'size' | 'bedrooms',
+        sortOrder: req.query.sortOrder as 'asc' | 'desc'
+      };
+
+      console.log('Fetching properties with filters:', JSON.stringify(filters, null, 2));
+      const properties = await storage.getProperties(filters);
+      console.log('Properties fetched:', properties.length);
+
+      properties.forEach(prop => {
+        console.log(`Property ${prop.id}: lat=${prop.latitude}, lng=${prop.longitude}`);
+      });
+
+      res.json(properties);
+    } catch (error) {
+      console.error("Get properties error:", error);
+      res.status(500).json({ message: "Failed to fetch properties" });
+    }
+  });
 
   // Search suggestions endpoint
   app.get("/api/suggest", async (req, res) => {
@@ -49,41 +84,6 @@ export function registerPropertyRoutes(app: Express) {
     }
   });
 
-
-    try {
-      const filters = {
-        minPrice: req.query.minPrice ? parseFloat(req.query.minPrice as string) : undefined,
-        maxPrice: req.query.maxPrice ? parseFloat(req.query.maxPrice as string) : undefined,
-        propertyType: req.query.propertyType as string,
-        minBedrooms: req.query.minBedrooms ? parseInt(req.query.minBedrooms as string) : undefined,
-        minBathrooms: req.query.minBathrooms ? parseFloat(req.query.minBathrooms as string) : undefined,
-        minSquareFeet: req.query.minSquareFeet ? parseInt(req.query.minSquareFeet as string) : undefined,
-        maxSquareFeet: req.query.maxSquareFeet ? parseInt(req.query.maxSquareFeet as string) : undefined,
-        city: req.query.city as string,
-        state: req.query.state as string,
-        zipCode: req.query.zipCode as string,
-        listingType: req.query.listingType as string,
-        status: req.query.status as string || 'active',
-        limit: req.query.limit ? parseInt(req.query.limit as string) : undefined,
-        offset: req.query.offset ? parseInt(req.query.offset as string) : undefined,
-        sortBy: req.query.sortBy as 'price' | 'date' | 'size' | 'bedrooms',
-        sortOrder: req.query.sortOrder as 'asc' | 'desc'
-      };
-
-      console.log('Fetching properties...');
-      const properties = await storage.getProperties(filters);
-      console.log('Properties fetched:', properties.length);
-
-      properties.forEach(prop => {
-        console.log(`Property ${prop.id}: lat=${prop.latitude}, lng=${prop.longitude}`);
-      });
-
-      res.json(properties);
-    } catch (error) {
-      console.error("Get properties error:", error);
-      res.status(500).json({ message: "Failed to fetch properties" });
-    }
-  });
 
   // Get single property
   app.get("/api/properties/:id", optionalAuthenticate, async (req, res) => { // Changed to optionalAuthenticate for public view

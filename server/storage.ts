@@ -15,7 +15,7 @@ import {
   type InsertSavedProperty
 } from "../shared/schema";
 import { db } from "./db";
-import { eq, and, desc, asc, sql, gte, lte, like, or } from "drizzle-orm";
+import { eq, desc, asc, gte, lte, isNull, isNotNull, and, or, ilike, sql } from "drizzle-orm";
 import { userRepository, type IUserRepository } from "./repositories/user-repository";
 import { propertyRepository, type IPropertyRepository, type PropertyFilters } from "./repositories/property-repository";
 
@@ -76,6 +76,7 @@ export interface PropertyFilters {
   offset?: number;
   sortBy?: 'price' | 'date' | 'size' | 'bedrooms';
   sortOrder?: 'asc' | 'desc';
+  location?: string;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -147,16 +148,29 @@ export class DatabaseStorage implements IStorage {
     if (filters.maxSquareFeet) {
       conditions.push(lte(properties.squareFeet, filters.maxSquareFeet));
     }
-    if (filters.city) {
+    
+    // Apply filters
+    if (filters.location) {
+      // Search across multiple location fields for better matching
       conditions.push(
         or(
-          like(properties.city, `%${filters.city}%`),
-          like(properties.address, `%${filters.city}%`)
+          ilike(properties.title, `%${filters.location}%`),
+          ilike(properties.description, `%${filters.location}%`),
+          ilike(properties.address, `%${filters.location}%`),
+          ilike(properties.city, `%${filters.location}%`),
+          ilike(properties.state, `%${filters.location}%`),
+          ilike(properties.areaText, `%${filters.location}%`),
+          ilike(properties.placeName, `%${filters.location}%`)
         )
       );
-    }
-    if (filters.state) {
-      conditions.push(eq(properties.state, filters.state));
+    } else {
+      // Only apply specific location filters if no general location search
+      if (filters.city) {
+        conditions.push(ilike(properties.city, `%${filters.city}%`));
+      }
+      if (filters.state) {
+        conditions.push(ilike(properties.state, `%${filters.state}%`));
+      }
     }
     if (filters.zipCode) {
       conditions.push(eq(properties.zipCode, filters.zipCode));
@@ -206,11 +220,11 @@ export class DatabaseStorage implements IStorage {
                            prop.longitude !== '' &&
                            !isNaN(parseFloat(prop.latitude)) && 
                            !isNaN(parseFloat(prop.longitude));
-      
+
       if (!hasValidCoords) {
         console.log(`Filtering out property ${prop.id} "${prop.title}" - invalid coordinates: lat=${prop.latitude}, lng=${prop.longitude}`);
       }
-      
+
       return hasValidCoords;
     });
 

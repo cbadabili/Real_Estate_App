@@ -106,13 +106,11 @@ export default function SmartSearchBar({ onSearch, initial = "", suggest }: Prop
     if (!value) return; // Ensure search term is not empty
     saveRecent(value);
     setRecents(loadRecents());
+    setQ(value); // Update the input value to show what was searched
     onSearch(value);
     setOpen(false);
     setHighlight(-1);
-    // Clear input focus after search
-    if (inputRef.current) {
-      inputRef.current.blur();
-    }
+    // Keep focus on input for better UX
   }
 
   function onSubmit(e?: React.FormEvent) {
