@@ -1,0 +1,91 @@
+You nailed the root cause: a storage-key mismatch.
+CreateListingPage reads localStorage.getItem('authToken'), but your AuthContext writes to localStorage.setItem('token', …). When the page looks up authToken, it gets null, so your auth check or Authorization header never gets set → form submit fails (often with 401/redirect).
+
+Here’s a clean, safe fix plus a small hardening so this never bites you again.
+
+1) Minimal patch (quick fix)
+// client/src/pages/CreateListingPage.tsx
+- const authToken = localStorage.getItem('authToken');
++ const authToken = localStorage.getItem('token');
+
+2) Better: use a single source of truth for the key
+
+Create a constant and use it everywhere.
+
+// client/src/constants/storageKeys.ts
+export const TOKEN_STORAGE_KEY = 'token' as const;
+
+
+Update your AuthContext:
+
+// client/src/context/AuthContext.tsx
++ import { TOKEN_STORAGE_KEY } from '@/constants/storageKeys';
+
+- const [token, setToken] = useState<string | null>(() => localStorage.getItem('token'));
++ const [token, setToken] = useState<string | null>(() => localStorage.getItem(TOKEN_STORAGE_KEY));
+
+  const login = (newToken: string) => {
+-   localStorage.setItem('token', newToken);
++   localStorage.setItem(TOKEN_STORAGE_KEY, newToken);
+    setToken(newToken);
+  };
+
+  const logout = () => {
+-   localStorage.removeItem('token');
++   localStorage.removeItem(TOKEN_STORAGE_KEY);
+    setToken(null);
+  };
+
+
+Then in CreateListingPage:
+
+// client/src/pages/CreateListingPage.tsx
++ import { useAuth } from '@/context/AuthContext';
++ import { TOKEN_STORAGE_KEY } from '@/constants/storageKeys';
+
+  export default function CreateListingPage() {
++   const { token } = useAuth();
+-   const authToken = localStorage.getItem('authToken');
++   const authToken = token ?? localStorage.getItem(TOKEN_STORAGE_KEY);
+
+    // When calling your API:
+    // headers: { Authorization: `Bearer ${authToken}` }
+  }
+
+3) Best practice (optional, but recommended)
+
+Stop reading localStorage in pages. Always get token from AuthContext (which itself can hydrate from storage once).
+
+Axios interceptor: inject the header centrally so pages don’t repeat themselves.
+
+// client/src/api/http.ts
+import axios from 'axios';
+import { TOKEN_STORAGE_KEY } from '@/constants/storageKeys';
+
+export const http = axios.create({ baseURL: import.meta.env.VITE_API_URL });
+
+http.interceptors.request.use((config) => {
+  const token = localStorage.getItem(TOKEN_STORAGE_KEY); // or a getter from AuthContext
+  if (token) config.headers.Authorization = `Bearer ${token}`;
+  return config;
+});
+
+
+Then your page just calls http.post('/listings', data).
+
+4) Guard rails to prevent regressions
+
+Type-safe constant (done above).
+
+ESLint rule / custom lint: forbid string literals 'token' | 'authToken' outside storageKeys.ts.
+
+Small migration (one release only): read both keys to avoid locking out users who still have authToken saved.
+
+const token = localStorage.getItem('token') ?? localStorage.getItem('authToken');
+
+
+Then write back to 'token' and remove 'authToken'.
+
+SSR safety: if you ever render on the server, gate localStorage access behind typeof window !== 'undefined'.
+
+That’s it—once the key is consistent (or, better, centralized), create-listing should work for logged-in users again.

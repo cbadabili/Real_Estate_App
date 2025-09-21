@@ -247,7 +247,7 @@ const CreateListingPage = () => {
 
       console.log('Transformed property data:', propertyData);
 
-      const token = localStorage.getItem('authToken');
+      const token = localStorage.getItem('token');
       
       // Ensure proper token format
       if (!token) {
