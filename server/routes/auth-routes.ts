@@ -10,11 +10,17 @@ export function registerAuthRoutes(app: Express) {
     try {
       console.log('Registration request received');
 
-      const { username, email, password, firstName, lastName, phone, bio, reacNumber } = req.body;
+      const { username, email, password, firstName, lastName, phone, bio, reacNumber, acceptTerms, acceptMarketing } = req.body;
 
       if (!email || !password || !firstName || !lastName) {
         return res.status(400).json({
           message: "Email, password, first name, and last name are required"
+        });
+      }
+
+      if (!acceptTerms) {
+        return res.status(400).json({
+          message: "You must accept the Terms of Service and Privacy Policy"
         });
       }
 
@@ -56,6 +62,7 @@ export function registerAuthRoutes(app: Express) {
         permissions: JSON.stringify([]), // Default empty permissions
         bio,
         reacNumber,
+        acceptMarketing: acceptMarketing || false,
         isActive: true, // Allow immediate activation for basic users
         isVerified: false, // Always require email verification
         createdAt: Math.floor(Date.now() / 1000),

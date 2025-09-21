@@ -88,6 +88,8 @@ import MarketplaceHub from './pages/marketplace/MarketplaceHub';
 
 import BuyMapPage from './pages/BuyMapPage';
 import TestMapPage from './pages/TestMapPage'; // Assuming this is a missing import
+import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
+import TermsOfServicePage from './pages/TermsOfServicePage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -211,6 +213,8 @@ function App() {
             <Route path="/buyer-seller-platform" element={<BuyerSellerPlatformPage />} />
             <Route path="/service-provider-directory" element={<ServiceProviderDirectory />} />
             <Route path="/test-map" element={<TestMapPage />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+          <Route path="/terms-of-service" element={<TermsOfServicePage />} />
           </Routes>
         </div>
       </PropertyProvider>
