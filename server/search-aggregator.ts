@@ -27,46 +27,81 @@ interface UnifiedProperty {
   };
 }
 
+interface SearchCriteria {
+  beds?: number;
+  type?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  location?: string;
+  query?: string;
+}
+
 // Enhanced NL parser with more sophisticated pattern matching
-function parseFreeText(q: string) {
-  const lower = q.toLowerCase();
+function parseFreeText(query: string): SearchCriteria {
+  const derived: SearchCriteria = {};
+
+  // Helper function to parse price with suffixes
+  const parsePrice = (priceStr: string, suffix: string = ''): number => {
+    const num = parseInt(priceStr);
+    if (suffix.toLowerCase() === 'k') return num * 1000;
+    if (suffix.toLowerCase() === 'm') return num * 1000000;
+    return num;
+  };
+
+  // Extract price ranges with proper suffix handling
+  const rangeMatch = query.match(/(\d+)(k|m)?\s*(?:to|-)\s*(\d+)(k|m)?/i);
+  if (rangeMatch) {
+    const [, min, minSuffix, max, maxSuffix] = rangeMatch;
+    derived.minPrice = parsePrice(min, minSuffix);
+    derived.maxPrice = parsePrice(max, maxSuffix);
+  }
+
+  // Extract single price limits with suffix support
+  const underMatch = query.match(/under\s*(\d+)(k|m)?/i);
+  if (underMatch) {
+    const [, amount, suffix] = underMatch;
+    derived.maxPrice = parsePrice(amount, suffix);
+  }
+
+  const overMatch = query.match(/over\s*(\d+)(k|m)?/i);
+  if (overMatch) {
+    const [, amount, suffix] = overMatch;
+    derived.minPrice = parsePrice(amount, suffix);
+  }
+
+  const aboveMatch = query.match(/above\s*(\d+)(k|m)?/i);
+  if (aboveMatch) {
+    const [, amount, suffix] = aboveMatch;
+    derived.minPrice = parsePrice(amount, suffix);
+  }
 
   // Bedroom extraction
   let beds: number | undefined;
-  const digitBed = lower.match(/(\d+)\s*(bed|bedroom|bedroomed)/);
+  const digitBed = query.match(/(\d+)\s*(bed|bedroom|bedroomed)/i);
   if (digitBed) {
     beds = parseInt(digitBed[1], 10);
   } else {
     const wordBeds: Record<string, number> = { 
       one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8 
     };
-    const wordMatch = lower.match(/(one|two|three|four|five|six|seven|eight)\s*(bed|bedroom|bedroomed)/);
+    const wordMatch = query.match(/(one|two|three|four|five|six|seven|eight)\s*(bed|bedroom|bedroomed)/i);
     if (wordMatch) beds = wordBeds[wordMatch[1]];
   }
 
   // Property type extraction
   let type: string | undefined;
-  if (/\b(house|standalone|detached)\b/.test(lower)) type = "house";
-  else if (/\b(apartment|flat|unit)\b/.test(lower)) type = "apartment";
-  else if (/\b(townhouse|townhome)\b/.test(lower)) type = "townhouse";
-  else if (/\b(plot|land|vacant)\b/.test(lower)) type = "plot";
-  else if (/\b(farm|agricultural)\b/.test(lower)) type = "farm";
-  else if (/\b(commercial|office|retail)\b/.test(lower)) type = "commercial";
-
-  // Price range extraction
-  let minPrice: number | undefined;
-  let maxPrice: number | undefined;
-  const priceRange = lower.match(/(\d+)k?\s*(?:to|-)?\s*(\d+)k?\s*(?:pula|bwp|p)?/);
-  if (priceRange) {
-    minPrice = parseInt(priceRange[1]) * (priceRange[1].includes('k') ? 1000 : 1);
-    maxPrice = parseInt(priceRange[2]) * (priceRange[2].includes('k') ? 1000 : 1);
-  }
+  if (/\b(house|standalone|detached)\b/i.test(query)) type = "house";
+  else if (/\b(apartment|flat|unit)\b/i.test(query)) type = "apartment";
+  else if (/\b(townhouse|townhome)\b/i.test(query)) type = "townhouse";
+  else if (/\b(plot|land|vacant)\b/i.test(query)) type = "plot";
+  else if (/\b(farm|agricultural)\b/i.test(query)) type = "farm";
+  else if (/\b(commercial|office|retail)\b/i.test(query)) type = "commercial";
 
   // Location extraction
   const locations = ['gaborone', 'francistown', 'kasane', 'maun', 'serowe', 'palapye', 'kanye'];
-  const location = locations.find(loc => lower.includes(loc));
+  const location = locations.find(loc => query.toLowerCase().includes(loc));
 
-  return { beds, type, minPrice, maxPrice, location };
+  return { beds, type, minPrice: derived.minPrice, maxPrice: derived.maxPrice, location };
 }
 
 async function queryDB(q: string, sort: string): Promise<UnifiedProperty[]> {
@@ -74,28 +109,33 @@ async function queryDB(q: string, sort: string): Promise<UnifiedProperty[]> {
     console.log('QueryDB called with:', { q, sort });
 
     const terms = [];
+    const derived = parseFreeText(q);
+    console.log('Parsed query filters:', derived);
 
-    if (q) {
-      const derived = parseFreeText(q);
-      console.log('Parsed query filters:', derived);
+    if (derived.beds) terms.push(gte(properties.bedrooms, derived.beds));
+    if (derived.type) terms.push(eq(properties.propertyType, derived.type));
+    if (derived.location) terms.push(ilike(properties.city, `%${derived.location}%`));
 
-      // More flexible approach: Apply semantic filters
-      if (derived.beds) terms.push(gte(properties.bedrooms, derived.beds));
-      if (derived.type) terms.push(eq(properties.propertyType, derived.type));
-      if (derived.location) terms.push(ilike(properties.city, `%${derived.location}%`));
-
-      // If no specific filters detected, fall back to text search
-      if (!derived.beds && !derived.type && !derived.location) {
-        const like = `%${q}%`;
-        terms.push(
-          or(
-            ilike(properties.title, like),
-            ilike(properties.description, like),
-            ilike(properties.city, like),
-            ilike(properties.address, like)
-          )
-        );
-      }
+    // Apply price constraints using Drizzle ORM's gte and lte
+    if (derived.minPrice !== undefined) {
+      terms.push(gte(properties.price, derived.minPrice));
+    }
+    if (derived.maxPrice !== undefined) {
+      // For maxPrice, we need to use '<=' which is lte in Drizzle
+      terms.push(sql`${properties.price} <= ${derived.maxPrice}`);
+    }
+    
+    // If no specific filters detected, fall back to text search
+    if (terms.length === 0) {
+      const like = `%${q}%`;
+      terms.push(
+        or(
+          ilike(properties.title, like),
+          ilike(properties.description, like),
+          ilike(properties.city, like),
+          ilike(properties.address, like)
+        )
+      );
     }
 
     const where = terms.length ? and(...terms) : undefined;
@@ -142,15 +182,15 @@ function mapDBRowToUnified(row: any): UnifiedProperty {
 }
 
 // Call OpenAI-powered search
-async function queryIntel(q: string, filters: any = {}): Promise<UnifiedProperty[]> {
+async function queryIntel(q: string, filters: SearchCriteria = {}): Promise<UnifiedProperty[]> {
   if (!process.env.OPENAI_API_KEY) {
     console.warn('OpenAI API key not configured, skipping external search');
     return [];
   }
 
   try {
-    const payload = { query: q };
-    console.log('Calling OpenAI search with query:', q);
+    const payload = { query: q, filters }; // Pass filters to the AI search
+    console.log('Calling OpenAI search with query:', q, 'and filters:', filters);
 
     const response = await fetch('http://0.0.0.0:5000/intel/search', {
       method: "POST",

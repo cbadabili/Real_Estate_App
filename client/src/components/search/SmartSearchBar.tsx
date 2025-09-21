@@ -102,12 +102,14 @@ export default function SmartSearchBar({ onSearch, initial = "", suggest }: Prop
   }, [q, ai, recents]);
 
   function doSearch(term: string) {
-    const value = term.trim();
-    if (!value) return; // Ensure search term is not empty
-    saveRecent(value);
-    setRecents(loadRecents());
-    setQ(value); // Update the input value to show what was searched
-    onSearch(value);
+    const trimmed = term.trim();
+    onSearch(trimmed);
+
+    // Only save non-empty searches to recents
+    if (trimmed) {
+      saveRecent(trimmed);
+    }
+
     setOpen(false);
     setHighlight(-1);
     // Keep focus on input for better UX
@@ -115,10 +117,7 @@ export default function SmartSearchBar({ onSearch, initial = "", suggest }: Prop
 
   function onSubmit(e?: React.FormEvent) {
     e?.preventDefault();
-    const searchTerm = q.trim();
-    if (searchTerm) {
-      doSearch(searchTerm); // Pass trimmed q to doSearch
-    }
+    doSearch(q); // Pass q to doSearch, which will trim it
   }
 
   function onPick(item: string) {
@@ -131,23 +130,29 @@ export default function SmartSearchBar({ onSearch, initial = "", suggest }: Prop
       setOpen(true);
       return;
     }
-    if (!visibleList.length) return;
-
-    if (e.key === "ArrowDown") {
+    if (e.key === 'ArrowDown') {
+      if (visibleList.length === 0) return;
       e.preventDefault();
-      setHighlight((i) => Math.min(i + 1, visibleList.length - 1));
-    } else if (e.key === "ArrowUp") {
+      setHighlight(prev => 
+        prev < visibleList.length - 1 ? prev + 1 : 0
+      );
+    } else if (e.key === 'ArrowUp') {
+      if (visibleList.length === 0) return;
       e.preventDefault();
-      setHighlight((i) => Math.max(i - 1, 0));
-    } else if (e.key === "Enter") {
-      if (highlight >= 0) {
-        e.preventDefault();
-        onPick(visibleList[highlight]);
+      setHighlight(prev => 
+        prev > 0 ? prev - 1 : visibleList.length - 1
+      );
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (visibleList.length > 0 && highlight >= 0) {
+        const selectedItem = visibleList[highlight];
+        onPick(selectedItem);
       } else {
-        onSubmit(e);
+        onSubmit(e as any); // Pass the event to onSubmit
       }
     } else if (e.key === "Escape") {
       setOpen(false);
+      setHighlight(-1); // Reset highlight on escape
     }
   }
 
@@ -163,17 +168,18 @@ export default function SmartSearchBar({ onSearch, initial = "", suggest }: Prop
             <input
               ref={inputRef}
               value={q}
-              onChange={(e) => setQ(e.target.value)}
+              onChange={(e) => {
+                setQ(e.target.value);
+                setOpen(true); // Keep suggestions open while typing
+              }}
               onFocus={() => setOpen(true)}
               onKeyDown={onKeyDown}
               placeholder="Search properties in Botswana…"
               className="w-full rounded-lg border border-gray-300 bg-white pl-12 pr-16 sm:pr-24 py-3 sm:py-4 text-sm sm:text-base text-gray-900 placeholder-gray-500 focus:border-beedab-blue focus:outline-none focus:ring-1 focus:ring-beedab-blue"
             />
             <button
-              type="submit"
               onClick={onSubmit}
-              disabled={!q.trim()}
-              className="absolute right-2 rounded-md bg-beedab-blue px-2 sm:px-4 py-1.5 sm:py-2 text-white text-xs sm:text-sm font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-beedab-blue focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="absolute right-2 rounded-md bg-beedab-blue px-2 sm:px-4 py-1.5 sm:py-2 text-white text-xs sm:text-sm font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-beedab-blue focus:ring-offset-2 transition-colors"
             >
               <span className="hidden sm:inline">Search</span>
               <Search className="h-4 w-4 sm:hidden" />

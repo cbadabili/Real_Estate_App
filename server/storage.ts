@@ -74,7 +74,7 @@ export interface PropertyFilters {
   status?: string;
   limit?: number;
   offset?: number;
-  sortBy?: 'price' | 'date' | 'size' | 'bedrooms';
+  sortBy?: 'price' | 'date' | 'size' | 'bedrooms' | 'price_low' | 'price_high' | 'newest';
   sortOrder?: 'asc' | 'desc';
   location?: string;
 }
@@ -127,11 +127,12 @@ export class DatabaseStorage implements IStorage {
     let query = db.select().from(properties);
     const conditions = [];
 
-    if (filters.minPrice) {
-      conditions.push(gte(properties.price, filters.minPrice.toString()));
+    // Apply filters with numeric price comparison
+    if (filters.minPrice !== undefined) {
+      conditions.push(sql`CAST(${properties.price} AS REAL) >= ${filters.minPrice}`);
     }
-    if (filters.maxPrice) {
-      conditions.push(lte(properties.price, filters.maxPrice.toString()));
+    if (filters.maxPrice !== undefined) {
+      conditions.push(sql`CAST(${properties.price} AS REAL) <= ${filters.maxPrice}`);
     }
     if (filters.propertyType && filters.propertyType !== 'all') {
       conditions.push(eq(properties.propertyType, filters.propertyType));
@@ -148,7 +149,7 @@ export class DatabaseStorage implements IStorage {
     if (filters.maxSquareFeet) {
       conditions.push(lte(properties.squareFeet, filters.maxSquareFeet));
     }
-    
+
     // Apply filters
     if (filters.location) {
       // Search across multiple location fields for better matching
@@ -186,18 +187,13 @@ export class DatabaseStorage implements IStorage {
       query = query.where(and(...conditions));
     }
 
-    // Sorting
-    if (filters.sortBy) {
-      const sortColumn = {
-        'price': properties.price,
-        'date': properties.createdAt,
-        'size': properties.squareFeet,
-        'bedrooms': properties.bedrooms
-      }[filters.sortBy];
-
-      if (sortColumn) {
-        query = filters.sortOrder === 'asc' ? query.orderBy(asc(sortColumn)) : query.orderBy(desc(sortColumn));
-      }
+    // Apply sorting with numeric price ordering
+    if (filters.sortBy === 'price_low') {
+      query = query.orderBy(sql`CAST(${properties.price} AS REAL) ASC`);
+    } else if (filters.sortBy === 'price_high') {
+      query = query.orderBy(sql`CAST(${properties.price} AS REAL) DESC`);
+    } else if (filters.sortBy === 'newest') {
+      query = query.orderBy(desc(properties.createdAt));
     } else {
       query = query.orderBy(desc(properties.createdAt));
     }
@@ -399,7 +395,7 @@ export class DatabaseStorage implements IStorage {
     const [appointment] = await db
       .update(appointments)
       .set({ status })
-      .where(eq(appointments.id, id))
+      .where(eq(appointment.id, id))
       .returning();
     return appointment || undefined;
   }
