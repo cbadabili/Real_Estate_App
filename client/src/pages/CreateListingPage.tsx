@@ -35,10 +35,7 @@ const CreateListingPage = () => {
   const { register, handleSubmit, watch, formState: { errors } } = useForm();
   const watchedListingType = watch('listingType');
   const watchedPropertyType = watch('propertyType');
-  const [formData, setFormData] = useState({
-    city: '',
-    state: '',
-  });
+  const [formData, setFormData] = useState({});
   const [locationData, setLocationData] = useState<{
     area_text: string;
     place_name?: string;
@@ -220,9 +217,9 @@ const CreateListingPage = () => {
         title: data.title,
         description: data.description,
         price: data.price ? data.price.toString() : '0', // Convert to string to match schema
-        address: locationData.area_text || `${formData.city || 'Gaborone'}, ${formData.state || 'South-East'}`,
-        city: formData.city || 'Gaborone',
-        state: formData.state || 'South-East',
+        address: locationData.area_text || 'Botswana',
+        city: locationData.area_text || 'Gaborone',
+        state: 'Botswana',
         zipCode: data.zipCode || '00000',
         // New location fields
         areaText: locationData.area_text || null,
@@ -492,180 +489,7 @@ const CreateListingPage = () => {
                         onChange={setLocationData}
                       />
                     </div>
-                     <div>
-                  <label className="block text-sm font-medium text-neutral-700 mb-2">
-                    District
-                  </label>
-                  <select
-                    value={formData.state || ''}
-                    onChange={(e) => {
-                      setFormData({ ...formData, state: e.target.value, city: '' });
-                    }}
-                    className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent transition-all"
-                    required
-                  >
-                    <option value="">Select District</option>
-                    <option value="South-East">South-East</option>
-                    <option value="North-East">North-East</option>
-                    <option value="North-West">North-West</option>
-                    <option value="Central">Central</option>
-                    <option value="Kweneng">Kweneng</option>
-                    <option value="Southern">Southern</option>
-                    <option value="Kgatleng">Kgatleng</option>
-                    <option value="Kgalagadi">Kgalagadi</option>
-                    <option value="Chobe">Chobe</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-neutral-700 mb-2">
-                    City/Town
-                  </label>
-                  <select
-                    value={formData.city || ''}
-                    onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                    className="w-full px-4 py-3 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent transition-all"
-                    required
-                    disabled={!formData.state}
-                  >
-                    <option value="">Select City/Town</option>
-                    {formData.state === 'South-East' && (
-                      <>
-                        <option value="Gaborone">Gaborone</option>
-                        <option value="Lobatse">Lobatse</option>
-                        <option value="Ramotswa">Ramotswa</option>
-                        <option value="Kanye">Kanye</option>
-                        <option value="Molepolole">Molepolole</option>
-                        <option value="Mogoditshane">Mogoditshane</option>
-                        <option value="Tlokweng">Tlokweng</option>
-                        <option value="Gabane">Gabane</option>
-                        <option value="Mmopane">Mmopane</option>
-                        <option value="Kopong">Kopong</option>
-                        <option value="Phakalane">Phakalane</option>
-                        <option value="Broadhurst">Broadhurst</option>
-                        <option value="Extension 2">Extension 2</option>
-                        <option value="Extension 10">Extension 10</option>
-                        <option value="Extension 12">Extension 12</option>
-                        <option value="Extension 14">Extension 14</option>
-                        <option value="Extension 15">Extension 15</option>
-                        <option value="Block 3">Block 3</option>
-                        <option value="Block 6">Block 6</option>
-                        <option value="Block 7">Block 7</option>
-                        <option value="Block 8">Block 8</option>
-                        <option value="Block 9">Block 9</option>
-                        <option value="Block 10">Block 10</option>
-                        <option value="Village">Village</option>
-                        <option value="CBD">CBD</option>
-                        <option value="Old Naledi">Old Naledi</option>
-                        <option value="New Canada">New Canada</option>
-                        <option value="White City">White City</option>
-                        <option value="Sebele">Sebele</option>
-                        <option value="G-West">G-West</option>
-                        <option value="Kgale">Kgale</option>
-                        <option value="Riverwalk">Riverwalk</option>
-                        <option value="Masa">Masa</option>
-                        <option value="Thamaga">Thamaga</option>
-                      </>
-                    )}
-                    {formData.state === 'North-East' && (
-                      <>
-                        <option value="Francistown">Francistown</option>
-                        <option value="Selebi-Phikwe">Selebi-Phikwe</option>
-                        <option value="Tonota">Tonota</option>
-                        <option value="Tutume">Tutume</option>
-                        <option value="Nata">Nata</option>
-                        <option value="Bobonong">Bobonong</option>
-                        <option value="Tati">Tati</option>
-                        <option value="Dukwi">Dukwi</option>
-                        <option value="Jackalas">Jackalas</option>
-                        <option value="Monarch">Monarch</option>
-                        <option value="Sua Pan">Sua Pan</option>
-                        <option value="Ramokgwebana">Ramokgwebana</option>
-                        <option value="Mathangwane">Mathangwane</option>
-                        <option value="Chadibe">Chadibe</option>
-                        <option value="Sebina">Sebina</option>
-                        <option value="Semolale">Semolale</option>
-                        <option value="Gerald Estate">Gerald Estate</option>
-                        <option value="Block 1">Block 1</option>
-                        <option value="Block 2">Block 2</option>
-                        <option value="Block 3">Block 3</option>
-                        <option value="Block 4">Block 4</option>
-                        <option value="Block 5">Block 5</option>
-                        <option value="Block 6">Block 6</option>
-                        <option value="Block 7">Block 7</option>
-                        <option value="Block 8">Block 8</option>
-                        <option value="Block 9">Block 9</option>
-                        <option value="Block 10">Block 10</option>
-                        <option value="Nyangabwe">Nyangabwe</option>
-                        <option value="Blue Jacket">Blue Jacket</option>
-                        <option value="Satellite">Satellite</option>
-                      </>
-                    )}
-                    {formData.state === 'North-West' && (
-                      <>
-                        <option value="Maun">Maun</option>
-                        <option value="Kasane">Kasane</option>
-                        <option value="Shakawe">Shakawe</option>
-                        <option value="Gumare">Gumare</option>
-                        <option value="Nokaneng">Nokaneng</option>
-                        <option value="Seronga">Seronga</option>
-                        <option value="Tsau">Tsau</option>
-                      </>
-                    )}
-                    {formData.state === 'Central' && (
-                      <>
-                        <option value="Serowe">Serowe</option>
-                        <option value="Palapye">Palapye</option>
-                        <option value="Mahalapye">Mahalapye</option>
-                        <option value="Shoshong">Shoshong</option>
-                        <option value="Boteti">Boteti</option>
-                        <option value="Orapa">Orapa</option>
-                        <option value="Letlhakane">Letlhakane</option>
-                      </>
-                    )}
-                    {formData.state === 'Kweneng' && (
-                      <>
-                        <option value="Molepolole">Molepolole</option>
-                        <option value="Thamaga">Thamaga</option>
-                        <option value="Kumakwane">Kumakwane</option>
-                        <option value="Letlhakeng">Letlhakeng</option>
-                        <option value="Mokatse">Mokatse</option>
-                      </>
-                    )}
-                    {formData.state === 'Southern' && (
-                      <>
-                        <option value="Kanye">Kanye</option>
-                        <option value="Jwaneng">Jwaneng</option>
-                        <option value="Tshabong">Tshabong</option>
-                        <option value="Goodhope">Goodhope</option>
-                        <option value="Kang">Kang</option>
-                        <option value="Hukuntsi">Hukuntsi</option>
-                      </>
-                    )}
-                    {formData.state === 'Kgatleng' && (
-                      <>
-                        <option value="Mochudi">Mochudi</option>
-                        <option value="Artesia">Artesia</option>
-                        <option value="Oodi">Oodi</option>
-                      </>
-                    )}
-                    {formData.state === 'Kgalagadi' && (
-                      <>
-                        <option value="Ghanzi">Ghanzi</option>
-                        <option value="Tsabong">Tsabong</option>
-                        <option value="Hukuntsi">Hukuntsi</option>
-                        <option value="Kang">Kang</option>
-                      </>
-                    )}
-                    {formData.state === 'Chobe' && (
-                      <>
-                        <option value="Kasane">Kasane</option>
-                        <option value="Kazungula">Kazungula</option>
-                        <option value="Pandamatenga">Pandamatenga</option>
-                      </>
-                    )}
-                  </select>
-                </div>
+                     
 
                     {/* Plot Size - Show for Farm, House, Commercial and Land */}
                     {(watchedPropertyType === 'farm' || watchedPropertyType === 'house' || watchedPropertyType === 'commercial' || watchedPropertyType === 'land_plot') && (
@@ -1316,7 +1140,7 @@ const CreateListingPage = () => {
                           <li>Type: {watch('propertyType')}</li>
                           <li>Title: {watch('title')}</li>
                           <li>Price: P{parseInt(watch('price') || '0').toLocaleString()}</li>
-                          <li>Address: {watch('address')}</li>
+                          <li>Location: {locationData.area_text || 'Not specified'}</li>
 
                           {/* Plot Size - Show for Farm, House, Commercial and Land */}
                           {(watchedPropertyType === 'farm' || watchedPropertyType === 'house' || watchedPropertyType === 'commercial' || watchedPropertyType === 'land_plot') && watch('plotSize') && (

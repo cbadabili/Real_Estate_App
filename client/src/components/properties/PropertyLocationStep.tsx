@@ -44,7 +44,7 @@ export default function PropertyLocationStep({
   // Initialize map
   useEffect(() => {
     if (!mapEl.current || mapRef.current || !MAPBOX_TOKEN) return;
-    
+
     mapRef.current = new mapboxgl.Map({
       container: mapEl.current,
       style: "mapbox://styles/mapbox/streets-v12",
@@ -107,7 +107,7 @@ export default function PropertyLocationStep({
         setLoading(false);
       }
     };
-    
+
     const t = setTimeout(run, 250); // debounce
     return () => { 
       clearTimeout(t); 
@@ -156,7 +156,7 @@ export default function PropertyLocationStep({
       console.warn('Marker dragged outside Botswana bounds');
       return;
     }
-    
+
     onChange({
       area_text: area,
       latitude: lat,
@@ -167,7 +167,7 @@ export default function PropertyLocationStep({
 
   function handleMapClick(e: mapboxgl.MapMouseEvent) {
     const { lng, lat } = e.lngLat;
-    
+
     if (!IN_BW(lng, lat)) {
       console.warn('Click location is outside Botswana bounds');
       return;
@@ -200,7 +200,7 @@ export default function PropertyLocationStep({
             Please add your VITE_MAPBOX_ACCESS_TOKEN to use the interactive location picker.
           </p>
         </div>
-        <label className="text-sm font-medium">Area / Neighborhood</label>
+        <label className="text-sm font-medium">City / Town / Village</label>
         <input
           value={area}
           onChange={(e) => {
@@ -210,7 +210,7 @@ export default function PropertyLocationStep({
               location_source: "geocode",
             });
           }}
-          placeholder="e.g., Block 8, Phakalane, Village..."
+          placeholder="e.g., Gaborone, Francistown, Maun, Block 8..."
           className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
         />
       </div>
@@ -220,14 +220,14 @@ export default function PropertyLocationStep({
   return (
     <div className="flex flex-col gap-3">
       <label className="text-sm font-medium text-gray-700">
-        Area / Neighborhood
+        City / Town / Village
       </label>
-      
+
       <div className="relative">
         <input
           value={area}
           onChange={(e) => setArea(e.target.value)}
-          placeholder="e.g., Block 8, Phakalane, Village..."
+          placeholder="e.g., Gaborone, Francistown, Maun, Block 8..."
           className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
         />
         {loading && (
@@ -255,9 +255,9 @@ export default function PropertyLocationStep({
       <div className="relative">
         <div 
           ref={mapEl} 
-          className="h-80 w-full rounded-lg border border-gray-300 bg-gray-100" 
+          className="h-96 w-full rounded-lg border border-gray-300 bg-gray-100" 
         />
-        
+
         {/* Map overlay instructions */}
         <div className="absolute top-2 left-2 bg-white/90 backdrop-blur-sm rounded-md px-2 py-1 text-xs text-gray-600 shadow-sm">
           Click or drag pin to set exact location
@@ -270,7 +270,7 @@ export default function PropertyLocationStep({
             <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
           </svg>
           <span>
-            <strong>Tip:</strong> Type the area name to center the map, then click or drag the pin to mark the exact property location within Botswana.
+            <strong>Tip:</strong> Type the area name to center the map, then click or drag the pin to mark the exact property location.
           </span>
         </p>
       </div>
