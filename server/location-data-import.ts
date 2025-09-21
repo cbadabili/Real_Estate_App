@@ -485,7 +485,7 @@ async function importSettlements() {
     
     // Ghanzi District Localities
     ['Ghanzi', 'Ghanzi'],
-    ['Ghanzi', 'D\\'Kar'],
+    ['Ghanzi', 'D\'Kar'],
     ['Ghanzi', 'Kuke'],
     ['Ghanzi', 'Qabo'],
     ['Ghanzi', 'Grootlaagte'],
@@ -648,26 +648,29 @@ async function importSettlements() {
 
   // Add all census localities to settlements data
   const censusSettlements = [];
+  const seenCombinations = new Set();
+  
+  // Track existing manual combinations
+  for (const settlement of settlementsData) {
+    seenCombinations.add(`${settlement.district}|${settlement.name}`);
+  }
+  
   for (const [censusDistrict, locality] of censusData) {
-    const mappedDistrictName = censusDistrictMapping[censusDistrict];
-    if (mappedDistrictName && districtMap.has(mappedDistrictName)) {
-      // Skip if already exists in manual data
-      const existsInManual = settlementsData.some(s => 
-        s.district === mappedDistrictName && s.name === locality
-      );
-      
-      if (!existsInManual) {
-        censusSettlements.push({
-          district: mappedDistrictName,
-          name: locality,
-          type: 'village',
-          population: null, // Will be updated with actual census data later
-          latitude: null,
-          longitude: null,
-          post_code: null,
-          is_major: false
-        });
-      }
+    const mappedDistrictName = censusDistrictMapping[censusDistrict as keyof typeof censusDistrictMapping];
+    const combinationKey = `${mappedDistrictName}|${locality}`;
+    
+    if (mappedDistrictName && districtMap.has(mappedDistrictName) && !seenCombinations.has(combinationKey)) {
+      censusSettlements.push({
+        district: mappedDistrictName,
+        name: locality,
+        type: 'village',
+        population: null, // Will be updated with actual census data later
+        latitude: null,
+        longitude: null,
+        post_code: null,
+        is_major: false
+      });
+      seenCombinations.add(combinationKey);
     }
   }
   
