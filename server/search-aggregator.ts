@@ -121,12 +121,11 @@ async function queryDB(q: string, sort: string): Promise<UnifiedProperty[]> {
       terms.push(gte(properties.price, derived.minPrice));
     }
     if (derived.maxPrice !== undefined) {
-      // For maxPrice, we need to use '<=' which is lte in Drizzle
       terms.push(sql`${properties.price} <= ${derived.maxPrice}`);
     }
     
-    // If no specific filters detected, fall back to text search
-    if (terms.length === 0) {
+    // Always include text search when there's a query string
+    if (q && q.trim()) {
       const like = `%${q}%`;
       terms.push(
         or(
@@ -162,7 +161,7 @@ function mapDBRowToUnified(row: any): UnifiedProperty {
   return {
     id: `local_${row.id}`,
     title: row.title,
-    price: parseFloat(row.price.replace(/[^\d.]/g, '')) || 0,
+    price: typeof row.price === 'number' ? row.price : (parseFloat(row.price?.replace?.(/[^\d.]/g, '') || '0') || 0),
     address: row.address,
     city: row.city,
     bedrooms: row.bedrooms,
