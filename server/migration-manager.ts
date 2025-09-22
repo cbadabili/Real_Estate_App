@@ -12,6 +12,89 @@ const __dirname = dirname(__filename);
 export class MigrationManager {
   private migrationsPath = path.join(__dirname, 'migrations');
 
+  async initializeMigrationsTable() {
+    await db.execute(sql`
+      CREATE TABLE IF NOT EXISTS schema_migrations (
+        id SERIAL PRIMARY KEY,
+        filename TEXT NOT NULL UNIQUE,
+        applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+  }
+
+  async getAppliedMigrations() {
+    try {
+      const result = await db.execute(sql`SELECT * FROM schema_migrations ORDER BY filename`);
+      return result.rows;
+    } catch (error) {
+      return [];
+    }
+  }
+
+  async getPendingMigrations() {
+    const appliedMigrations = await this.getAppliedMigrations();
+    const appliedFilenames = new Set(appliedMigrations.map((m: any) => m.filename));
+    
+    const allMigrationFiles = fs.readdirSync(this.migrationsPath)
+      .filter(file => file.endsWith('.sql'))
+      .sort();
+    
+    return allMigrationFiles.filter(file => !appliedFilenames.has(file));
+  }
+
+  async runMigration(filename: string) {
+    const filePath = path.join(this.migrationsPath, filename);
+    const migrationSQL = fs.readFileSync(filePath, 'utf8');
+    
+    // Split by semicolon and execute each statement
+    const statements = migrationSQL
+      .split(';')
+      .map(stmt => stmt.trim())
+      .filter(stmt => stmt.length > 0);
+    
+    console.log(`Running migration: ${filename}`);
+    
+    for (const statement of statements) {
+      await db.execute(sql.raw(statement));
+    }
+    
+    // Record migration as applied
+    await db.execute(sql`
+      INSERT INTO schema_migrations (filename) VALUES (${filename})
+    `);
+    
+    console.log(`✅ Migration ${filename} completed`);
+  }
+
+  async runAllPendingMigrations() {
+    await this.initializeMigrationsTable();
+    const pendingMigrations = await this.getPendingMigrations();
+    
+    if (pendingMigrations.length === 0) {
+      console.log('No pending migrations found');
+      return;
+    }
+    
+    console.log(`Found ${pendingMigrations.length} pending migrations`);
+    
+    for (const migration of pendingMigrations) {
+      await this.runMigration(migration);
+    }
+    
+    console.log('All migrations completed');
+  }
+
+  async resetDatabase() {
+    console.log('⚠️ Resetting database...');
+    
+    // Drop all tables
+    await db.execute(sql`DROP SCHEMA public CASCADE`);
+    await db.execute(sql`CREATE SCHEMA public`);
+    await db.execute(sql`GRANT ALL ON SCHEMA public TO public`);
+    
+    console.log('Database reset completed');
+  }
+
   async ensurePostgresExtensions() {
     console.log('🔧 Installing PostgreSQL extensions...');
     
@@ -116,3 +199,13 @@ export class MigrationManager {
 }
 
 export const migrationManager = new MigrationManager();
+
+// Singleton pattern for migration manager
+let _migrationManager: MigrationManager | null = null;
+
+export const getMigrationManager = (): MigrationManager => {
+  if (!_migrationManager) {
+    _migrationManager = new MigrationManager();
+  }
+  return _migrationManager;
+};
