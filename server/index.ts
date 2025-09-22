@@ -423,11 +423,8 @@ app.get('/api/health', (_req: Request, res: Response) => {
 
   // Seed rental data
 
-  // API routes
-  // Property routes are registered via registerPropertyRoutes in registerRoutes function
-  app.use('/api/users', userRoutes);
-  app.use('/api/auth', authRoutes);
-  app.use('/api', documentsRoutes);
+  // Register all API routes via the main registerRoutes function
+  await registerRoutes(app);
 
   // ALWAYS serve the app on port 5000
   // this serves both the API and the client.
