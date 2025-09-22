@@ -15,7 +15,6 @@ import {
   primaryKey,
   json,
   numeric,
-  tsvector,
   doublePrecision,
   jsonb,
   customType
@@ -28,6 +27,13 @@ import { relations, sql } from "drizzle-orm";
 const geography = customType<{ data: any; driverData: string }>({
   dataType() {
     return "geography(POINT, 4326)";
+  },
+});
+
+// Custom tsvector type for full-text search
+const tsvector = customType<{ data: any; driverData: string }>({
+  dataType() {
+    return "tsvector";
   },
 });
 
