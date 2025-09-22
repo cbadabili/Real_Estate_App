@@ -1,0 +1,59 @@
+Search today is stitched together from SQLite-era schema artifacts, a lightweight /api/search aggregator, demo-only /api/search/enhanced, and several ad hoc frontend flows. This keeps the experience functional, but it blocks the richer ranking, geo filtering, caching, observability, and evaluation targets you outlined.
+Recommendations
+1.	Replatform migrations to PostgreSQL to unlock FTS/geo features.
+The committed migrations are still SQLite-specific (e.g., AUTOINCREMENT, julianday), so none of the planned Postgres/PostGIS work can run cleanly until the history is regenerated against a real Postgres instance.
+Suggested taskMigrate Drizzle artifacts to PostgreSQL
+Start task 1. Launch a local Postgres instance and export the matching `DATABASE_URL`. 2. Remove or archive `migrations/` and `migrations/meta/` that contain SQLite DDL. 3. Run `npx drizzle-kit generate` (and the location config variant, if used) so new SQL snapshots target Postgres. 4. Apply the regenerated migrations with `npx drizzle-kit push` to verify they execute cleanly. 5. Commit the regenerated SQL/meta plus any schema tweaks (e.g., numeric price columns) needed for Postgres fidelity.
+2.	Extend properties with search-first columns, triggers, and indexes.
+The table lacks fts, geom, completeness_score, or even a boolean is_active, and there are no supporting triggers or indexes for BM25, trigram, or geo ranking.
+Suggested taskAdd FTS and geo fields to properties schema
+Start task 1. Update `shared/schema.ts` to add `fts` (`tsvector`), `geom` (`geography(Point,4326)`), `completenessScore` (`integer`), and `isActive` (`boolean`) columns. 2. Regenerate migrations that add the columns, install `pg_trgm`, and create the GIN/GiST indexes described in the plan. 3. Create a `properties_fts_update` trigger function/migration to keep `fts` in sync on insert/update. 4. Backfill `geom` and `completeness_score` for existing rows with an `UPDATE` migration or data patch script. 5. Adjust seeds and storage helpers to supply the new fields (e.g., numeric completeness defaults, `is_active` guards).
+
+3.	Refactor the search service into a single, typed /api/search surface.
+search-aggregator.ts currently interprets free text with a few regexes and merges AI responses, while /api/search/enhanced returns static demo data.
+Suggested taskImplement unified search router with parser and ranking
+Start task 1. Create `server/routes/search-routes.ts` that exposes `/api/search` with typed query params (entity, text, facets, geo, sort). 2. Replace `search-aggregator.ts` usage with modular services (parser → candidate fetch → ranking) and delete the demo-only `/api/search/enhanced` handler. 3. Update client callers (e.g., `PropertiesPage`, shared hooks) to use the new response schema and pagination metadata. 4. Add Vitest unit coverage for the parser and query-shaping utilities. 5. Document the API contract in an OpenAPI section for `/api/search`.
+
+4.	Introduce Redis (or pluggable) caching with proper invalidation.
+Every search request hits the database and AI tier with no memoization or hit metrics.
+Suggested taskAdd search result caching and invalidation
+Start task 1. Create `server/lib/cache.ts` with a Redis client and a memory fallback for local dev. 2. Wrap the unified search handler so it hashes query+geo facets into keys like `search:{hash}` with a 30–60 s TTL. 3. Emit cache hit/miss counters for observability and surface them via `/api/health`. 4. Wire property/rental/service mutation flows to invalidate affected keys (e.g., on status changes or new listings). 5. Provide configuration docs for connecting to Redis locally (docker-compose) and in production.
+
+5.	Layer in freshness, proximity, completeness, and verification boosts.
+Current ranking prefers local results, price order, or a hard-coded score = 0.8 for external items, so it cannot meet the NDCG/MRR targets.
+Suggested taskImplement multi-signal ranking for search results
+Start task 1. Add a `server/ranking/signals.ts` module to compute BM25, proximity, freshness decay, completeness, and verification boosts. 2. Update the SQL query (or service logic) to retrieve the inputs in one pass and combine them with the proposed weighting formula. 3. Persist `completeness_score`, `is_active`, and freshness timestamps in the DB for cheap scoring. 4. Cover the weighting math with unit tests to guard against regressions when tuning coefficients. 5. Expose scoring diagnostics in the API response (behind a debug flag) to aid future tuning.
+
+6.	Strengthen duplicate detection and moderation flows.
+Deduplication is currently a simple address substring check, with no moderation queue for suspected duplicates.
+Suggested taskAdd duplicate listing detection and moderation queue
+Start task 1. Build a duplicate detector (e.g., same geohash ±30 m and fuzzy price/bedrooms) under `server/ranking/duplicates.ts`. 2. Extend the search pipeline to tag or filter duplicates before scoring. 3. Create a moderation table/API (`server/routes/moderation-routes.ts`) where flagged items land for review. 4. Add an admin UI component (client `components/moderation/DuplicateQueue.tsx`) to triage duplicates. 5. Ensure flagged listings trigger cache invalidations and notify listing owners if needed.
+
+7.	Consolidate frontend query state into a reusable hook with URL sync.
+PropertiesPage mixes manual fetches, AI fallbacks, and local filtering without debounced hooks or sharable URLs.
+Suggested taskCreate useUnifiedSearch hook with URL/state syncing
+Start task 1. Implement `client/src/hooks/useUnifiedSearch.ts` that manages query params, debouncing, TanStack Query integration, and map bbox syncing. 2. Replace the ad-hoc fetch logic in `PropertiesPage.tsx` and related pages with the new hook. 3. Keep the URL in sync (via `useSearchParams`) so deep links restore filters, sorts, and map extents. 4. Provide shared utilities in `client/src/lib/queryMappers.ts` for translating UI filters → API params and back. 5. Add component tests to ensure list, map, and pagination remain aligned when state changes.
+
+8.	Integrate hierarchical autocomplete with the location APIs.
+The enhanced search bar keeps local filter state and calls the demo endpoint; it doesn’t tap the district/settlement/ward/plot services already exposed on the backend.
+Suggested taskHook search autocomplete into location hierarchy
+Start task 1. Create a `useLocationAutocomplete` hook that queries `/api/locations/search` as users type, caching recent results. 2. Update `EnhancedSearchBar.tsx` (and SmartSearchBar) to render grouped suggestions (district → locality → ward → plot). 3. On selection, emit both the canonical IDs and bbox so the new search hook can recenter the map. 4. Add keyboard navigation and loading states to the autocomplete UI. 5. Write integration tests covering keystroke-to-suggestion latency and map recenter behavior.
+
+9.	Persist saved/recent searches with alertability.
+Saved searches currently live entirely in local storage, so they can’t power alerts or cross-device continuity.
+Suggested taskBack saved and recent searches with the API
+Start task 1. Design a `saved_searches` table and corresponding Drizzle models for per-user saved and recent queries. 2. Expose CRUD endpoints under `/api/search/saved` and `/api/search/recent` with alert toggle support. 3. Update `SavedSearches.tsx` to load/store data via the API while keeping optimistic local updates. 4. Emit alert webhooks/emails when new results match a saved query (reusing the cache invalidation hooks). 5. Document how saved searches interact with feature flags (e.g., Typesense/vector variants) to preserve consistency.
+
+10.	Establish an offline relevance evaluation suite.
+Current tests assert status codes and simple performance thresholds, but there’s no gold set, NDCG, or MRR scoring in CI.
+Suggested taskAdd gold-standard relevance evaluation to CI
+Start task 1. Curate `tests/search/goldset.json` with 300–600 labelled Botswana queries and graded judgments. 2. Implement `tests/search/evaluator.test.ts` that computes NDCG@k/MRR/Recall and compares against a checked-in baseline. 3. Wire the evaluator into CI with a failure threshold when metrics regress beyond agreed tolerances. 4. Produce a CLI report (`npm run search:evaluate`) summarizing gains/regressions for ranking experiments. 5. Document the evaluation process in `docs/search-kpis.md` so contributors can extend the gold set responsibly.
+11.	Instrument search-specific observability.
+Logging middleware provides request IDs, but there are no dedicated metrics or trace context for search queries.
+Suggested taskExpose search logs, metrics, and traces
+Start task 1. Wrap the unified search handler with structured logging that records requestId, query hash, cache status, result counts, and latency. 2. Add an OpenTelemetry setup (`server/observability/otel.ts`) emitting spans for DB, cache, and downstream calls. 3. Publish Prometheus counters/gauges (e.g., `search_requests_total`, `search_cache_hits`, `search_latency_ms`) via `/metrics`. 4. Update the health endpoint to include cache hit rate and Postgres/Redis connectivity checks. 5. Create dashboards/runbooks in `docs/search-operations.md` outlining SLOs, alert thresholds, and debugging steps.
+
+12.	Add a targeted load test suite for search SLOs.
+Existing performance scripts run Vitest-based timing checks, but there’s no k6 (or similar) workload that mirrors the planned traffic mix.
+Suggested taskAuthor k6-based search load testing
+1. Add `scripts/k6/search.js` that drives the 80/15/5 read/detail/write mix with configurable QPS and captures p50/p95/p99. 2. Extend `package.json` and CI to run the k6 script nightly (or on demand) and archive the latency/error metrics. 3. Parameterize the script with feature flags (e.g., lexical vs. vector engines) so experiments can be compared. 4. Incorporate cache priming steps to observe cold-start vs. warm-cache behavior. 5. Publish a short report template (`docs/search-performance.md`) summarizing each run’s outcome versus SLOs.
