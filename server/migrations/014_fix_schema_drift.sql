@@ -1,11 +1,11 @@
 
+-- Fix schema drift migration with proper PostGIS setup and type casting
 BEGIN;
 
--- Enable PostGIS extension for geometry support
+-- Enable PostGIS extension for geometry support (must be first)
 CREATE EXTENSION IF NOT EXISTS postgis;
 
 -- Fix service_categories table schema
--- First, check if we need to modify the table structure
 DO $$
 BEGIN
   -- Add updated_at column if missing
@@ -14,7 +14,7 @@ BEGIN
     WHERE table_name = 'service_categories' AND column_name = 'updated_at'
   ) THEN
     ALTER TABLE service_categories 
-      ADD COLUMN updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP;
+      ADD COLUMN updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP;
   END IF;
 
   -- Convert created_at from bigint to timestamp if needed
@@ -31,8 +31,8 @@ BEGIN
     -- Convert existing epoch values to timestamps
     UPDATE service_categories 
     SET temp_created_at = CASE 
-      WHEN created_at > 1000000000000 THEN to_timestamp(created_at / 1000.0)  -- milliseconds
-      ELSE to_timestamp(created_at)  -- seconds
+      WHEN created_at > 1000000000000 THEN to_timestamp(created_at / 1000.0)
+      ELSE to_timestamp(created_at)
     END;
     
     -- Drop old column and rename
@@ -42,10 +42,6 @@ BEGIN
     ALTER TABLE service_categories ALTER COLUMN created_at SET DEFAULT CURRENT_TIMESTAMP;
   END IF;
 END $$;
-
--- Add missing updated_at column to service_categories
-ALTER TABLE service_categories
-  ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP;
 
 -- Create function to automatically update updated_at timestamp
 CREATE OR REPLACE FUNCTION set_updated_at() RETURNS trigger AS $$
@@ -66,24 +62,44 @@ BEGIN
   END IF;
 END $$;
 
+-- Ensure coordinate columns are proper numeric types
+DO $$
+BEGIN
+  -- Fix latitude column type if it's text
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns 
+    WHERE table_name = 'properties' 
+    AND column_name = 'latitude' 
+    AND data_type = 'text'
+  ) THEN
+    ALTER TABLE properties ALTER COLUMN latitude TYPE DOUBLE PRECISION USING CAST(latitude AS DOUBLE PRECISION);
+  END IF;
+
+  -- Fix longitude column type if it's text  
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns 
+    WHERE table_name = 'properties' 
+    AND column_name = 'longitude' 
+    AND data_type = 'text'
+  ) THEN
+    ALTER TABLE properties ALTER COLUMN longitude TYPE DOUBLE PRECISION USING CAST(longitude AS DOUBLE PRECISION);
+  END IF;
+END $$;
+
 -- Add missing geom column to properties (PostGIS Point geometry)
 ALTER TABLE properties
   ADD COLUMN IF NOT EXISTS geom geometry(Point, 4326);
 
--- Backfill geom from existing latitude/longitude data
+-- Backfill geom from existing latitude/longitude data with proper casting
 UPDATE properties
-SET geom = ST_SetSRID(ST_MakePoint(longitude, latitude), 4326)
-WHERE geom IS NULL AND longitude IS NOT NULL AND latitude IS NOT NULL;
-
--- Create spatial index for geom column
-CREATE INDEX IF NOT EXISTS idx_properties_geom_gist ON properties USING GIST (geom);
-
--- Ensure full-text search index exists
-CREATE INDEX IF NOT EXISTS idx_properties_fts_gin ON properties USING GIN (fts);
-
--- Create composite indexes for performance
-CREATE INDEX IF NOT EXISTS idx_properties_location_price ON properties (city, state, price);
-CREATE INDEX IF NOT EXISTS idx_properties_coords ON properties (latitude, longitude) WHERE latitude IS NOT NULL AND longitude IS NOT NULL;
+SET geom = ST_SetSRID(ST_MakePoint(CAST(longitude AS DOUBLE PRECISION), CAST(latitude AS DOUBLE PRECISION)), 4326)
+WHERE geom IS NULL 
+  AND longitude IS NOT NULL 
+  AND latitude IS NOT NULL 
+  AND longitude != '' 
+  AND latitude != ''
+  AND longitude ~ '^-?[0-9]+\.?[0-9]*$'
+  AND latitude ~ '^-?[0-9]+\.?[0-9]*$';
 
 -- Fix bathrooms column type from text to integer
 DO $$
@@ -100,10 +116,10 @@ BEGIN
     -- Convert text values to integers, handling decimal values
     UPDATE properties 
     SET temp_bathrooms = CASE 
-      WHEN bathrooms ~ '^[0-9]+\.5$' THEN CAST(REPLACE(bathrooms, '.5', '') AS INTEGER) + 1  -- Round up half-baths
+      WHEN bathrooms ~ '^[0-9]+\.5$' THEN CAST(REPLACE(bathrooms, '.5', '') AS INTEGER) + 1
       WHEN bathrooms ~ '^[0-9]+$' THEN CAST(bathrooms AS INTEGER)
       WHEN bathrooms ~ '^[0-9]+\.[0-9]+$' THEN CAST(ROUND(CAST(bathrooms AS NUMERIC)) AS INTEGER)
-      ELSE 1  -- Default fallback
+      ELSE 1
     END
     WHERE bathrooms IS NOT NULL AND bathrooms != '';
     
@@ -117,5 +133,15 @@ BEGIN
     ALTER TABLE properties RENAME COLUMN temp_bathrooms TO bathrooms;
   END IF;
 END $$;
+
+-- Create spatial index for geom column (only if PostGIS is loaded)
+CREATE INDEX IF NOT EXISTS idx_properties_geom_gist ON properties USING GIST (geom);
+
+-- Ensure full-text search index exists
+CREATE INDEX IF NOT EXISTS idx_properties_fts_gin ON properties USING GIN (fts);
+
+-- Create composite indexes for performance
+CREATE INDEX IF NOT EXISTS idx_properties_location_price ON properties (city, state, price);
+CREATE INDEX IF NOT EXISTS idx_properties_coords ON properties (latitude, longitude) WHERE latitude IS NOT NULL AND longitude IS NOT NULL;
 
 COMMIT;
