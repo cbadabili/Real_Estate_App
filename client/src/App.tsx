@@ -90,6 +90,8 @@ import BuyMapPage from './pages/BuyMapPage';
 import TestMapPage from './pages/TestMapPage'; // Assuming this is a missing import
 import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 import TermsOfServicePage from './pages/TermsOfServicePage';
+import { useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -106,6 +108,17 @@ const queryClient = new QueryClient({
   },
 });
 
+// Component to scroll to top on route change
+const ScrollToTop = () => {
+  const location = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
+
+  return null;
+};
+
 function App() {
   return (
     <ErrorBoundary>
@@ -114,6 +127,7 @@ function App() {
           <AuthProvider>
             <PropertyProvider>
               <div className="min-h-screen bg-neutral-50">
+                <ScrollToTop />
                 <OfflineIndicator />
                 <Navbar />
                 <Routes>
