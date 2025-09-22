@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useProperties } from '../hooks/useProperties';
 import { AISearchBar } from '../components/search/AISearchBar';
 import { 
@@ -31,6 +31,7 @@ const HomePage = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [currentAgency, setCurrentAgency] = useState(0);
   const { data: apiProperties = [] } = useProperties();
+  const navigate = useNavigate();
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -237,7 +238,7 @@ const HomePage = () => {
                     if (e.key === 'Enter') {
                       const query = (e.target as HTMLInputElement).value;
                       if (query.trim()) {
-                        window.location.href = `/properties?search=${encodeURIComponent(query)}`;
+                        navigate(`/properties?search=${encodeURIComponent(query)}`);
                       }
                     }
                   }}
@@ -248,7 +249,9 @@ const HomePage = () => {
                     const input = e.currentTarget.parentElement?.querySelector('input');
                     const query = input?.value;
                     if (query?.trim()) {
-                      window.location.href = `/properties?search=${encodeURIComponent(query)}`;
+                      navigate(`/properties?search=${encodeURIComponent(query)}`);
+                    } else {
+                      navigate('/properties');
                     }
                   }}
                 >
@@ -446,35 +449,24 @@ const HomePage = () => {
               ].map((feature, index) => {
                 const Icon = feature.icon;
                 return (
-                  <motion.div
-                    key={feature.title}
-                    variants={itemVariants}
-                    className="bg-white p-8 rounded-xl shadow-sm border border-gray-200 hover:shadow-lg transition-shadow text-center cursor-pointer group"
-                    onClick={() => window.location.href = feature.link}
-                  >
-                    <div className="w-12 h-12 bg-beedab-blue/10 rounded-xl flex items-center justify-center mx-auto mb-6 group-hover:bg-beedab-blue/20 transition-colors">
-                      <Icon className="h-6 w-6 text-beedab-blue" />
-                    </div>
-                    <h3 className="text-xl font-semibold text-gray-900 mb-4 group-hover:text-beedab-blue transition-colors">{feature.title}</h3>
-                    <p className="text-gray-600">{feature.description}</p>
-                    <div className="mt-4 flex items-center justify-center text-beedab-blue group-hover:text-beedab-darkblue transition-colors">
-                      <Link 
-                        to={
-                          feature.title === 'Buyer and Seller Platform' ? '/buyer-seller-platform' :
-                          feature.title === 'Market Intelligence' ? '/market-intelligence' :
-                          feature.title === 'Secure Transactions' ? '/secure-transactions' :
-                          feature.title === 'Instant Communication' ? '/communication' :
-                          feature.title === 'REAC Agent Network' ? '/agent-network' :
-                          feature.title === 'Comprehensive Listings' ? '/properties' :
-                          '#'
-                        }
-                        className="text-sm font-medium flex items-center"
-                      >
-                        Learn More
-                        <ArrowRight className="ml-2 h-4 w-4" />
-                      </Link>
-                    </div>
-                  </motion.div>
+                  <Link key={feature.title} to={feature.link} className="block">
+                    <motion.div
+                      variants={itemVariants}
+                      className="bg-white p-8 rounded-xl shadow-sm border border-gray-200 hover:shadow-lg transition-shadow text-center cursor-pointer group"
+                    >
+                      <div className="w-12 h-12 bg-beedab-blue/10 rounded-xl flex items-center justify-center mx-auto mb-6 group-hover:bg-beedab-blue/20 transition-colors">
+                        <Icon className="h-6 w-6 text-beedab-blue" />
+                      </div>
+                      <h3 className="text-xl font-semibold text-gray-900 mb-4 group-hover:text-beedab-blue transition-colors">{feature.title}</h3>
+                      <p className="text-gray-600">{feature.description}</p>
+                      <div className="mt-4 flex items-center justify-center text-beedab-blue group-hover:text-beedab-darkblue transition-colors">
+                        <span className="text-sm font-medium flex items-center">
+                          Learn More
+                          <ArrowRight className="ml-2 h-4 w-4" />
+                        </span>
+                      </div>
+                    </motion.div>
+                  </Link>
                 );
               })}
           </div>
