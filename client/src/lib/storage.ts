@@ -67,6 +67,9 @@ export class SafeStorage {
   }
 }
 
+// Default storage instance for backwards compatibility
+export const storage = SafeStorage;
+
 // Token-specific utilities
 export class TokenStorage {
   static getToken(): string | null {
