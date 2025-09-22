@@ -78,12 +78,12 @@ const PropertySearchPage = () => {
       let response;
       let data;
       
-      if (searchQueryParam && searchQueryParam.trim().length > 0) {
+      if (searchQuery && searchQuery.trim().length > 0) {
         // Use unified search for natural language queries
         const searchParams = new URLSearchParams();
-        searchParams.set('q', searchQueryParam);
-        if (currentFilters.propertyType !== 'all') {
-          searchParams.set('type', currentFilters.propertyType);
+        searchParams.set('q', searchQuery);
+        if (filters.propertyType !== 'all') {
+          searchParams.set('type', filters.propertyType);
         }
         
         response = await fetch(`/api/search?${searchParams}`);
@@ -106,11 +106,6 @@ const PropertySearchPage = () => {
         } else {
           throw new Error(`Properties fetch failed: ${response.status}`);
         }
-      }
-      } else {
-        console.error('Search request failed:', response.status, response.statusText);
-        setProperties([]);
-        setResultCount(0);
       }
     } catch (error) {
       console.error('Failed to search properties:', error);
