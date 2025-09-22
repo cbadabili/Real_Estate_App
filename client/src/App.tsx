@@ -199,7 +199,10 @@ function App() {
             <Route path="/pricing-guide" element={<PricingGuidePage />} />
             <Route path="/documents" element={<ProtectedRoute><DocumentsPage /></ProtectedRoute>} />
             <Route path="/legal-requirements" element={<LegalRequirementsPage />} />
-            <Route path="/legal-document-templates" element={<LegalDocumentTemplatesPage />} />
+          <Route path="/legal-document-templates" element={<LegalDocumentTemplatesPage />} />
+          <Route path="/services/legal-documents" element={<LegalDocumentTemplatesPage />} />
+          <Route path="/legal-transactions" element={<LegalTransactionsHub />} />
+          <Route path="/services/legal" element={<LegalServicesPage />} />
             <Route path="/secure-transactions" element={<SecureTransactionsPage />} />
             <Route path="/transaction-management" element={<ProtectedRoute><TransactionManagementPage /></ProtectedRoute>} />
             <Route path="/transfer-process" element={<TransferProcessPage />} />
