@@ -108,16 +108,16 @@ export declare class RentalStorage {
     }[]>;
     createRental(rentalData: any): Promise<{
         id: number;
-        created_at: Date | null;
-        updated_at: Date | null;
-        title: string;
         description: string;
         address: string;
         city: string;
+        created_at: Date | null;
+        updated_at: Date | null;
+        status: string | null;
+        title: string;
         property_type: string;
         bedrooms: number;
         bathrooms: number;
-        status: string | null;
         landlord_id: number | null;
         district: string;
         ward: string | null;

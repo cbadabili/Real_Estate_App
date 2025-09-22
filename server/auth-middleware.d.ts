@@ -11,7 +11,7 @@ declare global {
     }
 }
 export declare class AuthService {
-    static hasPermission(user: User, permission: string): boolean;
+    static hasPermission(user: User, permission: Permission | string): boolean;
     static hasAnyPermission(user: User, permissions: Permission[]): boolean;
     static hasAllPermissions(user: User, permissions: Permission[]): boolean;
     static isAdmin(user: User): boolean;

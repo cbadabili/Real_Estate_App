@@ -152,7 +152,7 @@ export const reviewResponses = pgTable("review_responses", {
     reviewId: integer("review_id").references(() => userReviews.id).notNull(),
     responderId: integer("responder_id").references(() => users.id).notNull(),
     response: text("response").notNull(),
-    isOfficial: integer("is_official", { mode: "boolean" }).default(false), // Official business response
+    isOfficial: boolean("is_official").default(false), // Official business response
     createdAt: timestamp("created_at").defaultNow(),
 });
 // Review helpful votes
@@ -160,7 +160,7 @@ export const reviewHelpful = pgTable("review_helpful", {
     id: serial("id").primaryKey(),
     reviewId: integer("review_id").references(() => userReviews.id).notNull(),
     userId: integer("user_id").references(() => users.id).notNull(),
-    isHelpful: integer("is_helpful", { mode: "boolean" }).notNull(), // true for helpful, false for not helpful
+    isHelpful: boolean("is_helpful").notNull(), // true for helpful, false for not helpful
     createdAt: timestamp("created_at").defaultNow(),
 });
 // User permissions and roles
@@ -187,9 +187,9 @@ export const adminAuditLog = pgTable("admin_audit_log", {
 export const saved_searches = pgTable('saved_searches', {
     id: serial("id").primaryKey(),
     user_id: integer('user_id').references(() => users.id, { onDelete: 'cascade' }),
-    search_criteria: text('search_criteria', { mode: 'json' }),
+    search_criteria: jsonb('search_criteria'),
     name: text('name'),
-    email_alerts: integer('email_alerts', { mode: 'boolean' }).default(false),
+    email_alerts: boolean('email_alerts').default(false),
     created_at: timestamp('created_at').defaultNow(),
 });
 export const rental_listings = pgTable('rental_listings', {
@@ -527,7 +527,7 @@ export const artisan_skills = pgTable('artisan_skills', {
     issue_date: text('issue_date'),
     expiry_date: text('expiry_date'),
     document_url: text('document_url'),
-    is_verified: integer('is_verified', { mode: 'boolean' }).default(false),
+    is_verified: boolean('is_verified').default(false),
     created_at: integer('created_at').default(sql `(cast((julianday('now') - 2440587.5)*86400000 as integer))`),
 });
 // Training programs and courses
@@ -547,7 +547,7 @@ export const training_programs = pgTable('training_programs', {
     course_outline: text('course_outline'), // JSON
     materials_included: text('materials_included'), // JSON array
     // Certification
-    provides_certificate: integer('provides_certificate', { mode: 'boolean' }).default(false),
+    provides_certificate: boolean('provides_certificate').default(false),
     certificate_type: text('certificate_type'),
     accreditation_body: text('accreditation_body'),
     // Scheduling
@@ -604,7 +604,7 @@ export const project_proposals = pgTable('project_proposals', {
     // Terms
     payment_terms: text('payment_terms'),
     warranty_period: text('warranty_period'),
-    materials_included: integer('materials_included', { mode: 'boolean' }).default(false),
+    materials_included: boolean('materials_included').default(false),
     // Status
     status: text('status').default('pending'), // 'pending', 'accepted', 'rejected', 'withdrawn'
     created_at: integer('created_at').default(sql `(cast((julianday('now') - 2440587.5)*86400000 as integer))`),
@@ -626,7 +626,7 @@ export const marketplace_reviews = pgTable('marketplace_reviews', {
     communication_rating: integer('communication_rating'), // 1-5
     value_rating: integer('value_rating'), // 1-5
     // Verification
-    is_verified: integer('is_verified', { mode: 'boolean' }).default(false),
+    is_verified: boolean('is_verified').default(false),
     verification_method: text('verification_method'),
     // Images
     review_images: text('review_images'), // JSON array
@@ -707,7 +707,7 @@ export const job_opportunities = pgTable('job_opportunities', {
     benefits: text('benefits'), // JSON array
     // Location
     job_location: text('job_location'),
-    remote_work: integer('remote_work', { mode: 'boolean' }).default(false),
+    remote_work: boolean('remote_work').default(false),
     // Status
     status: text('status').default('active'), // 'active', 'filled', 'cancelled', 'expired'
     applications_count: integer('applications_count').default(0),
@@ -762,7 +762,7 @@ export const plans = pgTable('plans', {
     description: text('description'),
     price_bwp: integer('price_bwp').notNull().default(0),
     interval: text('interval').notNull().default('monthly'), // monthly, yearly, one_time
-    features: text('features', { mode: 'json' }).notNull().default('{}'), // JSON object with features
+    features: jsonb('features').notNull().default('{}'), // JSON object with features
     is_active: boolean('is_active').default(true),
     created_at: integer('created_at').default(sql `(cast((julianday('now') - 2440587.5)*86400000 as integer))`),
     updated_at: integer('updated_at').default(sql `(cast((julianday('now') - 2440587.5)*86400000 as integer))`),

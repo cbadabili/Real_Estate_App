@@ -424,7 +424,7 @@ app.get('/api/health', (_req: Request, res: Response) => {
   // Seed rental data
 
   // API routes
-  app.use('/api/properties', propertyRoutes);
+  // Property routes are registered via registerPropertyRoutes in registerRoutes function
   app.use('/api/users', userRoutes);
   app.use('/api/auth', authRoutes);
   app.use('/api', documentsRoutes);

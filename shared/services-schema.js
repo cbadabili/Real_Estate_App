@@ -1,9 +1,9 @@
-import { pgTable, text, integer, real, boolean, timestamp, } from "drizzle-orm/pg-core";
+import { pgTable, text, integer, real, boolean, timestamp, serial, } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 export const serviceProviders = pgTable("service_providers", {
-    id: integer("id").primaryKey({ autoIncrement: true }),
+    id: serial("id").primaryKey(),
     companyName: text("company_name").notNull(),
     serviceCategory: text("service_category").notNull(), // 'Photography', 'Legal', 'Moving', 'Finance', 'Insurance', 'Cleaning', 'Construction'
     contactPerson: text("contact_person"),
@@ -23,7 +23,7 @@ export const serviceProviders = pgTable("service_providers", {
     updatedAt: timestamp("updated_at").defaultNow(),
 });
 export const serviceAds = pgTable("service_ads", {
-    id: integer("id").primaryKey({ autoIncrement: true }),
+    id: serial("id").primaryKey(),
     providerId: integer("provider_id").references(() => serviceProviders.id),
     adTitle: text("ad_title").notNull(),
     adCopy: text("ad_copy"), // e.g., "Make your listing shine. Book a pro photoshoot."
@@ -40,7 +40,7 @@ export const serviceAds = pgTable("service_ads", {
     updatedAt: timestamp("updated_at").defaultNow()
 });
 export const serviceReviews = pgTable("service_reviews", {
-    id: integer("id").primaryKey({ autoIncrement: true }),
+    id: serial("id").primaryKey(),
     providerId: integer("provider_id").references(() => serviceProviders.id),
     userId: integer("user_id"), // Reference to users table
     rating: integer("rating").notNull(), // 1-5 stars

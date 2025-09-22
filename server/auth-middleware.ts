@@ -151,7 +151,7 @@ export class AuthService {
 // JWT utilities
 import { env } from './utils/env';
 
-const JWT_SECRET = env.JWT_SECRET;
+const JWT_SECRET = env.JWT_SECRET as string;
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '24h';
 
 export interface JWTPayload {

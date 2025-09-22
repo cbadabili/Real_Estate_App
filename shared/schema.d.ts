@@ -2151,10 +2151,10 @@ export declare const reviewResponses: import("drizzle-orm/pg-core").PgTableWithC
         isOfficial: import("drizzle-orm/pg-core").PgColumn<{
             name: "is_official";
             tableName: "review_responses";
-            dataType: "number";
-            columnType: "PgInteger";
-            data: number;
-            driverParam: string | number;
+            dataType: "boolean";
+            columnType: "PgBoolean";
+            data: boolean;
+            driverParam: boolean;
             notNull: false;
             hasDefault: true;
             isPrimaryKey: false;
@@ -2243,10 +2243,10 @@ export declare const reviewHelpful: import("drizzle-orm/pg-core").PgTableWithCol
         isHelpful: import("drizzle-orm/pg-core").PgColumn<{
             name: "is_helpful";
             tableName: "review_helpful";
-            dataType: "number";
-            columnType: "PgInteger";
-            data: number;
-            driverParam: string | number;
+            dataType: "boolean";
+            columnType: "PgBoolean";
+            data: boolean;
+            driverParam: boolean;
             notNull: true;
             hasDefault: false;
             isPrimaryKey: false;
@@ -2587,16 +2587,16 @@ export declare const saved_searches: import("drizzle-orm/pg-core").PgTableWithCo
         search_criteria: import("drizzle-orm/pg-core").PgColumn<{
             name: "search_criteria";
             tableName: "saved_searches";
-            dataType: "string";
-            columnType: "PgText";
-            data: string;
-            driverParam: string;
+            dataType: "json";
+            columnType: "PgJsonb";
+            data: unknown;
+            driverParam: unknown;
             notNull: false;
             hasDefault: false;
             isPrimaryKey: false;
             isAutoincrement: false;
             hasRuntimeDefault: false;
-            enumValues: [string, ...string[]];
+            enumValues: undefined;
             baseColumn: never;
             identity: undefined;
             generated: undefined;
@@ -2621,10 +2621,10 @@ export declare const saved_searches: import("drizzle-orm/pg-core").PgTableWithCo
         email_alerts: import("drizzle-orm/pg-core").PgColumn<{
             name: "email_alerts";
             tableName: "saved_searches";
-            dataType: "number";
-            columnType: "PgInteger";
-            data: number;
-            driverParam: string | number;
+            dataType: "boolean";
+            columnType: "PgBoolean";
+            data: boolean;
+            driverParam: boolean;
             notNull: false;
             hasDefault: true;
             isPrimaryKey: false;
@@ -3586,8 +3586,8 @@ export declare const insertUserSchema: z.ZodObject<Omit<{
     createdAt: z.ZodOptional<z.ZodNullable<z.ZodDate>>;
     updatedAt: z.ZodOptional<z.ZodNullable<z.ZodDate>>;
 }, "id" | "createdAt" | "updatedAt">, "strip", z.ZodTypeAny, {
-    username: string;
     email: string;
+    username: string;
     password: string;
     firstName: string;
     lastName: string;
@@ -3602,8 +3602,8 @@ export declare const insertUserSchema: z.ZodObject<Omit<{
     reacNumber?: string | null | undefined;
     lastLoginAt?: Date | null | undefined;
 }, {
-    username: string;
     email: string;
+    username: string;
     password: string;
     firstName: string;
     lastName: string;
@@ -3668,15 +3668,16 @@ export declare const insertPropertySchema: z.ZodObject<Omit<{
     createdAt: z.ZodOptional<z.ZodNullable<z.ZodDate>>;
     updatedAt: z.ZodOptional<z.ZodNullable<z.ZodDate>>;
 }, "id" | "createdAt" | "updatedAt" | "views" | "daysOnMarket">, "strip", z.ZodTypeAny, {
-    title: string;
-    price: string;
     address: string;
     city: string;
+    title: string;
+    price: string;
     state: string;
     zipCode: string;
     propertyType: string;
     listingType: string;
     description?: string | null | undefined;
+    status?: string | undefined;
     latitude?: number | null | undefined;
     longitude?: number | null | undefined;
     areaText?: string | null | undefined;
@@ -3689,7 +3690,6 @@ export declare const insertPropertySchema: z.ZodObject<Omit<{
     areaBuild?: number | null | undefined;
     lotSize?: string | null | undefined;
     yearBuilt?: number | null | undefined;
-    status?: string | undefined;
     images?: string | null | undefined;
     features?: string | null | undefined;
     virtualTourUrl?: string | null | undefined;
@@ -3712,15 +3712,16 @@ export declare const insertPropertySchema: z.ZodObject<Omit<{
     auctionTerms?: string | null | undefined;
     lotNumber?: string | null | undefined;
 }, {
-    title: string;
-    price: string;
     address: string;
     city: string;
+    title: string;
+    price: string;
     state: string;
     zipCode: string;
     propertyType: string;
     listingType: string;
     description?: string | null | undefined;
+    status?: string | undefined;
     latitude?: number | null | undefined;
     longitude?: number | null | undefined;
     areaText?: string | null | undefined;
@@ -3733,7 +3734,6 @@ export declare const insertPropertySchema: z.ZodObject<Omit<{
     areaBuild?: number | null | undefined;
     lotSize?: string | null | undefined;
     yearBuilt?: number | null | undefined;
-    status?: string | undefined;
     images?: string | null | undefined;
     features?: string | null | undefined;
     virtualTourUrl?: string | null | undefined;
@@ -3764,13 +3764,13 @@ export declare const insertInquirySchema: z.ZodObject<Omit<{
     status: z.ZodOptional<z.ZodString>;
     createdAt: z.ZodOptional<z.ZodNullable<z.ZodDate>>;
 }, "id" | "createdAt" | "status">, "strip", z.ZodTypeAny, {
+    message: string;
     propertyId: number;
     buyerId: number;
-    message: string;
 }, {
+    message: string;
     propertyId: number;
     buyerId: number;
-    message: string;
 }>;
 export declare const insertAppointmentSchema: z.ZodObject<Omit<{
     id: z.ZodOptional<z.ZodNumber>;
@@ -3783,17 +3783,17 @@ export declare const insertAppointmentSchema: z.ZodObject<Omit<{
     notes: z.ZodOptional<z.ZodNullable<z.ZodString>>;
     createdAt: z.ZodOptional<z.ZodNullable<z.ZodDate>>;
 }, "id" | "createdAt" | "status">, "strip", z.ZodTypeAny, {
+    type: string;
     propertyId: number;
     buyerId: number;
     appointmentDate: Date;
-    type: string;
     agentId?: number | null | undefined;
     notes?: string | null | undefined;
 }, {
+    type: string;
     propertyId: number;
     buyerId: number;
     appointmentDate: Date;
-    type: string;
     agentId?: number | null | undefined;
     notes?: string | null | undefined;
 }>;
@@ -3834,9 +3834,9 @@ export declare const insertUserReviewSchema: z.ZodObject<Omit<{
     moderatorNotes: z.ZodOptional<z.ZodNullable<z.ZodString>>;
     createdAt: z.ZodOptional<z.ZodNullable<z.ZodDate>>;
     updatedAt: z.ZodOptional<z.ZodNullable<z.ZodDate>>;
-}, "id" | "isVerified" | "createdAt" | "updatedAt" | "status">, "strip", z.ZodTypeAny, {
-    reviewerId: number;
+}, "id" | "createdAt" | "updatedAt" | "status" | "isVerified">, "strip", z.ZodTypeAny, {
     rating: number;
+    reviewerId: number;
     revieweeId: number;
     reviewType: string;
     review?: string | null | undefined;
@@ -3844,8 +3844,8 @@ export declare const insertUserReviewSchema: z.ZodObject<Omit<{
     isPublic?: number | null | undefined;
     moderatorNotes?: string | null | undefined;
 }, {
-    reviewerId: number;
     rating: number;
+    reviewerId: number;
     revieweeId: number;
     reviewType: string;
     review?: string | null | undefined;
@@ -3858,33 +3858,33 @@ export declare const insertReviewResponseSchema: z.ZodObject<Omit<{
     reviewId: z.ZodNumber;
     responderId: z.ZodNumber;
     response: z.ZodString;
-    isOfficial: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+    isOfficial: z.ZodOptional<z.ZodNullable<z.ZodBoolean>>;
     createdAt: z.ZodOptional<z.ZodNullable<z.ZodDate>>;
 }, "id" | "createdAt">, "strip", z.ZodTypeAny, {
     reviewId: number;
     responderId: number;
     response: string;
-    isOfficial?: number | null | undefined;
+    isOfficial?: boolean | null | undefined;
 }, {
     reviewId: number;
     responderId: number;
     response: string;
-    isOfficial?: number | null | undefined;
+    isOfficial?: boolean | null | undefined;
 }>;
 export declare const insertReviewHelpfulSchema: z.ZodObject<Omit<{
     id: z.ZodOptional<z.ZodNumber>;
     reviewId: z.ZodNumber;
     userId: z.ZodNumber;
-    isHelpful: z.ZodNumber;
+    isHelpful: z.ZodBoolean;
     createdAt: z.ZodOptional<z.ZodNullable<z.ZodDate>>;
 }, "id" | "createdAt">, "strip", z.ZodTypeAny, {
     userId: number;
     reviewId: number;
-    isHelpful: number;
+    isHelpful: boolean;
 }, {
     userId: number;
     reviewId: number;
-    isHelpful: number;
+    isHelpful: boolean;
 }>;
 export declare const insertUserPermissionSchema: z.ZodObject<Omit<{
     id: z.ZodOptional<z.ZodNumber>;
@@ -4851,10 +4851,10 @@ export declare const artisan_skills: import("drizzle-orm/pg-core").PgTableWithCo
         is_verified: import("drizzle-orm/pg-core").PgColumn<{
             name: "is_verified";
             tableName: "artisan_skills";
-            dataType: "number";
-            columnType: "PgInteger";
-            data: number;
-            driverParam: string | number;
+            dataType: "boolean";
+            columnType: "PgBoolean";
+            data: boolean;
+            driverParam: boolean;
             notNull: false;
             hasDefault: true;
             isPrimaryKey: false;
@@ -5113,10 +5113,10 @@ export declare const training_programs: import("drizzle-orm/pg-core").PgTableWit
         provides_certificate: import("drizzle-orm/pg-core").PgColumn<{
             name: "provides_certificate";
             tableName: "training_programs";
-            dataType: "number";
-            columnType: "PgInteger";
-            data: number;
-            driverParam: string | number;
+            dataType: "boolean";
+            columnType: "PgBoolean";
+            data: boolean;
+            driverParam: boolean;
             notNull: false;
             hasDefault: true;
             isPrimaryKey: false;
@@ -5841,10 +5841,10 @@ export declare const project_proposals: import("drizzle-orm/pg-core").PgTableWit
         materials_included: import("drizzle-orm/pg-core").PgColumn<{
             name: "materials_included";
             tableName: "project_proposals";
-            dataType: "number";
-            columnType: "PgInteger";
-            data: number;
-            driverParam: string | number;
+            dataType: "boolean";
+            columnType: "PgBoolean";
+            data: boolean;
+            driverParam: boolean;
             notNull: false;
             hasDefault: true;
             isPrimaryKey: false;
@@ -6103,10 +6103,10 @@ export declare const marketplace_reviews: import("drizzle-orm/pg-core").PgTableW
         is_verified: import("drizzle-orm/pg-core").PgColumn<{
             name: "is_verified";
             tableName: "marketplace_reviews";
-            dataType: "number";
-            columnType: "PgInteger";
-            data: number;
-            driverParam: string | number;
+            dataType: "boolean";
+            columnType: "PgBoolean";
+            data: boolean;
+            driverParam: boolean;
             notNull: false;
             hasDefault: true;
             isPrimaryKey: false;
@@ -7093,10 +7093,10 @@ export declare const job_opportunities: import("drizzle-orm/pg-core").PgTableWit
         remote_work: import("drizzle-orm/pg-core").PgColumn<{
             name: "remote_work";
             tableName: "job_opportunities";
-            dataType: "number";
-            columnType: "PgInteger";
-            data: number;
-            driverParam: string | number;
+            dataType: "boolean";
+            columnType: "PgBoolean";
+            data: boolean;
+            driverParam: boolean;
             notNull: false;
             hasDefault: true;
             isPrimaryKey: false;
@@ -7324,16 +7324,16 @@ export declare const plans: import("drizzle-orm/pg-core").PgTableWithColumns<{
         features: import("drizzle-orm/pg-core").PgColumn<{
             name: "features";
             tableName: "plans";
-            dataType: "string";
-            columnType: "PgText";
-            data: string;
-            driverParam: string;
+            dataType: "json";
+            columnType: "PgJsonb";
+            data: unknown;
+            driverParam: unknown;
             notNull: true;
             hasDefault: true;
             isPrimaryKey: false;
             isAutoincrement: false;
             hasRuntimeDefault: false;
-            enumValues: [string, ...string[]];
+            enumValues: undefined;
             baseColumn: never;
             identity: undefined;
             generated: undefined;
