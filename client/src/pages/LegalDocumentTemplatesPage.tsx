@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
@@ -21,6 +20,31 @@ import {
 const LegalDocumentTemplatesPage = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const [previewing, setPreviewing] = useState({});
+  const [downloading, setDownloading] = useState({});
+
+  const handlePreview = (document) => {
+    setPreviewing(prev => ({ ...prev, [document.id]: true }));
+    // Simulate opening a preview, replace with actual preview logic if available
+    window.open(document.url, '_blank');
+    // Resetting the state after a short delay to show the 'Opening...' state
+    setTimeout(() => {
+      setPreviewing(prev => ({ ...prev, [document.id]: false }));
+    }, 1500);
+  };
+
+  const handleDownload = (document) => {
+    setDownloading(prev => ({ ...prev, [document.id]: true }));
+    // Simulate download, replace with actual download logic
+    setTimeout(() => {
+      setDownloading(prev => ({ ...prev, [document.id]: false }));
+      // In a real scenario, you would initiate the file download here.
+      // For example, using a library like file-saver:
+      // import { saveAs } from 'file-saver';
+      // saveAs(document.url, `${document.title}.pdf`);
+    }, 2000);
+  };
+
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -61,7 +85,8 @@ const LegalDocumentTemplatesPage = () => {
       rating: 4.9,
       price: 'Free',
       features: ['REAC Compliant', 'Lawyer Reviewed', 'Customizable'],
-      preview: true
+      preview: true,
+      url: '/documents/property_sale_agreement.pdf'
     },
     {
       id: 2,
@@ -74,7 +99,8 @@ const LegalDocumentTemplatesPage = () => {
       rating: 4.8,
       price: 'Free',
       features: ['Tenant Rights Included', 'Dispute Resolution', 'Customizable'],
-      preview: true
+      preview: true,
+      url: '/documents/residential_lease_agreement.pdf'
     },
     {
       id: 3,
@@ -87,7 +113,8 @@ const LegalDocumentTemplatesPage = () => {
       rating: 4.7,
       price: 'Free',
       features: ['Legal Requirement', 'Comprehensive', 'Easy to Complete'],
-      preview: true
+      preview: true,
+      url: '/documents/property_disclosure_statement.pdf'
     },
     {
       id: 4,
@@ -100,7 +127,8 @@ const LegalDocumentTemplatesPage = () => {
       rating: 4.9,
       price: 'Free',
       features: ['BURS Approved', 'Auto-Calculate', 'Digital Signature'],
-      preview: true
+      preview: true,
+      url: '/documents/transfer_duty_declaration.pdf'
     },
     {
       id: 5,
@@ -113,7 +141,8 @@ const LegalDocumentTemplatesPage = () => {
       rating: 4.8,
       price: 'P299',
       features: ['Business Law Compliant', 'Negotiation Terms', 'Customizable'],
-      preview: true
+      preview: true,
+      url: '/documents/commercial_lease_agreement.pdf'
     },
     {
       id: 6,
@@ -126,7 +155,8 @@ const LegalDocumentTemplatesPage = () => {
       rating: 4.6,
       price: 'P199',
       features: ['Notary Ready', 'Limited Scope', 'Revocable'],
-      preview: true
+      preview: true,
+      url: '/documents/power_of_attorney_property.pdf'
     }
   ];
 
@@ -268,14 +298,23 @@ const LegalDocumentTemplatesPage = () => {
 
                     <div className="flex space-x-2">
                       {document.preview && (
-                        <button className="flex-1 flex items-center justify-center px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
+                        <button
+                          onClick={() => handlePreview(document)}
+                          disabled={previewing[document.id]}
+                          className="flex-1 flex items-center justify-center px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                          title="Preview"
+                        >
                           <Eye className="h-4 w-4 mr-1" />
-                          Preview
+                          {previewing[document.id] ? 'Opening...' : 'Preview'}
                         </button>
                       )}
-                      <button className="flex-1 flex items-center justify-center px-4 py-2 bg-beedab-blue text-white rounded-lg hover:bg-beedab-darkblue transition-colors">
+                      <button 
+                        onClick={() => handleDownload(document)}
+                        disabled={downloading[document.id]}
+                        className="flex-1 flex items-center justify-center px-4 py-2 bg-beedab-blue text-white rounded-lg hover:bg-beedab-darkblue transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
                         <Download className="h-4 w-4 mr-1" />
-                        Download
+                        {downloading[document.id] ? 'Downloading...' : 'Download'}
                       </button>
                     </div>
                   </div>

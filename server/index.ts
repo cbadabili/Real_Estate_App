@@ -27,6 +27,7 @@ import { registerPropertyRoutes } from "./routes/property-routes";
 import { registerUserRoutes } from "./routes/user-routes";
 import { registerAuthRoutes } from "./routes/auth-routes";
 import { registerMarketIntelligenceRoutes } from "./market-intelligence-routes";
+import documentsRoutes from './routes/documents-routes.js';
 
 const app = express();
 
@@ -412,6 +413,12 @@ app.get('/api/health', (_req: Request, res: Response) => {
   }
 
   // Seed rental data
+
+  // API routes
+  app.use('/api/properties', propertyRoutes);
+  app.use('/api/users', userRoutes);
+  app.use('/api/auth', authRoutes);
+  app.use('/api', documentsRoutes);
 
   // ALWAYS serve the app on port 5000
   // this serves both the API and the client.

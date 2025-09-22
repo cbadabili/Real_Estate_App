@@ -1,0 +1,341 @@
+You are a careful repo mechanic.
+Before changing anything, audit the codebase and print findings. Then implement changes in small, reversible commits on a feature branch. Never delete history; archive/rename when in doubt. Prefer minimal diffs.
+
+Objectives (do in this order)
+
+Rebuild Drizzle migrations for PostgreSQL (remove SQLite artifacts safely).
+
+Add CI pipeline (lint, typecheck, tests, build, migration drift check).
+
+Add repository governance docs (CONTRIBUTING, CODEOWNERS, SECURITY, ADR, runbook).
+
+Publish OpenAPI spec and serve Swagger UI at /api/docs.
+
+Add docker-compose for local Postgres (and document usage).
+
+Guardrails
+
+Create branch: chore/hardening-migrations-ci-docs.
+
+Print a short AUDIT REPORT before modifying files:
+
+Drizzle config(s), current migrations/ and migrations/meta/ engines, presence of AUTOINCREMENT, INTEGER PRIMARY KEY, or sqlite_ tokens.
+
+Where DATABASE_URL is read and any drizzle-* scripts in package.json.
+
+Presence/absence of .github/workflows/*, OpenAPI/Swagger files, and docker-compose.
+
+If SQLite artifacts exist, archive them to migrations_sqlite_archive/ (don’t delete).
+
+Keep existing environment variables and README content; append additions rather than replace.
+
+After each major task, run npm run typecheck and tests if present, and print results.
+
+Step 0 — Branch, install, and baseline checks
+
+Create branch chore/hardening-migrations-ci-docs.
+
+npm ci (or pnpm i if lockfile indicates pnpm).
+
+Print Drizzle config file path(s) and contents summary.
+
+Grep for SQLite constructs:
+
+grep -RniE "AUTOINCREMENT|sqlite_|INTEGER PRIMARY KEY" migrations/ || true
+
+Print scripts from root and /server package.json (if monorepo).
+
+Print whether .github/workflows/ exists and list files.
+
+Print whether server/openapi.json or any swagger/openapi deps already exist.
+
+Print whether a docker-compose.yml exists.
+
+OUTPUT (must show): “AUDIT REPORT” section with bullets and file paths.
+
+Step 1 — Rebuild Drizzle migrations for PostgreSQL (safe)
+
+Only proceed if audit shows SQLite-era artifacts or missing Postgres DDL.
+
+Create an archive:
+
+Move migrations/* and migrations/meta/* to migrations_sqlite_archive/ preserving structure.
+
+Ensure Postgres is reachable:
+
+If no local Postgres, create a temporary one via docker (see Step 5 compose), or use DATABASE_URL if already set.
+
+Export DATABASE_URL in the Replit shell session.
+
+Generate new Postgres migrations:
+
+Run npx drizzle-kit generate (or the monorepo’s db:generate).
+
+If config file is nonstandard (e.g., drizzle.config.ts or drizzle.location.config.ts), use it.
+
+Apply to a Postgres instance:
+
+npx drizzle-kit push (or monorepo’s db:migrate or db:push) and show success logs.
+
+Verify migrations/meta snapshot now references pg and no SQLite tokens remain.
+
+Update seed scripts only if the schema changed vs shared schema types; otherwise leave them intact.
+
+Commit:
+
+feat(db): regenerate Postgres migrations; archive SQLite-era artifacts
+
+Acceptance checks (print output):
+
+grep -Rni "AUTOINCREMENT|sqlite_" migrations/ returns nothing.
+
+drizzle-kit push success summary.
+
+Step 2 — CI Workflow (lint, typecheck, tests, build, drift)
+
+Create .github/workflows/ci.yml with:
+
+Triggers: push, pull_request.
+
+Node 20.x or 22.x (match repo engines field if present).
+
+Install (npm or pnpm—respect lockfile).
+
+Steps: typecheck, lint, test (with coverage if available), build.
+
+Optional Postgres service: spin up postgres and run drizzle-kit diff or db:check to detect migration drift (skip gracefully if scripts are missing).
+
+Add scripts if missing in root package.json:
+
+"typecheck": "tsc -b"
+
+"lint": "eslint . --max-warnings=0"
+
+"test": "vitest run || jest --coverage || echo 'no tests'"
+
+"build": "turbo run build || vite build || tsc -b"
+
+"db:check": "drizzle-kit diff || echo 'drizzle not configured for diff'"
+
+Commit:
+
+ci: add GitHub Actions pipeline for typecheck/lint/tests/build (+optional drift)
+
+Acceptance checks (print output):
+
+Show workflow file.
+
+Show package.json scripts diff.
+
+Dry-run matrix prints.
+
+Create this exact file (minimal, adaptable):
+
+name: CI
+on: [push, pull_request]
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
+          POSTGRES_DB: beedab_ci
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd="pg_isready -U postgres" 
+          --health-interval=10s --health-timeout=5s --health-retries=5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci || pnpm i
+      - name: Typecheck
+        run: npm run typecheck || pnpm typecheck
+      - name: Lint
+        run: npm run lint || pnpm lint
+      - name: Test
+        run: npm run test || pnpm test
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/beedab_ci
+      - name: Build
+        run: npm run build || pnpm build
+      - name: Drizzle drift (best-effort)
+        run: npm run db:check || echo "db:check not configured"
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/beedab_ci
+
+Step 3 — Repository governance & ops docs
+
+Create/append (don’t overwrite existing docs):
+
+CONTRIBUTING.md (key points)
+
+Branching: feature branches → PR → required review.
+
+Commit style: Conventional Commits.
+
+CI gates: lint, typecheck, tests, build, drift.
+
+How to run local stack (see compose).
+
+.github/CODEOWNERS
+
+/server/ @backend-owner
+/client/ @frontend-owner
+/shared/ @platform-arch
+/docs/ @cbadabili
+
+
+SECURITY.md
+
+How to report vulnerabilities (email), acknowledgement window (e.g., 72h), patch timelines.
+
+docs/adr/0001-use-drizzle-orm.md
+
+Decision: Drizzle over Prisma.
+
+Context, Options, Consequences.
+
+docs/runbooks/incident-response.md
+
+Severity levels, on-call steps, rollback steps, log locations, how to mute webhooks.
+
+Link these from README.md (append a “Project Governance” section).
+Commit: docs: add CONTRIBUTING, CODEOWNERS, SECURITY, ADR, and incident runbook
+
+Step 4 — OpenAPI + Swagger UI
+
+Add deps:
+
+zod-to-openapi, swagger-ui-express (respect package manager).
+
+Add server/scripts/generate-openapi.ts:
+
+Walk Zod route schemas (auth, properties, search, services, billing, locations) if they exist; otherwise generate a skeleton spec with the known routes and fill out later.
+
+Output to server/openapi.json.
+
+Add npm script:
+
+"docs:openapi": "tsx server/scripts/generate-openapi.ts"
+
+Add server/routes/docs.ts:
+
+Serve Swagger UI at /api/docs using the generated openapi.json.
+
+Wire into server/index.ts:
+
+Mount docs route after security middleware.
+
+Run generator; print where docs are served.
+
+Commit:
+
+docs(api): generate OpenAPI and mount Swagger UI at /api/docs
+
+Minimal files (create if missing):
+
+server/scripts/generate-openapi.ts (skeleton)
+
+import { writeFileSync } from 'fs';
+const spec = {
+  openapi: "3.0.3",
+  info: { title: "BeeDab API", version: "0.1.0" },
+  paths: {
+    "/api/health": { get: { summary: "Health", responses: { "200": { description: "OK" }}}},
+    "/api/properties": { get: { summary: "List properties", responses: { "200": { description: "OK" }}}},
+    "/api/search": { get: { summary: "Unified search", responses: { "200": { description: "OK" }}}},
+    "/api/services": { get: { summary: "List service providers", responses: { "200": { description: "OK" }}}},
+  }
+};
+writeFileSync("server/openapi.json", JSON.stringify(spec, null, 2));
+console.log("Wrote server/openapi.json");
+
+
+server/routes/docs.ts
+
+import { Router } from 'express';
+import swaggerUi from 'swagger-ui-express';
+import spec from '../openapi.json';
+export const docsRouter = Router();
+docsRouter.use('/', swaggerUi.serve, swaggerUi.setup(spec));
+
+
+server/index.ts (mount)
+
+import { docsRouter } from './routes/docs';
+app.use('/api/docs', docsRouter);
+
+Step 5 — docker-compose for local Postgres (+ docs)
+
+Add docker-compose.yml at repo root:
+
+version: '3.9'
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: beedab
+      POSTGRES_PASSWORD: beedab
+      POSTGRES_DB: beedab_dev
+    ports: [ "5432:5432" ]
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U beedab"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+volumes:
+  db_data:
+
+
+Append to README.md:
+
+Quick start:
+
+docker compose up -d
+
+export DATABASE_URL=postgresql://beedab:beedab@localhost:5432/beedab_dev
+
+npm run db:migrate (or drizzle-kit push)
+
+Commit:
+
+chore(dev): add docker-compose for Postgres and quick-start docs
+
+Finalization — Print summary & open PR
+
+Run typecheck/tests/build one more time and print statuses.
+
+Show a concise CHANGE SUMMARY with file paths changed.
+
+Push branch and open a PR named:
+“Hardening: Postgres migrations, CI, governance docs, OpenAPI, docker-compose”
+
+In the PR body, include:
+
+AUDIT REPORT
+
+What changed (✅ checkboxes)
+
+How to verify (commands + URLs, e.g., /api/docs)
+
+Rollback steps (restore migrations_sqlite_archive/ if needed)
+
+Extra acceptance checks (print true/false)
+
+migrations/ contains only Postgres-compatible SQL.
+
+/api/docs serves Swagger UI locally.
+
+.github/workflows/ci.yml runs and would fail on lint/type/test/build errors.
+
+docker compose up -d followed by drizzle-kit push succeeds end-to-end.
+
+README references CONTRIBUTING, SECURITY, ADR, runbook, and /api/docs.
