@@ -153,6 +153,8 @@ const HomePage = () => {
                 src={property.image}
                 alt={property.location}
                 className="w-full h-full object-cover"
+                loading="lazy"
+                decoding="async"
               />
               <div className="absolute inset-0 bg-black/40"></div>
 
@@ -174,6 +176,8 @@ const HomePage = () => {
                     src={property.agent.photo}
                     alt={property.agent.name}
                     className="w-8 h-8 rounded-full object-cover"
+                    loading="lazy"
+                    decoding="async"
                   />
                   <div>
                     <p className="font-semibold text-gray-900 text-xs">{property.agent.name}</p>
@@ -284,6 +288,8 @@ const HomePage = () => {
                           src={agency.logo}
                           alt={agency.name}
                           className="w-full h-full object-cover"
+                          loading="lazy"
+                          decoding="async"
                         />
                       </div>
                       <h3 className="text-xl font-bold text-gray-900 mb-2">{agency.name}</h3>
@@ -367,6 +373,8 @@ const HomePage = () => {
                     src={property.image}
                     alt={property.location}
                     className="w-full h-48 object-cover"
+                    loading="lazy"
+                    decoding="async"
                   />
                   <div className="absolute top-3 right-3 bg-white px-2 py-1 rounded text-sm font-medium text-beedab-blue">
                     {property.type}

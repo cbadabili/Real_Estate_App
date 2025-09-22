@@ -89,6 +89,12 @@ const HeroCarousel = () => {
           src={currentProperty.images?.[0] || '/placeholder-property.jpg'}
           alt={currentProperty.title}
           className="w-full h-full object-cover"
+          loading="eager"
+          decoding="async"
+          onError={(e) => {
+            // Fallback to placeholder if image fails to load
+            e.currentTarget.src = '/placeholder-property.jpg';
+          }}
         />
         <div className="absolute inset-0 bg-black bg-opacity-40"></div>
       </div>
