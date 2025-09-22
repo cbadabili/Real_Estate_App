@@ -1,5 +1,5 @@
 import { QueryClient } from '@tanstack/react-query';
-import { TokenStorage } from './storage';
+import { storage } from './storage';
 
 // Default fetcher function for GET requests
 const defaultQueryFn = async ({ queryKey }: { queryKey: readonly unknown[] }) => {
@@ -36,7 +36,7 @@ export const queryClient = new QueryClient({
 
 // API request helper for mutations (POST, PUT, DELETE)
 export const apiRequest = async (url: string, options: RequestInit = {}) => {
-  const token = TokenStorage.getToken();
+  const token = storage.getToken();
 
   const response = await fetch(url, {
     ...options,
@@ -60,7 +60,7 @@ export const apiRequest = async (url: string, options: RequestInit = {}) => {
 
     if (response.status === 401) {
       // Clear invalid token and redirect to login
-      TokenStorage.removeToken();
+      storage.removeToken();
       window.location.href = '/login';
       throw new Error('User not authenticated');
     }

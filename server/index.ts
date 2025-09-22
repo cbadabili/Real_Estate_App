@@ -36,20 +36,29 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'", "https://api.mapbox.com", "https://fonts.googleapis.com"],
-      scriptSrc: ["'self'", ...(env.NODE_ENV !== 'production' ? ["'unsafe-eval'"] : []), "https://api.mapbox.com", "https://replit.com"],
-      scriptSrcElem: ["'self'", "'unsafe-inline'", "https://api.mapbox.com", "https://replit.com"],
+      styleSrc: ["'self'", "https://api.mapbox.com", "https://fonts.googleapis.com"],
+      scriptSrc: ["'self'", "https://api.mapbox.com"],
       imgSrc: ["'self'", "data:", "https:", "blob:"],
       connectSrc: ["'self'", "https://api.mapbox.com", "https://events.mapbox.com", "wss:", "ws:"],
       fontSrc: ["'self'", "data:", "https://fonts.gstatic.com", "https://fonts.googleapis.com"],
-      workerSrc: ["'self'", "blob:"],
       objectSrc: ["'none'"],
       upgradeInsecureRequests: [],
     },
   },
   referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
   permittedCrossDomainPolicies: false,
-  crossOriginOpenerPolicy: { policy: 'same-origin' }
+  crossOriginOpenerPolicy: { policy: 'same-origin' },
+  permissionsPolicy: {
+    camera: ['self'],
+    microphone: [],
+    geolocation: ['self'],
+    fullscreen: ['self'],
+    payment: [],
+    usb: [],
+    magnetometer: [],
+    accelerometer: [],
+    gyroscope: []
+  }
 }));
 
 app.use(cors({
@@ -100,6 +109,23 @@ const searchLimiter = rateLimit({
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
+app.use((req, res, next) => {
+  // Security headers
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.setHeader('Content-Security-Policy', 
+    "default-src 'self'; " +
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://replit.com; " +
+    "font-src 'self' data: https:; " +
+    "style-src 'self' 'unsafe-inline'; " +
+    "img-src 'self' data: https:; " +
+    "connect-src 'self' ws: wss: https:; " +
+    "frame-src 'self';"
+  );
+  next();
+});
 
 // --------------------------------------------------
 // Health check – must be registered before other routes
@@ -169,7 +195,119 @@ app.get('/api/health', (_req: Request, res: Response) => {
     console.warn('⚠️ Could not mount API docs:', error.message);
   }
 
+  // Search aggregator route
+  app.get('/api/search', async (req, res) => {
+    try {
+      const { query, location, type, minPrice, maxPrice, bedrooms, bathrooms } = req.query;
 
+      const searchParams = {
+        query: query as string,
+        location: location as string,
+        type: type as string,
+        minPrice: minPrice ? parseFloat(minPrice as string) : undefined,
+        maxPrice: maxPrice ? parseFloat(maxPrice as string) : undefined,
+        bedrooms: bedrooms ? parseInt(bedrooms as string) : undefined,
+        bathrooms: bathrooms ? parseInt(bathrooms as string) : undefined
+      };
+
+      const results = await searchAggregator.search(searchParams);
+      res.json(results);
+    } catch (error) {
+      console.error('Search error:', error);
+      res.status(500).json({ error: 'Search failed' });
+    }
+  });
+
+  // Search suggestions endpoint
+  app.get('/api/search/suggestions', async (req, res) => {
+    try {
+      const { q } = req.query;
+      const query = (q as string)?.toLowerCase() || '';
+
+      if (!query || query.length < 2) {
+        return res.json({ suggestions: [] });
+      }
+
+      const suggestions = [];
+
+      // Location suggestions
+      const locations = [
+        'Gaborone', 'Francistown', 'Maun', 'Kasane', 'Serowe', 'Palapye',
+        'Mogoditshane', 'Molepolole', 'Kanye', 'Mahalapye', 'Lobatse',
+        'Gaborone West', 'Gaborone CBD', 'Block 6', 'Block 8', 'Block 10',
+        'Extension 2', 'Extension 9', 'Extension 12', 'Phakalane'
+      ];
+
+      const matchingLocations = locations
+        .filter(loc => loc.toLowerCase().includes(query))
+        .slice(0, 3)
+        .map((loc, index) => ({
+          id: `loc-${index}`,
+          text: `Properties in ${loc}`,
+          type: 'location'
+        }));
+
+      suggestions.push(...matchingLocations);
+
+      // Property type suggestions
+      const propertyTypes = [
+        'house', 'apartment', 'townhouse', 'commercial', 'farm', 'land', 'plot'
+      ];
+
+      const matchingTypes = propertyTypes
+        .filter(type => type.includes(query) || query.includes(type))
+        .slice(0, 2)
+        .map((type, index) => ({
+          id: `type-${index}`,
+          text: `${type.charAt(0).toUpperCase() + type.slice(1)}s for sale`,
+          type: 'property_type'
+        }));
+
+      suggestions.push(...matchingTypes);
+
+      // Feature suggestions
+      const features = [
+        'with pool', 'with garden', '3 bedroom', '4 bedroom', '2 bathroom',
+        'with garage', 'furnished', 'sea view', 'city view', 'new development'
+      ];
+
+      const matchingFeatures = features
+        .filter(feature => feature.includes(query) || query.split(' ').some(word => feature.includes(word)))
+        .slice(0, 2)
+        .map((feature, index) => ({
+          id: `feat-${index}`,
+          text: `Properties ${feature}`,
+          type: 'feature'
+        }));
+
+      suggestions.push(...matchingFeatures);
+
+      // Price range suggestions
+      if (query.includes('under') || query.includes('below')) {
+        suggestions.push({
+          id: 'price-under',
+          text: 'Properties under BWP 2M',
+          type: 'feature'
+        });
+      }
+
+      if (query.includes('above') || query.includes('over')) {
+        suggestions.push({
+          id: 'price-over',
+          text: 'Properties over BWP 1M',
+          type: 'feature'
+        });
+      }
+
+      // Limit to 6 suggestions
+      const limitedSuggestions = suggestions.slice(0, 6);
+
+      res.json({ suggestions: limitedSuggestions });
+    } catch (error) {
+      console.error('Suggestions error:', error);
+      res.status(500).json({ error: 'Failed to fetch suggestions' });
+    }
+  });
 
   // Analytics endpoint
   app.post('/api/analytics/events', async (req, res) => {

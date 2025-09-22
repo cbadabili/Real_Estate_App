@@ -9,12 +9,9 @@ import './index.css';
 
 // Handle unhandled promise rejections
 window.addEventListener('unhandledrejection', (event) => {
-  // Suppress browser extension related errors
-  const errorMessage = event.reason?.message || '';
-  if (errorMessage.includes('message channel') || 
-      errorMessage.includes('listener indicated an asynchronous response') ||
-      errorMessage.includes('Extension context invalidated') ||
-      errorMessage.includes('Could not establish connection')) {
+  // Skip WebSocket-related errors that aren't critical
+  if (event.reason?.message?.includes('WebSocket') || 
+      event.reason?.message?.includes('wss://')) {
     event.preventDefault();
     return;
   }

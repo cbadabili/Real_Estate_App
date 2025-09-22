@@ -1225,13 +1225,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const rentalRouter = createRentalRoutes();
   app.use("/api/rentals", rentalRouter);
 
-  // Search aggregator endpoint (combines local + RealEstateIntel AI)
-  app.get('/api/search', searchAggregator);
-
-  // Enhanced search routes (RealEstateIntel integration)
-  app.get('/api/search/enhanced', async (req, res) => {
-    try {
-      console.log('Enhanced search API called with query:', req.query);
+  // Note: Search routes are now handled by registerSearchRoutes in routes/index.ts
+  // Keeping legacy routes for backward compatibility;
 
       // Simple demo response since no local properties exist
       const demoResponse = {
