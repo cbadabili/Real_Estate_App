@@ -72,7 +72,11 @@ BEGIN
     AND column_name = 'latitude' 
     AND data_type = 'text'
   ) THEN
-    ALTER TABLE properties ALTER COLUMN latitude TYPE DOUBLE PRECISION USING CAST(latitude AS DOUBLE PRECISION);
+    ALTER TABLE properties ALTER COLUMN latitude TYPE DOUBLE PRECISION 
+    USING CASE 
+      WHEN latitude IS NULL OR latitude = '' THEN NULL
+      ELSE CAST(latitude AS DOUBLE PRECISION)
+    END;
   END IF;
 
   -- Fix longitude column type if it's text  
@@ -82,7 +86,11 @@ BEGIN
     AND column_name = 'longitude' 
     AND data_type = 'text'
   ) THEN
-    ALTER TABLE properties ALTER COLUMN longitude TYPE DOUBLE PRECISION USING CAST(longitude AS DOUBLE PRECISION);
+    ALTER TABLE properties ALTER COLUMN longitude TYPE DOUBLE PRECISION 
+    USING CASE 
+      WHEN longitude IS NULL OR longitude = '' THEN NULL
+      ELSE CAST(longitude AS DOUBLE PRECISION)
+    END;
   END IF;
 END $$;
 
