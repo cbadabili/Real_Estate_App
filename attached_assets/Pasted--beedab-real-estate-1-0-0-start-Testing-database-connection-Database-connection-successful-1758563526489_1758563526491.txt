@@ -1,0 +1,285 @@
+
+> beedab-real-estate@1.0.0 start
+Testing database connection...
+✅ Database connection successful
+📚 API documentation available at /api/docs
+🔄 Running database migrations...
+Found 1 pending migrations
+Running migration: 014_fix_schema_drift.sql
+❌ Database initialization failed: DrizzleQueryError: Failed query: 
+BEGIN;
+
+-- Enable PostGIS extension for geometry support
+CREATE EXTENSION IF NOT EXISTS postgis;
+
+-- Fix service_categories table schema
+-- First, check if we need to modify the table structure
+DO $$
+BEGIN
+  -- Add updated_at column if missing
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.columns 
+    WHERE table_name = 'service_categories' AND column_name = 'updated_at'
+  ) THEN
+    ALTER TABLE service_categories 
+      ADD COLUMN updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP;
+  END IF;
+
+  -- Convert created_at from bigint to timestamp if needed
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns 
+    WHERE table_name = 'service_categories' 
+    AND column_name = 'created_at' 
+    AND data_type = 'bigint'
+  ) THEN
+    -- Create temp column with proper timestamp
+    ALTER TABLE service_categories 
+      ADD COLUMN temp_created_at TIMESTAMP WITH TIME ZONE;
+    
+    -- Convert existing epoch values to timestamps
+    UPDATE service_categories 
+    SET temp_created_at = CASE 
+      WHEN created_at > 1000000000000 THEN to_timestamp(created_at / 1000.0)  -- milliseconds
+      ELSE to_timestamp(created_at)  -- seconds
+    END;
+    
+    -- Drop old column and rename
+    ALTER TABLE service_categories DROP COLUMN created_at;
+    ALTER TABLE service_categories RENAME COLUMN temp_created_at TO created_at;
+    ALTER TABLE service_categories ALTER COLUMN created_at SET NOT NULL;
+    ALTER TABLE service_categories ALTER COLUMN created_at SET DEFAULT CURRENT_TIMESTAMP;
+  END IF;
+END $$;
+
+-- Add missing updated_at column to service_categories
+ALTER TABLE service_categories
+  ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP;
+
+-- Create function to automatically update updated_at timestamp
+CREATE OR REPLACE FUNCTION set_updated_at() RETURNS trigger AS $$
+BEGIN
+  NEW.updated_at = CURRENT_TIMESTAMP;
+  RETURN NEW;
+END; $$ LANGUAGE plpgsql;
+
+-- Create trigger for service_categories updated_at
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_trigger WHERE tgname = 'set_service_categories_updated_at'
+  ) THEN
+    CREATE TRIGGER set_service_categories_updated_at
+    BEFORE UPDATE ON service_categories
+    FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+  END IF;
+END $$;
+
+-- Add missing geom column to properties (PostGIS Point geometry)
+ALTER TABLE properties
+  ADD COLUMN IF NOT EXISTS geom geometry(Point, 4326);
+
+-- Backfill geom from existing latitude/longitude data
+UPDATE properties
+SET geom = ST_SetSRID(ST_MakePoint(longitude, latitude), 4326)
+WHERE geom IS NULL AND longitude IS NOT NULL AND latitude IS NOT NULL;
+
+-- Create spatial index for geom column
+CREATE INDEX IF NOT EXISTS idx_properties_geom_gist ON properties USING GIST (geom);
+
+-- Ensure full-text search index exists
+CREATE INDEX IF NOT EXISTS idx_properties_fts_gin ON properties USING GIN (fts);
+
+-- Create composite indexes for performance
+CREATE INDEX IF NOT EXISTS idx_properties_location_price ON properties (city, state, price);
+CREATE INDEX IF NOT EXISTS idx_properties_coords ON properties (latitude, longitude) WHERE latitude IS NOT NULL AND longitude IS NOT NULL;
+
+-- Fix bathrooms column type from text to integer
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns 
+    WHERE table_name = 'properties' 
+    AND column_name = 'bathrooms' 
+    AND data_type = 'text'
+  ) THEN
+    -- Add temporary integer column
+    ALTER TABLE properties ADD COLUMN temp_bathrooms INTEGER;
+    
+    -- Convert text values to integers, handling decimal values
+    UPDATE properties 
+    SET temp_bathrooms = CASE 
+      WHEN bathrooms ~ '^[0-9]+\.5$' THEN CAST(REPLACE(bathrooms, '.5', '') AS INTEGER) + 1  -- Round up half-baths
+      WHEN bathrooms ~ '^[0-9]+$' THEN CAST(bathrooms AS INTEGER)
+      WHEN bathrooms ~ '^[0-9]+\.[0-9]+$' THEN CAST(ROUND(CAST(bathrooms AS NUMERIC)) AS INTEGER)
+      ELSE 1  -- Default fallback
+    END
+    WHERE bathrooms IS NOT NULL AND bathrooms != '';
+    
+    -- Handle null/empty cases
+    UPDATE properties 
+    SET temp_bathrooms = 1 
+    WHERE bathrooms IS NULL OR bathrooms = '';
+    
+    -- Drop old column and rename
+    ALTER TABLE properties DROP COLUMN bathrooms;
+    ALTER TABLE properties RENAME COLUMN temp_bathrooms TO bathrooms;
+  END IF;
+END $$;
+
+COMMIT;
+
+params: 
+    at NodePgPreparedQuery.queryWithCache (/home/runner/workspace/node_modules/src/pg-core/session.ts:73:11)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async MigrationManager.runMigration (/home/runner/workspace/server/migration-manager.ts:54:7)
+    at async MigrationManager.runAllPendingMigrations (/home/runner/workspace/server/migration-manager.ts:87:7)
+    at async <anonymous> (/home/runner/workspace/server/index.ts:385:7) {
+  query: '\n' +
+    'BEGIN;\n' +
+    '\n' +
+    '-- Enable PostGIS extension for geometry support\n' +
+    'CREATE EXTENSION IF NOT EXISTS postgis;\n' +
+    '\n' +
+    '-- Fix service_categories table schema\n' +
+    '-- First, check if we need to modify the table structure\n' +
+    'DO $$\n' +
+    'BEGIN\n' +
+    '  -- Add updated_at column if missing\n' +
+    '  IF NOT EXISTS (\n' +
+    '    SELECT 1 FROM information_schema.columns \n' +
+    "    WHERE table_name = 'service_categories' AND column_name = 'updated_at'\n" +
+    '  ) THEN\n' +
+    '    ALTER TABLE service_categories \n' +
+    '      ADD COLUMN updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP;\n' +
+    '  END IF;\n' +
+    '\n' +
+    '  -- Convert created_at from bigint to timestamp if needed\n' +
+    '  IF EXISTS (\n' +
+    '    SELECT 1 FROM information_schema.columns \n' +
+    "    WHERE table_name = 'service_categories' \n" +
+    "    AND column_name = 'created_at' \n" +
+    "    AND data_type = 'bigint'\n" +
+    '  ) THEN\n' +
+    '    -- Create temp column with proper timestamp\n' +
+    '    ALTER TABLE service_categories \n' +
+    '      ADD COLUMN temp_created_at TIMESTAMP WITH TIME ZONE;\n' +
+    '    \n' +
+    '    -- Convert existing epoch values to timestamps\n' +
+    '    UPDATE service_categories \n' +
+    '    SET temp_created_at = CASE \n' +
+    '      WHEN created_at > 1000000000000 THEN to_timestamp(created_at / 1000.0)  -- milliseconds\n' +
+    '      ELSE to_timestamp(created_at)  -- seconds\n' +
+    '    END;\n' +
+    '    \n' +
+    '    -- Drop old column and rename\n' +
+    '    ALTER TABLE service_categories DROP COLUMN created_at;\n' +
+    '    ALTER TABLE service_categories RENAME COLUMN temp_created_at TO created_at;\n' +
+    '    ALTER TABLE service_categories ALTER COLUMN created_at SET NOT NULL;\n' +
+    '    ALTER TABLE service_categories ALTER COLUMN created_at SET DEFAULT CURRENT_TIMESTAMP;\n' +
+    '  END IF;\n' +
+    'END $$;\n' +
+    '\n' +
+    '-- Add missing updated_at column to service_categories\n' +
+    'ALTER TABLE service_categories\n' +
+    '  ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP;\n' +
+    '\n' +
+    '-- Create function to automatically update updated_at timestamp\n' +
+    'CREATE OR REPLACE FUNCTION set_updated_at() RETURNS trigger AS $$\n' +
+    'BEGIN\n' +
+    '  NEW.updated_at = CURRENT_TIMESTAMP;\n' +
+    '  RETURN NEW;\n' +
+    'END; $$ LANGUAGE plpgsql;\n' +
+    '\n' +
+    '-- Create trigger for service_categories updated_at\n' +
+    'DO $$\n' +
+    'BEGIN\n' +
+    '  IF NOT EXISTS (\n' +
+    "    SELECT 1 FROM pg_trigger WHERE tgname = 'set_service_categories_updated_at'\n" +
+    '  ) THEN\n' +
+    '    CREATE TRIGGER set_service_categories_updated_at\n' +
+    '    BEFORE UPDATE ON service_categories\n' +
+    '    FOR EACH ROW EXECUTE FUNCTION set_updated_at();\n' +
+    '  END IF;\n' +
+    'END $$;\n' +
+    '\n' +
+    '-- Add missing geom column to properties (PostGIS Point geometry)\n' +
+    'ALTER TABLE properties\n' +
+    '  ADD COLUMN IF NOT EXISTS geom geometry(Point, 4326);\n' +
+    '\n' +
+    '-- Backfill geom from existing latitude/longitude data\n' +
+    'UPDATE properties\n' +
+    'SET geom = ST_SetSRID(ST_MakePoint(longitude, latitude), 4326)\n' +
+    'WHERE geom IS NULL AND longitude IS NOT NULL AND latitude IS NOT NULL;\n' +
+    '\n' +
+    '-- Create spatial index for geom column\n' +
+    'CREATE INDEX IF NOT EXISTS idx_properties_geom_gist ON properties USING GIST (geom);\n' +
+    '\n' +
+    '-- Ensure full-text search index exists\n' +
+    'CREATE INDEX IF NOT EXISTS idx_properties_fts_gin ON properties USING GIN (fts);\n' +
+    '\n' +
+    '-- Create composite indexes for performance\n' +
+    'CREATE INDEX IF NOT EXISTS idx_properties_location_price ON properties (city, state, price);\n' +
+    'CREATE INDEX IF NOT EXISTS idx_properties_coords ON properties (latitude, longitude) WHERE latitude IS NOT NULL AND longitude IS NOT NULL;\n' +
+    '\n' +
+    '-- Fix bathrooms column type from text to integer\n' +
+    'DO $$\n' +
+    'BEGIN\n' +
+    '  IF EXISTS (\n' +
+    '    SELECT 1 FROM information_schema.columns \n' +
+    "    WHERE table_name = 'properties' \n" +
+    "    AND column_name = 'bathrooms' \n" +
+    "    AND data_type = 'text'\n" +
+    '  ) THEN\n' +
+    '    -- Add temporary integer column\n' +
+    '    ALTER TABLE properties ADD COLUMN temp_bathrooms INTEGER;\n' +
+    '    \n' +
+    '    -- Convert text values to integers, handling decimal values\n' +
+    '    UPDATE properties \n' +
+    '    SET temp_bathrooms = CASE \n' +
+    "      WHEN bathrooms ~ '^[0-9]+\\.5$' THEN CAST(REPLACE(bathrooms, '.5', '') AS INTEGER) + 1  -- Round up half-baths\n" +
+    "      WHEN bathrooms ~ '^[0-9]+$' THEN CAST(bathrooms AS INTEGER)\n" +
+    "      WHEN bathrooms ~ '^[0-9]+\\.[0-9]+$' THEN CAST(ROUND(CAST(bathrooms AS NUMERIC)) AS INTEGER)\n" +
+    '      ELSE 1  -- Default fallback\n' +
+    '    END\n' +
+    "    WHERE bathrooms IS NOT NULL AND bathrooms != '';\n" +
+    '    \n' +
+    '    -- Handle null/empty cases\n' +
+    '    UPDATE properties \n' +
+    '    SET temp_bathrooms = 1 \n' +
+    "    WHERE bathrooms IS NULL OR bathrooms = '';\n" +
+    '    \n' +
+    '    -- Drop old column and rename\n' +
+    '    ALTER TABLE properties DROP COLUMN bathrooms;\n' +
+    '    ALTER TABLE properties RENAME COLUMN temp_bathrooms TO bathrooms;\n' +
+    '  END IF;\n' +
+    'END $$;\n' +
+    '\n' +
+    'COMMIT;\n',
+  params: [],
+  cause: error: function st_makepoint(text, text) does not exist
+      at /home/runner/workspace/node_modules/pg-pool/index.js:45:11
+      at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+      at async <anonymous> (/home/runner/workspace/node_modules/src/node-postgres/session.ts:149:14)
+      at async NodePgPreparedQuery.queryWithCache (/home/runner/workspace/node_modules/src/pg-core/session.ts:71:12)
+      at async MigrationManager.runMigration (/home/runner/workspace/server/migration-manager.ts:54:7)
+      at async MigrationManager.runAllPendingMigrations (/home/runner/workspace/server/migration-manager.ts:87:7)
+      at async <anonymous> (/home/runner/workspace/server/index.ts:385:7) {
+    length: 219,
+    severity: 'ERROR',
+    code: '42883',
+    detail: undefined,
+    hint: 'No function matches the given name and argument types. You might need to add explicit type casts.',
+    position: '2517',
+    internalPosition: undefined,
+    internalQuery: undefined,
+    where: undefined,
+    schema: undefined,
+    table: undefined,
+    column: undefined,
+    dataType: undefined,
+    constraint: undefined,
+    file: 'parse_func.c',
+    line: '629',
+    routine: 'ParseFuncOrColumn'
+  }
+}
