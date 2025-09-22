@@ -45,23 +45,20 @@ const PropertySearchPage = () => {
     try {
       const queryParams = new URLSearchParams();
 
-      // Add search query
+      // Add search query using unified 'q' parameter
       if (searchQuery) {
-        queryParams.set('location', searchQuery);
+        queryParams.set('q', searchQuery);
       }
 
-      // Add filters
+      // Add filters using unified search API parameters
       if (filters.propertyType !== 'all') {
-        queryParams.set('propertyType', filters.propertyType);
+        queryParams.set('type', filters.propertyType);
       }
       if (filters.bedrooms !== 'any') {
-        queryParams.set('minBedrooms', filters.bedrooms === '5+' ? '5' : filters.bedrooms);
+        queryParams.set('beds', filters.bedrooms === '5+' ? '5' : filters.bedrooms);
       }
       if (filters.bathrooms !== 'any') {
-        queryParams.set('minBathrooms', filters.bathrooms === '4+' ? '4' : filters.bathrooms);
-      }
-      if (filters.listingType !== 'all') {
-        queryParams.set('listingType', filters.listingType);
+        queryParams.set('bathrooms', filters.bathrooms === '4+' ? '4' : filters.bathrooms);
       }
 
       // Add price range
@@ -69,17 +66,17 @@ const PropertySearchPage = () => {
       queryParams.set('maxPrice', filters.priceRange[1].toString());
 
       // Add sorting
-      queryParams.set('sortBy', sortBy);
-      queryParams.set('status', 'active');
+      queryParams.set('sort', sortBy);
 
-      console.log('Fetching with params:', queryParams.toString());
+      console.log('Fetching with unified search params:', queryParams.toString());
 
-      const response = await fetch(`/api/properties?${queryParams}`);
+      const response = await fetch(`/api/search?${queryParams}`);
       if (response.ok) {
         const data = await response.json();
-        console.log('Received properties:', data.length);
-        setProperties(Array.isArray(data) ? data : []);
-        setResultCount(Array.isArray(data) ? data.length : 0); // Update result count
+        const results = data.results || [];
+        console.log('Received search results:', results.length);
+        setProperties(results);
+        setResultCount(results.length);
       } else {
         console.error('Search request failed:', response.status, response.statusText);
         setProperties([]);
@@ -107,11 +104,9 @@ const PropertySearchPage = () => {
     try {
       const queryParams = new URLSearchParams();
 
-      // Use the combined search query and filters from SmartSearchBar
+      // Use unified search query parameter
       if (searchQueryParam) {
-        queryParams.set('location', searchQueryParam);
-        // Also search in city and address fields
-        queryParams.set('city', searchQueryParam);
+        queryParams.set('q', searchQueryParam);
       }
 
       // Apply filters from searchFiltersParam or use current filters
@@ -119,31 +114,27 @@ const PropertySearchPage = () => {
       setFilters(currentFilters); // Update local state with new filters
 
       if (currentFilters.propertyType !== 'all') {
-        queryParams.set('propertyType', currentFilters.propertyType);
+        queryParams.set('type', currentFilters.propertyType);
       }
       if (currentFilters.bedrooms !== 'any') {
-        queryParams.set('minBedrooms', currentFilters.bedrooms === '5+' ? '5' : currentFilters.bedrooms);
+        queryParams.set('beds', currentFilters.bedrooms === '5+' ? '5' : currentFilters.bedrooms);
       }
       if (currentFilters.bathrooms !== 'any') {
-        queryParams.set('minBathrooms', currentFilters.bathrooms === '4+' ? '4' : currentFilters.bathrooms);
-      }
-      if (currentFilters.listingType !== 'all') {
-        queryParams.set('listingType', currentFilters.listingType);
+        queryParams.set('bathrooms', currentFilters.bathrooms === '4+' ? '4' : currentFilters.bathrooms);
       }
 
       queryParams.set('minPrice', currentFilters.priceRange[0].toString());
       queryParams.set('maxPrice', currentFilters.priceRange[1].toString());
 
-      queryParams.set('sortBy', sortBy);
-      queryParams.set('status', 'active');
+      queryParams.set('sort', sortBy);
 
-      console.log('Searching with params:', queryParams.toString());
+      console.log('Searching with unified search params:', queryParams.toString());
 
-      const response = await fetch(`/api/properties?${queryParams}`);
+      const response = await fetch(`/api/search?${queryParams}`);
       const data = await response.json();
 
       if (response.ok) {
-        const results = Array.isArray(data) ? data : [];
+        const results = data.results || [];
         setProperties(results);
         setResultCount(results.length);
 
