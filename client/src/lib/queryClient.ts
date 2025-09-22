@@ -1,4 +1,5 @@
 import { QueryClient } from '@tanstack/react-query';
+import { TokenStorage } from './storage';
 
 // Default fetcher function for GET requests
 const defaultQueryFn = async ({ queryKey }: { queryKey: readonly unknown[] }) => {
