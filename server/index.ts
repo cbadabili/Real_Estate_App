@@ -36,29 +36,20 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      styleSrc: ["'self'", "https://api.mapbox.com", "https://fonts.googleapis.com"],
-      scriptSrc: ["'self'", "https://api.mapbox.com"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://api.mapbox.com", "https://fonts.googleapis.com"],
+      scriptSrc: ["'self'", ...(env.NODE_ENV !== 'production' ? ["'unsafe-eval'"] : []), "https://api.mapbox.com", "https://replit.com"],
+      scriptSrcElem: ["'self'", "'unsafe-inline'", "https://api.mapbox.com", "https://replit.com"],
       imgSrc: ["'self'", "data:", "https:", "blob:"],
       connectSrc: ["'self'", "https://api.mapbox.com", "https://events.mapbox.com", "wss:", "ws:"],
       fontSrc: ["'self'", "data:", "https://fonts.gstatic.com", "https://fonts.googleapis.com"],
+      workerSrc: ["'self'", "blob:"],
       objectSrc: ["'none'"],
       upgradeInsecureRequests: [],
     },
   },
   referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
   permittedCrossDomainPolicies: false,
-  crossOriginOpenerPolicy: { policy: 'same-origin' },
-  permissionsPolicy: {
-    camera: ['self'],
-    microphone: [],
-    geolocation: ['self'],
-    fullscreen: ['self'],
-    payment: [],
-    usb: [],
-    magnetometer: [],
-    accelerometer: [],
-    gyroscope: []
-  }
+  crossOriginOpenerPolicy: { policy: 'same-origin' }
 }));
 
 app.use(cors({
@@ -109,31 +100,6 @@ const searchLimiter = rateLimit({
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-app.use((req, res, next) => {
-  // Security headers
-  res.setHeader('X-Content-Type-Options', 'nosniff');
-  res.setHeader('X-Frame-Options', 'DENY');
-  res.setHeader('X-XSS-Protection', '1; mode=block');
-  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
-
-  // Content Security Policy - Updated to allow necessary inline content and data URIs
-  res.setHeader('Content-Security-Policy', [
-    "default-src 'self'",
-    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://api.mapbox.com https://replit.com",
-    "script-src-elem 'self' 'unsafe-inline' https://api.mapbox.com https://replit.com",
-    "style-src 'self' 'unsafe-inline' https://api.mapbox.com https://fonts.googleapis.com",
-    "font-src 'self' data: https://fonts.gstatic.com https://fonts.googleapis.com",
-    "img-src 'self' data: https: blob:",
-    "connect-src 'self' https://api.mapbox.com https://events.mapbox.com wss: ws:",
-    "worker-src 'self' blob:",
-    "child-src 'self'",
-    "base-uri 'self'",
-    "form-action 'self'",
-    "object-src 'none'"
-  ].join('; '));
-
-  next();
-});
 
 // --------------------------------------------------
 // Health check – must be registered before other routes
