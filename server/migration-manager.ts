@@ -1,3 +1,4 @@
+
 import { db } from "./db";
 import { sql } from "drizzle-orm";
 import fs from "fs";
@@ -8,121 +9,110 @@ import { dirname } from 'path';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-interface Migration {
-  id: number;
-  filename: string;
-  applied_at: string;
-}
-
 export class MigrationManager {
   private migrationsPath = path.join(__dirname, 'migrations');
 
-  async initializeMigrationsTable() {
-    await db.execute(sql`
-      CREATE TABLE IF NOT EXISTS schema_migrations (
-        id SERIAL PRIMARY KEY,
-        filename TEXT NOT NULL UNIQUE,
-        applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      )
-    `);
-  }
-
-  async getAppliedMigrations(): Promise<Migration[]> {
+  async ensurePostgresExtensions() {
+    console.log('🔧 Installing PostgreSQL extensions...');
+    
     try {
-      const result = await db.execute(sql`SELECT * FROM schema_migrations ORDER BY filename`);
-      return result.rows as Migration[];
+      // Install PostGIS for geographic queries
+      await db.execute(sql`CREATE EXTENSION IF NOT EXISTS postgis`);
+      console.log('✅ PostGIS extension installed');
+      
+      // Install pg_trgm for text search
+      await db.execute(sql`CREATE EXTENSION IF NOT EXISTS pg_trgm`);
+      console.log('✅ pg_trgm extension installed');
+      
+      // Install btree_gin for composite indexes
+      await db.execute(sql`CREATE EXTENSION IF NOT EXISTS btree_gin`);
+      console.log('✅ btree_gin extension installed');
+      
     } catch (error) {
-      return [];
+      console.warn('⚠️ Some extensions may not be available:', error);
     }
   }
 
-  async getPendingMigrations(): Promise<string[]> {
-    const appliedMigrations = await this.getAppliedMigrations();
-    const appliedFilenames = new Set(appliedMigrations.map(m => m.filename));
-
-    const allMigrationFiles = fs.readdirSync(this.migrationsPath)
-      .filter(file => file.endsWith('.sql'))
-      .sort();
-
-    return allMigrationFiles.filter(file => !appliedFilenames.has(file));
+  async createSearchIndexes() {
+    console.log('📊 Creating search and performance indexes...');
+    
+    try {
+      // FTS index for property search
+      await db.execute(sql`
+        CREATE INDEX IF NOT EXISTS properties_fts_idx 
+        ON properties USING gin(fts)
+      `);
+      
+      // Geographic index for location queries  
+      await db.execute(sql`
+        CREATE INDEX IF NOT EXISTS properties_geom_idx 
+        ON properties USING gist(geom)
+      `);
+      
+      // Composite index for active listings
+      await db.execute(sql`
+        CREATE INDEX IF NOT EXISTS properties_active_price_idx 
+        ON properties (is_active, price) 
+        WHERE is_active = true
+      `);
+      
+      // City and state filtering
+      await db.execute(sql`
+        CREATE INDEX IF NOT EXISTS properties_location_idx 
+        ON properties (city, state, is_active)
+      `);
+      
+      console.log('✅ Search indexes created');
+      
+    } catch (error) {
+      console.error('❌ Error creating indexes:', error);
+      throw error;
+    }
   }
 
-  async runMigration(filename: string): Promise<void> {
-    const filePath = path.join(this.migrationsPath, filename);
-    const migrationSQL = fs.readFileSync(filePath, 'utf8');
-
-    // Split by semicolon and execute each statement
-    const statements = migrationSQL
-      .split(';')
-      .map(stmt => stmt.trim())
-      .filter(stmt => stmt.length > 0);
-
-    console.log(`Running migration: ${filename}`);
-
-    for (const statement of statements) {
-      try {
-        await db.execute(sql.raw(statement));
-      } catch (error) {
-        console.error(`Error in migration ${filename}:`, error);
-        throw error;
-      }
+  async createFTSTrigger() {
+    console.log('🔍 Setting up full-text search triggers...');
+    
+    try {
+      // Create FTS update function
+      await db.execute(sql`
+        CREATE OR REPLACE FUNCTION update_properties_fts()
+        RETURNS trigger AS $$
+        BEGIN
+          NEW.fts := setweight(to_tsvector('english', COALESCE(NEW.title, '')), 'A') ||
+                    setweight(to_tsvector('english', COALESCE(NEW.description, '')), 'B') ||
+                    setweight(to_tsvector('english', COALESCE(NEW.address, '')), 'C') ||
+                    setweight(to_tsvector('english', COALESCE(NEW.city, '')), 'D');
+          RETURN NEW;
+        END;
+        $$ LANGUAGE plpgsql;
+      `);
+      
+      // Create trigger
+      await db.execute(sql`
+        DROP TRIGGER IF EXISTS properties_fts_trigger ON properties;
+        CREATE TRIGGER properties_fts_trigger
+        BEFORE INSERT OR UPDATE ON properties
+        FOR EACH ROW EXECUTE FUNCTION update_properties_fts();
+      `);
+      
+      console.log('✅ FTS trigger created');
+      
+    } catch (error) {
+      console.error('❌ Error creating FTS trigger:', error);
+      throw error;
     }
-
-    // Mark migration as applied
-    await db.execute(sql`
-      INSERT INTO schema_migrations (filename) VALUES (${filename})
-    `);
-
-    console.log(`✅ Migration ${filename} completed`);
   }
 
-  async runAllPendingMigrations(): Promise<void> {
-    await this.initializeMigrationsTable();
-    const pendingMigrations = await this.getPendingMigrations();
-
-    if (pendingMigrations.length === 0) {
-      console.log('✅ No pending migrations');
-      return;
-    }
-
-    console.log(`Running ${pendingMigrations.length} pending migrations...`);
-
-    for (const migration of pendingMigrations) {
-      await this.runMigration(migration);
-    }
-
-    console.log('✅ All migrations completed');
-  }
-
-  async resetDatabase(): Promise<void> {
-    console.log('🗑️ Resetting database...');
-
-    // Get all tables
-    const result = await db.execute(sql`
-      SELECT table_name as name FROM information_schema.tables 
-      WHERE table_schema = 'public' AND table_type = 'BASE TABLE'
-    `);
-    const tables = result.rows;
-
-    // Drop all tables
-    for (const table of tables) {
-      await db.execute(sql.raw(`DROP TABLE IF EXISTS ${table.name} CASCADE`));
-    }
-
-    console.log('✅ Database reset completed');
+  async runMigrations() {
+    console.log('🚀 Running PostgreSQL migrations...');
+    
+    await this.ensurePostgresExtensions();
+    await this.createSearchIndexes();
+    await this.createFTSTrigger();
+    
+    console.log('✅ All migrations completed successfully');
   }
 }
 
-let _migrationManager: MigrationManager | null = null;
-
-export const migrationManager = {
-  getInstance(): MigrationManager {
-    if (!_migrationManager) {
-      _migrationManager = new MigrationManager();
-    }
-    return _migrationManager;
-  }
-};
-
-// For backward compatibility, also export the methods directly
-export const getMigrationManager = () => migrationManager.getInstance();
+export const migrationManager = new MigrationManager();

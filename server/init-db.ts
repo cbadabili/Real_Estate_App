@@ -370,13 +370,14 @@ async function initializeDatabase() {
     // Initialize tables with the corrected schema
     await initializeTables();
 
+    // Run PostgreSQL-specific migrations
+    const { migrationManager } = await import('./migration-manager');
+    await migrationManager.runMigrations();
+
     // Seed the database
     console.log('Seeding database...');
     await seedDatabase();
     console.log('✅ Database initialization completed');
-
-    // Run migrations
-    await migrate(db, { migrationsFolder: join(__dirname, '..', 'migrations') });
 
     console.log('✅ Database initialized successfully');
     process.exit(0);

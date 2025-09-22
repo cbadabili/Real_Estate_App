@@ -58,10 +58,10 @@ export class PropertyRepository implements IPropertyRepository {
     const conditions = [];
 
     if (filters.minPrice) {
-      conditions.push(gte(properties.price, filters.minPrice.toString()));
+      conditions.push(gte(properties.price, filters.minPrice));
     }
     if (filters.maxPrice) {
-      conditions.push(lte(properties.price, filters.maxPrice.toString()));
+      conditions.push(lte(properties.price, filters.maxPrice));
     }
     if (filters.propertyType && filters.propertyType !== 'all') {
       conditions.push(eq(properties.propertyType, filters.propertyType));

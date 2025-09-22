@@ -50,7 +50,7 @@ async function seed() {
       {
         title: 'Modern Family Home in Suburbia',
         description: 'Beautiful 4-bedroom home with updated kitchen, hardwood floors, and large backyard. Perfect for families.',
-        price: '2500000.00',
+        price: 2500000,
         address: '123 Tlokweng Road',
         city: 'Gaborone',
         state: 'South East',
@@ -77,7 +77,7 @@ async function seed() {
       {
         title: 'Luxury Downtown Condo',
         description: 'Stunning high-rise condo with city views, modern amenities, and walking distance to everything downtown.',
-        price: '3200000.00',
+        price: 3200000,
         address: '456 CBD Square',
         city: 'Gaborone',
         state: 'South East',
@@ -103,7 +103,7 @@ async function seed() {
       {
         title: 'Cozy Suburban Townhouse',
         description: 'Well-maintained townhouse in family-friendly neighborhood with great schools and parks nearby.',
-        price: '1800000.00',
+        price: 1800000,
         address: '789 Kgale View',
         city: 'Francistown',
         state: 'North East',
@@ -129,7 +129,7 @@ async function seed() {
       {
         title: 'Spacious Ranch Home',
         description: 'Single-story ranch home with open floor plan, large master suite, and beautiful landscaping.',
-        price: '2100000.00',
+        price: 2100000,
         address: '321 Phakamisa Street',
         city: 'Maun',
         state: 'North West',
@@ -155,7 +155,7 @@ async function seed() {
       {
         title: 'Contemporary Loft',
         description: 'Industrial-style loft in converted warehouse with exposed brick, high ceilings, and modern finishes.',
-        price: '2800000.00',
+        price: 2800000,
         address: '555 Riverside Drive',
         city: 'Kasane',
         state: 'North West',
@@ -180,7 +180,7 @@ async function seed() {
       {
         title: 'Land in Gaborone',
         description: 'Land for sale in Gaborone',
-        price: '100000.00',
+        price: 100000,
         address: '123 Main Street',
         city: 'Gaborone',
         state: 'South East',
