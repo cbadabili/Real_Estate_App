@@ -1,5 +1,8 @@
 import { writeFileSync } from 'fs';
-import { resolve } from 'path';
+import { resolve, dirname } from 'path';
+import { fileURLToPath } from 'url';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 const spec = {
     openapi: "3.0.3",
     info: {
