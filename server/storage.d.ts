@@ -1,0 +1,95 @@
+import { type User, type InsertUser, type Property, type InsertProperty, type Inquiry, type InsertInquiry, type Appointment, type InsertAppointment, type SavedProperty } from "../shared/schema";
+import { type PropertyFilters } from "./repositories/property-repository";
+export interface IStorage {
+    getUser(id: number): Promise<User | undefined>;
+    getUserByUsername(username: string): Promise<User | undefined>;
+    getUserByEmail(email: string): Promise<User | undefined>;
+    getUserById(id: number): Promise<User | undefined>;
+    createUser(user: InsertUser): Promise<User>;
+    updateUser(id: number, updates: Partial<InsertUser>): Promise<User | undefined>;
+    getUsers(filters?: {
+        userType?: string;
+        isActive?: boolean;
+        limit?: number;
+        offset?: number;
+    }): Promise<User[]>;
+    getProperty(id: number): Promise<Property | undefined>;
+    getProperties(filters?: PropertyFilters): Promise<Property[]>;
+    createProperty(property: InsertProperty): Promise<Property>;
+    updateProperty(id: number, updates: Partial<InsertProperty>): Promise<Property | undefined>;
+    deleteProperty(id: number): Promise<boolean>;
+    getUserProperties(userId: number): Promise<Property[]>;
+    incrementPropertyViews(id: number): Promise<void>;
+    getInquiry(id: number): Promise<Inquiry | undefined>;
+    getPropertyInquiries(propertyId: number): Promise<Inquiry[]>;
+    getUserInquiries(userId: number): Promise<Inquiry[]>;
+    createInquiry(inquiry: InsertInquiry): Promise<Inquiry>;
+    updateInquiryStatus(id: number, status: string): Promise<Inquiry | undefined>;
+    getAppointment(id: number): Promise<Appointment | undefined>;
+    getPropertyAppointments(propertyId: number): Promise<Appointment[]>;
+    getUserAppointments(userId: number): Promise<Appointment[]>;
+    createAppointment(appointment: InsertAppointment): Promise<Appointment>;
+    updateAppointmentStatus(id: number, status: string): Promise<Appointment | undefined>;
+    getSavedProperties(userId: number): Promise<Property[]>;
+    saveProperty(userId: number, propertyId: number): Promise<SavedProperty>;
+    unsaveProperty(userId: number, propertyId: number): Promise<boolean>;
+    isPropertySaved(userId: number, propertyId: number): Promise<boolean>;
+}
+export interface PropertyFilters {
+    minPrice?: number;
+    maxPrice?: number;
+    propertyType?: string;
+    minBedrooms?: number;
+    minBathrooms?: number;
+    minSquareFeet?: number;
+    maxSquareFeet?: number;
+    city?: string;
+    state?: string;
+    zipCode?: string;
+    listingType?: string;
+    status?: string;
+    limit?: number;
+    offset?: number;
+    sortBy?: 'price' | 'date' | 'size' | 'bedrooms' | 'price_low' | 'price_high' | 'newest';
+    sortOrder?: 'asc' | 'desc';
+    location?: string;
+}
+export declare class DatabaseStorage implements IStorage {
+    private userRepo;
+    private propertyRepo;
+    constructor();
+    getUser(id: number): Promise<User | undefined>;
+    getUserByUsername(username: string): Promise<User | undefined>;
+    getUserByEmail(email: string): Promise<User | undefined>;
+    getUserById(id: number): Promise<User | undefined>;
+    createUser(insertUser: InsertUser): Promise<User>;
+    updateUser(id: number, updates: Partial<InsertUser>): Promise<User | undefined>;
+    getUsers(filters?: {
+        userType?: string;
+        isActive?: boolean;
+        limit?: number;
+        offset?: number;
+    }): Promise<User[]>;
+    getProperty(id: number): Promise<Property | undefined>;
+    getProperties(filters?: PropertyFilters): Promise<Property[]>;
+    createProperty(property: InsertProperty): Promise<Property>;
+    updateProperty(id: number, updates: Partial<InsertProperty>): Promise<Property | undefined>;
+    deleteProperty(id: number): Promise<boolean>;
+    getUserProperties(userId: number): Promise<Property[]>;
+    incrementPropertyViews(id: number): Promise<void>;
+    getInquiry(id: number): Promise<Inquiry | undefined>;
+    getPropertyInquiries(propertyId: number): Promise<Inquiry[]>;
+    getUserInquiries(userId: number): Promise<Inquiry[]>;
+    createInquiry(inquiry: InsertInquiry): Promise<Inquiry>;
+    updateInquiryStatus(id: number, status: string): Promise<Inquiry | undefined>;
+    getAppointment(id: number): Promise<Appointment | undefined>;
+    getPropertyAppointments(propertyId: number): Promise<Appointment[]>;
+    getUserAppointments(userId: number): Promise<Appointment[]>;
+    createAppointment(appointment: InsertAppointment): Promise<Appointment>;
+    updateAppointmentStatus(id: number, status: string): Promise<Appointment | undefined>;
+    getSavedProperties(userId: number): Promise<Property[]>;
+    saveProperty(userId: number, propertyId: number): Promise<SavedProperty>;
+    unsaveProperty(userId: number, propertyId: number): Promise<boolean>;
+    isPropertySaved(userId: number, propertyId: number): Promise<boolean>;
+}
+export declare const storage: DatabaseStorage;

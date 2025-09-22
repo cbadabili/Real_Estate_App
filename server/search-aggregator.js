@@ -1,0 +1,278 @@
+import { db } from "./db";
+import { properties } from "../shared/schema";
+import { and, desc, eq, gte, ilike, or, sql } from "drizzle-orm";
+import fetch from "node-fetch";
+// Enhanced NL parser with more sophisticated pattern matching
+function parseFreeText(query) {
+    const derived = {};
+    // Helper function to parse price with suffixes
+    const parsePrice = (priceStr, suffix = '') => {
+        const num = parseInt(priceStr);
+        if (suffix.toLowerCase() === 'k')
+            return num * 1000;
+        if (suffix.toLowerCase() === 'm')
+            return num * 1000000;
+        return num;
+    };
+    // Extract price ranges with proper suffix handling
+    const rangeMatch = query.match(/(\d+)(k|m)?\s*(?:to|-)\s*(\d+)(k|m)?/i);
+    if (rangeMatch) {
+        const [, min, minSuffix, max, maxSuffix] = rangeMatch;
+        derived.minPrice = parsePrice(min, minSuffix);
+        derived.maxPrice = parsePrice(max, maxSuffix);
+    }
+    // Extract single price limits with suffix support
+    const underMatch = query.match(/under\s*(\d+)(k|m)?/i);
+    if (underMatch) {
+        const [, amount, suffix] = underMatch;
+        derived.maxPrice = parsePrice(amount, suffix);
+    }
+    const overMatch = query.match(/over\s*(\d+)(k|m)?/i);
+    if (overMatch) {
+        const [, amount, suffix] = overMatch;
+        derived.minPrice = parsePrice(amount, suffix);
+    }
+    const aboveMatch = query.match(/above\s*(\d+)(k|m)?/i);
+    if (aboveMatch) {
+        const [, amount, suffix] = aboveMatch;
+        derived.minPrice = parsePrice(amount, suffix);
+    }
+    // Bedroom extraction
+    let beds;
+    const digitBed = query.match(/(\d+)\s*(bed|bedroom|bedroomed)/i);
+    if (digitBed) {
+        beds = parseInt(digitBed[1], 10);
+    }
+    else {
+        const wordBeds = {
+            one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8
+        };
+        const wordMatch = query.match(/(one|two|three|four|five|six|seven|eight)\s*(bed|bedroom|bedroomed)/i);
+        if (wordMatch)
+            beds = wordBeds[wordMatch[1]];
+    }
+    // Property type extraction
+    let type;
+    if (/\b(house|standalone|detached)\b/i.test(query))
+        type = "house";
+    else if (/\b(apartment|flat|unit)\b/i.test(query))
+        type = "apartment";
+    else if (/\b(townhouse|townhome)\b/i.test(query))
+        type = "townhouse";
+    else if (/\b(plot|land|vacant)\b/i.test(query))
+        type = "plot";
+    else if (/\b(farm|agricultural)\b/i.test(query))
+        type = "farm";
+    else if (/\b(commercial|office|retail)\b/i.test(query))
+        type = "commercial";
+    // Location extraction
+    const locations = ['gaborone', 'francistown', 'kasane', 'maun', 'serowe', 'palapye', 'kanye'];
+    const location = locations.find(loc => query.toLowerCase().includes(loc));
+    return { beds, type, minPrice: derived.minPrice, maxPrice: derived.maxPrice, location };
+}
+async function queryDB(q, sort) {
+    try {
+        console.log('QueryDB called with:', { q, sort });
+        const terms = [];
+        const derived = parseFreeText(q);
+        console.log('Parsed query filters:', derived);
+        if (derived.beds)
+            terms.push(gte(properties.bedrooms, derived.beds));
+        if (derived.type)
+            terms.push(eq(properties.propertyType, derived.type));
+        if (derived.location)
+            terms.push(ilike(properties.city, `%${derived.location}%`));
+        // Apply price constraints using Drizzle ORM's gte and lte
+        if (derived.minPrice !== undefined) {
+            terms.push(gte(properties.price, derived.minPrice));
+        }
+        if (derived.maxPrice !== undefined) {
+            // For maxPrice, we need to use '<=' which is lte in Drizzle
+            terms.push(sql `${properties.price} <= ${derived.maxPrice}`);
+        }
+        // If no specific filters detected, fall back to text search
+        if (terms.length === 0) {
+            const like = `%${q}%`;
+            terms.push(or(ilike(properties.title, like), ilike(properties.description, like), ilike(properties.city, like), ilike(properties.address, like)));
+        }
+        const where = terms.length ? and(...terms) : undefined;
+        const order = sort === "price_low" ? properties.price :
+            sort === "price_high" ? desc(properties.price) :
+                desc(properties.createdAt);
+        console.log('Executing query with', terms.length, 'filter terms');
+        const rows = await db.select().from(properties).where(where).orderBy(order).limit(50);
+        console.log('Raw query result:', rows.length, 'rows');
+        const mappedResults = rows.map(mapDBRowToUnified);
+        console.log('Mapped results:', mappedResults.length, 'properties');
+        return mappedResults;
+    }
+    catch (error) {
+        console.error('QueryDB error:', error);
+        return [];
+    }
+}
+function mapDBRowToUnified(row) {
+    return {
+        id: `local_${row.id}`,
+        title: row.title,
+        price: parseFloat(row.price.replace(/[^\d.]/g, '')) || 0,
+        address: row.address,
+        city: row.city,
+        bedrooms: row.bedrooms,
+        bathrooms: row.bathrooms ? parseFloat(row.bathrooms) : undefined,
+        propertyType: row.propertyType,
+        source: 'local',
+        description: row.description,
+        images: row.images ? JSON.parse(row.images) : [],
+        coordinates: row.latitude && row.longitude ? {
+            lat: parseFloat(row.latitude),
+            lng: parseFloat(row.longitude)
+        } : undefined,
+        agency: {
+            name: 'BeeDab Properties'
+        }
+    };
+}
+// Call OpenAI-powered search
+async function queryIntel(q, filters = {}) {
+    if (!process.env.OPENAI_API_KEY) {
+        console.warn('OpenAI API key not configured, skipping external search');
+        return [];
+    }
+    try {
+        const payload = { query: q, filters }; // Pass filters to the AI search
+        console.log('Calling OpenAI search with query:', q, 'and filters:', filters);
+        const response = await fetch('http://0.0.0.0:5000/intel/search', {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            body: JSON.stringify(payload)
+        });
+        if (!response.ok) {
+            throw new Error(`OpenAI search API error: ${response.status} ${response.statusText}`);
+        }
+        const data = await response.json();
+        console.log('OpenAI search response received:', { count: data.results?.length || 0 });
+        // Map OpenAI results to unified format
+        return (data.results || []).map((result, index) => ({
+            id: `external_${result.id || index}`,
+            title: result.title || 'External Property',
+            price: result.price || 0,
+            address: result.address || '',
+            city: result.city || '',
+            bedrooms: result.bedrooms,
+            bathrooms: result.bathrooms,
+            propertyType: result.propertyType || '',
+            source: 'external',
+            score: 0.8, // Default high score for OpenAI results
+            description: result.description || '',
+            images: result.images || [],
+            coordinates: result.lat && result.lng ? {
+                lat: result.lat,
+                lng: result.lng
+            } : undefined,
+            agency: {
+                name: result.agent?.name || 'External Agent',
+                contact: result.agent?.phone || result.agent?.email
+            }
+        }));
+    }
+    catch (error) {
+        console.error('OpenAI search API error:', error);
+        return [];
+    }
+}
+// Merge and dedupe results
+function mergeAndDedupe(localResults, externalResults) {
+    const merged = [...localResults];
+    // Simple deduplication based on address similarity
+    for (const external of externalResults) {
+        const isDuplicate = localResults.some(local => local.address.toLowerCase().includes(external.address.toLowerCase()) ||
+            external.address.toLowerCase().includes(local.address.toLowerCase()));
+        if (!isDuplicate) {
+            merged.push(external);
+        }
+    }
+    return merged;
+}
+// Rank results (local first, then by score/relevance)
+function rankResults(results, sort) {
+    return results.sort((a, b) => {
+        // Local properties get priority
+        if (a.source === 'local' && b.source === 'external')
+            return -1;
+        if (a.source === 'external' && b.source === 'local')
+            return 1;
+        // Then by specified sort
+        switch (sort) {
+            case 'price_low':
+                return a.price - b.price;
+            case 'price_high':
+                return b.price - a.price;
+            default:
+                return (b.score || 0) - (a.score || 0);
+        }
+    });
+}
+// Main aggregator endpoint
+export async function searchAggregator(req, res) {
+    try {
+        const { q = '', sort = 'relevance', limit = 20 } = req.query;
+        const query = q;
+        const sortBy = sort;
+        const maxResults = Math.min(parseInt(limit) || 20, 100);
+        console.log('Search aggregator called:', { query, sortBy, maxResults });
+        // Parse additional filters from query
+        const filters = parseFreeText(query);
+        // Step 1: Search local database
+        console.log('Searching local database...');
+        console.log('About to call queryDB with:', { query, sortBy });
+        let localResults = [];
+        try {
+            console.log('Calling queryDB now...');
+            localResults = await queryDB(query, sortBy);
+            console.log('QueryDB returned:', localResults.length, 'results');
+        }
+        catch (error) {
+            console.error('QueryDB threw error:', error);
+            localResults = [];
+        }
+        console.log('Local search phase completed with', localResults.length, 'results');
+        // Step 2: Search RealEstateIntel AI
+        console.log('Searching RealEstateIntel AI...');
+        const externalResults = await queryIntel(query, filters);
+        // Step 3: Merge and deduplicate
+        const mergedResults = mergeAndDedupe(localResults, externalResults);
+        console.log('After merge:', mergedResults.length, 'results');
+        // Step 4: Rank results
+        const rankedResults = rankResults(mergedResults, sortBy);
+        console.log('After ranking:', rankedResults.length, 'results');
+        // Step 5: Apply limit
+        const finalResults = rankedResults.slice(0, maxResults);
+        console.log('Search completed:', {
+            local: localResults.length,
+            external: externalResults.length,
+            final: finalResults.length
+        });
+        res.json({
+            query,
+            results: finalResults,
+            stats: {
+                total: finalResults.length,
+                local: localResults.length,
+                external: externalResults.length,
+                merged: mergedResults.length
+            },
+            timestamp: new Date().toISOString()
+        });
+    }
+    catch (error) {
+        console.error('Search aggregator error:', error);
+        res.status(500).json({
+            error: 'Search failed',
+            message: error instanceof Error ? error.message : 'Unknown error'
+        });
+    }
+}

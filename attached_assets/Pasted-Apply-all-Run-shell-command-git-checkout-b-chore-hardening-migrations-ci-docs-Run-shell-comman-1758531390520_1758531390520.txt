@@ -1,0 +1,61 @@
+Apply all:
+Run shell command:
+git checkout -b chore/hardening-migrations-ci-docs
+Run shell command:
+npm ci
+Run shell command:
+echo "=== AUDIT REPORT ===" echo echo "• Drizzle configurations:" find . -name "drizzle*.config.*" -type f echo echo "• Current migrations structure:" ls -la migrations/ 2>/dev/null || echo "No migrations/ directory found" ls -la migrations/meta/ 2>/dev/null || echo "No migrations/meta/ directory found" echo echo "• SQLite artifacts check:" grep -RniE "AUTOINCREMENT|sqlite_|INTEGER PRIMARY KEY" migrations/ 2>/dev/null || echo "No SQLite artifacts found in migrations/" echo echo "• DATABASE_URL usage:" grep -r "DATABASE_URL" . --include="*.ts" --include="*.js" --include="*.json" | head -5 echo echo "• Package.json scripts:" echo "Root package.json scripts:" cat package.json | jq -r '.scripts // {}' | head -10 echo echo "• GitHub workflows:" ls -la .github/workflows/ 2>/dev/null || echo "No .github/workflows/ directory found" echo echo "• OpenAPI/Swagger files:" find . -name "*openapi*" -o -name "*swagger*" | head -5 || echo "No OpenAPI/Swagger files found" echo echo "• Docker compose:" ls -la docker-compose* 2>/dev/null || echo "No docker-compose files found" echo "=== END AUDIT ==="
+Run shell command:
+echo "=== Drizzle Config Contents ===" for config in $(find . -name "drizzle*.config.*" -type f); do echo "File: $config" cat "$config" echo "---" done
+Run shell command:
+mkdir -p migrations_sqlite_archive if [ -d "migrations" ]; then cp -r migrations/* migrations_sqlite_archive/ 2>/dev/null || true echo "Archived existing migrations to migrations_sqlite_archive/" fi
+Run shell command:
+rm -rf migrations/ mkdir -p migrations/meta
+Run shell command:
+npx drizzle-kit generate
+Run shell command:
+npx drizzle-kit push
+Run shell command:
+echo "=== Verification: No SQLite artifacts ===" grep -Rni "AUTOINCREMENT\|sqlite_" migrations/ || echo "✅ No SQLite artifacts found" echo echo "=== Generated migrations structure ===" ls -la migrations/ ls -la migrations/meta/
+Run shell command:
+git add . git commit -m "feat(db): regenerate Postgres migrations; archive SQLite-era artifacts"
+Edit file
+.github/workflows/ci.yml
+Edit file
+package.json
+Run shell command:
+git add . git commit -m "ci: add GitHub Actions pipeline for typecheck/lint/tests/build (+optional drift)"
+Edit file
+CONTRIBUTING.md
+Edit file
+.github/CODEOWNERS
+Edit file
+SECURITY.md
+Edit file
+docs/adr/0001-use-drizzle-orm.md
+Edit file
+docs/runbooks/incident-response.md
+Edit file
+README.md
+Run shell command:
+git add . git commit -m "docs: add CONTRIBUTING, CODEOWNERS, SECURITY, ADR, and incident runbook"
+Run shell command:
+npm install swagger-ui-express zod-to-openapi npm install -D @types/swagger-ui-express
+Edit file
+server/scripts/generate-openapi.ts
+Edit file
+server/routes/docs.ts
+Edit file
+server/index.ts
+Run shell command:
+npm run docs:openapi
+Run shell command:
+git add . git commit -m "docs(api): generate OpenAPI and mount Swagger UI at /api/docs"
+Edit file
+docker-compose.yml
+Run shell command:
+git add . git commit -m "chore(dev): add docker-compose for Postgres and quick-start docs"
+Run shell command:
+echo "=== FINAL VERIFICATION ===" echo echo "✅ TypeScript compilation:" npm run typecheck echo echo "✅ Linting:" npm run lint || echo "⚠️ Linting issues found" echo echo "✅ Build process:" npm run build echo echo "✅ PostgreSQL migrations check:" grep -Rni "AUTOINCREMENT\|sqlite_" migrations/ && echo "❌ SQLite artifacts found" || echo "✅ No SQLite artifacts" echo echo "✅ API documentation:" ls -la server/openapi.json echo echo "✅ Docker Compose:" ls -la docker-compose.yml echo echo "✅ Governance docs:" ls -la CONTRIBUTING.md SECURITY.md .github/CODEOWNERS docs/adr/ docs/runbooks/
+Run shell command:
+echo "=== CHANGE SUMMARY ===" echo echo "📁 Files Changed:" git diff --name-only main ec

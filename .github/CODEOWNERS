@@ -1,0 +1,22 @@
+
+# Global ownership
+* @cbadabili
+
+# Backend components
+/server/ @backend-owner
+/shared/ @platform-arch
+/migrations/ @backend-owner
+/scripts/ @platform-arch
+
+# Frontend components  
+/client/ @frontend-owner
+
+# Documentation
+/docs/ @cbadabili
+README.md @cbadabili
+CONTRIBUTING.md @cbadabili
+
+# Infrastructure
+/.github/ @platform-arch
+/docker-compose.yml @platform-arch
+/package.json @platform-arch

@@ -281,6 +281,35 @@ The platform is designed to integrate with external real estate APIs:
 4. Add tests if applicable
 5. Submit a pull request
 
+## Project Governance
+
+### Contributing
+Please read [CONTRIBUTING.md](CONTRIBUTING.md) for development workflow, coding standards, and pull request process.
+
+### Security
+Report security vulnerabilities responsibly via [SECURITY.md](SECURITY.md).
+
+### Documentation
+- **Architecture Decisions**: [docs/adr/](docs/adr/) - Record of important technical decisions
+- **Incident Response**: [docs/runbooks/incident-response.md](docs/runbooks/incident-response.md) - On-call procedures and troubleshooting
+- **API Documentation**: [/api/docs](/api/docs) - Interactive OpenAPI/Swagger documentation
+- **Code Ownership**: [.github/CODEOWNERS](.github/CODEOWNERS) - Review assignments and component ownership
+
+### Development Quick Start
+```bash
+# Start local database
+docker compose up -d
+export DATABASE_URL=postgresql://beedab:beedab@localhost:5432/beedab_dev
+
+# Setup and run
+npm ci
+npm run db:push
+npm run docs:openapi
+npm run dev
+
+# View API docs at http://localhost:5000/api/docs
+```
+
 ## License
 
 This project is licensed under the MIT License.

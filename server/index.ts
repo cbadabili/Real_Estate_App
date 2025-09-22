@@ -194,6 +194,15 @@ app.get('/api/health', (_req: Request, res: Response) => {
   const { registerAllRoutes } = await import('./routes/index.js');
   registerAllRoutes(app);
 
+  // Mount API documentation
+  try {
+    const { docsRouter } = await import('./routes/docs.js');
+    app.use('/api/docs', docsRouter);
+    console.log('📚 API documentation available at /api/docs');
+  } catch (error) {
+    console.warn('⚠️ Could not mount API docs:', error.message);
+  }
+
   // Search aggregator route
   app.get('/api/search', async (req, res) => {
     try {
