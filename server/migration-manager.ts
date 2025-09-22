@@ -46,16 +46,22 @@ export class MigrationManager {
     const filePath = path.join(this.migrationsPath, filename);
     const migrationSQL = fs.readFileSync(filePath, 'utf8');
     
-    // Split by semicolon and execute each statement
-    const statements = migrationSQL
-      .split(';')
-      .map(stmt => stmt.trim())
-      .filter(stmt => stmt.length > 0);
-    
     console.log(`Running migration: ${filename}`);
     
-    for (const statement of statements) {
-      await db.execute(sql.raw(statement));
+    // Check if the migration contains dollar-quoted strings or procedural blocks
+    if (migrationSQL.includes('$$') || migrationSQL.includes('DO ') || migrationSQL.includes('BEGIN')) {
+      // Execute the entire file as one statement for complex migrations
+      await db.execute(sql.raw(migrationSQL));
+    } else {
+      // Split by semicolon and execute each statement for simple migrations
+      const statements = migrationSQL
+        .split(';')
+        .map(stmt => stmt.trim())
+        .filter(stmt => stmt.length > 0);
+      
+      for (const statement of statements) {
+        await db.execute(sql.raw(statement));
+      }
     }
     
     // Record migration as applied
