@@ -10,6 +10,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { StarIcon, ShieldIcon, UserIcon, FlagIcon } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Users, TrendingUp } from 'lucide-react';
 
 interface AdminUser {
   id: number;
@@ -705,6 +707,23 @@ export default function AdminPage() {
         {/* Statistics */}
         <TabsContent value="stats">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <Link
+              to="/admin/analytics"
+              className="bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow"
+            >
+              <TrendingUp className="h-12 w-12 text-green-600 mb-4" />
+              <h3 className="text-lg font-medium text-gray-900 mb-2">Business Analytics</h3>
+              <p className="text-gray-600">View metrics, performance data, and user insights</p>
+            </Link>
+
+            <Link
+              to="/admin/users"
+              className="bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow"
+            >
+              <Users className="h-12 w-12 text-blue-600 mb-4" />
+              <h3 className="text-lg font-medium text-gray-900 mb-2">User Management</h3>
+              <p className="text-gray-600">Manage user accounts, roles, and permissions</p>
+            </Link>
             <Card>
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium">Total Users</CardTitle>

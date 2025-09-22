@@ -28,8 +28,12 @@ import { registerUserRoutes } from "./routes/user-routes";
 import { registerAuthRoutes } from "./routes/auth-routes";
 import { registerMarketIntelligenceRoutes } from "./market-intelligence-routes";
 import documentsRoutes from './routes/documents-routes.js';
+import analyticsRoutes from './analytics-routes';
 
 const app = express();
+
+// Configure trust proxy for Replit
+app.set('trust proxy', 1);
 
 // Security middleware
 app.use(helmet({
@@ -176,6 +180,7 @@ app.get('/api/health', (_req: Request, res: Response) => {
   // Register billing and hero routes
   app.use('/api/billing', billingRoutes);
   app.use('/api/hero', heroRoutes);
+  app.use('/api/analytics', analyticsRoutes);
 
   // OpenAI-powered Intel adapter routes
   app.post('/intel/search', intelSearch);
