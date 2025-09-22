@@ -92,7 +92,7 @@ export const properties = pgTable("properties", {
   propertyType: text("property_type").notNull(), // 'house', 'apartment', 'condo', 'townhouse', 'land', 'mmatseta', 'commercial', 'farm'
   listingType: text("listing_type").notNull(), // 'owner', 'agent', 'rental', 'auction'
   bedrooms: integer("bedrooms"),
-  bathrooms: text("bathrooms"),
+  bathrooms: integer("bathrooms"),
   squareFeet: integer("square_feet"),
   areaBuild: integer("area_build"),
   lotSize: text("lot_size"),
