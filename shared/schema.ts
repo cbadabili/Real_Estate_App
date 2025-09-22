@@ -16,7 +16,9 @@ import {
   json,
   numeric,
   geography,
-  tsvector
+  tsvector,
+  doublePrecision,
+  jsonb
 } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
