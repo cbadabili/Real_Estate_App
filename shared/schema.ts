@@ -174,26 +174,26 @@ export const userReviews = pgTable("user_reviews", {
 
 // Review responses (for business replies)
 export const reviewResponses = pgTable("review_responses", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
+  id: serial("id").primaryKey(),
   reviewId: integer("review_id").references(() => userReviews.id).notNull(),
   responderId: integer("responder_id").references(() => users.id).notNull(),
   response: text("response").notNull(),
-  isOfficial: integer("is_official", { mode: "boolean" }).default(false), // Official business response
+  isOfficial: boolean("is_official").default(false), // Official business response
   createdAt: timestamp("created_at").defaultNow(),
 });
 
 // Review helpful votes
 export const reviewHelpful = pgTable("review_helpful", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
+  id: serial("id").primaryKey(),
   reviewId: integer("review_id").references(() => userReviews.id).notNull(),
   userId: integer("user_id").references(() => users.id).notNull(),
-  isHelpful: integer("is_helpful", { mode: "boolean" }).notNull(), // true for helpful, false for not helpful
+  isHelpful: boolean("is_helpful").notNull(), // true for helpful, false for not helpful
   createdAt: timestamp("created_at").defaultNow(),
 });
 
 // User permissions and roles
 export const userPermissions = pgTable("user_permissions", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
+  id: serial("id").primaryKey(),
   userId: integer("user_id").references(() => users.id).notNull(),
   permission: text("permission").notNull(),
   grantedBy: integer("granted_by").references(() => users.id),
@@ -203,7 +203,7 @@ export const userPermissions = pgTable("user_permissions", {
 
 // Admin audit log
 export const adminAuditLog = pgTable("admin_audit_log", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
+  id: serial("id").primaryKey(),
   adminId: integer("admin_id").references(() => users.id).notNull(),
   action: text("action").notNull(), // 'user_ban', 'review_moderate', 'property_approve', etc.
   targetType: text("target_type").notNull(), // 'user', 'property', 'review', etc.
@@ -215,11 +215,11 @@ export const adminAuditLog = pgTable("admin_audit_log", {
 });
 
 export const saved_searches = pgTable('saved_searches', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
+  id: serial("id").primaryKey(),
   user_id: integer('user_id').references(() => users.id, { onDelete: 'cascade' }),
-  search_criteria: text('search_criteria', { mode: 'json' }),
+  search_criteria: jsonb('search_criteria'),
   name: text('name'),
-  email_alerts: integer('email_alerts', { mode: 'boolean' }).default(false),
+  email_alerts: boolean('email_alerts').default(false),
   created_at: timestamp('created_at').defaultNow(),
 });
 
@@ -517,6 +517,7 @@ export enum Permission {
   DELETE_PROPERTY = "delete_property",
   VIEW_PROPERTY = "view_property",
   FEATURE_PROPERTY = "feature_property",
+  APPROVE_PROPERTY = "approve_property",
 
   // Review management
   CREATE_REVIEW = "create_review",
@@ -524,7 +525,12 @@ export enum Permission {
   DELETE_REVIEW = "delete_review",
   VIEW_REVIEW = "view_review",
   MODERATE_REVIEW = "moderate_review",
-  RESPOND_TO_REVIEW = "respond_to_REVIEW",
+  RESPOND_TO_REVIEW = "respond_to_review",
+
+  // User management
+  VERIFY_USER = "verify_user",
+  BAN_USER = "ban_user",
+  DELETE_USER = "delete_user",
 
   // Admin operations
   VIEW_ADMIN_PANEL = "view_admin_panel",
@@ -546,19 +552,19 @@ export enum Permission {
 
 // Professional service categories
 export const service_categories = pgTable('service_categories', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
+  id: serial("id").primaryKey(),
   name: text('name').notNull(),
   journey_type: text('journey_type').notNull(), // 'transaction', 'development', 'ownership', 'skills'
   icon: text('icon'),
   description: text('description'),
   sort_order: integer('sort_order').default(0),
-  is_active: integer('is_active', { mode: 'boolean' }).default(true),
+  is_active: boolean('is_active').default(true),
   created_at: integer('created_at').default(sql`(cast((julianday('now') - 2440587.5)*86400000 as integer))`),
 });
 
 // Expanded service providers for all marketplace segments
 export const marketplace_providers = pgTable('marketplace_providers', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
+  id: serial("id").primaryKey(),
   user_id: integer('user_id').references(() => users.id),
   provider_type: text('provider_type').notNull(), // 'professional', 'supplier', 'artisan', 'training_provider'
   business_name: text('business_name').notNull(),
@@ -604,7 +610,7 @@ export const marketplace_providers = pgTable('marketplace_providers', {
 
 // Skills and certifications for artisans
 export const artisan_skills = pgTable('artisan_skills', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
+  id: serial("id").primaryKey(),
   provider_id: integer('provider_id').references(() => marketplace_providers.id),
   skill_name: text('skill_name').notNull(),
   proficiency_level: text('proficiency_level').notNull(), // 'beginner', 'intermediate', 'advanced', 'expert'
@@ -613,13 +619,13 @@ export const artisan_skills = pgTable('artisan_skills', {
   issue_date: text('issue_date'),
   expiry_date: text('expiry_date'),
   document_url: text('document_url'),
-  is_verified: integer('is_verified', { mode: 'boolean' }).default(false),
+  is_verified: boolean('is_verified').default(false),
   created_at: integer('created_at').default(sql`(cast((julianday('now') - 2440587.5)*86400000 as integer))`),
 });
 
 // Training programs and courses
 export const training_programs = pgTable('training_programs', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
+  id: serial("id").primaryKey(),
   provider_id: integer('provider_id').references(() => marketplace_providers.id),
   program_name: text('program_name').notNull(),
   description: text('description'),
@@ -636,7 +642,7 @@ export const training_programs = pgTable('training_programs', {
   materials_included: text('materials_included'), // JSON array
 
   // Certification
-  provides_certificate: integer('provides_certificate', { mode: 'boolean' }).default(false),
+  provides_certificate: boolean('provides_certificate').default(false),
   certificate_type: text('certificate_type'),
   accreditation_body: text('accreditation_body'),
 
@@ -658,7 +664,7 @@ export const training_programs = pgTable('training_programs', {
 
 // Project requests from property owners
 export const project_requests = pgTable('project_requests', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
+  id: serial("id").primaryKey(),
   client_id: integer('client_id').references(() => users.id),
   property_id: integer('property_id').references(() => properties.id),
 
@@ -692,7 +698,7 @@ export const project_requests = pgTable('project_requests', {
 
 // Proposals from service providers
 export const project_proposals = pgTable('project_proposals', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
+  id: serial("id").primaryKey(),
   project_id: integer('project_id').references(() => project_requests.id),
   provider_id: integer('provider_id').references(() => marketplace_providers.id),
 
@@ -705,7 +711,7 @@ export const project_proposals = pgTable('project_proposals', {
   // Terms
   payment_terms: text('payment_terms'),
   warranty_period: text('warranty_period'),
-  materials_included: integer('materials_included', { mode: 'boolean' }).default(false),
+  materials_included: boolean('materials_included').default(false),
 
   // Status
   status: text('status').default('pending'), // 'pending', 'accepted', 'rejected', 'withdrawn'
@@ -716,7 +722,7 @@ export const project_proposals = pgTable('project_proposals', {
 
 // Marketplace reviews and ratings
 export const marketplace_reviews = pgTable('marketplace_reviews', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
+  id: serial("id").primaryKey(),
   provider_id: integer('provider_id').references(() => marketplace_providers.id),
   client_id: integer('client_id').references(() => users.id),
   project_id: integer('project_id').references(() => project_requests.id),
@@ -733,7 +739,7 @@ export const marketplace_reviews = pgTable('marketplace_reviews', {
   value_rating: integer('value_rating'), // 1-5
 
   // Verification
-  is_verified: integer('is_verified', { mode: 'boolean' }).default(false),
+  is_verified: boolean('is_verified').default(false),
   verification_method: text('verification_method'),
 
   // Images
@@ -747,7 +753,7 @@ export const marketplace_reviews = pgTable('marketplace_reviews', {
 
 // Building materials and supplies
 export const building_materials = pgTable('building_materials', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
+  id: serial("id").primaryKey(),
   supplier_id: integer('supplier_id').references(() => marketplace_providers.id),
 
   // Product Details
@@ -787,7 +793,7 @@ export const building_materials = pgTable('building_materials', {
 
 // Material orders
 export const material_orders = pgTable('material_orders', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
+  id: serial("id").primaryKey(),
   customer_id: integer('customer_id').references(() => users.id),
   supplier_id: integer('supplier_id').references(() => marketplace_providers.id),
 
@@ -812,7 +818,7 @@ export const material_orders = pgTable('material_orders', {
 
 // Job opportunities for skilled workers
 export const job_opportunities = pgTable('job_opportunities', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
+  id: serial("id").primaryKey(),
   employer_id: integer('employer_id').references(() => users.id),
 
   // Job Details
@@ -835,7 +841,7 @@ export const job_opportunities = pgTable('job_opportunities', {
 
   // Location
   job_location: text('job_location'),
-  remote_work: integer('remote_work', { mode: 'boolean' }).default(false),
+  remote_work: boolean('remote_work').default(false),
 
   // Status
   status: text('status').default('active'), // 'active', 'filled', 'cancelled', 'expired'
@@ -892,20 +898,20 @@ export const PropertyType = {
 
 // Billing and subscription tables
 export const plans = pgTable('plans', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
+  id: serial("id").primaryKey(),
   code: text('code').notNull().unique(),
   name: text('name').notNull(),
   description: text('description'),
   price_bwp: integer('price_bwp').notNull().default(0),
   interval: text('interval').notNull().default('monthly'), // monthly, yearly, one_time
-  features: text('features', { mode: 'json' }).notNull().default('{}'), // JSON object with features
-  is_active: integer('is_active', { mode: 'boolean' }).default(true),
+  features: jsonb('features').notNull().default('{}'), // JSON object with features
+  is_active: boolean('is_active').default(true),
   created_at: integer('created_at').default(sql`(cast((julianday('now') - 2440587.5)*86400000 as integer))`),
   updated_at: integer('updated_at').default(sql`(cast((julianday('now') - 2440587.5)*86400000 as integer))`),
 });
 
 export const subscriptions = pgTable('subscriptions', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
+  id: serial("id").primaryKey(),
   user_id: integer('user_id').notNull().references(() => users.id),
   plan_id: integer('plan_id').notNull().references(() => plans.id),
   status: text('status').notNull().default('pending'), // pending, active, past_due, canceled, expired
@@ -917,7 +923,7 @@ export const subscriptions = pgTable('subscriptions', {
 });
 
 export const entitlements = pgTable('entitlements', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
+  id: serial("id").primaryKey(),
   user_id: integer('user_id').notNull().references(() => users.id),
   subscription_id: integer('subscription_id').notNull().references(() => subscriptions.id),
   feature_key: text('feature_key').notNull(), // e.g., 'listingLimit', 'heroSlots', 'analytics'
@@ -929,7 +935,7 @@ export const entitlements = pgTable('entitlements', {
 });
 
 export const payments = pgTable('payments', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
+  id: serial("id").primaryKey(),
   user_id: integer('user_id').notNull().references(() => users.id),
   subscription_id: integer('subscription_id').references(() => subscriptions.id),
   plan_id: integer('plan_id').notNull().references(() => plans.id),
@@ -943,13 +949,13 @@ export const payments = pgTable('payments', {
 });
 
 export const hero_slots = pgTable('hero_slots', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
+  id: serial("id").primaryKey(),
   property_id: integer('property_id').notNull().references(() => properties.id),
   user_id: integer('user_id').notNull().references(() => users.id),
   starts_at: integer('starts_at').notNull(),
   ends_at: integer('ends_at').notNull(),
   position: integer('position').default(0), // carousel position priority
-  is_active: integer('is_active', { mode: 'boolean' }).default(true),
+  is_active: boolean('is_active').default(true),
   created_at: integer('created_at').default(sql`(cast((julianday('now') - 2440587.5)*86400000 as integer))`),
 });
 

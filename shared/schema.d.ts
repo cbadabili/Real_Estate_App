@@ -2084,11 +2084,11 @@ export declare const reviewResponses: import("drizzle-orm/pg-core").PgTableWithC
             name: "id";
             tableName: "review_responses";
             dataType: "number";
-            columnType: "PgInteger";
+            columnType: "PgSerial";
             data: number;
-            driverParam: string | number;
+            driverParam: number;
             notNull: true;
-            hasDefault: false;
+            hasDefault: true;
             isPrimaryKey: true;
             isAutoincrement: false;
             hasRuntimeDefault: false;
@@ -2193,11 +2193,11 @@ export declare const reviewHelpful: import("drizzle-orm/pg-core").PgTableWithCol
             name: "id";
             tableName: "review_helpful";
             dataType: "number";
-            columnType: "PgInteger";
+            columnType: "PgSerial";
             data: number;
-            driverParam: string | number;
+            driverParam: number;
             notNull: true;
-            hasDefault: false;
+            hasDefault: true;
             isPrimaryKey: true;
             isAutoincrement: false;
             hasRuntimeDefault: false;
@@ -2285,11 +2285,11 @@ export declare const userPermissions: import("drizzle-orm/pg-core").PgTableWithC
             name: "id";
             tableName: "user_permissions";
             dataType: "number";
-            columnType: "PgInteger";
+            columnType: "PgSerial";
             data: number;
-            driverParam: string | number;
+            driverParam: number;
             notNull: true;
-            hasDefault: false;
+            hasDefault: true;
             isPrimaryKey: true;
             isAutoincrement: false;
             hasRuntimeDefault: false;
@@ -2394,11 +2394,11 @@ export declare const adminAuditLog: import("drizzle-orm/pg-core").PgTableWithCol
             name: "id";
             tableName: "admin_audit_log";
             dataType: "number";
-            columnType: "PgInteger";
+            columnType: "PgSerial";
             data: number;
-            driverParam: string | number;
+            driverParam: number;
             notNull: true;
-            hasDefault: false;
+            hasDefault: true;
             isPrimaryKey: true;
             isAutoincrement: false;
             hasRuntimeDefault: false;
@@ -2554,11 +2554,11 @@ export declare const saved_searches: import("drizzle-orm/pg-core").PgTableWithCo
             name: "id";
             tableName: "saved_searches";
             dataType: "number";
-            columnType: "PgInteger";
+            columnType: "PgSerial";
             data: number;
-            driverParam: string | number;
+            driverParam: number;
             notNull: true;
-            hasDefault: false;
+            hasDefault: true;
             isPrimaryKey: true;
             isAutoincrement: false;
             hasRuntimeDefault: false;
@@ -3668,16 +3668,15 @@ export declare const insertPropertySchema: z.ZodObject<Omit<{
     createdAt: z.ZodOptional<z.ZodNullable<z.ZodDate>>;
     updatedAt: z.ZodOptional<z.ZodNullable<z.ZodDate>>;
 }, "id" | "createdAt" | "updatedAt" | "views" | "daysOnMarket">, "strip", z.ZodTypeAny, {
-    address: string;
-    city: string;
     title: string;
     price: string;
+    address: string;
+    city: string;
     state: string;
     zipCode: string;
     propertyType: string;
     listingType: string;
     description?: string | null | undefined;
-    status?: string | undefined;
     latitude?: number | null | undefined;
     longitude?: number | null | undefined;
     areaText?: string | null | undefined;
@@ -3690,6 +3689,7 @@ export declare const insertPropertySchema: z.ZodObject<Omit<{
     areaBuild?: number | null | undefined;
     lotSize?: string | null | undefined;
     yearBuilt?: number | null | undefined;
+    status?: string | undefined;
     images?: string | null | undefined;
     features?: string | null | undefined;
     virtualTourUrl?: string | null | undefined;
@@ -3712,16 +3712,15 @@ export declare const insertPropertySchema: z.ZodObject<Omit<{
     auctionTerms?: string | null | undefined;
     lotNumber?: string | null | undefined;
 }, {
-    address: string;
-    city: string;
     title: string;
     price: string;
+    address: string;
+    city: string;
     state: string;
     zipCode: string;
     propertyType: string;
     listingType: string;
     description?: string | null | undefined;
-    status?: string | undefined;
     latitude?: number | null | undefined;
     longitude?: number | null | undefined;
     areaText?: string | null | undefined;
@@ -3734,6 +3733,7 @@ export declare const insertPropertySchema: z.ZodObject<Omit<{
     areaBuild?: number | null | undefined;
     lotSize?: string | null | undefined;
     yearBuilt?: number | null | undefined;
+    status?: string | undefined;
     images?: string | null | undefined;
     features?: string | null | undefined;
     virtualTourUrl?: string | null | undefined;
@@ -3764,13 +3764,13 @@ export declare const insertInquirySchema: z.ZodObject<Omit<{
     status: z.ZodOptional<z.ZodString>;
     createdAt: z.ZodOptional<z.ZodNullable<z.ZodDate>>;
 }, "id" | "createdAt" | "status">, "strip", z.ZodTypeAny, {
-    message: string;
     propertyId: number;
     buyerId: number;
+    message: string;
 }, {
-    message: string;
     propertyId: number;
     buyerId: number;
+    message: string;
 }>;
 export declare const insertAppointmentSchema: z.ZodObject<Omit<{
     id: z.ZodOptional<z.ZodNumber>;
@@ -3783,17 +3783,17 @@ export declare const insertAppointmentSchema: z.ZodObject<Omit<{
     notes: z.ZodOptional<z.ZodNullable<z.ZodString>>;
     createdAt: z.ZodOptional<z.ZodNullable<z.ZodDate>>;
 }, "id" | "createdAt" | "status">, "strip", z.ZodTypeAny, {
-    type: string;
     propertyId: number;
     buyerId: number;
     appointmentDate: Date;
+    type: string;
     agentId?: number | null | undefined;
     notes?: string | null | undefined;
 }, {
-    type: string;
     propertyId: number;
     buyerId: number;
     appointmentDate: Date;
+    type: string;
     agentId?: number | null | undefined;
     notes?: string | null | undefined;
 }>;
@@ -3835,8 +3835,8 @@ export declare const insertUserReviewSchema: z.ZodObject<Omit<{
     createdAt: z.ZodOptional<z.ZodNullable<z.ZodDate>>;
     updatedAt: z.ZodOptional<z.ZodNullable<z.ZodDate>>;
 }, "id" | "isVerified" | "createdAt" | "updatedAt" | "status">, "strip", z.ZodTypeAny, {
-    rating: number;
     reviewerId: number;
+    rating: number;
     revieweeId: number;
     reviewType: string;
     review?: string | null | undefined;
@@ -3844,8 +3844,8 @@ export declare const insertUserReviewSchema: z.ZodObject<Omit<{
     isPublic?: number | null | undefined;
     moderatorNotes?: string | null | undefined;
 }, {
-    rating: number;
     reviewerId: number;
+    rating: number;
     revieweeId: number;
     reviewType: string;
     review?: string | null | undefined;
@@ -3854,7 +3854,7 @@ export declare const insertUserReviewSchema: z.ZodObject<Omit<{
     moderatorNotes?: string | null | undefined;
 }>;
 export declare const insertReviewResponseSchema: z.ZodObject<Omit<{
-    id: z.ZodNumber;
+    id: z.ZodOptional<z.ZodNumber>;
     reviewId: z.ZodNumber;
     responderId: z.ZodNumber;
     response: z.ZodString;
@@ -3872,7 +3872,7 @@ export declare const insertReviewResponseSchema: z.ZodObject<Omit<{
     isOfficial?: number | null | undefined;
 }>;
 export declare const insertReviewHelpfulSchema: z.ZodObject<Omit<{
-    id: z.ZodNumber;
+    id: z.ZodOptional<z.ZodNumber>;
     reviewId: z.ZodNumber;
     userId: z.ZodNumber;
     isHelpful: z.ZodNumber;
@@ -3887,7 +3887,7 @@ export declare const insertReviewHelpfulSchema: z.ZodObject<Omit<{
     isHelpful: number;
 }>;
 export declare const insertUserPermissionSchema: z.ZodObject<Omit<{
-    id: z.ZodNumber;
+    id: z.ZodOptional<z.ZodNumber>;
     userId: z.ZodNumber;
     permission: z.ZodString;
     grantedBy: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
@@ -3905,7 +3905,7 @@ export declare const insertUserPermissionSchema: z.ZodObject<Omit<{
     grantedBy?: number | null | undefined;
 }>;
 export declare const insertAdminAuditLogSchema: z.ZodObject<Omit<{
-    id: z.ZodNumber;
+    id: z.ZodOptional<z.ZodNumber>;
     adminId: z.ZodNumber;
     action: z.ZodString;
     targetType: z.ZodString;
@@ -3960,12 +3960,16 @@ export declare enum Permission {
     DELETE_PROPERTY = "delete_property",
     VIEW_PROPERTY = "view_property",
     FEATURE_PROPERTY = "feature_property",
+    APPROVE_PROPERTY = "approve_property",
     CREATE_REVIEW = "create_review",
     UPDATE_REVIEW = "update_review",
     DELETE_REVIEW = "delete_review",
     VIEW_REVIEW = "view_review",
     MODERATE_REVIEW = "moderate_review",
-    RESPOND_TO_REVIEW = "respond_to_REVIEW",
+    RESPOND_TO_REVIEW = "respond_to_review",
+    VERIFY_USER = "verify_user",
+    BAN_USER = "ban_user",
+    DELETE_USER = "delete_user",
     VIEW_ADMIN_PANEL = "view_admin_panel",
     MANAGE_PERMISSIONS = "manage_permissions",
     VIEW_AUDIT_LOG = "view_audit_log",
@@ -3984,11 +3988,11 @@ export declare const service_categories: import("drizzle-orm/pg-core").PgTableWi
             name: "id";
             tableName: "service_categories";
             dataType: "number";
-            columnType: "PgInteger";
+            columnType: "PgSerial";
             data: number;
-            driverParam: string | number;
+            driverParam: number;
             notNull: true;
-            hasDefault: false;
+            hasDefault: true;
             isPrimaryKey: true;
             isAutoincrement: false;
             hasRuntimeDefault: false;
@@ -4085,10 +4089,10 @@ export declare const service_categories: import("drizzle-orm/pg-core").PgTableWi
         is_active: import("drizzle-orm/pg-core").PgColumn<{
             name: "is_active";
             tableName: "service_categories";
-            dataType: "number";
-            columnType: "PgInteger";
-            data: number;
-            driverParam: string | number;
+            dataType: "boolean";
+            columnType: "PgBoolean";
+            data: boolean;
+            driverParam: boolean;
             notNull: false;
             hasDefault: true;
             isPrimaryKey: false;
@@ -4127,11 +4131,11 @@ export declare const marketplace_providers: import("drizzle-orm/pg-core").PgTabl
             name: "id";
             tableName: "marketplace_providers";
             dataType: "number";
-            columnType: "PgInteger";
+            columnType: "PgSerial";
             data: number;
-            driverParam: string | number;
+            driverParam: number;
             notNull: true;
-            hasDefault: false;
+            hasDefault: true;
             isPrimaryKey: true;
             isAutoincrement: false;
             hasRuntimeDefault: false;
@@ -4695,11 +4699,11 @@ export declare const artisan_skills: import("drizzle-orm/pg-core").PgTableWithCo
             name: "id";
             tableName: "artisan_skills";
             dataType: "number";
-            columnType: "PgInteger";
+            columnType: "PgSerial";
             data: number;
-            driverParam: string | number;
+            driverParam: number;
             notNull: true;
-            hasDefault: false;
+            hasDefault: true;
             isPrimaryKey: true;
             isAutoincrement: false;
             hasRuntimeDefault: false;
@@ -4889,11 +4893,11 @@ export declare const training_programs: import("drizzle-orm/pg-core").PgTableWit
             name: "id";
             tableName: "training_programs";
             dataType: "number";
-            columnType: "PgInteger";
+            columnType: "PgSerial";
             data: number;
-            driverParam: string | number;
+            driverParam: number;
             notNull: true;
-            hasDefault: false;
+            hasDefault: true;
             isPrimaryKey: true;
             isAutoincrement: false;
             hasRuntimeDefault: false;
@@ -5338,11 +5342,11 @@ export declare const project_requests: import("drizzle-orm/pg-core").PgTableWith
             name: "id";
             tableName: "project_requests";
             dataType: "number";
-            columnType: "PgInteger";
+            columnType: "PgSerial";
             data: number;
-            driverParam: string | number;
+            driverParam: number;
             notNull: true;
-            hasDefault: false;
+            hasDefault: true;
             isPrimaryKey: true;
             isAutoincrement: false;
             hasRuntimeDefault: false;
@@ -5685,11 +5689,11 @@ export declare const project_proposals: import("drizzle-orm/pg-core").PgTableWit
             name: "id";
             tableName: "project_proposals";
             dataType: "number";
-            columnType: "PgInteger";
+            columnType: "PgSerial";
             data: number;
-            driverParam: string | number;
+            driverParam: number;
             notNull: true;
-            hasDefault: false;
+            hasDefault: true;
             isPrimaryKey: true;
             isAutoincrement: false;
             hasRuntimeDefault: false;
@@ -5913,11 +5917,11 @@ export declare const marketplace_reviews: import("drizzle-orm/pg-core").PgTableW
             name: "id";
             tableName: "marketplace_reviews";
             dataType: "number";
-            columnType: "PgInteger";
+            columnType: "PgSerial";
             data: number;
-            driverParam: string | number;
+            driverParam: number;
             notNull: true;
-            hasDefault: false;
+            hasDefault: true;
             isPrimaryKey: true;
             isAutoincrement: false;
             hasRuntimeDefault: false;
@@ -6192,11 +6196,11 @@ export declare const building_materials: import("drizzle-orm/pg-core").PgTableWi
             name: "id";
             tableName: "building_materials";
             dataType: "number";
-            columnType: "PgInteger";
+            columnType: "PgSerial";
             data: number;
-            driverParam: string | number;
+            driverParam: number;
             notNull: true;
-            hasDefault: false;
+            hasDefault: true;
             isPrimaryKey: true;
             isAutoincrement: false;
             hasRuntimeDefault: false;
@@ -6590,11 +6594,11 @@ export declare const material_orders: import("drizzle-orm/pg-core").PgTableWithC
             name: "id";
             tableName: "material_orders";
             dataType: "number";
-            columnType: "PgInteger";
+            columnType: "PgSerial";
             data: number;
-            driverParam: string | number;
+            driverParam: number;
             notNull: true;
-            hasDefault: false;
+            hasDefault: true;
             isPrimaryKey: true;
             isAutoincrement: false;
             hasRuntimeDefault: false;
@@ -6835,11 +6839,11 @@ export declare const job_opportunities: import("drizzle-orm/pg-core").PgTableWit
             name: "id";
             tableName: "job_opportunities";
             dataType: "number";
-            columnType: "PgInteger";
+            columnType: "PgSerial";
             data: number;
-            driverParam: string | number;
+            driverParam: number;
             notNull: true;
-            hasDefault: false;
+            hasDefault: true;
             isPrimaryKey: true;
             isAutoincrement: false;
             hasRuntimeDefault: false;
@@ -7219,11 +7223,11 @@ export declare const plans: import("drizzle-orm/pg-core").PgTableWithColumns<{
             name: "id";
             tableName: "plans";
             dataType: "number";
-            columnType: "PgInteger";
+            columnType: "PgSerial";
             data: number;
-            driverParam: string | number;
+            driverParam: number;
             notNull: true;
-            hasDefault: false;
+            hasDefault: true;
             isPrimaryKey: true;
             isAutoincrement: false;
             hasRuntimeDefault: false;
@@ -7337,10 +7341,10 @@ export declare const plans: import("drizzle-orm/pg-core").PgTableWithColumns<{
         is_active: import("drizzle-orm/pg-core").PgColumn<{
             name: "is_active";
             tableName: "plans";
-            dataType: "number";
-            columnType: "PgInteger";
-            data: number;
-            driverParam: string | number;
+            dataType: "boolean";
+            columnType: "PgBoolean";
+            data: boolean;
+            driverParam: boolean;
             notNull: false;
             hasDefault: true;
             isPrimaryKey: false;
@@ -7396,11 +7400,11 @@ export declare const subscriptions: import("drizzle-orm/pg-core").PgTableWithCol
             name: "id";
             tableName: "subscriptions";
             dataType: "number";
-            columnType: "PgInteger";
+            columnType: "PgSerial";
             data: number;
-            driverParam: string | number;
+            driverParam: number;
             notNull: true;
-            hasDefault: false;
+            hasDefault: true;
             isPrimaryKey: true;
             isAutoincrement: false;
             hasRuntimeDefault: false;
@@ -7556,11 +7560,11 @@ export declare const entitlements: import("drizzle-orm/pg-core").PgTableWithColu
             name: "id";
             tableName: "entitlements";
             dataType: "number";
-            columnType: "PgInteger";
+            columnType: "PgSerial";
             data: number;
-            driverParam: string | number;
+            driverParam: number;
             notNull: true;
-            hasDefault: false;
+            hasDefault: true;
             isPrimaryKey: true;
             isAutoincrement: false;
             hasRuntimeDefault: false;
@@ -7716,11 +7720,11 @@ export declare const payments: import("drizzle-orm/pg-core").PgTableWithColumns<
             name: "id";
             tableName: "payments";
             dataType: "number";
-            columnType: "PgInteger";
+            columnType: "PgSerial";
             data: number;
-            driverParam: string | number;
+            driverParam: number;
             notNull: true;
-            hasDefault: false;
+            hasDefault: true;
             isPrimaryKey: true;
             isAutoincrement: false;
             hasRuntimeDefault: false;
@@ -7910,11 +7914,11 @@ export declare const hero_slots: import("drizzle-orm/pg-core").PgTableWithColumn
             name: "id";
             tableName: "hero_slots";
             dataType: "number";
-            columnType: "PgInteger";
+            columnType: "PgSerial";
             data: number;
-            driverParam: string | number;
+            driverParam: number;
             notNull: true;
-            hasDefault: false;
+            hasDefault: true;
             isPrimaryKey: true;
             isAutoincrement: false;
             hasRuntimeDefault: false;
@@ -8011,10 +8015,10 @@ export declare const hero_slots: import("drizzle-orm/pg-core").PgTableWithColumn
         is_active: import("drizzle-orm/pg-core").PgColumn<{
             name: "is_active";
             tableName: "hero_slots";
-            dataType: "number";
-            columnType: "PgInteger";
-            data: number;
-            driverParam: string | number;
+            dataType: "boolean";
+            columnType: "PgBoolean";
+            data: boolean;
+            driverParam: boolean;
             notNull: false;
             hasDefault: true;
             isPrimaryKey: false;

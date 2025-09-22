@@ -91,16 +91,16 @@ const USER_TYPE_PERMISSIONS: Record<UserType, Permission[]> = {
 
 export class AuthService {
   // Check if user has specific permission
-  static hasPermission(user: User, permission: string): boolean {
+  static hasPermission(user: User, permission: Permission | string): boolean {
     if (!user.isActive) return false;
 
     // Check role-based permissions
     const rolePermissions = ROLE_PERMISSIONS[user.role as UserRole] || [];
-    if (rolePermissions.includes(permission)) return true;
+    if (rolePermissions.includes(permission as Permission)) return true;
 
     // Check user type permissions
     const userTypePermissions = USER_TYPE_PERMISSIONS[user.userType as UserType] || [];
-    if (userTypePermissions.includes(permission)) return true;
+    if (userTypePermissions.includes(permission as Permission)) return true;
 
     // Check custom user permissions
     const customPermissions = user.permissions || [];
@@ -149,7 +149,9 @@ export class AuthService {
 }
 
 // JWT utilities
-const JWT_SECRET = process.env.JWT_SECRET || 'beedab-secret-key-change-in-production';
+import { env } from './utils/env';
+
+const JWT_SECRET = env.JWT_SECRET;
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '24h';
 
 export interface JWTPayload {

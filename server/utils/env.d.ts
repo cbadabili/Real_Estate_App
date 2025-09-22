@@ -4,6 +4,7 @@ export declare const env: {
     PORT: number;
     DATABASE_URL: string;
     SESSION_SECRET: string;
+    JWT_SECRET: string;
     CORS_ORIGIN: string;
     USE_INTEL: boolean;
     REALESTATEINTEL_URL: string;

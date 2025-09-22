@@ -11,6 +11,7 @@ export const env = {
     PORT: Number(process.env.PORT ?? 5000),
     DATABASE_URL: get('DATABASE_URL'),
     SESSION_SECRET: get('SESSION_SECRET', 'dev-secret-change-in-production'),
+    JWT_SECRET: get('JWT_SECRET', 'dev-jwt-secret-change-in-production-minimum-32-chars'),
     CORS_ORIGIN: get('CORS_ORIGIN', 'http://localhost:5173'),
     USE_INTEL: (process.env.USE_INTEL ?? 'false').toLowerCase() === 'true',
     REALESTATEINTEL_URL: process.env.REALESTATEINTEL_URL ?? '',
