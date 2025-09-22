@@ -166,6 +166,12 @@ export class MigrationManager {
                     setweight(to_tsvector('english', COALESCE(NEW.description, '')), 'B') ||
                     setweight(to_tsvector('english', COALESCE(NEW.address, '')), 'C') ||
                     setweight(to_tsvector('english', COALESCE(NEW.city, '')), 'D');
+          
+          -- Update geom if coordinates changed
+          IF (NEW.latitude IS NOT NULL AND NEW.longitude IS NOT NULL) THEN
+            NEW.geom := ST_SetSRID(ST_MakePoint(NEW.longitude, NEW.latitude), 4326);
+          END IF;
+          
           RETURN NEW;
         END;
         $$ LANGUAGE plpgsql;
