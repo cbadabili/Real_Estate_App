@@ -15,14 +15,21 @@ import {
   primaryKey,
   json,
   numeric,
-  geography,
   tsvector,
   doublePrecision,
-  jsonb
+  jsonb,
+  customType
 } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 import { relations, sql } from "drizzle-orm";
+
+// Custom PostGIS geography type
+const geography = customType<{ data: any; driverData: string }>({
+  dataType() {
+    return "geography(POINT, 4326)";
+  },
+});
 
 
 
