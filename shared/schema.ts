@@ -3,39 +3,18 @@ import {
   pgTable,
   text,
   integer,
-  real,
   boolean,
+  real,
+  doublePrecision,
+  numeric,
   timestamp,
+  jsonb,
   serial,
   varchar,
-  decimal,
-  bigint,
-  index,
-  unique,
-  primaryKey,
-  json,
-  numeric,
-  doublePrecision,
-  jsonb,
-  customType
 } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 import { relations, sql } from "drizzle-orm";
-
-// Custom PostGIS geography type
-const geography = customType<{ data: any; driverData: string }>({
-  dataType() {
-    return "geography(POINT, 4326)";
-  },
-});
-
-// Custom tsvector type for full-text search
-const tsvector = customType<{ data: any; driverData: string }>({
-  dataType() {
-    return "tsvector";
-  },
-});
 
 
 
@@ -76,15 +55,13 @@ export const properties = pgTable("properties", {
   id: serial("id").primaryKey(),
   title: text("title").notNull(),
   description: text("description"),
-  price: numeric("price", { precision: 12, scale: 2 }).notNull(),
+  price: text("price").notNull(),
   address: text("address").notNull(),
   city: text("city").notNull(),
   state: text("state").notNull(),
   zipCode: text("zip_code").notNull(),
-  latitude: numeric("latitude", { precision: 10, scale: 8 }),
-  longitude: numeric("longitude", { precision: 11, scale: 8 }),
-  geom: geography("geom", { type: "point", srid: 4326 }),
-  fts: tsvector("fts"),
+  latitude: doublePrecision("latitude"),
+  longitude: doublePrecision("longitude"),
   areaText: text("area_text"),
   placeName: text("place_name"),
   placeId: text("place_id"),
@@ -92,7 +69,7 @@ export const properties = pgTable("properties", {
   propertyType: text("property_type").notNull(), // 'house', 'apartment', 'condo', 'townhouse', 'land', 'mmatseta', 'commercial', 'farm'
   listingType: text("listing_type").notNull(), // 'owner', 'agent', 'rental', 'auction'
   bedrooms: integer("bedrooms"),
-  bathrooms: integer("bathrooms"),
+  bathrooms: text("bathrooms"),
   squareFeet: integer("square_feet"),
   areaBuild: integer("area_build"),
   lotSize: text("lot_size"),
@@ -582,8 +559,7 @@ export const service_categories = pgTable('service_categories', {
   description: text('description'),
   sort_order: integer('sort_order').default(0),
   is_active: boolean('is_active').default(true),
-  created_at: timestamp("created_at").defaultNow(),
-  updated_at: timestamp("updated_at").defaultNow(),
+  created_at: integer('created_at').default(sql`(cast((julianday('now') - 2440587.5)*86400000 as integer))`),
 });
 
 // Expanded service providers for all marketplace segments
@@ -628,8 +604,8 @@ export const marketplace_providers = pgTable('marketplace_providers', {
   status: text('status').default('active'), // 'active', 'inactive', 'suspended'
   availability_status: text('availability_status').default('available'), // 'available', 'busy', 'booked'
 
-  created_at: timestamp("created_at").defaultNow(),
-  updated_at: timestamp("updated_at").defaultNow(),
+  created_at: integer('created_at').default(sql`(cast((julianday('now') - 2440587.5)*86400000 as integer))`),
+  updated_at: integer('updated_at').default(sql`(cast((julianday('now') - 2440587.5)*86400000 as integer))`),
 });
 
 // Skills and certifications for artisans
@@ -644,7 +620,7 @@ export const artisan_skills = pgTable('artisan_skills', {
   expiry_date: text('expiry_date'),
   document_url: text('document_url'),
   is_verified: boolean('is_verified').default(false),
-  created_at: timestamp("created_at").defaultNow(),
+  created_at: integer('created_at').default(sql`(cast((julianday('now') - 2440587.5)*86400000 as integer))`),
 });
 
 // Training programs and courses
@@ -682,8 +658,8 @@ export const training_programs = pgTable('training_programs', {
   status: text('status').default('active'), // 'active', 'full', 'cancelled', 'completed'
   enrollment_count: integer('enrollment_count').default(0),
 
-  created_at: timestamp("created_at").defaultNow(),
-  updated_at: timestamp("updated_at").defaultNow(),
+  created_at: integer('created_at').default(sql`(cast((julianday('now') - 2440587.5)*86400000 as integer))`),
+  updated_at: integer('updated_at').default(sql`(cast((julianday('now') - 2440587.5)*86400000 as integer))`),
 });
 
 // Project requests from property owners
@@ -717,9 +693,8 @@ export const project_requests = pgTable('project_requests', {
   status: text('status').default('open'), // 'open', 'in_progress', 'completed', 'cancelled'
   proposals_count: integer('proposals_count').default(0),
 
-  created_at: timestamp("created_at").defaultNow(),
-  updated_at: timestamp("updated_at").defaultNow(),
-});
+  created_at: integer('created_at').default(sql`(cast((julianday('now') - 2440587.5)*86400000 as integer))`),
+  updated_at: integer('updated_at').default(sql`(cast((julianday('now') - 2440587.5)*86400000 as integer))`),});
 
 // Proposals from service providers
 export const project_proposals = pgTable('project_proposals', {
@@ -741,8 +716,8 @@ export const project_proposals = pgTable('project_proposals', {
   // Status
   status: text('status').default('pending'), // 'pending', 'accepted', 'rejected', 'withdrawn'
 
-  created_at: timestamp("created_at").defaultNow(),
-  updated_at: timestamp("updated_at").defaultNow(),
+  created_at: integer('created_at').default(sql`(cast((julianday('now') - 2440587.5)*86400000 as integer))`),
+  updated_at: integer('updated_at').default(sql`(cast((julianday('now') - 2440587.5)*86400000 as integer))`),
 });
 
 // Marketplace reviews and ratings
@@ -773,7 +748,7 @@ export const marketplace_reviews = pgTable('marketplace_reviews', {
   // Status
   status: text('status').default('active'), // 'active', 'hidden', 'flagged'
 
-  created_at: timestamp("created_at").defaultNow(),
+  created_at: integer('created_at').default(sql`(cast((julianday('now') - 2440587.5)*86400000 as integer))`),
 });
 
 // Building materials and supplies
@@ -812,8 +787,8 @@ export const building_materials = pgTable('building_materials', {
   // Status
   status: text('status').default('available'), // 'available', 'out_of_stock', 'discontinued'
 
-  created_at: timestamp("created_at").defaultNow(),
-  updated_at: timestamp("updated_at").defaultNow(),
+  created_at: integer('created_at').default(sql`(cast((julianday('now') - 2440587.5)*86400000 as integer))`),
+  updated_at: integer('updated_at').default(sql`(cast((julianday('now') - 2440587.5)*86400000 as integer))`),
 });
 
 // Material orders
@@ -837,8 +812,8 @@ export const material_orders = pgTable('material_orders', {
   status: text('status').default('pending'), // 'pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled'
   payment_status: text('payment_status').default('pending'), // 'pending', 'paid', 'partial', 'failed'
 
-  created_at: timestamp("created_at").defaultNow(),
-  updated_at: timestamp("updated_at").defaultNow(),
+  created_at: integer('created_at').default(sql`(cast((julianday('now') - 2440587.5)*86400000 as integer))`),
+  updated_at: integer('updated_at').default(sql`(cast((julianday('now') - 2440587.5)*86400000 as integer))`),
 });
 
 // Job opportunities for skilled workers
@@ -872,8 +847,8 @@ export const job_opportunities = pgTable('job_opportunities', {
   status: text('status').default('active'), // 'active', 'filled', 'cancelled', 'expired'
   applications_count: integer('applications_count').default(0),
 
-  created_at: timestamp("created_at").defaultNow(),
-  updated_at: timestamp("updated_at").defaultNow(),
+  created_at: integer('created_at').default(sql`(cast((julianday('now') - 2440587.5)*86400000 as integer))`),
+  updated_at: integer('updated_at').default(sql`(cast((julianday('now') - 2440587.5)*86400000 as integer))`),
 });
 
 // Re-export services schema types for convenience
@@ -931,8 +906,8 @@ export const plans = pgTable('plans', {
   interval: text('interval').notNull().default('monthly'), // monthly, yearly, one_time
   features: jsonb('features').notNull().default('{}'), // JSON object with features
   is_active: boolean('is_active').default(true),
-  created_at: timestamp("created_at").defaultNow(),
-  updated_at: timestamp("updated_at").defaultNow(),
+  created_at: integer('created_at').default(sql`(cast((julianday('now') - 2440587.5)*86400000 as integer))`),
+  updated_at: integer('updated_at').default(sql`(cast((julianday('now') - 2440587.5)*86400000 as integer))`),
 });
 
 export const subscriptions = pgTable('subscriptions', {
@@ -943,8 +918,8 @@ export const subscriptions = pgTable('subscriptions', {
   starts_at: integer('starts_at').notNull(),
   ends_at: integer('ends_at'),
   next_billing_date: integer('next_billing_date'),
-  created_at: timestamp("created_at").defaultNow(),
-  updated_at: timestamp("updated_at").defaultNow(),
+  created_at: integer('created_at').default(sql`(cast((julianday('now') - 2440587.5)*86400000 as integer))`),
+  updated_at: integer('updated_at').default(sql`(cast((julianday('now') - 2440587.5)*86400000 as integer))`),
 });
 
 export const entitlements = pgTable('entitlements', {
@@ -955,8 +930,8 @@ export const entitlements = pgTable('entitlements', {
   feature_value: integer('feature_value').notNull(), // numeric value or boolean (0/1)
   used_count: integer('used_count').notNull().default(0),
   expires_at: integer('expires_at'),
-  created_at: timestamp("created_at").defaultNow(),
-  updated_at: timestamp("updated_at").defaultNow(),
+  created_at: integer('created_at').default(sql`(cast((julianday('now') - 2440587.5)*86400000 as integer))`),
+  updated_at: integer('updated_at').default(sql`(cast((julianday('now') - 2440587.5)*86400000 as integer))`),
 });
 
 export const payments = pgTable('payments', {
@@ -969,8 +944,8 @@ export const payments = pgTable('payments', {
   payment_reference: text('payment_reference'),
   status: text('status').notNull().default('pending'), // pending, succeeded, failed, refunded
   notes: text('notes'),
-  created_at: timestamp("created_at").defaultNow(),
-  updated_at: timestamp("updated_at").defaultNow(),
+  created_at: integer('created_at').default(sql`(cast((julianday('now') - 2440587.5)*86400000 as integer))`),
+  updated_at: integer('updated_at').default(sql`(cast((julianday('now') - 2440587.5)*86400000 as integer))`),
 });
 
 export const hero_slots = pgTable('hero_slots', {
@@ -981,7 +956,7 @@ export const hero_slots = pgTable('hero_slots', {
   ends_at: integer('ends_at').notNull(),
   position: integer('position').default(0), // carousel position priority
   is_active: boolean('is_active').default(true),
-  created_at: timestamp("created_at").defaultNow(),
+  created_at: integer('created_at').default(sql`(cast((julianday('now') - 2440587.5)*86400000 as integer))`),
 });
 
 // Relations for billing tables

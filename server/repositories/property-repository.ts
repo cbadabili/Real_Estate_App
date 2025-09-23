@@ -5,7 +5,6 @@ import {
 } from "../../shared/schema";
 import { db } from "../db";
 import { eq, and, desc, asc, gte, lte, like, or, sql } from "drizzle-orm";
-import { cacheService, CacheService } from "../cache-service";
 
 export interface PropertyFilters {
   minPrice?: number;
@@ -44,24 +43,14 @@ export class PropertyRepository implements IPropertyRepository {
   }
 
   async getProperties(filters: PropertyFilters = {}): Promise<Property[]> {
-    // Create cache key based on filters
-    const cacheKey = CacheService.createKey('properties', filters);
-    
-    // Try to get from cache first
-    const cached = cacheService.get<Property[]>(cacheKey);
-    if (cached) {
-      console.log('Properties served from cache');
-      return cached;
-    }
-
     let query = db.select().from(properties);
     const conditions = [];
 
     if (filters.minPrice) {
-      conditions.push(gte(properties.price, filters.minPrice));
+      conditions.push(gte(properties.price, filters.minPrice.toString()));
     }
     if (filters.maxPrice) {
-      conditions.push(lte(properties.price, filters.maxPrice));
+      conditions.push(lte(properties.price, filters.maxPrice.toString()));
     }
     if (filters.propertyType && filters.propertyType !== 'all') {
       conditions.push(eq(properties.propertyType, filters.propertyType));
@@ -164,10 +153,6 @@ export class PropertyRepository implements IPropertyRepository {
     });
 
     console.log(`Retrieved ${processedResults.length} valid properties from database (filtered from ${results.length} total)`);
-    
-    // Cache the results for 5 minutes
-    cacheService.set(cacheKey, processedResults, 5 * 60 * 1000);
-    
     return processedResults;
   }
 
