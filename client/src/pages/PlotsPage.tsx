@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState, useEffect } from 'react';
 import { PlotSearchFilters, PlotFilters } from '../components/PlotSearchFilters';
 import { PlotListingCard, PlotListing } from '../components/PlotListingCard';

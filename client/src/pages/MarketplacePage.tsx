@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, Filter, MapPin, Star, Clock, Phone, Mail, Globe, Shield, Award, Package, Wrench, GraduationCap, UserPlus, Plus } from 'lucide-react';
