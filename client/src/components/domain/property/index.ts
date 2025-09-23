@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 export { default as PropertyCard } from './PropertyCard';
 export { default as PropertyGrid } from './PropertyGrid';

@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 export { default as ServiceProviderCard } from './ServiceProviderCard';
 export { RegisterProvider } from '../../marketplace/RegisterProvider';

@@ -1,6 +1,16 @@
 {
-  "extends": "../tsconfig.json",
   "compilerOptions": {
+    "target": "ES2022",
+    "useDefineForClassFields": true,
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
     "baseUrl": "./src",
     "paths": {
       "@/*": ["*"],
@@ -8,10 +18,5 @@
       "@assets/*": ["../attached_assets/*"]
     }
   },
-  "include": [
-    "./src/constants/**/*.ts",
-    "./src/lib/storage.ts",
-    "./src/utils/authGuards.ts",
-    "./src/pages/services/**/*.tsx"
-  ]
+  "include": ["./src"]
 }
