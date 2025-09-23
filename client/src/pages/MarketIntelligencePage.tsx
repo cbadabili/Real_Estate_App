@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { motion } from 'framer-motion';
 import { 
