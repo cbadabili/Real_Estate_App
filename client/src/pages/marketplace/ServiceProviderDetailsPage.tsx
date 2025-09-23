@@ -1,22 +1,17 @@
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { 
-  Star, 
-  MapPin, 
-  Phone, 
-  Mail, 
-  Globe, 
-  Clock, 
-  Shield, 
+import {
+  Star,
+  MapPin,
+  Phone,
+  Mail,
+  Globe,
+  Shield,
   Award,
   CheckCircle,
   MessageCircle,
-  Calendar,
   User,
-  Building,
-  Camera,
   ArrowLeft
 } from 'lucide-react';
 
@@ -55,7 +50,6 @@ const ServiceProviderDetailsPage: React.FC = () => {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
   const [reviewsLoading, setReviewsLoading] = useState(false);
-  const [showContactForm, setShowContactForm] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -104,7 +98,6 @@ const ServiceProviderDetailsPage: React.FC = () => {
         window.location.href = `mailto:${provider.email}`;
         break;
       case 'message':
-        setShowContactForm(true);
         break;
     }
   };

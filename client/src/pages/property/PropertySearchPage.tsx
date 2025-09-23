@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Grid, List, Map, Filter } from 'lucide-react';
+import { Grid, List, Map } from 'lucide-react';
 import SmartSearchBar from '../../components/search/SmartSearchBar';
 import PropertyGrid from '../../components/domain/property/PropertyGrid';
 import { PropertyFilters } from '../../components/properties/PropertyFilters';
@@ -22,7 +22,7 @@ const analytics = {
 
 const PropertySearchPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [properties, setProperties] = useState([]);
+  const [properties, setProperties] = useState<any[]>([]);
   const [viewMode, setViewMode] = useState<'grid' | 'list' | 'map'>('grid');
   const [showFilters, setShowFilters] = useState(true);
   const [filters, setFilters] = useState({
@@ -34,7 +34,7 @@ const PropertySearchPage = () => {
   });
   const [sortBy, setSortBy] = useState('newest');
   const [isLoading, setIsLoading] = useState(false);
-  const [comparisonProperties, setComparisonProperties] = useState([]);
+  const [comparisonProperties, setComparisonProperties] = useState<any[]>([]);
   const [showComparison, setShowComparison] = useState(false);
   const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
   const [resultCount, setResultCount] = useState(0); // Added state for resultCount

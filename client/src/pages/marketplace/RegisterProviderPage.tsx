@@ -1,13 +1,13 @@
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, type ComponentType } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import { Upload, X, Plus, User, Package, Wrench, GraduationCap } from 'lucide-react';
+import { X, Plus, User, Package, Wrench, GraduationCap } from 'lucide-react';
 
 interface ProviderTypeConfig {
   type: string;
   name: string;
-  icon: React.ComponentType<any>;
+  icon: ComponentType<any>;
   description: string;
   categories: string[];
   fields: string[];
@@ -21,12 +21,10 @@ const RegisterProviderPage: React.FC = () => {
   const [newSpecialty, setNewSpecialty] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { 
-    register, 
-    handleSubmit, 
-    formState: { errors },
-    watch,
-    setValue
+  const {
+    register,
+    handleSubmit,
+    formState: { errors }
   } = useForm();
 
   const providerTypes: ProviderTypeConfig[] = [
@@ -214,7 +212,7 @@ const RegisterProviderPage: React.FC = () => {
                   placeholder="Enter your business name"
                 />
                 {errors.business_name && (
-                  <p className="text-red-600 text-sm mt-1">{errors.business_name.message}</p>
+                  <p className="text-red-600 text-sm mt-1">{errors.business_name?.message}</p>
                 )}
               </div>
 
@@ -229,7 +227,7 @@ const RegisterProviderPage: React.FC = () => {
                   placeholder="Describe your business and services"
                 />
                 {errors.business_description && (
-                  <p className="text-red-600 text-sm mt-1">{errors.business_description.message}</p>
+                  <p className="text-red-600 text-sm mt-1">{errors.business_description?.message}</p>
                 )}
               </div>
 
@@ -249,7 +247,7 @@ const RegisterProviderPage: React.FC = () => {
                   ))}
                 </select>
                 {errors.category_id && (
-                  <p className="text-red-600 text-sm mt-1">{errors.category_id.message}</p>
+                  <p className="text-red-600 text-sm mt-1">{errors.category_id?.message}</p>
                 )}
               </div>
 
@@ -263,7 +261,7 @@ const RegisterProviderPage: React.FC = () => {
                   placeholder="e.g., Gaborone, Francistown, Nationwide"
                 />
                 {errors.service_area && (
-                  <p className="text-red-600 text-sm mt-1">{errors.service_area.message}</p>
+                  <p className="text-red-600 text-sm mt-1">{errors.service_area?.message}</p>
                 )}
               </div>
 
@@ -285,7 +283,7 @@ const RegisterProviderPage: React.FC = () => {
                   placeholder="0.00"
                 />
                 {errors.hourly_rate && (
-                  <p className="text-red-600 text-sm mt-1">{errors.hourly_rate.message}</p>
+                  <p className="text-red-600 text-sm mt-1">{errors.hourly_rate?.message}</p>
                 )}
               </div>
             </div>
@@ -347,7 +345,7 @@ const RegisterProviderPage: React.FC = () => {
                     placeholder="+267 1234 5678"
                   />
                   {errors.phone && (
-                    <p className="text-red-600 text-sm mt-1">{errors.phone.message}</p>
+                    <p className="text-red-600 text-sm mt-1">{errors.phone?.message}</p>
                   )}
                 </div>
 
@@ -368,7 +366,7 @@ const RegisterProviderPage: React.FC = () => {
                     placeholder="business@email.com"
                   />
                   {errors.email && (
-                    <p className="text-red-600 text-sm mt-1">{errors.email.message}</p>
+                    <p className="text-red-600 text-sm mt-1">{errors.email?.message}</p>
                   )}
                 </div>
               </div>
