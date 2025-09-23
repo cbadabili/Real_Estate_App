@@ -13,4 +13,5 @@ jobs:
           cache-dependency-path: package-lock.json
       - run: npm ci
       - name: Typecheck
-        run: npm run -w client typecheck
+      - run: npm run -w client typecheck
+

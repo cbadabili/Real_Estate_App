@@ -18,6 +18,7 @@ export const removeToken = (): void => {
 };
 export const hasToken = (): boolean => getToken() !== null;
 
+
 export const SafeStorage = {
   get(key: string): string | null {
     try { return localStorage.getItem(key); } catch { return null; }
