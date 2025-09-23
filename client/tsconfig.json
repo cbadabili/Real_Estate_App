@@ -1,0 +1,17 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": "./src",
+    "paths": {
+      "@/*": ["*"],
+      "@shared/*": ["../shared/*"],
+      "@assets/*": ["../attached_assets/*"]
+    }
+  },
+  "include": [
+    "./src/constants/**/*.ts",
+    "./src/lib/storage.ts",
+    "./src/utils/authGuards.ts",
+    "./src/pages/services/**/*.tsx"
+  ]
+}
