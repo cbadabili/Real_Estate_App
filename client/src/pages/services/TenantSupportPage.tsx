@@ -1,21 +1,15 @@
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { 
-  Shield, 
-  Phone, 
-  Mail, 
-  FileText, 
-  MessageCircle, 
-  Clock, 
+import {
+  Shield,
+  Phone,
+  Mail,
+  FileText,
+  MessageCircle,
+  Clock,
   AlertTriangle,
-  CheckCircle,
-  Home,
-  DollarSign,
-  Lock,
-  Users,
-  BookOpen,
-  ExternalLink
+  CheckCircle
 } from 'lucide-react';
 
 interface TenantResource {

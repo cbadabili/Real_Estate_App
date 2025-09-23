@@ -1,19 +1,16 @@
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { 
-  Building, 
-  Users, 
-  DollarSign, 
-  Calendar, 
-  MessageCircle, 
-  TrendingUp, 
-  Shield, 
+import {
+  Building,
+  Users,
+  DollarSign,
+  Calendar,
+  TrendingUp,
+  Shield,
   Clock,
   CheckCircle,
-  AlertCircle,
   Home,
-  FileText,
   Wrench
 } from 'lucide-react';
 

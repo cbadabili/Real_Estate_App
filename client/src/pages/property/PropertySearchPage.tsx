@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Grid, List, Map, Filter } from 'lucide-react';
+import { Grid, List, Map as MapIcon } from 'lucide-react';
 import SmartSearchBar from '../../components/search/SmartSearchBar';
 import PropertyGrid from '../../components/domain/property/PropertyGrid';
 import { PropertyFilters } from '../../components/properties/PropertyFilters';
@@ -20,9 +20,15 @@ const analytics = {
   }
 };
 
+const VIEW_MODE_META = {
+  grid: { label: 'Grid view', icon: Grid },
+  list: { label: 'List view', icon: List },
+  map: { label: 'Map view', icon: MapIcon }
+} as const;
+
 const PropertySearchPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [properties, setProperties] = useState([]);
+  const [properties, setProperties] = useState<any[]>([]);
   const [viewMode, setViewMode] = useState<'grid' | 'list' | 'map'>('grid');
   const [showFilters, setShowFilters] = useState(true);
   const [filters, setFilters] = useState({
@@ -34,7 +40,7 @@ const PropertySearchPage = () => {
   });
   const [sortBy, setSortBy] = useState('newest');
   const [isLoading, setIsLoading] = useState(false);
-  const [comparisonProperties, setComparisonProperties] = useState([]);
+  const [comparisonProperties, setComparisonProperties] = useState<any[]>([]);
   const [showComparison, setShowComparison] = useState(false);
   const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
   const [resultCount, setResultCount] = useState(0); // Added state for resultCount
@@ -204,15 +210,11 @@ const PropertySearchPage = () => {
   const handleFiltersChange = (newFilters: typeof filters) => {
     console.log('Filters changed:', newFilters);
     setFilters(newFilters);
-    // Trigger fetch when filters change, preserving current search query
-    fetchProperties();
   };
 
   // Handle sort change
   const handleSortChange = (newSortBy: string) => {
     setSortBy(newSortBy);
-    // Trigger fetch when sort changes, preserving current search query and filters
-    fetchProperties();
   };
 
   // Handle comparison
@@ -238,6 +240,9 @@ const PropertySearchPage = () => {
       fetchProperties();
     }
   };
+
+  const ActiveViewIcon = VIEW_MODE_META[viewMode].icon;
+  const activeViewLabel = VIEW_MODE_META[viewMode].label;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -287,6 +292,11 @@ const PropertySearchPage = () => {
               comparisonCount={comparisonProperties.length}
               onShowComparison={() => setShowComparison(true)}
             />
+
+            <div className="flex items-center text-sm text-gray-500 gap-2">
+              <ActiveViewIcon className="h-4 w-4" />
+              <span>{activeViewLabel}</span>
+            </div>
 
             {/* Results Content */}
             {viewMode === 'map' ? (

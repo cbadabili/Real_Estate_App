@@ -1,17 +1,5 @@
 import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
-import { 
-  Scale, 
-  FileText, 
-  ShieldCheck, 
-  Users, 
-  Star, 
-  Phone, 
-  Mail,
-  MapPin,
-  ArrowRight,
-  CheckCircle
-} from 'lucide-react';
+import { Scale, Star, Phone, Mail, MapPin } from 'lucide-react';
 
 const LegalServicesPage = () => {
   const containerVariants = {
@@ -110,7 +98,7 @@ const LegalServicesPage = () => {
           </motion.div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            {lawyers.map((lawyer, index) => (
+            {lawyers.map((lawyer) => (
               <motion.div
                 key={lawyer.name}
                 variants={itemVariants}
