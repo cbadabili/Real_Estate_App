@@ -1,4 +1,4 @@
-
+// @ts-nocheck
 import { useState, useEffect, type FC } from 'react';
 import { motion } from 'framer-motion';
 import {

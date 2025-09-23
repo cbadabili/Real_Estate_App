@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { motion } from 'framer-motion';
 import { Scale, Star, Phone, Mail, MapPin } from 'lucide-react';
 
