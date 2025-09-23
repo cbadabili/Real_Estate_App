@@ -90,6 +90,7 @@ import BuyMapPage from './pages/BuyMapPage';
 import TestMapPage from './pages/TestMapPage'; // Assuming this is a missing import
 import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 import TermsOfServicePage from './pages/TermsOfServicePage';
+import AdminAnalyticsPage from './pages/AdminAnalyticsPage';
 import { useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
 
@@ -232,6 +233,7 @@ function App() {
             <Route path="/test-map" element={<TestMapPage />} />
             <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
           <Route path="/terms-of-service" element={<TermsOfServicePage />} />
+          <Route path="/admin/analytics" element={<ProtectedRoute requiredRoles={["admin"]}><AdminAnalyticsPage /></ProtectedRoute>} />
           </Routes>
         </div>
       </PropertyProvider>
