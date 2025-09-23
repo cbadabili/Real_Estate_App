@@ -1,4 +1,4 @@
-
+import { useState, useEffect, type FC, type FormEvent } from 'react';
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
@@ -35,7 +35,7 @@ interface ComplaintForm {
   propertyId: string;
 }
 
-const TenantSupportPage: React.FC = () => {
+const TenantSupportPage: FC = () => {
   const [resources, setResources] = useState<SupportResources | null>(null);
   const [loading, setLoading] = useState(true);
   const [showComplaintForm, setShowComplaintForm] = useState(false);
@@ -66,7 +66,7 @@ const TenantSupportPage: React.FC = () => {
     fetchResources();
   }, []);
 
-  const handleComplaintSubmit = async (e: React.FormEvent) => {
+  const handleComplaintSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setSubmitting(true);
     

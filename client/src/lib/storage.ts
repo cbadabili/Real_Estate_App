@@ -1,13 +1,23 @@
 export const getToken = (): string | null => {
-  try { return localStorage.getItem('token'); } catch { return null; }
+  try {
+    const token = localStorage.getItem('token');
+    if (token) return token;
+    return localStorage.getItem('authToken');
+  } catch {
+    return null;
+  }
 };
 export const setToken = (token: string): void => {
   try { localStorage.setItem('token', token); } catch {}
 };
 export const removeToken = (): void => {
-  try { localStorage.removeItem('token'); } catch {}
+  try {
+    localStorage.removeItem('token');
+    localStorage.removeItem('authToken');
+  } catch {}
 };
-export const hasToken = (): boolean => !!getToken();
+export const hasToken = (): boolean => getToken() !== null;
+
 
 export const SafeStorage = {
   get(key: string): string | null {

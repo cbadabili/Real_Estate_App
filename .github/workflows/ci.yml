@@ -14,3 +14,4 @@ jobs:
       - run: npm ci
       - name: Typecheck
       - run: npm run -w client typecheck
+

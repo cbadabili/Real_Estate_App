@@ -24,6 +24,7 @@ import {
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import SmartSearchBar from '../components/search/SmartSearchBar';
+import { getToken } from '@/lib/storage';
 
 interface RentalProperty {
   id: number;
@@ -132,10 +133,14 @@ const RentPage = () => {
     if (!user) return;
 
     try {
-      const token = localStorage.getItem('authToken') || localStorage.getItem('token');
+      const token = getToken();
+      if (!token) {
+        setApplications([]);
+        return;
+      }
       const response = await fetch('/api/rental-applications/user', {
         headers: {
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
       });
@@ -161,10 +166,14 @@ const RentPage = () => {
     if (!user) return;
 
     try {
-      const token = localStorage.getItem('authToken') || localStorage.getItem('token');
+      const token = getToken();
+      if (!token) {
+        setMyListings([]);
+        return;
+      }
       const response = await fetch('/api/rentals/user', {
         headers: {
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
       });

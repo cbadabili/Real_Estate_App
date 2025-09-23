@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
@@ -29,7 +28,7 @@ interface DashboardData {
   }>;
 }
 
-const PropertyManagementPage: React.FC = () => {
+const PropertyManagementPage: FC = () => {
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
 

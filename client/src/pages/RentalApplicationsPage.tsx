@@ -2,18 +2,18 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { 
-  FileText, 
-  CheckCircle, 
-  XCircle, 
-  Clock, 
-  Eye, 
+import {
+  FileText,
+  CheckCircle,
+  XCircle,
+  Clock,
+  Eye,
   MessageSquare,
   Download,
-  Filter,
   Search
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { getToken } from '@/lib/storage';
 
 interface Application {
   id: number;
@@ -48,9 +48,10 @@ const RentalApplicationsPage = () => {
   const fetchApplications = async () => {
     try {
       const endpoint = user?.role === 'landlord' ? '/api/landlord/applications' : '/api/renter/applications';
+      const token = getToken();
       const response = await fetch(endpoint, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         }
       });
       const data = await response.json();
@@ -67,11 +68,12 @@ const RentalApplicationsPage = () => {
 
   const updateApplicationStatus = async (applicationId: number, status: 'approved' | 'rejected') => {
     try {
+      const token = getToken();
       const response = await fetch(`/api/applications/${applicationId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
         body: JSON.stringify({ status })
       });

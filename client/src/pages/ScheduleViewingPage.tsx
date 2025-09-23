@@ -1,14 +1,14 @@
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
-import { 
-  Calendar, 
-  Clock, 
-  User, 
-  Phone, 
-  Mail, 
+import {
+  Calendar,
+  Clock,
+  User,
+  Phone,
+  Mail,
   MessageSquare,
   MapPin,
   Home,
@@ -17,6 +17,7 @@ import {
   ArrowLeft
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { getToken } from '@/lib/storage';
 
 const ScheduleViewingPage = () => {
   const { id } = useParams();
@@ -102,7 +103,7 @@ const ScheduleViewingPage = () => {
       const appointmentTimestamp = Math.floor(appointmentDateTime.getTime() / 1000);
 
       // Get the authentication token
-      const token = localStorage.getItem('token');
+      const token = getToken();
       if (!token) {
         throw new Error('Please log in to schedule a viewing');
       }
