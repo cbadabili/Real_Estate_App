@@ -15,7 +15,6 @@ import {
   Hammer,
   Paintbrush
 } from 'lucide-react';
-import RegisterProvider from '../../components/shared/RegisterProvider';
 
 interface Supplier {
   id: number;
@@ -39,7 +38,6 @@ const SuppliersPage: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
-  const [showRegistration, setShowRegistration] = useState(false);
 
   const categories = [
     { id: 'all', name: 'All Suppliers', icon: Package },
@@ -278,8 +276,8 @@ const SuppliersPage: React.FC = () => {
                     </div>
 
                     <div className="flex space-x-2">
-                      <button 
-                        onClick={() => window.location.href = `tel:${supplier.contact_phone}`}
+                      <button
+                        onClick={() => window.location.href = `tel:${supplier.contact_phone.replace(/\s+/g, '')}`}
                         className="flex-1 bg-blue-600 text-white py-2 px-3 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors flex items-center justify-center"
                       >
                         <Phone className="h-4 w-4 mr-1" />
@@ -315,17 +313,6 @@ const SuppliersPage: React.FC = () => {
         </Link>
       </div>
 
-      {/* Registration Modal */}
-      {showRegistration && (
-        <RegisterProvider 
-          type="supplier"
-          onClose={() => setShowRegistration(false)}
-          onSuccess={() => {
-            setShowRegistration(false);
-            console.log('Supplier registered successfully!');
-          }}
-        />
-      )}
     </div>
   );
 };

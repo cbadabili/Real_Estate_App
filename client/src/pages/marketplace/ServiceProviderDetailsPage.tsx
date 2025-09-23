@@ -216,8 +216,9 @@ const ServiceProviderDetailsPage: React.FC = () => {
                 Email
               </button>
               <button
-                onClick={() => handleContact('message')}
-                className="flex items-center px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                disabled
+                title="Messaging coming soon"
+                className="flex items-center px-4 py-2 border border-gray-300 text-gray-700 rounded-lg transition-colors opacity-60 cursor-not-allowed"
               >
                 <MessageCircle className="h-4 w-4 mr-2" />
                 Message

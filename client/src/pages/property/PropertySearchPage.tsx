@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Grid, List, Map } from 'lucide-react';
+import { Grid, List, Map as MapIcon } from 'lucide-react';
 import SmartSearchBar from '../../components/search/SmartSearchBar';
 import PropertyGrid from '../../components/domain/property/PropertyGrid';
 import { PropertyFilters } from '../../components/properties/PropertyFilters';
@@ -19,6 +19,12 @@ const analytics = {
     console.error('Analytics: Error Occurred', { code, message, context });
   }
 };
+
+const VIEW_MODE_META = {
+  grid: { label: 'Grid view', icon: Grid },
+  list: { label: 'List view', icon: List },
+  map: { label: 'Map view', icon: MapIcon }
+} as const;
 
 const PropertySearchPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -204,15 +210,11 @@ const PropertySearchPage = () => {
   const handleFiltersChange = (newFilters: typeof filters) => {
     console.log('Filters changed:', newFilters);
     setFilters(newFilters);
-    // Trigger fetch when filters change, preserving current search query
-    fetchProperties();
   };
 
   // Handle sort change
   const handleSortChange = (newSortBy: string) => {
     setSortBy(newSortBy);
-    // Trigger fetch when sort changes, preserving current search query and filters
-    fetchProperties();
   };
 
   // Handle comparison
@@ -238,6 +240,9 @@ const PropertySearchPage = () => {
       fetchProperties();
     }
   };
+
+  const ActiveViewIcon = VIEW_MODE_META[viewMode].icon;
+  const activeViewLabel = VIEW_MODE_META[viewMode].label;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -287,6 +292,11 @@ const PropertySearchPage = () => {
               comparisonCount={comparisonProperties.length}
               onShowComparison={() => setShowComparison(true)}
             />
+
+            <div className="flex items-center text-sm text-gray-500 gap-2">
+              <ActiveViewIcon className="h-4 w-4" />
+              <span>{activeViewLabel}</span>
+            </div>
 
             {/* Results Content */}
             {viewMode === 'map' ? (

@@ -299,7 +299,7 @@ const RegisterProviderPage: React.FC = () => {
                   onChange={(e) => setNewSpecialty(e.target.value)}
                   className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-beedab-blue"
                   placeholder="Add a specialty"
-                  onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addSpecialty())}
+                  onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addSpecialty())}
                 />
                 <button
                   type="button"

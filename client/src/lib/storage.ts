@@ -7,7 +7,7 @@ export const setToken = (token: string): void => {
 export const removeToken = (): void => {
   try { localStorage.removeItem('token'); } catch {}
 };
-export const hasToken = (): boolean => getToken() !== null;
+export const hasToken = (): boolean => !!getToken();
 
 export const SafeStorage = {
   get(key: string): string | null {
@@ -20,9 +20,9 @@ export const SafeStorage = {
     try { localStorage.removeItem(key); } catch {}
   },
   getWithMigration(newKey: string, legacyKey?: string): string | null {
-    const v = this.get(newKey);
+    const v = SafeStorage.get(newKey);
     if (v != null) return v;
-    return legacyKey ? this.get(legacyKey) : null;
+    return legacyKey ? SafeStorage.get(legacyKey) : null;
   },
 };
 

@@ -7,7 +7,6 @@ import {
   Star,
   MapPin,
   Phone,
-  Mail,
   Clock,
   Shield,
   Users,

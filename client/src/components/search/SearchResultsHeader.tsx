@@ -1,5 +1,5 @@
 import React from 'react';
-import { Grid, List as ListIcon, Map, Filter, BarChart3, Search } from 'lucide-react';
+import { Grid, List as ListIcon, Map as MapIcon, Filter, BarChart3, Search } from 'lucide-react';
 
 interface SearchResultsHeaderProps {
   propertyCount: number;
@@ -129,7 +129,7 @@ export const SearchResultsHeader: React.FC<SearchResultsHeaderProps> = ({
               }`}
               title="Map View"
             >
-              <Map className="h-4 w-4" />
+              <MapIcon className="h-4 w-4" />
             </button>
           </div>
 

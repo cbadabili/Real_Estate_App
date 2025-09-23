@@ -1,6 +1,5 @@
-// @ts-nocheck
 
 export { default as ServiceProviderCard } from './ServiceProviderCard';
-export { RegisterProvider } from '../../marketplace/RegisterProvider';
-export { SectionContent } from '../../marketplace/SectionContent';
-export { ServiceCard } from '../../marketplace/ServiceCard';
+export { RegisterProvider } from '../../shared/RegisterProvider';
+export { default as SectionContent } from '../../marketplace/SectionContent';
+export { default as ServiceCard } from '../../marketplace/ServiceCard';
