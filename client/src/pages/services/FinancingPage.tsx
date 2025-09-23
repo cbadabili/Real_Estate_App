@@ -1,27 +1,10 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { 
-  Calculator, 
-  TrendingUp, 
-  Shield, 
-  Users, 
-  CheckCircle,
-  PiggyBank,
-  CreditCard,
-  Home,
-  DollarSign,
-  FileText,
-  Phone,
-  Mail,
-  Star,
-  Award,
-  ArrowLeft
-} from 'lucide-react';
+import { Calculator, CheckCircle, Phone, ArrowLeft } from 'lucide-react';
 
 const FinancingPage = () => {
   const navigate = useNavigate();
-  const [selectedCalculator, setSelectedCalculator] = useState('affordability');
   const [propertyPrice, setPropertyPrice] = useState(500000);
   const [downPayment, setDownPayment] = useState(50000);
   const [interestRate, setInterestRate] = useState(10.5);
@@ -240,7 +223,7 @@ const FinancingPage = () => {
           </motion.div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            {banks.map((bank, index) => (
+            {banks.map((bank) => (
               <motion.div
                 key={bank.name}
                 variants={itemVariants}

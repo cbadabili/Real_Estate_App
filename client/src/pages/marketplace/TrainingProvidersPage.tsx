@@ -1,14 +1,12 @@
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { 
-  Search, 
-  Filter, 
-  Star, 
-  MapPin, 
-  Phone, 
-  Mail, 
+import {
+  Search,
+  Star,
+  MapPin,
+  Phone,
   BookOpen,
   Users,
   Clock,

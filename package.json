@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "type": "module",
   "license": "MIT",
+  "workspaces": ["client"],
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",

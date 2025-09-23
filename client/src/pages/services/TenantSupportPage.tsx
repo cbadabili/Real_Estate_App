@@ -1,21 +1,15 @@
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, type FC, type FormEvent } from 'react';
 import { motion } from 'framer-motion';
-import { 
-  Shield, 
-  Phone, 
-  Mail, 
-  FileText, 
-  MessageCircle, 
-  Clock, 
+import {
+  Shield,
+  Phone,
+  Mail,
+  FileText,
+  MessageCircle,
+  Clock,
   AlertTriangle,
-  CheckCircle,
-  Home,
-  DollarSign,
-  Lock,
-  Users,
-  BookOpen,
-  ExternalLink
+  CheckCircle
 } from 'lucide-react';
 
 interface TenantResource {
@@ -41,7 +35,7 @@ interface ComplaintForm {
   propertyId: string;
 }
 
-const TenantSupportPage: React.FC = () => {
+const TenantSupportPage: FC = () => {
   const [resources, setResources] = useState<SupportResources | null>(null);
   const [loading, setLoading] = useState(true);
   const [showComplaintForm, setShowComplaintForm] = useState(false);
@@ -72,7 +66,7 @@ const TenantSupportPage: React.FC = () => {
     fetchResources();
   }, []);
 
-  const handleComplaintSubmit = async (e: React.FormEvent) => {
+  const handleComplaintSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setSubmitting(true);
     

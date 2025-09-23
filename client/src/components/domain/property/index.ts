@@ -1,7 +1,6 @@
-
-export { default as PropertyCard } from './PropertyCard';
+export { default as PropertyCard } from '../../shared/PropertyCard';
 export { default as PropertyGrid } from './PropertyGrid';
-export { default as PropertyFilters } from './PropertyFilters';
+export { default as PropertyFilters } from '../../properties/PropertyFilters';
 export { PropertyComparison } from '../../properties/PropertyComparison';
-export { PropertyMap } from '../../properties/PropertyMap';
+export { default as PropertyMap } from '../../properties/PropertyMap';
 export { SavedSearches } from '../../properties/SavedSearches';
