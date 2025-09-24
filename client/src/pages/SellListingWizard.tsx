@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { motion } from 'framer-motion';
 import { Home, MapPin, DollarSign, Camera, FileText, Check, ArrowLeft, ArrowRight, Loader2 } from 'lucide-react';
+import { getToken } from '@/lib/storage';
 
 interface SellProperty {
   id?: number;
@@ -80,9 +81,10 @@ const SellListingWizard = () => {
   const fetchProperty = async () => {
     try {
       setLoading(true);
+      const token = getToken();
       const response = await fetch(`/api/properties/${id}`, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         }
       });
       const data = await response.json();
@@ -109,12 +111,13 @@ const SellListingWizard = () => {
       setLoading(true);
       const endpoint = id ? `/api/properties/${id}` : '/api/properties';
       const method = id ? 'PUT' : 'POST';
-      
+      const token = getToken();
+
       const response = await fetch(endpoint, {
         method,
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
         body: JSON.stringify({
           ...property,

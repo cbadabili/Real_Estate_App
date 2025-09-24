@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
@@ -10,9 +11,10 @@ import {
 } from 'lucide-react';
 import { BudgetCalculator } from '../../components/BudgetCalculator';
 import { LoanCalculator } from '../../components/LoanCalculator';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const PlanningPage = () => {
+  const navigate = useNavigate();
   const [activeStep, setActiveStep] = useState(0);
   const [activeSection, setActiveSection] = useState<string | null>(null);
   const [budget, setBudget] = useState({

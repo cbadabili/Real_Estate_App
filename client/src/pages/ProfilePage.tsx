@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { User, Mail, Phone, MapPin, Edit, Save, Camera, Settings, Home, Heart } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { apiRequest } from '../lib/queryClient';
+import { getToken } from '@/lib/storage';
 
 const ProfilePage = () => {
   const { user, updateUser } = useAuth();
@@ -90,17 +91,17 @@ const ProfilePage = () => {
         bio: userInfo.bio
       };
       
-      const token = localStorage.getItem('token');
+      const token = getToken();
       if (!token) {
         alert('Please log in again to save changes.');
         return;
       }
-      
+
       const response = await fetch(`/api/users/${user.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(updates)
       });
