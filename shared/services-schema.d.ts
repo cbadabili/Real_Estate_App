@@ -775,10 +775,10 @@ export declare const insertServiceProviderSchema: z.ZodObject<{
     verified: z.ZodOptional<z.ZodNullable<z.ZodBoolean>>;
     featured: z.ZodOptional<z.ZodNullable<z.ZodBoolean>>;
 } & {
-    description: z.ZodString;
+    description: z.ZodOptional<z.ZodNullable<z.ZodString>>;
     serviceCategory: z.ZodEnum<["Legal Services", "Photography", "Property Inspection", "Finance & Loans", "Insurance", "Construction", "Moving", "Cleaning", "Maintenance", "Architectural Services", "Quantity Surveying", "Structural Engineering"]>;
 }, "strip", z.ZodTypeAny, {
-    description: string;
+    description?: string | null | undefined;
     companyName: string;
     serviceCategory: "Legal Services" | "Photography" | "Property Inspection" | "Finance & Loans" | "Insurance" | "Construction" | "Moving" | "Cleaning" | "Maintenance" | "Architectural Services" | "Quantity Surveying" | "Structural Engineering";
     email?: string | null | undefined;
@@ -793,7 +793,7 @@ export declare const insertServiceProviderSchema: z.ZodObject<{
     verified?: boolean | null | undefined;
     featured?: boolean | null | undefined;
 }, {
-    description: string;
+    description?: string | null | undefined;
     companyName: string;
     serviceCategory: "Legal Services" | "Photography" | "Property Inspection" | "Finance & Loans" | "Insurance" | "Construction" | "Moving" | "Cleaning" | "Maintenance" | "Architectural Services" | "Quantity Surveying" | "Structural Engineering";
     email?: string | null | undefined;

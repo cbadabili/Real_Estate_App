@@ -3682,7 +3682,7 @@ export declare const adminAuditLogRelations: import("drizzle-orm").Relations<"ad
     admin: import("drizzle-orm").One<"users", true>;
 }>;
 export declare const insertUserSchema: z.ZodObject<Omit<{}, "id" | "createdAt" | "updatedAt">, "strip", z.ZodTypeAny, {}, {}>;
-export declare const insertPropertySchema: z.ZodObject<Omit<{}, "id" | "createdAt" | "updatedAt" | "views" | "daysOnMarket">, "strip", z.ZodTypeAny, {}, {}>;
+export declare const insertPropertySchema: z.ZodObject<Omit<{}, "id" | "createdAt" | "updatedAt" | "views" | "daysOnMarket" | "fts">, "strip", z.ZodTypeAny, {}, {}>;
 export declare const insertInquirySchema: z.ZodObject<Omit<{}, "id" | "createdAt" | "status">, "strip", z.ZodTypeAny, {}, {}>;
 export declare const insertAppointmentSchema: z.ZodObject<Omit<{}, "id" | "createdAt" | "status">, "strip", z.ZodTypeAny, {}, {}>;
 export declare const insertSavedPropertySchema: z.ZodObject<Omit<{}, "id" | "createdAt">, "strip", z.ZodTypeAny, {}, {}>;

@@ -90,7 +90,7 @@ export const insertServiceProviderSchema = createInsertSchema(serviceProviders).
   createdAt: true,
   updatedAt: true
 }).extend({
-    description: z.string().min(1, "Description is required"),
+    description: z.string().min(1).optional().nullable(),
     serviceCategory: z.enum([
       "Legal Services",
       "Photography", 

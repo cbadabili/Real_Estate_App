@@ -12,9 +12,9 @@ ALTER TABLE properties
 ALTER TABLE properties
   ALTER COLUMN price TYPE numeric(12, 2)
     USING CASE
-      WHEN price IS NULL OR trim(price) = '' THEN 0
-      WHEN price ~ '^[0-9]+(\.[0-9]+)?$' THEN price::numeric(12, 2)
-      ELSE COALESCE(NULLIF(regexp_replace(price, '[^0-9\.]', '', 'g'), ''), '0')::numeric(12, 2)
+      WHEN price IS NULL OR NULLIF(trim(price::text), '') IS NULL THEN 0
+      WHEN price::text ~ '^[0-9]+(\.[0-9]+)?$' THEN (price::text)::numeric(12, 2)
+      ELSE COALESCE(NULLIF(regexp_replace(price::text, '[^0-9\.]', '', 'g'), ''), '0')::numeric(12, 2)
     END;
 
 ALTER TABLE properties
@@ -28,19 +28,23 @@ ALTER TABLE properties
 ALTER TABLE properties
   ALTER COLUMN images TYPE jsonb
     USING CASE
-      WHEN images IS NULL OR trim(images) = '' THEN '[]'::jsonb
-      WHEN images LIKE '[%' THEN images::jsonb
-      WHEN images LIKE '{%' THEN images::jsonb
-      ELSE jsonb_build_array(images)
+      WHEN images IS NULL THEN '[]'::jsonb
+      WHEN pg_typeof(images)::text = 'jsonb' THEN images
+      WHEN NULLIF(trim(images::text), '') IS NULL THEN '[]'::jsonb
+      WHEN images::text LIKE '[%' THEN images::jsonb
+      WHEN images::text LIKE '{%' THEN jsonb_build_array(images::jsonb)
+      ELSE jsonb_build_array(to_jsonb(images::text))
     END;
 
 ALTER TABLE properties
   ALTER COLUMN features TYPE jsonb
     USING CASE
-      WHEN features IS NULL OR trim(features) = '' THEN '[]'::jsonb
-      WHEN features LIKE '[%' THEN features::jsonb
-      WHEN features LIKE '{%' THEN features::jsonb
-      ELSE jsonb_build_array(features)
+      WHEN features IS NULL THEN '[]'::jsonb
+      WHEN pg_typeof(features)::text = 'jsonb' THEN features
+      WHEN NULLIF(trim(features::text), '') IS NULL THEN '[]'::jsonb
+      WHEN features::text LIKE '[%' THEN features::jsonb
+      WHEN features::text LIKE '{%' THEN jsonb_build_array(features::jsonb)
+      ELSE jsonb_build_array(to_jsonb(features::text))
     END;
 
 ALTER TABLE properties
@@ -48,6 +52,11 @@ ALTER TABLE properties
   ALTER COLUMN images SET NOT NULL,
   ALTER COLUMN features SET DEFAULT '[]'::jsonb,
   ALTER COLUMN features SET NOT NULL;
+
+-- Bathrooms should be stored as integers
+ALTER TABLE properties
+  ALTER COLUMN bathrooms TYPE integer
+    USING NULLIF(regexp_replace(bathrooms::text, '[^0-9]+', '', 'g'), '')::int;
 
 -- Latitude/longitude as doubles
 ALTER TABLE properties

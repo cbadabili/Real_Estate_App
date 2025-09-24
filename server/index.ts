@@ -119,15 +119,18 @@ app.use((req, res, next) => {
   res.setHeader('X-Frame-Options', 'DENY');
   res.setHeader('X-XSS-Protection', '1; mode=block');
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
-  res.setHeader('Content-Security-Policy', 
-    "default-src 'self'; " +
-    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://replit.com; " +
-    "font-src 'self' data: https:; " +
-    "style-src 'self' 'unsafe-inline'; " +
-    "img-src 'self' data: https:; " +
-    "connect-src 'self' ws: wss: https:; " +
-    "frame-src 'self';"
-  );
+  if (process.env.NODE_ENV === 'development') {
+    // In development we relax CSP for local tooling; production relies on helmet CSP
+    res.setHeader('Content-Security-Policy',
+      "default-src 'self'; " +
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://replit.com; " +
+      "font-src 'self' data: https:; " +
+      "style-src 'self' 'unsafe-inline'; " +
+      "img-src 'self' data: https:; " +
+      "connect-src 'self' ws: wss: https:; " +
+      "frame-src 'self';"
+    );
+  }
   next();
 });
 
@@ -420,8 +423,7 @@ app.get('/api/health', (_req: Request, res: Response) => {
 
   // Seed rental data
 
-  // Register all API routes via the main registerRoutes function
-  await registerRoutes(app);
+  // Routes already registered above; avoid double-registration.
 
   // ALWAYS serve the app on port 5000
   // this serves both the API and the client.

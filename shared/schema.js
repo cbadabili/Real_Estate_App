@@ -389,6 +389,7 @@ export const insertPropertySchema = createInsertSchema(properties).omit({
     daysOnMarket: true,
     createdAt: true,
     updatedAt: true,
+    fts: true,
 });
 export const insertInquirySchema = createInsertSchema(inquiries).omit({
     id: true,

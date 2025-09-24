@@ -168,8 +168,8 @@ export class PropertyRepository implements IPropertyRepository {
     if (filters.minBedrooms) {
       conditions.push(gte(properties.bedrooms, filters.minBedrooms));
     }
-    if (filters.minBathrooms) {
-      conditions.push(gte(properties.bathrooms, filters.minBathrooms.toString()));
+    if (filters.minBathrooms !== undefined) {
+      conditions.push(gte(properties.bathrooms, filters.minBathrooms));
     }
     if (filters.minSquareFeet) {
       conditions.push(gte(properties.squareFeet, filters.minSquareFeet));
