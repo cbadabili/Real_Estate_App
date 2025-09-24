@@ -1,11 +1,11 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { 
-  Shield, 
-  UserCheck, 
-  FileText, 
-  DollarSign, 
+import {
+  Shield,
+  UserCheck,
+  FileText,
+  DollarSign,
   Home,
   CheckCircle,
   Clock,
@@ -14,6 +14,7 @@ import {
   Download
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { getToken } from '@/lib/storage';
 
 const TenantScreeningPage = () => {
   const { user } = useAuth();
@@ -27,9 +28,10 @@ const TenantScreeningPage = () => {
 
   const fetchApplications = async () => {
     try {
+      const token = getToken();
       const response = await fetch('/api/landlord/applications', {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         }
       });
       const data = await response.json();
@@ -46,10 +48,11 @@ const TenantScreeningPage = () => {
 
   const initiateScreening = async (applicationId: number) => {
     try {
+      const token = getToken();
       const response = await fetch(`/api/applications/${applicationId}/screen`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         }
       });
 

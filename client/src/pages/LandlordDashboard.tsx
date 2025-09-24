@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Plus, Home, Users, TrendingUp, Calendar, DollarSign, Eye, MessageSquare } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext'; // Corrected import
+import { getToken } from '@/lib/storage';
 
 const LandlordDashboard = () => {
   const [activeTab, setActiveTab] = useState('overview');
@@ -12,9 +13,10 @@ const LandlordDashboard = () => {
     // Fetch landlord's rental listings
     const fetchMyRentals = async () => {
       try {
+        const token = getToken();
         const response = await fetch('/api/landlord/rentals', {
           headers: {
-            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
           }
         });
         const data = await response.json();

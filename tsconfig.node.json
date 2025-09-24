@@ -14,8 +14,7 @@
     "resolveJsonModule": true,
     "baseUrl": ".",
     "paths": {
-      "@shared/*": ["./shared/*"],
-      "@/*": ["./client/src/*"]
+      "@shared/*": ["./shared/*"]
     }
   },
   "include": ["vite.config.ts", "server/**/*", "shared/**/*"]
