@@ -1,9 +1,7 @@
 declare function createTestAdmin(): Promise<{
     id: number;
-    email: string;
-    createdAt: Date | null;
-    updatedAt: Date | null;
     username: string;
+    email: string;
     password: string;
     firstName: string;
     lastName: string;
@@ -17,6 +15,8 @@ declare function createTestAdmin(): Promise<{
     isActive: boolean | null;
     reacNumber: string | null;
     lastLoginAt: Date | null;
+    createdAt: Date | null;
+    updatedAt: Date | null;
 }>;
 declare function createTestData(): Promise<void>;
 declare function testAdminEndpoints(): Promise<void>;

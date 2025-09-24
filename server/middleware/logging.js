@@ -1,4 +1,5 @@
 import { randomUUID } from 'crypto';
+import { analyticsService } from '../analytics-service';
 export const addRequestId = (req, res, next) => {
     req.id = randomUUID();
     res.setHeader('X-Request-ID', req.id);
@@ -22,6 +23,12 @@ export const structuredLogger = (req, res, next) => {
                 query: Object.keys(req.query).length > 0 ? req.query : undefined,
             };
             console.log(JSON.stringify(logData));
+            // Track performance metrics
+            analyticsService.recordResponseTime(req.path, duration);
+            // Track errors
+            if (res.statusCode >= 400) {
+                analyticsService.recordError(req.path, res.statusCode.toString());
+            }
         }
         return originalSend.call(this, body);
     };
