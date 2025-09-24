@@ -28,6 +28,7 @@ export class ServicesStorage {
         if (filters.reacCertified !== undefined) {
             conditions.push(eq(serviceProviders.reacCertified, filters.reacCertified));
         }
+
         if (filters.minRating !== undefined) {
             // Ratings are stored as numeric values so direct comparison is safe
             conditions.push(gte(serviceProviders.rating, filters.minRating));
