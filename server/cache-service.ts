@@ -44,6 +44,15 @@ export class CacheService {
     return this.cache.delete(key);
   }
 
+  invalidatePrefix(prefix: string): void {
+    const match = `${prefix}:`;
+    for (const key of this.cache.keys()) {
+      if (key.startsWith(match)) {
+        this.cache.delete(key);
+      }
+    }
+  }
+
   clear(): void {
     this.cache.clear();
   }

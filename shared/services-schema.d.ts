@@ -224,6 +224,23 @@ export declare const serviceProviders: import("drizzle-orm/pg-core").PgTableWith
             identity: undefined;
             generated: undefined;
         }, {}, {}>;
+        reviewCount: import("drizzle-orm/pg-core").PgColumn<{
+            name: "review_count";
+            tableName: "service_providers";
+            dataType: "number";
+            columnType: "PgInteger";
+            data: number;
+            driverParam: string | number;
+            notNull: true;
+            hasDefault: true;
+            isPrimaryKey: false;
+            isAutoincrement: false;
+            hasRuntimeDefault: false;
+            enumValues: undefined;
+            baseColumn: never;
+            identity: undefined;
+            generated: undefined;
+        }, {}, {}>;
         verified: import("drizzle-orm/pg-core").PgColumn<{
             name: "verified";
             tableName: "service_providers";

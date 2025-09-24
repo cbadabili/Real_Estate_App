@@ -1,5 +1,6 @@
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
+import pgTypes from 'pg-types';
 import * as schema from "../shared/schema";
 
 // ---------------------------------------------------------------------------
@@ -52,3 +53,9 @@ export async function initializeDatabase() {
   }
   return db;
 }
+// Ensure NUMERIC columns are parsed as JavaScript numbers
+pgTypes.setTypeParser(1700, (value: string | null) => {
+  if (value === null) return null;
+  const parsed = parseFloat(value);
+  return Number.isNaN(parsed) ? null : parsed;
+});

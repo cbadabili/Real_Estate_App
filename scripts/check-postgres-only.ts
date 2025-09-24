@@ -26,9 +26,14 @@ function walk(currentPath: string) {
 
   for (const entry of entries) {
     if (entry.name.startsWith(".")) {
-      if (entry.name === ".env" || entry.name === ".env.example") {
-        // keep scanning env files
-      } else if (entry.name !== ".gitignore") {
+      const allowedHidden = new Set([
+        ".env",
+        ".env.example",
+        ".gitignore",
+        ".github",
+      ]);
+
+      if (!allowedHidden.has(entry.name)) {
         continue;
       }
     }

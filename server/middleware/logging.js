@@ -7,34 +7,32 @@ export const addRequestId = (req, res, next) => {
 };
 export const structuredLogger = (req, res, next) => {
     const start = Date.now();
-    const originalSend = res.send;
-    res.send = function (body) {
+    res.on('finish', () => {
+        if (!req.path.startsWith('/api')) {
+            return;
+        }
         const duration = Date.now() - start;
-        if (req.path.startsWith('/api')) {
-            const logData = {
-                timestamp: new Date().toISOString(),
-                requestId: req.id,
-                method: req.method,
-                path: req.path,
-                statusCode: res.statusCode,
-                duration,
-                userAgent: req.get('user-agent'),
-                ip: req.ip || req.connection.remoteAddress,
-                query: Object.keys(req.query).length > 0 ? req.query : undefined,
-            };
-            console.log(JSON.stringify(logData));
-            // Track performance metrics (never block responses)
-            try {
-                analyticsService.recordResponseTime(req.path, duration);
-                if (res.statusCode >= 400) {
-                    analyticsService.recordError(req.path, res.statusCode.toString());
-                }
-            }
-            catch (err) {
-                console.error('analyticsService error', { path: req.path, err: String(err) });
+        const logData = {
+            timestamp: new Date().toISOString(),
+            requestId: req.id,
+            method: req.method,
+            path: req.path,
+            statusCode: res.statusCode,
+            duration,
+            userAgent: req.get('user-agent'),
+            ip: req.ip || req.socket?.remoteAddress,
+            query: Object.keys(req.query).length > 0 ? req.query : undefined,
+        };
+        console.log(JSON.stringify(logData));
+        try {
+            analyticsService.recordResponseTime(req.path, duration);
+            if (res.statusCode >= 400) {
+                analyticsService.recordError(req.path, res.statusCode.toString());
             }
         }
-        return originalSend.call(this, body);
-    };
+        catch (err) {
+            console.error('analyticsService error', { path: req.path, err: String(err) });
+        }
+    });
     next();
 };

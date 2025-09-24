@@ -17,6 +17,7 @@ export const serviceProviders = pgTable("service_providers", {
     address: text("address"),
     city: text("city"),
     rating: real("rating").default(4.5), // Average rating out of 5
+    reviewCount: integer("review_count").notNull().default(0),
     verified: boolean("verified").default(false),
     featured: boolean("featured").default(false),
     dateJoined: timestamp("date_joined").defaultNow(),
@@ -74,9 +75,10 @@ export const insertServiceProviderSchema = createInsertSchema(serviceProviders).
     id: true,
     dateJoined: true,
     createdAt: true,
-    updatedAt: true
+    updatedAt: true,
+    reviewCount: true
 }).extend({
-    description: z.string().min(1).optional().nullable(),
+    description: z.string().trim().min(1).optional().nullable(),
     serviceCategory: z.enum([
         "Legal Services",
         "Photography",

@@ -82,17 +82,30 @@ For detailed system architecture, components, and deployment information, see [A
    npm install
    ```
 
-3. **Set up the database**
+3. **Start a local PostgreSQL instance**
+
+   The project includes a Docker configuration that mirrors the production
+   PostgreSQL/PostGIS environment. Run the database locally before executing
+   migrations or starting the API:
+
+   ```bash
+   docker compose up -d db
+   ```
+
+   This provisions a `postgres:16` container with the default credentials from
+   `docker-compose.yml` (`beedab` / `beedab`) and exposes it on `localhost:5432`.
+
+4. **Apply database migrations**
    ```bash
    npm run db:push
    ```
 
-4. **Seed sample data**
+5. **Seed sample data**
    ```bash
    npx tsx server/seed.ts
    ```
 
-5. **Start the development server**
+6. **Start the development server**
    ```bash
    npm run dev
    ```

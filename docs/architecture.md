@@ -53,7 +53,9 @@ graph TB
 - **PostgreSQL Database**: Primary data store on Replit
 
 ### Environment Configuration
-- **Development**: Local PostgreSQL (via Docker compose) + Vite dev server
+- **Development**: Local PostgreSQL/PostGIS (via `docker compose up -d db`) and
+  Vite dev server. Migrations are applied through Drizzle (`npm run db:push`) and
+  the schema aligns with the PostGIS-enabled migrations in `server/migrations`.
 - **Production**: PostgreSQL + static build serving
 
 ## Data Stores
@@ -101,6 +103,12 @@ All property mutations, user data access, and admin functions require JWT authen
 1. Frontend: `npm run build` → static assets
 2. Backend: TypeScript compilation
 3. Database: Drizzle migrations
+
+### Developer Quality Gates
+- **Postgres-only enforcement**: `npm run verify:postgres-only` scans the tracked
+  source files to ensure no legacy file-based database artefacts are reintroduced.
+- **Type safety & linting**: `npm run lint` and `npm run typecheck` remain part
+  of the local validation checklist before submitting changes.
 
 ### Hosting
 - **Platform**: Replit

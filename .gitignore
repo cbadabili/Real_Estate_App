@@ -18,6 +18,8 @@ yarn-error.log*
 
 # Database
 *.db
+postgres-data/
+pgdata/
 *.tsbuildinfo
 
 # Logs
