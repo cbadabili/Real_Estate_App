@@ -1,4 +1,3 @@
-# .github/workflows/client-ci.yml
 name: client-ci
 on:
   push:
@@ -32,13 +31,11 @@ jobs:
         run: npm ci
 
       - name: Client typecheck
-        run: npm run -w client typecheck   # uses client/tsconfig.ci.json
+        run: npm run -w client typecheck
 
       - name: Client lint
         run: npm run -w client lint
 
-      # Optional: build the client but don't gate the PR on it
       - name: Client build (non-blocking)
         run: npm run -w client build
         continue-on-error: true
-
