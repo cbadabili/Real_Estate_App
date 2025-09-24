@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import { useState, type FC, type FormEvent } from 'react';
 import { motion } from 'framer-motion';
 import { X, User, Briefcase, Phone, FileText } from 'lucide-react';
+import { getToken } from '@/lib/storage';
 
 interface RentalApplicationFormProps {
   rentalId: number;
@@ -8,7 +9,7 @@ interface RentalApplicationFormProps {
   onSubmit: (applicationData: any) => void;
 }
 
-const RentalApplicationForm: React.FC<RentalApplicationFormProps> = ({
+const RentalApplicationForm: FC<RentalApplicationFormProps> = ({
   rentalId,
   onClose,
   onSubmit
@@ -36,16 +37,17 @@ const RentalApplicationForm: React.FC<RentalApplicationFormProps> = ({
 
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
 
     try {
+      const token = getToken();
       const response = await fetch(`/api/rentals/${rentalId}/apply`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
         body: JSON.stringify({
           application_data: {

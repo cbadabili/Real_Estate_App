@@ -1,11 +1,12 @@
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
 import { Home, MapPin, DollarSign, Camera, FileText, Check } from 'lucide-react';
 import PropertyLocationStep from '../components/properties/PropertyLocationStep';
 import toast from 'react-hot-toast';
+import { getToken } from '@/lib/storage';
 
 interface RentalProperty {
   id?: number;
@@ -88,9 +89,10 @@ const RentalListingWizard = () => {
   const fetchProperty = async () => {
     try {
       setLoading(true);
+      const token = getToken();
       const response = await fetch(`/api/rentals/${id}`, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         }
       });
       const data = await response.json();
@@ -162,14 +164,14 @@ const RentalListingWizard = () => {
         status: 'active'
       };
 
-      const token = localStorage.getItem('authToken');
-      const authHeader = token && !token.startsWith('Bearer ') ? `Bearer ${token}` : token;
-      
+      const token = getToken();
+      const authHeader = token && !token.startsWith('Bearer ') ? `Bearer ${token}` : token || '';
+
       const response = await fetch(endpoint, {
         method,
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': authHeader || ''
+          ...(authHeader ? { Authorization: authHeader } : {}),
         },
         body: JSON.stringify(rentalData)
       });
