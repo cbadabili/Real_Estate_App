@@ -136,7 +136,7 @@ export class DatabaseStorage {
         return processedResults;
     }
     async createProperty(property) {
-        // Convert arrays to JSON strings for SQLite
+        // Normalize array fields before persisting
         const propertyData = {
             ...property,
             images: property.images ? JSON.stringify(property.images) : null,
@@ -154,7 +154,7 @@ export class DatabaseStorage {
         };
     }
     async updateProperty(id, updates) {
-        // Convert arrays to JSON strings for SQLite
+        // Normalize array fields before persisting
         const updateData = { ...updates };
         if (updates.images) {
             updateData.images = JSON.stringify(updates.images);

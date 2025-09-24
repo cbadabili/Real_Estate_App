@@ -53,7 +53,7 @@ graph TB
 - **PostgreSQL Database**: Primary data store on Replit
 
 ### Environment Configuration
-- **Development**: Local SQLite + Vite dev server
+- **Development**: Local PostgreSQL (via Docker compose) + Vite dev server
 - **Production**: PostgreSQL + static build serving
 
 ## Data Stores
