@@ -99,6 +99,16 @@ For detailed system architecture, components, and deployment information, see [A
 
 The application will be available at `http://localhost:5000`
 
+## Quality Gates
+
+Before opening a pull request, run the repository guard rails to ensure the codebase stays PostgreSQL-only:
+
+```bash
+npm run verify:postgres-only
+```
+
+This script scans the tracked files (excluding build artefacts) and fails if any new reference to the legacy file-based database sneaks back in.
+
 ## Advanced Features
 
 ### Real-time Chat System

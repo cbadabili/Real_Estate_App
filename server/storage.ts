@@ -246,7 +246,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createProperty(property: InsertProperty): Promise<Property> {
-    // Convert arrays to JSON strings for SQLite
+    // Normalize array fields before persisting
     const propertyData = {
       ...property,
       images: property.images ? JSON.stringify(property.images) : null,
@@ -258,7 +258,7 @@ export class DatabaseStorage implements IStorage {
       .values(propertyData)
       .returning();
 
-    // Parse JSON strings back to arrays
+    // Normalize array fields after retrieval
     return {
       ...newProperty,
       images: newProperty.images ? JSON.parse(newProperty.images) : [],
@@ -267,7 +267,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateProperty(id: number, updates: Partial<InsertProperty>): Promise<Property | undefined> {
-    // Convert arrays to JSON strings for SQLite
+    // Normalize array fields before persisting
     const updateData = { ...updates };
     if (updates.images) {
       updateData.images = JSON.stringify(updates.images);
