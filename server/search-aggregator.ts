@@ -4,6 +4,54 @@ import { properties } from "../shared/schema";
 import { and, desc, eq, gte, ilike, or, sql } from "drizzle-orm";
 import fetch from "node-fetch";
 
+const normalizeStringArray = (value: unknown): string[] => {
+  if (Array.isArray(value)) {
+    return value.map(item => String(item));
+  }
+
+  if (value === null || value === undefined) {
+    return [];
+  }
+
+  if (typeof value === "string") {
+    const trimmed = value.trim();
+    if (!trimmed) {
+      return [];
+    }
+    try {
+      const parsed = JSON.parse(trimmed);
+      if (Array.isArray(parsed)) {
+        return parsed.map(item => String(item));
+      }
+      if (parsed === null || parsed === undefined || parsed === "") {
+        return [];
+      }
+      return [String(parsed)];
+    } catch {
+      return [trimmed];
+    }
+  }
+
+  return [String(value)];
+};
+
+const normalizeNumber = (value: unknown): number | null => {
+  if (typeof value === "number") {
+    return Number.isFinite(value) ? value : null;
+  }
+
+  if (typeof value === "string") {
+    const direct = Number(value);
+    if (Number.isFinite(direct)) {
+      return direct;
+    }
+    const cleaned = Number(value.replace(/[^\d.-]/g, ""));
+    return Number.isFinite(cleaned) ? cleaned : null;
+  }
+
+  return null;
+};
+
 // ---- CONFIG ----
 // Now using OpenAI-powered search via /intel/search endpoint
 
@@ -178,22 +226,23 @@ async function queryDB(q: string, sort: string): Promise<UnifiedProperty[]> {
 }
 
 function mapDBRowToUnified(row: any): UnifiedProperty {
+  const price = normalizeNumber(row.price);
+  const lat = normalizeNumber(row.latitude);
+  const lng = normalizeNumber(row.longitude);
+
   return {
     id: `local_${row.id}`,
     title: row.title,
-    price: parseFloat(row.price.replace(/[^\d.]/g, '')) || 0,
+    price: price ?? 0,
     address: row.address,
     city: row.city,
-    bedrooms: row.bedrooms,
-    bathrooms: row.bathrooms ? parseFloat(row.bathrooms) : undefined,
+    bedrooms: typeof row.bedrooms === "number" ? row.bedrooms : normalizeNumber(row.bedrooms) ?? undefined,
+    bathrooms: row.bathrooms ? normalizeNumber(row.bathrooms) ?? undefined : undefined,
     propertyType: row.propertyType,
     source: 'local',
     description: row.description,
-    images: row.images ? JSON.parse(row.images) : [],
-    coordinates: row.latitude && row.longitude ? {
-      lat: parseFloat(row.latitude),
-      lng: parseFloat(row.longitude)
-    } : undefined,
+    images: normalizeStringArray(row.images),
+    coordinates: lat !== null && lng !== null ? { lat, lng } : undefined,
     agency: {
       name: 'BeeDab Properties'
     }

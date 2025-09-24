@@ -5,7 +5,6 @@ import { reviewStorage } from "./review-storage";
 import marketplaceRoutes from "./marketplace-routes";
 import { createRentalRoutes } from "./rental-routes";
 import { db } from "./db";
-import { searchAggregator } from './search-aggregator';
 import { registerAuthRoutes } from "./routes/auth-routes";
 import { registerUserRoutes } from "./routes/user-routes";
 import { registerPropertyRoutes } from "./routes/property-routes";
@@ -14,6 +13,34 @@ import { authenticate, optionalAuthenticate, authorize, requireAdmin, requireMod
 import { insertInquirySchema, insertAppointmentSchema, insertServiceProviderSchema, insertUserReviewSchema, insertReviewResponseSchema, insertUserPermissionSchema, Permission, UserRole, insertPropertySchema // Import schema for property creation
  } from "../shared/schema.js";
 import { eq, and, gte, lte, sql } from "drizzle-orm";
+const ensureStringArray = (value) => {
+    if (Array.isArray(value)) {
+        return value.map(item => String(item));
+    }
+    if (value === null || value === undefined) {
+        return [];
+    }
+    if (typeof value === "string") {
+        const trimmed = value.trim();
+        if (!trimmed) {
+            return [];
+        }
+        try {
+            const parsed = JSON.parse(trimmed);
+            if (Array.isArray(parsed)) {
+                return parsed.map(item => String(item));
+            }
+            if (parsed === null || parsed === undefined || parsed === "") {
+                return [];
+            }
+            return [String(parsed)];
+        }
+        catch {
+            return [trimmed];
+        }
+    }
+    return [String(value)];
+};
 import { properties } from "../shared/schema";
 export async function registerRoutes(app) {
     // Register modular routes
@@ -1077,12 +1104,11 @@ export async function registerRoutes(app) {
     // Rental routes
     const rentalRouter = createRentalRoutes();
     app.use("/api/rentals", rentalRouter);
-    // Search aggregator endpoint (combines local + RealEstateIntel AI)
-    app.get('/api/search', searchAggregator);
-    // Enhanced search routes (RealEstateIntel integration)
-    app.get('/api/search/enhanced', async (req, res) => {
+    // Note: Search routes are now handled by registerSearchRoutes in routes/index.ts
+    // Keeping legacy routes for backward compatibility;
+    // Enhanced search endpoint with external data integration
+    app.get("/api/search/enhanced", async (req, res) => {
         try {
-            console.log('Enhanced search API called with query:', req.query);
             // Simple demo response since no local properties exist
             const demoResponse = {
                 query: {
@@ -1341,7 +1367,7 @@ export async function registerRoutes(app) {
                 location: prop.address || `${prop.city}, ${prop.state}`,
                 city: prop.city || prop.state || 'Unknown',
                 propertyType: prop.propertyType || 'house',
-                images: Array.isArray(prop.images) ? prop.images : (prop.images ? JSON.parse(prop.images) : []),
+                images: ensureStringArray(prop.images),
                 status: prop.status || 'active',
                 listingType: prop.listingType || 'owner'
             }));
