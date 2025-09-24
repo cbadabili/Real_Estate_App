@@ -1,21 +1,44 @@
-name: ci
+# .github/workflows/client-ci.yml
+name: client-ci
 on:
   push:
-    paths-ignore:
-      - 'client/**'
-      - 'shared/**'
+    branches: [main]
+    paths:
+      - "client/**"
+      - "shared/**"
+      - ".github/workflows/client-ci.yml"
   pull_request:
-    paths-ignore:
-      - 'client/**'
-      - 'shared/**'
+    paths:
+      - "client/**"
+      - "shared/**"
+      - ".github/workflows/client-ci.yml"
+
+concurrency:
+  group: client-ci-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   typecheck:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
-      - run: npm ci || npm install
-      - run: npm run -w client typecheck
+          node-version: 20
+          cache: npm
+
+      - name: Install deps
+        run: npm ci
+
+      - name: Client typecheck
+        run: npm run -w client typecheck   # uses client/tsconfig.ci.json
+
+      - name: Client lint
+        run: npm run -w client lint
+
+      # Optional: build the client but don't gate the PR on it
+      - name: Client build (non-blocking)
+        run: npm run -w client build
+        continue-on-error: true
+
