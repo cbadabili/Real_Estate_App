@@ -6,7 +6,7 @@ export const requireAuth = (action: string = 'perform this action'): void => {
 };
 
 export const isAuthenticated = (): boolean => {
-  return getToken() !== null;
+  return !!getToken();
 };
 
 export const getAuthHeaders = (): Record<string, string> => {

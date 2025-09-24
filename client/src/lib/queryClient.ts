@@ -1,18 +1,31 @@
 // @ts-nocheck
 import { QueryClient } from '@tanstack/react-query';
 import { getToken, removeToken } from './storage';
-
-export const authHeaders = (): HeadersInit => {
+export const authHeaders = (url?: string): HeadersInit => {
   const token = getToken();
-  return token ? { Authorization: `Bearer ${token}` } : {};
-};
+  if (!token) {
+    return {};
+  }
+
+  if (url && typeof window !== 'undefined') {
+    try {
+      const candidate = new URL(url, window.location.origin);
+      if (candidate.origin !== window.location.origin) {
+        return {};
+      }
+    } catch {
+      return {};
+    }
+  }
+
+  return { Authorization: `Bearer ${token}` };
 
 // Default fetcher function for GET requests
 const defaultQueryFn = async ({ queryKey }: { queryKey: readonly unknown[] }) => {
   const url = queryKey[0] as string;
   const response = await fetch(url, {
     headers: {
-      ...authHeaders(),
+      ...authHeaders(url),
     },
   });
 
@@ -50,7 +63,7 @@ export const apiRequest = async (url: string, options: RequestInit = {}) => {
     ...options,
     headers: {
       'Content-Type': 'application/json',
-      ...authHeaders(),
+      ...authHeaders(url),
       ...options.headers,
     },
   });

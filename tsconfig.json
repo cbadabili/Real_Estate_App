@@ -29,6 +29,7 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["client/src", "server", "shared"],
+  "include": ["server", "shared"],
+  "exclude": ["client/**"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

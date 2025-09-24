@@ -1,5 +1,4 @@
-
-import { useState, useEffect } from 'react';
+import { useState, useEffect, type FC } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import {
   Star,
@@ -44,7 +43,7 @@ interface Review {
   createdAt: string;
 }
 
-const ServiceProviderDetailsPage: React.FC = () => {
+const ServiceProviderDetailsPage: FC = () => {
   const { id } = useParams<{ id: string }>();
   const [provider, setProvider] = useState<ServiceProvider | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);

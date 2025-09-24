@@ -215,8 +215,12 @@ const PropertiesPage: React.FC = () => {
       return false;
     }
 
-    const price = typeof property.price === 'number' ? property.price : parseFloat(property.price);
-    if (price < filters.priceRange[0] || price > filters.priceRange[1]) {
+    const priceNum = Number(property.price);
+    if (!Number.isFinite(priceNum)) {
+      return false;
+    }
+
+    if (priceNum < filters.priceRange[0] || priceNum > filters.priceRange[1]) {
       return false;
     }
 
@@ -232,8 +236,8 @@ const PropertiesPage: React.FC = () => {
   });
 
   const sortedProperties = [...filteredProperties].sort((a, b) => {
-    const priceA = typeof a.price === 'number' ? a.price : parseFloat(a.price);
-    const priceB = typeof b.price === 'number' ? b.price : parseFloat(b.price);
+    const priceA = Number.isFinite(Number(a.price)) ? Number(a.price) : 0;
+    const priceB = Number.isFinite(Number(b.price)) ? Number(b.price) : 0;
 
     switch (sortBy) {
       case 'price-low':

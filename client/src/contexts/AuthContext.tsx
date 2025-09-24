@@ -93,8 +93,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           return;
         }
 
-        console.log('Checking auth with token:', token.substring(0, 20) + '...');
-
         // Validate token with server
         const userData = await apiRequest('/api/auth/user', {
           method: 'GET',

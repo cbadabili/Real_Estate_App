@@ -7,31 +7,15 @@ export interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextArea
 }
 
 export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
-  ({ className = '', ...props }, ref) => {
-    return (
-      <textarea
-        ref={ref}
-        className={`flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
-        {...props}
-      />
-    );
-  }
+  ({ className = '', ...props }, ref) => (
+    <textarea
+      ref={ref}
+      className={`flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
+      {...props}
+    />
+  )
 );
 
 Textarea.displayName = 'Textarea';
-import React from 'react';
-
-interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
-  className?: string;
-}
-
-export const Textarea: React.FC<TextareaProps> = ({ className = '', ...props }) => {
-  return (
-    <textarea
-      className={`w-full px-3 py-2 border border-neutral-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-beedab-blue focus:border-transparent resize-vertical ${className}`}
-      {...props}
-    />
-  );
-};
 
 export default Textarea;
