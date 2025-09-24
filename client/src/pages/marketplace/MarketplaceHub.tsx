@@ -1,12 +1,75 @@
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, Plus, Award, Package, Wrench, GraduationCap } from 'lucide-react';
 import ServiceProviderCard from '../../components/domain/marketplace/ServiceProviderCard';
 import { PageHeader } from '../../components/layout/PageHeader';
 
+type MarketplaceProvider = {
+  id: number;
+  name: string;
+  category: string;
+  description: string;
+  rating: number;
+  reviewCount: number;
+  location: string;
+  responseTime: string;
+  hourlyRate: number;
+  verified: boolean;
+  specialties: string[];
+  phone: string;
+  email: string;
+};
+
+type RawMarketplaceProvider = Record<string, unknown>;
+
+const toNumber = (value: unknown, fallback = 0): number => {
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    return value;
+  }
+  if (typeof value === 'string') {
+    const parsed = Number(value);
+    if (Number.isFinite(parsed)) {
+      return parsed;
+    }
+  }
+  return fallback;
+};
+
+const toStringValue = (value: unknown, fallback = ''): string => (
+  typeof value === 'string' && value.trim().length > 0 ? value : fallback
+);
+
+const toStringArray = (value: unknown): string[] => {
+  if (Array.isArray(value)) {
+    return value.map(item => String(item)).filter(Boolean);
+  }
+  return [];
+};
+
+const normalizeProvider = (provider: RawMarketplaceProvider, index: number): MarketplaceProvider => {
+  const fallbackName = `Provider ${index + 1}`;
+  const specialties = toStringArray(provider.specialties ?? provider.services);
+
+  return {
+    id: toNumber(provider.id, index + 1),
+    name: toStringValue(provider.name ?? provider.business_name, fallbackName),
+    category: toStringValue(provider.category ?? provider.service_category, 'General Services'),
+    description: toStringValue(provider.description ?? provider.business_description, 'Details coming soon.'),
+    rating: toNumber(provider.rating ?? provider.review_rating),
+    reviewCount: toNumber(provider.reviewCount ?? provider.review_count),
+    location: toStringValue(provider.location ?? provider.service_area, 'Botswana'),
+    responseTime: toStringValue(provider.responseTime ?? provider.response_time, 'Within 24 hours'),
+    hourlyRate: toNumber(provider.hourlyRate ?? provider.hourly_rate),
+    verified: Boolean(provider.verified ?? provider.is_verified ?? provider.isVerified),
+    specialties,
+    phone: toStringValue(provider.phone ?? provider.phoneNumber ?? provider.contact_phone, ''),
+    email: toStringValue(provider.email ?? provider.contact_email, ''),
+  };
+};
+
 const MarketplaceHub = () => {
-  const [providers, setProviders] = useState([]);
+  const [providers, setProviders] = useState<MarketplaceProvider[]>([]);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(false);
@@ -35,7 +98,11 @@ const MarketplaceHub = () => {
       const response = await fetch(`/api/services/providers?${queryParams}`);
       if (response.ok) {
         const data = await response.json();
-        setProviders(data.providers || []);
+        const providerList = Array.isArray(data.providers) ? data.providers : [];
+        const normalizedProviders = providerList.map((item: unknown, index: number) =>
+          normalizeProvider((item ?? {}) as RawMarketplaceProvider, index)
+        );
+        setProviders(normalizedProviders);
       }
     } catch (error) {
       console.error('Failed to fetch providers:', error);
@@ -44,7 +111,7 @@ const MarketplaceHub = () => {
     }
   };
 
-  const handleContactProvider = (provider: any) => {
+  const handleContactProvider = (provider: MarketplaceProvider) => {
     // Handle provider contact logic
     console.log('Contacting provider:', provider);
   };

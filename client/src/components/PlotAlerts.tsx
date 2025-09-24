@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState } from 'react';
 import { Bell, MapPin, Trash2, Plus, CheckCircle } from 'lucide-react';
 

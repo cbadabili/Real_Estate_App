@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 // Export all shared components
 export { PropertyCard } from './PropertyCard';

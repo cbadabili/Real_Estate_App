@@ -1,14 +1,12 @@
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { 
-  Search, 
-  Filter, 
-  Star, 
-  MapPin, 
-  Phone, 
-  Mail, 
+import {
+  Search,
+  Star,
+  MapPin,
+  Phone,
   Clock,
   Shield,
   Users,
@@ -131,11 +129,6 @@ const ProfessionalsPage: React.FC = () => {
 
     setFilteredProfessionals(filtered);
   }, [selectedCategory, searchTerm, professionals]);
-
-  const getCategoryIcon = (categoryId: string) => {
-    const category = categories.find(cat => cat.id === categoryId);
-    return category ? category.icon : Users;
-  };
 
   return (
     <div className="min-h-screen bg-gray-50">
