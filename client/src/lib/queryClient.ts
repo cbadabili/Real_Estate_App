@@ -41,7 +41,6 @@ export const apiRequest = async <T = any>(
   options: ApiRequestOptions = {}
 ): Promise<T> => {
   const { method = "GET", headers = {}, body, signal } = options;
-
   const baseHeaders: HeadersInit = {
     "Content-Type": "application/json",
     ...authHeaders(url),
@@ -95,3 +94,4 @@ export const queryClient = new QueryClient({
     },
   },
 });
+
