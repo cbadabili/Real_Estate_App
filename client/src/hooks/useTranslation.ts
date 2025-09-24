@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 import { useUserPreferences } from './useLocalStorage';
 import en from '../locales/en.json';

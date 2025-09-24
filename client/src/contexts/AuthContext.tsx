@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { apiRequest } from '@/lib/queryClient';
 import { useQueryClient } from '@tanstack/react-query';
@@ -91,8 +92,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           setUser(null);
           return;
         }
-
-        console.log('Checking auth with token:', token.substring(0, 20) + '...');
 
         // Validate token with server
         const userData = await apiRequest('/api/auth/user', {

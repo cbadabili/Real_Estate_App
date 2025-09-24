@@ -1,77 +1,97 @@
-import { QueryClient } from '@tanstack/react-query';
-import { storage } from './storage';
+import { QueryClient } from "@tanstack/react-query";
+import { getToken } from "./storage";
 
-// Default fetcher function for GET requests
-const defaultQueryFn = async ({ queryKey }: { queryKey: readonly unknown[] }) => {
-  const url = queryKey[0] as string;
-  const response = await fetch(url);
-
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
-  }
-
-  return response.json();
+export type ApiRequestOptions = {
+  method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
+  headers?: HeadersInit;
+  // If you pass an object here, it will be JSON.stringified
+  body?: unknown;
+  // Optional signal for aborting
+  signal?: AbortSignal;
 };
 
-// Create query client with default settings
+/**
+ * Build Authorization header for same-origin requests only to avoid token leakage.
+ * If a fully-qualified URL is passed and its origin differs from window.location.origin,
+ * no Authorization header is added.
+ */
+export const authHeaders = (url?: string): HeadersInit => {
+  const token = getToken();
+  if (!token) return {};
+
+  if (url) {
+    const u = new URL(url, window.location.origin);
+    if (u.origin !== window.location.origin) {
+      return {};
+    }
+  }
+  return { Authorization: `Bearer ${token}` };
+};
+
+/**
+ * Lightweight fetch wrapper:
+ * - Adds JSON headers
+ * - Merges guarded auth headers
+ * - Stringifies object bodies
+ * - Throws on !res.ok with basic error info
+ * - Returns parsed JSON (or null on 204)
+ */
+export const apiRequest = async <T = any>(
+  url: string,
+  options: ApiRequestOptions = {}
+): Promise<T> => {
+  const { method = "GET", headers = {}, body, signal } = options;
+
+  const baseHeaders: HeadersInit = {
+    "Content-Type": "application/json",
+    ...authHeaders(url),
+    ...headers,
+  };
+
+  const init: RequestInit = {
+    method,
+    headers: baseHeaders,
+    signal,
+  };
+
+  if (body !== undefined) {
+    init.body = typeof body === "string" ? body : JSON.stringify(body);
+  }
+
+  const res = await fetch(url, init);
+
+  // 204 No Content
+  if (res.status === 204) return null as unknown as T;
+
+  const contentType = res.headers.get("content-type") || "";
+  const parseJson = contentType.includes("application/json");
+
+  if (!res.ok) {
+    let errorPayload: unknown = undefined;
+    try {
+      errorPayload = parseJson ? await res.json() : await res.text();
+    } catch {
+      // ignore parse error
+    }
+    const err = new Error(
+      `Request failed: ${res.status} ${res.statusText}`
+    ) as Error & { status?: number; data?: unknown; url?: string };
+    err.status = res.status;
+    err.data = errorPayload;
+    err.url = url;
+    throw err;
+  }
+
+  return (parseJson ? await res.json() : ((await res.text()) as unknown)) as T;
+};
+
+// A shared react-query client for the app
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      queryFn: defaultQueryFn,
-      staleTime: 1000 * 60 * 5, // 5 minutes
-      gcTime: 1000 * 60 * 30, // 30 minutes
-    },
-    mutations: {
-      retry: (failureCount, error: any) => {
-        // Don't retry authentication errors
-        if (error?.response?.status === 401 || error?.response?.status === 403) {
-          return false;
-        }
-        return failureCount < 1;
-      },
-      retryDelay: 1000,
+      // avoid accidental refetch storms in CI
+      refetchOnWindowFocus: false,
+      retry: 1,
     },
   },
 });
-
-// API request helper for mutations (POST, PUT, DELETE)
-export const apiRequest = async (url: string, options: RequestInit = {}) => {
-  const token = storage.getToken();
-
-  const response = await fetch(url, {
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token && { Authorization: `Bearer ${token}` }),
-      ...options.headers,
-    },
-  });
-
-  if (!response.ok) {
-    const errorText = await response.text();
-    let errorMessage: string;
-
-    try {
-      const errorJson = JSON.parse(errorText);
-      errorMessage = errorJson.message || errorJson.error || `HTTP ${response.status}`;
-    } catch {
-      errorMessage = errorText || `HTTP ${response.status}`;
-    }
-
-    if (response.status === 401) {
-      // Clear invalid token and redirect to login
-      storage.removeToken();
-      window.location.href = '/login';
-      throw new Error('User not authenticated');
-    }
-
-    throw new Error(errorMessage);
-  }
-
-  const contentType = response.headers.get('content-type');
-  if (contentType && contentType.includes('application/json')) {
-    return response.json();
-  }
-
-  return response.text();
-};

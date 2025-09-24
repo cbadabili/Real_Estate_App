@@ -1,9 +1,9 @@
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, type FC } from 'react';
 import { motion } from 'framer-motion';
-import { 
-  TrendingUp, 
-  Users, 
+import {
+  TrendingUp,
+  Users,
   Home, 
   Activity,
   DollarSign,
@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { Card } from '../components/ui/card';
 import { LoadingSpinner } from '../components/ui/LoadingSpinner';
+import { getToken } from '@/lib/storage';
 
 interface BusinessMetrics {
   userEngagement: {
@@ -53,7 +54,7 @@ interface TopProperty {
   location: string;
 }
 
-const AdminAnalyticsPage: React.FC = () => {
+const AdminAnalyticsPage: FC = () => {
   const [metrics, setMetrics] = useState<BusinessMetrics | null>(null);
   const [topProperties, setTopProperties] = useState<TopProperty[]>([]);
   const [userActivity, setUserActivity] = useState<any[]>([]);
@@ -70,21 +71,17 @@ const AdminAnalyticsPage: React.FC = () => {
   const fetchAnalytics = async () => {
     try {
       setLoading(true);
+      const token = getToken();
+      const authHeader = token ? { Authorization: `Bearer ${token}` } : {};
       const [metricsRes, topPropsRes, activityRes] = await Promise.all([
         fetch(`/api/analytics/metrics/overview?startDate=${dateRange.startDate}&endDate=${dateRange.endDate}`, {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          }
+          headers: authHeader,
         }),
         fetch('/api/analytics/metrics/properties/top?limit=10', {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          }
+          headers: authHeader,
         }),
         fetch('/api/analytics/metrics/users/activity?days=30', {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          }
+          headers: authHeader,
         })
       ]);
 
