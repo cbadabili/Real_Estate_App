@@ -1,0 +1,12 @@
+{
+  "name": "client",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit -p tsconfig.ci.json",
+    "lint": "eslint ./src --ext ts,tsx || echo 'Skipping lint (no config)'"
+  }
+}

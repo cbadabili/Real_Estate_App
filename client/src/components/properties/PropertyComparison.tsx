@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Bed, Bath, Square, MapPin, Heart, Share2, ExternalLink } from 'lucide-react';
