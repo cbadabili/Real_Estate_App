@@ -255,6 +255,7 @@ export class DatabaseStorage {
         .set(updatePayload)
         .where(eq(properties.id, id))
         .returning();
+
         if (!property)
             return undefined;
         return {

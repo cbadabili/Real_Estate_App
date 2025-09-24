@@ -345,7 +345,6 @@ export class DatabaseStorage implements IStorage {
     const latitude = parseCoordinate(property.latitude);
     const longitude = parseCoordinate(property.longitude);
     const geomValue = buildGeomValue(latitude, longitude);
-
     const [newProperty] = await db
       .insert(properties)
       .values({
@@ -355,7 +354,6 @@ export class DatabaseStorage implements IStorage {
         geom: geomValue,
       })
       .returning();
-
     return {
       ...newProperty,
       price: normalizeNumeric(newProperty.price),
