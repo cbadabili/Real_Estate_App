@@ -38,6 +38,37 @@ import {
 } from "../shared/schema.js";
 import { z } from "zod";
 import { eq, and, or, ilike, gte, lte, desc, asc, sql } from "drizzle-orm";
+
+const ensureStringArray = (value: unknown): string[] => {
+  if (Array.isArray(value)) {
+    return value.map(item => String(item));
+  }
+
+  if (value === null || value === undefined) {
+    return [];
+  }
+
+  if (typeof value === "string") {
+    const trimmed = value.trim();
+    if (!trimmed) {
+      return [];
+    }
+    try {
+      const parsed = JSON.parse(trimmed);
+      if (Array.isArray(parsed)) {
+        return parsed.map(item => String(item));
+      }
+      if (parsed === null || parsed === undefined || parsed === "") {
+        return [];
+      }
+      return [String(parsed)];
+    } catch {
+      return [trimmed];
+    }
+  }
+
+  return [String(value)];
+};
 import { properties, users, reviews } from "../shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -1499,7 +1530,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         location: prop.address || `${prop.city}, ${prop.state}`,
         city: prop.city || prop.state || 'Unknown',
         propertyType: prop.propertyType || 'house',
-        images: Array.isArray(prop.images) ? prop.images : (prop.images ? JSON.parse(prop.images) : []),
+        images: ensureStringArray(prop.images),
         status: prop.status || 'active',
         listingType: prop.listingType || 'owner'
       }));

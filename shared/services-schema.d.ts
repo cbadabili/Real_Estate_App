@@ -224,6 +224,23 @@ export declare const serviceProviders: import("drizzle-orm/pg-core").PgTableWith
             identity: undefined;
             generated: undefined;
         }, {}, {}>;
+        reviewCount: import("drizzle-orm/pg-core").PgColumn<{
+            name: "review_count";
+            tableName: "service_providers";
+            dataType: "number";
+            columnType: "PgInteger";
+            data: number;
+            driverParam: string | number;
+            notNull: false;
+            hasDefault: true;
+            isPrimaryKey: false;
+            isAutoincrement: false;
+            hasRuntimeDefault: false;
+            enumValues: undefined;
+            baseColumn: never;
+            identity: undefined;
+            generated: undefined;
+        }, {}, {}>;
         verified: import("drizzle-orm/pg-core").PgColumn<{
             name: "verified";
             tableName: "service_providers";
@@ -762,49 +779,46 @@ export declare const serviceReviewsRelations: import("drizzle-orm").Relations<"s
     provider: import("drizzle-orm").One<"service_providers", false>;
 }>;
 export declare const insertServiceProviderSchema: z.ZodObject<{
+    email: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    address: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    city: z.ZodOptional<z.ZodNullable<z.ZodString>>;
     companyName: z.ZodString;
     contactPerson: z.ZodOptional<z.ZodNullable<z.ZodString>>;
     phoneNumber: z.ZodOptional<z.ZodNullable<z.ZodString>>;
-    email: z.ZodOptional<z.ZodNullable<z.ZodString>>;
     websiteUrl: z.ZodOptional<z.ZodNullable<z.ZodString>>;
     logoUrl: z.ZodOptional<z.ZodNullable<z.ZodString>>;
     reacCertified: z.ZodOptional<z.ZodNullable<z.ZodBoolean>>;
-    address: z.ZodOptional<z.ZodNullable<z.ZodString>>;
-    city: z.ZodOptional<z.ZodNullable<z.ZodString>>;
-    rating: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
     verified: z.ZodOptional<z.ZodNullable<z.ZodBoolean>>;
     featured: z.ZodOptional<z.ZodNullable<z.ZodBoolean>>;
 } & {
-    description: z.ZodString;
+    description: z.ZodOptional<z.ZodNullable<z.ZodString>>;
     serviceCategory: z.ZodEnum<["Legal Services", "Photography", "Property Inspection", "Finance & Loans", "Insurance", "Construction", "Moving", "Cleaning", "Maintenance", "Architectural Services", "Quantity Surveying", "Structural Engineering"]>;
 }, "strip", z.ZodTypeAny, {
+    description?: string | null | undefined;
     companyName: string;
     serviceCategory: "Legal Services" | "Photography" | "Property Inspection" | "Finance & Loans" | "Insurance" | "Construction" | "Moving" | "Cleaning" | "Maintenance" | "Architectural Services" | "Quantity Surveying" | "Structural Engineering";
-    description: string;
+    email?: string | null | undefined;
+    address?: string | null | undefined;
+    city?: string | null | undefined;
     contactPerson?: string | null | undefined;
     phoneNumber?: string | null | undefined;
-    email?: string | null | undefined;
     websiteUrl?: string | null | undefined;
     logoUrl?: string | null | undefined;
     reacCertified?: boolean | null | undefined;
-    address?: string | null | undefined;
-    city?: string | null | undefined;
-    rating?: number | null | undefined;
     verified?: boolean | null | undefined;
     featured?: boolean | null | undefined;
 }, {
+    description?: string | null | undefined;
     companyName: string;
     serviceCategory: "Legal Services" | "Photography" | "Property Inspection" | "Finance & Loans" | "Insurance" | "Construction" | "Moving" | "Cleaning" | "Maintenance" | "Architectural Services" | "Quantity Surveying" | "Structural Engineering";
-    description: string;
+    email?: string | null | undefined;
+    address?: string | null | undefined;
+    city?: string | null | undefined;
     contactPerson?: string | null | undefined;
     phoneNumber?: string | null | undefined;
-    email?: string | null | undefined;
     websiteUrl?: string | null | undefined;
     logoUrl?: string | null | undefined;
     reacCertified?: boolean | null | undefined;
-    address?: string | null | undefined;
-    city?: string | null | undefined;
-    rating?: number | null | undefined;
     verified?: boolean | null | undefined;
     featured?: boolean | null | undefined;
 }>;
@@ -828,23 +842,23 @@ export declare const insertServiceAdSchema: z.ZodObject<Omit<{
     adTitle: string;
     targetAudience: string;
     contextTrigger: string;
+    active?: boolean | null | undefined;
     providerId?: number | null | undefined;
     adCopy?: string | null | undefined;
     adImageUrl?: string | null | undefined;
     ctaText?: string | null | undefined;
     ctaUrl?: string | null | undefined;
-    active?: boolean | null | undefined;
     priority?: number | null | undefined;
 }, {
     adTitle: string;
     targetAudience: string;
     contextTrigger: string;
+    active?: boolean | null | undefined;
     providerId?: number | null | undefined;
     adCopy?: string | null | undefined;
     adImageUrl?: string | null | undefined;
     ctaText?: string | null | undefined;
     ctaUrl?: string | null | undefined;
-    active?: boolean | null | undefined;
     priority?: number | null | undefined;
 }>;
 export declare const insertServiceReviewSchema: z.ZodObject<Omit<{
@@ -860,18 +874,18 @@ export declare const insertServiceReviewSchema: z.ZodObject<Omit<{
     createdAt: z.ZodOptional<z.ZodNullable<z.ZodDate>>;
 }, "id" | "createdAt" | "helpful">, "strip", z.ZodTypeAny, {
     rating: number;
-    verified?: boolean | null | undefined;
-    providerId?: number | null | undefined;
     userId?: number | null | undefined;
     review?: string | null | undefined;
+    verified?: boolean | null | undefined;
+    providerId?: number | null | undefined;
     reviewerName?: string | null | undefined;
     reviewerAvatar?: string | null | undefined;
 }, {
     rating: number;
-    verified?: boolean | null | undefined;
-    providerId?: number | null | undefined;
     userId?: number | null | undefined;
     review?: string | null | undefined;
+    verified?: boolean | null | undefined;
+    providerId?: number | null | undefined;
     reviewerName?: string | null | undefined;
     reviewerAvatar?: string | null | undefined;
 }>;

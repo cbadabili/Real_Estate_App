@@ -1,57 +1,62 @@
 // Adapter to convert BeeDab properties to RealEstateIntel format
 import type { BeeDabProperty, Listing, SearchQuery } from "../shared/real-estate-intel-types";
 
+const normalizeStringArray = (value: unknown): string[] => {
+  if (Array.isArray(value)) {
+    return value.map(item => String(item));
+  }
+
+  if (value === null || value === undefined) {
+    return [];
+  }
+
+  if (typeof value === "string") {
+    const trimmed = value.trim();
+    if (!trimmed) {
+      return [];
+    }
+    try {
+      const parsed = JSON.parse(trimmed);
+      if (Array.isArray(parsed)) {
+        return parsed.map(item => String(item));
+      }
+      if (parsed === null || parsed === undefined || parsed === "") {
+        return [];
+      }
+      return [String(parsed)];
+    } catch {
+      return [trimmed];
+    }
+  }
+
+  return [String(value)];
+};
+
+const normalizeNumber = (value: unknown): number | null => {
+  if (typeof value === "number") {
+    return Number.isFinite(value) ? value : null;
+  }
+
+  if (typeof value === "string") {
+    const direct = Number(value);
+    if (Number.isFinite(direct)) {
+      return direct;
+    }
+    const cleaned = Number(value.replace(/[^\d.-]/g, ""));
+    return Number.isFinite(cleaned) ? cleaned : null;
+  }
+
+  return null;
+};
+
 export function adaptBeeDabPropertyToListing(property: BeeDabProperty): Listing {
-  // Parse JSON fields safely
-  let images: string[] = [];
-  let features: string[] = [];
-  
-  try {
-    if (property.images) {
-      images = JSON.parse(property.images);
-    }
-  } catch (error) {
-    console.warn('Failed to parse property images:', error);
-  }
-  
-  try {
-    if (property.features) {
-      features = JSON.parse(property.features);
-    }
-  } catch (error) {
-    console.warn('Failed to parse property features:', error);
-  }
+  const images = normalizeStringArray(property.images);
+  const features = normalizeStringArray(property.features);
 
-  // Convert price from string to number (handle BWP currency)
-  let priceNumber: number | null = null;
-  try {
-    const priceStr = property.price.replace(/[^\d.]/g, ''); // Remove non-numeric characters
-    priceNumber = parseFloat(priceStr);
-    if (isNaN(priceNumber)) priceNumber = null;
-  } catch (error) {
-    console.warn('Failed to parse price:', error);
-  }
-
-  // Convert bathrooms from string to number
-  let bathsNumber: number | null = null;
-  try {
-    if (property.bathrooms) {
-      bathsNumber = parseFloat(property.bathrooms);
-      if (isNaN(bathsNumber)) bathsNumber = null;
-    }
-  } catch (error) {
-    console.warn('Failed to parse bathrooms:', error);
-  }
-
-  // Parse coordinates
-  let lat: number | null = null;
-  let lng: number | null = null;
-  try {
-    if (property.latitude) lat = parseFloat(property.latitude);
-    if (property.longitude) lng = parseFloat(property.longitude);
-  } catch (error) {
-    console.warn('Failed to parse coordinates:', error);
-  }
+  const priceNumber = normalizeNumber(property.price);
+  const bathsNumber = property.bathrooms ? normalizeNumber(property.bathrooms) : null;
+  const lat = normalizeNumber(property.latitude);
+  const lng = normalizeNumber(property.longitude);
 
   return {
     reference: `BD-${property.id}`, // BeeDab reference prefix

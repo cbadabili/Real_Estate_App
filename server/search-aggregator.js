@@ -1,19 +1,67 @@
 import { db } from "./db";
 import { properties } from "../shared/schema";
-import { and, desc, eq, gte, ilike, or, sql } from "drizzle-orm";
+import { and, desc, eq, gte, ilike, lte, or } from "drizzle-orm";
 import fetch from "node-fetch";
+const normalizeStringArray = (value) => {
+    if (Array.isArray(value)) {
+        return value.map(item => String(item));
+    }
+    if (value === null || value === undefined) {
+        return [];
+    }
+    if (typeof value === "string") {
+        const trimmed = value.trim();
+        if (!trimmed) {
+            return [];
+        }
+        try {
+            const parsed = JSON.parse(trimmed);
+            if (Array.isArray(parsed)) {
+                return parsed.map(item => String(item));
+            }
+            if (parsed === null || parsed === undefined || parsed === "") {
+                return [];
+            }
+            return [String(parsed)];
+        }
+        catch {
+            return [trimmed];
+        }
+    }
+    return [String(value)];
+};
+const normalizeNumber = (value) => {
+    if (typeof value === "number") {
+        return Number.isFinite(value) ? value : null;
+    }
+    if (typeof value === "string") {
+        const direct = Number(value);
+        if (Number.isFinite(direct)) {
+            return direct;
+        }
+        const cleaned = Number(value.replace(/[^\d.-]/g, ""));
+        return Number.isFinite(cleaned) ? cleaned : null;
+    }
+    return null;
+};
 // Enhanced NL parser with more sophisticated pattern matching
 function parseFreeText(query) {
     const derived = {};
     // Helper function to parse price with suffixes
-    const parsePrice = (priceStr, suffix = '') => {
-        const num = parseInt(priceStr);
+const parsePrice = (priceStr, suffix = '') => {
+  const num = parseFloat(priceStr);
         if (suffix.toLowerCase() === 'k')
             return num * 1000;
         if (suffix.toLowerCase() === 'm')
             return num * 1000000;
         return num;
     };
+    // Extract descriptive terms (modern, luxury, etc.)
+    const descriptiveTerms = ['modern', 'luxury', 'new', 'renovated', 'spacious', 'cozy', 'family'];
+    const foundTerms = descriptiveTerms.filter(term => query.toLowerCase().includes(term));
+    if (foundTerms.length > 0) {
+        derived.query = foundTerms.join(' ');
+    }
     // Extract price ranges with proper suffix handling
     const rangeMatch = query.match(/(\d+)(k|m)?\s*(?:to|-)\s*(\d+)(k|m)?/i);
     if (rangeMatch) {
@@ -86,14 +134,18 @@ async function queryDB(q, sort) {
         if (derived.minPrice !== undefined) {
             terms.push(gte(properties.price, derived.minPrice));
         }
-        if (derived.maxPrice !== undefined) {
-            // For maxPrice, we need to use '<=' which is lte in Drizzle
-            terms.push(sql `${properties.price} <= ${derived.maxPrice}`);
-        }
+    if (derived.maxPrice !== undefined) {
+        terms.push(lte(properties.price, derived.maxPrice));
+    }
         // If no specific filters detected, fall back to text search
         if (terms.length === 0) {
             const like = `%${q}%`;
-            terms.push(or(ilike(properties.title, like), ilike(properties.description, like), ilike(properties.city, like), ilike(properties.address, like)));
+            terms.push(or(ilike(properties.title, like), ilike(properties.description, like), ilike(properties.city, like), ilike(properties.address, like), ilike(properties.propertyType, like)));
+        }
+        else if (derived.query) {
+            // Add descriptive term search even if other filters exist
+            const descriptiveLike = `%${derived.query}%`;
+            terms.push(or(ilike(properties.title, descriptiveLike), ilike(properties.description, descriptiveLike)));
         }
         const where = terms.length ? and(...terms) : undefined;
         const order = sort === "price_low" ? properties.price :
@@ -112,22 +164,30 @@ async function queryDB(q, sort) {
     }
 }
 function mapDBRowToUnified(row) {
+    const price = normalizeNumber(row.price);
+    const lat = normalizeNumber(row.latitude);
+    const lng = normalizeNumber(row.longitude);
     return {
         id: `local_${row.id}`,
         title: row.title,
-        price: parseFloat(row.price.replace(/[^\d.]/g, '')) || 0,
+        price: price ?? 0,
         address: row.address,
         city: row.city,
-        bedrooms: row.bedrooms,
-        bathrooms: row.bathrooms ? parseFloat(row.bathrooms) : undefined,
+        bedrooms: (() => {
+            const value = typeof row.bedrooms === "number" ? row.bedrooms : normalizeNumber(row.bedrooms);
+            return Number.isFinite(value) ? Math.trunc(value) : undefined;
+        })(),
+        bathrooms: (() => {
+            const value = normalizeNumber(row.bathrooms);
+            return Number.isFinite(value) ? value : undefined;
+        })(),
         propertyType: row.propertyType,
         source: 'local',
         description: row.description,
-        images: row.images ? JSON.parse(row.images) : [],
-        coordinates: row.latitude && row.longitude ? {
-            lat: parseFloat(row.latitude),
-            lng: parseFloat(row.longitude)
-        } : undefined,
+        images: normalizeStringArray(row.images),
+        coordinates: Number.isFinite(lat) && Number.isFinite(lng)
+            ? { lat: lat, lng: lng }
+            : undefined,
         agency: {
             name: 'BeeDab Properties'
         }

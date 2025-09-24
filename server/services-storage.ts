@@ -77,9 +77,8 @@ export class ServicesStorage implements IServicesStorage {
     if (filters.reacCertified !== undefined) {
       conditions.push(eq(serviceProviders.reacCertified, filters.reacCertified));
     }
-    if (filters.minRating) {
-      // For SQLite, we need to handle string comparison differently
-      // For PostgreSQL, we can use gte directly on numeric types
+    if (filters.minRating !== undefined) {
+      // Ratings are stored as numeric values so direct comparison is safe
       conditions.push(gte(serviceProviders.rating, filters.minRating));
     }
 
@@ -110,11 +109,11 @@ export class ServicesStorage implements IServicesStorage {
     }
 
     // Pagination
-    if (filters.limit) {
-      query = query.limit(filters.limit);
+    if (filters.limit !== undefined) {
+      query = query.limit(Math.max(0, filters.limit));
     }
-    if (filters.offset) {
-      query = query.offset(filters.offset);
+    if (filters.offset !== undefined) {
+      query = query.offset(Math.max(0, filters.offset));
     }
 
     return await query;
@@ -245,7 +244,7 @@ export class ServicesStorage implements IServicesStorage {
       .update(serviceProviders)
       .set({
         reviewCount: reviews.length,
-        rating: avgRating.toFixed(1)
+        rating: Math.round(avgRating * 10) / 10
       })
       .where(eq(serviceProviders.id, review.providerId));
 

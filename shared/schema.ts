@@ -12,6 +12,7 @@ import {
   jsonb,
   serial,
   varchar,
+  customType,
 } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
@@ -51,59 +52,75 @@ export const refreshTokens = pgTable('refresh_tokens', {
 });
 
 
+
 // Properties table
+export const geometryPoint = customType<{ data: unknown; driverData: unknown }>({
+  dataType() {
+    return 'geometry(Point,4326)';
+  },
+});
+
+export const tsvector = customType<{ data: unknown; driverData: string }>({
+  dataType() {
+    return 'tsvector';
+  },
+});
+
 export const properties = pgTable("properties", {
   id: serial("id").primaryKey(),
+  ownerId: integer("owner_id").references(() => users.id),
+  agentId: integer("agent_id").references(() => users.id),
   title: text("title").notNull(),
   description: text("description"),
-  price: text("price").notNull(),
+  price: numeric("price", { precision: 12, scale: 2 }).$type<number>().notNull(),
+  currency: text("currency").default('BWP').notNull(),
   address: text("address").notNull(),
   city: text("city").notNull(),
   state: text("state").notNull(),
   zipCode: text("zip_code").notNull(),
   latitude: doublePrecision("latitude"),
   longitude: doublePrecision("longitude"),
+  geom: geometryPoint("geom"),
   areaText: text("area_text"),
   placeName: text("place_name"),
   placeId: text("place_id"),
-  locationSource: text("location_source"), // 'user_pin' | 'geocode'
-  propertyType: text("property_type").notNull(), // 'house', 'apartment', 'condo', 'townhouse', 'land', 'mmatseta', 'commercial', 'farm'
-  listingType: text("listing_type").notNull(), // 'owner', 'agent', 'rental', 'auction'
+  locationSource: text("location_source"),
+  propertyType: text("property_type").notNull(),
+  listingType: text("listing_type").notNull(),
+  status: text("status").default('active').notNull(),
   bedrooms: integer("bedrooms"),
-  bathrooms: text("bathrooms"),
+  bathrooms: numeric("bathrooms", { precision: 3, scale: 1 }).$type<number>(),
   squareFeet: integer("square_feet"),
   areaBuild: integer("area_build"),
   lotSize: text("lot_size"),
   yearBuilt: integer("year_built"),
-  status: text("status").notNull().default('active'), // 'active', 'pending', 'sold', 'withdrawn'
-  images: text("images"), // JSON string of image URLs
-  features: text("features"), // JSON string of features
+  images: jsonb("images").$type<string[]>().default(sql`'[]'::jsonb`).notNull(),
+  features: jsonb("features").$type<string[]>().default(sql`'[]'::jsonb`).notNull(),
   virtualTourUrl: text("virtual_tour_url"),
   videoUrl: text("video_url"),
   propertyTaxes: text("property_taxes"),
   hoaFees: text("hoa_fees"),
-  ownerId: integer("owner_id").references(() => users.id),
-  agentId: integer("agent_id").references(() => users.id),
   views: integer("views").default(0),
   daysOnMarket: integer("days_on_market").default(0),
-  forMap: boolean("for_map").default(true), // For geocode enforcement
-  // Auction-specific fields
+  forMap: boolean("for_map").default(true),
   auctionDate: integer("auction_date"),
   auctionTime: text("auction_time"),
   startingBid: text("starting_bid"),
   currentBid: text("current_bid"),
   reservePrice: text("reserve_price"),
-  auctionHouse: text("auction_house"), // e.g., "First National Bank of Botswana"
+  auctionHouse: text("auction_house"),
   auctioneerName: text("auctioneer_name"),
   auctioneerContact: text("auctioneer_contact"),
   bidIncrement: text("bid_increment"),
   depositRequired: text("deposit_required"),
   auctionTerms: text("auction_terms"),
   lotNumber: text("lot_number"),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+  fts: tsvector("fts").generatedAlwaysAs(() =>
+    sql`to_tsvector('simple', coalesce(title, '') || ' ' || coalesce(description, '') || ' ' || coalesce(address, ''))`
+  , { stored: true }),
 });
-
 // Property inquiries
 export const inquiries = pgTable("inquiries", {
   id: serial("id").primaryKey(),
@@ -422,6 +439,7 @@ export const insertPropertySchema = createInsertSchema(properties).omit({
   daysOnMarket: true,
   createdAt: true,
   updatedAt: true,
+  fts: true,
 });
 
 export const insertInquirySchema = createInsertSchema(inquiries).omit({

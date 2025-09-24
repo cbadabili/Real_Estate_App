@@ -19,7 +19,8 @@
     "db:reset": "npx tsx server/reset-db.ts",
     "db:migrate": "npx tsx scripts/migrate-db.ts",
     "db:check": "drizzle-kit diff || echo 'drizzle not configured for diff'",
-    "docs:openapi": "tsx server/scripts/generate-openapi.ts"
+    "docs:openapi": "tsx server/scripts/generate-openapi.ts",
+    "verify:postgres-only": "tsx scripts/check-postgres-only.ts"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.4",

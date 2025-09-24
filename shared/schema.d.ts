@@ -446,6 +446,58 @@ export declare const refreshTokens: import("drizzle-orm/pg-core").PgTableWithCol
     };
     dialect: "pg";
 }>;
+export declare const geometryPoint: {
+    (): import("drizzle-orm/pg-core").PgCustomColumnBuilder<{
+        name: "";
+        dataType: "custom";
+        columnType: "PgCustomColumn";
+        data: unknown;
+        driverParam: unknown;
+        enumValues: undefined;
+    }>;
+    <TConfig extends Record<string, any>>(fieldConfig?: TConfig): import("drizzle-orm/pg-core").PgCustomColumnBuilder<{
+        name: "";
+        dataType: "custom";
+        columnType: "PgCustomColumn";
+        data: unknown;
+        driverParam: unknown;
+        enumValues: undefined;
+    }>;
+    <TName extends string>(dbName: TName, fieldConfig?: unknown): import("drizzle-orm/pg-core").PgCustomColumnBuilder<{
+        name: TName;
+        dataType: "custom";
+        columnType: "PgCustomColumn";
+        data: unknown;
+        driverParam: unknown;
+        enumValues: undefined;
+    }>;
+};
+export declare const tsvector: {
+    (): import("drizzle-orm/pg-core").PgCustomColumnBuilder<{
+        name: "";
+        dataType: "custom";
+        columnType: "PgCustomColumn";
+        data: unknown;
+        driverParam: string;
+        enumValues: undefined;
+    }>;
+    <TConfig extends Record<string, any>>(fieldConfig?: TConfig): import("drizzle-orm/pg-core").PgCustomColumnBuilder<{
+        name: "";
+        dataType: "custom";
+        columnType: "PgCustomColumn";
+        data: unknown;
+        driverParam: string;
+        enumValues: undefined;
+    }>;
+    <TName extends string>(dbName: TName, fieldConfig?: unknown): import("drizzle-orm/pg-core").PgCustomColumnBuilder<{
+        name: TName;
+        dataType: "custom";
+        columnType: "PgCustomColumn";
+        data: unknown;
+        driverParam: string;
+        enumValues: undefined;
+    }>;
+};
 export declare const properties: import("drizzle-orm/pg-core").PgTableWithColumns<{
     name: "properties";
     schema: undefined;
@@ -460,6 +512,40 @@ export declare const properties: import("drizzle-orm/pg-core").PgTableWithColumn
             notNull: true;
             hasDefault: true;
             isPrimaryKey: true;
+            isAutoincrement: false;
+            hasRuntimeDefault: false;
+            enumValues: undefined;
+            baseColumn: never;
+            identity: undefined;
+            generated: undefined;
+        }, {}, {}>;
+        ownerId: import("drizzle-orm/pg-core").PgColumn<{
+            name: "owner_id";
+            tableName: "properties";
+            dataType: "number";
+            columnType: "PgInteger";
+            data: number;
+            driverParam: string | number;
+            notNull: false;
+            hasDefault: false;
+            isPrimaryKey: false;
+            isAutoincrement: false;
+            hasRuntimeDefault: false;
+            enumValues: undefined;
+            baseColumn: never;
+            identity: undefined;
+            generated: undefined;
+        }, {}, {}>;
+        agentId: import("drizzle-orm/pg-core").PgColumn<{
+            name: "agent_id";
+            tableName: "properties";
+            dataType: "number";
+            columnType: "PgInteger";
+            data: number;
+            driverParam: string | number;
+            notNull: false;
+            hasDefault: false;
+            isPrimaryKey: false;
             isAutoincrement: false;
             hasRuntimeDefault: false;
             enumValues: undefined;
@@ -505,11 +591,30 @@ export declare const properties: import("drizzle-orm/pg-core").PgTableWithColumn
             name: "price";
             tableName: "properties";
             dataType: "string";
+            columnType: "PgNumeric";
+            data: number;
+            driverParam: string;
+            notNull: true;
+            hasDefault: false;
+            isPrimaryKey: false;
+            isAutoincrement: false;
+            hasRuntimeDefault: false;
+            enumValues: undefined;
+            baseColumn: never;
+            identity: undefined;
+            generated: undefined;
+        }, {}, {
+            $type: number;
+        }>;
+        currency: import("drizzle-orm/pg-core").PgColumn<{
+            name: "currency";
+            tableName: "properties";
+            dataType: "string";
             columnType: "PgText";
             data: string;
             driverParam: string;
             notNull: true;
-            hasDefault: false;
+            hasDefault: true;
             isPrimaryKey: false;
             isAutoincrement: false;
             hasRuntimeDefault: false;
@@ -620,6 +725,25 @@ export declare const properties: import("drizzle-orm/pg-core").PgTableWithColumn
             identity: undefined;
             generated: undefined;
         }, {}, {}>;
+        geom: import("drizzle-orm/pg-core").PgColumn<{
+            name: "geom";
+            tableName: "properties";
+            dataType: "custom";
+            columnType: "PgCustomColumn";
+            data: unknown;
+            driverParam: unknown;
+            notNull: false;
+            hasDefault: false;
+            isPrimaryKey: false;
+            isAutoincrement: false;
+            hasRuntimeDefault: false;
+            enumValues: undefined;
+            baseColumn: never;
+            identity: undefined;
+            generated: undefined;
+        }, {}, {
+            pgColumnBuilderBrand: "PgCustomColumnBuilderBrand";
+        }>;
         areaText: import("drizzle-orm/pg-core").PgColumn<{
             name: "area_text";
             tableName: "properties";
@@ -722,6 +846,23 @@ export declare const properties: import("drizzle-orm/pg-core").PgTableWithColumn
             identity: undefined;
             generated: undefined;
         }, {}, {}>;
+        status: import("drizzle-orm/pg-core").PgColumn<{
+            name: "status";
+            tableName: "properties";
+            dataType: "string";
+            columnType: "PgText";
+            data: string;
+            driverParam: string;
+            notNull: true;
+            hasDefault: true;
+            isPrimaryKey: false;
+            isAutoincrement: false;
+            hasRuntimeDefault: false;
+            enumValues: [string, ...string[]];
+            baseColumn: never;
+            identity: undefined;
+            generated: undefined;
+        }, {}, {}>;
         bedrooms: import("drizzle-orm/pg-core").PgColumn<{
             name: "bedrooms";
             tableName: "properties";
@@ -742,16 +883,16 @@ export declare const properties: import("drizzle-orm/pg-core").PgTableWithColumn
         bathrooms: import("drizzle-orm/pg-core").PgColumn<{
             name: "bathrooms";
             tableName: "properties";
-            dataType: "string";
-            columnType: "PgText";
-            data: string;
+            dataType: "numeric";
+            columnType: "PgNumeric";
+            data: number;
             driverParam: string;
             notNull: false;
             hasDefault: false;
             isPrimaryKey: false;
             isAutoincrement: false;
             hasRuntimeDefault: false;
-            enumValues: [string, ...string[]];
+            enumValues: undefined;
             baseColumn: never;
             identity: undefined;
             generated: undefined;
@@ -824,57 +965,44 @@ export declare const properties: import("drizzle-orm/pg-core").PgTableWithColumn
             identity: undefined;
             generated: undefined;
         }, {}, {}>;
-        status: import("drizzle-orm/pg-core").PgColumn<{
-            name: "status";
+        images: import("drizzle-orm/pg-core").PgColumn<{
+            name: "images";
             tableName: "properties";
-            dataType: "string";
-            columnType: "PgText";
-            data: string;
-            driverParam: string;
+            dataType: "json";
+            columnType: "PgJsonb";
+            data: string[];
+            driverParam: unknown;
             notNull: true;
             hasDefault: true;
             isPrimaryKey: false;
             isAutoincrement: false;
             hasRuntimeDefault: false;
-            enumValues: [string, ...string[]];
+            enumValues: undefined;
             baseColumn: never;
             identity: undefined;
             generated: undefined;
-        }, {}, {}>;
-        images: import("drizzle-orm/pg-core").PgColumn<{
-            name: "images";
-            tableName: "properties";
-            dataType: "string";
-            columnType: "PgText";
-            data: string;
-            driverParam: string;
-            notNull: false;
-            hasDefault: false;
-            isPrimaryKey: false;
-            isAutoincrement: false;
-            hasRuntimeDefault: false;
-            enumValues: [string, ...string[]];
-            baseColumn: never;
-            identity: undefined;
-            generated: undefined;
-        }, {}, {}>;
+        }, {}, {
+            $type: string[];
+        }>;
         features: import("drizzle-orm/pg-core").PgColumn<{
             name: "features";
             tableName: "properties";
-            dataType: "string";
-            columnType: "PgText";
-            data: string;
-            driverParam: string;
-            notNull: false;
-            hasDefault: false;
+            dataType: "json";
+            columnType: "PgJsonb";
+            data: string[];
+            driverParam: unknown;
+            notNull: true;
+            hasDefault: true;
             isPrimaryKey: false;
             isAutoincrement: false;
             hasRuntimeDefault: false;
-            enumValues: [string, ...string[]];
+            enumValues: undefined;
             baseColumn: never;
             identity: undefined;
             generated: undefined;
-        }, {}, {}>;
+        }, {}, {
+            $type: string[];
+        }>;
         virtualTourUrl: import("drizzle-orm/pg-core").PgColumn<{
             name: "virtual_tour_url";
             tableName: "properties";
@@ -939,40 +1067,6 @@ export declare const properties: import("drizzle-orm/pg-core").PgTableWithColumn
             isAutoincrement: false;
             hasRuntimeDefault: false;
             enumValues: [string, ...string[]];
-            baseColumn: never;
-            identity: undefined;
-            generated: undefined;
-        }, {}, {}>;
-        ownerId: import("drizzle-orm/pg-core").PgColumn<{
-            name: "owner_id";
-            tableName: "properties";
-            dataType: "number";
-            columnType: "PgInteger";
-            data: number;
-            driverParam: string | number;
-            notNull: false;
-            hasDefault: false;
-            isPrimaryKey: false;
-            isAutoincrement: false;
-            hasRuntimeDefault: false;
-            enumValues: undefined;
-            baseColumn: never;
-            identity: undefined;
-            generated: undefined;
-        }, {}, {}>;
-        agentId: import("drizzle-orm/pg-core").PgColumn<{
-            name: "agent_id";
-            tableName: "properties";
-            dataType: "number";
-            columnType: "PgInteger";
-            data: number;
-            driverParam: string | number;
-            notNull: false;
-            hasDefault: false;
-            isPrimaryKey: false;
-            isAutoincrement: false;
-            hasRuntimeDefault: false;
-            enumValues: undefined;
             baseColumn: never;
             identity: undefined;
             generated: undefined;
@@ -1239,7 +1333,7 @@ export declare const properties: import("drizzle-orm/pg-core").PgTableWithColumn
             columnType: "PgTimestamp";
             data: Date;
             driverParam: string;
-            notNull: false;
+            notNull: true;
             hasDefault: true;
             isPrimaryKey: false;
             isAutoincrement: false;
@@ -1256,7 +1350,7 @@ export declare const properties: import("drizzle-orm/pg-core").PgTableWithColumn
             columnType: "PgTimestamp";
             data: Date;
             driverParam: string;
-            notNull: false;
+            notNull: true;
             hasDefault: true;
             isPrimaryKey: false;
             isAutoincrement: false;
@@ -1266,6 +1360,27 @@ export declare const properties: import("drizzle-orm/pg-core").PgTableWithColumn
             identity: undefined;
             generated: undefined;
         }, {}, {}>;
+        fts: import("drizzle-orm/pg-core").PgColumn<{
+            name: "fts";
+            tableName: "properties";
+            dataType: "custom";
+            columnType: "PgCustomColumn";
+            data: unknown;
+            driverParam: string;
+            notNull: false;
+            hasDefault: true;
+            isPrimaryKey: false;
+            isAutoincrement: false;
+            hasRuntimeDefault: false;
+            enumValues: undefined;
+            baseColumn: never;
+            identity: undefined;
+            generated: {
+                type: "always";
+            };
+        }, {}, {
+            pgColumnBuilderBrand: "PgCustomColumnBuilderBrand";
+        }>;
     };
     dialect: "pg";
 }>;
@@ -3566,249 +3681,11 @@ export declare const userPermissionsRelations: import("drizzle-orm").Relations<"
 export declare const adminAuditLogRelations: import("drizzle-orm").Relations<"admin_audit_log", {
     admin: import("drizzle-orm").One<"users", true>;
 }>;
-export declare const insertUserSchema: z.ZodObject<Omit<{
-    id: z.ZodOptional<z.ZodNumber>;
-    username: z.ZodString;
-    email: z.ZodString;
-    password: z.ZodString;
-    firstName: z.ZodString;
-    lastName: z.ZodString;
-    phone: z.ZodOptional<z.ZodNullable<z.ZodString>>;
-    userType: z.ZodString;
-    role: z.ZodOptional<z.ZodString>;
-    permissions: z.ZodOptional<z.ZodNullable<z.ZodArray<z.ZodString, "many">>>;
-    avatar: z.ZodOptional<z.ZodNullable<z.ZodString>>;
-    bio: z.ZodOptional<z.ZodNullable<z.ZodString>>;
-    isVerified: z.ZodOptional<z.ZodNullable<z.ZodBoolean>>;
-    isActive: z.ZodOptional<z.ZodNullable<z.ZodBoolean>>;
-    reacNumber: z.ZodOptional<z.ZodNullable<z.ZodString>>;
-    lastLoginAt: z.ZodOptional<z.ZodNullable<z.ZodDate>>;
-    createdAt: z.ZodOptional<z.ZodNullable<z.ZodDate>>;
-    updatedAt: z.ZodOptional<z.ZodNullable<z.ZodDate>>;
-}, "id" | "createdAt" | "updatedAt">, "strip", z.ZodTypeAny, {
-    email: string;
-    username: string;
-    password: string;
-    firstName: string;
-    lastName: string;
-    userType: string;
-    phone?: string | null | undefined;
-    role?: string | undefined;
-    permissions?: string[] | null | undefined;
-    avatar?: string | null | undefined;
-    bio?: string | null | undefined;
-    isVerified?: boolean | null | undefined;
-    isActive?: boolean | null | undefined;
-    reacNumber?: string | null | undefined;
-    lastLoginAt?: Date | null | undefined;
-}, {
-    email: string;
-    username: string;
-    password: string;
-    firstName: string;
-    lastName: string;
-    userType: string;
-    phone?: string | null | undefined;
-    role?: string | undefined;
-    permissions?: string[] | null | undefined;
-    avatar?: string | null | undefined;
-    bio?: string | null | undefined;
-    isVerified?: boolean | null | undefined;
-    isActive?: boolean | null | undefined;
-    reacNumber?: string | null | undefined;
-    lastLoginAt?: Date | null | undefined;
-}>;
-export declare const insertPropertySchema: z.ZodObject<Omit<{
-    id: z.ZodOptional<z.ZodNumber>;
-    title: z.ZodString;
-    description: z.ZodOptional<z.ZodNullable<z.ZodString>>;
-    price: z.ZodString;
-    address: z.ZodString;
-    city: z.ZodString;
-    state: z.ZodString;
-    zipCode: z.ZodString;
-    latitude: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
-    longitude: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
-    areaText: z.ZodOptional<z.ZodNullable<z.ZodString>>;
-    placeName: z.ZodOptional<z.ZodNullable<z.ZodString>>;
-    placeId: z.ZodOptional<z.ZodNullable<z.ZodString>>;
-    locationSource: z.ZodOptional<z.ZodNullable<z.ZodString>>;
-    propertyType: z.ZodString;
-    listingType: z.ZodString;
-    bedrooms: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
-    bathrooms: z.ZodOptional<z.ZodNullable<z.ZodString>>;
-    squareFeet: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
-    areaBuild: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
-    lotSize: z.ZodOptional<z.ZodNullable<z.ZodString>>;
-    yearBuilt: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
-    status: z.ZodOptional<z.ZodString>;
-    images: z.ZodOptional<z.ZodNullable<z.ZodString>>;
-    features: z.ZodOptional<z.ZodNullable<z.ZodString>>;
-    virtualTourUrl: z.ZodOptional<z.ZodNullable<z.ZodString>>;
-    videoUrl: z.ZodOptional<z.ZodNullable<z.ZodString>>;
-    propertyTaxes: z.ZodOptional<z.ZodNullable<z.ZodString>>;
-    hoaFees: z.ZodOptional<z.ZodNullable<z.ZodString>>;
-    ownerId: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
-    agentId: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
-    views: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
-    daysOnMarket: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
-    forMap: z.ZodOptional<z.ZodNullable<z.ZodBoolean>>;
-    auctionDate: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
-    auctionTime: z.ZodOptional<z.ZodNullable<z.ZodString>>;
-    startingBid: z.ZodOptional<z.ZodNullable<z.ZodString>>;
-    currentBid: z.ZodOptional<z.ZodNullable<z.ZodString>>;
-    reservePrice: z.ZodOptional<z.ZodNullable<z.ZodString>>;
-    auctionHouse: z.ZodOptional<z.ZodNullable<z.ZodString>>;
-    auctioneerName: z.ZodOptional<z.ZodNullable<z.ZodString>>;
-    auctioneerContact: z.ZodOptional<z.ZodNullable<z.ZodString>>;
-    bidIncrement: z.ZodOptional<z.ZodNullable<z.ZodString>>;
-    depositRequired: z.ZodOptional<z.ZodNullable<z.ZodString>>;
-    auctionTerms: z.ZodOptional<z.ZodNullable<z.ZodString>>;
-    lotNumber: z.ZodOptional<z.ZodNullable<z.ZodString>>;
-    createdAt: z.ZodOptional<z.ZodNullable<z.ZodDate>>;
-    updatedAt: z.ZodOptional<z.ZodNullable<z.ZodDate>>;
-}, "id" | "createdAt" | "updatedAt" | "views" | "daysOnMarket">, "strip", z.ZodTypeAny, {
-    address: string;
-    city: string;
-    title: string;
-    price: string;
-    state: string;
-    zipCode: string;
-    propertyType: string;
-    listingType: string;
-    description?: string | null | undefined;
-    status?: string | undefined;
-    latitude?: number | null | undefined;
-    longitude?: number | null | undefined;
-    areaText?: string | null | undefined;
-    placeName?: string | null | undefined;
-    placeId?: string | null | undefined;
-    locationSource?: string | null | undefined;
-    bedrooms?: number | null | undefined;
-    bathrooms?: string | null | undefined;
-    squareFeet?: number | null | undefined;
-    areaBuild?: number | null | undefined;
-    lotSize?: string | null | undefined;
-    yearBuilt?: number | null | undefined;
-    images?: string | null | undefined;
-    features?: string | null | undefined;
-    virtualTourUrl?: string | null | undefined;
-    videoUrl?: string | null | undefined;
-    propertyTaxes?: string | null | undefined;
-    hoaFees?: string | null | undefined;
-    ownerId?: number | null | undefined;
-    agentId?: number | null | undefined;
-    forMap?: boolean | null | undefined;
-    auctionDate?: number | null | undefined;
-    auctionTime?: string | null | undefined;
-    startingBid?: string | null | undefined;
-    currentBid?: string | null | undefined;
-    reservePrice?: string | null | undefined;
-    auctionHouse?: string | null | undefined;
-    auctioneerName?: string | null | undefined;
-    auctioneerContact?: string | null | undefined;
-    bidIncrement?: string | null | undefined;
-    depositRequired?: string | null | undefined;
-    auctionTerms?: string | null | undefined;
-    lotNumber?: string | null | undefined;
-}, {
-    address: string;
-    city: string;
-    title: string;
-    price: string;
-    state: string;
-    zipCode: string;
-    propertyType: string;
-    listingType: string;
-    description?: string | null | undefined;
-    status?: string | undefined;
-    latitude?: number | null | undefined;
-    longitude?: number | null | undefined;
-    areaText?: string | null | undefined;
-    placeName?: string | null | undefined;
-    placeId?: string | null | undefined;
-    locationSource?: string | null | undefined;
-    bedrooms?: number | null | undefined;
-    bathrooms?: string | null | undefined;
-    squareFeet?: number | null | undefined;
-    areaBuild?: number | null | undefined;
-    lotSize?: string | null | undefined;
-    yearBuilt?: number | null | undefined;
-    images?: string | null | undefined;
-    features?: string | null | undefined;
-    virtualTourUrl?: string | null | undefined;
-    videoUrl?: string | null | undefined;
-    propertyTaxes?: string | null | undefined;
-    hoaFees?: string | null | undefined;
-    ownerId?: number | null | undefined;
-    agentId?: number | null | undefined;
-    forMap?: boolean | null | undefined;
-    auctionDate?: number | null | undefined;
-    auctionTime?: string | null | undefined;
-    startingBid?: string | null | undefined;
-    currentBid?: string | null | undefined;
-    reservePrice?: string | null | undefined;
-    auctionHouse?: string | null | undefined;
-    auctioneerName?: string | null | undefined;
-    auctioneerContact?: string | null | undefined;
-    bidIncrement?: string | null | undefined;
-    depositRequired?: string | null | undefined;
-    auctionTerms?: string | null | undefined;
-    lotNumber?: string | null | undefined;
-}>;
-export declare const insertInquirySchema: z.ZodObject<Omit<{
-    id: z.ZodOptional<z.ZodNumber>;
-    propertyId: z.ZodNumber;
-    buyerId: z.ZodNumber;
-    message: z.ZodString;
-    status: z.ZodOptional<z.ZodString>;
-    createdAt: z.ZodOptional<z.ZodNullable<z.ZodDate>>;
-}, "id" | "createdAt" | "status">, "strip", z.ZodTypeAny, {
-    message: string;
-    propertyId: number;
-    buyerId: number;
-}, {
-    message: string;
-    propertyId: number;
-    buyerId: number;
-}>;
-export declare const insertAppointmentSchema: z.ZodObject<Omit<{
-    id: z.ZodOptional<z.ZodNumber>;
-    propertyId: z.ZodNumber;
-    buyerId: z.ZodNumber;
-    agentId: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
-    appointmentDate: z.ZodDate;
-    type: z.ZodString;
-    status: z.ZodOptional<z.ZodString>;
-    notes: z.ZodOptional<z.ZodNullable<z.ZodString>>;
-    createdAt: z.ZodOptional<z.ZodNullable<z.ZodDate>>;
-}, "id" | "createdAt" | "status">, "strip", z.ZodTypeAny, {
-    type: string;
-    propertyId: number;
-    buyerId: number;
-    appointmentDate: Date;
-    agentId?: number | null | undefined;
-    notes?: string | null | undefined;
-}, {
-    type: string;
-    propertyId: number;
-    buyerId: number;
-    appointmentDate: Date;
-    agentId?: number | null | undefined;
-    notes?: string | null | undefined;
-}>;
-export declare const insertSavedPropertySchema: z.ZodObject<Omit<{
-    id: z.ZodOptional<z.ZodNumber>;
-    userId: z.ZodNumber;
-    propertyId: z.ZodNumber;
-    createdAt: z.ZodOptional<z.ZodNullable<z.ZodDate>>;
-}, "id" | "createdAt">, "strip", z.ZodTypeAny, {
-    userId: number;
-    propertyId: number;
-}, {
-    userId: number;
-    propertyId: number;
-}>;
+export declare const insertUserSchema: z.ZodObject<Omit<{}, "id" | "createdAt" | "updatedAt">, "strip", z.ZodTypeAny, {}, {}>;
+export declare const insertPropertySchema: z.ZodObject<Omit<{}, "id" | "createdAt" | "updatedAt" | "views" | "daysOnMarket" | "fts">, "strip", z.ZodTypeAny, {}, {}>;
+export declare const insertInquirySchema: z.ZodObject<Omit<{}, "id" | "createdAt" | "status">, "strip", z.ZodTypeAny, {}, {}>;
+export declare const insertAppointmentSchema: z.ZodObject<Omit<{}, "id" | "createdAt" | "status">, "strip", z.ZodTypeAny, {}, {}>;
+export declare const insertSavedPropertySchema: z.ZodObject<Omit<{}, "id" | "createdAt">, "strip", z.ZodTypeAny, {}, {}>;
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type Property = typeof properties.$inferSelect;
@@ -3820,117 +3697,11 @@ export type InsertAppointment = z.infer<typeof insertAppointmentSchema>;
 export type SavedProperty = typeof savedProperties.$inferSelect;
 export type InsertSavedProperty = z.infer<typeof insertSavedPropertySchema>;
 export type RefreshToken = typeof refreshTokens.$inferSelect;
-export declare const insertUserReviewSchema: z.ZodObject<Omit<{
-    id: z.ZodOptional<z.ZodNumber>;
-    revieweeId: z.ZodNumber;
-    reviewerId: z.ZodNumber;
-    rating: z.ZodNumber;
-    review: z.ZodOptional<z.ZodNullable<z.ZodString>>;
-    reviewType: z.ZodString;
-    transactionId: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
-    isVerified: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
-    isPublic: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
-    status: z.ZodOptional<z.ZodString>;
-    moderatorNotes: z.ZodOptional<z.ZodNullable<z.ZodString>>;
-    createdAt: z.ZodOptional<z.ZodNullable<z.ZodDate>>;
-    updatedAt: z.ZodOptional<z.ZodNullable<z.ZodDate>>;
-}, "id" | "createdAt" | "updatedAt" | "status" | "isVerified">, "strip", z.ZodTypeAny, {
-    rating: number;
-    reviewerId: number;
-    revieweeId: number;
-    reviewType: string;
-    review?: string | null | undefined;
-    transactionId?: number | null | undefined;
-    isPublic?: number | null | undefined;
-    moderatorNotes?: string | null | undefined;
-}, {
-    rating: number;
-    reviewerId: number;
-    revieweeId: number;
-    reviewType: string;
-    review?: string | null | undefined;
-    transactionId?: number | null | undefined;
-    isPublic?: number | null | undefined;
-    moderatorNotes?: string | null | undefined;
-}>;
-export declare const insertReviewResponseSchema: z.ZodObject<Omit<{
-    id: z.ZodOptional<z.ZodNumber>;
-    reviewId: z.ZodNumber;
-    responderId: z.ZodNumber;
-    response: z.ZodString;
-    isOfficial: z.ZodOptional<z.ZodNullable<z.ZodBoolean>>;
-    createdAt: z.ZodOptional<z.ZodNullable<z.ZodDate>>;
-}, "id" | "createdAt">, "strip", z.ZodTypeAny, {
-    reviewId: number;
-    responderId: number;
-    response: string;
-    isOfficial?: boolean | null | undefined;
-}, {
-    reviewId: number;
-    responderId: number;
-    response: string;
-    isOfficial?: boolean | null | undefined;
-}>;
-export declare const insertReviewHelpfulSchema: z.ZodObject<Omit<{
-    id: z.ZodOptional<z.ZodNumber>;
-    reviewId: z.ZodNumber;
-    userId: z.ZodNumber;
-    isHelpful: z.ZodBoolean;
-    createdAt: z.ZodOptional<z.ZodNullable<z.ZodDate>>;
-}, "id" | "createdAt">, "strip", z.ZodTypeAny, {
-    userId: number;
-    reviewId: number;
-    isHelpful: boolean;
-}, {
-    userId: number;
-    reviewId: number;
-    isHelpful: boolean;
-}>;
-export declare const insertUserPermissionSchema: z.ZodObject<Omit<{
-    id: z.ZodOptional<z.ZodNumber>;
-    userId: z.ZodNumber;
-    permission: z.ZodString;
-    grantedBy: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
-    expiresAt: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
-    createdAt: z.ZodOptional<z.ZodNullable<z.ZodDate>>;
-}, "id" | "createdAt">, "strip", z.ZodTypeAny, {
-    userId: number;
-    permission: string;
-    expiresAt?: number | null | undefined;
-    grantedBy?: number | null | undefined;
-}, {
-    userId: number;
-    permission: string;
-    expiresAt?: number | null | undefined;
-    grantedBy?: number | null | undefined;
-}>;
-export declare const insertAdminAuditLogSchema: z.ZodObject<Omit<{
-    id: z.ZodOptional<z.ZodNumber>;
-    adminId: z.ZodNumber;
-    action: z.ZodString;
-    targetType: z.ZodString;
-    targetId: z.ZodNumber;
-    details: z.ZodOptional<z.ZodNullable<z.ZodString>>;
-    ipAddress: z.ZodOptional<z.ZodNullable<z.ZodString>>;
-    userAgent: z.ZodOptional<z.ZodNullable<z.ZodString>>;
-    createdAt: z.ZodOptional<z.ZodNullable<z.ZodDate>>;
-}, "id" | "createdAt">, "strip", z.ZodTypeAny, {
-    adminId: number;
-    action: string;
-    targetType: string;
-    targetId: number;
-    details?: string | null | undefined;
-    ipAddress?: string | null | undefined;
-    userAgent?: string | null | undefined;
-}, {
-    adminId: number;
-    action: string;
-    targetType: string;
-    targetId: number;
-    details?: string | null | undefined;
-    ipAddress?: string | null | undefined;
-    userAgent?: string | null | undefined;
-}>;
+export declare const insertUserReviewSchema: z.ZodObject<Omit<{}, "id" | "isVerified" | "createdAt" | "updatedAt" | "status">, "strip", z.ZodTypeAny, {}, {}>;
+export declare const insertReviewResponseSchema: z.ZodObject<Omit<{}, "id" | "createdAt">, "strip", z.ZodTypeAny, {}, {}>;
+export declare const insertReviewHelpfulSchema: z.ZodObject<Omit<{}, "id" | "createdAt">, "strip", z.ZodTypeAny, {}, {}>;
+export declare const insertUserPermissionSchema: z.ZodObject<Omit<{}, "id" | "createdAt">, "strip", z.ZodTypeAny, {}, {}>;
+export declare const insertAdminAuditLogSchema: z.ZodObject<Omit<{}, "id" | "createdAt">, "strip", z.ZodTypeAny, {}, {}>;
 export type UserReview = typeof userReviews.$inferSelect;
 export type InsertUserReview = z.infer<typeof insertUserReviewSchema>;
 export type ReviewResponse = typeof reviewResponses.$inferSelect;

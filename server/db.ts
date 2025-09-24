@@ -1,6 +1,8 @@
 import { drizzle } from 'drizzle-orm/node-postgres';
-import { Pool } from 'pg';
+import { Pool, types } from 'pg';
 import * as schema from "../shared/schema";
+
+types.setTypeParser(1700, (val: string) => parseFloat(val));
 
 // ---------------------------------------------------------------------------
 // PostgreSQL connection setup
