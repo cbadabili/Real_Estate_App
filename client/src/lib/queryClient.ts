@@ -1,7 +1,6 @@
 // @ts-nocheck
 import { QueryClient } from '@tanstack/react-query';
 import { getToken, removeToken } from './storage';
-
 export const authHeaders = (url?: string): HeadersInit => {
   const token = getToken();
   if (!token) {
@@ -21,6 +20,7 @@ export const authHeaders = (url?: string): HeadersInit => {
 
   return { Authorization: `Bearer ${token}` };
 };
+
 
 // Default fetcher function for GET requests
 const defaultQueryFn = async ({ queryKey }: { queryKey: readonly unknown[] }) => {
