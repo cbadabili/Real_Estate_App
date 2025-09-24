@@ -19,6 +19,8 @@ export const authHeaders = (url?: string): HeadersInit => {
   }
 
   return { Authorization: `Bearer ${token}` };
+};
+
 
 // Default fetcher function for GET requests
 const defaultQueryFn = async ({ queryKey }: { queryKey: readonly unknown[] }) => {

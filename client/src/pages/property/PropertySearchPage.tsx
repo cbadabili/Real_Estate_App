@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Grid, List, Map as MapIcon } from 'lucide-react';
 import SmartSearchBar from '../../components/search/SmartSearchBar';
@@ -44,6 +44,15 @@ const PropertySearchPage = () => {
   const [showComparison, setShowComparison] = useState(false);
   const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
   const [resultCount, setResultCount] = useState(0); // Added state for resultCount
+  const pendingAnalyticsRef = useRef<{ query: string; filters: typeof filters } | null>(null);
+
+  const trackSearchAnalytics = (results: any[]) => {
+    const pending = pendingAnalyticsRef.current;
+    if (pending && pending.query === searchQuery) {
+      analytics.searchPerformed(pending.query || '', { ...pending.filters, query: pending.query }, results.length);
+      pendingAnalyticsRef.current = null;
+    }
+  };
 
   // Fetch properties with current filters
   const fetchProperties = useCallback(async () => {
@@ -98,6 +107,7 @@ const PropertySearchPage = () => {
           const results = data.results || [];
           setProperties(results);
           setResultCount(results.length);
+          trackSearchAnalytics(results);
         } else {
           throw new Error(`Search failed: ${response.status}`);
         }
@@ -107,8 +117,10 @@ const PropertySearchPage = () => {
         if (response.ok) {
           data = await response.json();
           console.log('Received properties:', data.length);
-          setProperties(Array.isArray(data) ? data : []);
-          setResultCount(Array.isArray(data) ? data.length : 0);
+          const results = Array.isArray(data) ? data : [];
+          setProperties(results);
+          setResultCount(results.length);
+          trackSearchAnalytics(results);
         } else {
           throw new Error(`Properties fetch failed: ${response.status}`);
         }
@@ -117,6 +129,7 @@ const PropertySearchPage = () => {
       console.error('Failed to search properties:', error);
       setProperties([]);
       setResultCount(0);
+      pendingAnalyticsRef.current = null;
     } finally {
       setIsLoading(false);
     }
@@ -128,81 +141,12 @@ const PropertySearchPage = () => {
   }, [fetchProperties]);
 
   // Handle search from SmartSearchBar
-  const handleSearch = async (searchQueryParam: string, searchFiltersParam?: object) => {
-    setIsLoading(true);
-    setSearchQuery(searchQueryParam); // Update the search query state
-    
-    try {
-      const queryParams = new URLSearchParams();
-
-      // Use the combined search query and filters from SmartSearchBar
-      if (searchQueryParam) {
-        queryParams.set('location', searchQueryParam);
-        // Also search in city and address fields
-        queryParams.set('city', searchQueryParam);
-      }
-
-      // Apply filters from searchFiltersParam or use current filters
-      const currentFilters = { ...filters, ...searchFiltersParam };
-      setFilters(currentFilters); // Update local state with new filters
-
-      if (currentFilters.propertyType !== 'all') {
-        queryParams.set('propertyType', currentFilters.propertyType);
-      }
-      if (currentFilters.bedrooms !== 'any') {
-        queryParams.set('minBedrooms', currentFilters.bedrooms === '5+' ? '5' : currentFilters.bedrooms);
-      }
-      if (currentFilters.bathrooms !== 'any') {
-        queryParams.set('minBathrooms', currentFilters.bathrooms === '4+' ? '4' : currentFilters.bathrooms);
-      }
-      if (currentFilters.listingType !== 'all') {
-        queryParams.set('listingType', currentFilters.listingType);
-      }
-
-      queryParams.set('minPrice', currentFilters.priceRange[0].toString());
-      queryParams.set('maxPrice', currentFilters.priceRange[1].toString());
-
-      queryParams.set('sortBy', sortBy);
-      queryParams.set('status', 'active');
-
-      console.log('Searching with params:', queryParams.toString());
-
-      const response = await fetch(`/api/properties?${queryParams}`);
-      const data = await response.json();
-
-      if (response.ok) {
-        const results = Array.isArray(data) ? data : [];
-        setProperties(results);
-        setResultCount(results.length);
-
-        // Update URL with search query
-        if (searchQueryParam) {
-          setSearchParams({ q: searchQueryParam });
-        }
-
-        // Track search analytics
-        analytics.searchPerformed(
-          searchQueryParam || '',
-          { ...currentFilters, query: searchQueryParam },
-          results.length
-        );
-      } else {
-        console.error('Search failed:', response.status, response.statusText);
-        setProperties([]);
-        setResultCount(0);
-        // Track search error
-        analytics.errorOccurred('search_failed', `HTTP ${response.status}`, 'property_search');
-      }
-    } catch (error: any) {
-      console.error('Search error:', error);
-      setProperties([]);
-      setResultCount(0);
-
-      // Track search error
-      analytics.errorOccurred('search_failed', error.message, 'property_search');
-    } finally {
-      setIsLoading(false);
-    }
+  const handleSearch = (searchQueryParam: string, searchFiltersParam?: Partial<typeof filters>) => {
+    const mergedFilters = { ...filters, ...searchFiltersParam };
+    setFilters(mergedFilters);
+    setSearchQuery(searchQueryParam);
+    setSearchParams(searchQueryParam ? { q: searchQueryParam } : {});
+    pendingAnalyticsRef.current = { query: searchQueryParam, filters: mergedFilters };
   };
 
 
@@ -230,15 +174,14 @@ const PropertySearchPage = () => {
 
   // Handle saved search loading
   const handleLoadSearch = (savedSearch: any) => {
+    const nextFilters = savedSearch.filters ? savedSearch.filters : filters;
     if (savedSearch.filters) {
       setFilters(savedSearch.filters);
     }
-    if (savedSearch.query) {
-      setSearchQuery(savedSearch.query);
-      setSearchParams({ q: savedSearch.query });
-      // Fetch properties with the loaded search query and filters
-      fetchProperties();
-    }
+    const nextQuery = savedSearch.query ?? '';
+    setSearchQuery(nextQuery);
+    setSearchParams(nextQuery ? { q: nextQuery } : {});
+    pendingAnalyticsRef.current = { query: nextQuery, filters: nextFilters };
   };
 
   const ActiveViewIcon = VIEW_MODE_META[viewMode].icon;

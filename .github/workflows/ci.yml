@@ -1,13 +1,16 @@
-name: ci
+name: client-ci
 on: [push, pull_request]
 
 jobs:
-  typecheck:
+  client_typecheck:
+
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
-      - run: npm ci || npm install
-      - run: npm run -w client typecheck
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - name: Typecheck (client)
+        run: npm run -w client typecheck
