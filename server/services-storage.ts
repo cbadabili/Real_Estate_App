@@ -77,9 +77,8 @@ export class ServicesStorage implements IServicesStorage {
     if (filters.reacCertified !== undefined) {
       conditions.push(eq(serviceProviders.reacCertified, filters.reacCertified));
     }
-    if (filters.minRating) {
-      // For SQLite, we need to handle string comparison differently
-      // For PostgreSQL, we can use gte directly on numeric types
+    if (filters.minRating !== undefined) {
+      // Ratings are stored as numeric values so direct comparison is safe
       conditions.push(gte(serviceProviders.rating, filters.minRating));
     }
 

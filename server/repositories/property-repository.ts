@@ -7,6 +7,105 @@ import { db } from "../db";
 import { eq, and, desc, asc, gte, lte, like, or, sql } from "drizzle-orm";
 import { cacheService, CacheService } from "../cache-service";
 
+const normalizeStringArray = (value: unknown): string[] => {
+  if (Array.isArray(value)) {
+    return value.map(item => String(item));
+  }
+
+  if (value === null || value === undefined) {
+    return [];
+  }
+
+  if (typeof value === "string") {
+    const trimmed = value.trim();
+    if (!trimmed) {
+      return [];
+    }
+    try {
+      const parsed = JSON.parse(trimmed);
+      if (Array.isArray(parsed)) {
+        return parsed.map(item => String(item));
+      }
+      if (parsed === null || parsed === undefined || parsed === "") {
+        return [];
+      }
+      return [String(parsed)];
+    } catch {
+      return [trimmed];
+    }
+  }
+
+  return [String(value)];
+};
+
+const normalizeNumeric = (value: unknown): number => {
+  const direct = Number(value);
+  if (Number.isFinite(direct)) {
+    return direct;
+  }
+
+  if (typeof value === "string") {
+    const cleaned = Number(value.replace(/[^\d.-]/g, ""));
+    if (Number.isFinite(cleaned)) {
+      return cleaned;
+    }
+  }
+
+  return 0;
+};
+
+const parseCoordinate = (value: unknown): number | null => {
+  if (value === null || value === undefined) {
+    return null;
+  }
+
+  if (typeof value === "number") {
+    return Number.isFinite(value) ? value : null;
+  }
+
+  if (typeof value === "string") {
+    const trimmed = value.trim();
+    if (!trimmed) {
+      return null;
+    }
+
+    const parsed = Number(trimmed);
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+
+  return null;
+};
+
+const buildGeomValue = (latitude: number | null, longitude: number | null) => {
+  if (latitude === null || longitude === null) {
+    return null;
+  }
+
+  return sql`ST_SetSRID(ST_MakePoint(${longitude}, ${latitude}), 4326)`;
+};
+
+const buildGeomUpdateValue = (
+  latitude: number | null | undefined,
+  longitude: number | null | undefined,
+) => {
+  const latitudeExpression = latitude === undefined
+    ? sql`${properties.latitude}`
+    : latitude === null
+      ? sql`NULL`
+      : sql`${latitude}`;
+
+  const longitudeExpression = longitude === undefined
+    ? sql`${properties.longitude}`
+    : longitude === null
+      ? sql`NULL`
+      : sql`${longitude}`;
+
+  return sql`CASE
+    WHEN ${latitudeExpression} IS NULL OR ${longitudeExpression} IS NULL THEN NULL
+    ELSE ST_SetSRID(ST_MakePoint(${longitudeExpression}, ${latitudeExpression}), 4326)
+  END`;
+};
+
 export interface PropertyFilters {
   minPrice?: number;
   maxPrice?: number;
@@ -57,11 +156,11 @@ export class PropertyRepository implements IPropertyRepository {
     let query = db.select().from(properties);
     const conditions = [];
 
-    if (filters.minPrice) {
-      conditions.push(gte(properties.price, filters.minPrice.toString()));
+    if (filters.minPrice !== undefined) {
+      conditions.push(gte(properties.price, filters.minPrice));
     }
-    if (filters.maxPrice) {
-      conditions.push(lte(properties.price, filters.maxPrice.toString()));
+    if (filters.maxPrice !== undefined) {
+      conditions.push(lte(properties.price, filters.maxPrice));
     }
     if (filters.propertyType && filters.propertyType !== 'all') {
       conditions.push(eq(properties.propertyType, filters.propertyType));
@@ -69,8 +168,8 @@ export class PropertyRepository implements IPropertyRepository {
     if (filters.minBedrooms) {
       conditions.push(gte(properties.bedrooms, filters.minBedrooms));
     }
-    if (filters.minBathrooms) {
-      conditions.push(gte(properties.bathrooms, filters.minBathrooms.toString()));
+    if (filters.minBathrooms !== undefined) {
+      conditions.push(gte(properties.bathrooms, filters.minBathrooms));
     }
     if (filters.minSquareFeet) {
       conditions.push(gte(properties.squareFeet, filters.minSquareFeet));
@@ -134,12 +233,10 @@ export class PropertyRepository implements IPropertyRepository {
 
     // Filter out properties with invalid coordinates
     const validResults = results.filter(prop => {
-      const hasValidCoords = prop.latitude !== null &&
-                           prop.longitude !== null &&
-                           prop.latitude !== '' &&
-                           prop.longitude !== '' &&
-                           !isNaN(parseFloat(prop.latitude)) &&
-                           !isNaN(parseFloat(prop.longitude));
+      const lat = typeof prop.latitude === "number" ? prop.latitude : prop.latitude === null ? null : Number(prop.latitude);
+      const lng = typeof prop.longitude === "number" ? prop.longitude : prop.longitude === null ? null : Number(prop.longitude);
+      const hasValidCoords = typeof lat === "number" && !Number.isNaN(lat) &&
+        typeof lng === "number" && !Number.isNaN(lng);
 
       if (!hasValidCoords) {
         console.log(`Filtering out property ${prop.id} "${prop.title}" - invalid coordinates: lat=${prop.latitude}, lng=${prop.longitude}`);
@@ -149,13 +246,15 @@ export class PropertyRepository implements IPropertyRepository {
     });
 
     const processedResults = validResults.map(prop => {
-      const processed = {
-        ...prop,
-        images: prop.images ? JSON.parse(prop.images) : [],
-        features: prop.features ? (
-          Array.isArray(JSON.parse(prop.features)) ? JSON.parse(prop.features) :
-          typeof JSON.parse(prop.features) === 'string' ? [JSON.parse(prop.features)] : []
-        ) : [],
+      const lat = typeof prop.latitude === "number" ? prop.latitude : Number(prop.latitude);
+      const lng = typeof prop.longitude === "number" ? prop.longitude : Number(prop.longitude);
+    const processed = {
+      ...prop,
+      price: normalizeNumeric(prop.price),
+        latitude: Number.isFinite(lat) ? lat : null,
+        longitude: Number.isFinite(lng) ? lng : null,
+        images: normalizeStringArray(prop.images),
+        features: normalizeStringArray(prop.features),
       };
 
       console.log(`Property ${processed.id}: lat=${processed.latitude}, lng=${processed.longitude}, type=${processed.propertyType}`);
@@ -172,36 +271,51 @@ export class PropertyRepository implements IPropertyRepository {
   }
 
   async createProperty(property: InsertProperty): Promise<Property> {
-    const propertyData = {
-      ...property,
-      images: property.images ? JSON.stringify(property.images) : null,
-      features: property.features ? JSON.stringify(property.features) : null,
-    };
+    const latitude = parseCoordinate(property.latitude);
+    const longitude = parseCoordinate(property.longitude);
+    const geomValue = buildGeomValue(latitude, longitude);
 
     const [newProperty] = await db
       .insert(properties)
-      .values(propertyData)
+      .values({
+        ...property,
+        latitude,
+        longitude,
+        geom: geomValue,
+      })
       .returning();
 
     return {
       ...newProperty,
-      images: newProperty.images ? JSON.parse(newProperty.images) : [],
-      features: newProperty.features ? JSON.parse(newProperty.features) : [],
+      price: normalizeNumeric(newProperty.price),
+      images: normalizeStringArray(newProperty.images),
+      features: normalizeStringArray(newProperty.features),
     };
   }
 
   async updateProperty(id: number, updates: Partial<InsertProperty>): Promise<Property | undefined> {
-    const updateData = { ...updates };
-    if (updates.images) {
-      updateData.images = JSON.stringify(updates.images);
+    const updatePayload: Record<string, unknown> = { ...updates };
+
+    let latitude: number | null | undefined;
+    if (Object.prototype.hasOwnProperty.call(updates, "latitude")) {
+      latitude = parseCoordinate(updates.latitude);
+      updatePayload.latitude = latitude;
     }
-    if (updates.features) {
-      updateData.features = JSON.stringify(updates.features);
+
+    let longitude: number | null | undefined;
+    if (Object.prototype.hasOwnProperty.call(updates, "longitude")) {
+      longitude = parseCoordinate(updates.longitude);
+      updatePayload.longitude = longitude;
+    }
+
+    if (Object.prototype.hasOwnProperty.call(updates, "latitude") ||
+        Object.prototype.hasOwnProperty.call(updates, "longitude")) {
+      updatePayload.geom = buildGeomUpdateValue(latitude, longitude);
     }
 
     const [property] = await db
       .update(properties)
-      .set({ ...updateData, updatedAt: Math.floor(Date.now() / 1000) })
+      .set(updatePayload)
       .where(eq(properties.id, id))
       .returning();
 
@@ -209,8 +323,9 @@ export class PropertyRepository implements IPropertyRepository {
 
     return {
       ...property,
-      images: property.images ? JSON.parse(property.images) : [],
-      features: property.features ? JSON.parse(property.features) : [],
+      price: normalizeNumeric(property.price),
+      images: normalizeStringArray(property.images),
+      features: normalizeStringArray(property.features),
     };
   }
 
@@ -231,8 +346,9 @@ export class PropertyRepository implements IPropertyRepository {
 
     return userProps.map(prop => ({
       ...prop,
-      images: prop.images ? JSON.parse(prop.images) : [],
-      features: prop.features ? JSON.parse(prop.features) : [],
+      price: normalizeNumeric(prop.price),
+      images: normalizeStringArray(prop.images),
+      features: normalizeStringArray(prop.features),
     }));
   }
 

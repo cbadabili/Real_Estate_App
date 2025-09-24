@@ -18,8 +18,10 @@ import rateLimit from 'express-rate-limit';
 import { addRequestId, structuredLogger } from './middleware/logging';
 import billingRoutes from './billing-routes';
 import heroRoutes from './hero-routes';
-import documentsRoutes from './routes/documents-routes.js';
+import analyticsRoutes from './analytics-routes';
 const app = express();
+// Configure trust proxy for Replit
+app.set('trust proxy', 1);
 // Security middleware
 app.use(helmet({
     contentSecurityPolicy: {
@@ -96,21 +98,16 @@ app.use((req, res, next) => {
     res.setHeader('X-Frame-Options', 'DENY');
     res.setHeader('X-XSS-Protection', '1; mode=block');
     res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
-    // Content Security Policy - Updated to allow necessary inline content and data URIs
-    res.setHeader('Content-Security-Policy', [
-        "default-src 'self'",
-        "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://api.mapbox.com https://replit.com",
-        "script-src-elem 'self' 'unsafe-inline' https://api.mapbox.com https://replit.com",
-        "style-src 'self' 'unsafe-inline' https://api.mapbox.com https://fonts.googleapis.com",
-        "font-src 'self' data: https://fonts.gstatic.com https://fonts.googleapis.com",
-        "img-src 'self' data: https: blob:",
-        "connect-src 'self' https://api.mapbox.com https://events.mapbox.com wss: ws:",
-        "worker-src 'self' blob:",
-        "child-src 'self'",
-        "base-uri 'self'",
-        "form-action 'self'",
-        "object-src 'none'"
-    ].join('; '));
+    if (process.env.NODE_ENV === 'development') {
+        // In development we relax CSP for local tooling; production relies on helmet CSP
+        res.setHeader('Content-Security-Policy', "default-src 'self'; " +
+            "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://replit.com; " +
+            "font-src 'self' data: https:; " +
+            "style-src 'self' 'unsafe-inline'; " +
+            "img-src 'self' data: https:; " +
+            "connect-src 'self' ws: wss: https:; " +
+            "frame-src 'self';");
+    }
     next();
 });
 // --------------------------------------------------
@@ -154,6 +151,7 @@ app.get('/api/health', (_req, res) => {
     // Register billing and hero routes
     app.use('/api/billing', billingRoutes);
     app.use('/api/hero', heroRoutes);
+    app.use('/api/analytics', analyticsRoutes);
     // OpenAI-powered Intel adapter routes
     app.post('/intel/search', intelSearch);
     app.get('/intel/suggest', intelSuggest);
@@ -359,11 +357,7 @@ app.get('/api/health', (_req, res) => {
         }
     }
     // Seed rental data
-    // API routes
-    app.use('/api/properties', propertyRoutes);
-    app.use('/api/users', userRoutes);
-    app.use('/api/auth', authRoutes);
-    app.use('/api', documentsRoutes);
+    // Routes already registered above; avoid double-registration.
     // ALWAYS serve the app on port 5000
     // this serves both the API and the client.
     // It is the only port that is not firewalled.

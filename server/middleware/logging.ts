@@ -35,12 +35,15 @@ export const structuredLogger = (req: RequestWithId, res: Response, next: NextFu
 
       console.log(JSON.stringify(logData));
 
-      // Track performance metrics
-      analyticsService.recordResponseTime(req.path, duration);
-      
-      // Track errors
-      if (res.statusCode >= 400) {
-        analyticsService.recordError(req.path, res.statusCode.toString());
+      // Track performance metrics (never block responses)
+      try {
+        analyticsService.recordResponseTime(req.path, duration);
+
+        if (res.statusCode >= 400) {
+          analyticsService.recordError(req.path, res.statusCode.toString());
+        }
+      } catch (err) {
+        console.error('analyticsService error', { path: req.path, err: String(err) });
       }
     }
 
