@@ -26,27 +26,88 @@ const VIEW_MODE_META = {
   map: { label: 'Map view', icon: MapIcon }
 } as const;
 
+const defaultFilters = {
+  priceRange: [0, 5000000] as [number, number],
+  propertyType: 'all',
+  bedrooms: 'any',
+  bathrooms: 'any',
+  listingType: 'all'
+};
+
+type PropertyFiltersState = typeof defaultFilters;
+
+type NormalizedProperty = {
+  id: number;
+  title: string;
+  price: number;
+  location: string;
+  propertyType: string;
+  bedrooms: number;
+  bathrooms: number;
+  squareFeet?: number;
+  imageUrl?: string;
+  features?: string[];
+  latitude: number;
+  longitude: number;
+};
+
+type RawProperty = Record<string, unknown>;
+
+type SavedSearch = {
+  query?: string;
+  filters?: PropertyFiltersState;
+};
+
+const toNumber = (value: unknown, fallback = 0): number => {
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    return value;
+  }
+  if (typeof value === 'string') {
+    const parsed = Number(value);
+    if (Number.isFinite(parsed)) {
+      return parsed;
+    }
+  }
+  return fallback;
+};
+
+const toStringValue = (value: unknown, fallback = ''): string => (
+  typeof value === 'string' && value.trim().length > 0 ? value : fallback
+);
+
+const normalizeProperty = (property: RawProperty, fallbackIndex: number): NormalizedProperty => {
+  const fallbackTitle = `Property ${fallbackIndex + 1}`;
+  return {
+    id: toNumber(property.id, fallbackIndex + 1),
+    title: toStringValue(property.title ?? property.name, fallbackTitle),
+    price: toNumber(property.price),
+    location: toStringValue(property.location ?? property.address, 'Location not specified'),
+    propertyType: toStringValue(property.propertyType ?? property.type, 'Unknown'),
+    bedrooms: toNumber(property.bedrooms),
+    bathrooms: toNumber(property.bathrooms),
+    squareFeet: property.squareFeet !== undefined ? toNumber(property.squareFeet) : undefined,
+    imageUrl: typeof property.imageUrl === 'string' ? property.imageUrl : undefined,
+    features: Array.isArray(property.features) ? property.features.map((feature) => String(feature)) : undefined,
+    latitude: toNumber(property.latitude),
+    longitude: toNumber(property.longitude)
+  };
+};
+
 const PropertySearchPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [properties, setProperties] = useState<any[]>([]);
+  const [properties, setProperties] = useState<NormalizedProperty[]>([]);
   const [viewMode, setViewMode] = useState<'grid' | 'list' | 'map'>('grid');
   const [showFilters, setShowFilters] = useState(true);
-  const [filters, setFilters] = useState({
-    priceRange: [0, 5000000] as [number, number],
-    propertyType: 'all',
-    bedrooms: 'any',
-    bathrooms: 'any',
-    listingType: 'all'
-  });
+  const [filters, setFilters] = useState<PropertyFiltersState>(defaultFilters);
   const [sortBy, setSortBy] = useState('newest');
   const [isLoading, setIsLoading] = useState(false);
-  const [comparisonProperties, setComparisonProperties] = useState<any[]>([]);
+  const [comparisonProperties, setComparisonProperties] = useState<NormalizedProperty[]>([]);
   const [showComparison, setShowComparison] = useState(false);
   const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
   const [resultCount, setResultCount] = useState(0); // Added state for resultCount
-  const pendingAnalyticsRef = useRef<{ query: string; filters: typeof filters } | null>(null);
+  const pendingAnalyticsRef = useRef<{ query: string; filters: PropertyFiltersState } | null>(null);
 
-  const trackSearchAnalytics = (results: any[]) => {
+  const trackSearchAnalytics = (results: NormalizedProperty[]) => {
     const pending = pendingAnalyticsRef.current;
     if (pending && pending.query === searchQuery) {
       analytics.searchPerformed(pending.query || '', { ...pending.filters, query: pending.query }, results.length);
@@ -104,10 +165,13 @@ const PropertySearchPage = () => {
         response = await fetch(`/api/search?${searchParams}`);
         if (response.ok) {
           data = await response.json();
-          const results = data.results || [];
-          setProperties(results);
-          setResultCount(results.length);
-          trackSearchAnalytics(results);
+          const rawResults = Array.isArray(data.results) ? data.results : [];
+          const normalizedResults = rawResults.map((item, index) =>
+            normalizeProperty(item as RawProperty, index)
+          );
+          setProperties(normalizedResults);
+          setResultCount(normalizedResults.length);
+          trackSearchAnalytics(normalizedResults);
         } else {
           throw new Error(`Search failed: ${response.status}`);
         }
@@ -117,10 +181,13 @@ const PropertySearchPage = () => {
         if (response.ok) {
           data = await response.json();
           console.log('Received properties:', data.length);
-          const results = Array.isArray(data) ? data : [];
-          setProperties(results);
-          setResultCount(results.length);
-          trackSearchAnalytics(results);
+          const rawResults = Array.isArray(data) ? data : [];
+          const normalizedResults = rawResults.map((item, index) =>
+            normalizeProperty(item as RawProperty, index)
+          );
+          setProperties(normalizedResults);
+          setResultCount(normalizedResults.length);
+          trackSearchAnalytics(normalizedResults);
         } else {
           throw new Error(`Properties fetch failed: ${response.status}`);
         }
@@ -141,7 +208,7 @@ const PropertySearchPage = () => {
   }, [fetchProperties]);
 
   // Handle search from SmartSearchBar
-  const handleSearch = (searchQueryParam: string, searchFiltersParam?: Partial<typeof filters>) => {
+  const handleSearch = (searchQueryParam: string, searchFiltersParam?: Partial<PropertyFiltersState>) => {
     const mergedFilters = { ...filters, ...searchFiltersParam };
     setFilters(mergedFilters);
     setSearchQuery(searchQueryParam);
@@ -151,7 +218,7 @@ const PropertySearchPage = () => {
 
 
   // Handle filter changes
-  const handleFiltersChange = (newFilters: typeof filters) => {
+  const handleFiltersChange = (newFilters: PropertyFiltersState) => {
     console.log('Filters changed:', newFilters);
     setFilters(newFilters);
   };
@@ -162,7 +229,7 @@ const PropertySearchPage = () => {
   };
 
   // Handle comparison
-  const handleAddToComparison = (property: any) => {
+  const handleAddToComparison = (property: NormalizedProperty) => {
     if (comparisonProperties.length < 4 && !comparisonProperties.find(p => p.id === property.id)) {
       setComparisonProperties([...comparisonProperties, property]);
     }
@@ -173,7 +240,7 @@ const PropertySearchPage = () => {
   };
 
   // Handle saved search loading
-  const handleLoadSearch = (savedSearch: any) => {
+  const handleLoadSearch = (savedSearch: SavedSearch) => {
     const nextFilters = savedSearch.filters ? savedSearch.filters : filters;
     if (savedSearch.filters) {
       setFilters(savedSearch.filters);
