@@ -54,7 +54,9 @@ export function adaptBeeDabPropertyToListing(property: BeeDabProperty): Listing 
   const features = normalizeStringArray(property.features);
 
   const priceNumber = normalizeNumber(property.price);
-  const bathsNumber = property.bathrooms ? normalizeNumber(property.bathrooms) : null;
+  const bathsNumber = property.bathrooms === undefined || property.bathrooms === null
+    ? null
+    : normalizeNumber(property.bathrooms);
   const lat = normalizeNumber(property.latitude);
   const lng = normalizeNumber(property.longitude);
 
@@ -76,14 +78,14 @@ export function adaptBeeDabPropertyToListing(property: BeeDabProperty): Listing 
     beds: property.bedrooms,
     baths: bathsNumber,
     half_baths: 0, // Not tracked in BeeDab schema
-    area: property.squareFeet || property.areaBuild,
+    area: property.squareFeet ?? property.areaBuild,
     area_unit: 'sqft',
-    lot_size: property.lotSize ? parseFloat(property.lotSize.replace(/[^\d.]/g, '')) : null,
+    lot_size: normalizeNumber(property.lotSize),
     lot_unit: 'sqft',
     property_type: property.propertyType,
     tenure: property.listingType === 'owner' ? 'freehold' : null,
     year_built: property.yearBuilt,
-    hoa_fees: property.hoaFees ? parseFloat(property.hoaFees.replace(/[^\d.]/g, '')) : null,
+    hoa_fees: normalizeNumber(property.hoaFees),
     cap_rate: null, // Not tracked in BeeDab
     days_on_market: property.daysOnMarket,
     status: property.status === 'active' ? 'for_sale' : property.status,

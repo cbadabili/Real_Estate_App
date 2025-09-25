@@ -1,6 +1,7 @@
 BEGIN;
 
 CREATE EXTENSION IF NOT EXISTS postgis;
+CREATE EXTENSION IF NOT EXISTS pg_trgm;
 
 ALTER TABLE properties
   ADD COLUMN IF NOT EXISTS currency text NOT NULL DEFAULT 'BWP';
@@ -53,10 +54,15 @@ ALTER TABLE properties
   ALTER COLUMN features SET DEFAULT '[]'::jsonb,
   ALTER COLUMN features SET NOT NULL;
 
--- Bathrooms should be stored as integers
+-- Bathrooms stored as numeric(3,1) for partial baths
 ALTER TABLE properties
-  ALTER COLUMN bathrooms TYPE integer
-    USING NULLIF(regexp_replace(bathrooms::text, '[^0-9]+', '', 'g'), '')::int;
+  ALTER COLUMN bathrooms TYPE numeric(3,1)
+    USING CASE
+      WHEN bathrooms IS NULL OR NULLIF(trim(bathrooms::text), '') IS NULL THEN NULL
+      ELSE trunc(
+        NULLIF(regexp_replace(bathrooms::text, '[^0-9\.]+', '', 'g'), '')::numeric
+      , 1)
+    END;
 
 -- Latitude/longitude as doubles
 ALTER TABLE properties
@@ -124,11 +130,14 @@ ALTER TABLE properties
       to_tsvector('simple', coalesce(title, '') || ' ' || coalesce(description, '') || ' ' || coalesce(address, ''))
     ) STORED;
 
--- Supporting indexes
 CREATE INDEX IF NOT EXISTS properties_geom_gix ON properties USING GIST (geom);
 CREATE INDEX IF NOT EXISTS properties_price_idx ON properties (price);
 CREATE INDEX IF NOT EXISTS properties_status_listing_type_idx ON properties (status, listing_type);
 CREATE INDEX IF NOT EXISTS properties_created_at_idx ON properties (created_at);
-CREATE INDEX IF NOT EXISTS properties_fts_idx ON properties USING GIN (fts);
+CREATE INDEX IF NOT EXISTS properties_fts_gin_idx ON properties USING GIN (fts);
+CREATE INDEX IF NOT EXISTS properties_city_trgm_idx ON properties USING GIN (city gin_trgm_ops);
+CREATE INDEX IF NOT EXISTS properties_address_trgm_idx ON properties USING GIN (address gin_trgm_ops);
+CREATE INDEX IF NOT EXISTS properties_title_trgm_idx ON properties USING GIN (title gin_trgm_ops);
+CREATE INDEX IF NOT EXISTS properties_description_trgm_idx ON properties USING GIN (description gin_trgm_ops);
 
 COMMIT;

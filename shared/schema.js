@@ -66,7 +66,7 @@ export const properties = pgTable("properties", {
     listingType: text("listing_type").notNull(),
     status: text("status").default('active').notNull(),
     bedrooms: integer("bedrooms"),
-    bathrooms: text("bathrooms"),
+    bathrooms: numeric("bathrooms", { precision: 3, scale: 1 }).$type(),
     squareFeet: integer("square_feet"),
     areaBuild: integer("area_build"),
     lotSize: text("lot_size"),
@@ -390,6 +390,7 @@ export const insertPropertySchema = createInsertSchema(properties).omit({
     createdAt: true,
     updatedAt: true,
     fts: true,
+    geom: true,
 });
 export const insertInquirySchema = createInsertSchema(inquiries).omit({
     id: true,

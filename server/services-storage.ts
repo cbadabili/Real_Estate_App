@@ -78,8 +78,10 @@ export class ServicesStorage implements IServicesStorage {
       conditions.push(eq(serviceProviders.reacCertified, filters.reacCertified));
     }
     if (filters.minRating !== undefined) {
-      // Ratings are stored as numeric values so direct comparison is safe
-      conditions.push(gte(serviceProviders.rating, filters.minRating));
+      const min = Number(filters.minRating);
+      if (Number.isFinite(min)) {
+        conditions.push(gte(serviceProviders.rating, min));
+      }
     }
 
     if (conditions.length > 0) {
@@ -109,11 +111,17 @@ export class ServicesStorage implements IServicesStorage {
     }
 
     // Pagination
-    if (filters.limit) {
-      query = query.limit(filters.limit);
+    if (filters.limit !== undefined) {
+      const limit = Math.min(100, Math.max(0, Number(filters.limit)));
+      if (Number.isFinite(limit)) {
+        query = query.limit(limit);
+      }
     }
-    if (filters.offset) {
-      query = query.offset(filters.offset);
+    if (filters.offset !== undefined) {
+      const offset = Math.max(0, Number(filters.offset));
+      if (Number.isFinite(offset)) {
+        query = query.offset(offset);
+      }
     }
 
     return await query;
@@ -236,17 +244,7 @@ export class ServicesStorage implements IServicesStorage {
       .values(review)
       .returning();
 
-    // Update provider's review count and average rating
-    const reviews = await this.getServiceReviews(review.providerId);
-    const avgRating = reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length;
-
-    await db
-      .update(serviceProviders)
-      .set({
-        reviewCount: reviews.length,
-        rating: avgRating.toFixed(1)
-      })
-      .where(eq(serviceProviders.id, review.providerId));
+    await this.refreshProviderStats(review.providerId);
 
     return newReview;
   }
@@ -257,7 +255,40 @@ export class ServicesStorage implements IServicesStorage {
       .set(updates)
       .where(eq(serviceReviews.id, id))
       .returning();
-    return updatedReview || undefined;
+    if (!updatedReview) {
+      return undefined;
+    }
+
+    if (updatedReview.providerId) {
+      await this.refreshProviderStats(updatedReview.providerId);
+    }
+
+    return updatedReview;
+  }
+
+  private async refreshProviderStats(providerId: number): Promise<void> {
+    const [stats] = await db
+      .select({
+        count: sql<number>`COUNT(*)`,
+        avg: sql<number | null>`AVG(${serviceReviews.rating})`,
+      })
+      .from(serviceReviews)
+      .where(eq(serviceReviews.providerId, providerId));
+
+    const reviewCount = Number(stats?.count ?? 0);
+    const average = stats?.avg == null ? null : Number(stats.avg);
+    const normalizedAverage = average == null || Number.isNaN(average)
+      ? 0
+      : Math.round(average * 10) / 10;
+
+    await db
+      .update(serviceProviders)
+      .set({
+        reviewCount,
+        rating: normalizedAverage,
+        updatedAt: new Date(),
+      })
+      .where(eq(serviceProviders.id, providerId));
   }
 }
 

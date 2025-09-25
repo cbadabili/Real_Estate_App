@@ -82,14 +82,53 @@ const buildGeomUpdateValue = (latitude, longitude) => {
     ELSE ST_SetSRID(ST_MakePoint(${longitudeExpression}, ${latitudeExpression}), 4326)
   END`;
 };
+const toFiniteNumber = (value) => {
+    if (value === null || value === undefined) {
+        return undefined;
+    }
+    const num = Number(value);
+    return Number.isFinite(num) ? num : undefined;
+};
+const normalizePropertyRecord = (prop) => {
+    const lat = typeof prop.latitude === "number" ? prop.latitude : Number(prop.latitude);
+    const lng = typeof prop.longitude === "number" ? prop.longitude : Number(prop.longitude);
+    return {
+        ...prop,
+        price: normalizeNumeric(prop.price),
+        images: normalizeStringArray(prop.images),
+        features: normalizeStringArray(prop.features),
+        latitude: Number.isFinite(lat) ? lat : null,
+        longitude: Number.isFinite(lng) ? lng : null,
+    };
+};
 export class PropertyRepository {
     async getProperty(id) {
         const [property] = await db.select().from(properties).where(eq(properties.id, id));
-        return property || undefined;
+        if (!property) {
+            return undefined;
+        }
+        return normalizePropertyRecord(property);
     }
     async getProperties(filters = {}) {
-        // Create cache key based on filters
-        const cacheKey = CacheService.createKey('properties', filters);
+        const minPrice = toFiniteNumber(filters.minPrice);
+        const maxPrice = toFiniteNumber(filters.maxPrice);
+        const minBedrooms = toFiniteNumber(filters.minBedrooms);
+        const minBathrooms = toFiniteNumber(filters.minBathrooms);
+        const minSquareFeet = toFiniteNumber(filters.minSquareFeet);
+        const maxSquareFeet = toFiniteNumber(filters.maxSquareFeet);
+        const limit = toFiniteNumber(filters.limit);
+        const offset = toFiniteNumber(filters.offset);
+        const cacheKey = CacheService.createKey('properties', {
+            ...filters,
+            minPrice,
+            maxPrice,
+            minBedrooms,
+            minBathrooms,
+            minSquareFeet,
+            maxSquareFeet,
+            limit,
+            offset,
+        });
         // Try to get from cache first
         const cached = cacheService.get(cacheKey);
         if (cached) {
@@ -98,26 +137,26 @@ export class PropertyRepository {
         }
         let query = db.select().from(properties);
         const conditions = [];
-        if (filters.minPrice !== undefined) {
-            conditions.push(gte(properties.price, filters.minPrice));
+        if (minPrice !== undefined) {
+            conditions.push(gte(properties.price, minPrice));
         }
-        if (filters.maxPrice !== undefined) {
-            conditions.push(lte(properties.price, filters.maxPrice));
+        if (maxPrice !== undefined) {
+            conditions.push(lte(properties.price, maxPrice));
         }
         if (filters.propertyType && filters.propertyType !== 'all') {
             conditions.push(eq(properties.propertyType, filters.propertyType));
         }
-        if (filters.minBedrooms) {
-            conditions.push(gte(properties.bedrooms, filters.minBedrooms));
+        if (minBedrooms !== undefined) {
+            conditions.push(gte(properties.bedrooms, minBedrooms));
         }
-        if (filters.minBathrooms !== undefined) {
-            conditions.push(gte(properties.bathrooms, filters.minBathrooms));
+        if (minBathrooms !== undefined) {
+            conditions.push(gte(properties.bathrooms, minBathrooms));
         }
-        if (filters.minSquareFeet) {
-            conditions.push(gte(properties.squareFeet, filters.minSquareFeet));
+        if (minSquareFeet !== undefined) {
+            conditions.push(gte(properties.squareFeet, minSquareFeet));
         }
-        if (filters.maxSquareFeet) {
-            conditions.push(lte(properties.squareFeet, filters.maxSquareFeet));
+        if (maxSquareFeet !== undefined) {
+            conditions.push(lte(properties.squareFeet, maxSquareFeet));
         }
         if (filters.city || filters.location) {
             const searchTerm = filters.location || filters.city;
@@ -154,42 +193,33 @@ export class PropertyRepository {
             query = query.orderBy(desc(properties.createdAt));
         }
         // Pagination
-        if (filters.limit) {
-            query = query.limit(filters.limit);
+        if (limit !== undefined) {
+            const boundedLimit = Math.min(100, Math.max(0, Math.trunc(limit)));
+            query = query.limit(boundedLimit);
         }
-        if (filters.offset) {
-            query = query.offset(filters.offset);
+        if (offset !== undefined) {
+            const boundedOffset = Math.max(0, Math.trunc(offset));
+            query = query.offset(boundedOffset);
         }
         const results = await query;
-        // Filter out properties with invalid coordinates
-        const validResults = results.filter(prop => {
-            const lat = typeof prop.latitude === "number" ? prop.latitude : prop.latitude === null ? null : Number(prop.latitude);
-            const lng = typeof prop.longitude === "number" ? prop.longitude : prop.longitude === null ? null : Number(prop.longitude);
-            const hasValidCoords = typeof lat === "number" && !Number.isNaN(lat) &&
-                typeof lng === "number" && !Number.isNaN(lng);
-            if (!hasValidCoords) {
-                console.log(`Filtering out property ${prop.id} "${prop.title}" - invalid coordinates: lat=${prop.latitude}, lng=${prop.longitude}`);
-            }
-            return hasValidCoords;
-        });
-        const processedResults = validResults.map(prop => {
-            const lat = typeof prop.latitude === "number" ? prop.latitude : Number(prop.latitude);
-            const lng = typeof prop.longitude === "number" ? prop.longitude : Number(prop.longitude);
-            const processed = {
-                ...prop,
-                price: normalizeNumeric(prop.price),
-                latitude: Number.isFinite(lat) ? lat : null,
-                longitude: Number.isFinite(lng) ? lng : null,
-                images: normalizeStringArray(prop.images),
-                features: normalizeStringArray(prop.features),
-            };
-            console.log(`Property ${processed.id}: lat=${processed.latitude}, lng=${processed.longitude}, type=${processed.propertyType}`);
-            return processed;
-        });
-        console.log(`Retrieved ${processedResults.length} valid properties from database (filtered from ${results.length} total)`);
-        // Cache the results for 5 minutes
-        cacheService.set(cacheKey, processedResults, 5 * 60 * 1000);
-        return processedResults;
+        const normalizedResults = results.map(normalizePropertyRecord);
+        const finalResults = filters.requireValidCoordinates
+            ? normalizedResults.filter(prop => {
+                const hasValidCoords = typeof prop.latitude === "number" && typeof prop.longitude === "number";
+                if (!hasValidCoords) {
+                    console.log(`Filtering out property ${prop.id} "${prop.title}" - invalid coordinates: lat=${prop.latitude}, lng=${prop.longitude}`);
+                }
+                return hasValidCoords;
+            })
+            : normalizedResults;
+        if (filters.requireValidCoordinates) {
+            console.log(`Retrieved ${finalResults.length} valid properties from database (filtered from ${results.length} total)`);
+        }
+        else {
+            console.log(`Retrieved ${finalResults.length} properties from database`);
+        }
+        cacheService.set(cacheKey, finalResults, 5 * 60 * 1000);
+        return finalResults;
     }
     async createProperty(property) {
         const latitude = parseCoordinate(property.latitude);
@@ -204,12 +234,8 @@ export class PropertyRepository {
             geom: geomValue,
         })
             .returning();
-        return {
-            ...newProperty,
-            price: normalizeNumeric(newProperty.price),
-            images: normalizeStringArray(newProperty.images),
-            features: normalizeStringArray(newProperty.features),
-        };
+        cacheService.invalidatePrefix('properties');
+        return normalizePropertyRecord(newProperty);
     }
     async updateProperty(id, updates) {
         const updatePayload = { ...updates };
@@ -234,19 +260,19 @@ export class PropertyRepository {
             .returning();
         if (!property)
             return undefined;
-        return {
-            ...property,
-            price: normalizeNumeric(property.price),
-            images: normalizeStringArray(property.images),
-            features: normalizeStringArray(property.features),
-        };
+        cacheService.invalidatePrefix('properties');
+        return normalizePropertyRecord(property);
     }
     async deleteProperty(id) {
         const deleted = await db
             .delete(properties)
             .where(eq(properties.id, id))
             .returning({ id: properties.id });
-        return deleted.length > 0;
+        if (deleted.length > 0) {
+            cacheService.invalidatePrefix('properties');
+            return true;
+        }
+        return false;
     }
     async getUserProperties(userId) {
         const userProps = await db
@@ -254,12 +280,7 @@ export class PropertyRepository {
             .from(properties)
             .where(eq(properties.ownerId, userId))
             .orderBy(desc(properties.createdAt));
-        return userProps.map(prop => ({
-            ...prop,
-            price: normalizeNumeric(prop.price),
-            images: normalizeStringArray(prop.images),
-            features: normalizeStringArray(prop.features),
-        }));
+        return userProps.map(normalizePropertyRecord);
     }
     async incrementPropertyViews(id) {
         await db

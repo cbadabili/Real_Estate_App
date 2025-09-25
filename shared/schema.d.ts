@@ -883,9 +883,9 @@ export declare const properties: import("drizzle-orm/pg-core").PgTableWithColumn
         bathrooms: import("drizzle-orm/pg-core").PgColumn<{
             name: "bathrooms";
             tableName: "properties";
-            dataType: "string";
-            columnType: "PgText";
-            data: string;
+            dataType: "number";
+            columnType: "PgNumeric";
+            data: number | null;
             driverParam: string;
             notNull: false;
             hasDefault: false;
@@ -3682,7 +3682,7 @@ export declare const adminAuditLogRelations: import("drizzle-orm").Relations<"ad
     admin: import("drizzle-orm").One<"users", true>;
 }>;
 export declare const insertUserSchema: z.ZodObject<Omit<{}, "id" | "createdAt" | "updatedAt">, "strip", z.ZodTypeAny, {}, {}>;
-export declare const insertPropertySchema: z.ZodObject<Omit<{}, "id" | "createdAt" | "updatedAt" | "views" | "daysOnMarket" | "fts">, "strip", z.ZodTypeAny, {}, {}>;
+export declare const insertPropertySchema: z.ZodObject<Omit<{}, "id" | "createdAt" | "updatedAt" | "views" | "daysOnMarket" | "fts" | "geom">, "strip", z.ZodTypeAny, {}, {}>;
 export declare const insertInquirySchema: z.ZodObject<Omit<{}, "id" | "createdAt" | "status">, "strip", z.ZodTypeAny, {}, {}>;
 export declare const insertAppointmentSchema: z.ZodObject<Omit<{}, "id" | "createdAt" | "status">, "strip", z.ZodTypeAny, {}, {}>;
 export declare const insertSavedPropertySchema: z.ZodObject<Omit<{}, "id" | "createdAt">, "strip", z.ZodTypeAny, {}, {}>;

@@ -1,7 +1,7 @@
 import type { Request, Response } from "express";
 import { db } from "./db";
 import { properties } from "../shared/schema";
-import { and, desc, eq, gte, ilike, or, sql } from "drizzle-orm";
+import { and, desc, eq, gte, ilike, lte, or } from "drizzle-orm";
 import fetch from "node-fetch";
 
 const normalizeStringArray = (value: unknown): string[] => {
@@ -158,7 +158,14 @@ function parseFreeText(query: string): SearchCriteria {
   const locations = ['gaborone', 'francistown', 'kasane', 'maun', 'serowe', 'palapye', 'kanye'];
   const location = locations.find(loc => query.toLowerCase().includes(loc));
 
-  return { beds, type, minPrice: derived.minPrice, maxPrice: derived.maxPrice, location };
+  return {
+    beds,
+    type,
+    minPrice: derived.minPrice,
+    maxPrice: derived.maxPrice,
+    location,
+    query: derived.query,
+  };
 }
 
 async function queryDB(q: string, sort: string): Promise<UnifiedProperty[]> {
@@ -178,8 +185,7 @@ async function queryDB(q: string, sort: string): Promise<UnifiedProperty[]> {
       terms.push(gte(properties.price, derived.minPrice));
     }
     if (derived.maxPrice !== undefined) {
-      // For maxPrice, we need to use '<=' which is lte in Drizzle
-      terms.push(sql`${properties.price} <= ${derived.maxPrice}`);
+      terms.push(lte(properties.price, derived.maxPrice));
     }
     
     // If no specific filters detected, fall back to text search
@@ -237,11 +243,13 @@ function mapDBRowToUnified(row: any): UnifiedProperty {
     address: row.address,
     city: row.city,
     bedrooms: typeof row.bedrooms === "number" ? row.bedrooms : normalizeNumber(row.bedrooms) ?? undefined,
-    bathrooms: row.bathrooms ? normalizeNumber(row.bathrooms) ?? undefined : undefined,
+    bathrooms: row.bathrooms !== undefined && row.bathrooms !== null
+      ? normalizeNumber(row.bathrooms) ?? undefined
+      : undefined,
     propertyType: row.propertyType,
     source: 'local',
     description: row.description,
-    images: normalizeStringArray(row.images),
+    images: normalizeStringArray(row.images ?? []),
     coordinates: lat !== null && lng !== null ? { lat, lng } : undefined,
     agency: {
       name: 'BeeDab Properties'
@@ -260,7 +268,8 @@ async function queryIntel(q: string, filters: SearchCriteria = {}): Promise<Unif
     const payload = { query: q, filters }; // Pass filters to the AI search
     console.log('Calling OpenAI search with query:', q, 'and filters:', filters);
 
-    const response = await fetch('http://0.0.0.0:5000/intel/search', {
+    const base = (process.env.INTEL_API_BASE ?? 'http://localhost:5000').replace(/\/$/, '');
+    const response = await fetch(`${base}/intel/search`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -277,28 +286,35 @@ async function queryIntel(q: string, filters: SearchCriteria = {}): Promise<Unif
     console.log('OpenAI search response received:', { count: data.results?.length || 0 });
 
     // Map OpenAI results to unified format
-    return (data.results || []).map((result: any, index: number) => ({
-      id: `external_${result.id || index}`,
-      title: result.title || 'External Property',
-      price: result.price || 0,
-      address: result.address || '',
-      city: result.city || '',
-      bedrooms: result.bedrooms,
-      bathrooms: result.bathrooms,
-      propertyType: result.propertyType || '',
-      source: 'external' as const,
-      score: 0.8, // Default high score for OpenAI results
-      description: result.description || '',
-      images: result.images || [],
-      coordinates: result.lat && result.lng ? {
-        lat: result.lat,
-        lng: result.lng
-      } : undefined,
-      agency: {
-        name: result.agent?.name || 'External Agent',
-        contact: result.agent?.phone || result.agent?.email
-      }
-    }));
+    return (data.results || []).map((result: any, index: number) => {
+      const price = normalizeNumber(result.price) ?? 0;
+      const bedrooms = normalizeNumber(result.bedrooms ?? result.beds ?? null) ?? undefined;
+      const bathrooms = normalizeNumber(result.bathrooms ?? result.baths ?? null) ?? undefined;
+      const lat = normalizeNumber(result.lat);
+      const lng = normalizeNumber(result.lng);
+
+      return {
+        id: `external_${result.id || index}`,
+        title: result.title || 'External Property',
+        price,
+        address: result.address || '',
+        city: result.city || '',
+        bedrooms: bedrooms === undefined ? undefined : bedrooms,
+        bathrooms: bathrooms === undefined ? undefined : bathrooms,
+        propertyType: result.propertyType || '',
+        source: 'external' as const,
+        score: Number.isFinite(result.score) ? result.score : 0.8,
+        description: result.description || '',
+        images: normalizeStringArray(result.images ?? []),
+        coordinates: Number.isFinite(lat) && Number.isFinite(lng)
+          ? { lat: lat as number, lng: lng as number }
+          : undefined,
+        agency: {
+          name: result.agent?.name || 'External Agent',
+          contact: result.agent?.phone || result.agent?.email,
+        },
+      };
+    });
   } catch (error) {
     console.error('OpenAI search API error:', error);
     return [];

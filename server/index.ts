@@ -1,33 +1,23 @@
-import express, { type Request, Response, NextFunction } from "express";
-import { registerRoutes } from "./routes";
+import express, { type Request, Response } from "express";
+import { createServer } from "http";
 import { setupVite, serveStatic, log } from "./vite";
 import { testDatabaseConnection } from "./db";
+import { registerAllRoutes } from "./routes/index";
 import { createRentalRoutes } from './rental-routes';
-import { db } from './db';
 import servicesRoutes from './services-routes';
 import marketplaceRoutes from './marketplace-routes';
 import aiSearchRoutes from './ai-search';
 import tenantSupportRoutes from './tenant-support-routes';
 import propertyManagementRoutes from './property-management-routes';
 import { intelSearch, intelSuggest } from './intel-adapter';
-import { reviewRoutes } from './review-storage';
-import realEstateIntelRouter from './real-estate-intel-search';
-import { searchAggregator } from './search-aggregator';
-import { suggest } from './suggest';
 import { errorHandler, notFoundHandler } from './middleware/error';
 import { env } from './utils/env';
 import helmet from 'helmet';
 import cors from 'cors';
 import rateLimit from 'express-rate-limit';
-import morgan from 'morgan';
 import { addRequestId, structuredLogger } from './middleware/logging';
 import billingRoutes from './billing-routes';
 import heroRoutes from './hero-routes';
-import { registerPropertyRoutes } from "./routes/property-routes";
-import { registerUserRoutes } from "./routes/user-routes";
-import { registerAuthRoutes } from "./routes/auth-routes";
-import { registerMarketIntelligenceRoutes } from "./market-intelligence-routes";
-import documentsRoutes from './routes/documents-routes.js';
 import analyticsRoutes from './analytics-routes';
 
 const app = express();
@@ -35,35 +25,56 @@ const app = express();
 // Configure trust proxy for Replit
 app.set('trust proxy', 1);
 
+const isDevelopment = process.env.NODE_ENV === 'development';
+const helmetOptions: Parameters<typeof helmet>[0] = isDevelopment
+  ? {
+      contentSecurityPolicy: false,
+      referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
+      permittedCrossDomainPolicies: false,
+      crossOriginOpenerPolicy: { policy: 'same-origin' },
+      permissionsPolicy: {
+        camera: ['self'],
+        microphone: [],
+        geolocation: ['self'],
+        fullscreen: ['self'],
+        payment: [],
+        usb: [],
+        magnetometer: [],
+        accelerometer: [],
+        gyroscope: []
+      }
+    }
+  : {
+      contentSecurityPolicy: {
+        directives: {
+          defaultSrc: ["'self'"],
+          styleSrc: ["'self'", "https://api.mapbox.com", "https://fonts.googleapis.com"],
+          scriptSrc: ["'self'", "https://api.mapbox.com"],
+          imgSrc: ["'self'", "data:", "https:", "blob:"],
+          connectSrc: ["'self'", "https://api.mapbox.com", "https://events.mapbox.com", "wss:", "ws:"],
+          fontSrc: ["'self'", "data:", "https://fonts.gstatic.com", "https://fonts.googleapis.com"],
+          objectSrc: ["'none'"],
+          upgradeInsecureRequests: [],
+        },
+      },
+      referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
+      permittedCrossDomainPolicies: false,
+      crossOriginOpenerPolicy: { policy: 'same-origin' },
+      permissionsPolicy: {
+        camera: ['self'],
+        microphone: [],
+        geolocation: ['self'],
+        fullscreen: ['self'],
+        payment: [],
+        usb: [],
+        magnetometer: [],
+        accelerometer: [],
+        gyroscope: []
+      }
+    };
+
 // Security middleware
-app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      styleSrc: ["'self'", "https://api.mapbox.com", "https://fonts.googleapis.com"],
-      scriptSrc: ["'self'", "https://api.mapbox.com"],
-      imgSrc: ["'self'", "data:", "https:", "blob:"],
-      connectSrc: ["'self'", "https://api.mapbox.com", "https://events.mapbox.com", "wss:", "ws:"],
-      fontSrc: ["'self'", "data:", "https://fonts.gstatic.com", "https://fonts.googleapis.com"],
-      objectSrc: ["'none'"],
-      upgradeInsecureRequests: [],
-    },
-  },
-  referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
-  permittedCrossDomainPolicies: false,
-  crossOriginOpenerPolicy: { policy: 'same-origin' },
-  permissionsPolicy: {
-    camera: ['self'],
-    microphone: [],
-    geolocation: ['self'],
-    fullscreen: ['self'],
-    payment: [],
-    usb: [],
-    magnetometer: [],
-    accelerometer: [],
-    gyroscope: []
-  }
-}));
+app.use(helmet(helmetOptions));
 
 app.use(cors({
   origin: env.CORS_ORIGIN.split(',').map(s => s.trim()),
@@ -119,18 +130,6 @@ app.use((req, res, next) => {
   res.setHeader('X-Frame-Options', 'DENY');
   res.setHeader('X-XSS-Protection', '1; mode=block');
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
-  if (process.env.NODE_ENV === 'development') {
-    // In development we relax CSP for local tooling; production relies on helmet CSP
-    res.setHeader('Content-Security-Policy',
-      "default-src 'self'; " +
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://replit.com; " +
-      "font-src 'self' data: https:; " +
-      "style-src 'self' 'unsafe-inline'; " +
-      "img-src 'self' data: https:; " +
-      "connect-src 'self' ws: wss: https:; " +
-      "frame-src 'self';"
-    );
-  }
   next();
 });
 
@@ -169,7 +168,8 @@ app.get('/api/health', (_req: Request, res: Response) => {
   app.use('/api/search', searchLimiter);
   app.use('/api/suggest', searchLimiter);
 
-  const server = await registerRoutes(app);
+  // Register modular route bundles (auth, users, properties, search, etc.)
+  registerAllRoutes(app);
 
   const rentalRoutes = createRentalRoutes();
   app.use('/api/rentals', rentalRoutes);
@@ -189,11 +189,6 @@ app.get('/api/health', (_req: Request, res: Response) => {
   app.post('/intel/search', intelSearch);
   app.get('/intel/suggest', intelSuggest);
 
-  // Register other routes
-  // Import and register routes
-  const { registerAllRoutes } = await import('./routes/index.js');
-  registerAllRoutes(app);
-
   // Mount API documentation
   try {
     const { docsRouter } = await import('./routes/docs.js');
@@ -202,120 +197,6 @@ app.get('/api/health', (_req: Request, res: Response) => {
   } catch (error) {
     console.warn('⚠️ Could not mount API docs:', error.message);
   }
-
-  // Search aggregator route
-  app.get('/api/search', async (req, res) => {
-    try {
-      const { query, location, type, minPrice, maxPrice, bedrooms, bathrooms } = req.query;
-
-      const searchParams = {
-        query: query as string,
-        location: location as string,
-        type: type as string,
-        minPrice: minPrice ? parseFloat(minPrice as string) : undefined,
-        maxPrice: maxPrice ? parseFloat(maxPrice as string) : undefined,
-        bedrooms: bedrooms ? parseInt(bedrooms as string) : undefined,
-        bathrooms: bathrooms ? parseInt(bathrooms as string) : undefined
-      };
-
-      const results = await searchAggregator.search(searchParams);
-      res.json(results);
-    } catch (error) {
-      console.error('Search error:', error);
-      res.status(500).json({ error: 'Search failed' });
-    }
-  });
-
-  // Search suggestions endpoint
-  app.get('/api/search/suggestions', async (req, res) => {
-    try {
-      const { q } = req.query;
-      const query = (q as string)?.toLowerCase() || '';
-
-      if (!query || query.length < 2) {
-        return res.json({ suggestions: [] });
-      }
-
-      const suggestions = [];
-
-      // Location suggestions
-      const locations = [
-        'Gaborone', 'Francistown', 'Maun', 'Kasane', 'Serowe', 'Palapye',
-        'Mogoditshane', 'Molepolole', 'Kanye', 'Mahalapye', 'Lobatse',
-        'Gaborone West', 'Gaborone CBD', 'Block 6', 'Block 8', 'Block 10',
-        'Extension 2', 'Extension 9', 'Extension 12', 'Phakalane'
-      ];
-
-      const matchingLocations = locations
-        .filter(loc => loc.toLowerCase().includes(query))
-        .slice(0, 3)
-        .map((loc, index) => ({
-          id: `loc-${index}`,
-          text: `Properties in ${loc}`,
-          type: 'location'
-        }));
-
-      suggestions.push(...matchingLocations);
-
-      // Property type suggestions
-      const propertyTypes = [
-        'house', 'apartment', 'townhouse', 'commercial', 'farm', 'land', 'plot'
-      ];
-
-      const matchingTypes = propertyTypes
-        .filter(type => type.includes(query) || query.includes(type))
-        .slice(0, 2)
-        .map((type, index) => ({
-          id: `type-${index}`,
-          text: `${type.charAt(0).toUpperCase() + type.slice(1)}s for sale`,
-          type: 'property_type'
-        }));
-
-      suggestions.push(...matchingTypes);
-
-      // Feature suggestions
-      const features = [
-        'with pool', 'with garden', '3 bedroom', '4 bedroom', '2 bathroom',
-        'with garage', 'furnished', 'sea view', 'city view', 'new development'
-      ];
-
-      const matchingFeatures = features
-        .filter(feature => feature.includes(query) || query.split(' ').some(word => feature.includes(word)))
-        .slice(0, 2)
-        .map((feature, index) => ({
-          id: `feat-${index}`,
-          text: `Properties ${feature}`,
-          type: 'feature'
-        }));
-
-      suggestions.push(...matchingFeatures);
-
-      // Price range suggestions
-      if (query.includes('under') || query.includes('below')) {
-        suggestions.push({
-          id: 'price-under',
-          text: 'Properties under BWP 2M',
-          type: 'feature'
-        });
-      }
-
-      if (query.includes('above') || query.includes('over')) {
-        suggestions.push({
-          id: 'price-over',
-          text: 'Properties over BWP 1M',
-          type: 'feature'
-        });
-      }
-
-      // Limit to 6 suggestions
-      const limitedSuggestions = suggestions.slice(0, 6);
-
-      res.json({ suggestions: limitedSuggestions });
-    } catch (error) {
-      console.error('Suggestions error:', error);
-      res.status(500).json({ error: 'Failed to fetch suggestions' });
-    }
-  });
 
   // Analytics endpoint
   app.post('/api/analytics/events', async (req, res) => {
@@ -355,6 +236,8 @@ app.get('/api/health', (_req: Request, res: Response) => {
       res.status(500).json({ error: 'Failed to process analytics event' });
     }
   });
+
+  const server = createServer(app);
 
   // Set environment to development if not specified
   if (!process.env.NODE_ENV) {
