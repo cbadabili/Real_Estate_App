@@ -31,9 +31,11 @@ const rootDir = process.cwd();
 const hits: string[] = [];
 
 /**
- * Recursively traverse the repository and record files that reference SQLite usage.
+ * Recursively scans a directory tree for lines mentioning `sqlite` and records their locations.
  *
- * @param currentPath - Directory currently being scanned.
+ * Appends the first matching line per file to the module-level `hits` array in the format `relativePath:lineNumber`.
+ *
+ * @param currentPath - Directory path to scan
  */
 function walk(currentPath: string) {
   const entries = fs.readdirSync(currentPath, { withFileTypes: true });
