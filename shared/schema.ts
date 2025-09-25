@@ -1,5 +1,4 @@
 // @ts-nocheck
-/* eslint-disable @typescript-eslint/ban-ts-comment */
 import {
   pgTable,
   text,
@@ -118,7 +117,7 @@ export const properties = pgTable("properties", {
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
   fts: tsvector("fts").generatedAlwaysAs(() =>
-    sql`to_tsvector('simple', coalesce(title, '') || ' ' || coalesce(description, '') || ' ' || coalesce(address, ''))`
+    sql`to_tsvector('english', coalesce(title, '') || ' ' || coalesce(description, '') || ' ' || coalesce(address, ''))`
   , { stored: true }),
 });
 // Property inquiries

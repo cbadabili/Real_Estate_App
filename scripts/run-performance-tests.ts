@@ -1,4 +1,3 @@
-
 #!/usr/bin/env npx tsx
 
 import { execSync, spawn } from 'child_process';

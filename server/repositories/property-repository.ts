@@ -4,7 +4,7 @@ import {
   type InsertProperty
 } from "../../shared/schema";
 import { db } from "../db";
-import { eq, and, desc, asc, gte, lte, like, or, sql } from "drizzle-orm";
+import { eq, and, desc, asc, gte, lte, ilike, or, sql, type SQL } from "drizzle-orm";
 import { cacheService, CacheService } from "../cache-service";
 
 const normalizeStringArray = (value: unknown): string[] => {
@@ -54,26 +54,25 @@ const normalizeNumeric = (value: unknown): number => {
   return 0;
 };
 
-const parseCoordinate = (value: unknown): number | null => {
-  if (value === null || value === undefined) {
+const toCoord = (v: unknown): number | null => {
+  if (v == null) {
     return null;
   }
-
-  if (typeof value === "number") {
-    return Number.isFinite(value) ? value : null;
+  if (typeof v === "number") {
+    return Number.isFinite(v) ? v : null;
   }
-
-  if (typeof value === "string") {
-    const trimmed = value.trim();
-    if (!trimmed) {
-      return null;
-    }
-
-    const parsed = Number(trimmed);
+  if (typeof v === "string" && v.trim() !== "") {
+    const parsed = Number(v);
     return Number.isFinite(parsed) ? parsed : null;
   }
-
   return null;
+};
+
+const parseCoordinate = (value: unknown): number | null | undefined => {
+  if (value === undefined) {
+    return undefined;
+  }
+  return toCoord(value);
 };
 
 const buildGeomValue = (latitude: number | null, longitude: number | null) => {
@@ -116,19 +115,19 @@ const toFiniteNumber = (value: unknown): number | undefined => {
 };
 
 const normalizePropertyRecord = (prop: Property): Property => {
-  const lat = typeof prop.latitude === "number" ? prop.latitude : Number(prop.latitude);
-  const lng = typeof prop.longitude === "number" ? prop.longitude : Number(prop.longitude);
-
   return {
     ...prop,
     price: normalizeNumeric(prop.price),
     images: normalizeStringArray(prop.images),
     features: normalizeStringArray(prop.features),
-    latitude: Number.isFinite(lat) ? lat : null,
-    longitude: Number.isFinite(lng) ? lng : null,
+    latitude: toCoord(prop.latitude),
+    longitude: toCoord(prop.longitude),
   };
 };
 
+/**
+ * Filters that can be applied when querying for properties.
+ */
 export interface PropertyFilters {
   minPrice?: number;
   maxPrice?: number;
@@ -140,16 +139,22 @@ export interface PropertyFilters {
   city?: string;
   state?: string;
   zipCode?: string;
+  address?: string;
+  title?: string;
   location?: string; // General location search parameter
   listingType?: string;
   status?: string;
   limit?: number;
   offset?: number;
-  sortBy?: 'price' | 'date' | 'size' | 'bedrooms';
+  sortBy?: 'price' | 'date' | 'size' | 'bedrooms' | 'price_low' | 'price_high' | 'newest';
   sortOrder?: 'asc' | 'desc';
   requireValidCoordinates?: boolean;
+  searchTerm?: string;
 }
 
+/**
+ * Public contract for interacting with persisted property records.
+ */
 export interface IPropertyRepository {
   getProperty(id: number): Promise<Property | undefined>;
   getProperties(filters?: PropertyFilters): Promise<Property[]>;
@@ -160,7 +165,17 @@ export interface IPropertyRepository {
   incrementPropertyViews(id: number): Promise<void>;
 }
 
+/**
+ * Drizzle-backed implementation of the property repository. Handles
+ * normalization, caching, search, and spatial updates.
+ */
 export class PropertyRepository implements IPropertyRepository {
+  /**
+   * Look up a single property by its identifier.
+   *
+   * @param id - Unique identifier of the property to retrieve.
+   * @returns The normalized property or `undefined` when no match exists.
+   */
   async getProperty(id: number): Promise<Property | undefined> {
     const [property] = await db.select().from(properties).where(eq(properties.id, id));
     if (!property) {
@@ -169,6 +184,13 @@ export class PropertyRepository implements IPropertyRepository {
     return normalizePropertyRecord(property);
   }
 
+  /**
+   * Fetch a page of properties matching the provided filters. Results are cached
+   * briefly to reduce load on popular queries.
+   *
+   * @param filters - Optional constraints for price, beds/baths, sort order, etc.
+   * @returns An array of normalized properties ready for API consumption.
+   */
   async getProperties(filters: PropertyFilters = {}): Promise<Property[]> {
     const minPrice = toFiniteNumber(filters.minPrice);
     const maxPrice = toFiniteNumber(filters.maxPrice);
@@ -199,7 +221,8 @@ export class PropertyRepository implements IPropertyRepository {
     }
 
     let query = db.select().from(properties);
-    const conditions = [];
+    const conditions: SQL[] = [];
+    const orderings: SQL[] = [];
 
     if (minPrice !== undefined) {
       conditions.push(gte(properties.price, minPrice));
@@ -222,16 +245,40 @@ export class PropertyRepository implements IPropertyRepository {
     if (maxSquareFeet !== undefined) {
       conditions.push(lte(properties.squareFeet, maxSquareFeet));
     }
-    if (filters.city || filters.location) {
-      const searchTerm = filters.location || filters.city;
-      conditions.push(
-        or(
-          like(properties.city, `%${searchTerm}%`),
-          like(properties.address, `%${searchTerm}%`),
-          like(properties.title, `%${searchTerm}%`),
-          like(properties.description, `%${searchTerm}%`)
-        )
-      );
+    const searchTerm = filters.searchTerm ?? filters.location ?? filters.address ?? filters.title;
+    if (searchTerm && searchTerm.trim().length > 0) {
+      const term = searchTerm.trim();
+      if (term.length >= 2) {
+        const tsQuery = sql`plainto_tsquery('english', ${term})`;
+        conditions.push(sql`${properties.fts} @@ ${tsQuery}`);
+        orderings.push(sql`ts_rank_cd(${properties.fts}, ${tsQuery}) DESC`);
+      } else {
+        conditions.push(
+          or(
+            ilike(properties.title, `%${term}%`),
+            ilike(properties.description, `%${term}%`),
+            ilike(properties.address, `%${term}%`),
+            ilike(properties.city, `%${term}%`)
+          )
+        );
+      }
+    } else if (filters.location) {
+      const locationTerm = filters.location.trim();
+      if (locationTerm) {
+        conditions.push(
+          or(
+            ilike(properties.city, `%${locationTerm}%`),
+            ilike(properties.address, `%${locationTerm}%`),
+            ilike(properties.title, `%${locationTerm}%`),
+            ilike(properties.description, `%${locationTerm}%`)
+          )
+        );
+      }
+    }
+
+    const cityTerm = filters.city?.trim();
+    if (cityTerm) {
+      conditions.push(eq(properties.city, cityTerm));
     }
     if (filters.state) {
       conditions.push(eq(properties.state, filters.state));
@@ -251,16 +298,31 @@ export class PropertyRepository implements IPropertyRepository {
     }
 
     // Sorting
-    if (filters.sortBy) {
-      const sortColumn = {
-        'price': properties.price,
-        'date': properties.createdAt,
-        'size': properties.squareFeet,
-        'bedrooms': properties.bedrooms
-      }[filters.sortBy];
+    if (orderings.length > 0) {
+      query = query.orderBy(...orderings, desc(properties.createdAt));
+    } else if (filters.sortBy) {
+      const legacySortOptions = {
+        price_low: { column: properties.price, direction: 'asc' as const },
+        price_high: { column: properties.price, direction: 'desc' as const },
+        newest: { column: properties.createdAt, direction: 'desc' as const },
+      } as const;
 
-      if (sortColumn) {
-        query = filters.sortOrder === 'asc' ? query.orderBy(asc(sortColumn)) : query.orderBy(desc(sortColumn));
+      if (filters.sortBy in legacySortOptions) {
+        const legacySort = legacySortOptions[filters.sortBy as keyof typeof legacySortOptions];
+        query = legacySort.direction === 'asc'
+          ? query.orderBy(asc(legacySort.column))
+          : query.orderBy(desc(legacySort.column));
+      } else {
+        const sortColumn = {
+          price: properties.price,
+          date: properties.createdAt,
+          size: properties.squareFeet,
+          bedrooms: properties.bedrooms,
+        }[filters.sortBy];
+
+        if (sortColumn) {
+          query = filters.sortOrder === 'asc' ? query.orderBy(asc(sortColumn)) : query.orderBy(desc(sortColumn));
+        }
       }
     } else {
       query = query.orderBy(desc(properties.createdAt));
@@ -300,17 +362,25 @@ export class PropertyRepository implements IPropertyRepository {
     return finalResults;
   }
 
+  /**
+   * Persist a new property and compute its spatial geometry when coordinates are provided.
+   *
+   * @param property - Property attributes supplied by the caller.
+   * @returns The inserted property with normalization applied.
+   */
   async createProperty(property: InsertProperty): Promise<Property> {
     const latitude = parseCoordinate(property.latitude);
     const longitude = parseCoordinate(property.longitude);
-    const geomValue = buildGeomValue(latitude, longitude);
+    const normalizedLatitude = latitude ?? null;
+    const normalizedLongitude = longitude ?? null;
+    const geomValue = buildGeomValue(normalizedLatitude, normalizedLongitude);
 
     const [newProperty] = await db
       .insert(properties)
       .values({
         ...property,
-        latitude,
-        longitude,
+        latitude: normalizedLatitude,
+        longitude: normalizedLongitude,
         geom: geomValue,
       })
       .returning();
@@ -320,19 +390,35 @@ export class PropertyRepository implements IPropertyRepository {
     return normalizePropertyRecord(newProperty);
   }
 
+  /**
+   * Apply partial updates to an existing property, recalculating geometry when
+   * coordinates change.
+   *
+   * @param id - Unique identifier of the property to update.
+   * @param updates - Subset of property fields to change.
+   * @returns The updated property or `undefined` when no record matches.
+   */
   async updateProperty(id: number, updates: Partial<InsertProperty>): Promise<Property | undefined> {
-    const updatePayload: Record<string, unknown> = { ...updates };
+    const updatePayload: Partial<InsertProperty> & { geom?: SQL } = { ...updates };
 
     let latitude: number | null | undefined;
     if (Object.prototype.hasOwnProperty.call(updates, "latitude")) {
       latitude = parseCoordinate(updates.latitude);
-      updatePayload.latitude = latitude;
+      if (latitude !== undefined) {
+        updatePayload.latitude = latitude;
+      } else {
+        delete updatePayload.latitude;
+      }
     }
 
     let longitude: number | null | undefined;
     if (Object.prototype.hasOwnProperty.call(updates, "longitude")) {
       longitude = parseCoordinate(updates.longitude);
-      updatePayload.longitude = longitude;
+      if (longitude !== undefined) {
+        updatePayload.longitude = longitude;
+      } else {
+        delete updatePayload.longitude;
+      }
     }
 
     if (Object.prototype.hasOwnProperty.call(updates, "latitude") ||
@@ -353,6 +439,12 @@ export class PropertyRepository implements IPropertyRepository {
     return normalizePropertyRecord(property);
   }
 
+  /**
+   * Remove a property record.
+   *
+   * @param id - Identifier of the property to delete.
+   * @returns True when a record was deleted, otherwise false.
+   */
   async deleteProperty(id: number): Promise<boolean> {
     const deleted = await db
       .delete(properties)
@@ -365,6 +457,12 @@ export class PropertyRepository implements IPropertyRepository {
     return false;
   }
 
+  /**
+   * Retrieve all properties owned by a specific user ordered by recency.
+   *
+   * @param userId - Identifier for the owning user.
+   * @returns The normalized property list.
+   */
   async getUserProperties(userId: number): Promise<Property[]> {
     const userProps = await db
       .select()
@@ -375,6 +473,11 @@ export class PropertyRepository implements IPropertyRepository {
     return userProps.map(normalizePropertyRecord);
   }
 
+  /**
+   * Increment the view counter for a property atomically.
+   *
+   * @param id - Identifier of the property that was viewed.
+   */
   async incrementPropertyViews(id: number): Promise<void> {
     await db
       .update(properties)
@@ -383,4 +486,7 @@ export class PropertyRepository implements IPropertyRepository {
   }
 }
 
+/**
+ * Shared singleton instance used throughout the application.
+ */
 export const propertyRepository = new PropertyRepository();

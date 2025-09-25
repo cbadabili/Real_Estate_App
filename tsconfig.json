@@ -17,6 +17,7 @@
     "paths": {
       "@shared/*": ["shared/*"]
     },
+    "types": ["node", "vitest/globals"],
 
     /* Linting */
     "strict": true,
@@ -29,7 +30,7 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["server", "shared"],
+  "include": ["server", "shared", "scripts"],
   "exclude": ["client/**"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

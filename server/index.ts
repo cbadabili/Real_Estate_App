@@ -25,59 +25,74 @@ const app = express();
 // Configure trust proxy for Replit
 app.set('trust proxy', 1);
 
-const isDevelopment = process.env.NODE_ENV === 'development';
-const helmetOptions: Parameters<typeof helmet>[0] = isDevelopment
-  ? {
-      contentSecurityPolicy: false,
-      referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
-      permittedCrossDomainPolicies: false,
-      crossOriginOpenerPolicy: { policy: 'same-origin' },
-      permissionsPolicy: {
-        camera: ['self'],
-        microphone: [],
-        geolocation: ['self'],
-        fullscreen: ['self'],
-        payment: [],
-        usb: [],
-        magnetometer: [],
-        accelerometer: [],
-        gyroscope: []
-      }
-    }
-  : {
-      contentSecurityPolicy: {
-        directives: {
-          defaultSrc: ["'self'"],
-          styleSrc: ["'self'", "https://api.mapbox.com", "https://fonts.googleapis.com"],
-          scriptSrc: ["'self'", "https://api.mapbox.com"],
-          imgSrc: ["'self'", "data:", "https:", "blob:"],
-          connectSrc: ["'self'", "https://api.mapbox.com", "https://events.mapbox.com", "wss:", "ws:"],
-          fontSrc: ["'self'", "data:", "https://fonts.gstatic.com", "https://fonts.googleapis.com"],
-          objectSrc: ["'none'"],
-          upgradeInsecureRequests: [],
-        },
-      },
-      referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
-      permittedCrossDomainPolicies: false,
-      crossOriginOpenerPolicy: { policy: 'same-origin' },
-      permissionsPolicy: {
-        camera: ['self'],
-        microphone: [],
-        geolocation: ['self'],
-        fullscreen: ['self'],
-        payment: [],
-        usb: [],
-        magnetometer: [],
-        accelerometer: [],
-        gyroscope: []
-      }
-    };
+const nodeEnv = process.env.NODE_ENV ?? 'development';
+const isDevelopment = nodeEnv === 'development';
+
+if (!process.env.NODE_ENV) {
+  process.env.NODE_ENV = nodeEnv;
+}
 
 // Security middleware
-app.use(helmet(helmetOptions));
+app.use(helmet({
+  contentSecurityPolicy: isDevelopment
+    ? false
+    : {
+        useDefaults: true,
+        directives: {
+          "default-src": ["'self'"],
+          "base-uri": ["'self'"],
+          "object-src": ["'none'"],
+          "script-src": ["'self'"],
+          "style-src": ["'self'"],
+          "img-src": ["'self'", "data:", "https:"],
+          "connect-src": ["'self'", "https:", "wss:"],
+          "frame-ancestors": ["'self'"],
+          "upgrade-insecure-requests": [],
+        },
+      },
+  referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
+  crossOriginOpenerPolicy: { policy: 'same-origin' },
+  xPermittedCrossDomainPolicies: { permittedPolicies: 'none' },
+  permissionsPolicy: {
+    features: {
+      camera: ["'self'"],
+      microphone: [],
+      geolocation: ["'self'"],
+      fullscreen: ["'self'"],
+      payment: [],
+      usb: [],
+      magnetometer: [],
+      accelerometer: [],
+      gyroscope: [],
+    },
+  },
+}));
+
+const allowedOrigins = env.CORS_ORIGIN
+  ?.split(',')
+  .map(origin => origin.trim())
+  .filter(Boolean);
+
+const allowAllOrigins = allowedOrigins?.includes('*');
 
 app.use(cors({
-  origin: env.CORS_ORIGIN.split(',').map(s => s.trim()),
+  origin: (origin, callback) => {
+    if (!origin) {
+      return callback(null, true);
+    }
+    if (allowAllOrigins) {
+      return callback(null, true);
+    }
+
+    if (!allowedOrigins?.length) {
+      return callback(null, isDevelopment ? true : false);
+    }
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    console.warn(`Blocked CORS origin: ${origin}`);
+    return callback(null, false);
+  },
   credentials: true,
 }));
 
@@ -88,7 +103,7 @@ app.use(structuredLogger);
 // Rate limiting for auth and write endpoints
 const authWriteLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100,
+  limit: 100,
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: 'Too many requests, please try again later' }
@@ -97,7 +112,7 @@ const authWriteLimiter = rateLimit({
 // General API rate limiting
 const generalApiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 1000, // More generous for general API usage
+  limit: 1000, // More generous for general API usage
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: 'API rate limit exceeded' }
@@ -106,7 +121,7 @@ const generalApiLimiter = rateLimit({
 // Write operations rate limiting
 const writeApiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 50,
+  limit: 50,
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: 'Too many write requests, please try again later' }
@@ -115,7 +130,7 @@ const writeApiLimiter = rateLimit({
 // Search rate limiting
 const searchLimiter = rateLimit({
   windowMs: 1 * 60 * 1000, // 1 minute
-  max: 100,
+  limit: 100,
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: 'Search rate limit exceeded' }
@@ -123,15 +138,6 @@ const searchLimiter = rateLimit({
 
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
-
-app.use((req, res, next) => {
-  // Security headers
-  res.setHeader('X-Content-Type-Options', 'nosniff');
-  res.setHeader('X-Frame-Options', 'DENY');
-  res.setHeader('X-XSS-Protection', '1; mode=block');
-  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
-  next();
-});
 
 // --------------------------------------------------
 // Health check – must be registered before other routes
@@ -167,6 +173,7 @@ app.get('/api/health', (_req: Request, res: Response) => {
   // Apply search limiting
   app.use('/api/search', searchLimiter);
   app.use('/api/suggest', searchLimiter);
+  app.use('/intel', searchLimiter);
 
   // Register modular route bundles (auth, users, properties, search, etc.)
   registerAllRoutes(app);
@@ -178,7 +185,6 @@ app.get('/api/health', (_req: Request, res: Response) => {
   app.use('/api', tenantSupportRoutes);
   app.use('/api/services', servicesRoutes);
   app.use('/api', marketplaceRoutes);
-  app.use('/api/services', marketplaceRoutes); // Mount marketplace routes under services as well
 
   // Register billing and hero routes
   app.use('/api/billing', billingRoutes);
@@ -191,11 +197,12 @@ app.get('/api/health', (_req: Request, res: Response) => {
 
   // Mount API documentation
   try {
-    const { docsRouter } = await import('./routes/docs.js');
+    const { docsRouter } = await import('./routes/docs');
     app.use('/api/docs', docsRouter);
     console.log('📚 API documentation available at /api/docs');
-  } catch (error) {
-    console.warn('⚠️ Could not mount API docs:', error.message);
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : String(error);
+    console.warn('⚠️ Could not mount API docs:', message);
   }
 
   // Analytics endpoint
@@ -238,11 +245,6 @@ app.get('/api/health', (_req: Request, res: Response) => {
   });
 
   const server = createServer(app);
-
-  // Set environment to development if not specified
-  if (!process.env.NODE_ENV) {
-    process.env.NODE_ENV = 'development';
-  }
 
   // importantly only setup vite in development and after
   // setting up all the other routes so the catch-all route
@@ -311,7 +313,7 @@ app.get('/api/health', (_req: Request, res: Response) => {
   // ALWAYS serve the app on port 5000
   // this serves both the API and the client.
   // It is the only port that is not firewalled.
-  const port = 5000; // Force port 5000 for consistency with Vite proxy
+  const port = Number(process.env.PORT) || 5000; // Default to 5000 for Replit/Vite compatibility
   server.listen(port, "0.0.0.0", () => {
     log(`serving on port ${port}`);
   });
