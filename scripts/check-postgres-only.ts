@@ -8,12 +8,18 @@ const IGNORED_DIRECTORIES = new Set([
   "node_modules",
   "attached_assets",
   "build",
-  "dist"
+  "dist",
+  ".next",
+  "coverage",
+  ".turbo",
+  ".cache",
 ]);
 
 const ALLOWED_FILES = new Set([
   path.join("scripts", "check-postgres-only.ts"),
-  "package-lock.json"
+  "package-lock.json",
+  "yarn.lock",
+  "pnpm-lock.yaml",
 ]);
 
 const MAX_FILE_SIZE_BYTES = 1024 * 1024; // 1 MB safety cap for scanning
@@ -54,8 +60,12 @@ function walk(currentPath: string) {
       if (ALLOWED_FILES.has(relativePath)) continue;
 
       const contents = fs.readFileSync(fullPath, "utf8");
-      if (/sqlite/i.test(contents)) {
-        hits.push(relativePath);
+      const lines = contents.split(/\r?\n/);
+      for (let i = 0; i < lines.length; i++) {
+        if (/sqlite/i.test(lines[i])) {
+          hits.push(`${relativePath}:${i + 1}`);
+          break;
+        }
       }
     } catch (error) {
       console.warn(`Skipping ${fullPath}: ${(error as Error).message}`);

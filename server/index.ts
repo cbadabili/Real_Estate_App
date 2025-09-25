@@ -76,6 +76,16 @@ const helmetOptions: Parameters<typeof helmet>[0] = isDevelopment
 // Security middleware
 app.use(helmet(helmetOptions));
 
+if (isDevelopment) {
+  app.use((req, res, next) => {
+    res.setHeader('Content-Security-Policy',
+      "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://replit.com; " +
+      "font-src 'self' data: https:; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; " +
+      "connect-src 'self' ws: wss: https:; frame-src 'self';");
+    next();
+  });
+}
+
 app.use(cors({
   origin: env.CORS_ORIGIN.split(',').map(s => s.trim()),
   credentials: true,
@@ -178,7 +188,6 @@ app.get('/api/health', (_req: Request, res: Response) => {
   app.use('/api', tenantSupportRoutes);
   app.use('/api/services', servicesRoutes);
   app.use('/api', marketplaceRoutes);
-  app.use('/api/services', marketplaceRoutes); // Mount marketplace routes under services as well
 
   // Register billing and hero routes
   app.use('/api/billing', billingRoutes);

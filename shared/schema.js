@@ -66,7 +66,7 @@ export const properties = pgTable("properties", {
     listingType: text("listing_type").notNull(),
     status: text("status").default('active').notNull(),
     bedrooms: integer("bedrooms"),
-    bathrooms: numeric("bathrooms", { precision: 3, scale: 1 }).$type(),
+    bathrooms: integer("bathrooms").$type(),
     squareFeet: integer("square_feet"),
     areaBuild: integer("area_build"),
     lotSize: text("lot_size"),

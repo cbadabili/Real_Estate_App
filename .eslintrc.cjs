@@ -1,0 +1,42 @@
+module.exports = {
+  root: true,
+  parser: '@typescript-eslint/parser',
+  plugins: ['@typescript-eslint', 'react', 'react-hooks', 'testing-library'],
+  extends: [
+    'eslint:recommended',
+    'plugin:@typescript-eslint/recommended',
+    'plugin:react/recommended',
+    'plugin:react-hooks/recommended',
+    'plugin:testing-library/react',
+  ],
+  settings: {
+    react: { version: 'detect' },
+  },
+  env: {
+    es2022: true,
+    node: true,
+    browser: true,
+  },
+  ignorePatterns: [
+    'dist/',
+    'build/',
+    'node_modules/',
+    'coverage/',
+    '.next/',
+    '.turbo/',
+    '.cache/',
+    '**/*.tsbuildinfo',
+  ],
+  rules: {
+    '@typescript-eslint/no-empty-object-type': 'off',
+    '@typescript-eslint/no-explicit-any': 'off',
+    '@typescript-eslint/no-unused-vars': 'off',
+    '@typescript-eslint/ban-ts-comment': 'off',
+    '@typescript-eslint/no-require-imports': 'off',
+    '@typescript-eslint/no-namespace': 'off',
+    '@typescript-eslint/prefer-as-const': 'off',
+    'react/react-in-jsx-scope': 'off',
+    'no-case-declarations': 'off',
+    'prefer-const': 'off',
+  },
+};

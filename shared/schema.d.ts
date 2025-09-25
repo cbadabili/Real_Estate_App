@@ -884,15 +884,15 @@ export declare const properties: import("drizzle-orm/pg-core").PgTableWithColumn
             name: "bathrooms";
             tableName: "properties";
             dataType: "number";
-            columnType: "PgNumeric";
+            columnType: "PgInteger";
             data: number | null;
-            driverParam: string;
+            driverParam: string | number;
             notNull: false;
             hasDefault: false;
             isPrimaryKey: false;
             isAutoincrement: false;
             hasRuntimeDefault: false;
-            enumValues: [string, ...string[]];
+            enumValues: undefined;
             baseColumn: never;
             identity: undefined;
             generated: undefined;

@@ -50,6 +50,21 @@ const normalizeStringArray = (value: unknown): string[] => {
   return [String(value)];
 };
 
+const normalizePrice = (value: unknown): number => {
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return value;
+  }
+
+  if (typeof value === "string") {
+    const cleaned = Number(value.replace(/[^\d.-]/g, ""));
+    if (Number.isFinite(cleaned)) {
+      return cleaned;
+    }
+  }
+
+  return 0;
+};
+
 export interface IStorage {
   // User methods
   getUser(id: number): Promise<User | undefined>;
@@ -277,8 +292,9 @@ export class DatabaseStorage implements IStorage {
 
     return savedProps.map(prop => ({
       ...prop,
-      images: normalizeStringArray(prop.images),
-      features: normalizeStringArray(prop.features),
+      price: normalizePrice(prop.price),
+      images: Array.isArray(prop.images) ? prop.images : normalizeStringArray(prop.images),
+      features: Array.isArray(prop.features) ? prop.features : normalizeStringArray(prop.features),
     }));
   }
 

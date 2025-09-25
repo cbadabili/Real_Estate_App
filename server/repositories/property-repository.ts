@@ -4,7 +4,7 @@ import {
   type InsertProperty
 } from "../../shared/schema";
 import { db } from "../db";
-import { eq, and, desc, asc, gte, lte, like, or, sql } from "drizzle-orm";
+import { eq, and, desc, asc, gte, lte, ilike, or, sql } from "drizzle-orm";
 import { cacheService, CacheService } from "../cache-service";
 
 const normalizeStringArray = (value: unknown): string[] => {
@@ -226,10 +226,10 @@ export class PropertyRepository implements IPropertyRepository {
       const searchTerm = filters.location || filters.city;
       conditions.push(
         or(
-          like(properties.city, `%${searchTerm}%`),
-          like(properties.address, `%${searchTerm}%`),
-          like(properties.title, `%${searchTerm}%`),
-          like(properties.description, `%${searchTerm}%`)
+          ilike(properties.city, `%${searchTerm}%`),
+          ilike(properties.address, `%${searchTerm}%`),
+          ilike(properties.title, `%${searchTerm}%`),
+          ilike(properties.description, `%${searchTerm}%`)
         )
       );
     }
