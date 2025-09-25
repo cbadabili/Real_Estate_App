@@ -99,7 +99,8 @@ ALTER TABLE properties
   ALTER COLUMN created_at TYPE timestamptz
     USING CASE
       WHEN pg_typeof(created_at)::text LIKE 'timestamp%' THEN created_at::timestamptz
-      ELSE to_timestamp((created_at)::bigint / 1000)
+      WHEN created_at::text ~ '^[0-9]{10,13}$' THEN to_timestamp((created_at)::bigint / 1000)
+      ELSE created_at::timestamptz
     END;
 
 UPDATE properties SET created_at = now() WHERE created_at IS NULL;
@@ -112,7 +113,8 @@ ALTER TABLE properties
   ALTER COLUMN updated_at TYPE timestamptz
     USING CASE
       WHEN pg_typeof(updated_at)::text LIKE 'timestamp%' THEN updated_at::timestamptz
-      ELSE to_timestamp((updated_at)::bigint / 1000)
+      WHEN updated_at::text ~ '^[0-9]{10,13}$' THEN to_timestamp((updated_at)::bigint / 1000)
+      ELSE updated_at::timestamptz
     END;
 
 UPDATE properties SET updated_at = now() WHERE updated_at IS NULL;

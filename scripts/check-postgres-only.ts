@@ -30,6 +30,11 @@ const MAX_FILE_SIZE_BYTES = 1024 * 1024; // 1 MB safety cap for scanning
 const rootDir = process.cwd();
 const hits: string[] = [];
 
+/**
+ * Recursively traverse the repository and record files that reference SQLite usage.
+ *
+ * @param currentPath - Directory currently being scanned.
+ */
 function walk(currentPath: string) {
   const entries = fs.readdirSync(currentPath, { withFileTypes: true });
 
@@ -65,9 +70,6 @@ function walk(currentPath: string) {
       }
 
       const contents = fs.readFileSync(fullPath, "utf8");
-      if (contents.includes("\u0000")) {
-        continue;
-      }
       const lines = contents.split(/\r?\n/);
       for (let i = 0; i < lines.length; i++) {
         if (/sqlite/i.test(lines[i])) {

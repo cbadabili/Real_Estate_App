@@ -7,12 +7,27 @@ export interface RequestWithId extends Request {
   id: string;
 }
 
+/**
+ * Assign a unique request identifier and expose it via the X-Request-ID header.
+ *
+ * @param req - Express request augmented with the request identifier.
+ * @param res - Express response instance that receives the header.
+ * @param next - Callback to move execution to the next middleware.
+ */
 export const addRequestId = (req: RequestWithId, res: Response, next: NextFunction) => {
   req.id = randomUUID();
   res.setHeader('X-Request-ID', req.id);
   next();
 };
 
+/**
+ * Log structured request metadata and record analytics timings without
+ * impacting response flow.
+ *
+ * @param req - Express request carrying the generated request ID.
+ * @param res - Express response used to access status codes and attach hooks.
+ * @param next - Callback that defers to downstream middleware/handlers.
+ */
 export const structuredLogger = (req: RequestWithId, res: Response, next: NextFunction) => {
   const start = Date.now();
 

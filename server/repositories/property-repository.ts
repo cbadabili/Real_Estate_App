@@ -170,6 +170,12 @@ export interface IPropertyRepository {
  * normalization, caching, search, and spatial updates.
  */
 export class PropertyRepository implements IPropertyRepository {
+  /**
+   * Look up a single property by its identifier.
+   *
+   * @param id - Unique identifier of the property to retrieve.
+   * @returns The normalized property or `undefined` when no match exists.
+   */
   async getProperty(id: number): Promise<Property | undefined> {
     const [property] = await db.select().from(properties).where(eq(properties.id, id));
     if (!property) {
@@ -178,6 +184,13 @@ export class PropertyRepository implements IPropertyRepository {
     return normalizePropertyRecord(property);
   }
 
+  /**
+   * Fetch a page of properties matching the provided filters. Results are cached
+   * briefly to reduce load on popular queries.
+   *
+   * @param filters - Optional constraints for price, beds/baths, sort order, etc.
+   * @returns An array of normalized properties ready for API consumption.
+   */
   async getProperties(filters: PropertyFilters = {}): Promise<Property[]> {
     const minPrice = toFiniteNumber(filters.minPrice);
     const maxPrice = toFiniteNumber(filters.maxPrice);
@@ -344,6 +357,12 @@ export class PropertyRepository implements IPropertyRepository {
     return finalResults;
   }
 
+  /**
+   * Persist a new property and compute its spatial geometry when coordinates are provided.
+   *
+   * @param property - Property attributes supplied by the caller.
+   * @returns The inserted property with normalization applied.
+   */
   async createProperty(property: InsertProperty): Promise<Property> {
     const latitude = parseCoordinate(property.latitude);
     const longitude = parseCoordinate(property.longitude);
@@ -366,6 +385,14 @@ export class PropertyRepository implements IPropertyRepository {
     return normalizePropertyRecord(newProperty);
   }
 
+  /**
+   * Apply partial updates to an existing property, recalculating geometry when
+   * coordinates change.
+   *
+   * @param id - Unique identifier of the property to update.
+   * @param updates - Subset of property fields to change.
+   * @returns The updated property or `undefined` when no record matches.
+   */
   async updateProperty(id: number, updates: Partial<InsertProperty>): Promise<Property | undefined> {
     const updatePayload: Partial<InsertProperty> & { geom?: SQL } = { ...updates };
 
@@ -407,6 +434,12 @@ export class PropertyRepository implements IPropertyRepository {
     return normalizePropertyRecord(property);
   }
 
+  /**
+   * Remove a property record.
+   *
+   * @param id - Identifier of the property to delete.
+   * @returns True when a record was deleted, otherwise false.
+   */
   async deleteProperty(id: number): Promise<boolean> {
     const deleted = await db
       .delete(properties)
@@ -419,6 +452,12 @@ export class PropertyRepository implements IPropertyRepository {
     return false;
   }
 
+  /**
+   * Retrieve all properties owned by a specific user ordered by recency.
+   *
+   * @param userId - Identifier for the owning user.
+   * @returns The normalized property list.
+   */
   async getUserProperties(userId: number): Promise<Property[]> {
     const userProps = await db
       .select()
@@ -429,6 +468,11 @@ export class PropertyRepository implements IPropertyRepository {
     return userProps.map(normalizePropertyRecord);
   }
 
+  /**
+   * Increment the view counter for a property atomically.
+   *
+   * @param id - Identifier of the property that was viewed.
+   */
   async incrementPropertyViews(id: number): Promise<void> {
     await db
       .update(properties)

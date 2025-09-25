@@ -28,6 +28,10 @@ app.set('trust proxy', 1);
 const nodeEnv = process.env.NODE_ENV ?? 'development';
 const isDevelopment = nodeEnv === 'development';
 
+if (!process.env.NODE_ENV) {
+  process.env.NODE_ENV = nodeEnv;
+}
+
 // Security middleware
 app.use(helmet({
   contentSecurityPolicy: isDevelopment
@@ -43,27 +47,45 @@ app.use(helmet({
           "img-src": ["'self'", "data:", "https:"],
           "connect-src": ["'self'", "https:", "wss:"],
           "frame-ancestors": ["'self'"],
-          upgradeInsecureRequests: [],
+          "upgrade-insecure-requests": [],
         },
       },
   referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
   crossOriginOpenerPolicy: { policy: 'same-origin' },
   xPermittedCrossDomainPolicies: { permittedPolicies: 'none' },
   permissionsPolicy: {
-    camera: ['self'],
-    microphone: [],
-    geolocation: ['self'],
-    fullscreen: ['self'],
-    payment: [],
-    usb: [],
-    magnetometer: [],
-    accelerometer: [],
-    gyroscope: []
-  }
+    features: {
+      camera: ["'self'"],
+      microphone: [],
+      geolocation: ["'self'"],
+      fullscreen: ["'self'"],
+      payment: [],
+      usb: [],
+      magnetometer: [],
+      accelerometer: [],
+      gyroscope: [],
+    },
+  },
 }));
 
+const allowedOrigins = env.CORS_ORIGIN
+  ?.split(',')
+  .map(origin => origin.trim())
+  .filter(Boolean);
+
 app.use(cors({
-  origin: env.CORS_ORIGIN.split(',').map(s => s.trim()),
+  origin: (origin, callback) => {
+    if (!origin) {
+      return callback(null, true);
+    }
+    if (!allowedOrigins?.length) {
+      return callback(null, isDevelopment ? true : false);
+    }
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    return callback(new Error('Not allowed by CORS'));
+  },
   credentials: true,
 }));
 
@@ -74,8 +96,8 @@ app.use(structuredLogger);
 // Rate limiting for auth and write endpoints
 const authWriteLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100,
-  standardHeaders: true,
+  limit: 100,
+  standardHeaders: 'draft-8',
   legacyHeaders: false,
   message: { error: 'Too many requests, please try again later' }
 });
@@ -83,8 +105,8 @@ const authWriteLimiter = rateLimit({
 // General API rate limiting
 const generalApiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 1000, // More generous for general API usage
-  standardHeaders: true,
+  limit: 1000, // More generous for general API usage
+  standardHeaders: 'draft-8',
   legacyHeaders: false,
   message: { error: 'API rate limit exceeded' }
 });
@@ -92,8 +114,8 @@ const generalApiLimiter = rateLimit({
 // Write operations rate limiting
 const writeApiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 50,
-  standardHeaders: true,
+  limit: 50,
+  standardHeaders: 'draft-8',
   legacyHeaders: false,
   message: { error: 'Too many write requests, please try again later' }
 });
@@ -101,8 +123,8 @@ const writeApiLimiter = rateLimit({
 // Search rate limiting
 const searchLimiter = rateLimit({
   windowMs: 1 * 60 * 1000, // 1 minute
-  max: 100,
-  standardHeaders: true,
+  limit: 100,
+  standardHeaders: 'draft-8',
   legacyHeaders: false,
   message: { error: 'Search rate limit exceeded' }
 });
@@ -168,7 +190,7 @@ app.get('/api/health', (_req: Request, res: Response) => {
 
   // Mount API documentation
   try {
-    const { docsRouter } = await import('./routes/docs.js');
+    const { docsRouter } = await import('./routes/docs');
     app.use('/api/docs', docsRouter);
     console.log('📚 API documentation available at /api/docs');
   } catch (error: unknown) {
@@ -284,7 +306,7 @@ app.get('/api/health', (_req: Request, res: Response) => {
   // ALWAYS serve the app on port 5000
   // this serves both the API and the client.
   // It is the only port that is not firewalled.
-  const port = 5000; // Force port 5000 for consistency with Vite proxy
+  const port = Number(process.env.PORT) || 5000; // Default to 5000 for Replit/Vite compatibility
   server.listen(port, "0.0.0.0", () => {
     log(`serving on port ${port}`);
   });
