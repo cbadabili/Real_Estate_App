@@ -1,0 +1,32 @@
+{
+  "ci": {
+    "collect": {
+      "staticDistDir": "dist",
+      "url": [
+        "http://localhost:4173/properties",
+        "http://localhost:4173/properties/1",
+        "http://localhost:4173/services"
+      ],
+      "numberOfRuns": 1,
+      "settings": {
+        "preset": "mobile",
+        "throttling": {
+          "rttMs": 150,
+          "throughputKbps": 1600,
+          "cpuSlowdownMultiplier": 4
+        },
+        "formFactor": "mobile"
+      }
+    },
+    "assert": {
+      "assertions": {
+        "categories:performance": ["error", { "minScore": 0.85 }],
+        "first-contentful-paint": ["warn", { "maxNumericValue": 2500 }],
+        "largest-contentful-paint": ["error", { "maxNumericValue": 2500 }],
+        "interactive": ["error", { "maxNumericValue": 4000 }],
+        "total-blocking-time": ["warn", { "maxNumericValue": 250 }],
+        "cumulative-layout-shift": ["error", { "maxNumericValue": 0.1 }]
+      }
+    }
+  }
+}
