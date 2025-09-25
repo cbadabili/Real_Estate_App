@@ -27,6 +27,7 @@ module.exports = tseslint.config(
       'scripts/**/*.js',
       'tailwind.config.js',
       'tailwind.config.ts',
+      'eslint.config.cjs',
     ],
   },
   js.configs.recommended,

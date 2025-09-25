@@ -73,11 +73,17 @@ const allowedOrigins = env.CORS_ORIGIN
   .map(origin => origin.trim())
   .filter(Boolean);
 
+const allowAllOrigins = allowedOrigins?.includes('*');
+
 app.use(cors({
   origin: (origin, callback) => {
     if (!origin) {
       return callback(null, true);
     }
+    if (allowAllOrigins) {
+      return callback(null, true);
+    }
+
     if (!allowedOrigins?.length) {
       return callback(null, isDevelopment ? true : false);
     }

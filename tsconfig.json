@@ -17,7 +17,7 @@
     "paths": {
       "@shared/*": ["shared/*"]
     },
-    "types": ["vitest/globals"],
+    "types": ["node", "vitest/globals"],
 
     /* Linting */
     "strict": true,

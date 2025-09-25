@@ -172,11 +172,11 @@ export class PropertyRepository {
       conditions.push(lte(properties.squareFeet, maxSquareFeet));
     }
 
-    const searchTerm = filters.searchTerm ?? filters.location ?? filters.city ?? filters.address ?? filters.title;
+    const searchTerm = filters.searchTerm ?? filters.location ?? filters.address ?? filters.title;
     if (searchTerm && searchTerm.trim().length > 0) {
       const term = searchTerm.trim();
       if (term.length >= 2) {
-        const tsQuery = sql`plainto_tsquery('simple', ${term})`;
+        const tsQuery = sql`plainto_tsquery('english', ${term})`;
         conditions.push(sql`${properties.fts} @@ ${tsQuery}`);
         orderings.push(sql`ts_rank_cd(${properties.fts}, ${tsQuery}) DESC`);
       } else {
@@ -189,8 +189,8 @@ export class PropertyRepository {
           ),
         );
       }
-    } else if (filters.city || filters.location) {
-      const locationTerm = (filters.location ?? filters.city ?? "").trim();
+    } else if (filters.location) {
+      const locationTerm = filters.location.trim();
       if (locationTerm) {
         conditions.push(
           or(
@@ -201,6 +201,13 @@ export class PropertyRepository {
           ),
         );
       }
+    }
+
+    const cityTerm = typeof filters.city === "string"
+      ? filters.city.trim()
+      : filters.city?.trim?.();
+    if (cityTerm) {
+      conditions.push(eq(properties.city, cityTerm));
     }
 
     if (filters.state) {

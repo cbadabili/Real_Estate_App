@@ -8,11 +8,15 @@ describe('Memory and Resource Performance', () => {
 
   beforeEach(() => {
     initialMemory = process.memoryUsage();
-    global.gc && global.gc(); // Force garbage collection if available
+    if (typeof global.gc === 'function') {
+      global.gc(); // Force garbage collection if available
+    }
   });
 
   afterEach(() => {
-    global.gc && global.gc();
+    if (typeof global.gc === 'function') {
+      global.gc();
+    }
   });
 
   it('should not have significant memory leaks in property queries', async () => {

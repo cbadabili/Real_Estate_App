@@ -15,8 +15,10 @@ export interface RequestWithId extends Request {
  * @param next - Callback to move execution to the next middleware.
  */
 export const addRequestId = (req: RequestWithId, res: Response, next: NextFunction) => {
-  req.id = randomUUID();
-  res.setHeader('X-Request-ID', req.id);
+  const inboundId = req.get('x-request-id');
+  const requestId = inboundId && inboundId.trim() ? inboundId : randomUUID();
+  req.id = requestId;
+  res.setHeader('X-Request-ID', requestId);
   next();
 };
 
@@ -51,14 +53,14 @@ export const structuredLogger = (req: RequestWithId, res: Response, next: NextFu
 
     console.log(JSON.stringify(logData));
 
-    try {
-      analyticsService.recordResponseTime(req.path, duration);
-
-      if (res.statusCode >= 400) {
-        analyticsService.recordError(req.path, res.statusCode.toString());
-      }
-    } catch (err) {
+    Promise.resolve(analyticsService.recordResponseTime(req.path, duration)).catch(err => {
       console.error('analyticsService error', { path: req.path, err: String(err) });
+    });
+
+    if (res.statusCode >= 400) {
+      Promise.resolve(analyticsService.recordError(req.path, res.statusCode.toString())).catch(err => {
+        console.error('analyticsService error', { path: req.path, err: String(err) });
+      });
     }
   });
 

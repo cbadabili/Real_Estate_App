@@ -94,7 +94,7 @@ export const properties = pgTable("properties", {
     lotNumber: text("lot_number"),
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
-    fts: tsvector("fts").generatedAlwaysAs(() => sql `to_tsvector('simple', coalesce(title, '') || ' ' || coalesce(description, '') || ' ' || coalesce(address, ''))`, { stored: true }),
+    fts: tsvector("fts").generatedAlwaysAs(() => sql `to_tsvector('english', coalesce(title, '') || ' ' || coalesce(description, '') || ' ' || coalesce(address, ''))`, { stored: true }),
 });
 // Property inquiries
 export const inquiries = pgTable("inquiries", {

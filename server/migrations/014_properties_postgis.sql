@@ -9,16 +9,29 @@ ALTER TABLE properties
   ALTER COLUMN price TYPE numeric(12, 2)
     USING CASE
       WHEN price IS NULL OR NULLIF(trim(price::text), '') IS NULL THEN 0
-      WHEN price::text ~ '^[0-9]+(\.[0-9]+)?$' THEN (price::text)::numeric(12, 2)
-      ELSE COALESCE(NULLIF(regexp_replace(price::text, '[^0-9\.]', '', 'g'), ''), '0')::numeric(12, 2)
+      WHEN price::text ~ '^[+-]?[0-9]+(\.[0-9]+)?$' THEN GREATEST((price::text)::numeric(12, 2), 0)
+      ELSE GREATEST(
+        COALESCE(NULLIF(regexp_replace(price::text, '[^0-9\.\+\-]', '', 'g'), ''), '0')::numeric(12, 2),
+        0
+      )
     END;
 
 ALTER TABLE properties
   ALTER COLUMN price SET DEFAULT 0,
   ALTER COLUMN price SET NOT NULL;
 
-ALTER TABLE properties
-  ADD CONSTRAINT properties_price_non_negative CHECK (price >= 0);
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1
+    FROM pg_constraint
+    WHERE conname = 'properties_price_non_negative'
+      AND conrelid = 'properties'::regclass
+  ) THEN
+    ALTER TABLE properties
+      ADD CONSTRAINT properties_price_non_negative CHECK (price >= 0);
+  END IF;
+END$$;
 
 -- Ensure images column is jsonb with sensible defaults
 ALTER TABLE properties
@@ -27,9 +40,9 @@ ALTER TABLE properties
       WHEN images IS NULL THEN '[]'::jsonb
       WHEN pg_typeof(images)::text = 'jsonb' THEN images
       WHEN NULLIF(trim(images::text), '') IS NULL THEN '[]'::jsonb
-      WHEN images::text LIKE '[%' THEN images::jsonb
-      WHEN images::text LIKE '{%' THEN jsonb_build_array(images::jsonb)
-      ELSE jsonb_build_array(to_jsonb(images::text))
+      WHEN images::text ~ '^\s*\[' THEN images::jsonb
+      WHEN images::text ~ '^\s*\{' THEN jsonb_build_array(images::jsonb)
+      ELSE jsonb_build_array(to_jsonb(trim(images::text)))
     END,
   ALTER COLUMN images SET DEFAULT '[]'::jsonb,
   ALTER COLUMN images SET NOT NULL;
@@ -41,9 +54,9 @@ ALTER TABLE properties
       WHEN features IS NULL THEN '[]'::jsonb
       WHEN pg_typeof(features)::text = 'jsonb' THEN features
       WHEN NULLIF(trim(features::text), '') IS NULL THEN '[]'::jsonb
-      WHEN features::text LIKE '[%' THEN features::jsonb
-      WHEN features::text LIKE '{%' THEN jsonb_build_array(features::jsonb)
-      ELSE jsonb_build_array(to_jsonb(features::text))
+      WHEN features::text ~ '^\s*\[' THEN features::jsonb
+      WHEN features::text ~ '^\s*\{' THEN jsonb_build_array(features::jsonb)
+      ELSE jsonb_build_array(to_jsonb(trim(features::text)))
     END,
   ALTER COLUMN features SET DEFAULT '[]'::jsonb,
   ALTER COLUMN features SET NOT NULL;
@@ -75,6 +88,29 @@ ALTER TABLE properties
       ELSE NULLIF(regexp_replace(longitude::text, '[^0-9\.\-+]', '', 'g'), '')::double precision
     END;
 
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint
+    WHERE conname = 'properties_lat_range_chk'
+      AND conrelid = 'properties'::regclass
+  ) THEN
+    ALTER TABLE properties
+      ADD CONSTRAINT properties_lat_range_chk
+      CHECK (latitude IS NULL OR (latitude BETWEEN -90 AND 90));
+  END IF;
+
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint
+    WHERE conname = 'properties_lng_range_chk'
+      AND conrelid = 'properties'::regclass
+  ) THEN
+    ALTER TABLE properties
+      ADD CONSTRAINT properties_lng_range_chk
+      CHECK (longitude IS NULL OR (longitude BETWEEN -180 AND 180));
+  END IF;
+END$$;
+
 -- Add currency (app & schema depend on it)
 DO $$
 BEGIN
@@ -99,7 +135,8 @@ ALTER TABLE properties
   ALTER COLUMN created_at TYPE timestamptz
     USING CASE
       WHEN pg_typeof(created_at)::text LIKE 'timestamp%' THEN created_at::timestamptz
-      WHEN created_at::text ~ '^[0-9]{10,13}$' THEN to_timestamp((created_at)::bigint / 1000)
+      WHEN created_at::text ~ '^[0-9]{13}$' THEN to_timestamp((created_at)::bigint / 1000.0)
+      WHEN created_at::text ~ '^[0-9]{10}$' THEN to_timestamp((created_at)::bigint)
       ELSE created_at::timestamptz
     END;
 
@@ -113,7 +150,8 @@ ALTER TABLE properties
   ALTER COLUMN updated_at TYPE timestamptz
     USING CASE
       WHEN pg_typeof(updated_at)::text LIKE 'timestamp%' THEN updated_at::timestamptz
-      WHEN updated_at::text ~ '^[0-9]{10,13}$' THEN to_timestamp((updated_at)::bigint / 1000)
+      WHEN updated_at::text ~ '^[0-9]{13}$' THEN to_timestamp((updated_at)::bigint / 1000.0)
+      WHEN updated_at::text ~ '^[0-9]{10}$' THEN to_timestamp((updated_at)::bigint)
       ELSE updated_at::timestamptz
     END;
 
@@ -128,7 +166,7 @@ ALTER TABLE properties
   ADD COLUMN IF NOT EXISTS fts tsvector
     GENERATED ALWAYS AS (
       to_tsvector(
-        'simple',
+        'english',
         coalesce(title, '') || ' ' ||
         coalesce(description, '') || ' ' ||
         coalesce(address, '')
