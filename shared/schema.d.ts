@@ -883,8 +883,8 @@ export declare const properties: import("drizzle-orm/pg-core").PgTableWithColumn
         bathrooms: import("drizzle-orm/pg-core").PgColumn<{
             name: "bathrooms";
             tableName: "properties";
-            dataType: "number";
-            columnType: "PgInteger";
+            dataType: "string";
+            columnType: "PgNumeric";
             data: number | null;
             driverParam: string | number;
             notNull: false;

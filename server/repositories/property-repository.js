@@ -1,6 +1,6 @@
 import { properties } from "../../shared/schema";
 import { db } from "../db";
-import { eq, and, desc, asc, gte, lte, like, or, sql } from "drizzle-orm";
+import { eq, and, desc, asc, gte, lte, ilike, or, sql } from "drizzle-orm";
 import { cacheService, CacheService } from "../cache-service";
 const normalizeStringArray = (value) => {
     if (Array.isArray(value)) {
@@ -43,22 +43,24 @@ const normalizeNumeric = (value) => {
     }
     return 0;
 };
-const parseCoordinate = (value) => {
-    if (value === null || value === undefined) {
+const toCoord = (v) => {
+    if (v == null) {
         return null;
     }
-    if (typeof value === "number") {
-        return Number.isFinite(value) ? value : null;
+    if (typeof v === "number") {
+        return Number.isFinite(v) ? v : null;
     }
-    if (typeof value === "string") {
-        const trimmed = value.trim();
-        if (!trimmed) {
-            return null;
-        }
-        const parsed = Number(trimmed);
+    if (typeof v === "string" && v.trim() !== "") {
+        const parsed = Number(v);
         return Number.isFinite(parsed) ? parsed : null;
     }
     return null;
+};
+const parseCoordinate = (value) => {
+    if (value === undefined) {
+        return null;
+    }
+    return toCoord(value);
 };
 const buildGeomValue = (latitude, longitude) => {
     if (latitude === null || longitude === null) {
@@ -90,15 +92,13 @@ const toFiniteNumber = (value) => {
     return Number.isFinite(num) ? num : undefined;
 };
 const normalizePropertyRecord = (prop) => {
-    const lat = typeof prop.latitude === "number" ? prop.latitude : Number(prop.latitude);
-    const lng = typeof prop.longitude === "number" ? prop.longitude : Number(prop.longitude);
     return {
         ...prop,
         price: normalizeNumeric(prop.price),
         images: normalizeStringArray(prop.images),
         features: normalizeStringArray(prop.features),
-        latitude: Number.isFinite(lat) ? lat : null,
-        longitude: Number.isFinite(lng) ? lng : null,
+        latitude: toCoord(prop.latitude),
+        longitude: toCoord(prop.longitude),
     };
 };
 export class PropertyRepository {
@@ -137,6 +137,7 @@ export class PropertyRepository {
         }
         let query = db.select().from(properties);
         const conditions = [];
+        const orderings = [];
         if (minPrice !== undefined) {
             conditions.push(gte(properties.price, minPrice));
         }
@@ -158,9 +159,18 @@ export class PropertyRepository {
         if (maxSquareFeet !== undefined) {
             conditions.push(lte(properties.squareFeet, maxSquareFeet));
         }
-        if (filters.city || filters.location) {
-            const searchTerm = filters.location || filters.city;
-            conditions.push(or(like(properties.city, `%${searchTerm}%`), like(properties.address, `%${searchTerm}%`), like(properties.title, `%${searchTerm}%`), like(properties.description, `%${searchTerm}%`)));
+        const searchTerm = (filters.searchTerm ?? filters.location ?? filters.city ?? filters.address ?? filters.title);
+        if ((searchTerm === null || searchTerm === void 0 ? void 0 : searchTerm.trim().length) > 0) {
+            const term = searchTerm.trim();
+            const tsQuery = sql `plainto_tsquery('simple', ${term})`;
+            conditions.push(sql `${properties.fts} @@ ${tsQuery}`);
+            orderings.push(sql `ts_rank_cd(${properties.fts}, ${tsQuery}) DESC`);
+        }
+        else if (filters.city || filters.location) {
+            const locationTerm = (filters.location ?? filters.city ?? "").trim();
+            if (locationTerm) {
+                conditions.push(or(ilike(properties.city, `%${locationTerm}%`), ilike(properties.address, `%${locationTerm}%`), ilike(properties.title, `%${locationTerm}%`), ilike(properties.description, `%${locationTerm}%`)));
+            }
         }
         if (filters.state) {
             conditions.push(eq(properties.state, filters.state));
@@ -178,7 +188,10 @@ export class PropertyRepository {
             query = query.where(and(...conditions));
         }
         // Sorting
-        if (filters.sortBy) {
+        if (orderings.length > 0) {
+            query = query.orderBy(...orderings, desc(properties.createdAt));
+        }
+        else if (filters.sortBy) {
             const sortColumn = {
                 'price': properties.price,
                 'date': properties.createdAt,

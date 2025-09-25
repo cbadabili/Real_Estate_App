@@ -31,10 +31,9 @@ const normalizeStringArray = (value) => {
     }
     return [String(value)];
 };
-const normalizeNumeric = (value) => {
-    const direct = Number(value);
-    if (Number.isFinite(direct)) {
-        return direct;
+const normalizePrice = (value) => {
+    if (typeof value === "number" && Number.isFinite(value)) {
+        return value;
     }
     if (typeof value === "string") {
         const cleaned = Number(value.replace(/[^\d.-]/g, ""));
@@ -202,7 +201,7 @@ export class DatabaseStorage {
             const lng = typeof prop.longitude === "number" ? prop.longitude : Number(prop.longitude);
             const processed = {
                 ...prop,
-                price: normalizeNumeric(prop.price),
+                price: normalizePrice(prop.price),
                 latitude: Number.isFinite(lat) ? lat : null,
                 longitude: Number.isFinite(lng) ? lng : null,
                 images: normalizeStringArray(prop.images),
@@ -229,7 +228,7 @@ export class DatabaseStorage {
         .returning();
     return {
         ...newProperty,
-        price: normalizeNumeric(newProperty.price),
+        price: normalizePrice(newProperty.price),
         images: normalizeStringArray(newProperty.images),
         features: normalizeStringArray(newProperty.features),
         };
@@ -259,7 +258,7 @@ export class DatabaseStorage {
             return undefined;
         return {
             ...property,
-            price: normalizeNumeric(property.price),
+            price: normalizePrice(property.price),
             images: normalizeStringArray(property.images),
             features: normalizeStringArray(property.features),
         };
@@ -279,7 +278,7 @@ export class DatabaseStorage {
             .orderBy(desc(properties.createdAt));
         return userProps.map(prop => ({
             ...prop,
-            price: normalizeNumeric(prop.price),
+            price: normalizePrice(prop.price),
             images: normalizeStringArray(prop.images),
             features: normalizeStringArray(prop.features),
         }));
@@ -366,6 +365,7 @@ export class DatabaseStorage {
             title: properties.title,
             description: properties.description,
             price: properties.price,
+            currency: properties.currency,
             address: properties.address,
             city: properties.city,
             state: properties.state,
@@ -399,8 +399,9 @@ export class DatabaseStorage {
             .orderBy(desc(savedProperties.createdAt));
         return savedProps.map(prop => ({
             ...prop,
-            images: normalizeStringArray(prop.images),
-            features: normalizeStringArray(prop.features),
+            price: normalizePrice(prop.price),
+            images: Array.isArray(prop.images) ? prop.images : normalizeStringArray(prop.images),
+            features: Array.isArray(prop.features) ? prop.features : normalizeStringArray(prop.features),
         }));
     }
     async saveProperty(userId, propertyId) {

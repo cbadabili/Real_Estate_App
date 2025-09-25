@@ -17,7 +17,9 @@ import {
 import { db } from "./db";
 import { eq, desc, asc, and } from "drizzle-orm";
 import { userRepository, type IUserRepository } from "./repositories/user-repository";
-import { propertyRepository, type IPropertyRepository, type PropertyFilters } from "./repositories/property-repository";
+import { propertyRepository, type IPropertyRepository } from "./repositories/property-repository";
+
+type PropertyFilters = Parameters<IPropertyRepository["getProperties"]>[0];
 
 const normalizeStringArray = (value: unknown): string[] => {
   if (Array.isArray(value)) {
@@ -258,6 +260,7 @@ export class DatabaseStorage implements IStorage {
         title: properties.title,
         description: properties.description,
         price: properties.price,
+        currency: properties.currency,
         address: properties.address,
         city: properties.city,
         state: properties.state,

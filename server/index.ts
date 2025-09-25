@@ -25,66 +25,41 @@ const app = express();
 // Configure trust proxy for Replit
 app.set('trust proxy', 1);
 
+if (!process.env.NODE_ENV) {
+  process.env.NODE_ENV = 'development';
+}
 const isDevelopment = process.env.NODE_ENV === 'development';
-const helmetOptions: Parameters<typeof helmet>[0] = isDevelopment
-  ? {
-      contentSecurityPolicy: false,
-      referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
-      permittedCrossDomainPolicies: false,
-      crossOriginOpenerPolicy: { policy: 'same-origin' },
-      permissionsPolicy: {
-        camera: ['self'],
-        microphone: [],
-        geolocation: ['self'],
-        fullscreen: ['self'],
-        payment: [],
-        usb: [],
-        magnetometer: [],
-        accelerometer: [],
-        gyroscope: []
-      }
-    }
-  : {
-      contentSecurityPolicy: {
-        directives: {
-          defaultSrc: ["'self'"],
-          styleSrc: ["'self'", "https://api.mapbox.com", "https://fonts.googleapis.com"],
-          scriptSrc: ["'self'", "https://api.mapbox.com"],
-          imgSrc: ["'self'", "data:", "https:", "blob:"],
-          connectSrc: ["'self'", "https://api.mapbox.com", "https://events.mapbox.com", "wss:", "ws:"],
-          fontSrc: ["'self'", "data:", "https://fonts.gstatic.com", "https://fonts.googleapis.com"],
-          objectSrc: ["'none'"],
-          upgradeInsecureRequests: [],
-        },
-      },
-      referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
-      permittedCrossDomainPolicies: false,
-      crossOriginOpenerPolicy: { policy: 'same-origin' },
-      permissionsPolicy: {
-        camera: ['self'],
-        microphone: [],
-        geolocation: ['self'],
-        fullscreen: ['self'],
-        payment: [],
-        usb: [],
-        magnetometer: [],
-        accelerometer: [],
-        gyroscope: []
-      }
-    };
 
 // Security middleware
-app.use(helmet(helmetOptions));
-
-if (isDevelopment) {
-  app.use((req, res, next) => {
-    res.setHeader('Content-Security-Policy',
-      "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://replit.com; " +
-      "font-src 'self' data: https:; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; " +
-      "connect-src 'self' ws: wss: https:; frame-src 'self';");
-    next();
-  });
-}
+app.use(helmet({
+  contentSecurityPolicy: isDevelopment
+    ? {
+        useDefaults: true,
+        directives: {
+          "script-src": ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+          "style-src": ["'self'", "'unsafe-inline'"],
+          "img-src": ["'self'", "data:", "https:"],
+          "connect-src": ["'self'", "ws:", "wss:", "https:"],
+          "frame-src": ["'self'"],
+          upgradeInsecureRequests: [],
+        },
+      }
+    : undefined,
+  referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
+  crossOriginOpenerPolicy: { policy: 'same-origin' },
+  permittedCrossDomainPolicies: false,
+  permissionsPolicy: {
+    camera: ['self'],
+    microphone: [],
+    geolocation: ['self'],
+    fullscreen: ['self'],
+    payment: [],
+    usb: [],
+    magnetometer: [],
+    accelerometer: [],
+    gyroscope: []
+  }
+}));
 
 app.use(cors({
   origin: env.CORS_ORIGIN.split(',').map(s => s.trim()),
@@ -133,15 +108,6 @@ const searchLimiter = rateLimit({
 
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
-
-app.use((req, res, next) => {
-  // Security headers
-  res.setHeader('X-Content-Type-Options', 'nosniff');
-  res.setHeader('X-Frame-Options', 'DENY');
-  res.setHeader('X-XSS-Protection', '1; mode=block');
-  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
-  next();
-});
 
 // --------------------------------------------------
 // Health check – must be registered before other routes
@@ -247,11 +213,6 @@ app.get('/api/health', (_req: Request, res: Response) => {
   });
 
   const server = createServer(app);
-
-  // Set environment to development if not specified
-  if (!process.env.NODE_ENV) {
-    process.env.NODE_ENV = 'development';
-  }
 
   // importantly only setup vite in development and after
   // setting up all the other routes so the catch-all route

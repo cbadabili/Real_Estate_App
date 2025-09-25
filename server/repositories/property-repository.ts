@@ -4,7 +4,7 @@ import {
   type InsertProperty
 } from "../../shared/schema";
 import { db } from "../db";
-import { eq, and, desc, asc, gte, lte, ilike, or, sql } from "drizzle-orm";
+import { eq, and, desc, asc, gte, lte, ilike, or, sql, type SQL } from "drizzle-orm";
 import { cacheService, CacheService } from "../cache-service";
 
 const normalizeStringArray = (value: unknown): string[] => {
@@ -54,26 +54,25 @@ const normalizeNumeric = (value: unknown): number => {
   return 0;
 };
 
-const parseCoordinate = (value: unknown): number | null => {
-  if (value === null || value === undefined) {
+const toCoord = (v: unknown): number | null => {
+  if (v == null) {
     return null;
   }
-
-  if (typeof value === "number") {
-    return Number.isFinite(value) ? value : null;
+  if (typeof v === "number") {
+    return Number.isFinite(v) ? v : null;
   }
-
-  if (typeof value === "string") {
-    const trimmed = value.trim();
-    if (!trimmed) {
-      return null;
-    }
-
-    const parsed = Number(trimmed);
+  if (typeof v === "string" && v.trim() !== "") {
+    const parsed = Number(v);
     return Number.isFinite(parsed) ? parsed : null;
   }
-
   return null;
+};
+
+const parseCoordinate = (value: unknown): number | null => {
+  if (value === undefined) {
+    return null;
+  }
+  return toCoord(value);
 };
 
 const buildGeomValue = (latitude: number | null, longitude: number | null) => {
@@ -116,16 +115,13 @@ const toFiniteNumber = (value: unknown): number | undefined => {
 };
 
 const normalizePropertyRecord = (prop: Property): Property => {
-  const lat = typeof prop.latitude === "number" ? prop.latitude : Number(prop.latitude);
-  const lng = typeof prop.longitude === "number" ? prop.longitude : Number(prop.longitude);
-
   return {
     ...prop,
     price: normalizeNumeric(prop.price),
     images: normalizeStringArray(prop.images),
     features: normalizeStringArray(prop.features),
-    latitude: Number.isFinite(lat) ? lat : null,
-    longitude: Number.isFinite(lng) ? lng : null,
+    latitude: toCoord(prop.latitude),
+    longitude: toCoord(prop.longitude),
   };
 };
 
@@ -140,6 +136,8 @@ export interface PropertyFilters {
   city?: string;
   state?: string;
   zipCode?: string;
+  address?: string;
+  title?: string;
   location?: string; // General location search parameter
   listingType?: string;
   status?: string;
@@ -148,6 +146,7 @@ export interface PropertyFilters {
   sortBy?: 'price' | 'date' | 'size' | 'bedrooms';
   sortOrder?: 'asc' | 'desc';
   requireValidCoordinates?: boolean;
+  searchTerm?: string;
 }
 
 export interface IPropertyRepository {
@@ -199,7 +198,8 @@ export class PropertyRepository implements IPropertyRepository {
     }
 
     let query = db.select().from(properties);
-    const conditions = [];
+    const conditions: SQL[] = [];
+    const orderings: SQL[] = [];
 
     if (minPrice !== undefined) {
       conditions.push(gte(properties.price, minPrice));
@@ -222,16 +222,24 @@ export class PropertyRepository implements IPropertyRepository {
     if (maxSquareFeet !== undefined) {
       conditions.push(lte(properties.squareFeet, maxSquareFeet));
     }
-    if (filters.city || filters.location) {
-      const searchTerm = filters.location || filters.city;
-      conditions.push(
-        or(
-          ilike(properties.city, `%${searchTerm}%`),
-          ilike(properties.address, `%${searchTerm}%`),
-          ilike(properties.title, `%${searchTerm}%`),
-          ilike(properties.description, `%${searchTerm}%`)
-        )
-      );
+    const searchTerm = filters.searchTerm ?? filters.location ?? filters.city ?? filters.address ?? filters.title;
+    if (searchTerm && searchTerm.trim().length > 0) {
+      const term = searchTerm.trim();
+      const tsQuery = sql`plainto_tsquery('simple', ${term})`;
+      conditions.push(sql`${properties.fts} @@ ${tsQuery}`);
+      orderings.push(sql`ts_rank_cd(${properties.fts}, ${tsQuery}) DESC`);
+    } else if (filters.city || filters.location) {
+      const locationTerm = (filters.location ?? filters.city ?? "").trim();
+      if (locationTerm) {
+        conditions.push(
+          or(
+            ilike(properties.city, `%${locationTerm}%`),
+            ilike(properties.address, `%${locationTerm}%`),
+            ilike(properties.title, `%${locationTerm}%`),
+            ilike(properties.description, `%${locationTerm}%`)
+          )
+        );
+      }
     }
     if (filters.state) {
       conditions.push(eq(properties.state, filters.state));
@@ -251,7 +259,9 @@ export class PropertyRepository implements IPropertyRepository {
     }
 
     // Sorting
-    if (filters.sortBy) {
+    if (orderings.length > 0) {
+      query = query.orderBy(...orderings, desc(properties.createdAt));
+    } else if (filters.sortBy) {
       const sortColumn = {
         'price': properties.price,
         'date': properties.createdAt,

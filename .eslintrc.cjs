@@ -1,22 +1,39 @@
 module.exports = {
   root: true,
   parser: '@typescript-eslint/parser',
-  plugins: ['@typescript-eslint', 'react', 'react-hooks', 'testing-library'],
+  plugins: ['@typescript-eslint', 'testing-library'],
   extends: [
     'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
-    'plugin:react/recommended',
-    'plugin:react-hooks/recommended',
-    'plugin:testing-library/react',
   ],
-  settings: {
-    react: { version: 'detect' },
+  parserOptions: {
+    ecmaVersion: 'latest',
+    sourceType: 'module',
+    // project: ['./tsconfig.json'],
+    // tsconfigRootDir: __dirname,
   },
   env: {
     es2022: true,
-    node: true,
-    browser: true,
   },
+  overrides: [
+    {
+      files: ['server/**/*.{ts,tsx,js,jsx}', 'scripts/**/*.{ts,tsx,js,jsx}'],
+      env: { node: true, browser: false },
+    },
+    {
+      files: ['client/**/*.{ts,tsx,js,jsx}'],
+      env: { browser: true, node: false },
+    },
+    {
+      files: ['*.config.{js,ts,cjs,mjs}', '*.config.*', 'vite.config.*', 'tailwind.config.*', 'postcss.config.*'],
+      env: { node: true },
+    },
+    {
+      files: ['**/*.{test,spec}.{ts,tsx}', 'tests/**/*.{ts,tsx}'],
+      extends: ['plugin:testing-library/react'],
+      env: { browser: true },
+    },
+  ],
   ignorePatterns: [
     'dist/',
     'build/',
@@ -35,8 +52,7 @@ module.exports = {
     '@typescript-eslint/no-require-imports': 'off',
     '@typescript-eslint/no-namespace': 'off',
     '@typescript-eslint/prefer-as-const': 'off',
-    'react/react-in-jsx-scope': 'off',
-    'no-case-declarations': 'off',
     'prefer-const': 'off',
+    'no-case-declarations': 'off',
   },
 };

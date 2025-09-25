@@ -20,6 +20,7 @@ const ALLOWED_FILES = new Set([
   "package-lock.json",
   "yarn.lock",
   "pnpm-lock.yaml",
+  "bun.lockb",
 ]);
 
 const MAX_FILE_SIZE_BYTES = 1024 * 1024; // 1 MB safety cap for scanning

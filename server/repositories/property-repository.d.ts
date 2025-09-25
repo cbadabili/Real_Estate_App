@@ -10,6 +10,8 @@ export interface PropertyFilters {
     city?: string;
     state?: string;
     zipCode?: string;
+    address?: string;
+    title?: string;
     location?: string;
     listingType?: string;
     status?: string;
@@ -17,6 +19,8 @@ export interface PropertyFilters {
     offset?: number;
     sortBy?: 'price' | 'date' | 'size' | 'bedrooms';
     sortOrder?: 'asc' | 'desc';
+    requireValidCoordinates?: boolean;
+    searchTerm?: string;
 }
 export interface IPropertyRepository {
     getProperty(id: number): Promise<Property | undefined>;
