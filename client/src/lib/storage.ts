@@ -1,5 +1,8 @@
 const reportStorageError = (error: unknown) => {
-  if (typeof console !== 'undefined' && process.env.NODE_ENV !== 'production') {
+  if (
+    typeof console !== 'undefined' &&
+    (typeof process === 'undefined' || process.env.NODE_ENV !== 'production')
+  ) {
     console.warn('Local storage access failed', error);
   }
 };

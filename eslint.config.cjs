@@ -56,6 +56,12 @@ module.exports = tseslint.config(
     },
     settings: { react: { version: 'detect' } },
     rules: {
+      ...(reactPlugin.configs?.recommended?.rules ?? {}),
+      ...(reactHooksPlugin.configs?.recommended?.rules ?? {}),
+      'react/prop-types': 'off',
+      'react/no-unescaped-entities': 'off',
+      'react-hooks/rules-of-hooks': 'off',
+      'react-hooks/exhaustive-deps': 'warn',
       'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
     },
   },

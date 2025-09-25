@@ -348,49 +348,17 @@ export class DatabaseStorage implements IStorage {
    */
   async getSavedProperties(userId: number): Promise<Property[]> {
     const savedProps = await db
-      .select({
-        id: properties.id,
-        title: properties.title,
-        description: properties.description,
-        price: properties.price,
-        currency: properties.currency,
-        address: properties.address,
-        city: properties.city,
-        state: properties.state,
-        zipCode: properties.zipCode,
-        latitude: properties.latitude,
-        longitude: properties.longitude,
-        propertyType: properties.propertyType,
-        listingType: properties.listingType,
-        bedrooms: properties.bedrooms,
-        bathrooms: properties.bathrooms,
-        squareFeet: properties.squareFeet,
-        lotSize: properties.lotSize,
-        yearBuilt: properties.yearBuilt,
-        status: properties.status,
-        images: properties.images,
-        features: properties.features,
-        virtualTourUrl: properties.virtualTourUrl,
-        videoUrl: properties.videoUrl,
-        propertyTaxes: properties.propertyTaxes,
-        hoaFees: properties.hoaFees,
-        ownerId: properties.ownerId,
-        agentId: properties.agentId,
-        views: properties.views,
-        daysOnMarket: properties.daysOnMarket,
-        createdAt: properties.createdAt,
-        updatedAt: properties.updatedAt,
-      })
+      .select({ p: properties })
       .from(savedProperties)
       .innerJoin(properties, eq(savedProperties.propertyId, properties.id))
       .where(eq(savedProperties.userId, userId))
       .orderBy(desc(savedProperties.createdAt));
 
-    return savedProps.map(prop => ({
-      ...prop,
-      price: normalizePrice(prop.price),
-      images: Array.isArray(prop.images) ? prop.images : normalizeStringArray(prop.images),
-      features: Array.isArray(prop.features) ? prop.features : normalizeStringArray(prop.features),
+    return savedProps.map(({ p }) => ({
+      ...p,
+      price: normalizePrice(p.price),
+      images: Array.isArray(p.images) ? p.images : normalizeStringArray(p.images),
+      features: Array.isArray(p.features) ? p.features : normalizeStringArray(p.features),
     }));
   }
 

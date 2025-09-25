@@ -90,7 +90,8 @@ app.use(cors({
     if (allowedOrigins.includes(origin)) {
       return callback(null, true);
     }
-    return callback(new Error('Not allowed by CORS'));
+    console.warn(`Blocked CORS origin: ${origin}`);
+    return callback(null, false);
   },
   credentials: true,
 }));
@@ -103,7 +104,7 @@ app.use(structuredLogger);
 const authWriteLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   limit: 100,
-  standardHeaders: 'draft-8',
+  standardHeaders: true,
   legacyHeaders: false,
   message: { error: 'Too many requests, please try again later' }
 });
@@ -112,7 +113,7 @@ const authWriteLimiter = rateLimit({
 const generalApiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   limit: 1000, // More generous for general API usage
-  standardHeaders: 'draft-8',
+  standardHeaders: true,
   legacyHeaders: false,
   message: { error: 'API rate limit exceeded' }
 });
@@ -121,7 +122,7 @@ const generalApiLimiter = rateLimit({
 const writeApiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   limit: 50,
-  standardHeaders: 'draft-8',
+  standardHeaders: true,
   legacyHeaders: false,
   message: { error: 'Too many write requests, please try again later' }
 });
@@ -130,7 +131,7 @@ const writeApiLimiter = rateLimit({
 const searchLimiter = rateLimit({
   windowMs: 1 * 60 * 1000, // 1 minute
   limit: 100,
-  standardHeaders: 'draft-8',
+  standardHeaders: true,
   legacyHeaders: false,
   message: { error: 'Search rate limit exceeded' }
 });

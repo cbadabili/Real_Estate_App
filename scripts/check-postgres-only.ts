@@ -39,18 +39,6 @@ function walk(currentPath: string) {
   const entries = fs.readdirSync(currentPath, { withFileTypes: true });
 
   for (const entry of entries) {
-    if (entry.name.startsWith(".")) {
-      const allowedHidden = new Set([
-        ".env",
-        ".env.example",
-        ".gitignore",
-        ".github",
-      ]);
-
-      if (!allowedHidden.has(entry.name)) {
-        continue;
-      }
-    }
 
     const fullPath = path.join(currentPath, entry.name);
     if (entry.isDirectory()) {
@@ -62,6 +50,12 @@ function walk(currentPath: string) {
     try {
       const stats = fs.statSync(fullPath);
       if (!stats.isFile()) continue;
+      const base = path.basename(fullPath);
+      if (/\.(sqlite|sqlite3|db|db3)$/i.test(base)) {
+        const rel = path.relative(rootDir, fullPath);
+        hits.push(`${rel}:1`);
+        continue;
+      }
       if (stats.size > MAX_FILE_SIZE_BYTES) continue;
 
       const relativePath = path.relative(rootDir, fullPath);
@@ -72,7 +66,7 @@ function walk(currentPath: string) {
       const contents = fs.readFileSync(fullPath, "utf8");
       const lines = contents.split(/\r?\n/);
       for (let i = 0; i < lines.length; i++) {
-        if (/sqlite/i.test(lines[i])) {
+        if (/\b(sqlite|sqlite3|better-sqlite3|sql\.js)\b/i.test(lines[i])) {
           hits.push(`${relativePath}:${i + 1}`);
           break;
         }

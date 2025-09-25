@@ -33,7 +33,7 @@ export const addRequestId = (req: RequestWithId, res: Response, next: NextFuncti
 export const structuredLogger = (req: RequestWithId, res: Response, next: NextFunction) => {
   const start = Date.now();
 
-  res.on('finish', () => {
+  res.once('finish', () => {
     if (!req.path.startsWith('/api')) {
       return;
     }
