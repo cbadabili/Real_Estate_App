@@ -17,7 +17,7 @@ export interface PropertyFilters {
     status?: string;
     limit?: number;
     offset?: number;
-    sortBy?: 'price' | 'date' | 'size' | 'bedrooms';
+    sortBy?: 'price' | 'date' | 'size' | 'bedrooms' | 'price_low' | 'price_high' | 'newest';
     sortOrder?: 'asc' | 'desc';
     requireValidCoordinates?: boolean;
     searchTerm?: string;

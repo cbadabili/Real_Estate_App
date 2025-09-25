@@ -1,48 +1,49 @@
 module.exports = {
   root: true,
   parser: '@typescript-eslint/parser',
-  plugins: ['@typescript-eslint', 'testing-library'],
-  extends: [
-    'eslint:recommended',
-    'plugin:@typescript-eslint/recommended',
-  ],
+  plugins: ['@typescript-eslint', 'testing-library', 'react', 'react-hooks'],
+  extends: ['eslint:recommended', 'plugin:@typescript-eslint/recommended'],
   parserOptions: {
     ecmaVersion: 'latest',
     sourceType: 'module',
-    // project: ['./tsconfig.json'],
-    // tsconfigRootDir: __dirname,
   },
   env: {
     es2022: true,
   },
   overrides: [
     {
-      files: ['server/**/*.{ts,tsx,js,jsx}', 'scripts/**/*.{ts,tsx,js,jsx}'],
+      files: ['server/**/*.{ts,tsx}', 'scripts/**/*.{ts,tsx}'],
       env: { node: true, browser: false },
+      parserOptions: {
+        project: ['./tsconfig.json'],
+        tsconfigRootDir: __dirname,
+      },
     },
     {
       files: ['client/**/*.{ts,tsx,js,jsx}'],
       env: { browser: true, node: false },
-    },
-    {
-      files: ['*.config.{js,ts,cjs,mjs}', '*.config.*', 'vite.config.*', 'tailwind.config.*', 'postcss.config.*'],
-      env: { node: true },
+      extends: ['plugin:react/recommended', 'plugin:react-hooks/recommended'],
+      settings: { react: { version: 'detect' } },
+      rules: {
+        'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
+      },
     },
     {
       files: ['**/*.{test,spec}.{ts,tsx}', 'tests/**/*.{ts,tsx}'],
       extends: ['plugin:testing-library/react'],
       env: { browser: true },
+      globals: {
+        vi: 'readonly',
+        describe: 'readonly',
+        it: 'readonly',
+        test: 'readonly',
+        expect: 'readonly',
+        beforeAll: 'readonly',
+        beforeEach: 'readonly',
+        afterAll: 'readonly',
+        afterEach: 'readonly',
+      },
     },
-  ],
-  ignorePatterns: [
-    'dist/',
-    'build/',
-    'node_modules/',
-    'coverage/',
-    '.next/',
-    '.turbo/',
-    '.cache/',
-    '**/*.tsbuildinfo',
   ],
   rules: {
     '@typescript-eslint/no-empty-object-type': 'off',
@@ -52,7 +53,19 @@ module.exports = {
     '@typescript-eslint/no-require-imports': 'off',
     '@typescript-eslint/no-namespace': 'off',
     '@typescript-eslint/prefer-as-const': 'off',
-    'prefer-const': 'off',
+    'react/react-in-jsx-scope': 'off',
     'no-case-declarations': 'off',
+    'prefer-const': 'off',
   },
+  ignorePatterns: [
+    'dist/',
+    'build/',
+    'node_modules/',
+    'coverage/',
+    '.next/',
+    '.turbo/',
+    '.cache/',
+    '**/*.tsbuildinfo',
+    'drizzle/',
+  ],
 };

@@ -133,6 +133,10 @@ ALTER TABLE properties
       )
     ) STORED;
 
+-- Ensure geom column exists prior to backfill/indexing
+ALTER TABLE properties
+  ADD COLUMN IF NOT EXISTS geom geometry(Point, 4326);
+
 -- Backfill geom from lat/lng (only for valid ranges)
 UPDATE properties
 SET geom = CASE
@@ -184,5 +188,7 @@ CREATE INDEX IF NOT EXISTS properties_address_trgm_idx ON properties USING GIN (
 CREATE INDEX IF NOT EXISTS properties_title_trgm_idx ON properties USING GIN (title gin_trgm_ops);
 CREATE INDEX IF NOT EXISTS properties_description_trgm_idx ON properties USING GIN (description gin_trgm_ops);
 CREATE INDEX IF NOT EXISTS properties_geom_gix ON properties USING GIST (geom);
+CREATE INDEX IF NOT EXISTS properties_price_idx ON properties (price);
+CREATE INDEX IF NOT EXISTS properties_created_at_idx ON properties (created_at);
 
 COMMIT;

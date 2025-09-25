@@ -25,29 +25,30 @@ const app = express();
 // Configure trust proxy for Replit
 app.set('trust proxy', 1);
 
-if (!process.env.NODE_ENV) {
-  process.env.NODE_ENV = 'development';
-}
-const isDevelopment = process.env.NODE_ENV === 'development';
+const nodeEnv = process.env.NODE_ENV ?? 'development';
+const isDevelopment = nodeEnv === 'development';
 
 // Security middleware
 app.use(helmet({
   contentSecurityPolicy: isDevelopment
-    ? {
+    ? false
+    : {
         useDefaults: true,
         directives: {
-          "script-src": ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
-          "style-src": ["'self'", "'unsafe-inline'"],
+          "default-src": ["'self'"],
+          "base-uri": ["'self'"],
+          "object-src": ["'none'"],
+          "script-src": ["'self'"],
+          "style-src": ["'self'"],
           "img-src": ["'self'", "data:", "https:"],
-          "connect-src": ["'self'", "ws:", "wss:", "https:"],
-          "frame-src": ["'self'"],
+          "connect-src": ["'self'", "https:", "wss:"],
+          "frame-ancestors": ["'self'"],
           upgradeInsecureRequests: [],
         },
-      }
-    : undefined,
+      },
   referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
   crossOriginOpenerPolicy: { policy: 'same-origin' },
-  permittedCrossDomainPolicies: false,
+  xPermittedCrossDomainPolicies: { permittedPolicies: 'none' },
   permissionsPolicy: {
     camera: ['self'],
     microphone: [],
@@ -143,6 +144,7 @@ app.get('/api/health', (_req: Request, res: Response) => {
   // Apply search limiting
   app.use('/api/search', searchLimiter);
   app.use('/api/suggest', searchLimiter);
+  app.use('/intel', searchLimiter);
 
   // Register modular route bundles (auth, users, properties, search, etc.)
   registerAllRoutes(app);
@@ -169,8 +171,9 @@ app.get('/api/health', (_req: Request, res: Response) => {
     const { docsRouter } = await import('./routes/docs.js');
     app.use('/api/docs', docsRouter);
     console.log('📚 API documentation available at /api/docs');
-  } catch (error) {
-    console.warn('⚠️ Could not mount API docs:', error.message);
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : String(error);
+    console.warn('⚠️ Could not mount API docs:', message);
   }
 
   // Analytics endpoint

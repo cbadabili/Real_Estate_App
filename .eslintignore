@@ -6,6 +6,12 @@ coverage/
 .turbo/
 .cache/
 **/*.tsbuildinfo
+drizzle/
+**/*.d.ts
+**/*.js
 client/
 tests/
 scripts/
+shared/
+tailwind.config.ts
+tailwind.config.js

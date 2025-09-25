@@ -13,10 +13,12 @@ const IGNORED_DIRECTORIES = new Set([
   "coverage",
   ".turbo",
   ".cache",
+  "out",
+  ".vercel",
 ]);
 
-const ALLOWED_FILES = new Set([
-  path.join("scripts", "check-postgres-only.ts"),
+const ALLOWED_PATHS = new Set([path.join("scripts", "check-postgres-only.ts")]);
+const ALLOWED_BASENAMES = new Set([
   "package-lock.json",
   "yarn.lock",
   "pnpm-lock.yaml",
@@ -58,9 +60,14 @@ function walk(currentPath: string) {
       if (stats.size > MAX_FILE_SIZE_BYTES) continue;
 
       const relativePath = path.relative(rootDir, fullPath);
-      if (ALLOWED_FILES.has(relativePath)) continue;
+      if (ALLOWED_PATHS.has(relativePath) || ALLOWED_BASENAMES.has(path.basename(relativePath))) {
+        continue;
+      }
 
       const contents = fs.readFileSync(fullPath, "utf8");
+      if (contents.includes("\u0000")) {
+        continue;
+      }
       const lines = contents.split(/\r?\n/);
       for (let i = 0; i < lines.length; i++) {
         if (/sqlite/i.test(lines[i])) {

@@ -68,9 +68,9 @@ const toCoord = (v: unknown): number | null => {
   return null;
 };
 
-const parseCoordinate = (value: unknown): number | null => {
+const parseCoordinate = (value: unknown): number | null | undefined => {
   if (value === undefined) {
-    return null;
+    return undefined;
   }
   return toCoord(value);
 };
@@ -125,6 +125,9 @@ const normalizePropertyRecord = (prop: Property): Property => {
   };
 };
 
+/**
+ * Filters that can be applied when querying for properties.
+ */
 export interface PropertyFilters {
   minPrice?: number;
   maxPrice?: number;
@@ -143,12 +146,15 @@ export interface PropertyFilters {
   status?: string;
   limit?: number;
   offset?: number;
-  sortBy?: 'price' | 'date' | 'size' | 'bedrooms';
+  sortBy?: 'price' | 'date' | 'size' | 'bedrooms' | 'price_low' | 'price_high' | 'newest';
   sortOrder?: 'asc' | 'desc';
   requireValidCoordinates?: boolean;
   searchTerm?: string;
 }
 
+/**
+ * Public contract for interacting with persisted property records.
+ */
 export interface IPropertyRepository {
   getProperty(id: number): Promise<Property | undefined>;
   getProperties(filters?: PropertyFilters): Promise<Property[]>;
@@ -159,6 +165,10 @@ export interface IPropertyRepository {
   incrementPropertyViews(id: number): Promise<void>;
 }
 
+/**
+ * Drizzle-backed implementation of the property repository. Handles
+ * normalization, caching, search, and spatial updates.
+ */
 export class PropertyRepository implements IPropertyRepository {
   async getProperty(id: number): Promise<Property | undefined> {
     const [property] = await db.select().from(properties).where(eq(properties.id, id));
@@ -225,9 +235,20 @@ export class PropertyRepository implements IPropertyRepository {
     const searchTerm = filters.searchTerm ?? filters.location ?? filters.city ?? filters.address ?? filters.title;
     if (searchTerm && searchTerm.trim().length > 0) {
       const term = searchTerm.trim();
-      const tsQuery = sql`plainto_tsquery('simple', ${term})`;
-      conditions.push(sql`${properties.fts} @@ ${tsQuery}`);
-      orderings.push(sql`ts_rank_cd(${properties.fts}, ${tsQuery}) DESC`);
+      if (term.length >= 2) {
+        const tsQuery = sql`plainto_tsquery('simple', ${term})`;
+        conditions.push(sql`${properties.fts} @@ ${tsQuery}`);
+        orderings.push(sql`ts_rank_cd(${properties.fts}, ${tsQuery}) DESC`);
+      } else {
+        conditions.push(
+          or(
+            ilike(properties.title, `%${term}%`),
+            ilike(properties.description, `%${term}%`),
+            ilike(properties.address, `%${term}%`),
+            ilike(properties.city, `%${term}%`)
+          )
+        );
+      }
     } else if (filters.city || filters.location) {
       const locationTerm = (filters.location ?? filters.city ?? "").trim();
       if (locationTerm) {
@@ -262,15 +283,28 @@ export class PropertyRepository implements IPropertyRepository {
     if (orderings.length > 0) {
       query = query.orderBy(...orderings, desc(properties.createdAt));
     } else if (filters.sortBy) {
-      const sortColumn = {
-        'price': properties.price,
-        'date': properties.createdAt,
-        'size': properties.squareFeet,
-        'bedrooms': properties.bedrooms
-      }[filters.sortBy];
+      const legacySortOptions = {
+        price_low: { column: properties.price, direction: 'asc' as const },
+        price_high: { column: properties.price, direction: 'desc' as const },
+        newest: { column: properties.createdAt, direction: 'desc' as const },
+      } as const;
 
-      if (sortColumn) {
-        query = filters.sortOrder === 'asc' ? query.orderBy(asc(sortColumn)) : query.orderBy(desc(sortColumn));
+      if (filters.sortBy in legacySortOptions) {
+        const legacySort = legacySortOptions[filters.sortBy as keyof typeof legacySortOptions];
+        query = legacySort.direction === 'asc'
+          ? query.orderBy(asc(legacySort.column))
+          : query.orderBy(desc(legacySort.column));
+      } else {
+        const sortColumn = {
+          price: properties.price,
+          date: properties.createdAt,
+          size: properties.squareFeet,
+          bedrooms: properties.bedrooms,
+        }[filters.sortBy];
+
+        if (sortColumn) {
+          query = filters.sortOrder === 'asc' ? query.orderBy(asc(sortColumn)) : query.orderBy(desc(sortColumn));
+        }
       }
     } else {
       query = query.orderBy(desc(properties.createdAt));
@@ -313,14 +347,16 @@ export class PropertyRepository implements IPropertyRepository {
   async createProperty(property: InsertProperty): Promise<Property> {
     const latitude = parseCoordinate(property.latitude);
     const longitude = parseCoordinate(property.longitude);
-    const geomValue = buildGeomValue(latitude, longitude);
+    const normalizedLatitude = latitude ?? null;
+    const normalizedLongitude = longitude ?? null;
+    const geomValue = buildGeomValue(normalizedLatitude, normalizedLongitude);
 
     const [newProperty] = await db
       .insert(properties)
       .values({
         ...property,
-        latitude,
-        longitude,
+        latitude: normalizedLatitude,
+        longitude: normalizedLongitude,
         geom: geomValue,
       })
       .returning();
@@ -331,18 +367,26 @@ export class PropertyRepository implements IPropertyRepository {
   }
 
   async updateProperty(id: number, updates: Partial<InsertProperty>): Promise<Property | undefined> {
-    const updatePayload: Record<string, unknown> = { ...updates };
+    const updatePayload: Partial<InsertProperty> & { geom?: SQL } = { ...updates };
 
     let latitude: number | null | undefined;
     if (Object.prototype.hasOwnProperty.call(updates, "latitude")) {
       latitude = parseCoordinate(updates.latitude);
-      updatePayload.latitude = latitude;
+      if (latitude !== undefined) {
+        updatePayload.latitude = latitude;
+      } else {
+        delete updatePayload.latitude;
+      }
     }
 
     let longitude: number | null | undefined;
     if (Object.prototype.hasOwnProperty.call(updates, "longitude")) {
       longitude = parseCoordinate(updates.longitude);
-      updatePayload.longitude = longitude;
+      if (longitude !== undefined) {
+        updatePayload.longitude = longitude;
+      } else {
+        delete updatePayload.longitude;
+      }
     }
 
     if (Object.prototype.hasOwnProperty.call(updates, "latitude") ||
@@ -393,4 +437,7 @@ export class PropertyRepository implements IPropertyRepository {
   }
 }
 
+/**
+ * Shared singleton instance used throughout the application.
+ */
 export const propertyRepository = new PropertyRepository();

@@ -11,8 +11,7 @@ import {
   type InsertInquiry,
   type Appointment,
   type InsertAppointment,
-  type SavedProperty,
-  type InsertSavedProperty
+  type SavedProperty
 } from "../shared/schema";
 import { db } from "./db";
 import { eq, desc, asc, and } from "drizzle-orm";
@@ -53,20 +52,28 @@ const normalizeStringArray = (value: unknown): string[] => {
 };
 
 const normalizePrice = (value: unknown): number => {
-  if (typeof value === "number" && Number.isFinite(value)) {
-    return value;
-  }
+  let normalized: number | undefined;
 
-  if (typeof value === "string") {
+  if (typeof value === "number" && Number.isFinite(value)) {
+    normalized = value;
+  } else if (typeof value === "string") {
     const cleaned = Number(value.replace(/[^\d.-]/g, ""));
     if (Number.isFinite(cleaned)) {
-      return cleaned;
+      normalized = cleaned;
     }
   }
 
-  return 0;
+  if (!Number.isFinite(normalized)) {
+    return 0;
+  }
+
+  const clamped = Math.max(0, normalized as number);
+  return Math.round(clamped * 100) / 100;
 };
 
+/**
+ * Contract for the storage layer that fronts repositories and raw Drizzle operations.
+ */
 export interface IStorage {
   // User methods
   getUser(id: number): Promise<User | undefined>;
@@ -107,6 +114,9 @@ export interface IStorage {
   isPropertySaved(userId: number, propertyId: number): Promise<boolean>;
 }
 
+/**
+ * Database-backed storage implementation delegating to domain repositories where possible.
+ */
 export class DatabaseStorage implements IStorage {
   private userRepo: IUserRepository;
   private propertyRepo: IPropertyRepository;
@@ -333,4 +343,7 @@ export class DatabaseStorage implements IStorage {
   }
 }
 
+/**
+ * Singleton storage adapter used by the application.
+ */
 export const storage = new DatabaseStorage();
