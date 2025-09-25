@@ -1,6 +1,6 @@
 import { APIRequestContext, expect } from '@playwright/test';
 
-interface RegisterUserInput {
+export interface RegisterUserInput {
   email: string;
   password: string;
   firstName?: string;
@@ -10,8 +10,12 @@ interface RegisterUserInput {
 
 export interface AuthContext {
   token: string;
-  userId: number;
+  userId: string | number;
 }
+
+const authHeaders = (auth: AuthContext) => ({
+  Authorization: `Bearer ${auth.token}`
+});
 
 export async function registerUser(api: APIRequestContext, input: RegisterUserInput): Promise<AuthContext> {
   const registerResponse = await api.post('/api/users/register', {
@@ -26,7 +30,13 @@ export async function registerUser(api: APIRequestContext, input: RegisterUserIn
     }
   });
 
-  expect(registerResponse.status(), 'registration should succeed or surface validation errors').toBeLessThan(500);
+  if (!registerResponse.ok() && registerResponse.status() !== 409) {
+    const body = await registerResponse.text();
+    expect(
+      registerResponse.ok(),
+      `registration failed [${registerResponse.status()}]: ${body}`
+    ).toBeTruthy();
+  }
 
   const loginResponse = await api.post('/api/users/login', {
     data: {
@@ -35,20 +45,22 @@ export async function registerUser(api: APIRequestContext, input: RegisterUserIn
     }
   });
 
-  expect(loginResponse.ok(), 'login should succeed for newly registered user').toBeTruthy();
+  expect(loginResponse, 'login should succeed for newly registered or existing user').toBeOK();
 
   const loginJson = await loginResponse.json();
-  expect(loginJson.token, 'login response should include JWT token').toBeTruthy();
-  expect(loginJson.id ?? loginJson.user?.id, 'login response should include user id').toBeTruthy();
+  const token = loginJson.token ?? loginJson.user?.token ?? loginJson.user?.sessionToken;
+  const userId = loginJson.id ?? loginJson.user?.id ?? loginJson.userId;
+  expect(token, 'login response should include JWT token').toBeTruthy();
+  expect(userId, 'login response should include user id').toBeTruthy();
 
   return {
-    token: loginJson.token ?? loginJson.user?.token ?? loginJson.user?.sessionToken,
-    userId: loginJson.id ?? loginJson.user?.id ?? loginJson.userId
+    token,
+    userId
   };
 }
 
-interface PropertyPayload {
-  ownerId?: number;
+export interface PropertyPayload {
+  ownerId?: string | number;
   title: string;
   description?: string;
   price: number;
@@ -67,12 +79,13 @@ interface PropertyPayload {
 }
 
 export async function createProperty(api: APIRequestContext, auth: AuthContext, payload: PropertyPayload) {
+  const ownerIdSource = payload.ownerId ?? auth.userId;
+  const normalizedOwnerId =
+    typeof ownerIdSource === 'string' ? Number(ownerIdSource) : ownerIdSource;
   const response = await api.post('/api/properties', {
-    headers: {
-      Authorization: `Bearer ${auth.token}`
-    },
+    headers: authHeaders(auth),
     data: {
-      ownerId: payload.ownerId ?? auth.userId,
+      ownerId: Number.isNaN(normalizedOwnerId) ? ownerIdSource : normalizedOwnerId,
       title: payload.title,
       description: payload.description ?? 'Automated listing',
       price: payload.price,
@@ -97,7 +110,7 @@ export async function createProperty(api: APIRequestContext, auth: AuthContext, 
     }
   });
 
-  expect(response.ok(), 'property creation should succeed').toBeTruthy();
+  expect(response, 'property creation should succeed').toBeOK();
   const json = await response.json();
   expect(json.id, 'new property should have id').toBeTruthy();
   return json;
@@ -105,9 +118,7 @@ export async function createProperty(api: APIRequestContext, auth: AuthContext, 
 
 export async function saveSearch(api: APIRequestContext, auth: AuthContext, filters: Record<string, unknown>) {
   const response = await api.post('/api/users/saved-searches', {
-    headers: {
-      Authorization: `Bearer ${auth.token}`
-    },
+    headers: authHeaders(auth),
     data: {
       name: 'Playwright smoke',
       filters,
@@ -115,37 +126,34 @@ export async function saveSearch(api: APIRequestContext, auth: AuthContext, filt
     }
   });
 
-  expect(response.status()).toBeLessThan(500);
+  expect(response).toBeOK();
   return response;
 }
 
 export async function saveFavorite(api: APIRequestContext, auth: AuthContext, propertyId: number) {
   const response = await api.post(`/api/users/${auth.userId}/saved-properties/${propertyId}`, {
-    headers: {
-      Authorization: `Bearer ${auth.token}`
-    }
+    headers: authHeaders(auth)
   });
 
-  expect(response.status()).toBeLessThan(500);
+  expect(response).toBeOK();
   return response;
 }
 
 export async function unsaveFavorite(api: APIRequestContext, auth: AuthContext, propertyId: number) {
   const response = await api.delete(`/api/users/${auth.userId}/saved-properties/${propertyId}`, {
-    headers: {
-      Authorization: `Bearer ${auth.token}`
-    }
+    headers: authHeaders(auth)
   });
 
-  expect(response.status()).toBeLessThan(500);
+  expect(
+    response.ok() || response.status() === 404,
+    'unsaveFavorite should succeed or be a no-op'
+  ).toBeTruthy();
   return response;
 }
 
 export async function scheduleViewing(api: APIRequestContext, auth: AuthContext, propertyId: number, datetimeIso: string) {
   const response = await api.post('/api/appointments', {
-    headers: {
-      Authorization: `Bearer ${auth.token}`
-    },
+    headers: authHeaders(auth),
     data: {
       propertyId,
       buyerId: auth.userId,
@@ -155,6 +163,6 @@ export async function scheduleViewing(api: APIRequestContext, auth: AuthContext,
     }
   });
 
-  expect(response.status()).toBeLessThan(500);
+  expect(response).toBeOK();
   return response;
 }

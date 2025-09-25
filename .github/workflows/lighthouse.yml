@@ -21,6 +21,7 @@ jobs:
         options: >-
           --health-cmd "pg_isready -d beedab -U beedab" --health-interval 10s --health-timeout 5s --health-retries 5
     env:
+      # checkov:skip=CKV_SECRET_4 Ephemeral CI Postgres service credentials
       DATABASE_URL: postgresql://beedab:beedab@localhost:5432/beedab
       NODE_ENV: production
       FORCE_DB_MIGRATIONS: 'true'
@@ -39,17 +40,31 @@ jobs:
       - name: Start API server
         run: |
           nohup npm run start >/tmp/server.log 2>&1 &
-          sleep 25
+      - name: Start web preview
+        run: |
+          nohup npm run preview -- --port 4173 --strictPort >/tmp/preview.log 2>&1 &
+          for i in {1..30}; do
+            if curl -fsS http://127.0.0.1:4173/ >/dev/null; then
+              break
+            fi
+            sleep 2
+          done
       - name: Run Lighthouse CI
         uses: treosh/lighthouse-ci-action@v11
         with:
           configPath: ./lighthouserc.json
           temporaryPublicStorage: true
-          runs: 1
       - name: Upload server logs
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: lighthouse-server-log
           path: /tmp/server.log
+          if-no-files-found: ignore
+      - name: Upload preview logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-preview-log
+          path: /tmp/preview.log
           if-no-files-found: ignore

@@ -30,7 +30,7 @@ export default defineConfig({
     },
     {
       name: 'chromium-tablet',
-      use: { ...devices['Pixel 5'], viewport: viewports.tablet }
+      use: { ...devices['Galaxy Tab S4'], browserName: 'chromium' }
     },
     {
       name: 'chromium-desktop',
@@ -38,11 +38,11 @@ export default defineConfig({
     },
     {
       name: 'firefox-mobile',
-      use: { ...devices['Desktop Firefox'], viewport: viewports.mobile, userAgent: devices['Pixel 5'].userAgent }
+      use: { ...devices['Pixel 5'], browserName: 'firefox' }
     },
     {
       name: 'firefox-tablet',
-      use: { ...devices['Desktop Firefox'], viewport: viewports.tablet }
+      use: { ...devices['iPad (gen 7)'], browserName: 'firefox' }
     },
     {
       name: 'firefox-desktop',
@@ -54,7 +54,7 @@ export default defineConfig({
     },
     {
       name: 'webkit-tablet',
-      use: { ...devices['Desktop Safari'], viewport: viewports.tablet }
+      use: { ...devices['iPad (gen 7)'], browserName: 'webkit' }
     },
     {
       name: 'webkit-desktop',

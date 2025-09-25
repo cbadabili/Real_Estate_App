@@ -20,11 +20,17 @@ test.describe('Accessibility regressions', () => {
         continue;
       }
 
-      const axe = await new AxeBuilder({ page })
+      const results = await new AxeBuilder({ page })
         .withTags(['wcag2a', 'wcag2aa'])
         .analyze();
+      if (results.violations.length) {
+        await testInfo.attach('axe-violations', {
+          contentType: 'application/json',
+          body: JSON.stringify(results, null, 2)
+        });
+      }
 
-      expect(axe.violations, `${target} should not ship with critical accessibility violations`).toHaveLength(0);
+      expect(results.violations, `${target} should not ship with critical accessibility violations`).toHaveLength(0);
     }
   });
 });

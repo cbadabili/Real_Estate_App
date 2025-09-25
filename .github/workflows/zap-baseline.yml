@@ -21,6 +21,7 @@ jobs:
         run: npm ci
       - name: Start BeeDab API
         env:
+          # checkov:skip=CKV_SECRET_4 Ephemeral CI Postgres service credentials
           DATABASE_URL: postgresql://beedab:beedab@localhost:5432/beedab
           NODE_ENV: production
           FORCE_DB_MIGRATIONS: 'true'
@@ -30,11 +31,16 @@ jobs:
           docker run -d --name zap-postgres -e POSTGRES_DB=beedab -e POSTGRES_USER=beedab -e POSTGRES_PASSWORD=beedab -p 5432:5432 postgres:15
           until docker exec zap-postgres pg_isready -d beedab -U beedab; do sleep 2; done
           nohup npm run start >/tmp/server.log 2>&1 &
-          sleep 30
+          for i in {1..30}; do
+            if curl -fsS http://127.0.0.1:5000/api/health >/dev/null; then
+              break
+            fi
+            sleep 2
+          done
       - name: ZAP Baseline Scan
         uses: zaproxy/action-baseline@v0.11.0
         with:
-          target: 'http://127.0.0.1:5000'
+          target: 'http://host.docker.internal:5000'
           cmd_options: '-a -j'
           allow_issue_writing: false
       - name: Upload ZAP Report

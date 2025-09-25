@@ -42,7 +42,9 @@ test.describe('Buyer engagement journeys', () => {
     expect(favoritesResponse.ok()).toBeTruthy();
     const favorites = await favoritesResponse.json();
     expect(Array.isArray(favorites)).toBe(true);
-    expect(favorites.some((fav: any) => fav.propertyId === property.id || fav.id === property.id)).toBe(true);
+    expect(
+      favorites.some((fav: any) => Number(fav.propertyId ?? fav.id) === Number(property.id))
+    ).toBe(true);
 
     const viewingResponse = await scheduleViewing(request, buyer, property.id, new Date(Date.now() + 86400000).toISOString());
     expect(viewingResponse.ok()).toBeTruthy();
@@ -56,7 +58,13 @@ test.describe('Buyer engagement journeys', () => {
         Authorization: `Bearer ${buyer.token}`
       }
     });
+    expect(afterUnsave.ok()).toBeTruthy();
     const updatedFavorites = await afterUnsave.json();
-    expect(updatedFavorites.some((fav: any) => fav.propertyId === property.id || fav.id === property.id)).toBe(false);
+    expect(Array.isArray(updatedFavorites)).toBe(true);
+    expect(
+      updatedFavorites.some(
+        (fav: any) => Number(fav.propertyId ?? fav.id) === Number(property.id)
+      )
+    ).toBe(false);
   });
 });

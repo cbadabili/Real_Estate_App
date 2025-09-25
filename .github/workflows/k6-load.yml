@@ -21,6 +21,7 @@ jobs:
         options: >-
           --health-cmd "pg_isready -d beedab -U beedab" --health-interval 10s --health-timeout 5s --health-retries 5
     env:
+      # checkov:skip=CKV_SECRET_4 Ephemeral CI Postgres service credentials
       DATABASE_URL: postgresql://beedab:beedab@localhost:5432/beedab
       NODE_ENV: production
       FORCE_DB_MIGRATIONS: 'true'
@@ -37,7 +38,12 @@ jobs:
       - name: Start API server
         run: |
           nohup npm run start >/tmp/server.log 2>&1 &
-          sleep 25
+          for i in {1..30}; do
+            if curl -fsS http://127.0.0.1:5000/api/health >/dev/null; then
+              break
+            fi
+            sleep 2
+          done
       - name: Run k6 smoke
         uses: grafana/k6-action@v0.3.1
         with:

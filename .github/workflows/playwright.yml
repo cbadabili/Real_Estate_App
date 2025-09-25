@@ -21,11 +21,13 @@ jobs:
         options: >-
           --health-cmd "pg_isready -d beedab -U beedab" --health-interval 10s --health-timeout 5s --health-retries 5
     env:
+      # checkov:skip=CKV_SECRET_4 Ephemeral CI Postgres service credentials
       DATABASE_URL: postgresql://beedab:beedab@localhost:5432/beedab
       NODE_ENV: development
       FORCE_DB_MIGRATIONS: 'true'
       FORCE_DB_SEED: 'true'
       PLAYWRIGHT_BASE_URL: http://127.0.0.1:5000
+      PORT: 5000
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -43,12 +45,17 @@ jobs:
       - name: Start API server
         run: |
           nohup npm run start >/tmp/server.log 2>&1 &
-          sleep 25
+          for i in {1..30}; do
+            if curl -fsS http://127.0.0.1:5000/api/health >/dev/null; then
+              break
+            fi
+            sleep 2
+          done
       - name: Smoke check API
         run: |
-          curl -f http://127.0.0.1:5000/api/health || true
+          curl -f http://127.0.0.1:5000/api/health
       - name: Run Playwright
-        run: npx playwright test --reporter=dot
+        run: npx playwright test --reporter=line,html
       - name: Upload Playwright report
         if: always()
         uses: actions/upload-artifact@v4

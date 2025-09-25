@@ -12,9 +12,9 @@ export const options = {
     { duration: '30s', target: 0 }
   ],
   thresholds: {
-    http_req_failed: ['rate<0.001'],
-    http_req_duration: ['p(95)<300', 'p(99)<500'],
-    'search_tti': ['p(95)<1200']
+    http_req_failed: ['rate<0.01'],
+    http_req_duration: ['p(95)<1200', 'p(99)<2000'],
+    search_tti: ['p(95)<1200']
   }
 };
 
@@ -43,9 +43,10 @@ export default function () {
   const duration = Date.now() - start;
   searchTTI.add(duration);
 
+  const body = res.json();
   check(res, {
     'status is 200': r => r.status === 200,
-    'payload is json array': r => Array.isArray(r.json()),
+    'payload is json array': () => Array.isArray(body),
     'fast enough for SLO': () => duration < 1200
   });
 

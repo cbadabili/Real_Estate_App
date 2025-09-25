@@ -8,7 +8,7 @@ This document defines the end-to-end quality strategy required to prove BeeDab i
 
 ### 1. Critical User Journeys (Playwright E2E)
 
-Run Playwright specs on every pull request and nightly against a seeded PostgreSQL database. Execute on Chromium, Firefox, and WebKit at the following breakpoints: mobile (390px), tablet (768px), and desktop (1440px). Enforce ≤ 2s time-to-interactive (TTI) on 4G throttling for the search results grid and property detail pages via Playwright performance traces and Lighthouse budgets.
+Run Playwright specs on every pull request and nightly against a seeded PostgreSQL database. Execute on Chromium, Firefox, and WebKit at the following breakpoints: mobile (390px), tablet (768px), and desktop (1440px). Enforce ≤ 200ms interaction-to-next-paint (INP) and ≤ 2.5s largest-contentful-paint on 4G throttling for the search results grid and property detail pages via Playwright performance traces and Lighthouse budgets.
 
 #### Anonymous discovery
 - Load marketing/home page.
@@ -128,9 +128,9 @@ Document evidence for each score in release notes.
 ## Part D — Implementation Details to Add to Repo
 
 1. **Playwright smoke suite** (to be expanded):
-   - `tests/e2e/search.spec.ts`: search flow verifying Botswana districts (e.g., South East → Tlokweng), filters, view switches, first listing assertions.
-   - `tests/e2e/listing-create.spec.ts`: authenticated agent wizard covering centroid snap, map drag, reverse-geocode, 8-photo upload, publish.
-   - `tests/e2e/favorites-savedsearch.spec.ts`: save search (with email stub), favorite toggles, persistence checks.
+   - `tests/playwright/search.spec.ts`: search flow verifying Botswana districts (e.g., South East → Tlokweng), filters, view switches, first listing assertions.
+   - `tests/playwright/listing-create.spec.ts`: authenticated agent wizard covering centroid snap, map drag, reverse-geocode, 8-photo upload, publish.
+   - `tests/playwright/favorites-savedsearch.spec.ts`: save search (with email stub), favorite toggles, persistence checks.
 
 2. **k6 load tests** located under `tests/load/`: template script hitting `/api/properties` with mixed filter payloads and thresholds for latency/error budgets.
 

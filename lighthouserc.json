@@ -7,7 +7,7 @@
         "http://localhost:4173/properties/1",
         "http://localhost:4173/services"
       ],
-      "numberOfRuns": 1,
+      "numberOfRuns": 3,
       "settings": {
         "preset": "mobile",
         "throttling": {
@@ -23,7 +23,7 @@
         "categories:performance": ["error", { "minScore": 0.85 }],
         "first-contentful-paint": ["warn", { "maxNumericValue": 2500 }],
         "largest-contentful-paint": ["error", { "maxNumericValue": 2500 }],
-        "interactive": ["error", { "maxNumericValue": 4000 }],
+        "interaction-to-next-paint": ["error", { "maxNumericValue": 200 }],
         "total-blocking-time": ["warn", { "maxNumericValue": 250 }],
         "cumulative-layout-shift": ["error", { "maxNumericValue": 0.1 }]
       }
