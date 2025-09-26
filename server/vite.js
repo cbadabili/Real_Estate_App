@@ -1,10 +1,7 @@
 import express from "express";
 import fs from "fs/promises";
 import path from "path";
-import { createServer as createViteServer, createLogger } from "vite";
-import viteConfig from "../vite.config.ts";
 const generateId = () => Math.random().toString(36).substring(2, 15);
-const viteLogger = createLogger();
 export function log(message, source = "express") {
     const formattedTime = new Date().toLocaleTimeString("en-US", {
         hour: "numeric",
@@ -15,6 +12,30 @@ export function log(message, source = "express") {
     console.log(`${formattedTime} [${source}] ${message}`);
 }
 export async function setupVite(app, server) {
+    const isProduction = (process.env.NODE_ENV ?? "development") === "production";
+    if (isProduction) {
+        log("Skipping Vite middleware in production mode", "vite");
+        return;
+    }
+    let viteModule;
+    try {
+        viteModule = await import("vite");
+    }
+    catch (error) {
+        const reason = error instanceof Error ? error.message : String(error);
+        throw new Error(`Vite development server requested but the 'vite' package is unavailable. Install dev dependencies before running in development.\n${reason}`);
+    }
+    let viteConfig;
+    try {
+        const configModule = await import("../vite.config.ts");
+        viteConfig = configModule.default;
+    }
+    catch (error) {
+        const reason = error instanceof Error ? error.message : String(error);
+        throw new Error(`Failed to load Vite configuration. Ensure vite.config.ts is present and its dependencies are installed.\n${reason}`);
+    }
+    const { createServer: createViteServer, createLogger } = viteModule;
+    const viteLogger = createLogger();
     const serverOptions = {
         middlewareMode: true,
         hmr: { server },

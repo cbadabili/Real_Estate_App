@@ -23,6 +23,13 @@ export function log(message: string, source = "express") {
 }
 
 export async function setupVite(app: Express, server: Server) {
+  const isProduction = (process.env.NODE_ENV ?? "development") === "production";
+
+  if (isProduction) {
+    log("Skipping Vite middleware in production mode", "vite");
+    return;
+  }
+
   let createViteServer: typeof import("vite")['createServer'] | undefined;
   let createLogger: typeof import("vite")['createLogger'] | undefined;
   let viteConfig: InlineConfig | undefined;
@@ -56,7 +63,7 @@ export async function setupVite(app: Express, server: Server) {
   const serverOptions = {
     middlewareMode: true,
     hmr: { server },
-    allowedHosts: true as true,
+    allowedHosts: true,
   };
 
   const vite = await createViteServer({
