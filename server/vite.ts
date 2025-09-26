@@ -1,12 +1,15 @@
-import express, { type Express } from "express";
+import express, {
+  type Express,
+  type NextFunction,
+  type Request,
+  type Response,
+} from "express";
 import fs from "fs/promises";
 import path from "path";
-import { createServer as createViteServer, createLogger } from "vite";
 import { type Server } from "http";
-import viteConfig from "../vite.config.ts";
+import type { InlineConfig } from "vite";
 
 const generateId = () => Math.random().toString(36).substring(2, 15);
-const viteLogger = createLogger();
 
 export function log(message: string, source = "express") {
   const formattedTime = new Date().toLocaleTimeString("en-US", {
@@ -20,10 +23,47 @@ export function log(message: string, source = "express") {
 }
 
 export async function setupVite(app: Express, server: Server) {
+  const isProduction = (process.env.NODE_ENV ?? "development") === "production";
+
+  if (isProduction) {
+    log("Skipping Vite middleware in production mode", "vite");
+    return;
+  }
+
+  let createViteServer: typeof import("vite")['createServer'] | undefined;
+  let createLogger: typeof import("vite")['createLogger'] | undefined;
+  let viteConfig: InlineConfig | undefined;
+
+  try {
+    const viteModule = await import("vite");
+    createViteServer = viteModule.createServer;
+    createLogger = viteModule.createLogger;
+  } catch (error) {
+    const reason = error instanceof Error ? error.message : String(error);
+    throw new Error(
+      `Vite development server requested but the 'vite' package is unavailable. Install dev dependencies before running in development.\n${reason}`,
+    );
+  }
+
+  try {
+    const configModule = await import("../vite.config");
+    viteConfig = configModule.default as InlineConfig;
+  } catch (error) {
+    const reason = error instanceof Error ? error.message : String(error);
+    throw new Error(
+      `Failed to load Vite configuration. Ensure vite.config.ts is present and its dependencies are installed.\n${reason}`,
+    );
+  }
+
+  if (!createViteServer || !createLogger || !viteConfig) {
+    throw new Error("Vite tooling was not fully initialised. Aborting development server start.");
+  }
+
+  const viteLogger = createLogger();
   const serverOptions = {
     middlewareMode: true,
     hmr: { server },
-    allowedHosts: true as true,
+    allowedHosts: true,
   };
 
   const vite = await createViteServer({
@@ -31,8 +71,8 @@ export async function setupVite(app: Express, server: Server) {
     configFile: false,
     customLogger: {
       ...viteLogger,
-      error: (msg, options) => {
-        viteLogger.error(msg, options);
+      error: (...args: Parameters<typeof viteLogger.error>) => {
+        viteLogger.error(...args);
         process.exit(1);
       },
     },
@@ -41,7 +81,7 @@ export async function setupVite(app: Express, server: Server) {
   });
 
   app.use(vite.middlewares);
-  app.use("*", async (req, res, next) => {
+  app.use("*", async (req: Request, res: Response, next: NextFunction) => {
     const url = req.originalUrl;
 
     try {
@@ -69,13 +109,19 @@ export async function setupVite(app: Express, server: Server) {
   });
 }
 
-export function serveStatic(app: Express) {
+export async function serveStatic(app: Express) {
   const distPath = path.resolve(import.meta.dirname, "..", "dist", "public");
 
   app.use(express.static(distPath));
 
-  // fall through to index.html if the file doesn't exist
-  app.use("*", (_req, res) => {
-    res.sendFile(path.resolve(distPath, "index.html"));
-  });
+  const indexPath = path.resolve(distPath, "index.html");
+
+  try {
+    await fs.access(indexPath);
+    app.use("*", (_req: Request, res: Response) => {
+      res.sendFile(indexPath);
+    });
+  } catch {
+    log("Static build not found; skipping SPA fallback", "static");
+  }
 }

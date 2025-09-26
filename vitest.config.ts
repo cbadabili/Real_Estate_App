@@ -20,6 +20,8 @@ export default defineConfig({
       'tests/e2e/**',
       'tests/contract/**',
       'tests/frontend/**',
+      'tests/playwright/**',
+      'tests/load/**',
     ],
   },
   resolve: {
