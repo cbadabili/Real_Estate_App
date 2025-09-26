@@ -1,21 +1,29 @@
-import { pgTable, text, integer, numeric, timestamp } from 'drizzle-orm/pg-core';
+import {
+  pgTable,
+  text,
+  integer,
+  numeric,
+  timestamp,
+  serial,
+  boolean,
+} from 'drizzle-orm/pg-core';
 import { properties, users } from "./schema";
 
 // Auction bids table
 export const auctionBids = pgTable("auction_bids", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
+  id: serial("id").primaryKey(),
   propertyId: integer("property_id").references(() => properties.id).notNull(),
   bidderId: integer("bidder_id").references(() => users.id).notNull(),
   bidAmount: numeric("bid_amount").notNull(),
   bidTime: timestamp("bid_time").defaultNow(),
-  isWinningBid: integer("is_winning_bid", { mode: "boolean" }).default(false),
+  isWinningBid: boolean("is_winning_bid").default(false).notNull(),
   bidStatus: text("bid_status").notNull().default("active"), // 'active', 'outbid', 'winning', 'withdrawn'
   createdAt: timestamp("created_at").defaultNow(),
 });
 
 // Auction registrations
 export const auctionRegistrations = pgTable("auction_registrations", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
+  id: serial("id").primaryKey(),
   propertyId: integer("property_id").references(() => properties.id).notNull(),
   bidderId: integer("bidder_id").references(() => users.id).notNull(),
   registrationNumber: text("registration_number").notNull(),
@@ -27,7 +35,7 @@ export const auctionRegistrations = pgTable("auction_registrations", {
 
 // Auction results
 export const auctionResults = pgTable("auction_results", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
+  id: serial("id").primaryKey(),
   propertyId: integer("property_id").references(() => properties.id).notNull(),
   winningBidderId: integer("winning_bidder_id").references(() => users.id),
   finalBidAmount: numeric("final_bid_amount"),
