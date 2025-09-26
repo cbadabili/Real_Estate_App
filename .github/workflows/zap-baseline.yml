@@ -44,12 +44,19 @@ jobs:
       - name: Start BeeDab API
         run: |
           nohup npm run start >/tmp/server.log 2>&1 &
-          for i in {1..30}; do
+          ready=0
+          for i in {1..60}; do
             if curl -fsS http://127.0.0.1:5000/api/health >/dev/null; then
+              ready=1
               break
             fi
             sleep 2
           done
+          if [ "$ready" -ne 1 ]; then
+            echo "API failed to start within timeout"
+            tail -n 200 /tmp/server.log || true
+            exit 1
+          fi
       - name: Run ZAP Baseline Scan
         env:
           ZAP_AUTH_HEADER: ${{ secrets.ZAP_AUTH_HEADER }}
