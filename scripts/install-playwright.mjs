@@ -3,10 +3,16 @@ import { execSync } from 'node:child_process';
 import process from 'node:process';
 
 const SKIP_ENV = process.env.PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD;
-const shouldSkip = typeof SKIP_ENV === 'string' && ['1', 'true', 'yes'].includes(SKIP_ENV.toLowerCase());
+const isProductionInstall = process.env.npm_config_production === 'true';
+const shouldSkip =
+  isProductionInstall ||
+  (typeof SKIP_ENV === 'string' && ['1', 'true', 'yes'].includes(SKIP_ENV.toLowerCase()));
 
 if (shouldSkip) {
-  process.stdout.write('Skipping Playwright browser installation because PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD is set.\n');
+  const reason = isProductionInstall
+    ? 'npm_config_production is true'
+    : 'PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD is set';
+  process.stdout.write(`Skipping Playwright browser installation because ${reason}.\n`);
   process.exit(0);
 }
 
