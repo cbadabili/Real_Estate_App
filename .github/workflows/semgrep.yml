@@ -12,20 +12,21 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: semgrep/semgrep-action@v1
+        id: semgrep
         with:
           config: p/ci
           generateSarif: true
           publishToken: ${{ secrets.SEMGREP_APP_TOKEN }}
       - name: Upload SARIF to GitHub Security
-        if: always()
+        if: always() && steps.semgrep.outputs.sarif != ''
         uses: github/codeql-action/upload-sarif@v3
         with:
-          sarif_file: semgrep.sarif
+          sarif_file: ${{ steps.semgrep.outputs.sarif }}
           category: semgrep
       - name: Upload SARIF artifact
-        if: always()
+        if: always() && steps.semgrep.outputs.sarif != ''
         uses: actions/upload-artifact@v4
         with:
           name: semgrep-sarif
-          path: semgrep.sarif
+          path: ${{ steps.semgrep.outputs.sarif }}
           if-no-files-found: ignore
