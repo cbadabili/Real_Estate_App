@@ -252,7 +252,7 @@ app.get('/api/health', (_req: Request, res: Response) => {
   if (process.env.NODE_ENV === "development") {
     await setupVite(app, server);
   } else {
-    serveStatic(app);
+    await serveStatic(app);
   }
 
   // 404 handler must come AFTER Vite setup so frontend serving works
