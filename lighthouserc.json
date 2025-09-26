@@ -3,9 +3,9 @@
     "collect": {
       "staticDistDir": "dist",
       "url": [
-        "http://localhost:4173/properties",
-        "http://localhost:4173/properties/1",
-        "http://localhost:4173/services"
+        "/properties",
+        "/properties/1",
+        "/services"
       ],
       "numberOfRuns": 3,
       "settings": {
