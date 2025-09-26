@@ -22,7 +22,7 @@
     "test:axe": "playwright test tests/playwright/accessibility.spec.ts",
     "test:load:k6": "k6 run tests/load/properties-search.js",
     "test:load:k6:docker": "docker run --rm -v \"$PWD/tests/load\":/scripts -i grafana/k6 run /scripts/properties-search.js",
-    "postinstall": "playwright install --with-deps",
+    "postinstall": "node ./scripts/install-playwright.mjs",
     "db:generate": "drizzle-kit generate",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
