@@ -40,7 +40,7 @@ All pull requests must pass:
 1. **Start local database:**
    ```bash
    docker compose up -d
-   export DATABASE_URL=postgresql://beedab:beedab@localhost:5432/beedab_dev
+   export DATABASE_URL=postgresql://beedab:beedab@localhost:5432/beedab_dev?sslmode=disable
    ```
 
 2. **Install dependencies:**

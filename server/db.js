@@ -10,10 +10,27 @@ if (!databaseUrl) {
     process.exit(1);
 }
 // Optional SSL support for serverless providers (e.g. Vercel, Render)
-// Disable by setting PGSSLMODE=disable
-const ssl = process.env.PGSSLMODE === 'disable'
+// We disable SSL automatically for local/CI databases (localhost) unless explicitly enabled.
+const localHosts = new Set(['localhost', '127.0.0.1', '::1']);
+const normalizeSslMode = (value) => (typeof value === 'string' ? value.trim().toLowerCase() : undefined);
+let parsedHost;
+let urlSslMode;
+try {
+    const parsed = new URL(databaseUrl);
+    parsedHost = parsed.hostname;
+    urlSslMode = normalizeSslMode(parsed.searchParams.get('sslmode')) ?? undefined;
+}
+catch (error) {
+    console.warn('⚠️ Unable to parse DATABASE_URL for SSL detection. Falling back to environment configuration.', error);
+}
+const envSslMode = normalizeSslMode(process.env.PGSSLMODE);
+const explicitlyDisableSsl = (urlSslMode === 'disable') || (envSslMode === 'disable') || (parsedHost ? localHosts.has(parsedHost) : false);
+const explicitlyEnableSsl = !explicitlyDisableSsl && Boolean((urlSslMode && urlSslMode !== 'prefer' && urlSslMode !== 'allow') || (envSslMode && envSslMode !== 'prefer' && envSslMode !== 'allow'));
+const ssl = explicitlyDisableSsl
     ? false
-    : { rejectUnauthorized: false };
+    : (explicitlyEnableSsl || (parsedHost ? !localHosts.has(parsedHost) : false))
+        ? { rejectUnauthorized: false }
+        : false;
 const pool = new Pool({
     connectionString: databaseUrl,
     ssl,

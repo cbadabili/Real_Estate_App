@@ -322,7 +322,7 @@ Report security vulnerabilities responsibly via [SECURITY.md](SECURITY.md).
 ```bash
 # Start local database
 docker compose up -d
-export DATABASE_URL=postgresql://beedab:beedab@localhost:5432/beedab_dev
+export DATABASE_URL=postgresql://beedab:beedab@localhost:5432/beedab_dev?sslmode=disable
 
 # Setup and run
 npm ci

@@ -24,11 +24,12 @@ jobs:
           --health-cmd "pg_isready -d beedab -U beedab" --health-interval 10s --health-timeout 5s --health-retries 5
     env:
       # checkov:skip=CKV_SECRET_4 Ephemeral CI Postgres service credentials
-      DATABASE_URL: postgresql://beedab:beedab@localhost:5432/beedab
+      DATABASE_URL: postgresql://beedab:beedab@localhost:5432/beedab?sslmode=disable
       NODE_ENV: production
       FORCE_DB_MIGRATIONS: 'true'
       FORCE_DB_SEED: 'true'
       PORT: 5000
+      PGSSLMODE: disable
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

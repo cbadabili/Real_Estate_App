@@ -1,5 +1,6 @@
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
+import type { PoolConfig } from 'pg';
 import pgTypes from 'pg-types';
 import * as schema from "../shared/schema";
 
@@ -13,11 +14,41 @@ if (!databaseUrl) {
 }
 
 // Optional SSL support for serverless providers (e.g. Vercel, Render)
-// Disable by setting PGSSLMODE=disable
-const ssl =
-  process.env.PGSSLMODE === 'disable'
-    ? false
-    : { rejectUnauthorized: false } as const;
+// We disable SSL automatically for local/CI databases (localhost) unless explicitly enabled.
+const localHosts = new Set(['localhost', '127.0.0.1', '::1']);
+
+const normalizeSslMode = (value?: string | null) => value?.trim().toLowerCase();
+
+let parsedHost: string | undefined;
+let urlSslMode: string | undefined;
+
+try {
+  const parsed = new URL(databaseUrl);
+  parsedHost = parsed.hostname;
+  urlSslMode = normalizeSslMode(parsed.searchParams.get('sslmode')) ?? undefined;
+} catch (error) {
+  console.warn('⚠️ Unable to parse DATABASE_URL for SSL detection. Falling back to environment configuration.', error);
+}
+
+const envSslMode = normalizeSslMode(process.env.PGSSLMODE);
+
+const explicitlyDisableSsl =
+  urlSslMode === 'disable' ||
+  envSslMode === 'disable' ||
+  (parsedHost ? localHosts.has(parsedHost) : false);
+
+const explicitlyEnableSsl =
+  !explicitlyDisableSsl &&
+  Boolean(
+    (urlSslMode && urlSslMode !== 'prefer' && urlSslMode !== 'allow') ||
+    (envSslMode && envSslMode !== 'prefer' && envSslMode !== 'allow')
+  );
+
+const ssl: PoolConfig['ssl'] = explicitlyDisableSsl
+  ? false
+  : explicitlyEnableSsl || (parsedHost ? !localHosts.has(parsedHost) : false)
+    ? { rejectUnauthorized: false }
+    : false;
 
 const pool = new Pool({
   connectionString: databaseUrl,
