@@ -6,12 +6,16 @@ import { eq, and, lte, gte, desc } from 'drizzle-orm';
 
 const router = Router();
 
+type HeroSlotRecord = typeof hero_slots.$inferSelect;
+type PropertyRecord = typeof properties.$inferSelect;
+type HeroListing = { heroSlot: HeroSlotRecord; property: PropertyRecord };
+
 // Get active hero listings for homepage carousel
 router.get('/', async (_req, res) => {
   try {
     const now = Date.now();
 
-    const heroListings = await db
+    const heroListings: HeroListing[] = await db
       .select({
         heroSlot: hero_slots,
         property: properties
@@ -28,7 +32,7 @@ router.get('/', async (_req, res) => {
 
     res.json({
       success: true,
-      data: heroListings.map(item => ({
+      data: heroListings.map((item) => ({
         ...item.property,
         heroSlot: item.heroSlot
       }))

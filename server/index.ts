@@ -71,7 +71,7 @@ app.use(
 
 const allowedOrigins = env.CORS_ORIGIN
   ?.split(",")
-  .map(origin => origin.trim())
+  .map((origin: string) => origin.trim())
   .filter(Boolean);
 
 const allowAllOrigins = allowedOrigins?.includes("*");

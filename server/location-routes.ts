@@ -342,8 +342,8 @@ export function registerLocationRoutes(app: Express) {
         population: number | null;
         is_major: boolean | null;
         level: 'settlement' | 'district';
-      }> = settlementSuggestions.map(s => ({
-        ...s,
+      }> = settlementSuggestions.map((suggestion) => ({
+        ...suggestion,
         level: 'settlement' as const
       }));
 
@@ -364,8 +364,8 @@ export function registerLocationRoutes(app: Express) {
           .limit(remaining);
 
         // Add level and is_major properties manually
-        const districtSuggestions = districtResults.map(d => ({
-          ...d,
+        const districtSuggestions = districtResults.map((district) => ({
+          ...district,
           is_major: false as boolean | null,
           level: 'district' as const
         }));

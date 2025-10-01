@@ -110,10 +110,10 @@ export async function seedProperties() {
     return;
   }
 
-  console.log(`Found ${eligibleUsers.length} eligible users with IDs: ${eligibleUsers.map(u => u.id).join(', ')}`);
+  console.log(`Found ${eligibleUsers.length} eligible users with IDs: ${eligibleUsers.map((user) => user.id).join(', ')}`);
 
   const totalUsers = eligibleUsers.length;
-  const agentPool = eligibleUsers.filter(u => u.userType === 'agent');
+  const agentPool = eligibleUsers.filter((user) => user.userType === 'agent');
   const fallbackPool = agentPool.length > 0 ? agentPool : eligibleUsers;
 
   const getOwnerId = (i: number) => eligibleUsers[i % totalUsers]!.id;

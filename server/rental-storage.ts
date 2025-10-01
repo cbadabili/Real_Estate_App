@@ -209,7 +209,7 @@ export class RentalStorage {
         .where(eq(rental_applications.rental_id, rentalId))
         .orderBy(desc(rental_applications.created_at));
 
-      return applications.map(app => {
+      return applications.map((app) => {
         const mapped: RentalApplication = {
           id: app.id,
           rental_id: app.rental_id ?? 0,

@@ -1995,7 +1995,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       };
 
       // Process properties to ensure valid coordinates and match expected interface
-      const processedResult = result.map(prop => {
+      const processedResult = result.map((prop) => {
         let lat = prop.latitude;
         let lng = prop.longitude;
 
@@ -2051,7 +2051,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
 
       console.log(`Found ${processedResult.length} properties`);
-      processedResult.forEach(prop => {
+      processedResult.forEach((prop) => {
         console.log(`Property ${prop.id}: lat=${prop.latitude}, lng=${prop.longitude}, title="${prop.title}"`);
       });
 

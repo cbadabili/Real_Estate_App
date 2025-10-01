@@ -7,10 +7,20 @@ import { eq, and, desc, sql } from 'drizzle-orm';
 
 const router = Router();
 
+type PlanRecord = typeof plans.$inferSelect;
+type EntitlementRecord = typeof entitlements.$inferSelect;
+type PaymentRecord = typeof payments.$inferSelect;
+type UserRecord = typeof users.$inferSelect;
+type PendingPayment = {
+  payment: PaymentRecord;
+  plan: PlanRecord;
+  user: Pick<UserRecord, 'id' | 'username' | 'email' | 'firstName' | 'lastName'>;
+};
+
 // Get all available plans
 router.get('/plans', async (_req, res) => {
   try {
-    const availablePlans = await db
+    const availablePlans: PlanRecord[] = await db
       .select()
       .from(plans)
       .where(eq(plans.is_active, true))
@@ -18,7 +28,7 @@ router.get('/plans', async (_req, res) => {
 
     res.json({
       success: true,
-      data: availablePlans.map(plan => ({
+      data: availablePlans.map((plan) => ({
         ...plan,
         features: typeof plan.features === 'string' ? JSON.parse(plan.features) : plan.features
       }))
@@ -155,20 +165,26 @@ router.get('/me', authenticate, async (req, res) => {
       .limit(1);
 
     // Get entitlements
-    const userEntitlements = await db
+    const userEntitlements: EntitlementRecord[] = await db
       .select()
       .from(entitlements)
       .where(eq(entitlements.user_id, req.user.id));
 
     // Transform entitlements into a more usable format
-    const entitlementsMap = userEntitlements.reduce((acc, entitlement) => {
-      acc[entitlement.feature_key] = {
-        limit: entitlement.feature_value,
-        used: entitlement.used_count,
-        remaining: entitlement.feature_value === -1 ? -1 : Math.max(0, entitlement.feature_value - entitlement.used_count)
-      };
-      return acc;
-    }, {} as Record<string, any>);
+    const entitlementsMap = userEntitlements.reduce<Record<string, { limit: number; used: number; remaining: number }>>(
+      (acc, entitlement) => {
+        const featureLimit = entitlement.feature_value ?? 0;
+        const usedCount = entitlement.used_count ?? 0;
+
+        acc[entitlement.feature_key] = {
+          limit: featureLimit,
+          used: usedCount,
+          remaining: featureLimit === -1 ? -1 : Math.max(0, featureLimit - usedCount)
+        };
+        return acc;
+      },
+      {},
+    );
 
     res.json({
       success: true,
@@ -204,7 +220,7 @@ router.get('/payments/pending', authenticate, async (req, res) => {
       });
     }
 
-    const pendingPayments = await db
+    const pendingPayments: PendingPayment[] = await db
       .select({
         payment: payments,
         plan: plans,
@@ -224,7 +240,7 @@ router.get('/payments/pending', authenticate, async (req, res) => {
 
     res.json({
       success: true,
-      data: pendingPayments.map(p => ({
+      data: pendingPayments.map((p) => ({
         ...p.payment,
         plan: p.plan,
         user: p.user

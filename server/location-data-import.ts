@@ -2,6 +2,10 @@ import { db } from "./db";
 import { districts, settlements, wards, plots } from "../shared/schema";
 import { sql } from "drizzle-orm";
 
+type DistrictRecord = typeof districts.$inferSelect;
+type SettlementRecord = typeof settlements.$inferSelect;
+type WardRecord = typeof wards.$inferSelect;
+
 /**
  * Comprehensive Botswana Location Data Import
  * Based on 2022 Population and Housing Census Preliminary Results
@@ -37,7 +41,14 @@ export async function importLocationData() {
 }
 
 async function importDistricts() {
-  const districtsData = [
+  const districtsData: Array<{
+    code: string;
+    name: string;
+    type: string;
+    region: string;
+    population: number;
+    area_km2: number;
+  }> = [
     // Cities
     { code: '01', name: 'Gaborone', type: 'city', region: 'Greater Gaborone', population: 244107, area_km2: 169 },
     { code: '02', name: 'Francistown', type: 'city', region: 'Northern', population: 102444, area_km2: 127 },
@@ -82,7 +93,7 @@ async function importDistricts() {
   ];
 
   // Calculate population density
-  const districtsWithDensity = districtsData.map(district => ({
+  const districtsWithDensity = districtsData.map((district) => ({
     ...district,
     population_density: district.population / district.area_km2
   }));
@@ -104,8 +115,8 @@ async function importDistricts() {
 
 async function importSettlements() {
   // Get district IDs for foreign keys
-  const districtRecords = await db.select().from(districts);
-  const districtMap = new Map(districtRecords.map(d => [d.name, d.id]));
+  const districtRecords: DistrictRecord[] = await db.select().from(districts);
+  const districtMap = new Map<string, number>(districtRecords.map((district) => [district.name, district.id]));
 
   // Create a mapping from census district names to our district names
   const censusDistrictMapping = {
@@ -141,7 +152,7 @@ async function importSettlements() {
   };
 
   // Comprehensive census data from 2022 Population and Housing Census
-  const censusData = [
+  const censusData: Array<[string, string]> = [
     // Cities and Towns (from census file)
     ['Gaborone City', 'Gaborone'],
     ['Francistown City', 'Francistown'],
@@ -534,7 +545,16 @@ async function importSettlements() {
     ['Kgalagadi South', 'Ukwi']
   ];
 
-  const settlementsData = [
+  const settlementsData: Array<{
+    district: string;
+    name: string;
+    type: string;
+    population: number | null;
+    latitude: number | null;
+    longitude: number | null;
+    post_code: string | null;
+    is_major?: boolean;
+  }> = [
     // GABORONE DISTRICT SETTLEMENTS
     { district: 'Gaborone', name: 'Gaborone', type: 'city', population: 244107, latitude: -24.6282, longitude: 25.9231, post_code: '00000', is_major: true },
     
@@ -647,7 +667,7 @@ async function importSettlements() {
   ];
 
   // Add all census localities to settlements data
-  const censusSettlements = [];
+  const censusSettlements: typeof settlementsData = [];
   const seenCombinations = new Set();
   
   // Track existing manual combinations
@@ -675,10 +695,10 @@ async function importSettlements() {
   }
   
   // Combine manual and census data
-  const allSettlements = [...settlementsData, ...censusSettlements];
+  const allSettlements: typeof settlementsData = [...settlementsData, ...censusSettlements];
 
   // Convert settlement data with district foreign keys
-  const settlementsWithDistrictIds = allSettlements.flatMap(settlement => {
+  const settlementsWithDistrictIds = allSettlements.flatMap((settlement) => {
     const districtId = districtMap.get(settlement.district);
     const name = settlement.name;
 
@@ -717,11 +737,16 @@ async function importSettlements() {
 
 async function importWards() {
   // Get settlement IDs for foreign keys
-  const settlementRecords = await db.select().from(settlements);
-  const settlementMap = new Map(settlementRecords.map(s => [s.name, s.id]));
+  const settlementRecords: SettlementRecord[] = await db.select().from(settlements);
+  const settlementMap = new Map<string, number>(settlementRecords.map((record) => [record.name, record.id]));
 
   // Sample ward data for major cities and towns
-  const wardsData = [
+  const wardsData: Array<{
+    settlement: string;
+    name: string;
+    ward_number: string;
+    constituency: string;
+  }> = [
     // Gaborone Wards (simplified)
     { settlement: 'Gaborone', name: 'Central Business District', ward_number: 'Ward 1', constituency: 'Gaborone Central' },
     { settlement: 'Gaborone', name: 'Village', ward_number: 'Ward 2', constituency: 'Gaborone Central' },
@@ -766,7 +791,7 @@ async function importWards() {
   ];
 
   // Convert ward data with settlement foreign keys
-  const wardsWithSettlementIds = wardsData.map(ward => ({
+  const wardsWithSettlementIds = wardsData.map((ward) => ({
     settlement_id: settlementMap.get(ward.settlement)!,
     name: ward.name,
     ward_number: ward.ward_number,
@@ -790,11 +815,11 @@ async function importWards() {
 
 async function importBasicPlots() {
   // Get ward and settlement IDs for foreign keys
-  const wardRecords = await db.select().from(wards);
-  const settlementRecords = await db.select().from(settlements);
-  
-  const wardMap = new Map(wardRecords.map(w => [`${w.name}`, w]));
-  const settlementMap = new Map(settlementRecords.map(s => [s.name, s.id]));
+  const wardRecords: WardRecord[] = await db.select().from(wards);
+  const settlementRecords: SettlementRecord[] = await db.select().from(settlements);
+
+  const wardMap = new Map<string, WardRecord>(wardRecords.map((ward) => [String(ward.name), ward]));
+  const settlementMap = new Map<string, number>(settlementRecords.map((record) => [record.name, record.id]));
 
   // Sample plot data for major areas
   const plotsData = [

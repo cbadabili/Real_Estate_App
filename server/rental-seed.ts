@@ -31,7 +31,7 @@ export async function seedRentals() {
     return;
   }
   
-  console.log(`Found ${landlords.length} eligible landlords with IDs: ${landlords.map(l => l.id).join(', ')}`);
+  console.log(`Found ${landlords.length} eligible landlords with IDs: ${landlords.map((landlord) => landlord.id).join(', ')}`);
   
   const getLandlordId = (i: number) => landlords[i % landlords.length]!.id;
 

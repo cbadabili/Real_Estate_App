@@ -290,7 +290,7 @@ export class ReviewStorage implements IReviewStorage {
       ));
 
     const distribution: Record<number, number> = {};
-    ratingDistribution.forEach(item => {
+    ratingDistribution.forEach((item) => {
       distribution[item.rating] = Number(item.count ?? 0);
     });
 
@@ -499,7 +499,7 @@ export class ReviewStorage implements IReviewStorage {
     const logs = await finalQuery;
 
     // JSONB fields are automatically parsed by Drizzle
-    return logs.map(log => ({
+    return logs.map((log) => ({
       ...log,
       details: log.details // No need to parse JSON.parse if it's JSONB
     }));
