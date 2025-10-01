@@ -34,31 +34,34 @@ test.describe('Buyer engagement journeys', () => {
 
     await saveFavorite(request, buyer, property.id);
 
+    const authHeaders = { Authorization: `Bearer ${buyer.token}` };
+
     const favoritesResponse = await request.get(`/api/users/${buyer.userId}/saved-properties`, {
-      headers: {
-        Authorization: `Bearer ${buyer.token}`
-      }
+      headers: authHeaders
     });
-    expect(favoritesResponse.ok()).toBeTruthy();
+    expect(favoritesResponse).toBeOK();
     const favorites = await favoritesResponse.json();
     expect(Array.isArray(favorites)).toBe(true);
     expect(
       favorites.some((fav: any) => Number(fav.propertyId ?? fav.id) === Number(property.id))
     ).toBe(true);
 
-    const viewingResponse = await scheduleViewing(request, buyer, property.id, new Date(Date.now() + 86400000).toISOString());
-    expect(viewingResponse.ok()).toBeTruthy();
+    const viewingResponse = await scheduleViewing(
+      request,
+      buyer,
+      property.id,
+      new Date(Date.now() + 86400000).toISOString()
+    );
+    expect(viewingResponse).toBeOK();
     const viewing = await viewingResponse.json();
     expect(viewing.propertyId ?? viewing.property_id).toBe(property.id);
     expect(new Date(viewing.appointmentDate ?? viewing.appointment_date).getTime()).toBeGreaterThan(Date.now());
 
     await unsaveFavorite(request, buyer, property.id);
     const afterUnsave = await request.get(`/api/users/${buyer.userId}/saved-properties`, {
-      headers: {
-        Authorization: `Bearer ${buyer.token}`
-      }
+      headers: authHeaders
     });
-    expect(afterUnsave.ok()).toBeTruthy();
+    expect(afterUnsave).toBeOK();
     const updatedFavorites = await afterUnsave.json();
     expect(Array.isArray(updatedFavorites)).toBe(true);
     expect(

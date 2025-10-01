@@ -1,6 +1,5 @@
 import express, { type Request, Response } from "express";
 import { createServer } from "http";
-import { setupVite, serveStatic, log } from "./vite";
 import { testDatabaseConnection } from "./db";
 import { registerAllRoutes } from "./routes/index";
 import { createRentalRoutes } from './rental-routes';
@@ -249,9 +248,13 @@ app.get('/api/health', (_req: Request, res: Response) => {
   // importantly only setup vite in development and after
   // setting up all the other routes so the catch-all route
   // doesn't interfere with the other routes
+  app.use('/api', notFoundHandler);
+
   if (process.env.NODE_ENV === "development") {
+    const { setupVite } = await import('./vite');
     await setupVite(app, server);
   } else {
+    const { serveStatic } = await import('./vite');
     await serveStatic(app);
   }
 
@@ -315,6 +318,6 @@ app.get('/api/health', (_req: Request, res: Response) => {
   // It is the only port that is not firewalled.
   const port = Number(process.env.PORT) || 5000; // Default to 5000 for Replit/Vite compatibility
   server.listen(port, "0.0.0.0", () => {
-    log(`serving on port ${port}`);
+    console.log(`serving on port ${port}`);
   });
 })();

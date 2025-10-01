@@ -11,7 +11,7 @@ if (!databaseUrl) {
 }
 // Optional SSL support for serverless providers (e.g. Vercel, Render)
 // We disable SSL automatically for local/CI databases (localhost) unless explicitly enabled.
-const localHosts = new Set(['localhost', '127.0.0.1', '::1']);
+const localHosts = new Set(['localhost', '127.0.0.1', '::1', 'host.docker.internal']);
 const normalizeSslMode = (value) => (typeof value === 'string' ? value.trim().toLowerCase() : undefined);
 let parsedHost;
 let urlSslMode;
@@ -24,16 +24,26 @@ catch (error) {
     console.warn('⚠️ Unable to parse DATABASE_URL for SSL detection. Falling back to environment configuration.', error);
 }
 const envSslMode = normalizeSslMode(process.env.PGSSLMODE);
-const explicitlyDisableSsl = (urlSslMode === 'disable') || (envSslMode === 'disable') || (parsedHost ? localHosts.has(parsedHost) : false);
-const explicitlyEnableSsl = !explicitlyDisableSsl && Boolean((urlSslMode && urlSslMode !== 'prefer' && urlSslMode !== 'allow') || (envSslMode && envSslMode !== 'prefer' && envSslMode !== 'allow'));
-const ssl = explicitlyDisableSsl
-    ? false
-    : (explicitlyEnableSsl || (parsedHost ? !localHosts.has(parsedHost) : false))
-        ? { rejectUnauthorized: false }
-        : false;
+const sslMode = urlSslMode ?? envSslMode;
+const isLocalHost = parsedHost ? localHosts.has(parsedHost) : false;
+let ssl;
+if (sslMode === 'disable') {
+    ssl = false;
+} else if (sslMode === 'verify-ca' || sslMode === 'verify-full') {
+    ssl = { rejectUnauthorized: true };
+} else if (sslMode === 'require') {
+    ssl = { rejectUnauthorized: false };
+} else if (isLocalHost) {
+    ssl = false;
+} else if (process.env.NODE_ENV === 'production' && parsedHost && !isLocalHost) {
+    ssl = { rejectUnauthorized: false };
+} else {
+    ssl = false;
+}
 const pool = new Pool({
     connectionString: databaseUrl,
     ssl,
+    connectionTimeoutMillis: 5000,
 });
 // Create drizzle database instance
 export const db = drizzle(pool, { schema });
@@ -41,10 +51,21 @@ export const db = drizzle(pool, { schema });
 export async function testDatabaseConnection() {
     try {
         // Test a simple query with timeout
-        const result = await Promise.race([
-            pool.query('SELECT 1'),
-            new Promise((_, reject) => setTimeout(() => reject(new Error('Database connection timeout')), 5000))
-        ]);
+        const withTimeout = async (promise, ms, message) => {
+            let timer;
+            const timeout = new Promise((_, reject) => {
+                timer = setTimeout(() => reject(new Error(message)), ms);
+            });
+            try {
+                return await Promise.race([promise, timeout]);
+            }
+            finally {
+                if (timer) {
+                    clearTimeout(timer);
+                }
+            }
+        };
+        await withTimeout(pool.query('SELECT 1'), 5000, 'Database connection timeout');
         console.log('✅ Database connection successful');
         return true;
     }

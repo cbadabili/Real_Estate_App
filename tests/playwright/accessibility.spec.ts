@@ -24,7 +24,7 @@ test.describe('Accessibility regressions', () => {
         .withTags(['wcag2a', 'wcag2aa'])
         .analyze();
       if (results.violations.length) {
-        await testInfo.attach('axe-violations', {
+        await testInfo.attach(`axe-violations-${target.replace(/\W+/g, '-')}`, {
           contentType: 'application/json',
           body: JSON.stringify(results, null, 2)
         });

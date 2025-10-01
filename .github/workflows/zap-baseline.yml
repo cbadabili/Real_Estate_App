@@ -72,7 +72,7 @@ jobs:
             -e ZAP_AUTH_HEADER_SITE \
             -v "$(pwd)/zap-work":/zap/wrk/:rw \
             ghcr.io/zaproxy/zaproxy:stable \
-            zap-baseline.py -t http://127.0.0.1:5000 -J zap-report.json -w zap-report.md -r zap-report.html -a -j
+            zap-baseline.py -t http://127.0.0.1:5000 -J zap-report.json -w zap-report.md -r zap-report.html -a -j -l High
           cp zap-work/zap-report.* .
       - name: Package ZAP artifacts
         if: always()

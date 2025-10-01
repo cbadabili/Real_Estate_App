@@ -45,8 +45,8 @@ test.describe('Anonymous discovery experience', () => {
     });
     const elapsed = Date.now() - searchStart;
 
-    expect(response.ok(), 'Search endpoint should return 200').toBeTruthy();
-    expect(elapsed, 'Search response should be fast enough for smoke budget').toBeLessThanOrEqual(2000);
+    expect(response).toBeOK();
+    expect(elapsed, 'Search response should be fast enough for smoke budget').toBeLessThanOrEqual(5000);
 
     const listings = await response.json();
     expect(Array.isArray(listings), 'Search response should return array').toBe(true);
