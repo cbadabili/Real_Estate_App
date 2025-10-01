@@ -14,12 +14,15 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
+      - name: Configure Semgrep publish token
+        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork == false
+        run: echo "SEMGREP_PUBLISH_TOKEN=${{ secrets.SEMGREP_APP_TOKEN }}" >> "$GITHUB_ENV"
       - uses: semgrep/semgrep-action@v1
         id: semgrep
         with:
           config: p/ci
           generateSarif: true
-          publishToken: "${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork ? '' : secrets.SEMGREP_APP_TOKEN }}"
+          publishToken: ${{ env.SEMGREP_PUBLISH_TOKEN }}
       - name: Upload SARIF to GitHub Security
         if: always() && steps.semgrep.outputs.sarif != ''
         uses: github/codeql-action/upload-sarif@v3
