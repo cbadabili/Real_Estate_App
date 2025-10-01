@@ -1,6 +1,9 @@
 import express from "express";
 import fs from "fs/promises";
 import path from "path";
+import { fileURLToPath } from "url";
+
+const dirname = path.dirname(fileURLToPath(import.meta.url));
 const generateId = () => Math.random().toString(36).substring(2, 15);
 export function log(message, source = "express") {
     const formattedTime = new Date().toLocaleTimeString("en-US", {
@@ -25,17 +28,43 @@ export async function setupVite(app, server) {
         const reason = error instanceof Error ? error.message : String(error);
         throw new Error(`Vite development server requested but the 'vite' package is unavailable. Install dev dependencies before running in development.\n${reason}`);
     }
+    const { createServer: createViteServer, createLogger, loadConfigFromFile } = viteModule;
+    const viteLogger = createLogger();
     let viteConfig;
     try {
-        const configModule = await import("../vite.config.ts");
-        viteConfig = configModule.default;
+        if (!loadConfigFromFile) {
+            throw new Error("Vite loadConfigFromFile helper is unavailable");
+        }
+        const loader = loadConfigFromFile;
+        const configEnv = { command: "serve", mode: process.env.NODE_ENV ?? "development" };
+        const projectRoot = path.resolve(dirname, "..");
+        const configCandidates = [undefined, path.resolve(projectRoot, "vite.config.ts"), path.resolve(projectRoot, "vite.config.js")];
+        let loaded;
+        let lastError;
+        for (const candidate of configCandidates) {
+            try {
+                loaded = await loader(configEnv, candidate, projectRoot);
+                if (loaded) {
+                    break;
+                }
+            }
+            catch (error) {
+                lastError = error;
+            }
+        }
+        if (!loaded) {
+            if (lastError instanceof Error) {
+                throw lastError;
+            }
+            throw new Error(String(lastError ?? 'Unable to load Vite configuration'));
+        }
+        const rawConfig = (loaded === null || loaded === void 0 ? void 0 : loaded.config) ?? {};
+        viteConfig = typeof rawConfig === "function" ? await rawConfig(configEnv) : rawConfig;
     }
     catch (error) {
         const reason = error instanceof Error ? error.message : String(error);
-        throw new Error(`Failed to load Vite configuration. Ensure vite.config.ts is present and its dependencies are installed.\n${reason}`);
+        throw new Error(`Failed to load Vite configuration. Ensure vite.config.(ts|js) is present and its dependencies are installed.\n${reason}`);
     }
-    const { createServer: createViteServer, createLogger } = viteModule;
-    const viteLogger = createLogger();
     const serverOptions = {
         middlewareMode: true,
         hmr: { server },
@@ -48,7 +77,6 @@ export async function setupVite(app, server) {
             ...viteLogger,
             error: (msg, options) => {
                 viteLogger.error(msg, options);
-                process.exit(1);
             },
         },
         server: serverOptions,
@@ -58,8 +86,8 @@ export async function setupVite(app, server) {
     app.use("*", async (req, res, next) => {
         const url = req.originalUrl;
         try {
-            const clientTemplate = path.resolve(import.meta.dirname, "..", "client", "index.html");
-            // always reload the index.html file from disk incase it changes
+            const clientTemplate = path.resolve(dirname, "..", "client", "index.html");
+            // always reload the index.html file from disk in case it changes
             let template = await fs.readFile(clientTemplate, "utf-8");
             template = template.replace(`src="/src/main.tsx"`, `src="/src/main.tsx?v=${generateId()}"`);
             const page = await vite.transformIndexHtml(url, template);
@@ -73,11 +101,17 @@ export async function setupVite(app, server) {
         }
     });
 }
-export function serveStatic(app) {
-    const distPath = path.resolve(import.meta.dirname, "..", "dist", "public");
+export async function serveStatic(app) {
+    const distPath = path.resolve(dirname, "..", "dist", "public");
     app.use(express.static(distPath));
-    // fall through to index.html if the file doesn't exist
-    app.use("*", (_req, res) => {
-        res.sendFile(path.resolve(distPath, "index.html"));
-    });
+    const indexPath = path.resolve(distPath, "index.html");
+    try {
+        await fs.access(indexPath);
+        app.use("*", (_req, res) => {
+            res.sendFile(indexPath);
+        });
+    }
+    catch (_a) {
+        log("Static build not found; skipping SPA fallback", "static");
+    }
 }

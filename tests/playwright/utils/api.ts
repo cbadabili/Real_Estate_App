@@ -80,12 +80,12 @@ export interface PropertyPayload {
 
 export async function createProperty(api: APIRequestContext, auth: AuthContext, payload: PropertyPayload) {
   const ownerIdSource = payload.ownerId ?? auth.userId;
-  const normalizedOwnerId =
-    typeof ownerIdSource === 'string' ? Number(ownerIdSource) : ownerIdSource;
+  const normalizedOwnerId = Number(ownerIdSource);
+  expect(Number.isFinite(normalizedOwnerId), 'ownerId must be numeric').toBeTruthy();
   const response = await api.post('/api/properties', {
     headers: authHeaders(auth),
     data: {
-      ownerId: Number.isNaN(normalizedOwnerId) ? ownerIdSource : normalizedOwnerId,
+      ownerId: normalizedOwnerId,
       title: payload.title,
       description: payload.description ?? 'Automated listing',
       price: payload.price,

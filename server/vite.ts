@@ -6,8 +6,12 @@ import express, {
 } from "express";
 import fs from "fs/promises";
 import path from "path";
+import { fileURLToPath } from "url";
 import { type Server } from "http";
 import type { InlineConfig } from "vite";
+
+const dirname = path.dirname(fileURLToPath(import.meta.url));
+
 
 const generateId = () => Math.random().toString(36).substring(2, 15);
 
@@ -32,12 +36,14 @@ export async function setupVite(app: Express, server: Server) {
 
   let createViteServer: typeof import("vite")['createServer'] | undefined;
   let createLogger: typeof import("vite")['createLogger'] | undefined;
+  let loadConfigFromFile: typeof import("vite")['loadConfigFromFile'] | undefined;
   let viteConfig: InlineConfig | undefined;
 
   try {
     const viteModule = await import("vite");
     createViteServer = viteModule.createServer;
     createLogger = viteModule.createLogger;
+    loadConfigFromFile = viteModule.loadConfigFromFile;
   } catch (error) {
     const reason = error instanceof Error ? error.message : String(error);
     throw new Error(
@@ -46,12 +52,49 @@ export async function setupVite(app: Express, server: Server) {
   }
 
   try {
-    const configModule = await import("../vite.config");
-    viteConfig = configModule.default as InlineConfig;
+    const configEnv = {
+      command: "serve" as const,
+      mode: process.env.NODE_ENV ?? "development",
+    };
+
+    if (!loadConfigFromFile) {
+      throw new Error("Vite loadConfigFromFile helper is unavailable");
+    }
+
+    const loader = loadConfigFromFile!;
+    const projectRoot = path.resolve(dirname, "..");
+    const configCandidates = [
+      undefined,
+      path.resolve(projectRoot, "vite.config.ts"),
+      path.resolve(projectRoot, "vite.config.js"),
+    ];
+
+    let loaded: Awaited<ReturnType<typeof loadConfigFromFile>> | undefined;
+    let lastError: unknown;
+    for (const candidate of configCandidates) {
+      try {
+        loaded = await loader(configEnv, candidate, projectRoot);
+        if (loaded) {
+          break;
+        }
+      } catch (error) {
+        lastError = error;
+      }
+    }
+
+    if (!loaded) {
+      throw lastError instanceof Error ? lastError : new Error(String(lastError ?? 'Unable to load Vite configuration'));
+    }
+
+    const rawConfig = loaded.config ?? {};
+    viteConfig =
+      typeof rawConfig === "function"
+        ? await rawConfig(configEnv)
+        : (rawConfig as InlineConfig);
   } catch (error) {
     const reason = error instanceof Error ? error.message : String(error);
     throw new Error(
-      `Failed to load Vite configuration. Ensure vite.config.ts is present and its dependencies are installed.\n${reason}`,
+      `Failed to load Vite configuration. Ensure vite.config.(ts|js) is present and its dependencies are installed.\n${reason}`,
     );
   }
 
@@ -73,7 +116,6 @@ export async function setupVite(app: Express, server: Server) {
       ...viteLogger,
       error: (...args: Parameters<typeof viteLogger.error>) => {
         viteLogger.error(...args);
-        process.exit(1);
       },
     },
     server: serverOptions,
@@ -85,14 +127,9 @@ export async function setupVite(app: Express, server: Server) {
     const url = req.originalUrl;
 
     try {
-      const clientTemplate = path.resolve(
-        import.meta.dirname,
-        "..",
-        "client",
-        "index.html",
-      );
+      const clientTemplate = path.resolve(dirname, "..", "client", "index.html");
 
-      // always reload the index.html file from disk incase it changes
+      // always reload the index.html file from disk in case it changes
       let template = await fs.readFile(clientTemplate, "utf-8");
       template = template.replace(
         `src="/src/main.tsx"`,
@@ -110,7 +147,7 @@ export async function setupVite(app: Express, server: Server) {
 }
 
 export async function serveStatic(app: Express) {
-  const distPath = path.resolve(import.meta.dirname, "..", "dist", "public");
+  const distPath = path.resolve(dirname, "..", "dist", "public");
 
   app.use(express.static(distPath));
 

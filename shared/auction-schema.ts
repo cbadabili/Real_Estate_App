@@ -39,7 +39,7 @@ export const auctionResults = pgTable("auction_results", {
   propertyId: integer("property_id").references(() => properties.id).notNull(),
   winningBidderId: integer("winning_bidder_id").references(() => users.id),
   finalBidAmount: numeric("final_bid_amount"),
-  auctionStatus: text("auction_status").notNull(), // 'sold', 'unsold', 'withdrawn', 'postponed'
+  auctionStatus: text("auction_status").notNull().default("pending"), // 'sold', 'unsold', 'withdrawn', 'postponed'
   auctionEndTime: timestamp("auction_end_time"),
   totalBids: integer("total_bids").default(0),
   createdAt: timestamp("created_at").defaultNow(),

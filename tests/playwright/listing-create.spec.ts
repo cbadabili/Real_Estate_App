@@ -31,11 +31,10 @@ test.describe('Agent listing lifecycle', () => {
     expect(property.status).toBe('active');
     expect(property.latitude).toBeCloseTo(-24.6285, 3);
     expect(property.longitude).toBeCloseTo(25.9235, 3);
+    const authHeaders = { Authorization: `Bearer ${auth.token}` };
 
     const updateResponse = await request.put(`/api/properties/${property.id}`, {
-      headers: {
-        Authorization: `Bearer ${auth.token}`
-      },
+      headers: authHeaders,
       data: {
         price: 975000,
         bedrooms: 5,
@@ -44,7 +43,7 @@ test.describe('Agent listing lifecycle', () => {
         status: 'active'
       }
     });
-    expect(updateResponse.ok()).toBeTruthy();
+    expect(updateResponse).toBeOK();
     const updated = await updateResponse.json();
     expect(Number(updated.price)).toBe(975000);
     expect(updated.bedrooms).toBe(5);
@@ -52,14 +51,12 @@ test.describe('Agent listing lifecycle', () => {
     expect(updated.longitude).toBeCloseTo(25.9239, 3);
 
     const unpublishResponse = await request.put(`/api/properties/${property.id}`, {
-      headers: {
-        Authorization: `Bearer ${auth.token}`
-      },
+      headers: authHeaders,
       data: {
         status: 'inactive'
       }
     });
-    expect(unpublishResponse.ok()).toBeTruthy();
+    expect(unpublishResponse).toBeOK();
     const unpublished = await unpublishResponse.json();
     expect(unpublished.status).toBe('inactive');
   });

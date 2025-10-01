@@ -37,17 +37,14 @@ export default function () {
     sortOrder: Math.random() > 0.5 ? 'asc' : 'desc',
     limit: '20'
   }).toString();
-
-  const start = Date.now();
   const res = http.get(`${BASE_URL}/api/properties?${params}`);
-  const duration = Date.now() - start;
-  searchTTI.add(duration);
+  searchTTI.add(res.timings.duration);
 
   const body = res.json();
   check(res, {
     'status is 200': r => r.status === 200,
     'payload is json array': () => Array.isArray(body),
-    'fast enough for SLO': () => duration < 1200
+    'fast enough for SLO': () => res.timings.duration < 1200
   });
 
   sleep(Math.random() * 2);
