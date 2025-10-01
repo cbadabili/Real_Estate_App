@@ -2036,9 +2036,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
           console.log(`Property ${prop.id} "${prop.title}" has invalid coordinates (${prop.latitude}, ${prop.longitude}), using fallback for ${prop.city || prop.state}`);
 
           // Try to get coordinates from city name
-          const rawCityName = prop.city ?? prop.state ?? '';
-          const cityName = typeof rawCityName === 'string' ? rawCityName.trim() : '';
-          const cityCoords = cityName ? cityCoordinates[cityName as keyof typeof cityCoordinates] : undefined;
+          const rawCityName = prop.city ?? prop.state ?? null;
+          const cityName = typeof rawCityName === 'string' ? rawCityName.trim() || null : null;
+          const cityCoords =
+            typeof cityName === 'string' && cityName in cityCoordinates
+              ? cityCoordinates[cityName as keyof typeof cityCoordinates]
+              : undefined;
           if (cityCoords) {
             lat = cityCoords.lat + (Math.random() - 0.5) * 0.01; // Add small random offset
             lng = cityCoords.lng + (Math.random() - 0.5) * 0.01;
