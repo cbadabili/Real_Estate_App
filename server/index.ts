@@ -22,6 +22,8 @@ import analyticsRoutes from "./analytics-routes";
 
 const app = express();
 
+let isReady = false;
+
 // Configure trust proxy for Replit
 app.set('trust proxy', 1);
 
@@ -153,6 +155,14 @@ app.get('/api/health', (_req: Request, res: Response) => {
   res.json({ status: 'ok' });
 });
 
+app.get('/healthz', (_req: Request, res: Response) => {
+  if (isReady) {
+    return res.status(200).send('ok');
+  }
+
+  return res.status(503).send('starting');
+});
+
 (async () => {
   // Test database connection before starting server
   console.log('Testing database connection...');
@@ -267,8 +277,12 @@ app.get('/api/health', (_req: Request, res: Response) => {
   // Global error handler must come last
   app.use(errorHandler);
 
+  let migrationsCompleted = false;
+  let migrationsAttempted = false;
+
   // Initialize database with migrations
   if (process.env.NODE_ENV !== 'production' || process.env.FORCE_DB_MIGRATIONS === 'true') {
+    migrationsAttempted = true;
     const { seedManager } = await import('./seed-manager');
     const { initializeDatabase } = await import('./db');
     const { getMigrationManager } = await import('./migration-manager');
@@ -303,6 +317,7 @@ app.get('/api/health', (_req: Request, res: Response) => {
       }
 
       console.log('✅ Database initialization completed');
+      migrationsCompleted = true;
     } catch (error) {
       console.error('❌ Database initialization failed:', error);
       if (process.env.NODE_ENV !== 'production' || process.env.FORCE_DB_MIGRATIONS === 'true') {
@@ -310,6 +325,16 @@ app.get('/api/health', (_req: Request, res: Response) => {
       }
       // In production without FORCE flag just continue running
     }
+  } else {
+    migrationsCompleted = true;
+  }
+
+  if (migrationsAttempted && !migrationsCompleted) {
+    console.warn('⚠️ Server not marked ready because migrations did not complete successfully.');
+  }
+
+  if (migrationsCompleted) {
+    isReady = true;
   }
 
   // Seed rental data
