@@ -1,7 +1,8 @@
+---
 name: Semgrep SAST
 
 on:
-  pull_request:
+  pull_request: {}
   push:
     branches: [main]
 
@@ -15,8 +16,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Configure Semgrep publish token
-        if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork == false
-        run: echo "SEMGREP_PUBLISH_TOKEN=${{ secrets.SEMGREP_APP_TOKEN }}" >> "$GITHUB_ENV"
+        if: >-
+          github.event_name != 'pull_request' ||
+          github.event.pull_request.head.repo.fork == false
+        run: |
+          echo "SEMGREP_PUBLISH_TOKEN=${{ secrets.SEMGREP_APP_TOKEN }}" >> "$GITHUB_ENV"
       - uses: semgrep/semgrep-action@v1
         id: semgrep
         with:
@@ -25,7 +29,12 @@ jobs:
         env:
           SEMGREP_APP_TOKEN: ${{ env.SEMGREP_PUBLISH_TOKEN || '' }}
       - name: Upload SARIF to GitHub Security
-        if: always() && steps.semgrep.outputs.sarif != ''
+        if: >-
+          always() &&
+          steps.semgrep.outcome == 'success' &&
+          steps.semgrep.outputs.sarif != '' &&
+          (github.event_name != 'pull_request' ||
+          github.event.pull_request.head.repo.fork == false)
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: ${{ steps.semgrep.outputs.sarif }}
