@@ -21,6 +21,7 @@ import heroRoutes from "./hero-routes";
 import analyticsRoutes from "./analytics-routes";
 
 const app = express();
+const server = createServer(app);
 
 let isReady = false;
 
@@ -156,14 +157,10 @@ app.get('/api/health', (_req: Request, res: Response) => {
 });
 
 app.get('/healthz', (_req: Request, res: Response) => {
-  if (isReady) {
-    return res.status(200).send('ok');
-  }
-
-  return res.status(503).send('starting');
+  res.status(isReady ? 200 : 503).send(isReady ? 'ok' : 'starting');
 });
 
-(async () => {
+async function boot() {
   // Test database connection before starting server
   console.log('Testing database connection...');
   const dbConnected = await testDatabaseConnection();
@@ -171,6 +168,8 @@ app.get('/healthz', (_req: Request, res: Response) => {
     console.error('Failed to connect to database. Server will not start.');
     process.exit(1);
   }
+
+  const isE2E = process.env.E2E === 'true';
 
   // Apply rate limiting to sensitive endpoints BEFORE registering routes
   app.use('/api/users/login', authWriteLimiter);
@@ -261,12 +260,10 @@ app.get('/healthz', (_req: Request, res: Response) => {
     }
   });
 
-  const server = createServer(app);
-
-  if (process.env.NODE_ENV !== "production") {
+  if (!isE2E && process.env.NODE_ENV !== "production") {
     const { createViteForDev } = await import("./vite");
     await createViteForDev(app, server);
-  } else {
+  } else if (process.env.NODE_ENV === "production") {
     const { serveStatic } = await import("./vite");
     await serveStatic(app);
   }
@@ -280,8 +277,10 @@ app.get('/healthz', (_req: Request, res: Response) => {
   let migrationsCompleted = false;
   let migrationsAttempted = false;
 
-  // Initialize database with migrations
-  if (process.env.NODE_ENV !== 'production' || process.env.FORCE_DB_MIGRATIONS === 'true') {
+  const shouldAttemptMigrations =
+    !isE2E && (process.env.NODE_ENV !== 'production' || process.env.FORCE_DB_MIGRATIONS === 'true');
+
+  if (shouldAttemptMigrations) {
     migrationsAttempted = true;
     const { seedManager } = await import('./seed-manager');
     const { initializeDatabase } = await import('./db');
@@ -292,11 +291,10 @@ app.get('/healthz', (_req: Request, res: Response) => {
       const migrationManager = getMigrationManager();
       await migrationManager.runAllPendingMigrations(); // Run all migrations, including rental
 
-      // Initialize database only in development or when explicitly requested
       const shouldInitializeDB =
         process.env.NODE_ENV !== 'production' || process.env.FORCE_DB_INIT === 'true';
       const shouldSeedDB =
-        process.env.NODE_ENV === 'development' || process.env.FORCE_DB_SEED === 'true';
+        !isE2E && (process.env.NODE_ENV === 'development' || process.env.FORCE_DB_SEED === 'true');
 
       if (shouldInitializeDB) {
         console.log('Initializing database...');
@@ -314,6 +312,8 @@ app.get('/healthz', (_req: Request, res: Response) => {
         }
       } else if (env.NODE_ENV === 'production') {
         console.log('⚠️ Seeding skipped in production environment');
+      } else if (isE2E) {
+        console.log('⚠️ Skipping full seed in E2E mode; assuming database prepared upstream');
       }
 
       console.log('✅ Database initialization completed');
@@ -326,6 +326,9 @@ app.get('/healthz', (_req: Request, res: Response) => {
       // In production without FORCE flag just continue running
     }
   } else {
+    if (isE2E) {
+      console.log('⏭️  Skipping migrations in E2E mode');
+    }
     migrationsCompleted = true;
   }
 
@@ -333,19 +336,20 @@ app.get('/healthz', (_req: Request, res: Response) => {
     console.warn('⚠️ Server not marked ready because migrations did not complete successfully.');
   }
 
-  if (migrationsCompleted) {
-    isReady = true;
-  }
-
-  // Seed rental data
-
-  // Routes already registered above; avoid double-registration.
-
   // ALWAYS serve the app on port 5000
   // this serves both the API and the client.
   // It is the only port that is not firewalled.
   const PORT = Number(process.env.PORT ?? 5000);
-  server.listen(PORT, "0.0.0.0", () => {
-    console.log(`🚀 API listening on http://localhost:${PORT}`);
+  await new Promise<void>(resolve => {
+    server.listen(PORT, "0.0.0.0", () => {
+      isReady = true;
+      console.log(`🚀 API listening on http://localhost:${PORT}`);
+      resolve();
+    });
   });
-})();
+}
+
+boot().catch(error => {
+  console.error('Failed to start server', error);
+  process.exit(1);
+});
