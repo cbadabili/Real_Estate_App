@@ -1,12 +1,10 @@
 import { test, expect } from '@playwright/test';
-import { createProperty, registerUser } from './utils/api';
-
-const uniqueEmail = () => `agent-${Date.now()}-${Math.random().toString(16).slice(2)}@example.com`;
+import { createProperty, registerUser, uniqueEmail } from './utils/api';
 
 test.describe('Anonymous discovery experience', () => {
   test('searching by district with filters surfaces seeded listing metadata', async ({ request }) => {
     const auth = await registerUser(request, {
-      email: uniqueEmail(),
+      email: uniqueEmail('agent'),
       password: 'Secure!123',
       userType: 'agent'
     });

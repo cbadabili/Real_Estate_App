@@ -1,11 +1,10 @@
 {
   "ci": {
     "collect": {
-      "staticDistDir": "dist",
       "url": [
-        "/properties",
-        "/properties/1",
-        "/services"
+        "http://127.0.0.1:5000/properties",
+        "http://127.0.0.1:5000/properties/1",
+        "http://127.0.0.1:5000/services"
       ],
       "numberOfRuns": 3,
       "settings": {

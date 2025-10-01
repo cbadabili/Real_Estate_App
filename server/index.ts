@@ -1,5 +1,4 @@
 import express, { type Request, Response } from "express";
-import { createServer } from "http";
 import cors, { type CorsOptions } from "cors";
 import helmet from "helmet";
 import permissionsPolicy from "permissions-policy";
@@ -21,9 +20,8 @@ import heroRoutes from "./hero-routes";
 import analyticsRoutes from "./analytics-routes";
 
 const app = express();
-const server = createServer(app);
 
-let isReady = false;
+let READY = false;
 
 // Configure trust proxy for Replit
 app.set('trust proxy', 1);
@@ -157,11 +155,10 @@ app.get('/api/health', (_req: Request, res: Response) => {
 });
 
 app.get('/healthz', (_req: Request, res: Response) => {
-  res.status(isReady ? 200 : 503).send(isReady ? 'ok' : 'starting');
+  res.status(READY ? 200 : 503).send(READY ? 'ok' : 'starting');
 });
 
 async function boot() {
-  // Test database connection before starting server
   console.log('Testing database connection...');
   const dbConnected = await testDatabaseConnection();
   if (!dbConnected) {
@@ -170,28 +167,21 @@ async function boot() {
   }
 
   const isE2E = process.env.E2E === 'true';
+  const nodeEnv = process.env.NODE_ENV ?? 'development';
 
-  // Apply rate limiting to sensitive endpoints BEFORE registering routes
   app.use('/api/users/login', authWriteLimiter);
   app.use('/api/users/register', authWriteLimiter);
-
-  // Apply general rate limiting to all API routes
   app.use('/api', generalApiLimiter);
-
-  // Apply write limiting to write operations
   app.use('/api/properties', writeApiLimiter);
   app.use('/api/services', writeApiLimiter);
   app.use('/api/rentals', writeApiLimiter);
   app.use('/api/inquiries', writeApiLimiter);
   app.use('/api/appointments', writeApiLimiter);
   app.use('/api/hero', writeApiLimiter);
-
-  // Apply search limiting
   app.use('/api/search', searchLimiter);
   app.use('/api/suggest', searchLimiter);
   app.use('/intel', searchLimiter);
 
-  // Register modular route bundles (auth, users, properties, search, etc.)
   registerAllRoutes(app);
 
   const rentalRoutes = createRentalRoutes();
@@ -201,17 +191,13 @@ async function boot() {
   app.use('/api', tenantSupportRoutes);
   app.use('/api/services', servicesRoutes);
   app.use('/api', marketplaceRoutes);
-
-  // Register billing and hero routes
   app.use('/api/billing', billingRoutes);
   app.use('/api/hero', heroRoutes);
   app.use('/api/analytics', analyticsRoutes);
 
-  // OpenAI-powered Intel adapter routes
   app.post('/intel/search', intelSearch);
   app.get('/intel/suggest', intelSuggest);
 
-  // Mount API documentation
   try {
     const { docsRouter } = await import('./routes/docs');
     app.use('/api/docs', docsRouter);
@@ -221,17 +207,14 @@ async function boot() {
     console.warn('⚠️ Could not mount API docs:', message);
   }
 
-  // Analytics endpoint
   app.post('/api/analytics/events', async (req, res) => {
     try {
       const { event, properties, userId, timestamp, sessionId, page, referrer, userAgent } = req.body;
 
-      // Validate required fields
       if (!event) {
         return res.status(400).json({ error: 'Event name is required' });
       }
 
-      // Store analytics event (you can extend this to use a proper analytics service)
       const analyticsEvent = {
         id: Math.random().toString(36).substring(2, 15),
         event,
@@ -245,13 +228,9 @@ async function boot() {
         createdAt: new Date().toISOString()
       };
 
-      // In development, log to console
-      if (process.env.NODE_ENV === 'development') {
+      if (nodeEnv === 'development') {
         console.log('📊 Analytics Event:', JSON.stringify(analyticsEvent, null, 2));
       }
-
-      // TODO: Store in database or send to analytics service
-      // For now, we'll just acknowledge receipt
 
       res.json({ success: true, eventId: analyticsEvent.id });
     } catch (error) {
@@ -260,90 +239,59 @@ async function boot() {
     }
   });
 
-  if (!isE2E && process.env.NODE_ENV !== "production") {
-    const { createViteForDev } = await import("./vite");
-    await createViteForDev(app, server);
-  } else if (process.env.NODE_ENV === "production") {
-    const { serveStatic } = await import("./vite");
-    await serveStatic(app);
+  if (!isE2E && nodeEnv !== 'production') {
+    const { createViteForDev } = await import('./vite');
+    await createViteForDev(app);
+  } else if (nodeEnv === 'production') {
+    const { serveStatic } = await import('./vite');
+    const served = await serveStatic(app);
+    if (served) {
+      console.log('📦 Serving static SPA from /dist');
+    }
   }
 
-  // 404 handler must come AFTER Vite setup so frontend serving works
   app.use(notFoundHandler);
-
-  // Global error handler must come last
   app.use(errorHandler);
 
-  let migrationsCompleted = false;
-  let migrationsAttempted = false;
+  const shouldRunMigrations = !isE2E || process.env.FORCE_DB_MIGRATIONS === 'true';
 
-  const shouldAttemptMigrations =
-    !isE2E && (process.env.NODE_ENV !== 'production' || process.env.FORCE_DB_MIGRATIONS === 'true');
-
-  if (shouldAttemptMigrations) {
-    migrationsAttempted = true;
-    const { seedManager } = await import('./seed-manager');
-    const { initializeDatabase } = await import('./db');
-    const { getMigrationManager } = await import('./migration-manager');
-
+  if (shouldRunMigrations) {
     try {
       console.log('🔄 Running database migrations...');
+      const { getMigrationManager } = await import('./migration-manager');
       const migrationManager = getMigrationManager();
-      await migrationManager.runAllPendingMigrations(); // Run all migrations, including rental
+      await migrationManager.runAllPendingMigrations();
+      console.log('✅ Database migrations completed');
 
-      const shouldInitializeDB =
-        process.env.NODE_ENV !== 'production' || process.env.FORCE_DB_INIT === 'true';
-      const shouldSeedDB =
-        !isE2E && (process.env.NODE_ENV === 'development' || process.env.FORCE_DB_SEED === 'true');
-
-      if (shouldInitializeDB) {
-        console.log('Initializing database...');
-        await initializeDatabase();
-      }
-
-      if (shouldSeedDB && env.NODE_ENV !== 'production') {
-        console.log('Seeding database...');
+      const shouldSeed = !isE2E && (nodeEnv === 'development' || process.env.FORCE_DB_SEED === 'true');
+      if (shouldSeed) {
         try {
+          const { seedManager } = await import('./seed-manager');
+          console.log('Seeding database...');
           await seedManager.seedAll();
           console.log('✅ Database seeding completed');
-        } catch (error) {
-          console.error('❌ Database seeding failed:', error);
-          // Don't exit in development, just log the error
+        } catch (seedError) {
+          console.error('❌ Database seeding failed:', seedError);
         }
-      } else if (env.NODE_ENV === 'production') {
+      } else if (nodeEnv === 'production') {
         console.log('⚠️ Seeding skipped in production environment');
       } else if (isE2E) {
         console.log('⚠️ Skipping full seed in E2E mode; assuming database prepared upstream');
       }
-
-      console.log('✅ Database initialization completed');
-      migrationsCompleted = true;
     } catch (error) {
       console.error('❌ Database initialization failed:', error);
-      if (process.env.NODE_ENV !== 'production' || process.env.FORCE_DB_MIGRATIONS === 'true') {
-        process.exit(1);
-      }
-      // In production without FORCE flag just continue running
+      process.exit(1);
     }
   } else {
-    if (isE2E) {
-      console.log('⏭️  Skipping migrations in E2E mode');
-    }
-    migrationsCompleted = true;
+    console.log('⏭️  Skipping migrations in E2E mode');
   }
 
-  if (migrationsAttempted && !migrationsCompleted) {
-    console.warn('⚠️ Server not marked ready because migrations did not complete successfully.');
-  }
-
-  // ALWAYS serve the app on port 5000
-  // this serves both the API and the client.
-  // It is the only port that is not firewalled.
   const PORT = Number(process.env.PORT ?? 5000);
-  await new Promise<void>(resolve => {
-    server.listen(PORT, "0.0.0.0", () => {
-      isReady = true;
-      console.log(`🚀 API listening on http://localhost:${PORT}`);
+  const HOST = process.env.HOST ?? '0.0.0.0';
+  await new Promise<void>((resolve) => {
+    app.listen(PORT, HOST, () => {
+      READY = true;
+      console.log(`🚀 API listening on http://${HOST}:${PORT}`);
       resolve();
     });
   });

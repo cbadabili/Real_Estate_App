@@ -8,6 +8,9 @@ export interface RegisterUserInput {
   userType?: 'buyer' | 'seller' | 'agent' | 'landlord';
 }
 
+export const uniqueEmail = (prefix = 'e2e') =>
+  `${prefix}+${Date.now()}-${Math.random().toString(36).slice(2, 8)}@example.com`;
+
 export interface AuthContext {
   token: string;
   userId: string | number;

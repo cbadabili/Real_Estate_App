@@ -149,19 +149,25 @@ export async function createViteForDev(app: Express, server?: Server) {
   });
 }
 
-export async function serveStatic(app: Express) {
-  const distPath = path.resolve(dirname, "..", "dist", "public");
-
-  app.use(express.static(distPath));
-
+export async function serveStatic(app: Express): Promise<boolean> {
+  const distPath = path.resolve(dirname, "..", "dist");
   const indexPath = path.resolve(distPath, "index.html");
 
   try {
     await fs.access(indexPath);
-    app.use("*", (_req: Request, res: Response) => {
-      res.sendFile(indexPath);
-    });
   } catch {
     log("Static build not found; skipping SPA fallback", "static");
+    return false;
   }
+
+  app.use(express.static(distPath));
+  app.get("*", (req: Request, res: Response, next: NextFunction) => {
+    if (req.path.startsWith("/api")) {
+      return next();
+    }
+    res.sendFile(indexPath);
+  });
+
+  log("Serving prebuilt frontend from dist", "static");
+  return true;
 }

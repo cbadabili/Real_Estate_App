@@ -1,7 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { createProperty, registerUser, saveFavorite, unsaveFavorite, scheduleViewing } from './utils/api';
-
-const uniqueEmail = (prefix: string) => `${prefix}-${Date.now()}-${Math.random().toString(16).slice(2)}@example.com`;
+import { createProperty, registerUser, saveFavorite, unsaveFavorite, scheduleViewing, uniqueEmail } from './utils/api';
 
 test.describe('Buyer engagement journeys', () => {
   test('buyer can save listings, schedule viewings, and manage state', async ({ request }) => {

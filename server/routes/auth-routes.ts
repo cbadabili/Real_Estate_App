@@ -1,94 +1,114 @@
 import type { Express } from "express";
+import bcrypt from "bcrypt";
 import { storage } from "../storage";
-import { insertUserSchema } from "../../shared/schema";
 import { generateToken, authenticate } from "../auth-middleware";
-import bcrypt from 'bcrypt';
+import { createDefaultEntitlements } from "../entitlements-service";
+import type { InsertUser } from "../../shared/schema";
 
 export function registerAuthRoutes(app: Express) {
   // User registration
   app.post("/api/users/register", async (req, res) => {
     try {
-      console.log('Registration request received');
-
-      const { username, email, password, firstName, lastName, phone, bio, reacNumber, acceptTerms, acceptMarketing } = req.body;
+      const {
+        username,
+        email,
+        password,
+        firstName,
+        lastName,
+        phone,
+        bio,
+        reacNumber,
+        acceptTerms,
+        userType,
+      } = req.body ?? {};
 
       if (!email || !password || !firstName || !lastName) {
         return res.status(400).json({
-          message: "Email, password, first name, and last name are required"
+          message: "Email, password, first name, and last name are required",
         });
       }
 
       if (!acceptTerms) {
         return res.status(400).json({
-          message: "You must accept the Terms of Service and Privacy Policy"
+          message: "You must accept the Terms of Service and Privacy Policy",
         });
       }
 
-      // Validate email format
+      const normalizedEmail = String(email).trim().toLowerCase();
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(email)) {
+      if (!emailRegex.test(normalizedEmail)) {
         return res.status(400).json({ message: "Invalid email format" });
       }
 
-      // Validate password strength
-      if (password.length < 6) {
+      if (String(password).length < 6) {
         return res.status(400).json({ message: "Password must be at least 6 characters long" });
       }
 
-      // Check if user already exists
-      const existingUser = await storage.getUserByEmail(email.toLowerCase());
+      const existingUser = await storage.getUserByEmail(normalizedEmail);
       if (existingUser) {
-        return res.status(400).json({
-          message: "User with this email already exists"
-        });
+        return res.status(409).json({ message: "Email already registered" });
       }
 
-      // Hash password
-      const hashedPassword = await bcrypt.hash(password, 10);
+      const allowedUserTypes = new Set(["buyer", "seller", "agent", "landlord"]);
+      const normalizedUserType = typeof userType === "string" && allowedUserTypes.has(userType.toLowerCase())
+        ? userType.toLowerCase()
+        : "buyer";
 
-      // Generate username if not provided
-      const finalUsername = username || `${firstName.toLowerCase()}_${lastName.toLowerCase()}_${Date.now()}`;
+      const hashedPassword = await bcrypt.hash(String(password), 10);
+      const safeUsername = username
+        ? String(username)
+        : `${String(firstName).toLowerCase()}_${String(lastName).toLowerCase()}_${Date.now()}`;
 
-      // Create user data with secure defaults - ignore client-provided security flags
-      const userData: any = {
-        username: finalUsername,
-        email: email.toLowerCase(), // Normalize email consistently
+      const userData: InsertUser = {
+        username: safeUsername,
+        email: normalizedEmail,
         password: hashedPassword,
-        firstName,
-        lastName,
-        phone,
-        userType: 'buyer', // Always default to buyer, admin upgrades require manual approval
-        role: 'user', // Always default to user role, never allow client to set admin roles
-        permissions: JSON.stringify([]), // Default empty permissions
-        bio,
-        reacNumber,
-        acceptMarketing: acceptMarketing || false,
-        isActive: true, // Allow immediate activation for basic users
-        isVerified: false, // Always require email verification
-        createdAt: Math.floor(Date.now() / 1000),
-        updatedAt: Math.floor(Date.now() / 1000)
+        firstName: String(firstName),
+        lastName: String(lastName),
+        phone: phone ? String(phone) : null,
+        userType: normalizedUserType,
+        role: "user",
+        permissions: [],
+        bio: bio ? String(bio) : null,
+        reacNumber: reacNumber ? String(reacNumber) : null,
+        isActive: true,
+        isVerified: false,
+        lastLoginAt: null,
+        avatar: null,
       };
-
-      console.log('Creating user with secure defaults');
 
       const user = await storage.createUser(userData);
 
-      console.log('User created successfully');
-
-      const { password: _, ...userResponse } = user;
-      res.status(201).json({
-      success: true,
-      user: {
-        id: user.id,
-        email: user.email,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        userType: user.userType
+      if (process.env.E2E !== "true") {
+        try {
+          await createDefaultEntitlements(user.id, userData.userType);
+        } catch (entitlementError) {
+          const reason = entitlementError instanceof Error ? entitlementError.message : String(entitlementError);
+          console.warn(`entitlements non-fatal: ${reason}`);
+        }
       }
-    });
+
+      const token = generateToken(user);
+
+      return res.status(201).json({
+        success: true,
+        token,
+        user: {
+          id: user.id,
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          userType: user.userType,
+        },
+      });
     } catch (error) {
-      console.error("Registration error:", error);
-      res.status(500).json({ message: "Registration failed" });
+      const code = typeof error === "object" && error && "code" in error ? (error as { code?: string }).code : undefined;
+      if (code === "23505") {
+        return res.status(409).json({ message: "Email already registered" });
+      }
+      const reason = error instanceof Error ? error.message : String(error);
+      console.error("Registration error:", reason);
+      return res.status(500).json({ message: "Registration failed" });
     }
   });
 
