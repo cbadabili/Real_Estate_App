@@ -21,7 +21,9 @@ export async function seedRentals() {
   }
 
   // Get existing users for landlord IDs
-  const landlords = await db.select({id: users.id})
+  type LandlordUser = { id: number };
+
+  const landlords: LandlordUser[] = await db.select({ id: users.id })
     .from(users)
     .where(inArray(users.userType, ['agent', 'fsbo', 'seller']))
     .orderBy(asc(users.id));
@@ -31,7 +33,7 @@ export async function seedRentals() {
     return;
   }
   
-  console.log(`Found ${landlords.length} eligible landlords with IDs: ${landlords.map((landlord) => landlord.id).join(', ')}`);
+  console.log(`Found ${landlords.length} eligible landlords with IDs: ${landlords.map((landlord: LandlordUser) => landlord.id).join(', ')}`);
   
   const getLandlordId = (i: number) => landlords[i % landlords.length]!.id;
 

@@ -100,7 +100,9 @@ export async function seedProperties() {
   }
 
   // Get existing users for owner/agent IDs
-  const eligibleUsers = await db.select({id: users.id, userType: users.userType})
+  type EligibleUser = { id: number; userType: string };
+
+  const eligibleUsers: EligibleUser[] = await db.select({ id: users.id, userType: users.userType })
     .from(users)
     .where(inArray(users.userType, ['agent', 'fsbo', 'seller', 'buyer']))
     .orderBy(asc(users.id));
@@ -110,10 +112,10 @@ export async function seedProperties() {
     return;
   }
 
-  console.log(`Found ${eligibleUsers.length} eligible users with IDs: ${eligibleUsers.map((user) => user.id).join(', ')}`);
+  console.log(`Found ${eligibleUsers.length} eligible users with IDs: ${eligibleUsers.map((user: EligibleUser) => user.id).join(', ')}`);
 
   const totalUsers = eligibleUsers.length;
-  const agentPool = eligibleUsers.filter((user) => user.userType === 'agent');
+  const agentPool = eligibleUsers.filter((user: EligibleUser) => user.userType === 'agent');
   const fallbackPool = agentPool.length > 0 ? agentPool : eligibleUsers;
 
   const getOwnerId = (i: number) => eligibleUsers[i % totalUsers]!.id;
