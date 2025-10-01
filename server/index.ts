@@ -319,8 +319,8 @@ app.get('/api/health', (_req: Request, res: Response) => {
   // ALWAYS serve the app on port 5000
   // this serves both the API and the client.
   // It is the only port that is not firewalled.
-  const port = Number(process.env.PORT) || 5000; // Default to 5000 for Replit/Vite compatibility
-  server.listen(port, "0.0.0.0", () => {
-    console.log(`serving on port ${port}`);
+  const PORT = Number(process.env.PORT ?? 5000);
+  server.listen(PORT, "0.0.0.0", () => {
+    console.log(`🚀 API listening on http://localhost:${PORT}`);
   });
 })();
