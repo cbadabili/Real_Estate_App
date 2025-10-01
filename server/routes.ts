@@ -1995,7 +1995,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
       };
 
       // Process properties to ensure valid coordinates and match expected interface
-      const processedResult = result.map((prop) => {
+      type RawSearchProperty = {
+        id: number;
+        title: string | null;
+        description: string | null;
+        price: number | string | null;
+        latitude: number | string | null;
+        longitude: number | string | null;
+        bedrooms: number | null;
+        bathrooms: number | string | null;
+        address: string | null;
+        city: string | null;
+        state: string | null;
+        propertyType: string | null;
+        images: unknown;
+        status: string | null;
+        listingType: string | null;
+      };
+
+      const processedResult = result.map((prop: RawSearchProperty) => {
         let lat = prop.latitude;
         let lng = prop.longitude;
 
@@ -2051,7 +2069,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
 
       console.log(`Found ${processedResult.length} properties`);
-      processedResult.forEach((prop) => {
+      processedResult.forEach((prop: (typeof processedResult)[number]) => {
         console.log(`Property ${prop.id}: lat=${prop.latitude}, lng=${prop.longitude}, title="${prop.title}"`);
       });
 
