@@ -62,7 +62,14 @@ router.get('/tenant-support/resources', async (req, res) => {
 router.post('/tenant-support/complaint', authenticate, async (req, res) => {
   try {
     const { subject, description, category, propertyId } = req.body;
-    
+
+    if (!req.user) {
+      return res.status(401).json({
+        success: false,
+        error: 'Authentication required'
+      });
+    }
+
     const complaint = {
       id: Math.floor(Math.random() * 1000),
       subject,

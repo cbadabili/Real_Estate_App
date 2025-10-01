@@ -678,17 +678,26 @@ async function importSettlements() {
   const allSettlements = [...settlementsData, ...censusSettlements];
 
   // Convert settlement data with district foreign keys
-  const settlementsWithDistrictIds = allSettlements.map(settlement => ({
-    district_id: districtMap.get(settlement.district)!,
-    name: settlement.name,
-    type: settlement.type,
-    population: settlement.population,
-    growth_rate: null, // Can be calculated later if needed
-    latitude: settlement.latitude,
-    longitude: settlement.longitude,
-    post_code: settlement.post_code,
-    is_major: settlement.is_major
-  }));
+  const settlementsWithDistrictIds = allSettlements.flatMap(settlement => {
+    const districtId = districtMap.get(settlement.district);
+    const name = settlement.name;
+
+    if (!districtId || !name) {
+      return [];
+    }
+
+    return [{
+      district_id: districtId,
+      name,
+      type: settlement.type,
+      population: settlement.population,
+      growth_rate: null,
+      latitude: settlement.latitude,
+      longitude: settlement.longitude,
+      post_code: settlement.post_code,
+      is_major: settlement.is_major ?? false,
+    }];
+  });
 
   await db.insert(settlements).values(settlementsWithDistrictIds)
     .onConflictDoUpdate({

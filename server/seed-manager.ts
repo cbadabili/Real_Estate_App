@@ -156,7 +156,7 @@ export class SeedManager {
         years_experience: 15,
         isVerified: true,
         isFeatured: true,
-        reac_certified: 1,
+        reac_certified: true,
         business_address: "Plot 12345, CBD, Gaborone",
         operating_hours: JSON.stringify({"monday": "08:00-17:00", "tuesday": "08:00-17:00", "wednesday": "08:00-17:00", "thursday": "08:00-17:00", "friday": "08:00-17:00", "saturday": "09:00-14:00", "sunday": "closed"}),
         service_radius: 50,
@@ -165,17 +165,7 @@ export class SeedManager {
         projects_completed: 450,
         response_time: 2,
         availability_status: "available",
-        minimum_project_size: 50000,
-        maximum_project_size: 5000000,
-        hourly_rate: 15000,
-        emergency_services: 1,
-        warranty_period: 12,
-        payment_terms: JSON.stringify(["50% upfront", "50% on completion"]),
-        payment_methods: JSON.stringify(["Cash", "Bank Transfer", "Orange Money"]),
-        portfolio_images: JSON.stringify(["/images/portfolio/bw-prime-1.jpg", "/images/portfolio/bw-prime-2.jpg"]),
-        certifications: JSON.stringify(["REAC Certified", "BQA Approved"]),
-        languages_spoken: JSON.stringify(["English", "Setswana"]),
-        team_size: 8
+        status: "active"
       },
       {
         user_id: allUsers.find(u => u.username === "mpho_supplier")?.id,
@@ -199,17 +189,8 @@ export class SeedManager {
         projects_completed: 300,
         response_time: 4,
         availability_status: "available",
-        minimum_project_size: 10000,
-        maximum_project_size: 2000000,
-        daily_rate: 50000,
-        emergency_services: 1,
-        warranty_period: 6,
-        payment_terms: JSON.stringify(["30% deposit", "70% on delivery"]),
-        payment_methods: JSON.stringify(["Cash", "Bank Transfer", "Credit Card"]),
-        portfolio_images: JSON.stringify(["/images/portfolio/kalahari-1.jpg", "/images/portfolio/kalahari-2.jpg"]),
-        certifications: JSON.stringify(["ISO 9001", "Building Materials Council Certified"]),
-        languages_spoken: JSON.stringify(["English", "Setswana", "Afrikaans"]),
-        team_size: 15
+        status: "active",
+        reac_certified: false
       }
     ];
 
@@ -225,14 +206,14 @@ export class SeedManager {
       await this.seedServiceCategories();
       await this.seedMarketplaceProviders();
 
-  // Seed services
-  await seedServices(db);
+      // Seed services
+      await seedServices();
 
-  // Seed marketplace
-  await seedMarketplace(db);
+      // Seed marketplace
+      await seedMarketplace();
 
-  // Seed rentals
-  await seedRentals();
+      // Seed rentals
+      await seedRentals();
 
       // Seed billing
       await seedBilling();

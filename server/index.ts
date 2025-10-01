@@ -1,23 +1,24 @@
 import express, { type Request, Response } from "express";
 import { createServer } from "http";
+import cors, { type CorsOptions } from "cors";
+import helmet from "helmet";
+import permissionsPolicy from "permissions-policy";
+import rateLimit from "express-rate-limit";
 import { testDatabaseConnection } from "./db";
 import { registerAllRoutes } from "./routes/index";
-import { createRentalRoutes } from './rental-routes';
-import servicesRoutes from './services-routes';
-import marketplaceRoutes from './marketplace-routes';
-import aiSearchRoutes from './ai-search';
-import tenantSupportRoutes from './tenant-support-routes';
-import propertyManagementRoutes from './property-management-routes';
-import { intelSearch, intelSuggest } from './intel-adapter';
-import { errorHandler, notFoundHandler } from './middleware/error';
-import { env } from './utils/env';
-import helmet from 'helmet';
-import cors from 'cors';
-import rateLimit from 'express-rate-limit';
-import { addRequestId, structuredLogger } from './middleware/logging';
-import billingRoutes from './billing-routes';
-import heroRoutes from './hero-routes';
-import analyticsRoutes from './analytics-routes';
+import { createRentalRoutes } from "./rental-routes";
+import servicesRoutes from "./services-routes";
+import marketplaceRoutes from "./marketplace-routes";
+import aiSearchRoutes from "./ai-search";
+import tenantSupportRoutes from "./tenant-support-routes";
+import propertyManagementRoutes from "./property-management-routes";
+import { intelSearch, intelSuggest } from "./intel-adapter";
+import { errorHandler, notFoundHandler } from "./middleware/error";
+import { env } from "./utils/env";
+import { addRequestId, structuredLogger } from "./middleware/logging";
+import billingRoutes from "./billing-routes";
+import heroRoutes from "./hero-routes";
+import analyticsRoutes from "./analytics-routes";
 
 const app = express();
 
@@ -32,68 +33,75 @@ if (!process.env.NODE_ENV) {
 }
 
 // Security middleware
-app.use(helmet({
-  contentSecurityPolicy: isDevelopment
-    ? false
-    : {
-        useDefaults: true,
-        directives: {
-          "default-src": ["'self'"],
-          "base-uri": ["'self'"],
-          "object-src": ["'none'"],
-          "script-src": ["'self'"],
-          "style-src": ["'self'"],
-          "img-src": ["'self'", "data:", "https:"],
-          "connect-src": ["'self'", "https:", "wss:"],
-          "frame-ancestors": ["'self'"],
-          "upgrade-insecure-requests": [],
+app.use(
+  helmet({
+    contentSecurityPolicy: isDevelopment
+      ? false
+      : {
+          useDefaults: true,
+          directives: {
+            "default-src": ["'self'"],
+            "base-uri": ["'self'"],
+            "object-src": ["'none'"],
+            "script-src": ["'self'"],
+            "style-src": ["'self'"],
+            "img-src": ["'self'", "data:", "https:"],
+            "connect-src": ["'self'", "https:", "wss:"],
+            "frame-ancestors": ["'self'"],
+            "upgrade-insecure-requests": [],
+          },
         },
-      },
-  referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
-  crossOriginOpenerPolicy: { policy: 'same-origin' },
-  xPermittedCrossDomainPolicies: { permittedPolicies: 'none' },
-  permissionsPolicy: {
+    referrerPolicy: { policy: "strict-origin-when-cross-origin" },
+    crossOriginOpenerPolicy: { policy: "same-origin" },
+    xPermittedCrossDomainPolicies: { permittedPolicies: "none" },
+  }),
+);
+
+app.use(
+  permissionsPolicy({
     features: {
-      camera: ["'self'"],
-      microphone: [],
-      geolocation: ["'self'"],
-      fullscreen: ["'self'"],
-      payment: [],
-      usb: [],
-      magnetometer: [],
-      accelerometer: [],
-      gyroscope: [],
+      geolocation: ["self"],
+      fullscreen: ["self"],
     },
-  },
-}));
+  }),
+);
 
 const allowedOrigins = env.CORS_ORIGIN
-  ?.split(',')
+  ?.split(",")
   .map(origin => origin.trim())
   .filter(Boolean);
 
-const allowAllOrigins = allowedOrigins?.includes('*');
+const allowAllOrigins = allowedOrigins?.includes("*");
 
-app.use(cors({
-  origin: (origin, callback) => {
+const corsOptions: CorsOptions = {
+  origin(origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) {
     if (!origin) {
-      return callback(null, true);
+      callback(null, true);
+      return;
     }
+
     if (allowAllOrigins) {
-      return callback(null, true);
+      callback(null, true);
+      return;
     }
 
     if (!allowedOrigins?.length) {
-      return callback(null, isDevelopment ? true : false);
+      callback(null, isDevelopment);
+      return;
     }
+
     if (allowedOrigins.includes(origin)) {
-      return callback(null, true);
+      callback(null, true);
+      return;
     }
+
     console.warn(`Blocked CORS origin: ${origin}`);
-    return callback(null, false);
+    callback(null, false);
   },
   credentials: true,
-}));
+};
+
+app.use(cors(corsOptions));
 
 // Add request ID and structured logging
 app.use(addRequestId);
@@ -245,16 +253,11 @@ app.get('/api/health', (_req: Request, res: Response) => {
 
   const server = createServer(app);
 
-  // importantly only setup vite in development and after
-  // setting up all the other routes so the catch-all route
-  // doesn't interfere with the other routes
-  app.use('/api', notFoundHandler);
-
-  if (process.env.NODE_ENV === "development") {
-    const { setupVite } = await import('./vite');
-    await setupVite(app, server);
+  if (process.env.NODE_ENV !== "production") {
+    const { createViteForDev } = await import("./vite");
+    await createViteForDev(app, server);
   } else {
-    const { serveStatic } = await import('./vite');
+    const { serveStatic } = await import("./vite");
     await serveStatic(app);
   }
 

@@ -1,7 +1,7 @@
 import {
   properties,
   type Property,
-  type InsertProperty
+  type InsertProperty,
 } from "../../shared/schema";
 import { db } from "../db";
 import { eq, and, desc, asc, gte, lte, ilike, or, sql, type SQL } from "drizzle-orm";
@@ -75,6 +75,8 @@ const parseCoordinate = (value: unknown): number | null | undefined => {
   return toCoord(value);
 };
 
+type PropertyInsertRecord = typeof properties.$inferInsert;
+
 const buildGeomValue = (latitude: number | null, longitude: number | null) => {
   if (latitude === null || longitude === null) {
     return null;
@@ -87,22 +89,19 @@ const buildGeomUpdateValue = (
   latitude: number | null | undefined,
   longitude: number | null | undefined,
 ) => {
-  const latitudeExpression = latitude === undefined
-    ? sql`${properties.latitude}`
-    : latitude === null
-      ? sql`NULL`
-      : sql`${latitude}`;
+  if (latitude === undefined && longitude === undefined) {
+    return undefined;
+  }
 
-  const longitudeExpression = longitude === undefined
-    ? sql`${properties.longitude}`
-    : longitude === null
-      ? sql`NULL`
-      : sql`${longitude}`;
+  if (latitude === null || longitude === null) {
+    return sql`NULL`;
+  }
 
-  return sql`CASE
-    WHEN ${latitudeExpression} IS NULL OR ${longitudeExpression} IS NULL THEN NULL
-    ELSE ST_SetSRID(ST_MakePoint(${longitudeExpression}, ${latitudeExpression}), 4326)
-  END`;
+  if (latitude === undefined || longitude === undefined) {
+    return undefined;
+  }
+
+  return sql`ST_SetSRID(ST_MakePoint(${longitude}, ${latitude}), 4326)`;
 };
 
 const toFiniteNumber = (value: unknown): number | undefined => {
@@ -155,11 +154,13 @@ export interface PropertyFilters {
 /**
  * Public contract for interacting with persisted property records.
  */
+type PropertyInsert = InsertProperty & { latitude?: unknown; longitude?: unknown };
+
 export interface IPropertyRepository {
   getProperty(id: number): Promise<Property | undefined>;
   getProperties(filters?: PropertyFilters): Promise<Property[]>;
-  createProperty(property: InsertProperty): Promise<Property>;
-  updateProperty(id: number, updates: Partial<InsertProperty>): Promise<Property | undefined>;
+  createProperty(property: PropertyInsert): Promise<Property>;
+  updateProperty(id: number, updates: Partial<PropertyInsert>): Promise<Property | undefined>;
   deleteProperty(id: number): Promise<boolean>;
   getUserProperties(userId: number): Promise<Property[]>;
   incrementPropertyViews(id: number): Promise<void>;
@@ -220,7 +221,7 @@ export class PropertyRepository implements IPropertyRepository {
       return cached;
     }
 
-    let query = db.select().from(properties);
+    const baseQuery = db.select().from(properties);
     const conditions: SQL[] = [];
     const orderings: SQL[] = [];
 
@@ -253,26 +254,30 @@ export class PropertyRepository implements IPropertyRepository {
         conditions.push(sql`${properties.fts} @@ ${tsQuery}`);
         orderings.push(sql`ts_rank_cd(${properties.fts}, ${tsQuery}) DESC`);
       } else {
-        conditions.push(
-          or(
-            ilike(properties.title, `%${term}%`),
-            ilike(properties.description, `%${term}%`),
-            ilike(properties.address, `%${term}%`),
-            ilike(properties.city, `%${term}%`)
-          )
+        const fallbackSearch = or(
+          ilike(properties.title, `%${term}%`),
+          ilike(properties.description, `%${term}%`),
+          ilike(properties.address, `%${term}%`),
+          ilike(properties.city, `%${term}%`)
         );
+
+        if (fallbackSearch) {
+          conditions.push(fallbackSearch);
+        }
       }
     } else if (filters.location) {
       const locationTerm = filters.location.trim();
       if (locationTerm) {
-        conditions.push(
-          or(
-            ilike(properties.city, `%${locationTerm}%`),
-            ilike(properties.address, `%${locationTerm}%`),
-            ilike(properties.title, `%${locationTerm}%`),
-            ilike(properties.description, `%${locationTerm}%`)
-          )
+        const locationSearch = or(
+          ilike(properties.city, `%${locationTerm}%`),
+          ilike(properties.address, `%${locationTerm}%`),
+          ilike(properties.title, `%${locationTerm}%`),
+          ilike(properties.description, `%${locationTerm}%`)
         );
+
+        if (locationSearch) {
+          conditions.push(locationSearch);
+        }
       }
     }
 
@@ -293,52 +298,59 @@ export class PropertyRepository implements IPropertyRepository {
       conditions.push(eq(properties.status, filters.status));
     }
 
-    if (conditions.length > 0) {
-      query = query.where(and(...conditions));
-    }
+    const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+    const queryWithWhere = whereClause ? baseQuery.where(whereClause) : baseQuery;
 
-    // Sorting
+    let sortOrderings: SQL[] = [];
+
     if (orderings.length > 0) {
-      query = query.orderBy(...orderings, desc(properties.createdAt));
+      sortOrderings = [...orderings, desc(properties.createdAt)];
     } else if (filters.sortBy) {
       const legacySortOptions = {
-        price_low: { column: properties.price, direction: 'asc' as const },
-        price_high: { column: properties.price, direction: 'desc' as const },
-        newest: { column: properties.createdAt, direction: 'desc' as const },
+        price_low: { column: properties.price, direction: "asc" as const },
+        price_high: { column: properties.price, direction: "desc" as const },
+        newest: { column: properties.createdAt, direction: "desc" as const },
       } as const;
 
       if (filters.sortBy in legacySortOptions) {
         const legacySort = legacySortOptions[filters.sortBy as keyof typeof legacySortOptions];
-        query = legacySort.direction === 'asc'
-          ? query.orderBy(asc(legacySort.column))
-          : query.orderBy(desc(legacySort.column));
+        sortOrderings = [
+          legacySort.direction === "asc" ? asc(legacySort.column) : desc(legacySort.column),
+        ];
       } else {
-        const sortColumn = {
+        const sortKeyMap = {
           price: properties.price,
           date: properties.createdAt,
           size: properties.squareFeet,
           bedrooms: properties.bedrooms,
-        }[filters.sortBy];
+        } as const;
 
-        if (sortColumn) {
-          query = filters.sortOrder === 'asc' ? query.orderBy(asc(sortColumn)) : query.orderBy(desc(sortColumn));
+        const sortKey = filters.sortBy as keyof typeof sortKeyMap;
+
+        if (sortKey && sortKey in sortKeyMap) {
+          const column = sortKeyMap[sortKey];
+          sortOrderings = [
+            filters.sortOrder === "asc" ? asc(column) : desc(column),
+          ];
         }
       }
-    } else {
-      query = query.orderBy(desc(properties.createdAt));
     }
 
-    // Pagination
-    if (limit !== undefined) {
-      const boundedLimit = Math.min(100, Math.max(0, Math.trunc(limit)));
-      query = query.limit(boundedLimit);
-    }
-    if (offset !== undefined) {
-      const boundedOffset = Math.max(0, Math.trunc(offset));
-      query = query.offset(boundedOffset);
+    if (sortOrderings.length === 0) {
+      sortOrderings = [desc(properties.createdAt)];
     }
 
-    const results = await query;
+    const queryWithOrder = queryWithWhere.orderBy(...sortOrderings);
+
+    const queryWithLimit = limit !== undefined
+      ? queryWithOrder.limit(Math.min(100, Math.max(0, Math.trunc(limit))))
+      : queryWithOrder;
+
+    const finalQuery = offset !== undefined
+      ? queryWithLimit.offset(Math.max(0, Math.trunc(offset)))
+      : queryWithLimit;
+
+    const results = await finalQuery;
 
     const normalizedResults = results.map(normalizePropertyRecord);
     const finalResults = filters.requireValidCoordinates
@@ -368,21 +380,23 @@ export class PropertyRepository implements IPropertyRepository {
    * @param property - Property attributes supplied by the caller.
    * @returns The inserted property with normalization applied.
    */
-  async createProperty(property: InsertProperty): Promise<Property> {
+  async createProperty(property: PropertyInsert): Promise<Property> {
     const latitude = parseCoordinate(property.latitude);
     const longitude = parseCoordinate(property.longitude);
     const normalizedLatitude = latitude ?? null;
     const normalizedLongitude = longitude ?? null;
     const geomValue = buildGeomValue(normalizedLatitude, normalizedLongitude);
 
+    const insertPayload: PropertyInsertRecord = {
+      ...property,
+      latitude: normalizedLatitude ?? undefined,
+      longitude: normalizedLongitude ?? undefined,
+      geom: geomValue === null ? null : geomValue ?? undefined,
+    };
+
     const [newProperty] = await db
       .insert(properties)
-      .values({
-        ...property,
-        latitude: normalizedLatitude,
-        longitude: normalizedLongitude,
-        geom: geomValue,
-      })
+      .values(insertPayload)
       .returning();
 
     cacheService.invalidatePrefix('properties');
@@ -398,8 +412,13 @@ export class PropertyRepository implements IPropertyRepository {
    * @param updates - Subset of property fields to change.
    * @returns The updated property or `undefined` when no record matches.
    */
-  async updateProperty(id: number, updates: Partial<InsertProperty>): Promise<Property | undefined> {
-    const updatePayload: Partial<InsertProperty> & { geom?: SQL } = { ...updates };
+  async updateProperty(id: number, updates: Partial<PropertyInsert>): Promise<Property | undefined> {
+    const updatePayload: Partial<PropertyInsertRecord> = { ...updates };
+
+    // Always recompute geometry from the provided coordinates rather than trusting caller input
+    if ("geom" in updatePayload) {
+      delete (updatePayload as { geom?: unknown }).geom;
+    }
 
     let latitude: number | null | undefined;
     if (Object.prototype.hasOwnProperty.call(updates, "latitude")) {
@@ -421,9 +440,9 @@ export class PropertyRepository implements IPropertyRepository {
       }
     }
 
-    if (Object.prototype.hasOwnProperty.call(updates, "latitude") ||
-        Object.prototype.hasOwnProperty.call(updates, "longitude")) {
-      updatePayload.geom = buildGeomUpdateValue(latitude, longitude);
+    const geomUpdate = buildGeomUpdateValue(latitude, longitude);
+    if (geomUpdate !== undefined) {
+      (updatePayload as { geom?: SQL<unknown> | null }).geom = geomUpdate;
     }
 
     const [property] = await db

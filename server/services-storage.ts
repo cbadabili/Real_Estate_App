@@ -10,7 +10,7 @@ import {
   type InsertServiceReview
 } from "../shared/services-schema";
 import { db } from "./db";
-import { eq, and, desc, asc, like, sql, gte } from "drizzle-orm";
+import { eq, and, desc, asc, like, sql, gte, type SQL } from "drizzle-orm";
 
 export interface IServicesStorage {
   // Service Provider methods
@@ -59,8 +59,8 @@ export class ServicesStorage implements IServicesStorage {
   }
 
   async getServiceProviders(filters: ServiceProviderFilters = {}): Promise<ServiceProvider[]> {
-    let query = db.select().from(serviceProviders);
-    const conditions = [];
+    const baseQuery = db.select().from(serviceProviders);
+    const conditions: SQL<unknown>[] = [];
 
     if (filters.category) {
       conditions.push(eq(serviceProviders.serviceCategory, filters.category));
@@ -84,47 +84,46 @@ export class ServicesStorage implements IServicesStorage {
       }
     }
 
-    if (conditions.length > 0) {
-      query = query.where(and(...conditions));
-    }
+    const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+    const filteredQuery = whereClause ? baseQuery.where(whereClause) : baseQuery;
 
-    // Sorting
-    if (filters.sortBy) {
-      const direction = filters.sortOrder === 'desc' ? desc : asc;
+    const sortDirection = filters.sortOrder === 'desc' ? desc : asc;
+    const orderedQuery = (() => {
+      if (!filters.sortBy) {
+        return filteredQuery.orderBy(desc(serviceProviders.featured), desc(serviceProviders.rating));
+      }
+
       switch (filters.sortBy) {
         case 'rating':
-          query = query.orderBy(direction(serviceProviders.rating));
-          break;
+          return filteredQuery.orderBy(sortDirection(serviceProviders.rating));
         case 'reviewCount':
-          query = query.orderBy(direction(serviceProviders.reviewCount));
-          break;
+          return filteredQuery.orderBy(sortDirection(serviceProviders.reviewCount));
         case 'name':
-          query = query.orderBy(direction(serviceProviders.companyName));
-          break;
+          return filteredQuery.orderBy(sortDirection(serviceProviders.companyName));
         case 'newest':
-          query = query.orderBy(direction(serviceProviders.dateJoined));
-          break;
+          return filteredQuery.orderBy(sortDirection(serviceProviders.dateJoined));
+        default:
+          return filteredQuery;
       }
-    } else {
-      // Default sorting: featured first, then by rating
-      query = query.orderBy(desc(serviceProviders.featured), desc(serviceProviders.rating));
-    }
+    })();
 
-    // Pagination
-    if (filters.limit !== undefined) {
+    const limitedQuery = (() => {
+      if (filters.limit === undefined) {
+        return orderedQuery;
+      }
       const limit = Math.min(100, Math.max(0, Number(filters.limit)));
-      if (Number.isFinite(limit)) {
-        query = query.limit(limit);
-      }
-    }
-    if (filters.offset !== undefined) {
-      const offset = Math.max(0, Number(filters.offset));
-      if (Number.isFinite(offset)) {
-        query = query.offset(offset);
-      }
-    }
+      return Number.isFinite(limit) ? orderedQuery.limit(limit) : orderedQuery;
+    })();
 
-    return await query;
+    const finalQuery = (() => {
+      if (filters.offset === undefined) {
+        return limitedQuery;
+      }
+      const offset = Math.max(0, Number(filters.offset));
+      return Number.isFinite(offset) ? limitedQuery.offset(offset) : limitedQuery;
+    })();
+
+    return await finalQuery;
   }
 
   async getServiceProvidersByCategory(category: string): Promise<ServiceProvider[]> {
@@ -189,13 +188,12 @@ export class ServicesStorage implements IServicesStorage {
   }
 
   async getServiceAds(providerId?: number): Promise<ServiceAd[]> {
-    let query = db.select().from(serviceAds);
+    const baseQuery = db.select().from(serviceAds);
+    const filteredQuery = typeof providerId === 'number'
+      ? baseQuery.where(eq(serviceAds.providerId, providerId))
+      : baseQuery;
 
-    if (providerId) {
-      query = query.where(eq(serviceAds.providerId, providerId));
-    }
-
-    return await query.orderBy(desc(serviceAds.priority), desc(serviceAds.createdAt));
+    return await filteredQuery.orderBy(desc(serviceAds.priority), desc(serviceAds.createdAt));
   }
 
   async createServiceAd(ad: InsertServiceAd): Promise<ServiceAd> {
@@ -244,7 +242,9 @@ export class ServicesStorage implements IServicesStorage {
       .values(review)
       .returning();
 
-    await this.refreshProviderStats(review.providerId);
+    if (typeof review.providerId === 'number') {
+      await this.refreshProviderStats(review.providerId);
+    }
 
     return newReview;
   }

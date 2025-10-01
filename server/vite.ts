@@ -26,13 +26,13 @@ export function log(message: string, source = "express") {
   console.log(`${formattedTime} [${source}] ${message}`);
 }
 
-export async function setupVite(app: Express, server: Server) {
-  const isProduction = (process.env.NODE_ENV ?? "development") === "production";
-
-  if (isProduction) {
+export async function createViteForDev(app: Express, server?: Server) {
+  if (process.env.NODE_ENV === "production") {
     log("Skipping Vite middleware in production mode", "vite");
     return;
   }
+
+  const isProduction = (process.env.NODE_ENV ?? "development") === "production";
 
   let createViteServer: typeof import("vite")['createServer'] | undefined;
   let createLogger: typeof import("vite")['createLogger'] | undefined;
@@ -61,7 +61,7 @@ export async function setupVite(app: Express, server: Server) {
       throw new Error("Vite loadConfigFromFile helper is unavailable");
     }
 
-    const loader = loadConfigFromFile!;
+    const loader = loadConfigFromFile;
     const projectRoot = path.resolve(dirname, "..");
     const configCandidates = [
       undefined,
@@ -69,7 +69,7 @@ export async function setupVite(app: Express, server: Server) {
       path.resolve(projectRoot, "vite.config.js"),
     ];
 
-    let loaded: Awaited<ReturnType<typeof loadConfigFromFile>> | undefined;
+    let loaded: Awaited<ReturnType<typeof loader>> | undefined;
     let lastError: unknown;
     for (const candidate of configCandidates) {
       try {
@@ -83,14 +83,12 @@ export async function setupVite(app: Express, server: Server) {
     }
 
     if (!loaded) {
-      throw lastError instanceof Error ? lastError : new Error(String(lastError ?? 'Unable to load Vite configuration'));
+      throw lastError instanceof Error ? lastError : new Error(String(lastError ?? "Unable to load Vite configuration"));
     }
 
-    const rawConfig = loaded.config ?? {};
-    viteConfig =
-      typeof rawConfig === "function"
-        ? await rawConfig(configEnv)
-        : (rawConfig as InlineConfig);
+    type ViteConfigExport = InlineConfig | ((env: typeof configEnv) => InlineConfig | Promise<InlineConfig>);
+    const rawConfig = (loaded.config ?? {}) as ViteConfigExport;
+    viteConfig = typeof rawConfig === "function" ? await rawConfig(configEnv) : rawConfig;
   } catch (error) {
     const reason = error instanceof Error ? error.message : String(error);
     throw new Error(
@@ -103,11 +101,16 @@ export async function setupVite(app: Express, server: Server) {
   }
 
   const viteLogger = createLogger();
-  const serverOptions = {
+  const serverOptions: NonNullable<InlineConfig["server"]> = {
     middlewareMode: true,
-    hmr: { server },
     allowedHosts: true,
   };
+
+  if (server) {
+    serverOptions.hmr = { server };
+  } else {
+    serverOptions.hmr = true;
+  }
 
   const vite = await createViteServer({
     ...viteConfig,

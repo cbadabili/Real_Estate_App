@@ -1,7 +1,7 @@
 
 import { db } from './db';
 import { rental_listings, rental_applications } from '../shared/schema';
-import { eq, and, gte, lte, like, desc, count, avg, or } from 'drizzle-orm';
+import { eq, and, gte, lte, like, desc, count, avg, type SQL } from 'drizzle-orm';
 
 export interface RentalFilters {
   location?: string;
@@ -56,8 +56,8 @@ export class RentalStorage {
   // Search rentals with filters
   async searchRentals(filters: RentalFilters) {
     try {
-      let query = db.select().from(rental_listings);
-      const conditions = [];
+      const baseQuery = db.select().from(rental_listings);
+      const conditions: (SQL<unknown> | undefined)[] = [];
 
       // Build filter conditions using Drizzle query builder
       if (filters.location) {
@@ -116,12 +116,12 @@ export class RentalStorage {
       }
 
       // Apply conditions if any exist
-      if (conditions.length > 0) {
-        query = query.where(and(...conditions));
-      }
+      const activeConditions = conditions.filter((condition): condition is SQL<unknown> => Boolean(condition));
+      const whereClause = activeConditions.length > 0 ? and(...activeConditions) : undefined;
+      const filteredQuery = whereClause ? baseQuery.where(whereClause) : baseQuery;
 
       console.log('Searching rentals with filters:', filters);
-      const results = await query.orderBy(desc(rental_listings.created_at));
+      const results = await filteredQuery.orderBy(desc(rental_listings.created_at));
       console.log('Found rentals:', results.length);
       
       return results;
@@ -172,7 +172,7 @@ export class RentalStorage {
     try {
       const updateData = {
         ...updates,
-        updated_at: new Date().toISOString()
+        updated_at: new Date()
       };
 
       const result = await db.update(rental_listings)
@@ -209,17 +209,27 @@ export class RentalStorage {
         .where(eq(rental_applications.rental_id, rentalId))
         .orderBy(desc(rental_applications.created_at));
 
-      return applications.map(app => ({
-        id: app.id,
-        rental_id: app.rental_id!,
-        renter_id: app.renter_id!,
-        application_data: app.application_data,
-        status: app.status as 'pending' | 'approved' | 'rejected',
-        background_check_status: app.background_check_status || undefined,
-        credit_report_status: app.credit_report_status || undefined,
-        created_at: app.created_at || undefined,
-        updated_at: app.updated_at || undefined
-      }));
+      return applications.map(app => {
+        const mapped: RentalApplication = {
+          id: app.id,
+          rental_id: app.rental_id ?? 0,
+          renter_id: app.renter_id ?? 0,
+          application_data: app.application_data,
+          status: (app.status as RentalApplication['status']) ?? 'pending',
+          background_check_status: app.background_check_status ?? 'pending',
+          credit_report_status: app.credit_report_status ?? 'pending',
+        };
+
+        if (app.created_at instanceof Date) {
+          mapped.created_at = app.created_at.toISOString();
+        }
+
+        if (app.updated_at instanceof Date) {
+          mapped.updated_at = app.updated_at.toISOString();
+        }
+
+        return mapped;
+      });
     } catch (error) {
       console.error('Error getting rental applications:', error);
       return [];
@@ -250,9 +260,9 @@ export class RentalStorage {
   async updateRentalApplicationStatus(id: number, status: string) {
     try {
       const result = await db.update(rental_applications)
-        .set({ 
+        .set({
           status,
-          updated_at: new Date().toISOString()
+          updated_at: new Date()
         })
         .where(eq(rental_applications.id, id))
         .returning();

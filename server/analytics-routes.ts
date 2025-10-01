@@ -114,7 +114,7 @@ router.get('/metrics/performance', authenticate, async (req, res) => {
 });
 
 // Public analytics (limited data)
-router.get('/public/stats', async (req, res) => {
+router.get('/public/stats', async (_req, res) => {
   try {
     const startDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
     const endDate = new Date();

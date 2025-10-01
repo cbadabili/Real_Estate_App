@@ -1,5 +1,28 @@
 import { db } from "./db";
-import { serviceProviders, serviceAds, serviceReviews } from "../shared/services-schema";
+import { serviceProviders } from "../shared/services-schema";
+
+type ServiceProviderInsert = typeof serviceProviders.$inferInsert;
+
+type RawProvider = {
+  companyName: string;
+  serviceCategory: string;
+  description?: string;
+  contactPerson?: string;
+  contactPhone?: string;
+  contactEmail?: string;
+  phoneNumber?: string;
+  email?: string;
+  websiteUrl?: string;
+  logoUrl?: string;
+  address?: string;
+  city?: string;
+  rating?: number | string;
+  reviewCount?: number | string;
+  verified?: boolean;
+  featured?: boolean;
+  reacCertified?: boolean;
+  dateJoined?: Date | string;
+};
 
 export async function seedServices() {
   console.log('Seeding services...');
@@ -12,7 +35,7 @@ export async function seedServices() {
   }
 
   // Sample service providers data
-  const sampleProviders = [
+  const sampleProviders: RawProvider[] = [
     {
       companyName: 'Elite Property Solutions',
       serviceCategory: 'Real Estate Agent',
@@ -120,7 +143,50 @@ export async function seedServices() {
   ];
 
   // Insert service providers
-  await db.insert(serviceProviders).values(sampleProviders);
+  const normalizedProviders: ServiceProviderInsert[] = sampleProviders.map(provider => {
+    const ratingRaw = typeof provider.rating === 'string'
+      ? Number.parseFloat(provider.rating)
+      : typeof provider.rating === 'number'
+        ? provider.rating
+        : undefined;
+
+    const ratingValue = typeof ratingRaw === 'number' && Number.isFinite(ratingRaw) ? ratingRaw : undefined;
+
+    const reviewCountRaw = typeof provider.reviewCount === 'string'
+      ? Number.parseInt(provider.reviewCount, 10)
+      : typeof provider.reviewCount === 'number'
+        ? provider.reviewCount
+        : undefined;
+
+    const reviewCountValue = typeof reviewCountRaw === 'number' && Number.isFinite(reviewCountRaw) ? reviewCountRaw : undefined;
+
+    const dateJoined = provider.dateJoined instanceof Date
+      ? provider.dateJoined
+      : provider.dateJoined
+        ? new Date(provider.dateJoined)
+        : new Date();
+
+    return {
+      companyName: provider.companyName,
+      serviceCategory: provider.serviceCategory,
+      description: provider.description ?? null,
+      contactPerson: provider.contactPerson ?? null,
+      phoneNumber: provider.contactPhone ?? provider.phoneNumber ?? null,
+      email: provider.contactEmail ?? provider.email ?? null,
+      websiteUrl: provider.websiteUrl ?? null,
+      logoUrl: provider.logoUrl ?? null,
+      address: provider.address ?? null,
+      city: provider.city ?? null,
+      rating: ratingValue,
+      reviewCount: reviewCountValue,
+      verified: Boolean(provider.verified),
+      featured: Boolean(provider.featured),
+      reacCertified: Boolean(provider.reacCertified),
+      dateJoined,
+    } satisfies ServiceProviderInsert;
+  });
+
+  await db.insert(serviceProviders).values(normalizedProviders);
 
   console.log('✅ Services seeded successfully');
 }

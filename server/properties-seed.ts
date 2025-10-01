@@ -1,6 +1,88 @@
-import { db } from './db';
-import { properties, users } from '../shared/schema';
-import { inArray, asc } from 'drizzle-orm';
+import { db } from "./db";
+import { properties, users, type InsertProperty } from "../shared/schema";
+import { inArray, asc } from "drizzle-orm";
+
+type RawProperty = {
+  title: string;
+  description?: string;
+  price: number | string;
+  address: string;
+  city: string;
+  state: string;
+  zipCode: string;
+  latitude?: number | string | null;
+  longitude?: number | string | null;
+  propertyType: string;
+  listingType: string;
+  status?: string;
+  bedrooms?: number | string | null;
+  bathrooms?: number | string | null;
+  squareFeet?: number | string | null;
+  areaBuild?: number | string | null;
+  lotSize?: number | string | null;
+  yearBuilt?: number | string | null;
+  images?: unknown;
+  features?: unknown;
+  virtualTourUrl?: string | null;
+  videoUrl?: string | null;
+  propertyTaxes?: string | null;
+  hoaFees?: string | null;
+  ownerId?: number | null;
+  agentId?: number | null;
+  areaText?: string | null;
+  placeName?: string | null;
+  placeId?: string | null;
+  locationSource?: string | null;
+  views?: number | string | null;
+  daysOnMarket?: number | string | null;
+  forMap?: boolean;
+  auctionDate?: number | string | null;
+  auctionTime?: string | null;
+  startingBid?: string | null;
+  currentBid?: string | null;
+  reservePrice?: string | null;
+  auctionHouse?: string | null;
+  auctioneerName?: string | null;
+  auctioneerContact?: string | null;
+  bidIncrement?: string | null;
+  depositRequired?: string | null;
+  auctionTerms?: string | null;
+  lotNumber?: string | null;
+  createdAt?: number | string | Date;
+  updatedAt?: number | string | Date;
+};
+
+const toNumber = (value: unknown, fallback = 0): number => {
+  const numeric = typeof value === "number" ? value : Number(value);
+  return Number.isFinite(numeric) ? numeric : fallback;
+};
+
+const toNullableNumber = (value: unknown): number | null => {
+  if (value == null || value === "") {
+    return null;
+  }
+  const numeric = Number(value);
+  return Number.isFinite(numeric) ? numeric : null;
+};
+
+const parseJsonArray = (value: unknown): string[] => {
+  if (Array.isArray(value)) {
+    return value.map(item => String(item));
+  }
+
+  if (typeof value === "string" && value.trim()) {
+    try {
+      const parsed = JSON.parse(value);
+      if (Array.isArray(parsed)) {
+        return parsed.map(item => String(item));
+      }
+    } catch {
+      return [value];
+    }
+  }
+
+  return [];
+};
 
 export async function seedProperties() {
   console.log('Seeding properties...');
@@ -30,13 +112,14 @@ export async function seedProperties() {
 
   console.log(`Found ${eligibleUsers.length} eligible users with IDs: ${eligibleUsers.map(u => u.id).join(', ')}`);
 
-  const getOwnerId = (i: number) => eligibleUsers[i % eligibleUsers.length].id;
-  const getAgentId = (i: number) => {
-    const agents = eligibleUsers.filter(u => u.userType === 'agent');
-    return agents.length > 0 ? agents[i % agents.length].id : eligibleUsers[i % eligibleUsers.length].id;
-  };
+  const totalUsers = eligibleUsers.length;
+  const agentPool = eligibleUsers.filter(u => u.userType === 'agent');
+  const fallbackPool = agentPool.length > 0 ? agentPool : eligibleUsers;
 
-  const sampleProperties = [
+  const getOwnerId = (i: number) => eligibleUsers[i % totalUsers]!.id;
+  const getAgentId = (i: number) => fallbackPool[i % fallbackPool.length]!.id;
+
+  const sampleProperties: RawProperty[] = [
     {
       title: 'Modern Family Home in Gaborone',
       description: 'Beautiful 4-bedroom home with updated kitchen, hardwood floors, and large backyard. Perfect for families.',
@@ -297,6 +380,7 @@ export async function seedProperties() {
       bathrooms: 4,
       squareFeet: 450,
       yearBuilt: 2018,
+      address: "Plot 456, Extension 11",
       city: "Gaborone",
       state: "South East",
       zipCode: "0000",
@@ -339,7 +423,97 @@ export async function seedProperties() {
   try {
     console.log(`Adding ${sampleProperties.length} properties...`);
 
-    const insertedProperties = await db.insert(properties).values(sampleProperties).returning();
+    const normalizedProperties: InsertProperty[] = sampleProperties.map(raw => {
+      const createdAt = (() => {
+        if (raw.createdAt instanceof Date) {
+          return raw.createdAt;
+        }
+        if (typeof raw.createdAt === 'number' && Number.isFinite(raw.createdAt)) {
+          const epoch = raw.createdAt > 1_000_000_000_000 ? raw.createdAt : raw.createdAt * 1000;
+          return new Date(epoch);
+        }
+        if (typeof raw.createdAt === 'string') {
+          const parsed = new Date(raw.createdAt);
+          if (!Number.isNaN(parsed.getTime())) {
+            return parsed;
+          }
+        }
+        return new Date();
+      })();
+
+      const updatedAt = (() => {
+        if (raw.updatedAt instanceof Date) {
+          return raw.updatedAt;
+        }
+        if (typeof raw.updatedAt === 'number' && Number.isFinite(raw.updatedAt)) {
+          const epoch = raw.updatedAt > 1_000_000_000_000 ? raw.updatedAt : raw.updatedAt * 1000;
+          return new Date(epoch);
+        }
+        if (typeof raw.updatedAt === 'string') {
+          const parsed = new Date(raw.updatedAt);
+          if (!Number.isNaN(parsed.getTime())) {
+            return parsed;
+          }
+        }
+        return createdAt;
+      })();
+
+      const latitude = toNullableNumber(raw.latitude);
+      const longitude = toNullableNumber(raw.longitude);
+
+      return {
+        title: String(raw.title ?? 'Untitled property'),
+        description: raw.description ?? null,
+        price: toNumber(raw.price),
+        currency: 'BWP',
+        address: String(raw.address ?? ''),
+        city: String(raw.city ?? ''),
+        state: String(raw.state ?? ''),
+        zipCode: String(raw.zipCode ?? ''),
+        latitude,
+        longitude,
+        areaText: raw.areaText ?? null,
+        placeName: raw.placeName ?? null,
+        placeId: raw.placeId ?? null,
+        locationSource: raw.locationSource ?? null,
+        propertyType: String(raw.propertyType ?? 'house'),
+        listingType: String(raw.listingType ?? 'sale'),
+        status: String(raw.status ?? 'active'),
+        bedrooms: raw.bedrooms == null ? null : toNumber(raw.bedrooms),
+        bathrooms: toNullableNumber(raw.bathrooms),
+        squareFeet: raw.squareFeet == null ? null : toNumber(raw.squareFeet),
+        areaBuild: raw.areaBuild == null ? null : toNumber(raw.areaBuild),
+        lotSize: raw.lotSize == null ? null : String(raw.lotSize),
+        yearBuilt: raw.yearBuilt == null ? null : toNumber(raw.yearBuilt),
+        images: parseJsonArray(raw.images),
+        features: parseJsonArray(raw.features),
+        virtualTourUrl: raw.virtualTourUrl ?? null,
+        videoUrl: raw.videoUrl ?? null,
+        propertyTaxes: raw.propertyTaxes ?? null,
+        hoaFees: raw.hoaFees ?? null,
+        views: raw.views == null ? undefined : toNumber(raw.views),
+        daysOnMarket: raw.daysOnMarket == null ? undefined : toNumber(raw.daysOnMarket),
+        forMap: raw.forMap == null ? undefined : Boolean(raw.forMap),
+        auctionDate: raw.auctionDate == null ? null : toNumber(raw.auctionDate),
+        auctionTime: raw.auctionTime ?? null,
+        startingBid: raw.startingBid ?? null,
+        currentBid: raw.currentBid ?? null,
+        reservePrice: raw.reservePrice ?? null,
+        auctionHouse: raw.auctionHouse ?? null,
+        auctioneerName: raw.auctioneerName ?? null,
+        auctioneerContact: raw.auctioneerContact ?? null,
+        bidIncrement: raw.bidIncrement ?? null,
+        depositRequired: raw.depositRequired ?? null,
+        auctionTerms: raw.auctionTerms ?? null,
+        lotNumber: raw.lotNumber ?? null,
+        ownerId: raw.ownerId ?? null,
+        agentId: raw.agentId ?? null,
+        createdAt,
+        updatedAt,
+      } satisfies InsertProperty;
+    });
+
+    const insertedProperties = await db.insert(properties).values(normalizedProperties).returning();
     console.log(`✅ Successfully inserted ${insertedProperties.length} properties`);
 
   } catch (error) {

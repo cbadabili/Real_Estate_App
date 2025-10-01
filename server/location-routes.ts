@@ -1,11 +1,11 @@
 import { Express } from 'express';
 import { db } from './db';
 import { districts, settlements, wards, plots } from '../shared/schema';
-import { eq, and, or, ilike, desc, asc } from 'drizzle-orm';
+import { eq, or, ilike, desc, asc } from 'drizzle-orm';
 
 export function registerLocationRoutes(app: Express) {
   // Get all districts
-  app.get("/api/locations/districts", async (req, res) => {
+  app.get("/api/locations/districts", async (_req, res) => {
     try {
       const allDistricts = await db
         .select()

@@ -7,7 +7,7 @@ import { eq, and, lte, gte, desc } from 'drizzle-orm';
 const router = Router();
 
 // Get active hero listings for homepage carousel
-router.get('/', async (req, res) => {
+router.get('/', async (_req, res) => {
   try {
     const now = Date.now();
 
@@ -52,7 +52,14 @@ router.post('/properties/:propertyId/hero', authenticate, async (req, res) => {
       });
     }
 
-    const propertyId = parseInt(req.params.propertyId);
+    const propertyParam = req.params.propertyId;
+    const propertyId = Number.parseInt(propertyParam ?? '', 10);
+    if (!propertyParam || Number.isNaN(propertyId)) {
+      return res.status(400).json({
+        success: false,
+        error: 'Invalid property identifier'
+      });
+    }
 
     // Check if property exists and belongs to user
     const [property] = await db
@@ -60,7 +67,7 @@ router.post('/properties/:propertyId/hero', authenticate, async (req, res) => {
       .from(properties)
       .where(and(
         eq(properties.id, propertyId),
-        eq(properties.user_id, req.user.id)
+        eq(properties.ownerId, req.user.id)
       ));
 
     if (!property) {

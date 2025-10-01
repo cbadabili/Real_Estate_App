@@ -1,5 +1,5 @@
 import { db } from './db';
-import { users, properties } from '../shared/schema';
+import { users, properties, type InsertProperty } from '../shared/schema';
 
 async function seed() {
   console.log('🌱 Starting database seed...');
@@ -45,6 +45,11 @@ async function seed() {
     const createdUsers = await db.insert(users).values(sampleUsers).returning();
     console.log(`✅ Created ${createdUsers.length} users`);
 
+    const [buyerUser, agentUser, fsboUser] = createdUsers;
+    if (!buyerUser || !agentUser || !fsboUser) {
+      throw new Error('Failed to create initial users');
+    }
+
     // Create sample properties
     const sampleProperties = [
       {
@@ -72,7 +77,7 @@ async function seed() {
         features: JSON.stringify(['Hardwood Floors', 'Updated Kitchen', 'Large Backyard', 'Two-Car Garage']),
         propertyTaxes: '8500.00',
         hoaFees: '0.00',
-        ownerId: createdUsers[2].id, // Mike (FSBO seller)
+        ownerId: fsboUser.id,
       },
       {
         title: 'Luxury Downtown Condo',
@@ -98,7 +103,7 @@ async function seed() {
         features: JSON.stringify(['City Views', 'Concierge', 'Rooftop Pool', 'Fitness Center']),
         propertyTaxes: '12000.00',
         hoaFees: '450.00',
-        agentId: createdUsers[1].id, // Sarah (Agent)
+        agentId: agentUser.id,
       },
       {
         title: 'Cozy Suburban Townhouse',
@@ -124,7 +129,7 @@ async function seed() {
         features: JSON.stringify(['Attached Garage', 'Patio', 'Master Suite', 'Open Floor Plan']),
         propertyTaxes: '6200.00',
         hoaFees: '180.00',
-        agentId: createdUsers[1].id, // Sarah (Agent)
+        agentId: agentUser.id,
       },
       {
         title: 'Spacious Ranch Home',
@@ -150,7 +155,7 @@ async function seed() {
         features: JSON.stringify(['Open Floor Plan', 'Master Suite', 'Landscaping', 'Energy Efficient']),
         propertyTaxes: '7200.00',
         hoaFees: '0.00',
-        ownerId: createdUsers[0].id, // John (buyer who became seller)
+        ownerId: buyerUser.id,
       },
       {
         title: 'Contemporary Loft',
@@ -175,7 +180,7 @@ async function seed() {
         features: JSON.stringify(['Exposed Brick', 'High Ceilings', 'Modern Finishes', 'Urban Location']),
         propertyTaxes: '9800.00',
         hoaFees: '275.00',
-        agentId: createdUsers[1].id, // Sarah (Agent)
+        agentId: agentUser.id,
       },
       {
         title: 'Land in Gaborone',
@@ -199,7 +204,7 @@ async function seed() {
         features: JSON.stringify([]),
         propertyTaxes: '0.00',
         hoaFees: '0.00',
-        ownerId: createdUsers[2].id, // Mike (FSBO seller)
+        ownerId: fsboUser.id,
       },
       {
         title: 'Modern 3-Bedroom House in Gaborone',
@@ -221,7 +226,7 @@ async function seed() {
         status: 'active',
         images: JSON.stringify([]),
         features: JSON.stringify([]),
-        ownerId: createdUsers[0].id,
+        ownerId: buyerUser.id,
       },
       {
         title: 'Luxury Apartment in Phakalane',
@@ -243,7 +248,7 @@ async function seed() {
         status: 'active',
         images: JSON.stringify([]),
         features: JSON.stringify([]),
-        ownerId: createdUsers[1].id,
+        ownerId: agentUser.id,
       },
       {
         title: 'Family Home in Mogoditshane',
@@ -265,7 +270,7 @@ async function seed() {
         status: 'active',
         images: JSON.stringify([]),
         features: JSON.stringify([]),
-        ownerId: createdUsers[2].id,
+        ownerId: fsboUser.id,
       },
       {
         title: 'Commercial Land in Francistown',
@@ -287,12 +292,56 @@ async function seed() {
         status: 'active',
         images: JSON.stringify([]),
         features: JSON.stringify([]),
-        ownerId: createdUsers[2].id,
+        ownerId: fsboUser.id,
       }
     ];
 
     console.log('🏠 Creating properties...');
-    const createdProperties = await db.insert(properties).values(sampleProperties).returning();
+    const toNumber = (value: unknown, fallback = 0): number => {
+      const numeric = typeof value === 'number' ? value : Number(value);
+      return Number.isFinite(numeric) ? numeric : fallback;
+    };
+
+    const toNullableNumber = (value: unknown): number | null => {
+      if (value === null || value === undefined || value === '') {
+        return null;
+      }
+      const numeric = Number(value);
+      return Number.isFinite(numeric) ? numeric : null;
+    };
+
+    const parseJsonArray = (value: unknown): string[] => {
+      if (Array.isArray(value)) {
+        return value.map(item => String(item));
+      }
+
+      if (typeof value === 'string' && value.trim()) {
+        try {
+          const parsed = JSON.parse(value);
+          if (Array.isArray(parsed)) {
+            return parsed.map(item => String(item));
+          }
+        } catch {
+          return [value];
+        }
+      }
+
+      return [];
+    };
+
+    const normalizedProperties: InsertProperty[] = sampleProperties.map(property => ({
+      ...property,
+      price: toNumber(property.price),
+      bedrooms: toNumber(property.bedrooms),
+      bathrooms: toNullableNumber(property.bathrooms),
+      squareFeet: toNumber(property.squareFeet),
+      latitude: toNullableNumber(property.latitude),
+      longitude: toNullableNumber(property.longitude),
+      images: parseJsonArray(property.images),
+      features: parseJsonArray(property.features),
+    })) as InsertProperty[];
+
+    const createdProperties = await db.insert(properties).values(normalizedProperties).returning();
     console.log(`✅ Created ${createdProperties.length} properties`);
 
     console.log('🎉 Database seed completed successfully!');

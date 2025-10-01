@@ -8,7 +8,7 @@ import { eq, and, desc, sql } from 'drizzle-orm';
 const router = Router();
 
 // Get all available plans
-router.get('/plans', async (req, res) => {
+router.get('/plans', async (_req, res) => {
   try {
     const availablePlans = await db
       .select()
@@ -78,6 +78,10 @@ router.post('/subscribe', authenticate, async (req, res) => {
         status: 'pending'
       })
       .returning();
+
+    if (!payment) {
+      throw new Error('Failed to create payment record');
+    }
 
     // For free plans, auto-activate
     if (plan.price_bwp === 0) {
@@ -245,7 +249,11 @@ router.post('/payments/:id/approve', authenticate, async (req, res) => {
       });
     }
 
-    const paymentId = parseInt(req.params.id);
+    const paymentParam = req.params.id;
+    const paymentId = Number.parseInt(paymentParam ?? '', 10);
+    if (!paymentParam || Number.isNaN(paymentId)) {
+      return res.status(400).json({ success: false, error: 'Invalid payment identifier' });
+    }
     const { notes } = req.body;
 
     // Get payment details
@@ -323,7 +331,11 @@ router.post('/payments/:id/reject', authenticate, async (req, res) => {
       });
     }
 
-    const paymentId = parseInt(req.params.id);
+    const paymentParam = req.params.id;
+    const paymentId = Number.parseInt(paymentParam ?? '', 10);
+    if (!paymentParam || Number.isNaN(paymentId)) {
+      return res.status(400).json({ success: false, error: 'Invalid payment identifier' });
+    }
     const { reason } = req.body;
 
     if (!reason) {
@@ -477,16 +489,37 @@ async function activateSubscription(userId: number, planId: number, paymentId: n
     })
     .returning();
 
+  if (!subscription) {
+    throw new Error('Failed to create subscription record');
+  }
+
   // Create entitlements based on plan features
-  const features = typeof plan.features === 'string' ? JSON.parse(plan.features) : plan.features;
-  const entitlementData = Object.entries(features).map(([key, value]) => ({
-    user_id: userId,
-    subscription_id: subscription.id,
-    feature_key: key,
-    feature_value: typeof value === 'boolean' ? (value ? 1 : 0) : Number(value),
-    used_count: 0,
-    expires_at: subscription.ends_at
-  }));
+  const rawFeatures = typeof plan.features === 'string' ? JSON.parse(plan.features) : plan.features;
+  const featureEntries = rawFeatures && typeof rawFeatures === 'object' ? Object.entries(rawFeatures as Record<string, unknown>) : [];
+  const entitlementData = featureEntries.map(([key, value]) => {
+    const numericValue = (() => {
+      if (typeof value === 'boolean') {
+        return value ? 1 : 0;
+      }
+      if (typeof value === 'string') {
+        if (value.toLowerCase() === 'true') return 1;
+        if (value.toLowerCase() === 'false') return 0;
+        const parsed = Number(value);
+        return Number.isFinite(parsed) ? parsed : 0;
+      }
+      const parsed = Number(value);
+      return Number.isFinite(parsed) ? parsed : 0;
+    })();
+
+    return {
+      user_id: userId,
+      subscription_id: subscription.id,
+      feature_key: key,
+      feature_value: numericValue,
+      used_count: 0,
+      expires_at: subscription.ends_at
+    };
+  });
 
   if (entitlementData.length > 0) {
     await db.insert(entitlements).values(entitlementData);

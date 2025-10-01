@@ -4,6 +4,14 @@ import { users } from '../shared/schema';
 import { eq } from 'drizzle-orm';
 import bcrypt from 'bcrypt';
 
+type BasicUserRow = {
+  id: number;
+  email: string;
+  username: string;
+  isActive: boolean;
+  hasPassword: string | null;
+};
+
 async function checkUser() {
   const email = 'cbadabili@gmail.com';
   
@@ -16,17 +24,17 @@ async function checkUser() {
       console.log('❌ User not found');
       
       // Show all users
-      const allUsers = await db.select({
+      const allUsers: BasicUserRow[] = await db.select({
         id: users.id,
         email: users.email,
         username: users.username,
         isActive: users.isActive,
         hasPassword: users.password
       }).from(users);
-      
+
       console.log('All users in database:');
-      allUsers.forEach(u => {
-        console.log(`- ID: ${u.id}, Email: ${u.email}, Username: ${u.username}, Active: ${u.isActive}, Has Password: ${!!u.hasPassword}`);
+      allUsers.forEach((u) => {
+        console.log(`- ID: ${u.id}, Email: ${u.email}, Username: ${u.username}, Active: ${u.isActive}, Has Password: ${Boolean(u.hasPassword)}`);
       });
       
       return;
@@ -55,13 +63,15 @@ async function checkUser() {
           const isMatch = await bcrypt.compare(testPassword, user.password);
           console.log(`- "${testPassword}": ${isMatch ? '✅ MATCH' : '❌ No match'}`);
         } catch (error) {
-          console.log(`- "${testPassword}": ❌ Error - ${error.message}`);
+          const message = error instanceof Error ? error.message : String(error);
+          console.log(`- "${testPassword}": ❌ Error - ${message}`);
         }
       }
     }
-    
+
   } catch (error) {
-    console.error('❌ Error checking user:', error);
+    const message = error instanceof Error ? error.message : String(error);
+    console.error('❌ Error checking user:', message);
   }
 }
 

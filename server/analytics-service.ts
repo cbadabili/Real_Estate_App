@@ -1,7 +1,8 @@
 
-import { db } from './db';
-import { users, properties, inquiries, appointments } from '../shared/schema';
-import { sql, eq, gte, lte, and, count, desc, asc } from 'drizzle-orm';
+import { db } from "./db";
+import { users, properties, inquiries, appointments } from "../shared/schema";
+import { sql, eq, gte, lte, and, count, desc, asc } from "drizzle-orm";
+import { daysAgo } from "./db/date-utils";
 
 export interface BusinessMetrics {
   userEngagement: {
@@ -38,9 +39,6 @@ export class AnalyticsService {
 
   // User Engagement Metrics
   async getUserEngagementMetrics(startDate: Date, endDate: Date) {
-    const startTimestamp = Math.floor(startDate.getTime() / 1000);
-    const endTimestamp = Math.floor(endDate.getTime() / 1000);
-
     const [totalUsers] = await db
       .select({ count: count() })
       .from(users);
@@ -49,37 +47,41 @@ export class AnalyticsService {
       .select({ count: count() })
       .from(users)
       .where(and(
-        gte(users.lastLoginAt, startTimestamp),
-        lte(users.lastLoginAt, endTimestamp)
+        gte(users.lastLoginAt, startDate),
+        lte(users.lastLoginAt, endDate)
       ));
 
     const [newUsers] = await db
       .select({ count: count() })
       .from(users)
       .where(and(
-        gte(users.createdAt, startTimestamp),
-        lte(users.createdAt, endTimestamp)
+        gte(users.createdAt, startDate),
+        lte(users.createdAt, endDate)
       ));
 
     // Calculate retention rate (users who logged in this period and last period)
     const lastPeriodStart = new Date(startDate.getTime() - (endDate.getTime() - startDate.getTime()));
-    const lastPeriodTimestamp = Math.floor(lastPeriodStart.getTime() / 1000);
 
     const [retainedUsers] = await db
       .select({ count: count() })
       .from(users)
       .where(and(
-        gte(users.lastLoginAt, startTimestamp),
-        gte(users.createdAt, lastPeriodTimestamp),
-        lte(users.createdAt, startTimestamp)
+        gte(users.lastLoginAt, startDate),
+        gte(users.createdAt, lastPeriodStart),
+        lte(users.createdAt, startDate)
       ));
 
-    const retentionRate = newUsers.count > 0 ? (retainedUsers.count / newUsers.count) * 100 : 0;
+    const totalUsersCount = Number(totalUsers?.count ?? 0);
+    const activeUsersCount = Number(activeUsers?.count ?? 0);
+    const newUsersCount = Number(newUsers?.count ?? 0);
+    const retainedUsersCount = Number(retainedUsers?.count ?? 0);
+
+    const retentionRate = newUsersCount > 0 ? (retainedUsersCount / newUsersCount) * 100 : 0;
 
     return {
-      totalUsers: totalUsers.count,
-      activeUsers: activeUsers.count,
-      newUsers: newUsers.count,
+      totalUsers: totalUsersCount,
+      activeUsers: activeUsersCount,
+      newUsers: newUsersCount,
       retentionRate: Math.round(retentionRate * 10) / 10,
       avgSessionDuration: 0 // To be implemented with session tracking
     };
@@ -87,9 +89,6 @@ export class AnalyticsService {
 
   // Property Performance Metrics
   async getPropertyMetrics(startDate: Date, endDate: Date) {
-    const startTimestamp = Math.floor(startDate.getTime() / 1000);
-    const endTimestamp = Math.floor(endDate.getTime() / 1000);
-
     const [totalListings] = await db
       .select({ count: count() })
       .from(properties);
@@ -103,41 +102,46 @@ export class AnalyticsService {
       .select({ totalViews: sql<number>`SUM(${properties.views})` })
       .from(properties)
       .where(and(
-        gte(properties.createdAt, startTimestamp),
-        lte(properties.createdAt, endTimestamp)
+        gte(properties.createdAt, startDate),
+        lte(properties.createdAt, endDate)
       ));
 
     const [totalInquiries] = await db
       .select({ count: count() })
       .from(inquiries)
       .where(and(
-        gte(inquiries.createdAt, startTimestamp),
-        lte(inquiries.createdAt, endTimestamp)
+        gte(inquiries.createdAt, startDate),
+        lte(inquiries.createdAt, endDate)
       ));
 
     const [totalAppointments] = await db
       .select({ count: count() })
       .from(appointments)
       .where(and(
-        gte(appointments.createdAt, startTimestamp),
-        lte(appointments.createdAt, endTimestamp)
+        gte(appointments.createdAt, startDate),
+        lte(appointments.createdAt, endDate)
       ));
 
-    const viewsPerListing = activeListings.count > 0 
-      ? Math.round((totalViews.totalViews || 0) / activeListings.count)
+    const activeListingsCount = Number(activeListings?.count ?? 0);
+    const totalInquiriesCount = Number(totalInquiries?.count ?? 0);
+    const totalAppointmentsCount = Number(totalAppointments?.count ?? 0);
+    const totalViewsValue = Number(totalViews?.totalViews ?? 0);
+
+    const viewsPerListing = activeListingsCount > 0
+      ? Math.round(totalViewsValue / activeListingsCount)
       : 0;
 
-    const inquiryRate = totalViews.totalViews > 0 
-      ? Math.round((totalInquiries.count / (totalViews.totalViews || 1)) * 100 * 10) / 10
+    const inquiryRate = totalViewsValue > 0
+      ? Math.round((totalInquiriesCount / Math.max(totalViewsValue, 1)) * 100 * 10) / 10
       : 0;
 
-    const conversionToViewing = totalInquiries.count > 0
-      ? Math.round((totalAppointments.count / totalInquiries.count) * 100 * 10) / 10
+    const conversionToViewing = totalInquiriesCount > 0
+      ? Math.round((totalAppointmentsCount / totalInquiriesCount) * 100 * 10) / 10
       : 0;
 
     return {
-      totalListings: totalListings.count,
-      activeListings: activeListings.count,
+      totalListings: Number(totalListings?.count ?? 0),
+      activeListings: activeListingsCount,
       viewsPerListing,
       inquiryRate,
       conversionToViewing
@@ -216,19 +220,17 @@ export class AnalyticsService {
 
   // User activity trends
   async getUserActivityTrends(days: number = 30) {
-    const startDate = new Date();
-    startDate.setDate(startDate.getDate() - days);
-    const startTimestamp = Math.floor(startDate.getTime() / 1000);
-
+    const startDate = daysAgo(days);
+    const dayExpression = sql`DATE(${users.createdAt})`;
     const dailyStats = await db
       .select({
-        date: sql<string>`DATE(datetime(${users.createdAt}, 'unixepoch'))`,
+        date: sql<string>`to_char(${users.createdAt}, 'YYYY-MM-DD')`,
         registrations: count()
       })
       .from(users)
-      .where(gte(users.createdAt, startTimestamp))
-      .groupBy(sql`DATE(datetime(${users.createdAt}, 'unixepoch'))`)
-      .orderBy(asc(sql`DATE(datetime(${users.createdAt}, 'unixepoch'))`));
+      .where(gte(users.createdAt, startDate))
+      .groupBy(dayExpression)
+      .orderBy(asc(dayExpression));
 
     return dailyStats;
   }

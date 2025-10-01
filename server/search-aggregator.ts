@@ -89,10 +89,17 @@ function parseFreeText(query: string): SearchCriteria {
   const derived: SearchCriteria = {};
 
   // Helper function to parse price with suffixes
-  const parsePrice = (priceStr: string, suffix: string = ''): number => {
-    const num = parseInt(priceStr);
-    if (suffix.toLowerCase() === 'k') return num * 1000;
-    if (suffix.toLowerCase() === 'm') return num * 1000000;
+  const parsePrice = (priceStr: string | undefined, suffix: string | undefined = ''): number | undefined => {
+    if (!priceStr) {
+      return undefined;
+    }
+    const num = Number.parseInt(priceStr, 10);
+    if (Number.isNaN(num)) {
+      return undefined;
+    }
+    const normalizedSuffix = suffix?.toLowerCase();
+    if (normalizedSuffix === 'k') return num * 1000;
+    if (normalizedSuffix === 'm') return num * 1_000_000;
     return num;
   };
 
@@ -109,40 +116,61 @@ function parseFreeText(query: string): SearchCriteria {
   const rangeMatch = query.match(/(\d+)(k|m)?\s*(?:to|-)\s*(\d+)(k|m)?/i);
   if (rangeMatch) {
     const [, min, minSuffix, max, maxSuffix] = rangeMatch;
-    derived.minPrice = parsePrice(min, minSuffix);
-    derived.maxPrice = parsePrice(max, maxSuffix);
+    const minParsed = parsePrice(min, minSuffix);
+    if (minParsed !== undefined) {
+      derived.minPrice = minParsed;
+    }
+    const maxParsed = parsePrice(max, maxSuffix);
+    if (maxParsed !== undefined) {
+      derived.maxPrice = maxParsed;
+    }
   }
 
   // Extract single price limits with suffix support
   const underMatch = query.match(/under\s*(\d+)(k|m)?/i);
   if (underMatch) {
     const [, amount, suffix] = underMatch;
-    derived.maxPrice = parsePrice(amount, suffix);
+    const parsed = parsePrice(amount, suffix);
+    if (parsed !== undefined) {
+      derived.maxPrice = parsed;
+    }
   }
 
   const overMatch = query.match(/over\s*(\d+)(k|m)?/i);
   if (overMatch) {
     const [, amount, suffix] = overMatch;
-    derived.minPrice = parsePrice(amount, suffix);
+    const parsed = parsePrice(amount, suffix);
+    if (parsed !== undefined) {
+      derived.minPrice = parsed;
+    }
   }
 
   const aboveMatch = query.match(/above\s*(\d+)(k|m)?/i);
   if (aboveMatch) {
     const [, amount, suffix] = aboveMatch;
-    derived.minPrice = parsePrice(amount, suffix);
+    const parsed = parsePrice(amount, suffix);
+    if (parsed !== undefined) {
+      derived.minPrice = parsed;
+    }
   }
 
   // Bedroom extraction
   let beds: number | undefined;
   const digitBed = query.match(/(\d+)\s*(bed|bedroom|bedroomed)/i);
-  if (digitBed) {
-    beds = parseInt(digitBed[1], 10);
+  if (digitBed && digitBed[1]) {
+    const parsedBeds = Number.parseInt(digitBed[1], 10);
+    if (!Number.isNaN(parsedBeds)) {
+      beds = parsedBeds;
+    }
   } else {
-    const wordBeds: Record<string, number> = { 
-      one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8 
+    const wordBeds: Record<string, number> = {
+      one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8
     };
     const wordMatch = query.match(/(one|two|three|four|five|six|seven|eight)\s*(bed|bedroom|bedroomed)/i);
-    if (wordMatch) beds = wordBeds[wordMatch[1]];
+    if (wordMatch && wordMatch[1]) {
+      const key = wordMatch[1].toLowerCase() as keyof typeof wordBeds;
+      beds = wordBeds[key];
+    }
   }
 
   // Property type extraction
@@ -158,14 +186,27 @@ function parseFreeText(query: string): SearchCriteria {
   const locations = ['gaborone', 'francistown', 'kasane', 'maun', 'serowe', 'palapye', 'kanye'];
   const location = locations.find(loc => query.toLowerCase().includes(loc));
 
-  return {
-    beds,
-    type,
-    minPrice: derived.minPrice,
-    maxPrice: derived.maxPrice,
-    location,
-    query: derived.query,
-  };
+  const criteria: SearchCriteria = {};
+  if (beds !== undefined) {
+    criteria.beds = beds;
+  }
+  if (type) {
+    criteria.type = type;
+  }
+  if (derived.minPrice !== undefined) {
+    criteria.minPrice = derived.minPrice;
+  }
+  if (derived.maxPrice !== undefined) {
+    criteria.maxPrice = derived.maxPrice;
+  }
+  if (location) {
+    criteria.location = location;
+  }
+  if (derived.query) {
+    criteria.query = derived.query;
+  }
+
+  return criteria;
 }
 
 async function queryDB(q: string, sort: string): Promise<UnifiedProperty[]> {
@@ -235,26 +276,41 @@ function mapDBRowToUnified(row: any): UnifiedProperty {
   const price = normalizeNumber(row.price);
   const lat = normalizeNumber(row.latitude);
   const lng = normalizeNumber(row.longitude);
+  const bedroomsValue = typeof row.bedrooms === "number" ? row.bedrooms : normalizeNumber(row.bedrooms);
+  const bathroomsValue = row.bathrooms !== undefined && row.bathrooms !== null
+    ? normalizeNumber(row.bathrooms)
+    : null;
 
-  return {
+  const hasCoordinates = typeof lat === 'number' && typeof lng === 'number';
+
+  const property: UnifiedProperty = {
     id: `local_${row.id}`,
     title: row.title,
     price: price ?? 0,
     address: row.address,
     city: row.city,
-    bedrooms: typeof row.bedrooms === "number" ? row.bedrooms : normalizeNumber(row.bedrooms) ?? undefined,
-    bathrooms: row.bathrooms !== undefined && row.bathrooms !== null
-      ? normalizeNumber(row.bathrooms) ?? undefined
-      : undefined,
     propertyType: row.propertyType,
     source: 'local',
     description: row.description,
     images: normalizeStringArray(row.images ?? []),
-    coordinates: lat !== null && lng !== null ? { lat, lng } : undefined,
     agency: {
       name: 'BeeDab Properties'
     }
   };
+
+  if (bedroomsValue !== null && bedroomsValue !== undefined) {
+    property.bedrooms = bedroomsValue;
+  }
+
+  if (bathroomsValue !== null && bathroomsValue !== undefined) {
+    property.bathrooms = bathroomsValue;
+  }
+
+  if (hasCoordinates) {
+    property.coordinates = { lat: lat as number, lng: lng as number };
+  }
+
+  return property;
 }
 
 // Call OpenAI-powered search

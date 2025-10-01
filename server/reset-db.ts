@@ -5,11 +5,12 @@ import { seedManager } from './seed-manager';
 async function resetDatabase() {
   try {
     console.log('🗑️ Resetting database...');
-    await migrationManager.resetDatabase();
-    
+    const manager = migrationManager.getInstance();
+    await manager.resetDatabase();
+
     console.log('🔄 Running migrations...');
-    await migrationManager.runAllPendingMigrations();
-    
+    await manager.runAllPendingMigrations();
+
     console.log('🌱 Seeding database...');
     await seedManager.seedAll();
     

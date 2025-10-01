@@ -18,8 +18,21 @@ CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
 CREATE INDEX IF NOT EXISTS idx_users_created_at ON users(created_at);
 CREATE INDEX IF NOT EXISTS idx_users_last_login ON users(last_login_at);
 
--- Indexes for inquiries and appointments
-CREATE INDEX IF NOT EXISTS idx_inquiries_property_id ON inquiries(property_id);
-CREATE INDEX IF NOT EXISTS idx_inquiries_created_at ON inquiries(created_at);
-CREATE INDEX IF NOT EXISTS idx_appointments_property_id ON appointments(property_id);
-CREATE INDEX IF NOT EXISTS idx_appointments_created_at ON appointments(created_at);
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM information_schema.tables
+    WHERE table_schema = 'public' AND table_name = 'inquiries'
+  ) THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_inquiries_property_id ON inquiries(property_id)';
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_inquiries_created_at ON inquiries(created_at)';
+  END IF;
+
+  IF EXISTS (
+    SELECT 1 FROM information_schema.tables
+    WHERE table_schema = 'public' AND table_name = 'appointments'
+  ) THEN
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_appointments_property_id ON appointments(property_id)';
+    EXECUTE 'CREATE INDEX IF NOT EXISTS idx_appointments_created_at ON appointments(created_at)';
+  END IF;
+END $$;
