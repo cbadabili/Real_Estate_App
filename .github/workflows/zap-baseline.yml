@@ -25,7 +25,6 @@ jobs:
     env:
       # checkov:skip=CKV_SECRET_4 Ephemeral CI Postgres service credentials
       DATABASE_URL: postgresql://beedab:beedab@localhost:5432/beedab?sslmode=disable
-      NODE_ENV: production
       FORCE_DB_MIGRATIONS: 'true'
       FORCE_DB_SEED: 'true'
       PORT: 5000
@@ -43,6 +42,8 @@ jobs:
           npm run db:push || echo 'drizzle push skipped'
           npm run db:seed || echo 'seed step failed; continuing because app can self-seed'
       - name: Start BeeDab API
+        env:
+          NODE_ENV: production
         run: |
           nohup npm run start >/tmp/server.log 2>&1 &
           ready=0

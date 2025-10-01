@@ -60,12 +60,32 @@ export async function setupVite(app: Express, server: Server) {
       throw new Error("Vite loadConfigFromFile helper is unavailable");
     }
 
-    const loaded =
-      (await loadConfigFromFile(configEnv).catch(async () =>
-        loadConfigFromFile!(configEnv, path.resolve(dirname, "..", "vite.config.js"))
-      )) ?? undefined;
+    const loader = loadConfigFromFile!;
+    const projectRoot = path.resolve(dirname, "..");
+    const configCandidates = [
+      undefined,
+      path.resolve(projectRoot, "vite.config.ts"),
+      path.resolve(projectRoot, "vite.config.js"),
+    ];
 
-    const rawConfig = loaded?.config ?? {};
+    let loaded: Awaited<ReturnType<typeof loadConfigFromFile>> | undefined;
+    let lastError: unknown;
+    for (const candidate of configCandidates) {
+      try {
+        loaded = await loader(configEnv, candidate, projectRoot);
+        if (loaded) {
+          break;
+        }
+      } catch (error) {
+        lastError = error;
+      }
+    }
+
+    if (!loaded) {
+      throw lastError instanceof Error ? lastError : new Error(String(lastError ?? 'Unable to load Vite configuration'));
+    }
+
+    const rawConfig = loaded.config ?? {};
     viteConfig =
       typeof rawConfig === "function"
         ? await rawConfig(configEnv)

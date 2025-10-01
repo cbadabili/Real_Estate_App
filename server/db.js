@@ -24,19 +24,21 @@ catch (error) {
     console.warn('⚠️ Unable to parse DATABASE_URL for SSL detection. Falling back to environment configuration.', error);
 }
 const envSslMode = normalizeSslMode(process.env.PGSSLMODE);
-const sslMode = urlSslMode ?? envSslMode;
+const sslModes = [urlSslMode, envSslMode].filter((mode) => typeof mode === 'string' && mode.length > 0);
 const isLocalHost = parsedHost ? localHosts.has(parsedHost) : false;
+const explicitlyDisable = sslModes.includes('disable');
+const prioritizedMode = sslModes.find((mode) => mode ? !['disable', 'prefer', 'allow'].includes(mode) : false);
 let ssl;
-if (sslMode === 'disable') {
+if (explicitlyDisable) {
     ssl = false;
-} else if (sslMode === 'verify-ca' || sslMode === 'verify-full') {
+} else if (prioritizedMode === 'verify-ca' || prioritizedMode === 'verify-full') {
     ssl = { rejectUnauthorized: true };
-} else if (sslMode === 'require') {
+} else if (prioritizedMode === 'require') {
     ssl = { rejectUnauthorized: false };
 } else if (isLocalHost) {
     ssl = false;
-} else if (process.env.NODE_ENV === 'production' && parsedHost && !isLocalHost) {
-    ssl = { rejectUnauthorized: false };
+} else if (parsedHost) {
+    ssl = { rejectUnauthorized: true };
 } else {
     ssl = false;
 }
