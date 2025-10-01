@@ -12,6 +12,7 @@ import type { InlineConfig } from "vite";
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
+
 const generateId = () => Math.random().toString(36).substring(2, 15);
 
 export function log(message: string, source = "express") {

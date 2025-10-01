@@ -45,7 +45,6 @@ test.describe('Buyer engagement journeys', () => {
     expect(
       favorites.some((fav: any) => Number(fav.propertyId ?? fav.id) === Number(property.id))
     ).toBe(true);
-
     const viewingResponse = await scheduleViewing(
       request,
       buyer,

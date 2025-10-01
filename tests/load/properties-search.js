@@ -37,7 +37,6 @@ export default function () {
     sortOrder: Math.random() > 0.5 ? 'asc' : 'desc',
     limit: '20'
   }).toString();
-
   const res = http.get(`${BASE_URL}/api/properties?${params}`);
   searchTTI.add(res.timings.duration);
 

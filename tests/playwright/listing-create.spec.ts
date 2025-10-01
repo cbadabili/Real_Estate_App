@@ -31,7 +31,6 @@ test.describe('Agent listing lifecycle', () => {
     expect(property.status).toBe('active');
     expect(property.latitude).toBeCloseTo(-24.6285, 3);
     expect(property.longitude).toBeCloseTo(25.9235, 3);
-
     const authHeaders = { Authorization: `Bearer ${auth.token}` };
 
     const updateResponse = await request.put(`/api/properties/${property.id}`, {

@@ -54,6 +54,7 @@ try {
     process.stderr.write(
       'Playwright installation with system dependencies failed. Falling back to browser-only installation.\n'
     );
+
     runCommand(baseCommand);
   } else {
     throw error;
