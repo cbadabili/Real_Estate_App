@@ -1,4 +1,4 @@
-import { db } from "./db";
+import { db, pool } from "./db";
 import { sql } from "drizzle-orm";
 import fs from "fs";
 import path from "path";
@@ -69,29 +69,19 @@ export class MigrationManager {
     const filePath = path.join(this.migrationsPath, filename);
     const migrationSQL = fs.readFileSync(filePath, 'utf8');
 
-    // Split by semicolon and execute each statement
-    const statements = migrationSQL
-      .split(';')
-      .map(stmt => stmt.trim())
-      .filter(stmt => stmt.length > 0);
-
     console.log(`Running migration: ${filename}`);
 
-    for (const statement of statements) {
-      try {
-        await db.execute(sql.raw(statement));
-      } catch (error) {
-        console.error(`Error in migration ${filename}:`, error);
-        throw error;
-      }
+    const client = await pool.connect();
+    try {
+      await client.query(migrationSQL);
+      await client.query('INSERT INTO schema_migrations (filename) VALUES ($1)', [filename]);
+      console.log(`✅ Migration ${filename} completed`);
+    } catch (error) {
+      console.error(`Error in migration ${filename}:`, error);
+      throw error;
+    } finally {
+      client.release();
     }
-
-    // Mark migration as applied
-    await db.execute(sql`
-      INSERT INTO schema_migrations (filename) VALUES (${filename})
-    `);
-
-    console.log(`✅ Migration ${filename} completed`);
   }
 
   async runAllPendingMigrations(): Promise<void> {
