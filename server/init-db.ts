@@ -38,9 +38,9 @@ async function initializeTables() {
         is_verified BOOLEAN DEFAULT false,
         is_active BOOLEAN DEFAULT true,
         reac_number TEXT,
-        last_login_at BIGINT,
-        created_at BIGINT DEFAULT EXTRACT(EPOCH FROM NOW()) * 1000,
-        updated_at BIGINT DEFAULT EXTRACT(EPOCH FROM NOW()) * 1000
+        last_login_at TIMESTAMPTZ,
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        updated_at TIMESTAMPTZ DEFAULT NOW()
       )
     `);
     console.log('✅ Users table ready');
@@ -89,8 +89,8 @@ async function initializeTables() {
         deposit_required TEXT,
         auction_terms TEXT,
         lot_number TEXT,
-        created_at BIGINT DEFAULT EXTRACT(EPOCH FROM NOW()) * 1000,
-        updated_at BIGINT DEFAULT EXTRACT(EPOCH FROM NOW()) * 1000
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        updated_at TIMESTAMPTZ DEFAULT NOW()
       )
     `);
     console.log('✅ Properties table ready');
@@ -103,7 +103,7 @@ async function initializeTables() {
         buyer_id INTEGER REFERENCES users(id) NOT NULL,
         message TEXT NOT NULL,
         status TEXT NOT NULL DEFAULT 'unread',
-        created_at BIGINT DEFAULT EXTRACT(EPOCH FROM NOW()) * 1000
+        created_at TIMESTAMPTZ DEFAULT NOW()
       )
     `);
 
@@ -114,11 +114,11 @@ async function initializeTables() {
         property_id INTEGER REFERENCES properties(id) NOT NULL,
         buyer_id INTEGER REFERENCES users(id) NOT NULL,
         agent_id INTEGER REFERENCES users(id),
-        appointment_date BIGINT NOT NULL,
+        appointment_date TIMESTAMPTZ NOT NULL,
         type TEXT NOT NULL,
         status TEXT NOT NULL DEFAULT 'scheduled',
         notes TEXT,
-        created_at BIGINT DEFAULT EXTRACT(EPOCH FROM NOW()) * 1000
+        created_at TIMESTAMPTZ DEFAULT NOW()
       )
     `);
 
@@ -128,7 +128,7 @@ async function initializeTables() {
         id SERIAL PRIMARY KEY,
         user_id INTEGER REFERENCES users(id) NOT NULL,
         property_id INTEGER REFERENCES properties(id) NOT NULL,
-        created_at BIGINT DEFAULT EXTRACT(EPOCH FROM NOW()) * 1000
+        created_at TIMESTAMPTZ DEFAULT NOW()
       )
     `);
 
@@ -153,9 +153,9 @@ async function initializeTables() {
         review_count INTEGER DEFAULT 0,
         verified BOOLEAN DEFAULT false,
         featured BOOLEAN DEFAULT false,
-        date_joined BIGINT DEFAULT EXTRACT(EPOCH FROM NOW()) * 1000,
-        created_at BIGINT DEFAULT EXTRACT(EPOCH FROM NOW()) * 1000,
-        updated_at BIGINT DEFAULT EXTRACT(EPOCH FROM NOW()) * 1000
+        date_joined TIMESTAMPTZ DEFAULT NOW(),
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        updated_at TIMESTAMPTZ DEFAULT NOW()
       )
     `);
 

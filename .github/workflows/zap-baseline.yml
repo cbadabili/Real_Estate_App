@@ -43,7 +43,7 @@ jobs:
         run: npm run db:migrate
       - name: Start BeeDab API
         run: |
-          nohup BOOT_RUN_MIGRATIONS=false PORT="${PORT:-5000}" npm run start >/tmp/server.log 2>&1 &
+          nohup env BOOT_RUN_MIGRATIONS=false PORT="${PORT:-5000}" npm run start >/tmp/server.log 2>&1 &
       - name: Wait for API readiness
         run: |
           scripts/wait-for-http.sh "http://127.0.0.1:${PORT:-5000}/health" 120 || {
