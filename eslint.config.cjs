@@ -25,6 +25,7 @@ module.exports = tseslint.config(
       'shared/schema.d.ts',
       'server/**/*.js',
       'scripts/**/*.js',
+      'scripts/**/*.ts',
       'tailwind.config.js',
       'tailwind.config.ts',
       'eslint.config.cjs',
