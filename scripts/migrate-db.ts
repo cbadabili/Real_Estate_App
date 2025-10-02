@@ -1,11 +1,16 @@
 #!/usr/bin/env tsx
 
-import { db } from '../server/db.js';
+import { initializeDatabase } from '../server/db';
+import { getMigrationManager } from '../server/migration-manager';
 
 async function runMigrations() {
   try {
     console.log('🔄 Running database migrations...');
-    await db.initializeDatabase();
+    await initializeDatabase();
+
+    const manager = getMigrationManager();
+    await manager.runAllPendingMigrations();
+
     console.log('✅ Database migrations completed successfully');
     process.exit(0);
   } catch (error) {
