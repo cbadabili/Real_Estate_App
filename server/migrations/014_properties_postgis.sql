@@ -138,6 +138,10 @@ BEGIN
       AND column_name = 'created_at'
       AND data_type <> 'timestamp with time zone'
   ) THEN
+    ALTER TABLE properties
+      ALTER COLUMN created_at DROP DEFAULT,
+      ALTER COLUMN created_at DROP NOT NULL;
+
     ALTER TABLE properties ADD COLUMN IF NOT EXISTS created_at_tmp timestamptz;
 
     UPDATE properties
@@ -168,6 +172,10 @@ BEGIN
       AND column_name = 'updated_at'
       AND data_type <> 'timestamp with time zone'
   ) THEN
+    ALTER TABLE properties
+      ALTER COLUMN updated_at DROP DEFAULT,
+      ALTER COLUMN updated_at DROP NOT NULL;
+
     ALTER TABLE properties ADD COLUMN IF NOT EXISTS updated_at_tmp timestamptz;
 
     UPDATE properties
