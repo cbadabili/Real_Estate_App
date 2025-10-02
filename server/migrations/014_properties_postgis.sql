@@ -134,10 +134,18 @@ ALTER TABLE properties
 ALTER TABLE properties
   ALTER COLUMN created_at TYPE timestamptz
     USING CASE
+      WHEN created_at IS NULL THEN now()
       WHEN pg_typeof(created_at)::text LIKE 'timestamp%' THEN created_at::timestamptz
-      WHEN created_at::text ~ '^[0-9]{13}$' THEN to_timestamp((created_at)::bigint / 1000.0)
-      WHEN created_at::text ~ '^[0-9]{10}$' THEN to_timestamp((created_at)::bigint)
-      ELSE created_at::timestamptz
+      WHEN pg_typeof(created_at)::text IN ('integer', 'bigint', 'smallint', 'numeric', 'real', 'double precision') THEN
+        to_timestamp(
+          CASE
+            WHEN created_at::numeric >= 100000000000 THEN (created_at::numeric / 1000.0)
+            ELSE created_at::numeric
+          END::double precision
+        )
+      WHEN created_at::text ~ '^[0-9]{13}$' THEN to_timestamp((created_at)::numeric / 1000.0)
+      WHEN created_at::text ~ '^[0-9]{10}$' THEN to_timestamp((created_at)::numeric)
+      ELSE now()
     END;
 
 UPDATE properties SET created_at = now() WHERE created_at IS NULL;
@@ -149,10 +157,18 @@ ALTER TABLE properties
 ALTER TABLE properties
   ALTER COLUMN updated_at TYPE timestamptz
     USING CASE
+      WHEN updated_at IS NULL THEN now()
       WHEN pg_typeof(updated_at)::text LIKE 'timestamp%' THEN updated_at::timestamptz
-      WHEN updated_at::text ~ '^[0-9]{13}$' THEN to_timestamp((updated_at)::bigint / 1000.0)
-      WHEN updated_at::text ~ '^[0-9]{10}$' THEN to_timestamp((updated_at)::bigint)
-      ELSE updated_at::timestamptz
+      WHEN pg_typeof(updated_at)::text IN ('integer', 'bigint', 'smallint', 'numeric', 'real', 'double precision') THEN
+        to_timestamp(
+          CASE
+            WHEN updated_at::numeric >= 100000000000 THEN (updated_at::numeric / 1000.0)
+            ELSE updated_at::numeric
+          END::double precision
+        )
+      WHEN updated_at::text ~ '^[0-9]{13}$' THEN to_timestamp((updated_at)::numeric / 1000.0)
+      WHEN updated_at::text ~ '^[0-9]{10}$' THEN to_timestamp((updated_at)::numeric)
+      ELSE now()
     END;
 
 UPDATE properties SET updated_at = now() WHERE updated_at IS NULL;
