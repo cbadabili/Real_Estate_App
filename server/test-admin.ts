@@ -37,7 +37,8 @@ async function createTestAdmin() {
 
     return adminUser;
   } catch (error) {
-    console.error('❌ Error creating admin user:', error);
+    const message = error instanceof Error ? error.message : String(error);
+    console.error('❌ Error creating admin user:', message);
     throw error;
   }
 }
@@ -90,44 +91,51 @@ async function createTestData() {
           console.log(`📋 Test user already exists: ${userData.email}`);
         }
       } catch (error) {
-        console.log(`⚠️ Skipped ${userData.email}: already exists`);
+        const message = error instanceof Error ? error.message : String(error);
+        console.log(`⚠️ Skipped ${userData.email}: ${message}`);
       }
     }
 
     // Create some test reviews for moderation
     const users = await storage.getUsers({ limit: 10 });
     if (users.length >= 2) {
-      try {
-        const testReview = await reviewStorage.createUserReview({
-          reviewerId: users[0].id,
-          revieweeId: users[1].id,
-          rating: 4,
-          review: 'This is a test review for admin moderation testing',
-          reviewType: 'transaction',
-          status: 'pending',
-          isPublic: true
-        });
-        console.log('✅ Created test review for moderation');
+      const [firstUser, secondUser] = users;
+      if (!firstUser || !secondUser) {
+        console.warn('⚠️ Unable to locate users for test review creation');
+      } else {
+        try {
+          const testReview = await reviewStorage.createUserReview({
+            reviewerId: firstUser.id,
+            revieweeId: secondUser.id,
+            rating: 4,
+            review: 'This is a test review for admin moderation testing',
+            reviewType: 'transaction',
+            isPublic: 1
+          });
+          console.log('✅ Created test review for moderation');
 
-        // Create audit log entry
-        await reviewStorage.createAuditLogEntry({
-          adminId: users[0].id,
-          action: 'test_review_created',
-          targetType: 'review',
-          targetId: testReview.id,
-          details: { test: true },
-          ipAddress: '127.0.0.1',
-          userAgent: 'Test Script'
-        });
-        console.log('✅ Created test audit log entry');
-      } catch (error) {
-        console.log('⚠️ Test review creation skipped:', error.message);
+          // Create audit log entry
+          await reviewStorage.createAuditLogEntry({
+            adminId: firstUser.id,
+            action: 'test_review_created',
+            targetType: 'review',
+            targetId: testReview.id,
+            details: JSON.stringify({ test: true }),
+            ipAddress: '127.0.0.1',
+            userAgent: 'Test Script'
+          });
+          console.log('✅ Created test audit log entry');
+        } catch (error) {
+          const message = error instanceof Error ? error.message : String(error);
+          console.log('⚠️ Test review creation skipped:', message);
+        }
       }
     }
 
     console.log('✅ Test data creation completed');
   } catch (error) {
-    console.error('❌ Error creating test data:', error);
+    const message = error instanceof Error ? error.message : String(error);
+    console.error('❌ Error creating test data:', message);
   }
 }
 
@@ -149,7 +157,8 @@ async function testAdminEndpoints() {
 
     console.log('\n✅ All admin endpoints are working correctly!');
   } catch (error) {
-    console.error('❌ Error testing admin endpoints:', error);
+    const message = error instanceof Error ? error.message : String(error);
+    console.error('❌ Error testing admin endpoints:', message);
   }
 }
 
@@ -169,7 +178,8 @@ async function main() {
     console.log('💡 Use token:', admin.id, 'for API testing');
 
   } catch (error) {
-    console.error('❌ Admin testing failed:', error);
+    const message = error instanceof Error ? error.message : String(error);
+    console.error('❌ Admin testing failed:', message);
     process.exit(1);
   }
 }

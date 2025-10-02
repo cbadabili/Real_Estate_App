@@ -1,9 +1,9 @@
 
-import { Request, Response, NextFunction } from 'express';
+import { type RequestHandler } from 'express';
 import { randomUUID } from 'crypto';
 import { analyticsService } from '../analytics-service';
 
-export interface RequestWithId extends Request {
+export interface RequestWithId {
   id: string;
 }
 
@@ -14,10 +14,11 @@ export interface RequestWithId extends Request {
  * @param res - Express response instance that receives the header.
  * @param next - Callback to move execution to the next middleware.
  */
-export const addRequestId = (req: RequestWithId, res: Response, next: NextFunction) => {
-  const inboundId = req.get('x-request-id');
+export const addRequestId: RequestHandler = (req, res, next) => {
+  const request = req as unknown as RequestWithId & { get(name: string): string | undefined };
+  const inboundId = request.get('x-request-id');
   const requestId = inboundId && inboundId.trim() ? inboundId : randomUUID();
-  req.id = requestId;
+  (request as RequestWithId).id = requestId;
   res.setHeader('X-Request-ID', requestId);
   next();
 };
@@ -30,7 +31,8 @@ export const addRequestId = (req: RequestWithId, res: Response, next: NextFuncti
  * @param res - Express response used to access status codes and attach hooks.
  * @param next - Callback that defers to downstream middleware/handlers.
  */
-export const structuredLogger = (req: RequestWithId, res: Response, next: NextFunction) => {
+export const structuredLogger: RequestHandler = (req, res, next) => {
+  const request = req as unknown as RequestWithId & { id?: string };
   const start = Date.now();
 
   res.once('finish', () => {
@@ -41,7 +43,7 @@ export const structuredLogger = (req: RequestWithId, res: Response, next: NextFu
     const duration = Date.now() - start;
     const logData = {
       timestamp: new Date().toISOString(),
-      requestId: req.id,
+      requestId: request.id,
       method: req.method,
       path: req.path,
       statusCode: res.statusCode,

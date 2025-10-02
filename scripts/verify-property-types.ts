@@ -1,7 +1,6 @@
 
 import { db } from '../server/db';
 import { properties } from '../shared/schema';
-import { eq } from 'drizzle-orm';
 
 async function verifyPropertyTypes() {
   try {
@@ -14,10 +13,11 @@ async function verifyPropertyTypes() {
       description: properties.description
     }).from(properties);
 
-    const typeCounts = allProperties.reduce((acc, prop) => {
-      acc[prop.propertyType] = (acc[prop.propertyType] || 0) + 1;
+    const typeCounts = allProperties.reduce<Record<string, number>>((acc, prop) => {
+      const key = prop.propertyType ?? 'unknown';
+      acc[key] = (acc[key] ?? 0) + 1;
       return acc;
-    }, {} as Record<string, number>);
+    }, {});
 
     console.log('\nType counts:', typeCounts);
 
@@ -32,7 +32,8 @@ async function verifyPropertyTypes() {
       .forEach(p => console.log(`- ${p.id}: ${p.title}`));
 
   } catch (error) {
-    console.error('Error verifying property types:', error);
+    const message = error instanceof Error ? error.message : String(error);
+    console.error('Error verifying property types:', message);
   }
 }
 

@@ -1,14 +1,12 @@
-import type { Express } from "express";
+import type { Express, Response } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { servicesStorage } from "./services-storage";
-import { reviewStorage } from "./review-storage";
+import { servicesStorage, type ServiceProviderFilters } from "./services-storage";
+import { reviewStorage, type ReviewFilters } from "./review-storage";
+import type { PropertyFilters } from "./repositories/property-repository";
 import marketplaceRoutes from "./marketplace-routes";
 import { createRentalRoutes } from "./rental-routes";
 import { db } from "./db";
-import { parseNaturalLanguageSearch } from './ai-search';
-import realEstateIntelSearchRoutes from './real-estate-intel-search';
-import { searchAggregator } from './search-aggregator';
 import { registerAuthRoutes } from "./routes/auth-routes";
 import { registerUserRoutes } from "./routes/user-routes";
 import { registerPropertyRoutes } from "./routes/property-routes";
@@ -19,7 +17,6 @@ import {
   authorize,
   requireAdmin,
   requireModerator,
-  requireOwnerOrAdmin,
   AuthService
 } from "./auth-middleware";
 import {
@@ -28,16 +25,17 @@ import {
   insertServiceProviderSchema,
   insertUserReviewSchema,
   insertReviewResponseSchema,
-  insertReviewHelpfulSchema,
   insertUserPermissionSchema,
-  insertAdminAuditLogSchema,
+  type InsertUserReview,
   Permission,
   UserRole,
   UserType,
-  insertPropertySchema // Import schema for property creation
+  insertPropertySchema,
+  type InsertProperty,
+  properties,
 } from "../shared/schema.js";
 import { z } from "zod";
-import { eq, and, or, ilike, gte, lte, desc, asc, sql } from "drizzle-orm";
+import { eq, and, gte, lte, sql, type SQL } from "drizzle-orm";
 
 const ensureStringArray = (value: unknown): string[] => {
   if (Array.isArray(value)) {
@@ -69,9 +67,26 @@ const ensureStringArray = (value: unknown): string[] => {
 
   return [String(value)];
 };
-import { properties, users, reviews } from "../shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  const parseIdParam = (value: unknown): number | undefined => {
+    if (typeof value !== "string") {
+      return undefined;
+    }
+
+    const parsed = Number.parseInt(value, 10);
+    return Number.isNaN(parsed) ? undefined : parsed;
+  };
+
+  const requireIdParam = (value: unknown, res: Response, label: string): number | undefined => {
+    const parsed = parseIdParam(value);
+    if (parsed === undefined) {
+      res.status(400).json({ message: `Invalid ${label} id` });
+      return undefined;
+    }
+    return parsed;
+  };
+
   // Register modular routes
   registerAuthRoutes(app);
   registerUserRoutes(app);
@@ -79,7 +94,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   registerLocationRoutes(app);
 
   // Buyer dashboard stats
-  app.get("/api/dashboard/buyer-stats", async (req, res) => {
+  app.get("/api/dashboard/buyer-stats", async (_req, res) => {
     try {
       const stats = {
         savedProperties: 0,
@@ -100,52 +115,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const user = req.user!;
       let stats: any;
 
-      switch (user.role) {
-        case UserRole.BUYER:
-          // Placeholder for buyer-specific stats
-          stats = {
-            propertiesViewed: 10,
-            savedSearches: 5,
-            inquiriesSent: 3
-          };
-          break;
-        case UserRole.SELLER:
-          // Placeholder for seller-specific stats
-          const propertyStats = await storage.getSellerStats(user.id);
-          stats = {
-            listedProperties: propertyStats.listed,
-            soldProperties: propertyStats.sold,
-            pendingOffers: propertyStats.pending,
-            totalValue: propertyStats.totalValue
-          };
-          break;
-        case UserRole.AGENT:
-          // Placeholder for agent-specific stats
-          const agentStats = await storage.getAgentStats(user.id);
-          stats = {
-            propertiesManaged: agentStats.managed,
-            clients: agentStats.clients,
-            appointmentsScheduled: agentStats.appointments,
-            totalCommission: agentStats.commission
-          };
-          break;
-        case UserRole.ADMIN:
-          // Placeholder for admin-specific stats
-          const [userCount, propertyCount, reviewCount] = await Promise.all([
-            storage.countUsers(),
-            storage.countProperties(),
-            reviewStorage.countReviews()
-          ]);
-          stats = {
-            totalUsers: userCount,
-            totalProperties: propertyCount,
-            totalReviews: reviewCount,
-            pendingReviews: await reviewStorage.countReviews({ status: 'pending' })
-          };
-          break;
-        default:
-          stats = { message: "No specific dashboard stats available for this role." };
-          break;
+      if (user.role === UserRole.ADMIN || user.role === UserRole.SUPER_ADMIN) {
+        const [userCount, propertyCount, reviewCount, pendingReviews] = await Promise.all([
+          storage.countUsers(),
+          storage.countProperties(),
+          reviewStorage.countReviews(),
+          reviewStorage.countReviews({ status: "pending" }),
+        ]);
+
+        stats = {
+          totalUsers: userCount,
+          totalProperties: propertyCount,
+          totalReviews: reviewCount,
+          pendingReviews,
+        };
+      } else {
+        switch (user.userType as UserType) {
+          case UserType.BUYER:
+            stats = {
+              propertiesViewed: 10,
+              savedSearches: 5,
+              inquiriesSent: 3,
+            };
+            break;
+          case UserType.SELLER: {
+            const propertyStats = await storage.getSellerStats(user.id);
+            stats = {
+              listedProperties: propertyStats.listed,
+              soldProperties: propertyStats.sold,
+              pendingOffers: propertyStats.pending,
+              totalValue: propertyStats.totalValue,
+            };
+            break;
+          }
+          case UserType.AGENT: {
+            const agentStats = await storage.getAgentStats(user.id);
+            stats = {
+              propertiesManaged: agentStats.managed,
+              clients: agentStats.clients,
+              appointmentsScheduled: agentStats.appointments,
+              totalCommission: agentStats.commission,
+            };
+            break;
+          }
+          default:
+            stats = { message: "No specific dashboard stats available for this role." };
+            break;
+        }
       }
       res.json(stats);
     } catch (error) {
@@ -157,24 +173,85 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Property Management
   app.get("/api/properties", async (req, res) => {
     try {
-      const filters = {
-        minPrice: req.query.minPrice ? parseFloat(req.query.minPrice as string) : undefined,
-        maxPrice: req.query.maxPrice ? parseFloat(req.query.maxPrice as string) : undefined,
-        propertyType: req.query.propertyType as string,
-        minBedrooms: req.query.minBedrooms ? parseInt(req.query.minBedrooms as string) : undefined,
-        minBathrooms: req.query.minBathrooms ? parseFloat(req.query.minBathrooms as string) : undefined,
-        minSquareFeet: req.query.minSquareFeet ? parseInt(req.query.minSquareFeet as string) : undefined,
-        maxSquareFeet: req.query.maxSquareFeet ? parseInt(req.query.maxSquareFeet as string) : undefined,
-        city: req.query.city as string,
-        state: req.query.state as string,
-        zipCode: req.query.zipCode as string,
-        listingType: req.query.listingType as string,
-        status: req.query.status as string || 'active',
-        limit: req.query.limit ? parseInt(req.query.limit as string) : undefined,
-        offset: req.query.offset ? parseInt(req.query.offset as string) : undefined,
-        sortBy: req.query.sortBy as 'price' | 'date' | 'size' | 'bedrooms',
-        sortOrder: req.query.sortOrder as 'asc' | 'desc'
+      const filters: PropertyFilters = {};
+
+      const parseFloatSafe = (value: unknown): number | undefined => {
+        if (typeof value !== "string") {
+          return undefined;
+        }
+        const parsed = Number.parseFloat(value);
+        return Number.isNaN(parsed) ? undefined : parsed;
       };
+
+      const parseIntSafe = (value: unknown): number | undefined => {
+        if (typeof value !== "string") {
+          return undefined;
+        }
+        const parsed = Number.parseInt(value, 10);
+        return Number.isNaN(parsed) ? undefined : parsed;
+      };
+
+      const minPrice = parseFloatSafe(req.query.minPrice);
+      if (minPrice !== undefined) filters.minPrice = minPrice;
+
+      const maxPrice = parseFloatSafe(req.query.maxPrice);
+      if (maxPrice !== undefined) filters.maxPrice = maxPrice;
+
+      const minBedrooms = parseIntSafe(req.query.minBedrooms);
+      if (minBedrooms !== undefined) filters.minBedrooms = minBedrooms;
+
+      const minBathrooms = parseFloatSafe(req.query.minBathrooms);
+      if (minBathrooms !== undefined) filters.minBathrooms = minBathrooms;
+
+      const minSquareFeet = parseIntSafe(req.query.minSquareFeet);
+      if (minSquareFeet !== undefined) filters.minSquareFeet = minSquareFeet;
+
+      const maxSquareFeet = parseIntSafe(req.query.maxSquareFeet);
+      if (maxSquareFeet !== undefined) filters.maxSquareFeet = maxSquareFeet;
+
+      if (typeof req.query.propertyType === "string" && req.query.propertyType.trim()) {
+        filters.propertyType = req.query.propertyType.trim();
+      }
+
+      if (typeof req.query.city === "string" && req.query.city.trim()) {
+        filters.city = req.query.city.trim();
+      }
+
+      if (typeof req.query.state === "string" && req.query.state.trim()) {
+        filters.state = req.query.state.trim();
+      }
+
+      if (typeof req.query.zipCode === "string" && req.query.zipCode.trim()) {
+        filters.zipCode = req.query.zipCode.trim();
+      }
+
+      if (typeof req.query.listingType === "string" && req.query.listingType.trim()) {
+        filters.listingType = req.query.listingType.trim();
+      }
+
+      filters.status = typeof req.query.status === "string" && req.query.status.trim()
+        ? req.query.status.trim()
+        : "active";
+
+      const limit = parseIntSafe(req.query.limit);
+      if (limit !== undefined) filters.limit = limit;
+
+      const offset = parseIntSafe(req.query.offset);
+      if (offset !== undefined) filters.offset = offset;
+
+      if (typeof req.query.sortBy === "string") {
+        const sortBy = req.query.sortBy as PropertyFilters["sortBy"];
+        if (sortBy) {
+          filters.sortBy = sortBy;
+        }
+      }
+
+      if (typeof req.query.sortOrder === "string") {
+        const sortOrder = req.query.sortOrder as PropertyFilters["sortOrder"];
+        if (sortOrder) {
+          filters.sortOrder = sortOrder;
+        }
+      }
 
       console.log('Fetching properties...');
       const properties = await storage.getProperties(filters);
@@ -188,20 +265,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(properties);
     } catch (error) {
       console.error("Get properties error:", error);
+      const message = error instanceof Error ? error.message : String(error);
       res.status(500).json({
         success: false,
         error: "Failed to fetch properties",
-        message: error.message
+        message,
       });
     }
   });
 
   app.get("/api/properties/:id", async (req, res) => {
     try {
-      const propertyId = parseInt(req.params.id);
+      const propertyId = parseIdParam(req.params.id);
 
-      // Validate that propertyId is a valid number
-      if (isNaN(propertyId) || propertyId <= 0) {
+      if (!propertyId || propertyId <= 0) {
         return res.status(400).json({ message: "Invalid property ID" });
       }
 
@@ -248,27 +325,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
         locationSource: locationSource || 'geocode'
       };
 
-      const validatedData = insertPropertySchema.parse(propertyData);
+      const validatedData = insertPropertySchema.parse(propertyData) as InsertProperty;
       const property = await storage.createProperty(validatedData);
       res.status(201).json(property);
     } catch (error) {
       console.error("Create property error:", error);
-      if (error.name === 'ZodError') {
+      if (error instanceof z.ZodError) {
         return res.status(400).json({
           message: "Invalid property data",
           details: error.errors
         });
       }
-      res.status(400).json({ message: "Invalid property data" });
+      const message = error instanceof Error ? error.message : "Invalid property data";
+      res.status(400).json({ message });
     }
   });
 
   app.put("/api/properties/:id", async (req, res) => {
     try {
-      const propertyId = parseInt(req.params.id);
+      const propertyId = parseIdParam(req.params.id);
 
-      // Validate that propertyId is a valid number
-      if (isNaN(propertyId) || propertyId <= 0) {
+      if (!propertyId || propertyId <= 0) {
         return res.status(400).json({ message: "Invalid property ID" });
       }
 
@@ -288,10 +365,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.delete("/api/properties/:id", async (req, res) => {
     try {
-      const propertyId = parseInt(req.params.id);
+      const propertyId = parseIdParam(req.params.id);
 
-      // Validate that propertyId is a valid number
-      if (isNaN(propertyId) || propertyId <= 0) {
+      if (!propertyId || propertyId <= 0) {
         return res.status(400).json({ message: "Invalid property ID" });
       }
 
@@ -310,7 +386,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/users/:id/properties", async (req, res) => {
     try {
-      const userId = parseInt(req.params.id);
+      const userId = requireIdParam(req.params.id, res, "user");
+      if (userId === undefined) {
+        return;
+      }
       const properties = await storage.getUserProperties(userId);
       res.json(properties);
     } catch (error) {
@@ -322,7 +401,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Property Inquiries
   app.get("/api/properties/:id/inquiries", async (req, res) => {
     try {
-      const propertyId = parseInt(req.params.id);
+      const propertyId = requireIdParam(req.params.id, res, "property");
+      if (propertyId === undefined) {
+        return;
+      }
       const inquiries = await storage.getPropertyInquiries(propertyId);
       res.json(inquiries);
     } catch (error) {
@@ -344,7 +426,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/users/:id/inquiries", async (req, res) => {
     try {
-      const userId = parseInt(req.params.id);
+      const userId = requireIdParam(req.params.id, res, "user");
+      if (userId === undefined) {
+        return;
+      }
       const inquiries = await storage.getUserInquiries(userId);
       res.json(inquiries);
     } catch (error) {
@@ -355,7 +440,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.put("/api/inquiries/:id/status", async (req, res) => {
     try {
-      const inquiryId = parseInt(req.params.id);
+      const inquiryId = requireIdParam(req.params.id, res, "inquiry");
+      if (inquiryId === undefined) {
+        return;
+      }
       const { status } = req.body;
 
       const inquiry = await storage.updateInquiryStatus(inquiryId, status);
@@ -384,7 +472,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/properties/:id/appointments", async (req, res) => {
     try {
-      const propertyId = parseInt(req.params.id);
+      const propertyId = requireIdParam(req.params.id, res, "property");
+      if (propertyId === undefined) {
+        return;
+      }
       const appointments = await storage.getPropertyAppointments(propertyId);
       res.json(appointments);
     } catch (error) {
@@ -395,7 +486,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/users/:id/appointments", async (req, res) => {
     try {
-      const userId = parseInt(req.params.id);
+      const userId = requireIdParam(req.params.id, res, "user");
+      if (userId === undefined) {
+        return;
+      }
       const appointments = await storage.getUserAppointments(userId);
       res.json(appointments);
     } catch (error) {
@@ -406,7 +500,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.put("/api/appointments/:id/status", async (req, res) => {
     try {
-      const appointmentId = parseInt(req.params.id);
+      const appointmentId = requireIdParam(req.params.id, res, "appointment");
+      if (appointmentId === undefined) {
+        return;
+      }
       const { status } = req.body;
 
       const appointment = await storage.updateAppointmentStatus(appointmentId, status);
@@ -424,7 +521,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Saved Properties (Favorites)
   app.get("/api/users/:id/saved-properties", async (req, res) => {
     try {
-      const userId = parseInt(req.params.id);
+      const userId = requireIdParam(req.params.id, res, "user");
+      if (userId === undefined) {
+        return;
+      }
       const savedProperties = await storage.getSavedProperties(userId);
       res.json(savedProperties);
     } catch (error) {
@@ -518,18 +618,65 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Services API endpoints
   app.get("/api/services/providers", async (req, res) => {
     try {
-      const filters = {
-        category: req.query.category as string,
-        city: req.query.city as string,
-        verified: req.query.verified === 'true' ? true : req.query.verified === 'false' ? false : undefined,
-        featured: req.query.featured === 'true' ? true : req.query.featured === 'false' ? false : undefined,
-        reacCertified: req.query.reacCertified === 'true' ? true : req.query.reacCertified === 'false' ? false : undefined,
-        minRating: req.query.minRating ? parseFloat(req.query.minRating as string) : undefined,
-        limit: req.query.limit ? parseInt(req.query.limit as string) : undefined,
-        offset: req.query.offset ? parseInt(req.query.offset as string) : undefined,
-        sortBy: req.query.sortBy as 'rating' | 'reviewCount' | 'name' | 'newest',
-        sortOrder: req.query.sortOrder as 'asc' | 'desc'
+      const filters: ServiceProviderFilters = {};
+
+      if (typeof req.query.category === "string" && req.query.category.trim()) {
+        filters.category = req.query.category.trim();
+      }
+
+      if (typeof req.query.city === "string" && req.query.city.trim()) {
+        filters.city = req.query.city.trim();
+      }
+
+      const parseBoolean = (value: unknown): boolean | undefined => {
+        if (value === "true") return true;
+        if (value === "false") return false;
+        return undefined;
       };
+
+      const verified = parseBoolean(req.query.verified);
+      if (verified !== undefined) filters.verified = verified;
+
+      const featured = parseBoolean(req.query.featured);
+      if (featured !== undefined) filters.featured = featured;
+
+      const reacCertified = parseBoolean(req.query.reacCertified);
+      if (reacCertified !== undefined) filters.reacCertified = reacCertified;
+
+      if (typeof req.query.minRating === "string") {
+        const parsed = Number.parseFloat(req.query.minRating);
+        if (!Number.isNaN(parsed)) {
+          filters.minRating = parsed;
+        }
+      }
+
+      if (typeof req.query.limit === "string") {
+        const parsed = Number.parseInt(req.query.limit, 10);
+        if (!Number.isNaN(parsed)) {
+          filters.limit = parsed;
+        }
+      }
+
+      if (typeof req.query.offset === "string") {
+        const parsed = Number.parseInt(req.query.offset, 10);
+        if (!Number.isNaN(parsed)) {
+          filters.offset = parsed;
+        }
+      }
+
+      if (typeof req.query.sortBy === "string") {
+        const sortBy = req.query.sortBy as ServiceProviderFilters["sortBy"];
+        if (sortBy) {
+          filters.sortBy = sortBy;
+        }
+      }
+
+      if (typeof req.query.sortOrder === "string") {
+        const sortOrder = req.query.sortOrder as ServiceProviderFilters["sortOrder"];
+        if (sortOrder) {
+          filters.sortOrder = sortOrder;
+        }
+      }
 
       const providers = await servicesStorage.getServiceProviders(filters);
       res.json(providers);
@@ -539,7 +686,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/services/categories", async (req, res) => {
+  app.get("/api/services/categories", async (_req, res) => {
     try {
       const categories = await servicesStorage.getServiceCategories();
       res.json(categories);
@@ -551,7 +698,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/services/providers/:id", async (req, res) => {
     try {
-      const providerId = parseInt(req.params.id);
+      const providerId = requireIdParam(req.params.id, res, "service provider");
+      if (providerId === undefined) {
+        return;
+      }
       const provider = await servicesStorage.getServiceProvider(providerId);
 
       if (!provider) {
@@ -620,19 +770,85 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // User Reviews
   app.get("/api/reviews", optionalAuthenticate, async (req, res) => {
     try {
-      const filters = {
-        revieweeId: req.query.reviewee_id ? parseInt(req.query.reviewee_id as string) : undefined,
-        reviewerId: req.query.reviewer_id ? parseInt(req.query.reviewer_id as string) : undefined,
-        reviewType: req.query.review_type as string,
-        minRating: req.query.min_rating ? parseInt(req.query.min_rating as string) : undefined,
-        maxRating: req.query.max_rating ? parseInt(req.query.max_rating as string) : undefined,
-        status: req.query.status as string || 'active',
-        isPublic: req.query.is_public !== undefined ? req.query.is_public === 'true' : true,
-        limit: req.query.limit ? parseInt(req.query.limit as string) : 20,
-        offset: req.query.offset ? parseInt(req.query.offset as string) : 0,
-        sortBy: req.query.sort_by as 'rating' | 'date' | 'helpful' || 'date',
-        sortOrder: req.query.sort_order as 'asc' | 'desc' || 'desc'
+      const filters: ReviewFilters = {};
+
+      const parseOptionalInt = (value: unknown): number | undefined => {
+        if (typeof value !== "string") {
+          return undefined;
+        }
+        const parsed = Number.parseInt(value, 10);
+        return Number.isNaN(parsed) ? undefined : parsed;
       };
+
+      const revieweeId = parseOptionalInt(req.query.reviewee_id);
+      if (revieweeId !== undefined) {
+        filters.revieweeId = revieweeId;
+      }
+
+      const reviewerId = parseOptionalInt(req.query.reviewer_id);
+      if (reviewerId !== undefined) {
+        filters.reviewerId = reviewerId;
+      }
+
+      if (typeof req.query.review_type === "string" && req.query.review_type.trim()) {
+        filters.reviewType = req.query.review_type.trim();
+      }
+
+      const minRating = parseOptionalInt(req.query.min_rating);
+      if (minRating !== undefined) {
+        filters.minRating = minRating;
+      }
+
+      const maxRating = parseOptionalInt(req.query.max_rating);
+      if (maxRating !== undefined) {
+        filters.maxRating = maxRating;
+      }
+
+      if (typeof req.query.status === "string" && req.query.status.trim()) {
+        filters.status = req.query.status.trim();
+      } else {
+        filters.status = "active";
+      }
+
+      if (typeof req.query.is_public === "string") {
+        filters.isPublic = req.query.is_public === "true";
+      }
+
+      if (typeof req.query.limit === "string") {
+        const limit = parseOptionalInt(req.query.limit);
+        if (limit !== undefined) {
+          filters.limit = limit;
+        }
+      } else {
+        filters.limit = 20;
+      }
+
+      if (typeof req.query.offset === "string") {
+        const offset = parseOptionalInt(req.query.offset);
+        if (offset !== undefined) {
+          filters.offset = offset;
+        }
+      } else {
+        filters.offset = 0;
+      }
+
+      if (typeof req.query.sort_by === "string") {
+        const sortBy = req.query.sort_by as ReviewFilters["sortBy"];
+        if (sortBy) {
+          filters.sortBy = sortBy;
+        }
+      } else {
+        filters.sortBy = "date";
+      }
+
+      if (typeof req.query.sort_order === "string") {
+        const sortOrder = req.query.sort_order as ReviewFilters["sortOrder"];
+        if (sortOrder) {
+          filters.sortOrder = sortOrder;
+        }
+      } else {
+        filters.sortOrder = "desc";
+      }
 
       const reviews = await reviewStorage.getUserReviewsWithDetails(filters);
       res.json(reviews);
@@ -644,7 +860,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/reviews/:id", async (req, res) => {
     try {
-      const reviewId = parseInt(req.params.id);
+      const reviewId = parseIdParam(req.params.id);
+      if (reviewId === undefined) {
+        return res.status(400).json({ message: "Invalid review id" });
+      }
       const review = await reviewStorage.getUserReview(reviewId);
 
       if (!review || (review.status !== 'active' && !review.isPublic)) {
@@ -692,7 +911,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         action: 'review_created',
         targetType: 'review',
         targetId: review.id,
-        details: { revieweeId: reviewData.revieweeId, rating: reviewData.rating },
+        details: JSON.stringify({ revieweeId: reviewData.revieweeId, rating: reviewData.rating }),
         ipAddress: req.ip,
         userAgent: req.get('User-Agent') || ''
       });
@@ -706,7 +925,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.put("/api/reviews/:id", authenticate, async (req, res) => {
     try {
-      const reviewId = parseInt(req.params.id);
+      const reviewId = parseIdParam(req.params.id);
+      if (reviewId === undefined) {
+        return res.status(400).json({ message: "Invalid review id" });
+      }
       const existingReview = await reviewStorage.getUserReview(reviewId);
 
       if (!existingReview) {
@@ -721,7 +943,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Not authorized to edit this review" });
       }
 
-      const updates = insertUserReviewSchema.partial().parse(req.body);
+      const parsedUpdates = insertUserReviewSchema.partial().parse(req.body);
+      const updates = Object.fromEntries(
+        Object.entries(parsedUpdates).filter(([, value]) => value !== undefined)
+      ) as Partial<InsertUserReview>;
+
       const updatedReview = await reviewStorage.updateUserReview(reviewId, updates);
 
       // Log audit entry
@@ -730,7 +956,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         action: isOwner ? 'review_updated' : 'review_moderated',
         targetType: 'review',
         targetId: reviewId,
-        details: updates,
+        details: JSON.stringify(updates),
         ipAddress: req.ip,
         userAgent: req.get('User-Agent') || ''
       });
@@ -744,7 +970,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.delete("/api/reviews/:id", authenticate, async (req, res) => {
     try {
-      const reviewId = parseInt(req.params.id);
+      const reviewId = requireIdParam(req.params.id, res, "review");
+      if (reviewId === undefined) {
+        return;
+      }
       const existingReview = await reviewStorage.getUserReview(reviewId);
 
       if (!existingReview) {
@@ -771,7 +1000,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         action: 'review_deleted',
         targetType: 'review',
         targetId: reviewId,
-        details: { revieweeId: existingReview.revieweeId },
+        details: JSON.stringify({ revieweeId: existingReview.revieweeId }),
         ipAddress: req.ip,
         userAgent: req.get('User-Agent') || ''
       });
@@ -786,7 +1015,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Review Statistics
   app.get("/api/users/:id/review-stats", async (req, res) => {
     try {
-      const userId = parseInt(req.params.id);
+      const userId = requireIdParam(req.params.id, res, "user");
+      if (userId === undefined) {
+        return;
+      }
       const stats = await reviewStorage.getUserReviewStats(userId);
       res.json(stats);
     } catch (error) {
@@ -798,7 +1030,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Review Responses
   app.get("/api/reviews/:id/responses", async (req, res) => {
     try {
-      const reviewId = parseInt(req.params.id);
+      const reviewId = parseIdParam(req.params.id);
+      if (reviewId === undefined) {
+        return res.status(400).json({ message: "Invalid review id" });
+      }
       const responses = await reviewStorage.getReviewResponses(reviewId);
       res.json(responses);
     } catch (error) {
@@ -809,7 +1044,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/reviews/:id/responses", authenticate, authorize(Permission.RESPOND_TO_REVIEW), async (req, res) => {
     try {
-      const reviewId = parseInt(req.params.id);
+      const reviewId = parseIdParam(req.params.id);
+      if (reviewId === undefined) {
+        return res.status(400).json({ message: "Invalid review id" });
+      }
       const review = await reviewStorage.getUserReview(reviewId);
 
       if (!review) {
@@ -833,7 +1071,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Review Helpful Votes
   app.post("/api/reviews/:id/helpful", authenticate, async (req, res) => {
     try {
-      const reviewId = parseInt(req.params.id);
+      const reviewId = parseIdParam(req.params.id);
+      if (reviewId === undefined) {
+        return res.status(400).json({ message: "Invalid review id" });
+      }
       const { isHelpful } = req.body;
 
       if (typeof isHelpful !== 'boolean') {
@@ -856,7 +1097,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/reviews/:id/helpful-stats", async (req, res) => {
     try {
-      const reviewId = parseInt(req.params.id);
+      const reviewId = parseIdParam(req.params.id);
+      if (reviewId === undefined) {
+        return res.status(400).json({ message: "Invalid review id" });
+      }
       const stats = await reviewStorage.getReviewHelpfulStats(reviewId);
       res.json(stats);
     } catch (error) {
@@ -868,16 +1112,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // ==================== ADMIN & MODERATION ====================
 
   // Admin Panel Access
-  app.get("/api/admin/dashboard", authenticate, requireAdmin, async (req, res) => {
+  app.get("/api/admin/dashboard", authenticate, requireAdmin, async (_req, res) => {
     try {
-      const [
-        flaggedReviews,
-        recentAuditLogs,
-        userStats
-      ] = await Promise.all([
+      const [flaggedReviews, recentAuditLogs] = await Promise.all([
         reviewStorage.getReviewsForModeration(10),
         reviewStorage.getAuditLog({ limit: 20 }),
-        storage.getUsers({ limit: 1 }) // Just to test connection
       ]);
 
       res.json({
@@ -905,7 +1144,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/reviews/:id/flag", authenticate, async (req, res) => {
     try {
-      const reviewId = parseInt(req.params.id);
+      const reviewId = requireIdParam(req.params.id, res, "review");
+      if (reviewId === undefined) {
+        return;
+      }
       const { reason } = req.body;
 
       const success = await reviewStorage.flagReview(reviewId, reason);
@@ -920,7 +1162,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         action: 'review_flagged',
         targetType: 'review',
         targetId: reviewId,
-        details: { reason },
+        details: JSON.stringify({ reason }),
         ipAddress: req.ip,
         userAgent: req.get('User-Agent') || ''
       });
@@ -934,7 +1176,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/admin/reviews/:id/moderate", authenticate, requireModerator, async (req, res) => {
     try {
-      const reviewId = parseInt(req.params.id);
+      const reviewId = requireIdParam(req.params.id, res, "review");
+      if (reviewId === undefined) {
+        return;
+      }
       const { status, moderatorNotes } = req.body;
 
       const moderatedReview = await reviewStorage.moderateReview(reviewId, status, moderatorNotes);
@@ -949,7 +1194,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         action: 'review_moderated',
         targetType: 'review',
         targetId: reviewId,
-        details: { status, moderatorNotes },
+        details: JSON.stringify({ status, moderatorNotes }),
         ipAddress: req.ip,
         userAgent: req.get('User-Agent') || ''
       });
@@ -964,15 +1209,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // User Management
   app.get("/api/admin/users", authenticate, requireAdmin, async (req, res) => {
     try {
-      const search = req.query.search as string;
-      const filters = {
-        userType: req.query.user_type as string,
-        isActive: req.query.is_active !== undefined ? req.query.is_active === 'true' : undefined,
-        limit: req.query.limit ? parseInt(req.query.limit as string) : 50,
-        offset: req.query.offset ? parseInt(req.query.offset as string) : 0
-      };
+      const search = typeof req.query.search === "string" ? req.query.search : "";
+      const userFilters: { userType?: string; isActive?: boolean; limit?: number; offset?: number } = {};
 
-      let users = await storage.getUsers(filters);
+      if (typeof req.query.user_type === "string" && req.query.user_type.trim()) {
+        userFilters.userType = req.query.user_type.trim();
+      }
+
+      if (typeof req.query.is_active === "string") {
+        userFilters.isActive = req.query.is_active === "true";
+      }
+
+      const limit = typeof req.query.limit === "string" ? Number.parseInt(req.query.limit, 10) : 50;
+      userFilters.limit = Number.isNaN(limit) ? 50 : limit;
+
+      const offset = typeof req.query.offset === "string" ? Number.parseInt(req.query.offset, 10) : 0;
+      userFilters.offset = Number.isNaN(offset) ? 0 : offset;
+
+      let users = await storage.getUsers(userFilters);
 
       // Apply search filter if provided
       if (search) {
@@ -1019,7 +1273,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.patch("/api/admin/users/:id", authenticate, requireAdmin, async (req, res) => {
     try {
-      const userId = parseInt(req.params.id);
+      const userId = requireIdParam(req.params.id, res, "user");
+      if (userId === undefined) {
+        return;
+      }
       const updates = req.body;
 
       const updatedUser = await storage.updateUser(userId, updates);
@@ -1034,7 +1291,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         action: 'user_updated',
         targetType: 'user',
         targetId: userId,
-        details: updates,
+        details: JSON.stringify(updates),
         ipAddress: req.ip,
         userAgent: req.get('User-Agent') || ''
       });
@@ -1049,7 +1306,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.patch("/api/admin/reviews/:id/moderate", authenticate, requireModerator, async (req, res) => {
     try {
-      const reviewId = parseInt(req.params.id);
+      const reviewId = requireIdParam(req.params.id, res, "review");
+      if (reviewId === undefined) {
+        return;
+      }
       const { status, moderatorNotes } = req.body;
 
       const moderatedReview = await reviewStorage.moderateReview(reviewId, status, moderatorNotes);
@@ -1064,7 +1324,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         action: 'review_moderated',
         targetType: 'review',
         targetId: reviewId,
-        details: { status, moderatorNotes },
+        details: JSON.stringify({ status, moderatorNotes }),
         ipAddress: req.ip,
         userAgent: req.get('User-Agent') || ''
       });
@@ -1078,15 +1338,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/admin/audit-log", authenticate, requireAdmin, async (req, res) => {
     try {
-      const filters = {
-        adminId: req.query.admin_id ? parseInt(req.query.admin_id as string) : undefined,
-        action: req.query.action as string,
-        targetType: req.query.target_type as string,
-        limit: req.query.limit ? parseInt(req.query.limit as string) : 50,
-        offset: req.query.offset ? parseInt(req.query.offset as string) : 0
-      };
+      const auditFilters: { adminId?: number; action?: string; targetType?: string; limit?: number; offset?: number } = {};
 
-      const logs = await reviewStorage.getAuditLog(filters);
+      if (typeof req.query.admin_id === "string") {
+        const parsed = Number.parseInt(req.query.admin_id, 10);
+        if (!Number.isNaN(parsed)) {
+          auditFilters.adminId = parsed;
+        }
+      }
+
+      if (typeof req.query.action === "string" && req.query.action.trim()) {
+        auditFilters.action = req.query.action.trim();
+      }
+
+      if (typeof req.query.target_type === "string" && req.query.target_type.trim()) {
+        auditFilters.targetType = req.query.target_type.trim();
+      }
+
+      const limit = typeof req.query.limit === "string" ? Number.parseInt(req.query.limit, 10) : 50;
+      auditFilters.limit = Number.isNaN(limit) ? 50 : limit;
+
+      const offset = typeof req.query.offset === "string" ? Number.parseInt(req.query.offset, 10) : 0;
+      auditFilters.offset = Number.isNaN(offset) ? 0 : offset;
+
+      const logs = await reviewStorage.getAuditLog(auditFilters);
       res.json(logs);
     } catch (error) {
       console.error("Get audit logs error:", error);
@@ -1096,7 +1371,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.put("/api/admin/users/:id/status", authenticate, requireAdmin, async (req, res) => {
     try {
-      const userId = parseInt(req.params.id);
+      const userId = requireIdParam(req.params.id, res, "user");
+      if (userId === undefined) {
+        return;
+      }
       const { isActive, reason } = req.body;
 
       const updatedUser = await storage.updateUser(userId, { isActive });
@@ -1111,7 +1389,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         action: isActive ? 'user_activated' : 'user_deactivated',
         targetType: 'user',
         targetId: userId,
-        details: { reason },
+        details: JSON.stringify({ reason }),
         ipAddress: req.ip,
         userAgent: req.get('User-Agent') || ''
       });
@@ -1127,15 +1405,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Audit Logs
   app.get("/api/admin/audit-logs", authenticate, requireAdmin, async (req, res) => {
     try {
-      const filters = {
-        adminId: req.query.admin_id ? parseInt(req.query.admin_id as string) : undefined,
-        action: req.query.action as string,
-        targetType: req.query.target_type as string,
-        limit: req.query.limit ? parseInt(req.query.limit as string) : 50,
-        offset: req.query.offset ? parseInt(req.query.offset as string) : 0
-      };
+      const listFilters: { adminId?: number; action?: string; targetType?: string; limit?: number; offset?: number } = {};
 
-      const logs = await reviewStorage.getAuditLog(filters);
+      if (typeof req.query.admin_id === "string") {
+        const parsed = Number.parseInt(req.query.admin_id, 10);
+        if (!Number.isNaN(parsed)) {
+          listFilters.adminId = parsed;
+        }
+      }
+
+      if (typeof req.query.action === "string" && req.query.action.trim()) {
+        listFilters.action = req.query.action.trim();
+      }
+
+      if (typeof req.query.target_type === "string" && req.query.target_type.trim()) {
+        listFilters.targetType = req.query.target_type.trim();
+      }
+
+      const listLimit = typeof req.query.limit === "string" ? Number.parseInt(req.query.limit, 10) : 50;
+      listFilters.limit = Number.isNaN(listLimit) ? 50 : listLimit;
+
+      const listOffset = typeof req.query.offset === "string" ? Number.parseInt(req.query.offset, 10) : 0;
+      listFilters.offset = Number.isNaN(listOffset) ? 0 : listOffset;
+
+      const logs = await reviewStorage.getAuditLog(listFilters);
       res.json(logs);
     } catch (error) {
       console.error("Get audit logs error:", error);
@@ -1146,7 +1439,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // User Permissions
   app.get("/api/admin/users/:id/permissions", authenticate, requireAdmin, async (req, res) => {
     try {
-      const userId = parseInt(req.params.id);
+      const userId = requireIdParam(req.params.id, res, "user");
+      if (userId === undefined) {
+        return;
+      }
       const permissions = await reviewStorage.getUserPermissions(userId);
       res.json(permissions);
     } catch (error) {
@@ -1157,7 +1453,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/admin/users/:id/permissions", authenticate, requireAdmin, async (req, res) => {
     try {
-      const userId = parseInt(req.params.id);
+      const userId = requireIdParam(req.params.id, res, "user");
+      if (userId === undefined) {
+        return;
+      }
       const permissionData = insertUserPermissionSchema.parse({
         ...req.body,
         userId,
@@ -1172,7 +1471,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         action: 'permission_granted',
         targetType: 'user',
         targetId: userId,
-        details: { permission: permissionData.permission },
+        details: JSON.stringify({ permission: permissionData.permission }),
         ipAddress: req.ip,
         userAgent: req.get('User-Agent') || ''
       });
@@ -1186,8 +1485,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.delete("/api/admin/users/:id/permissions/:permission", authenticate, requireAdmin, async (req, res) => {
     try {
-      const userId = parseInt(req.params.id);
-      const permissionName = req.params.permission;
+      const userId = requireIdParam(req.params.id, res, "user");
+      if (userId === undefined) {
+        return;
+      }
+      const permissionName = typeof req.params.permission === "string" ? req.params.permission : undefined;
+      if (!permissionName) {
+        return res.status(400).json({ message: "Permission name is required" });
+      }
 
       const revoked = await reviewStorage.revokeUserPermission(userId, permissionName);
 
@@ -1201,7 +1506,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         action: 'permission_revoked',
         targetType: 'user',
         targetId: userId,
-        details: { permission: permissionName },
+        details: JSON.stringify({ permission: permissionName }),
         ipAddress: req.ip,
         userAgent: req.get('User-Agent') || ''
       });
@@ -1214,7 +1519,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Debug endpoint to check user data (remove in production)
-  app.get("/api/debug/users", async (req, res) => {
+  app.get("/api/debug/users", async (_req, res) => {
     try {
       const users = await storage.getUsers({ limit: 10 });
       const safeUsers = users.map(user => ({
@@ -1448,19 +1753,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Test endpoint
-  app.get('/api/test', (req, res) => {
+  app.get('/api/test', (_req, res) => {
     res.json({ message: 'API is working!', timestamp: new Date().toISOString() });
   });
 
   // Debug endpoint for property coordinates
-  app.get('/api/debug/properties', async (req, res) => {
+  app.get('/api/debug/properties', async (_req, res) => {
     try {
       const result = await db
         .select({
           id: properties.id,
           title: properties.title,
           city: properties.city,
-          district: properties.district,
+          district: properties.state,
           latitude: properties.latitude,
           longitude: properties.longitude,
           latType: sql`typeof(${properties.latitude})`,
@@ -1498,24 +1803,68 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return isNaN(parsed) ? undefined : parsed;
       };
 
-      const filters = {
-        minPrice: safeParseFloat(req.query.minPrice),
-        maxPrice: safeParseFloat(req.query.maxPrice),
-        propertyType: req.query.type as string,
-        minBedrooms: req.query.bedrooms && req.query.bedrooms !== 'any' ? safeParseInt(req.query.bedrooms) : undefined,
-        minBathrooms: req.query.bathrooms && req.query.bathrooms !== 'any' ? safeParseFloat(req.query.bathrooms) : undefined,
-        city: req.query.location as string,
-        listingType: req.query.listingType as string,
-        status: req.query.status as string || 'active',
-        limit: safeParseInt(req.query.limit) || 20,
-        offset: safeParseInt(req.query.offset) || 0,
-        sortBy: req.query.sortBy as 'price' | 'date' | 'size' | 'bedrooms' || 'date',
-        sortOrder: 'desc' as const
-      };
+      const searchFilters: PropertyFilters = {};
 
-      console.log('Property search filters:', JSON.stringify(filters, null, 2));
+      const minPriceSearch = safeParseFloat(req.query.minPrice);
+      if (minPriceSearch !== undefined) {
+        searchFilters.minPrice = minPriceSearch;
+      }
 
-      const rawProperties = await storage.getProperties(filters);
+      const maxPriceSearch = safeParseFloat(req.query.maxPrice);
+      if (maxPriceSearch !== undefined) {
+        searchFilters.maxPrice = maxPriceSearch;
+      }
+
+      if (typeof req.query.type === "string" && req.query.type.trim()) {
+        searchFilters.propertyType = req.query.type.trim();
+      }
+
+      const minBedroomsSearch = req.query.bedrooms && req.query.bedrooms !== 'any'
+        ? safeParseInt(req.query.bedrooms)
+        : undefined;
+      if (minBedroomsSearch !== undefined) {
+        searchFilters.minBedrooms = minBedroomsSearch;
+      }
+
+      const minBathroomsSearch = req.query.bathrooms && req.query.bathrooms !== 'any'
+        ? safeParseFloat(req.query.bathrooms)
+        : undefined;
+      if (minBathroomsSearch !== undefined) {
+        searchFilters.minBathrooms = minBathroomsSearch;
+      }
+
+      if (typeof req.query.location === "string" && req.query.location.trim()) {
+        searchFilters.city = req.query.location.trim();
+      }
+
+      if (typeof req.query.listingType === "string" && req.query.listingType.trim()) {
+        searchFilters.listingType = req.query.listingType.trim();
+      }
+
+      searchFilters.status = typeof req.query.status === "string" && req.query.status.trim()
+        ? req.query.status.trim()
+        : "active";
+
+      const limitSearch = safeParseInt(req.query.limit);
+      searchFilters.limit = limitSearch ?? 20;
+
+      const offsetSearch = safeParseInt(req.query.offset);
+      searchFilters.offset = offsetSearch ?? 0;
+
+      if (typeof req.query.sortBy === "string") {
+        const sortBy = req.query.sortBy as PropertyFilters["sortBy"];
+        if (sortBy) {
+          searchFilters.sortBy = sortBy;
+        }
+      } else {
+        searchFilters.sortBy = "date";
+      }
+
+      searchFilters.sortOrder = "desc";
+
+      console.log('Property search filters:', JSON.stringify(searchFilters, null, 2));
+
+      const rawProperties = await storage.getProperties(searchFilters);
 
       // Process properties to match the expected format from PropertySearchPage
       const processedProperties = rawProperties.map(prop => ({
@@ -1556,7 +1905,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       console.log('Fetching properties with filters:', req.query);
 
-      let query = db
+      const baseQuery = db
         .select({
           id: properties.id,
           title: properties.title,
@@ -1582,7 +1931,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         .from(properties);
 
       // Apply filters
-      const conditions = [];
+      const conditions: SQL[] = [];
 
       if (req.query.status) {
         conditions.push(eq(properties.status, req.query.status as string));
@@ -1606,19 +1955,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
 
-      if (req.query.priceRange) {
-        const [min, max] = (req.query.priceRange as string).split(',').map(Number);
-        if (!isNaN(min) && !isNaN(max)) {
-          conditions.push(gte(properties.price, min));
-          conditions.push(lte(properties.price, max));
+      if (typeof req.query.priceRange === "string") {
+        const [minPart, maxPart] = req.query.priceRange.split(',');
+
+        const parseRangeValue = (value?: string): number | undefined => {
+          if (!value) {
+            return undefined;
+          }
+          const parsed = Number(value.trim());
+          return Number.isFinite(parsed) ? parsed : undefined;
+        };
+
+        const minParsed = parseRangeValue(minPart);
+        if (minParsed !== undefined) {
+          conditions.push(gte(properties.price, minParsed));
+        }
+
+        const maxParsed = parseRangeValue(maxPart);
+        if (maxParsed !== undefined) {
+          conditions.push(lte(properties.price, maxParsed));
         }
       }
 
-      if (conditions.length > 0) {
-        query = query.where(and(...conditions));
-      }
-
-      const result = await query;
+      const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+      const result = whereClause ? await baseQuery.where(whereClause) : await baseQuery;
 
       // Define coordinate fallbacks for Botswana cities
       const cityCoordinates: { [key: string]: { lat: number; lng: number } } = {
@@ -1635,7 +1995,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
       };
 
       // Process properties to ensure valid coordinates and match expected interface
-      const processedResult = result.map(prop => {
+      type RawSearchProperty = {
+        id: number;
+        title: string | null;
+        description: string | null;
+        price: number | string | null;
+        latitude: number | string | null;
+        longitude: number | string | null;
+        bedrooms: number | null;
+        bathrooms: number | string | null;
+        address: string | null;
+        city: string | null;
+        state: string | null;
+        propertyType: string | null;
+        images: unknown;
+        status: string | null;
+        listingType: string | null;
+      };
+
+      const processedResult = result.map((prop: RawSearchProperty) => {
         let lat = prop.latitude;
         let lng = prop.longitude;
 
@@ -1658,8 +2036,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
           console.log(`Property ${prop.id} "${prop.title}" has invalid coordinates (${prop.latitude}, ${prop.longitude}), using fallback for ${prop.city || prop.state}`);
 
           // Try to get coordinates from city name
-          const cityName = prop.city || prop.state;
-          const cityCoords = cityCoordinates[cityName];
+          const rawCityName = prop.city ?? prop.state ?? null;
+          const cityName = typeof rawCityName === 'string' ? rawCityName.trim() || null : null;
+          const cityCoords =
+            typeof cityName === 'string' && cityName in cityCoordinates
+              ? cityCoordinates[cityName as keyof typeof cityCoordinates]
+              : undefined;
           if (cityCoords) {
             lat = cityCoords.lat + (Math.random() - 0.5) * 0.01; // Add small random offset
             lng = cityCoords.lng + (Math.random() - 0.5) * 0.01;
@@ -1691,7 +2073,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
 
       console.log(`Found ${processedResult.length} properties`);
-      processedResult.forEach(prop => {
+      processedResult.forEach((prop: (typeof processedResult)[number]) => {
         console.log(`Property ${prop.id}: lat=${prop.latitude}, lng=${prop.longitude}, title="${prop.title}"`);
       });
 

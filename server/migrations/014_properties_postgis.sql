@@ -38,7 +38,7 @@ ALTER TABLE properties
   ALTER COLUMN images TYPE jsonb
     USING CASE
       WHEN images IS NULL THEN '[]'::jsonb
-      WHEN pg_typeof(images)::text = 'jsonb' THEN images
+      WHEN pg_typeof(images)::text = 'jsonb' THEN images::jsonb
       WHEN NULLIF(trim(images::text), '') IS NULL THEN '[]'::jsonb
       WHEN images::text ~ '^\s*\[' THEN images::jsonb
       WHEN images::text ~ '^\s*\{' THEN jsonb_build_array(images::jsonb)
@@ -52,7 +52,7 @@ ALTER TABLE properties
   ALTER COLUMN features TYPE jsonb
     USING CASE
       WHEN features IS NULL THEN '[]'::jsonb
-      WHEN pg_typeof(features)::text = 'jsonb' THEN features
+      WHEN pg_typeof(features)::text = 'jsonb' THEN features::jsonb
       WHEN NULLIF(trim(features::text), '') IS NULL THEN '[]'::jsonb
       WHEN features::text ~ '^\s*\[' THEN features::jsonb
       WHEN features::text ~ '^\s*\{' THEN jsonb_build_array(features::jsonb)
@@ -130,36 +130,77 @@ UPDATE properties SET currency = 'BWP' WHERE currency IS NULL;
 ALTER TABLE properties
   ALTER COLUMN currency SET NOT NULL;
 
--- Timestamps as timestamptz with safe backfill
-ALTER TABLE properties
-  ALTER COLUMN created_at TYPE timestamptz
-    USING CASE
-      WHEN pg_typeof(created_at)::text LIKE 'timestamp%' THEN created_at::timestamptz
-      WHEN created_at::text ~ '^[0-9]{13}$' THEN to_timestamp((created_at)::bigint / 1000.0)
-      WHEN created_at::text ~ '^[0-9]{10}$' THEN to_timestamp((created_at)::bigint)
-      ELSE created_at::timestamptz
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_name = 'properties'
+      AND column_name = 'created_at'
+      AND data_type <> 'timestamp with time zone'
+  ) THEN
+    ALTER TABLE properties
+      ALTER COLUMN created_at DROP DEFAULT,
+      ALTER COLUMN created_at DROP NOT NULL;
+
+    ALTER TABLE properties ADD COLUMN IF NOT EXISTS created_at_tmp timestamptz;
+
+    UPDATE properties
+    SET created_at_tmp = CASE
+      WHEN pg_typeof(created_at)::text LIKE 'timestamp%'
+        THEN created_at::timestamptz
+      WHEN created_at IS NULL OR NULLIF(trim(created_at::text), '') IS NULL THEN NULL
+      WHEN created_at::text ~ '^[0-9]{13}$' THEN to_timestamp((created_at::text)::numeric / 1000.0)
+      WHEN created_at::text ~ '^[0-9]{10}$' THEN to_timestamp((created_at::text)::numeric)
+      WHEN created_at::text ~ '^[0-9]+(\.[0-9]+)?$' THEN to_timestamp((created_at::text)::numeric)
+      WHEN created_at::text ~ '^[0-9]{4}-[0-9]{2}-[0-9]{2}' THEN (created_at::text)::timestamptz
+      ELSE NULL
     END;
 
-UPDATE properties SET created_at = now() WHERE created_at IS NULL;
+    UPDATE properties SET created_at_tmp = now() WHERE created_at_tmp IS NULL;
 
-ALTER TABLE properties
-  ALTER COLUMN created_at SET DEFAULT now(),
-  ALTER COLUMN created_at SET NOT NULL;
+    ALTER TABLE properties
+      ALTER COLUMN created_at TYPE timestamptz USING created_at_tmp,
+      ALTER COLUMN created_at SET DEFAULT now(),
+      ALTER COLUMN created_at SET NOT NULL;
 
-ALTER TABLE properties
-  ALTER COLUMN updated_at TYPE timestamptz
-    USING CASE
-      WHEN pg_typeof(updated_at)::text LIKE 'timestamp%' THEN updated_at::timestamptz
-      WHEN updated_at::text ~ '^[0-9]{13}$' THEN to_timestamp((updated_at)::bigint / 1000.0)
-      WHEN updated_at::text ~ '^[0-9]{10}$' THEN to_timestamp((updated_at)::bigint)
-      ELSE updated_at::timestamptz
+    ALTER TABLE properties DROP COLUMN created_at_tmp;
+  END IF;
+
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_name = 'properties'
+      AND column_name = 'updated_at'
+      AND data_type <> 'timestamp with time zone'
+  ) THEN
+    ALTER TABLE properties
+      ALTER COLUMN updated_at DROP DEFAULT,
+      ALTER COLUMN updated_at DROP NOT NULL;
+
+    ALTER TABLE properties ADD COLUMN IF NOT EXISTS updated_at_tmp timestamptz;
+
+    UPDATE properties
+    SET updated_at_tmp = CASE
+      WHEN pg_typeof(updated_at)::text LIKE 'timestamp%'
+        THEN updated_at::timestamptz
+      WHEN updated_at IS NULL OR NULLIF(trim(updated_at::text), '') IS NULL THEN NULL
+      WHEN updated_at::text ~ '^[0-9]{13}$' THEN to_timestamp((updated_at::text)::numeric / 1000.0)
+      WHEN updated_at::text ~ '^[0-9]{10}$' THEN to_timestamp((updated_at::text)::numeric)
+      WHEN updated_at::text ~ '^[0-9]+(\.[0-9]+)?$' THEN to_timestamp((updated_at::text)::numeric)
+      WHEN updated_at::text ~ '^[0-9]{4}-[0-9]{2}-[0-9]{2}' THEN (updated_at::text)::timestamptz
+      ELSE NULL
     END;
 
-UPDATE properties SET updated_at = now() WHERE updated_at IS NULL;
+    UPDATE properties SET updated_at_tmp = now() WHERE updated_at_tmp IS NULL;
 
-ALTER TABLE properties
-  ALTER COLUMN updated_at SET DEFAULT now(),
-  ALTER COLUMN updated_at SET NOT NULL;
+    ALTER TABLE properties
+      ALTER COLUMN updated_at TYPE timestamptz USING updated_at_tmp,
+      ALTER COLUMN updated_at SET DEFAULT now(),
+      ALTER COLUMN updated_at SET NOT NULL;
+
+    ALTER TABLE properties DROP COLUMN updated_at_tmp;
+  END IF;
+END
+$$;
 
 -- Add generated FTS column (must exist before GIN index)
 ALTER TABLE properties

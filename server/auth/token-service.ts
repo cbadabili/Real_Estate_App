@@ -53,33 +53,33 @@ export class TokenService {
       const decoded = jwt.verify(token, env.JWT_SECRET) as any;
       
       // Check if token exists in database
-      const storedToken = await db
+      const [storedToken] = await db
         .select()
         .from(refreshTokens)
         .where(eq(refreshTokens.id, decoded.tokenId))
         .limit(1);
 
-      if (!storedToken.length || storedToken[0].token !== token) {
+      if (!storedToken || storedToken.token !== token) {
         return null;
       }
 
       // Get user data for new access token
       const { users } = await import('../../shared/schema');
-      const user = await db
+      const [userRecord] = await db
         .select()
         .from(users)
         .where(eq(users.id, decoded.id))
         .limit(1);
 
-      if (!user.length) {
+      if (!userRecord) {
         return null;
       }
 
       return {
-        id: user[0].id,
-        email: user[0].email,
-        userType: user[0].userType,
-        role: user[0].role,
+        id: userRecord.id,
+        email: userRecord.email,
+        userType: userRecord.userType,
+        role: userRecord.role,
       };
     } catch {
       return null;

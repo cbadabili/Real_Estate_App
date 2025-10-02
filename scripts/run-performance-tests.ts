@@ -32,6 +32,7 @@ async function runPerformanceTests() {
       stdio: 'inherit',
       detached: true
     });
+    serverProcess.unref();
     
     // Wait for server to start
     await new Promise(resolve => setTimeout(resolve, 5000));

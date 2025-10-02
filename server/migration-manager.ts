@@ -1,4 +1,4 @@
-import { db } from "./db";
+import { db, pool } from "./db";
 import { sql } from "drizzle-orm";
 import fs from "fs";
 import path from "path";
@@ -30,7 +30,25 @@ export class MigrationManager {
   async getAppliedMigrations(): Promise<Migration[]> {
     try {
       const result = await db.execute(sql`SELECT * FROM schema_migrations ORDER BY filename`);
-      return result.rows as Migration[];
+      const rows = Array.isArray(result.rows) ? result.rows : [];
+
+      return rows
+        .map((row): Migration | null => {
+          const id = Number((row as Record<string, unknown>).id);
+          const filename = (row as Record<string, unknown>).filename;
+          const appliedAt = (row as Record<string, unknown>).applied_at;
+
+          if (!Number.isFinite(id) || typeof filename !== 'string') {
+            return null;
+          }
+
+          return {
+            id,
+            filename,
+            applied_at: typeof appliedAt === 'string' ? appliedAt : new Date().toISOString(),
+          };
+        })
+        .filter((migration): migration is Migration => migration !== null);
     } catch (error) {
       return [];
     }
@@ -51,29 +69,19 @@ export class MigrationManager {
     const filePath = path.join(this.migrationsPath, filename);
     const migrationSQL = fs.readFileSync(filePath, 'utf8');
 
-    // Split by semicolon and execute each statement
-    const statements = migrationSQL
-      .split(';')
-      .map(stmt => stmt.trim())
-      .filter(stmt => stmt.length > 0);
-
     console.log(`Running migration: ${filename}`);
 
-    for (const statement of statements) {
-      try {
-        await db.execute(sql.raw(statement));
-      } catch (error) {
-        console.error(`Error in migration ${filename}:`, error);
-        throw error;
-      }
+    const client = await pool.connect();
+    try {
+      await client.query(migrationSQL);
+      await client.query('INSERT INTO schema_migrations (filename) VALUES ($1)', [filename]);
+      console.log(`✅ Migration ${filename} completed`);
+    } catch (error) {
+      console.error(`Error in migration ${filename}:`, error);
+      throw error;
+    } finally {
+      client.release();
     }
-
-    // Mark migration as applied
-    await db.execute(sql`
-      INSERT INTO schema_migrations (filename) VALUES (${filename})
-    `);
-
-    console.log(`✅ Migration ${filename} completed`);
   }
 
   async runAllPendingMigrations(): Promise<void> {
@@ -99,13 +107,18 @@ export class MigrationManager {
 
     // Get all tables
     const result = await db.execute(sql`
-      SELECT table_name as name FROM information_schema.tables 
+      SELECT table_name as name FROM information_schema.tables
       WHERE table_schema = 'public' AND table_type = 'BASE TABLE'
     `);
-    const tables = result.rows;
+    const tables = (Array.isArray(result.rows) ? result.rows : []).map((row) => ({
+      name: String((row as Record<string, unknown>).name ?? ''),
+    }));
 
     // Drop all tables
     for (const table of tables) {
+      if (!table.name) {
+        continue;
+      }
       await db.execute(sql.raw(`DROP TABLE IF EXISTS ${table.name} CASCADE`));
     }
 

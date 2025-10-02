@@ -18,7 +18,7 @@ import {
   type InsertAdminAuditLog,
   Permission
 } from "../shared/schema";
-import { eq, desc, asc, and, sql } from "drizzle-orm";
+import { eq, desc, asc, and, sql, gte, lte, count, type SQL } from "drizzle-orm";
 
 export interface ReviewFilters {
   revieweeId?: number;
@@ -47,6 +47,7 @@ export interface IReviewStorage {
   // User Reviews
   getUserReview(id: number): Promise<UserReview | undefined>;
   getUserReviews(filters?: ReviewFilters): Promise<UserReview[]>;
+  countReviews(filters?: ReviewFilters): Promise<number>;
   getUserReviewsWithDetails(filters?: ReviewFilters): Promise<(UserReview & { 
     reviewer: { firstName: string; lastName: string; avatar?: string | null };
     reviewee: { firstName: string; lastName: string; avatar?: string | null };
@@ -91,22 +92,14 @@ export interface IReviewStorage {
 }
 
 export class ReviewStorage implements IReviewStorage {
-  // User Reviews
-  async getUserReview(id: number): Promise<UserReview | undefined> {
-    const [review] = await db.select().from(userReviews).where(eq(userReviews.id, id));
-    return review;
-  }
+  private buildReviewConditions(filters: ReviewFilters = {}): SQL[] {
+    const conditions: SQL[] = [];
 
-  async getUserReviews(filters: ReviewFilters = {}): Promise<UserReview[]> {
-    let query = db.select().from(userReviews);
-
-    const conditions = [];
-
-    if (filters.revieweeId) {
+    if (filters.revieweeId != null) {
       conditions.push(eq(userReviews.revieweeId, filters.revieweeId));
     }
 
-    if (filters.reviewerId) {
+    if (filters.reviewerId != null) {
       conditions.push(eq(userReviews.reviewerId, filters.reviewerId));
     }
 
@@ -114,12 +107,12 @@ export class ReviewStorage implements IReviewStorage {
       conditions.push(eq(userReviews.reviewType, filters.reviewType));
     }
 
-    if (filters.minRating) {
-      conditions.push(sql`${userReviews.rating} >= ${filters.minRating}`);
+    if (filters.minRating != null) {
+      conditions.push(gte(userReviews.rating, filters.minRating));
     }
 
-    if (filters.maxRating) {
-      conditions.push(sql`${userReviews.rating} <= ${filters.maxRating}`);
+    if (filters.maxRating != null) {
+      conditions.push(lte(userReviews.rating, filters.maxRating));
     }
 
     if (filters.status) {
@@ -127,37 +120,53 @@ export class ReviewStorage implements IReviewStorage {
     }
 
     if (filters.isPublic !== undefined) {
-      conditions.push(eq(userReviews.isPublic, filters.isPublic));
+      conditions.push(eq(userReviews.isPublic, filters.isPublic ? 1 : 0));
     }
 
     if (filters.isVerified !== undefined) {
-      conditions.push(eq(userReviews.isVerified, filters.isVerified));
+      conditions.push(eq(userReviews.isVerified, filters.isVerified ? 1 : 0));
     }
 
-    if (conditions.length > 0) {
-      query = query.where(and(...conditions));
-    }
+    return conditions;
+  }
 
-    // Sorting
-    const sortBy = filters.sortBy || 'date';
-    const sortOrder = filters.sortOrder || 'desc';
+  // User Reviews
+  async getUserReview(id: number): Promise<UserReview | undefined> {
+    const [review] = await db.select().from(userReviews).where(eq(userReviews.id, id));
+    return review;
+  }
 
-    if (sortBy === 'rating') {
-      query = sortOrder === 'asc' ? query.orderBy(asc(userReviews.rating)) : query.orderBy(desc(userReviews.rating));
-    } else if (sortBy === 'date') {
-      query = sortOrder === 'asc' ? query.orderBy(asc(userReviews.createdAt)) : query.orderBy(desc(userReviews.createdAt));
-    }
+  async getUserReviews(filters: ReviewFilters = {}): Promise<UserReview[]> {
+    const conditions = this.buildReviewConditions(filters);
+    const sortBy = filters.sortBy ?? 'date';
+    const sortOrder = filters.sortOrder ?? 'desc';
 
-    // Pagination
-    if (filters.limit) {
-      query = query.limit(filters.limit);
-    }
+    const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+    const orderExpression = sortBy === 'rating'
+      ? (sortOrder === 'asc' ? asc(userReviews.rating) : desc(userReviews.rating))
+      : (sortOrder === 'asc' ? asc(userReviews.createdAt) : desc(userReviews.createdAt));
 
-    if (filters.offset) {
-      query = query.offset(filters.offset);
-    }
+    const baseQuery = whereClause
+      ? db.select().from(userReviews).where(whereClause)
+      : db.select().from(userReviews);
 
-    return await query;
+    const orderedQuery = baseQuery.orderBy(orderExpression);
+    const limitedQuery = typeof filters.limit === 'number' ? orderedQuery.limit(filters.limit) : orderedQuery;
+    const finalQuery = typeof filters.offset === 'number' ? limitedQuery.offset(filters.offset) : limitedQuery;
+
+    return await finalQuery;
+  }
+
+  async countReviews(filters: ReviewFilters = {}): Promise<number> {
+    const conditions = this.buildReviewConditions(filters);
+    const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+
+    const query = whereClause
+      ? db.select({ value: count() }).from(userReviews).where(whereClause)
+      : db.select({ value: count() }).from(userReviews);
+
+    const [result] = await query;
+    return Number(result?.value ?? 0);
   }
 
   async getUserReviewsWithDetails(filters: ReviewFilters = {}): Promise<(UserReview & { 
@@ -185,7 +194,7 @@ export class ReviewStorage implements IReviewStorage {
 
         // Get response count
         const [responsesResult] = await db
-          .select({ count: sql`count(*)` })
+          .select({ count: sql<number>`count(*)` })
           .from(reviewResponses)
           .where(eq(reviewResponses.reviewId, review.id));
 
@@ -196,7 +205,7 @@ export class ReviewStorage implements IReviewStorage {
           ...review,
           reviewer: reviewer || { firstName: 'Unknown', lastName: 'User', avatar: null },
           reviewee: reviewee || { firstName: 'Unknown', lastName: 'User', avatar: null },
-          responsesCount: responsesResult?.count || 0,
+          responsesCount: Number(responsesResult?.count ?? 0),
           helpfulCount: helpfulStats.helpful,
           notHelpfulCount: helpfulStats.notHelpful,
         };
@@ -208,6 +217,9 @@ export class ReviewStorage implements IReviewStorage {
 
   async createUserReview(review: InsertUserReview): Promise<UserReview> {
     const [newReview] = await db.insert(userReviews).values(review).returning();
+    if (!newReview) {
+      throw new Error('Failed to create review');
+    }
     return newReview;
   }
 
@@ -233,14 +245,14 @@ export class ReviewStorage implements IReviewStorage {
     // Get total reviews and average rating
     const [statsResult] = await db
       .select({
-        totalReviews: sql`count(*)`,
-        averageRating: sql`avg(${userReviews.rating})`,
+        totalReviews: sql<number>`count(*)`,
+        averageRating: sql<number | null>`avg(${userReviews.rating})`,
       })
       .from(userReviews)
       .where(and(
         eq(userReviews.revieweeId, userId),
         eq(userReviews.status, 'active'),
-        eq(userReviews.isPublic, true)
+        eq(userReviews.isPublic, 1)
       ));
 
     // Get rating distribution
@@ -253,23 +265,23 @@ export class ReviewStorage implements IReviewStorage {
       .where(and(
         eq(userReviews.revieweeId, userId),
         eq(userReviews.status, 'active'),
-        eq(userReviews.isPublic, true)
+        eq(userReviews.isPublic, 1)
       ))
       .groupBy(userReviews.rating);
 
     // Get verified reviews count
     const [verifiedStats] = await db
-      .select({ count: sql`count(*)` })
+      .select({ count: sql<number>`count(*)` })
       .from(userReviews)
       .where(and(
         eq(userReviews.revieweeId, userId),
-        eq(userReviews.isVerified, true),
+        eq(userReviews.isVerified, 1),
         eq(userReviews.status, 'active')
       ));
 
     // Get total helpful votes
     const [helpfulStats] = await db
-      .select({ count: sql`count(*)` })
+      .select({ count: sql<number>`count(*)` })
       .from(reviewHelpful)
       .innerJoin(userReviews, eq(reviewHelpful.reviewId, userReviews.id))
       .where(and(
@@ -278,16 +290,18 @@ export class ReviewStorage implements IReviewStorage {
       ));
 
     const distribution: Record<number, number> = {};
-    ratingDistribution.forEach(item => {
-      distribution[item.rating] = item.count;
+    type RatingDistributionRow = { rating: number; count: unknown };
+    (ratingDistribution as RatingDistributionRow[]).forEach((item) => {
+      const value = typeof item.count === 'number' ? item.count : Number(item.count ?? 0);
+      distribution[item.rating] = Number(value ?? 0);
     });
 
     return {
-      totalReviews: statsResult?.totalReviews || 0,
-      averageRating: parseFloat(statsResult?.averageRating?.toString() || '0'),
+      totalReviews: Number(statsResult?.totalReviews ?? 0),
+      averageRating: Number(statsResult?.averageRating ?? 0),
       ratingDistribution: distribution,
-      verifiedReviews: verifiedStats?.count || 0,
-      helpfulVotes: helpfulStats?.count || 0,
+      verifiedReviews: Number(verifiedStats?.count ?? 0),
+      helpfulVotes: Number(helpfulStats?.count ?? 0),
     };
   }
 
@@ -307,6 +321,9 @@ export class ReviewStorage implements IReviewStorage {
 
   async createReviewResponse(response: InsertReviewResponse): Promise<ReviewResponse> {
     const [newResponse] = await db.insert(reviewResponses).values(response).returning();
+    if (!newResponse) {
+      throw new Error('Failed to create review response');
+    }
     return newResponse;
   }
 
@@ -343,7 +360,7 @@ export class ReviewStorage implements IReviewStorage {
 
   async getReviewHelpfulStats(reviewId: number): Promise<{ helpful: number; notHelpful: number }> {
     const [helpfulCount] = await db
-      .select({ count: sql`count(*)` })
+      .select({ count: sql<number>`count(*)` })
       .from(reviewHelpful)
       .where(and(
         eq(reviewHelpful.reviewId, reviewId),
@@ -351,7 +368,7 @@ export class ReviewStorage implements IReviewStorage {
       ));
 
     const [notHelpfulCount] = await db
-      .select({ count: sql`count(*)` })
+      .select({ count: sql<number>`count(*)` })
       .from(reviewHelpful)
       .where(and(
         eq(reviewHelpful.reviewId, reviewId),
@@ -359,8 +376,8 @@ export class ReviewStorage implements IReviewStorage {
       ));
 
     return {
-      helpful: helpfulCount?.count || 0,
-      notHelpful: notHelpfulCount?.count || 0,
+      helpful: Number(helpfulCount?.count ?? 0),
+      notHelpful: Number(notHelpfulCount?.count ?? 0),
     };
   }
 
@@ -370,10 +387,14 @@ export class ReviewStorage implements IReviewStorage {
 
     if (existingVote) {
       // Update existing vote
-      return await this.updateReviewHelpful(vote.reviewId, vote.userId, vote.isHelpful);
+      const updated = await this.updateReviewHelpful(vote.reviewId, vote.userId, vote.isHelpful);
+      return updated ?? existingVote;
     } else {
       // Create new vote
       const [newVote] = await db.insert(reviewHelpful).values(vote).returning();
+      if (!newVote) {
+        throw new Error('Failed to create review vote');
+      }
       return newVote;
     }
   }
@@ -421,6 +442,9 @@ export class ReviewStorage implements IReviewStorage {
 
   async createUserPermission(permission: InsertUserPermission): Promise<UserPermission> {
     const [newPermission] = await db.insert(userPermissions).values(permission).returning();
+    if (!newPermission) {
+      throw new Error('Failed to create permission');
+    }
     return newPermission;
   }
 
@@ -438,7 +462,7 @@ export class ReviewStorage implements IReviewStorage {
 
   async hasUserPermission(userId: number, permission: Permission): Promise<boolean> {
     const [result] = await db
-      .select({ count: sql`count(*)` })
+      .select({ count: sql<number>`count(*)` })
       .from(userPermissions)
       .where(and(
         eq(userPermissions.userId, userId),
@@ -446,14 +470,12 @@ export class ReviewStorage implements IReviewStorage {
         sql`(${userPermissions.expiresAt} IS NULL OR ${userPermissions.expiresAt} > now())`
       ));
 
-    return (result?.count || 0) > 0;
+    return Number(result?.count ?? 0) > 0;
   }
 
   // Admin Audit Log
   async getAuditLog(filters: { adminId?: number; action?: string; targetType?: string; limit?: number; offset?: number } = {}): Promise<AdminAuditLog[]> {
-    let query = db.select().from(adminAuditLog);
-
-    const conditions = [];
+    const conditions: SQL[] = [];
 
     if (filters.adminId) {
       conditions.push(eq(adminAuditLog.adminId, filters.adminId));
@@ -467,24 +489,19 @@ export class ReviewStorage implements IReviewStorage {
       conditions.push(eq(adminAuditLog.targetType, filters.targetType));
     }
 
-    if (conditions.length > 0) {
-      query = query.where(and(...conditions));
-    }
+    const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+    const baseQuery = whereClause
+      ? db.select().from(adminAuditLog).where(whereClause)
+      : db.select().from(adminAuditLog);
 
-    query = query.orderBy(desc(adminAuditLog.createdAt));
+    const orderedQuery = baseQuery.orderBy(desc(adminAuditLog.createdAt));
+    const limitedQuery = typeof filters.limit === 'number' ? orderedQuery.limit(filters.limit) : orderedQuery;
+    const finalQuery = typeof filters.offset === 'number' ? limitedQuery.offset(filters.offset) : limitedQuery;
 
-    if (filters.limit) {
-      query = query.limit(filters.limit);
-    }
-
-    if (filters.offset) {
-      query = query.offset(filters.offset);
-    }
-
-    const logs = await query;
+    const logs = await finalQuery;
 
     // JSONB fields are automatically parsed by Drizzle
-    return logs.map(log => ({
+    return logs.map((log: AdminAuditLog) => ({
       ...log,
       details: log.details // No need to parse JSON.parse if it's JSONB
     }));
@@ -498,6 +515,10 @@ export class ReviewStorage implements IReviewStorage {
     };
 
     const [newEntry] = await db.insert(adminAuditLog).values(entryData).returning();
+
+    if (!newEntry) {
+      throw new Error('Failed to create audit log entry');
+    }
 
     return newEntry;
   }

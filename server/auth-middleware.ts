@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import jwt from 'jsonwebtoken';
+import jwt, { type Secret, type SignOptions } from 'jsonwebtoken';
 import { User, UserRole, UserType, Permission } from '../shared/schema';
 import { storage } from './storage';
 
@@ -151,7 +151,13 @@ export class AuthService {
 // JWT utilities
 import { env } from './utils/env';
 
-const JWT_SECRET = env.JWT_SECRET as string;
+const resolvedSecret = process.env.JWT_SECRET ?? env.JWT_SECRET;
+
+if (!resolvedSecret) {
+  throw new Error("JWT_SECRET environment variable is not configured");
+}
+
+const JWT_SECRET: Secret = resolvedSecret;
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '24h';
 
 export interface JWTPayload {
@@ -172,7 +178,7 @@ export const generateToken = (user: User): string => {
   };
 
   return jwt.sign(payload, JWT_SECRET, {
-    expiresIn: JWT_EXPIRES_IN,
+    expiresIn: JWT_EXPIRES_IN as SignOptions["expiresIn"],
     issuer: 'beedab-api',
     audience: 'beedab-client'
   });

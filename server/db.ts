@@ -56,7 +56,7 @@ if (explicitlyDisable) {
   ssl = false;
 }
 
-const pool = new Pool({
+export const pool = new Pool({
   connectionString: databaseUrl,
   ssl,
   connectionTimeoutMillis: 5000,

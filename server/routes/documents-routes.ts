@@ -5,16 +5,6 @@ import fs from 'fs';
 
 const router = Router();
 
-// Mock document data - in production this would come from a database
-const documents = {
-  1: { filename: 'property-sale-agreement.pdf', title: 'Property Sale Agreement' },
-  2: { filename: 'residential-lease-agreement.pdf', title: 'Residential Lease Agreement' },
-  3: { filename: 'property-disclosure-statement.pdf', title: 'Property Disclosure Statement' },
-  4: { filename: 'transfer-duty-declaration.pdf', title: 'Transfer Duty Declaration' },
-  5: { filename: 'commercial-lease-agreement.pdf', title: 'Commercial Lease Agreement' },
-  6: { filename: 'power-of-attorney-property.pdf', title: 'Power of Attorney - Property' }
-};
-
 // Serve document files
 router.get('/documents/:filename', (req, res) => {
   const filename = req.params.filename;

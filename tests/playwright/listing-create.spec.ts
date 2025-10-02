@@ -1,12 +1,10 @@
 import { test, expect } from '@playwright/test';
-import { createProperty, registerUser } from './utils/api';
-
-const uniqueEmail = () => `lister-${Date.now()}-${Math.random().toString(16).slice(2)}@example.com`;
+import { createProperty, registerUser, uniqueEmail } from './utils/api';
 
 test.describe('Agent listing lifecycle', () => {
   test('agent can publish, update, and unpublish a Botswana geo-coded listing', async ({ request }) => {
     const auth = await registerUser(request, {
-      email: uniqueEmail(),
+      email: uniqueEmail('lister'),
       password: 'Secure!123',
       userType: 'agent'
     });

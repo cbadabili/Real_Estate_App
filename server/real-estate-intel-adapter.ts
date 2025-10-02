@@ -91,7 +91,7 @@ export function adaptBeeDabPropertyToListing(property: BeeDabProperty): Listing 
     status: property.status === 'active' ? 'for_sale' : property.status,
     url: `/properties/${property.id}`,
     media: {
-      cover: images.length > 0 ? images[0] : null,
+      cover: images.length > 0 ? images[0] ?? null : null,
       gallery: images
     },
     agency: {

@@ -1,7 +1,8 @@
 import type { Express } from "express";
 import { Request, Response } from 'express';
+import { ZodError } from 'zod';
 import { storage } from "../storage";
-import { insertPropertySchema, UserType } from "../../shared/schema";
+import { insertPropertySchema, type InsertProperty, UserType } from "../../shared/schema";
 import { authenticate, optionalAuthenticate, requireUserType, AuthService } from "../auth-middleware";
 
 export function registerPropertyRoutes(app: Express) {
@@ -171,7 +172,8 @@ export function registerPropertyRoutes(app: Express) {
           const imageArray = Array.isArray(images) ? images : JSON.parse(images);
           validateImages(imageArray);
         } catch (imageError) {
-          return res.status(400).json({ error: imageError.message });
+          const message = imageError instanceof Error ? imageError.message : 'Invalid image payload';
+          return res.status(400).json({ error: message });
         }
       }
 
@@ -191,19 +193,21 @@ export function registerPropertyRoutes(app: Express) {
 
       console.log("Processed property data:", propertyData);
 
-      const validatedData = insertPropertySchema.parse(propertyData);
+      const validatedData = insertPropertySchema.parse(propertyData) as InsertProperty;
       const property = await storage.createProperty(validatedData);
       res.status(201).json(property);
     } catch (error) {
       console.error("Create property error:", error);
-      if (error.name === 'ZodError') {
+      if (error instanceof ZodError) {
         console.error("Validation errors:", error.errors);
         return res.status(400).json({
           message: "Invalid property data",
           details: error.errors
         });
       }
-      res.status(400).json({ message: "Invalid property data", error: error.message });
+
+      const message = error instanceof Error ? error.message : 'Invalid property data';
+      res.status(400).json({ message: "Invalid property data", error: message });
     }
   });
 

@@ -11,6 +11,7 @@ export interface ImageValidationResult {
     height: number;
     format: string;
     size: number;
+    hash?: string;
   };
 }
 
@@ -19,15 +20,24 @@ export class ImageProcessor {
   private static readonly MAX_DIMENSION = 4096;
   private static readonly ALLOWED_FORMATS = ['jpeg', 'png', 'webp'];
 
-  static async validateAndProcess(imageData: string): Promise<ImageValidationResult> {
+  static async validateAndProcess(imageData: string | null | undefined): Promise<ImageValidationResult> {
     try {
+      if (!imageData) {
+        return { isValid: false, error: 'No image data provided' };
+      }
       // Extract data URL info
       const matches = imageData.match(/^data:image\/([^;]+);base64,(.+)$/);
       if (!matches) {
         return { isValid: false, error: 'Invalid image format' };
       }
 
-      const [, mimeType, base64Data] = matches;
+      const mimeType = matches[1]?.toLowerCase();
+      const base64Data = matches[2];
+
+      if (!mimeType || !base64Data) {
+        return { isValid: false, error: 'Invalid image payload' };
+      }
+
       if (!this.ALLOWED_FORMATS.includes(mimeType)) {
         return { isValid: false, error: 'Unsupported image format' };
       }
@@ -54,7 +64,6 @@ export class ImageProcessor {
       // Strip EXIF and optimize
       const processedBuffer = await image
         .rotate() // Auto-rotate based on EXIF
-        .removeMetadata()
         .jpeg({ quality: 85, progressive: true })
         .toBuffer();
 
@@ -70,10 +79,12 @@ export class ImageProcessor {
           height: metadata.height,
           format: 'jpeg',
           size: processedBuffer.length,
+          hash,
         },
       };
     } catch (error) {
-      return { isValid: false, error: 'Image processing failed' };
+      const message = error instanceof Error ? error.message : 'Image processing failed';
+      return { isValid: false, error: message };
     }
   }
 

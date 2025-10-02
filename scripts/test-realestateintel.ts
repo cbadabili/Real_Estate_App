@@ -4,6 +4,22 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
+type RealEstateIntelResult = {
+  title?: string;
+  price?: number;
+  city?: string;
+  country?: string;
+  beds?: number;
+  source?: string;
+  [key: string]: unknown;
+};
+
+type RealEstateIntelResponse = {
+  results?: RealEstateIntelResult[];
+  stats?: Record<string, unknown>;
+  [key: string]: unknown;
+};
+
 const REALINTEL_URL = process.env.REALESTATEINTEL_URL || 'https://api.realestateintel.ai/search';
 const REALINTEL_KEY = process.env.REALESTATEINTEL_API_KEY;
 
@@ -66,12 +82,12 @@ async function testRealEstateIntelAPI() {
       console.log(`Status: ${response.status} ${response.statusText}`);
 
       if (response.ok) {
-        const data = await response.json();
+        const data = await response.json() as RealEstateIntelResponse;
         console.log('✅ Success!');
         console.log(`Results: ${data.results?.length || 0} properties`);
-        
+
         if (data.results && data.results.length > 0) {
-          const firstResult = data.results[0];
+          const [firstResult] = data.results;
           console.log('Sample result:', {
             title: firstResult.title,
             price: firstResult.price,
@@ -85,7 +101,8 @@ async function testRealEstateIntelAPI() {
         console.log('❌ Error response:', errorText);
       }
     } catch (error) {
-      console.error('❌ Request failed:', error);
+      const message = error instanceof Error ? error.message : String(error);
+      console.error('❌ Request failed:', message);
     }
   }
 }
@@ -107,7 +124,7 @@ async function testLocalSearchAggregator() {
       const response = await fetch(`${testUrl}?q=${encodeURIComponent(query)}&limit=5`);
       
       if (response.ok) {
-        const data = await response.json();
+        const data = await response.json() as RealEstateIntelResponse;
         console.log('✅ Local aggregator working!');
         console.log('Stats:', data.stats);
         console.log(`Total results: ${data.results?.length || 0}`);
@@ -115,7 +132,8 @@ async function testLocalSearchAggregator() {
         console.log('❌ Local aggregator error:', response.status);
       }
     } catch (error) {
-      console.error('❌ Local request failed:', error);
+      const message = error instanceof Error ? error.message : String(error);
+      console.error('❌ Local request failed:', message);
     }
   }
 }
@@ -132,4 +150,7 @@ async function runAllTests() {
   console.log('3. Check the server logs for integration status');
 }
 
-runAllTests().catch(console.error);
+runAllTests().catch((error) => {
+  const message = error instanceof Error ? error.message : String(error);
+  console.error('❌ Test suite failed:', message);
+});

@@ -3,6 +3,7 @@ import {
   appointments,
   savedProperties,
   properties,
+  users,
   type User,
   type InsertUser,
   type Property,
@@ -14,7 +15,7 @@ import {
   type SavedProperty
 } from "../shared/schema";
 import { db } from "./db";
-import { eq, desc, asc, and } from "drizzle-orm";
+import { eq, desc, asc, and, count } from "drizzle-orm";
 import { userRepository, type IUserRepository } from "./repositories/user-repository";
 import { propertyRepository, type IPropertyRepository } from "./repositories/property-repository";
 
@@ -83,6 +84,7 @@ export interface IStorage {
   createUser(user: InsertUser): Promise<User>;
   updateUser(id: number, updates: Partial<InsertUser>): Promise<User | undefined>;
   getUsers(filters?: { userType?: string; isActive?: boolean; limit?: number; offset?: number }): Promise<User[]>;
+  countUsers(): Promise<number>;
 
   // Property methods
   getProperty(id: number): Promise<Property | undefined>;
@@ -92,6 +94,9 @@ export interface IStorage {
   deleteProperty(id: number): Promise<boolean>;
   getUserProperties(userId: number): Promise<Property[]>;
   incrementPropertyViews(id: number): Promise<void>;
+  countProperties(): Promise<number>;
+  getSellerStats(userId: number): Promise<{ listed: number; sold: number; pending: number; totalValue: number }>;
+  getAgentStats(userId: number): Promise<{ managed: number; clients: number; appointments: number; commission: number }>;
 
   // Inquiry methods
   getInquiry(id: number): Promise<Inquiry | undefined>;
@@ -160,7 +165,7 @@ export class DatabaseStorage implements IStorage {
    * Alias for getUser to preserve historical API usage.
    */
   async getUserById(id: number): Promise<User | undefined> {
-    return this.userRepo.getUserById(id);
+    return this.userRepo.getUser(id);
   }
 
   /**
@@ -182,6 +187,11 @@ export class DatabaseStorage implements IStorage {
    */
   async getUsers(filters: { userType?: string; isActive?: boolean; limit?: number; offset?: number } = {}): Promise<User[]> {
     return this.userRepo.getUsers(filters);
+  }
+
+  async countUsers(): Promise<number> {
+    const [result] = await db.select({ value: count() }).from(users);
+    return Number(result?.value ?? 0);
   }
 
   // Property methods
@@ -232,6 +242,74 @@ export class DatabaseStorage implements IStorage {
    */
   async incrementPropertyViews(id: number): Promise<void> {
     await this.propertyRepo.incrementPropertyViews(id);
+  }
+
+  async countProperties(): Promise<number> {
+    const [result] = await db.select({ value: count() }).from(properties);
+    return Number(result?.value ?? 0);
+  }
+
+  async getSellerStats(userId: number): Promise<{ listed: number; sold: number; pending: number; totalValue: number }> {
+    const sellerProperties = await this.propertyRepo.getUserProperties(userId);
+
+    let sold = 0;
+    let pending = 0;
+    let totalValue = 0;
+
+    for (const property of sellerProperties) {
+      const price = Number(property.price ?? 0);
+      if (Number.isFinite(price)) {
+        totalValue += price;
+      }
+
+      const status = typeof property.status === 'string' ? property.status.toLowerCase() : '';
+      if (status === 'sold') {
+        sold += 1;
+      } else if (status === 'pending') {
+        pending += 1;
+      }
+    }
+
+    return {
+      listed: sellerProperties.length,
+      sold,
+      pending,
+      totalValue,
+    };
+  }
+
+  async getAgentStats(userId: number): Promise<{ managed: number; clients: number; appointments: number; commission: number }> {
+    const agentProperties = await db
+      .select({ id: properties.id, price: properties.price })
+      .from(properties)
+      .where(eq(properties.agentId, userId));
+
+    const appointmentsForAgent = await db
+      .select({ buyerId: appointments.buyerId })
+      .from(appointments)
+      .where(eq(appointments.agentId, userId));
+
+    const clientIds = new Set<number>();
+    for (const appointment of appointmentsForAgent) {
+      if (appointment.buyerId != null) {
+        clientIds.add(appointment.buyerId);
+      }
+    }
+
+    const totalCommission = agentProperties.reduce((sum, property) => {
+      const price = Number(property.price ?? 0);
+      if (!Number.isFinite(price)) {
+        return sum;
+      }
+      return sum + price * 0.03;
+    }, 0);
+
+    return {
+      managed: agentProperties.length,
+      clients: clientIds.size,
+      appointments: appointmentsForAgent.length,
+      commission: Number(totalCommission.toFixed(2)),
+    };
   }
 
   // Inquiry methods

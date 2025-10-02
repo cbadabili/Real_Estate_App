@@ -21,7 +21,9 @@ export async function seedRentals() {
   }
 
   // Get existing users for landlord IDs
-  const landlords = await db.select({id: users.id})
+  type LandlordUser = { id: number };
+
+  const landlords: LandlordUser[] = await db.select({ id: users.id })
     .from(users)
     .where(inArray(users.userType, ['agent', 'fsbo', 'seller']))
     .orderBy(asc(users.id));
@@ -31,21 +33,9 @@ export async function seedRentals() {
     return;
   }
   
-  console.log(`Found ${landlords.length} eligible landlords with IDs: ${landlords.map(l => l.id).join(', ')}`);
+  console.log(`Found ${landlords.length} eligible landlords with IDs: ${landlords.map((landlord: LandlordUser) => landlord.id).join(', ')}`);
   
-  const getLandlordId = (i: number) => landlords[i % landlords.length].id;
-
-  // Predefined town coordinates for seeding (since location data is now API-based)
-  const towns = [
-    { name: 'Gaborone', coordinates: { lat: -24.6282, lng: 25.9231 } },
-    { name: 'Francistown', coordinates: { lat: -21.1670, lng: 27.5080 } },
-    { name: 'Maun', coordinates: { lat: -19.9833, lng: 23.4167 } },
-    { name: 'Kasane', coordinates: { lat: -17.8167, lng: 25.1500 } },
-    { name: 'Serowe', coordinates: { lat: -22.3833, lng: 26.7167 } },
-    { name: 'Lobatse', coordinates: { lat: -25.2270, lng: 25.6689 } },
-    { name: 'Palapye', coordinates: { lat: -22.5500, lng: 27.1333 } },
-    { name: 'Kanye', coordinates: { lat: -24.9667, lng: 25.3333 } }
-  ];
+  const getLandlordId = (i: number) => landlords[i % landlords.length]!.id;
 
   const baseRentals = [
     {

@@ -1,11 +1,11 @@
 import { Express } from 'express';
 import { db } from './db';
 import { districts, settlements, wards, plots } from '../shared/schema';
-import { eq, and, or, ilike, desc, asc } from 'drizzle-orm';
+import { eq, or, ilike, desc, asc } from 'drizzle-orm';
 
 export function registerLocationRoutes(app: Express) {
   // Get all districts
-  app.get("/api/locations/districts", async (req, res) => {
+  app.get("/api/locations/districts", async (_req, res) => {
     try {
       const allDistricts = await db
         .select()
@@ -314,7 +314,16 @@ export function registerLocationRoutes(app: Express) {
       const searchPattern = `${query.toLowerCase()}%`;
 
       // Get suggestions from major settlements first, then districts
-      const settlementSuggestions = await db
+      type SettlementSuggestionRow = {
+        id: number;
+        name: string;
+        type: string;
+        district_name: string;
+        population: number | null;
+        is_major: boolean | null;
+      };
+
+      const settlementSuggestions: SettlementSuggestionRow[] = await db
         .select({
           id: settlements.id,
           name: settlements.name,
@@ -342,15 +351,23 @@ export function registerLocationRoutes(app: Express) {
         population: number | null;
         is_major: boolean | null;
         level: 'settlement' | 'district';
-      }> = settlementSuggestions.map(s => ({
-        ...s,
+      }> = settlementSuggestions.map((suggestion: SettlementSuggestionRow) => ({
+        ...suggestion,
         level: 'settlement' as const
       }));
 
       // If we need more suggestions, add districts
       if (suggestions.length < limit) {
         const remaining = limit - suggestions.length;
-        const districtResults = await db
+        type DistrictSuggestionRow = {
+          id: number;
+          name: string;
+          type: string;
+          district_name: string;
+          population: number | null;
+        };
+
+        const districtResults: DistrictSuggestionRow[] = await db
           .select({
             id: districts.id,
             name: districts.name,
@@ -364,8 +381,8 @@ export function registerLocationRoutes(app: Express) {
           .limit(remaining);
 
         // Add level and is_major properties manually
-        const districtSuggestions = districtResults.map(d => ({
-          ...d,
+        const districtSuggestions = districtResults.map((district: DistrictSuggestionRow) => ({
+          ...district,
           is_major: false as boolean | null,
           level: 'district' as const
         }));
