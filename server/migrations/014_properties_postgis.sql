@@ -130,6 +130,10 @@ UPDATE properties SET currency = 'BWP' WHERE currency IS NULL;
 ALTER TABLE properties
   ALTER COLUMN currency SET NOT NULL;
 
+ALTER TABLE properties
+  ALTER COLUMN created_at DROP DEFAULT,
+  ALTER COLUMN created_at DROP NOT NULL;
+
 ALTER TABLE properties ADD COLUMN created_at_tmp timestamptz;
 
 UPDATE properties
@@ -159,6 +163,10 @@ UPDATE properties SET created_at = now() WHERE created_at IS NULL;
 ALTER TABLE properties
   ALTER COLUMN created_at SET DEFAULT now(),
   ALTER COLUMN created_at SET NOT NULL;
+
+ALTER TABLE properties
+  ALTER COLUMN updated_at DROP DEFAULT,
+  ALTER COLUMN updated_at DROP NOT NULL;
 
 ALTER TABLE properties ADD COLUMN updated_at_tmp timestamptz;
 
