@@ -65,10 +65,15 @@ export const pool = new Pool({
 // Create drizzle database instance
 export const db = drizzle(pool, { schema });
 
-let lastDatabaseError: unknown;
+export type DatabaseHealth = {
+  ok: true;
+} | {
+  ok: false;
+  error: unknown;
+};
 
 // Test database connection on startup
-export async function testDatabaseConnection(): Promise<boolean> {
+export async function testDatabaseConnection(): Promise<DatabaseHealth> {
   try {
     // Test a simple query with timeout
     const withTimeout = async <T>(promise: Promise<T>, ms: number, message: string) => {
@@ -87,21 +92,19 @@ export async function testDatabaseConnection(): Promise<boolean> {
 
     await withTimeout(pool.query('SELECT 1'), 5000, 'Database connection timeout');
     console.log('✅ Database connection successful');
-    lastDatabaseError = undefined;
-    return true;
+    return { ok: true };
   } catch (error) {
     console.error('❌ Database connection failed:', error);
-    lastDatabaseError = error;
-    return false;
+    return { ok: false, error };
   }
 }
 
 export async function initializeDatabase() {
   console.log('Testing PostgreSQL database connection...');
-  const ok = await testDatabaseConnection();
-  if (!ok) {
-    if (lastDatabaseError instanceof Error) {
-      throw lastDatabaseError;
+  const result = await testDatabaseConnection();
+  if (!result.ok) {
+    if (result.error) {
+      throw result.error;
     }
 
     throw new Error('Database connection failed');

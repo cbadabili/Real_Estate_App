@@ -50,6 +50,7 @@ const optionalBoolean = () =>
     return candidate;
   }, z.boolean().optional());
 
+// Include legacy aliases alongside canonical sort keys so existing clients keep working.
 const sortByEnum = [
   'price',
   'date',
@@ -114,8 +115,6 @@ export const parsePropertyFilters = (query: unknown): PropertyFilters => {
 
     (sanitized as Record<string, unknown>)[key] = value;
   }
-
-  sanitized.status = sanitized.status ?? 'active';
 
   return sanitized;
 };
