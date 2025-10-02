@@ -1,4 +1,4 @@
-import { APIRequestContext, expect } from '@playwright/test';
+import { APIRequestContext, APIResponse, expect } from '@playwright/test';
 
 export interface RegisterUserInput {
   email: string;
@@ -20,24 +20,51 @@ const authHeaders = (auth: AuthContext) => ({
   Authorization: `Bearer ${auth.token}`
 });
 
-export async function registerUser(api: APIRequestContext, input: RegisterUserInput): Promise<AuthContext> {
-  const registerResponse = await api.post('/api/users/register', {
-    data: {
-      email: input.email,
-      password: input.password,
-      firstName: input.firstName ?? 'Test',
-      lastName: input.lastName ?? 'User',
-      acceptTerms: true,
-      acceptMarketing: false,
-      userType: input.userType ?? 'buyer'
-    }
-  });
+const wait = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
-  if (!registerResponse.ok() && registerResponse.status() !== 409) {
-    const body = await registerResponse.text();
+export async function registerUser(api: APIRequestContext, input: RegisterUserInput): Promise<AuthContext> {
+  const maxAttempts = 5;
+  let registerResponse: APIResponse | undefined;
+  let responseBody: string | undefined;
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    registerResponse = await api.post('/api/users/register', {
+      data: {
+        email: input.email,
+        password: input.password,
+        firstName: input.firstName ?? 'Test',
+        lastName: input.lastName ?? 'User',
+        acceptTerms: true,
+        acceptMarketing: false,
+        userType: input.userType ?? 'buyer'
+      }
+    });
+
+    if (registerResponse.ok() || registerResponse.status() === 409) {
+      break;
+    }
+
+    responseBody = await registerResponse.text();
+
+    if (registerResponse.status() === 429 && attempt < maxAttempts) {
+      const retryAfterHeader = registerResponse.headers()['retry-after'];
+      const retryAfterSeconds = retryAfterHeader ? Number(retryAfterHeader) : undefined;
+      const computedBackoff = Number.isFinite(retryAfterSeconds)
+        ? Math.max(0, Number(retryAfterSeconds) * 1000)
+        : 500 * attempt;
+      const backoffMs = Math.min(Math.max(computedBackoff, 250), 5000);
+      await wait(backoffMs);
+      continue;
+    }
+
+    break;
+  }
+
+  if (!registerResponse || (!registerResponse.ok() && registerResponse.status() !== 409)) {
+    const failureBody = responseBody ?? (registerResponse ? await registerResponse.text() : '');
     expect(
-      registerResponse.ok(),
-      `registration failed [${registerResponse.status()}]: ${body}`
+      registerResponse?.ok(),
+      `registration failed [${registerResponse?.status()}]: ${failureBody}`
     ).toBeTruthy();
   }
 
