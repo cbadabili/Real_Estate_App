@@ -44,19 +44,11 @@ jobs:
           nohup npm run start >/tmp/server.log 2>&1 &
       - name: Wait for API server health
         run: |
-          ready=0
-          for i in {1..60}; do
-            if curl -fsS "http://127.0.0.1:${PORT:-5000}/healthz" >/dev/null; then
-              ready=1
-              break
-            fi
-            sleep 2
-          done
-          if [ "$ready" -ne 1 ]; then
+          scripts/wait-for-http.sh "http://127.0.0.1:${PORT:-5000}/health" 120 || {
             echo "API failed to become healthy for Lighthouse run"
             tail -n 200 /tmp/server.log || true
             exit 1
-          fi
+          }
       - name: Run Lighthouse CI
         run: |
           npx lhci autorun --collect.startServer=false --upload.target=temporary-public-storage

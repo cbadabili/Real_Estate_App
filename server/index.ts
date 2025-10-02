@@ -150,6 +150,10 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // --------------------------------------------------
 // Health check – must be registered before other routes
 // --------------------------------------------------
+app.get('/health', (_req: Request, res: Response) => {
+  res.status(200).send('ok');
+});
+
 app.get('/api/health', (_req: Request, res: Response) => {
   res.json({ status: 'ok' });
 });
