@@ -53,8 +53,10 @@ ALTER TABLE users
   ALTER COLUMN created_at TYPE timestamptz USING created_at_tmp;
 
 ALTER TABLE users
-  ALTER COLUMN created_at SET DEFAULT now(),
   ALTER COLUMN created_at SET NOT NULL;
+
+ALTER TABLE users
+  ALTER COLUMN created_at SET DEFAULT now();
 
 ALTER TABLE users DROP COLUMN created_at_tmp;
 
@@ -86,7 +88,9 @@ ALTER TABLE users
   ALTER COLUMN updated_at TYPE timestamptz USING updated_at_tmp;
 
 ALTER TABLE users
-  ALTER COLUMN updated_at SET DEFAULT now(),
   ALTER COLUMN updated_at SET NOT NULL;
+
+ALTER TABLE users
+  ALTER COLUMN updated_at SET DEFAULT now();
 
 ALTER TABLE users DROP COLUMN updated_at_tmp;

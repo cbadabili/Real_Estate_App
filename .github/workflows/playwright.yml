@@ -36,7 +36,7 @@ jobs:
           node-version: 20
           cache: 'npm'
       - name: Install dependencies
-        run: npm ci
+        run: npm ci --include=dev
       - name: Install Playwright
         run: npx playwright install --with-deps
       - name: Prepare database

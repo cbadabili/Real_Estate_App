@@ -162,6 +162,9 @@ async function initializeTables() {
     await db.execute(sql`CREATE UNIQUE INDEX service_providers_email_unique ON service_providers (email)`);
 
     console.log('Creating service_ads table...');
+    // NOTE: Marketplace and marketing tables currently retain millisecond epoch timestamps
+    // because downstream analytics jobs expect numeric fields. These will be
+    // migrated to timestamptz in a dedicated follow-up once the consumers are updated.
     await db.execute(sql`
       CREATE TABLE service_ads (
         id SERIAL PRIMARY KEY,
