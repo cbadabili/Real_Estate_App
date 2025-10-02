@@ -105,10 +105,15 @@ type PropertyFilterInput = z.infer<typeof propertyFilterSchema>;
 export const parsePropertyFilters = (query: unknown): PropertyFilters => {
   const parsed = propertyFilterSchema.parse(query) as PropertyFilterInput;
 
-  const filters: PropertyFilters = {
-    ...parsed,
-    status: parsed.status ?? 'active',
-  };
+  const sanitized = Object.entries(parsed).reduce<Partial<PropertyFilters>>((acc, [key, value]) => {
+    if (value !== undefined) {
+      acc[key as keyof PropertyFilters] = value as PropertyFilters[keyof PropertyFilters];
+    }
+    return acc;
+  }, {});
 
-  return filters;
+  return {
+    ...sanitized,
+    status: sanitized.status ?? 'active',
+  };
 };

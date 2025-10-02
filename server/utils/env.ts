@@ -20,14 +20,14 @@ function requireEnv(name: string, { devDefault }: EnvOptions = {}) {
     throw new Error(`Missing required env var: ${name}`);
   }
 
-  return typeof trimmed === 'string' ? trimmed : String(trimmed);
+  return trimmed;
 }
 
 export const env = {
   NODE_ENV,
   PORT: Number(process.env.PORT ?? 5000),
   DATABASE_URL: requireEnv('DATABASE_URL'),
-  SESSION_SECRET: requireEnv('SESSION_SECRET'),
+  SESSION_SECRET: requireEnv('SESSION_SECRET', { devDefault: 'dev-only-insecure-secret' }),
   JWT_SECRET: requireEnv('JWT_SECRET'),
   CORS_ORIGIN: requireEnv('CORS_ORIGIN', { devDefault: 'http://localhost:5173' }),
   USE_INTEL: (process.env.USE_INTEL ?? 'false').toLowerCase() === 'true',
@@ -38,10 +38,10 @@ export const env = {
 };
 
 export const config = {
-  port: Number(process.env.PORT ?? 5000),
-  nodeEnv: NODE_ENV,
-  dbPath: requireEnv('DATABASE_URL'),
-  jwtSecret: requireEnv('JWT_SECRET'),
+  port: env.PORT,
+  nodeEnv: env.NODE_ENV,
+  dbPath: env.DATABASE_URL,
+  jwtSecret: env.JWT_SECRET,
   openaiApiKey: process.env.OPENAI_API_KEY,
   mapboxToken: process.env.MAPBOX_TOKEN,
   rankingV2: process.env.RANKING_V2 === 'true'
