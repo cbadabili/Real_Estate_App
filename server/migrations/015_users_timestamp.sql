@@ -18,8 +18,10 @@ SET last_login_at_tmp = CASE
 END;
 
 ALTER TABLE users
-  ALTER COLUMN last_login_at TYPE timestamptz USING last_login_at_tmp,
   ALTER COLUMN last_login_at DROP DEFAULT;
+
+ALTER TABLE users
+  ALTER COLUMN last_login_at TYPE timestamptz USING last_login_at_tmp;
 
 ALTER TABLE users DROP COLUMN last_login_at_tmp;
 
@@ -45,7 +47,12 @@ SET created_at_tmp = now()
 WHERE created_at_tmp IS NULL;
 
 ALTER TABLE users
-  ALTER COLUMN created_at TYPE timestamptz USING created_at_tmp,
+  ALTER COLUMN created_at DROP DEFAULT;
+
+ALTER TABLE users
+  ALTER COLUMN created_at TYPE timestamptz USING created_at_tmp;
+
+ALTER TABLE users
   ALTER COLUMN created_at SET DEFAULT now(),
   ALTER COLUMN created_at SET NOT NULL;
 
@@ -73,7 +80,12 @@ SET updated_at_tmp = now()
 WHERE updated_at_tmp IS NULL;
 
 ALTER TABLE users
-  ALTER COLUMN updated_at TYPE timestamptz USING updated_at_tmp,
+  ALTER COLUMN updated_at DROP DEFAULT;
+
+ALTER TABLE users
+  ALTER COLUMN updated_at TYPE timestamptz USING updated_at_tmp;
+
+ALTER TABLE users
   ALTER COLUMN updated_at SET DEFAULT now(),
   ALTER COLUMN updated_at SET NOT NULL;
 
