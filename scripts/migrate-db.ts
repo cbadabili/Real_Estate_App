@@ -1,7 +1,7 @@
 #!/usr/bin/env tsx
 
-import { initializeDatabase } from '../server/db';
-import { getMigrationManager } from '../server/migration-manager';
+import { initializeDatabase } from '../server/db.ts';
+import { getMigrationManager } from '../server/migration-manager.ts';
 
 async function runMigrations() {
   try {
