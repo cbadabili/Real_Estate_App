@@ -29,6 +29,8 @@ jobs:
       PGSSLMODE: disable
       NODE_ENV: production
       JWT_SECRET: test-secret
+      SESSION_SECRET: test-session
+      CORS_ORIGIN: http://127.0.0.1:5173
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
