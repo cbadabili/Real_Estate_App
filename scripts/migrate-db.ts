@@ -26,6 +26,13 @@ const describeDatabaseTarget = (): string | undefined => {
   }
 };
 
+type ConnectionLikeError = {
+  code?: string;
+  address?: string;
+  port?: number | string;
+  message?: string;
+};
+
 const isConnectionRefusedError = (error: unknown): boolean => {
   if (!error || typeof error !== 'object') {
     return false;
@@ -49,6 +56,36 @@ const isConnectionRefusedError = (error: unknown): boolean => {
   return false;
 };
 
+const extractConnectionErrors = (error: unknown): ConnectionLikeError[] => {
+  if (!error || typeof error !== 'object') {
+    return [];
+  }
+
+  const candidate = error as { errors?: unknown[] } & ConnectionLikeError;
+
+  if (candidate.errors && Array.isArray(candidate.errors)) {
+    return candidate.errors
+      .filter((entry): entry is ConnectionLikeError => typeof entry === 'object' && entry !== null)
+      .map((entry) => entry as ConnectionLikeError);
+  }
+
+  return [candidate];
+};
+
+const logConnectionRefusedDetails = (error: unknown) => {
+  const connectionErrors = extractConnectionErrors(error);
+
+  connectionErrors.forEach((entry) => {
+    if (entry.address || entry.port) {
+      const host = entry.address ?? 'unknown host';
+      const port = entry.port ?? 'unknown port';
+      console.error(`   ↳ Attempted ${host}:${port} → ${entry.message ?? 'connection refused'}`);
+    } else if (entry.message) {
+      console.error(`   ↳ ${entry.message}`);
+    }
+  });
+};
+
 async function runMigrations() {
   try {
     console.log('🔄 Running database migrations...');
@@ -62,6 +99,7 @@ async function runMigrations() {
   } catch (error) {
     console.error('❌ Migration failed:', error);
     if (isConnectionRefusedError(error)) {
+      logConnectionRefusedDetails(error);
       const target = describeDatabaseTarget();
       if (target) {
         console.error(
