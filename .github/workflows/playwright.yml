@@ -42,7 +42,7 @@ jobs:
       - name: Prepare database
         run: |
           npm run db:migrate
-          npm run db:seed || echo 'seed step failed, continuing without fixtures'
+          npm run db:seed
       - name: Run Playwright
         run: npx playwright test --reporter=line,html
       - name: Upload Playwright report
