@@ -38,7 +38,7 @@ ALTER TABLE properties
   ALTER COLUMN images TYPE jsonb
     USING CASE
       WHEN images IS NULL THEN '[]'::jsonb
-      WHEN pg_typeof(images)::text = 'jsonb' THEN images
+      WHEN pg_typeof(images)::text = 'jsonb' THEN images::jsonb
       WHEN NULLIF(trim(images::text), '') IS NULL THEN '[]'::jsonb
       WHEN images::text ~ '^\s*\[' THEN images::jsonb
       WHEN images::text ~ '^\s*\{' THEN jsonb_build_array(images::jsonb)
@@ -52,7 +52,7 @@ ALTER TABLE properties
   ALTER COLUMN features TYPE jsonb
     USING CASE
       WHEN features IS NULL THEN '[]'::jsonb
-      WHEN pg_typeof(features)::text = 'jsonb' THEN features
+      WHEN pg_typeof(features)::text = 'jsonb' THEN features::jsonb
       WHEN NULLIF(trim(features::text), '') IS NULL THEN '[]'::jsonb
       WHEN features::text ~ '^\s*\[' THEN features::jsonb
       WHEN features::text ~ '^\s*\{' THEN jsonb_build_array(features::jsonb)
