@@ -10,6 +10,12 @@ CREATE TABLE IF NOT EXISTS public.inquiries (
   created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE INDEX IF NOT EXISTS idx_inquiries_property_id
+  ON public.inquiries(property_id);
+
+CREATE INDEX IF NOT EXISTS idx_inquiries_created_at
+  ON public.inquiries(created_at);
+
 CREATE TABLE IF NOT EXISTS public.appointments (
   id SERIAL PRIMARY KEY,
   property_id INTEGER NOT NULL REFERENCES public.properties(id) ON DELETE CASCADE,
@@ -21,3 +27,9 @@ CREATE TABLE IF NOT EXISTS public.appointments (
   notes TEXT,
   created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE INDEX IF NOT EXISTS idx_appointments_property_id
+  ON public.appointments(property_id);
+
+CREATE INDEX IF NOT EXISTS idx_appointments_created_at
+  ON public.appointments(created_at);
