@@ -130,23 +130,29 @@ UPDATE properties SET currency = 'BWP' WHERE currency IS NULL;
 ALTER TABLE properties
   ALTER COLUMN currency SET NOT NULL;
 
--- Timestamps as timestamptz with safe backfill
+ALTER TABLE properties ADD COLUMN created_at_tmp timestamptz;
+
+UPDATE properties
+SET created_at_tmp = CASE
+  WHEN created_at IS NULL THEN NULL
+  WHEN pg_typeof(created_at)::text LIKE 'timestamp%' THEN created_at::timestamptz
+  WHEN trim(created_at::text) = '' THEN NULL
+  WHEN created_at::text ~ '^[0-9]{13}$' THEN to_timestamp((created_at::text)::numeric / 1000.0)
+  WHEN created_at::text ~ '^[0-9]{10}$' THEN to_timestamp((created_at::text)::numeric)
+  WHEN created_at::text ~ '^[0-9]+(\.[0-9]+)?$' THEN to_timestamp((created_at::text)::numeric)
+  WHEN created_at::text ~ '^[0-9]{4}-[0-9]{2}-[0-9]{2}' THEN (created_at::text)::timestamptz
+  ELSE NULL
+END;
+
+UPDATE properties
+SET created_at_tmp = now()
+WHERE created_at_tmp IS NULL;
+
 ALTER TABLE properties
   ALTER COLUMN created_at TYPE timestamptz
-    USING CASE
-      WHEN created_at IS NULL THEN now()
-      WHEN pg_typeof(created_at)::text LIKE 'timestamp%' THEN created_at::timestamptz
-      WHEN pg_typeof(created_at)::text IN ('integer', 'bigint', 'smallint', 'numeric', 'real', 'double precision') THEN
-        to_timestamp(
-          CASE
-            WHEN created_at::numeric >= 100000000000 THEN (created_at::numeric / 1000.0)
-            ELSE created_at::numeric
-          END::double precision
-        )
-      WHEN created_at::text ~ '^[0-9]{13}$' THEN to_timestamp((created_at)::numeric / 1000.0)
-      WHEN created_at::text ~ '^[0-9]{10}$' THEN to_timestamp((created_at)::numeric)
-      ELSE now()
-    END;
+    USING COALESCE(created_at_tmp, now());
+
+ALTER TABLE properties DROP COLUMN created_at_tmp;
 
 UPDATE properties SET created_at = now() WHERE created_at IS NULL;
 
@@ -154,22 +160,29 @@ ALTER TABLE properties
   ALTER COLUMN created_at SET DEFAULT now(),
   ALTER COLUMN created_at SET NOT NULL;
 
+ALTER TABLE properties ADD COLUMN updated_at_tmp timestamptz;
+
+UPDATE properties
+SET updated_at_tmp = CASE
+  WHEN updated_at IS NULL THEN NULL
+  WHEN pg_typeof(updated_at)::text LIKE 'timestamp%' THEN updated_at::timestamptz
+  WHEN trim(updated_at::text) = '' THEN NULL
+  WHEN updated_at::text ~ '^[0-9]{13}$' THEN to_timestamp((updated_at::text)::numeric / 1000.0)
+  WHEN updated_at::text ~ '^[0-9]{10}$' THEN to_timestamp((updated_at::text)::numeric)
+  WHEN updated_at::text ~ '^[0-9]+(\.[0-9]+)?$' THEN to_timestamp((updated_at::text)::numeric)
+  WHEN updated_at::text ~ '^[0-9]{4}-[0-9]{2}-[0-9]{2}' THEN (updated_at::text)::timestamptz
+  ELSE NULL
+END;
+
+UPDATE properties
+SET updated_at_tmp = now()
+WHERE updated_at_tmp IS NULL;
+
 ALTER TABLE properties
   ALTER COLUMN updated_at TYPE timestamptz
-    USING CASE
-      WHEN updated_at IS NULL THEN now()
-      WHEN pg_typeof(updated_at)::text LIKE 'timestamp%' THEN updated_at::timestamptz
-      WHEN pg_typeof(updated_at)::text IN ('integer', 'bigint', 'smallint', 'numeric', 'real', 'double precision') THEN
-        to_timestamp(
-          CASE
-            WHEN updated_at::numeric >= 100000000000 THEN (updated_at::numeric / 1000.0)
-            ELSE updated_at::numeric
-          END::double precision
-        )
-      WHEN updated_at::text ~ '^[0-9]{13}$' THEN to_timestamp((updated_at)::numeric / 1000.0)
-      WHEN updated_at::text ~ '^[0-9]{10}$' THEN to_timestamp((updated_at)::numeric)
-      ELSE now()
-    END;
+    USING COALESCE(updated_at_tmp, now());
+
+ALTER TABLE properties DROP COLUMN updated_at_tmp;
 
 UPDATE properties SET updated_at = now() WHERE updated_at IS NULL;
 
