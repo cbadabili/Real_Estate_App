@@ -33,6 +33,41 @@ type ConnectionLikeError = {
   message?: string;
 };
 
+const moduleNotFoundCodes = new Set(['MODULE_NOT_FOUND', 'ERR_MODULE_NOT_FOUND']);
+
+type ModuleResolutionError = {
+  code?: string;
+  message?: string;
+  cause?: unknown;
+};
+
+const extractModuleNotFound = (error: unknown): ModuleResolutionError | undefined => {
+  if (!error || typeof error !== 'object') {
+    return undefined;
+  }
+
+  const candidate = error as ModuleResolutionError;
+
+  if (candidate.code && moduleNotFoundCodes.has(candidate.code)) {
+    return candidate;
+  }
+
+  if (candidate.cause) {
+    return extractModuleNotFound(candidate.cause);
+  }
+
+  return undefined;
+};
+
+const describeMissingModule = (error: ModuleResolutionError | undefined): string | undefined => {
+  if (!error?.message) {
+    return undefined;
+  }
+
+  const match = error.message.match(/Cannot find (?:module|package) '([^']+)'/);
+  return match?.[1];
+};
+
 const isConnectionRefusedError = (error: unknown): boolean => {
   if (!error || typeof error !== 'object') {
     return false;
@@ -98,6 +133,14 @@ async function runMigrations() {
     process.exit(0);
   } catch (error) {
     console.error('❌ Migration failed:', error);
+    const moduleNotFound = extractModuleNotFound(error);
+    if (moduleNotFound) {
+      const missing = describeMissingModule(moduleNotFound);
+      if (missing) {
+        console.error(`💡 Missing dependency detected: '${missing}'.`);
+      }
+      console.error("📘 Hint: Run 'npm install' before executing database migrations to install all required packages.");
+    }
     if (isConnectionRefusedError(error)) {
       logConnectionRefusedDetails(error);
       const target = describeDatabaseTarget();
