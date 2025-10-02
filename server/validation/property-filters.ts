@@ -110,9 +110,5 @@ export const parsePropertyFilters = (query: unknown): PropertyFilters => {
     status: parsed.status ?? 'active',
   };
 
-  if (filters.limit && filters.limit > 100) {
-    filters.limit = 100;
-  }
-
   return filters;
 };

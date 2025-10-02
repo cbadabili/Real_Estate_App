@@ -28,7 +28,7 @@ app.set('trust proxy', 1);
 
 const nodeEnv = process.env.NODE_ENV ?? 'development';
 const isDevelopment = nodeEnv === 'development';
-const shouldBootMigrations = process.env.BOOT_RUN_MIGRATIONS !== 'false';
+const shouldBootMigrations = (process.env.BOOT_RUN_MIGRATIONS ?? '').toLowerCase() !== 'false';
 
 if (!process.env.NODE_ENV) {
   process.env.NODE_ENV = nodeEnv;

@@ -34,7 +34,7 @@ module.exports = tseslint.config(
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {
-    files: ['server/**/*.{ts,tsx}', 'scripts/**/*.{ts,tsx}'],
+    files: ['server/**/*.{ts,tsx}'],
     languageOptions: {
       parserOptions: {
         project: ['./tsconfig.json'],

@@ -1,37 +1,58 @@
-import type { Express } from "express";
+import type { Express, Request } from "express";
 import { ZodError } from 'zod';
 import { storage } from "../storage";
 import { insertPropertySchema, type InsertProperty } from "../../shared/schema";
 import { authenticate, optionalAuthenticate, AuthService } from "../auth-middleware";
 import { logError, logInfo, logWarn } from "../utils/logger";
 import { parsePropertyFilters } from "../validation/property-filters";
+import type { RequestWithId } from "../middleware/logging";
 
 export function registerPropertyRoutes(app: Express) {
+  const buildRequestContext = (req: Request) => {
+    const requestWithId = req as Request & Partial<RequestWithId>;
+    return {
+      requestId: requestWithId.id,
+      method: req.method,
+      path: req.path,
+    };
+  };
+
+  const isNum = (value: unknown): value is number =>
+    typeof value === 'number' && Number.isFinite(value);
+
+  const coordinatesWithinBotswana = (lng: number, lat: number) =>
+    lng >= 20 && lng <= 29 && lat >= -27 && lat <= -17;
+
   // Get all properties
   app.get("/api/properties", async (req, res) => {
     try {
       const filters = parsePropertyFilters(req.query);
       const properties = await storage.getProperties(filters);
       logInfo("property.list.success", {
-        req,
         meta: {
           filters,
           resultCount: properties.length,
+          request: buildRequestContext(req),
         },
       });
       res.json(properties);
     } catch (error) {
       if (error instanceof ZodError) {
         logWarn("property.list.validation_failed", {
-          req,
-          meta: { issues: error.issues },
+          meta: {
+            issues: error.issues,
+            request: buildRequestContext(req),
+          },
         });
         return res.status(400).json({
           message: "Invalid property filters",
           details: error.issues,
         });
       }
-      logError("property.list.failed", { req, error });
+      logError("property.list.failed", {
+        error,
+        meta: buildRequestContext(req),
+      });
       res.status(500).json({ message: "Failed to fetch properties" });
     }
   });
@@ -72,7 +93,10 @@ export function registerPropertyRoutes(app: Express) {
 
       res.json(suggestions);
     } catch (error) {
-      logError("property.suggest.failed", { req, error });
+      logError("property.suggest.failed", {
+        error,
+        meta: buildRequestContext(req),
+      });
       res.json([]);
     }
   });
@@ -97,7 +121,10 @@ export function registerPropertyRoutes(app: Express) {
       await storage.incrementPropertyViews(propertyId);
       res.json(property);
     } catch (error) {
-      logError("property.get.failed", { req, error });
+      logError("property.get.failed", {
+        error,
+        meta: buildRequestContext(req),
+      });
       res.status(500).json({ message: "Failed to fetch property" });
     }
   });
@@ -156,14 +183,40 @@ export function registerPropertyRoutes(app: Express) {
       if (!trimmed) {
         return [];
       }
+
+      const splitCommaSeparated = (input: string) =>
+        input
+          .split(',')
+          .map(item => item.trim())
+          .filter(Boolean)
+          .map(item => String(item));
+
       try {
         const parsed = JSON.parse(trimmed);
         if (Array.isArray(parsed)) {
           return parsed.map(item => String(item));
         }
+
+        if (typeof parsed === 'string') {
+          const normalized = parsed.trim();
+          if (!normalized) {
+            return [];
+          }
+          return normalized.includes(',')
+            ? splitCommaSeparated(normalized)
+            : [normalized];
+        }
+
+        if (trimmed.includes(',')) {
+          return splitCommaSeparated(trimmed);
+        }
+
         throw new Error(`${field} must be an array of strings`);
       } catch (parseError) {
         if (parseError instanceof SyntaxError) {
+          if (trimmed.includes(',')) {
+            return splitCommaSeparated(trimmed);
+          }
           return [trimmed];
         }
         throw parseError;
@@ -184,10 +237,7 @@ export function registerPropertyRoutes(app: Express) {
       } = req.body;
 
       // Validate coordinates are within Botswana bounds
-      const isNum = (v: unknown): v is number => typeof v === "number" && Number.isFinite(v);
-      const inBW = (lng: number, lat: number) => lng >= 20 && lng <= 29 && lat >= -27 && lat <= -17;
-
-      if (isNum(latitude) && isNum(longitude) && !inBW(longitude, latitude)) {
+      if (isNum(latitude) && isNum(longitude) && !coordinatesWithinBotswana(longitude, latitude)) {
         return res.status(400).json({ error: "Coordinates must be within Botswana bounds." });
       }
 
@@ -202,8 +252,10 @@ export function registerPropertyRoutes(app: Express) {
       } catch (imageError) {
         const message = imageError instanceof Error ? imageError.message : 'Invalid image payload';
         logWarn("property.create.invalid_images", {
-          req,
           userId: req.user?.id,
+          meta: {
+            request: buildRequestContext(req),
+          },
           error: imageError,
         });
         return res.status(400).json({ error: message });
@@ -214,8 +266,10 @@ export function registerPropertyRoutes(app: Express) {
       } catch (featureError) {
         const message = featureError instanceof Error ? featureError.message : 'Invalid features payload';
         logWarn("property.create.invalid_features", {
-          req,
           userId: req.user?.id,
+          meta: {
+            request: buildRequestContext(req),
+          },
           error: featureError,
         });
         return res.status(400).json({ error: message });
@@ -238,17 +292,21 @@ export function registerPropertyRoutes(app: Express) {
       const validatedData = insertPropertySchema.parse(propertyData) as InsertProperty;
       const property = await storage.createProperty(validatedData);
       logInfo("property.create.success", {
-        req,
         userId: req.user?.id,
-        meta: { propertyId: property.id },
+        meta: {
+          propertyId: property.id,
+          request: buildRequestContext(req),
+        },
       });
       res.status(201).json(property);
     } catch (error) {
       if (error instanceof ZodError) {
         logWarn("property.create.validation_failed", {
-          req,
           userId: req.user?.id,
-          meta: { issues: error.errors },
+          meta: {
+            issues: error.errors,
+            request: buildRequestContext(req),
+          },
         });
         return res.status(400).json({
           message: "Invalid property data",
@@ -258,8 +316,8 @@ export function registerPropertyRoutes(app: Express) {
 
       const message = error instanceof Error ? error.message : 'Invalid property data';
       logError("property.create.failed", {
-        req,
         userId: req.user?.id,
+        meta: buildRequestContext(req),
         error,
       });
       res.status(400).json({ message: "Invalid property data", error: message });
@@ -276,9 +334,6 @@ export function registerPropertyRoutes(app: Express) {
         return res.status(400).json({ message: "Invalid property ID" });
       }
 
-      const updates = req.body;
-
-      // Check if user owns the property or is admin
       const existingProperty = await storage.getProperty(propertyId);
       if (!existingProperty) {
         return res.status(404).json({ message: "Property not found" });
@@ -291,7 +346,150 @@ export function registerPropertyRoutes(app: Express) {
         return res.status(403).json({ message: "Not authorized to update this property" });
       }
 
-      const property = await storage.updateProperty(propertyId, updates);
+      const updates = (req.body ?? {}) as Record<string, unknown>;
+
+      const {
+        areaText,
+        placeName,
+        placeId,
+        latitude,
+        longitude,
+        locationSource,
+        features,
+        images,
+        ...restUpdates
+      } = updates;
+
+      const normalizedUpdates: Partial<InsertProperty> = {
+        ...(restUpdates as Partial<InsertProperty>),
+      };
+
+      if (Object.prototype.hasOwnProperty.call(updates, 'areaText')) {
+        normalizedUpdates.areaText = areaText ? String(areaText) : null;
+      }
+
+      if (Object.prototype.hasOwnProperty.call(updates, 'placeName')) {
+        normalizedUpdates.placeName = placeName ? String(placeName) : null;
+      }
+
+      if (Object.prototype.hasOwnProperty.call(updates, 'placeId')) {
+        normalizedUpdates.placeId = placeId ? String(placeId) : null;
+      }
+
+      if (Object.prototype.hasOwnProperty.call(updates, 'locationSource')) {
+        const sourceString = typeof locationSource === 'string' ? locationSource.trim() : '';
+        normalizedUpdates.locationSource = sourceString || 'geocode';
+      }
+
+      const coerceCoordinate = (
+        value: unknown,
+        field: 'latitude' | 'longitude'
+      ): number | null | undefined => {
+        if (value === undefined) {
+          return undefined;
+        }
+        if (value === null || value === '') {
+          return null;
+        }
+        if (typeof value === 'number' && Number.isFinite(value)) {
+          return value;
+        }
+        if (typeof value === 'string') {
+          const trimmed = value.trim();
+          if (!trimmed) {
+            return null;
+          }
+          const numeric = Number(trimmed);
+          if (Number.isFinite(numeric)) {
+            return numeric;
+          }
+        }
+        throw new Error(`${field} must be a number`);
+      };
+
+      let normalizedLatitude: number | null | undefined;
+      if (Object.prototype.hasOwnProperty.call(updates, 'latitude')) {
+        try {
+          normalizedLatitude = coerceCoordinate(latitude, 'latitude');
+          if (normalizedLatitude !== undefined) {
+            normalizedUpdates.latitude = normalizedLatitude;
+          }
+        } catch (coordinateError) {
+          const message = coordinateError instanceof Error ? coordinateError.message : 'Invalid latitude';
+          return res.status(400).json({ error: message });
+        }
+      }
+
+      let normalizedLongitude: number | null | undefined;
+      if (Object.prototype.hasOwnProperty.call(updates, 'longitude')) {
+        try {
+          normalizedLongitude = coerceCoordinate(longitude, 'longitude');
+          if (normalizedLongitude !== undefined) {
+            normalizedUpdates.longitude = normalizedLongitude;
+          }
+        } catch (coordinateError) {
+          const message = coordinateError instanceof Error ? coordinateError.message : 'Invalid longitude';
+          return res.status(400).json({ error: message });
+        }
+      }
+
+      const finalLatitude =
+        normalizedLatitude !== undefined
+          ? normalizedLatitude
+          : (existingProperty.latitude ?? undefined);
+      const finalLongitude =
+        normalizedLongitude !== undefined
+          ? normalizedLongitude
+          : (existingProperty.longitude ?? undefined);
+
+      if (
+        typeof finalLatitude === 'number' &&
+        typeof finalLongitude === 'number' &&
+        !coordinatesWithinBotswana(finalLongitude, finalLatitude)
+      ) {
+        return res.status(400).json({ error: "Coordinates must be within Botswana bounds." });
+      }
+
+      if (Object.prototype.hasOwnProperty.call(updates, 'features')) {
+        try {
+          const parsedFeatures = parseStringArrayField(features, 'features');
+          if (parsedFeatures !== undefined) {
+            normalizedUpdates.features = parsedFeatures;
+          }
+        } catch (featureError) {
+          const message = featureError instanceof Error ? featureError.message : 'Invalid features payload';
+          logWarn("property.update.invalid_features", {
+            userId: req.user?.id,
+            meta: {
+              request: buildRequestContext(req),
+            },
+            error: featureError,
+          });
+          return res.status(400).json({ error: message });
+        }
+      }
+
+      if (Object.prototype.hasOwnProperty.call(updates, 'images')) {
+        try {
+          const parsedImages = parseStringArrayField(images, 'images');
+          if (parsedImages !== undefined) {
+            validateImages(parsedImages);
+            normalizedUpdates.images = parsedImages;
+          }
+        } catch (imageError) {
+          const message = imageError instanceof Error ? imageError.message : 'Invalid image payload';
+          logWarn("property.update.invalid_images", {
+            userId: req.user?.id,
+            meta: {
+              request: buildRequestContext(req),
+            },
+            error: imageError,
+          });
+          return res.status(400).json({ error: message });
+        }
+      }
+
+      const property = await storage.updateProperty(propertyId, normalizedUpdates);
       if (!property) {
         return res.status(404).json({ message: "Property not found" });
       }
@@ -299,8 +497,8 @@ export function registerPropertyRoutes(app: Express) {
       res.json(property);
     } catch (error) {
       logError("property.update.failed", {
-        req,
         userId: req.user?.id,
+        meta: buildRequestContext(req),
         error,
       });
       res.status(500).json({ message: "Failed to update property" });
@@ -334,8 +532,8 @@ export function registerPropertyRoutes(app: Express) {
       res.json({ message: "Property deleted successfully" });
     } catch (error) {
       logError("property.delete.failed", {
-        req,
         userId: req.user?.id,
+        meta: buildRequestContext(req),
         error,
       });
       res.status(500).json({ message: "Failed to delete property" });
@@ -363,7 +561,10 @@ export function registerPropertyRoutes(app: Express) {
 
       res.status(201).json(appointment);
     } catch (error) {
-      logError("property.appointment.failed", { req, error });
+      logError("property.appointment.failed", {
+        meta: buildRequestContext(req),
+        error,
+      });
       res.status(500).json({ message: "Failed to create appointment" });
     }
   });

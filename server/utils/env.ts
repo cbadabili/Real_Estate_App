@@ -14,10 +14,13 @@ const isDevelopment = NODE_ENV === 'development';
 
 function requireEnv(name: string, { devDefault }: EnvOptions = {}) {
   const candidate = process.env[name] ?? (isDevelopment ? devDefault : undefined);
-  if (candidate === undefined || String(candidate).trim() === '') {
+  const trimmed = typeof candidate === 'string' ? candidate.trim() : candidate;
+
+  if (trimmed === undefined || trimmed === null || trimmed === '') {
     throw new Error(`Missing required env var: ${name}`);
   }
-  return String(candidate);
+
+  return typeof trimmed === 'string' ? trimmed : String(trimmed);
 }
 
 export const env = {
