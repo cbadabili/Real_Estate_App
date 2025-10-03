@@ -109,10 +109,14 @@ app.use(cors(corsOptions));
 app.use(addRequestId);
 app.use(structuredLogger);
 
+const isTestLikeEnvironment = process.env.NODE_ENV === 'test' || process.env.E2E === 'true';
+const resolveRateLimit = (defaultLimit: number, testOverride = 1000) =>
+  isTestLikeEnvironment ? Math.max(defaultLimit, testOverride) : defaultLimit;
+
 // Rate limiting for auth and write endpoints
 const authWriteLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  limit: 100,
+  limit: resolveRateLimit(100),
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: 'Too many requests, please try again later' }
@@ -121,7 +125,7 @@ const authWriteLimiter = rateLimit({
 // General API rate limiting
 const generalApiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  limit: 1000, // More generous for general API usage
+  limit: resolveRateLimit(1000, 2000), // More generous for general API usage
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: 'API rate limit exceeded' }
@@ -130,7 +134,7 @@ const generalApiLimiter = rateLimit({
 // Write operations rate limiting
 const writeApiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  limit: 50,
+  limit: resolveRateLimit(50),
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: 'Too many write requests, please try again later' }
@@ -139,7 +143,7 @@ const writeApiLimiter = rateLimit({
 // Search rate limiting
 const searchLimiter = rateLimit({
   windowMs: 1 * 60 * 1000, // 1 minute
-  limit: 100,
+  limit: resolveRateLimit(100, 500),
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: 'Search rate limit exceeded' }

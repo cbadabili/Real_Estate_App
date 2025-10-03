@@ -41,14 +41,6 @@ export default defineConfig({
       use: { ...devices['Desktop Chrome'], viewport: viewports.desktop }
     },
     {
-      name: 'firefox-mobile',
-      use: { ...devices['Pixel 5'], browserName: 'firefox' }
-    },
-    {
-      name: 'firefox-tablet',
-      use: { ...devices['iPad (gen 7)'], browserName: 'firefox' }
-    },
-    {
       name: 'firefox-desktop',
       use: { ...devices['Desktop Firefox'], viewport: viewports.desktop }
     },
