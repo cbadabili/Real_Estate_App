@@ -17,6 +17,19 @@ export function registerPropertyRoutes(app: Express) {
     };
   };
 
+  const parseNumericParam = (value: unknown, label: string): number => {
+    if (typeof value !== 'string' || value.trim() === '') {
+      throw new Error(`${label} is required`);
+    }
+
+    const parsed = Number.parseInt(value, 10);
+    if (Number.isNaN(parsed)) {
+      throw new Error(`${label} must be a number`);
+    }
+
+    return parsed;
+  };
+
   const sanitizeNullableString = (value: unknown): string | null => {
     if (value === undefined || value === null) {
       return null;
@@ -167,11 +180,12 @@ export function registerPropertyRoutes(app: Express) {
   // Get single property
   app.get("/api/properties/:id", optionalAuthenticate, async (req, res) => { // Changed to optionalAuthenticate for public view
     try {
-      const propertyId = parseInt(req.params.id);
-
-      // Validate that propertyId is a valid number
-      if (isNaN(propertyId) || propertyId <= 0) {
-        return res.status(400).json({ message: "Invalid property ID" });
+      let propertyId: number;
+      try {
+        propertyId = parseNumericParam(req.params.id, 'Property id');
+      } catch (validationError) {
+        const message = validationError instanceof Error ? validationError.message : 'Invalid property ID';
+        return res.status(400).json({ message });
       }
 
       const property = await storage.getProperty(propertyId);
@@ -218,7 +232,8 @@ export function registerPropertyRoutes(app: Express) {
 
         // Validate MIME type
         const mimeMatch = image.match(/^data:([^;]+);/);
-        if (!mimeMatch || !['image/jpeg', 'image/png', 'image/webp'].includes(mimeMatch[1])) {
+        const mimeType = mimeMatch?.[1];
+        if (!mimeType || !['image/jpeg', 'image/png', 'image/webp'].includes(mimeType)) {
           throw new Error('Invalid image type. Only JPEG, PNG, and WebP are allowed');
         }
       }
@@ -314,7 +329,7 @@ export function registerPropertyRoutes(app: Express) {
       } catch (imageError) {
         const message = imageError instanceof Error ? imageError.message : 'Invalid image payload';
         logWarn("property.create.invalid_images", {
-          userId: req.user?.id,
+          ...(req.user?.id !== undefined ? { userId: req.user.id } : {}),
           meta: {
             request: buildRequestContext(req),
           },
@@ -328,7 +343,7 @@ export function registerPropertyRoutes(app: Express) {
       } catch (featureError) {
         const message = featureError instanceof Error ? featureError.message : 'Invalid features payload';
         logWarn("property.create.invalid_features", {
-          userId: req.user?.id,
+          ...(req.user?.id !== undefined ? { userId: req.user.id } : {}),
           meta: {
             request: buildRequestContext(req),
           },
@@ -361,7 +376,7 @@ export function registerPropertyRoutes(app: Express) {
         return res.status(400).json({ error: message });
       }
 
-      const optionalNumericFields: Array<{ key: keyof InsertProperty; allowNull?: boolean }> = [
+      const optionalNumericFields: Array<{ key: Extract<keyof InsertProperty, string>; allowNull?: boolean }> = [
         { key: 'bedrooms', allowNull: true },
         { key: 'bathrooms', allowNull: true },
         { key: 'squareFeet', allowNull: true },
@@ -372,15 +387,15 @@ export function registerPropertyRoutes(app: Express) {
       for (const { key, allowNull } of optionalNumericFields) {
         if (Object.prototype.hasOwnProperty.call(restPayload, key)) {
           try {
-            const coerced = coerceNumericField(restPayload[key as string], key as string, {
+            const coerced = coerceNumericField(restPayload[key], key, {
               optional: true,
               allowNull: allowNull ?? false,
             });
 
             if (coerced === undefined) {
-              delete propertyData[key as string];
+              delete propertyData[key];
             } else {
-              propertyData[key as string] = coerced;
+              propertyData[key] = coerced;
             }
           } catch (numericError) {
             const message = numericError instanceof Error ? numericError.message : `Invalid ${String(key)} value`;
@@ -392,7 +407,7 @@ export function registerPropertyRoutes(app: Express) {
       const validatedData = insertPropertySchema.parse(propertyData) as InsertProperty;
       const property = await storage.createProperty(validatedData);
       logInfo("property.create.success", {
-        userId: req.user?.id,
+        ...(req.user?.id !== undefined ? { userId: req.user.id } : {}),
         meta: {
           propertyId: property.id,
           request: buildRequestContext(req),
@@ -402,7 +417,7 @@ export function registerPropertyRoutes(app: Express) {
     } catch (error) {
       if (error instanceof ZodError) {
         logWarn("property.create.validation_failed", {
-          userId: req.user?.id,
+          ...(req.user?.id !== undefined ? { userId: req.user.id } : {}),
           meta: {
             issues: error.errors,
             request: buildRequestContext(req),
@@ -416,7 +431,7 @@ export function registerPropertyRoutes(app: Express) {
 
       const message = error instanceof Error ? error.message : 'Invalid property data';
       logError("property.create.failed", {
-        userId: req.user?.id,
+        ...(req.user?.id !== undefined ? { userId: req.user.id } : {}),
         meta: buildRequestContext(req),
         error,
       });
@@ -427,11 +442,12 @@ export function registerPropertyRoutes(app: Express) {
   // Update property - requires authentication and ownership or admin
   app.put("/api/properties/:id", authenticate, async (req, res) => {
     try {
-      const propertyId = parseInt(req.params.id);
-
-      // Validate that propertyId is a valid number
-      if (isNaN(propertyId) || propertyId <= 0) {
-        return res.status(400).json({ message: "Invalid property ID" });
+      let propertyId: number;
+      try {
+        propertyId = parseNumericParam(req.params.id, 'Property id');
+      } catch (validationError) {
+        const message = validationError instanceof Error ? validationError.message : 'Invalid property ID';
+        return res.status(400).json({ message });
       }
 
       const existingProperty = await storage.getProperty(propertyId);
@@ -480,7 +496,7 @@ export function registerPropertyRoutes(app: Express) {
         normalizedUpdates.locationSource = sanitizeNullableString(locationSource) ?? 'geocode';
       }
 
-      const optionalNumericUpdateFields: Array<{ key: keyof InsertProperty; allowNull?: boolean }> = [
+      const optionalNumericUpdateFields: Array<{ key: Extract<keyof InsertProperty, string>; allowNull?: boolean }> = [
         { key: 'price', allowNull: false },
         { key: 'bedrooms', allowNull: true },
         { key: 'bathrooms', allowNull: true },
@@ -492,7 +508,7 @@ export function registerPropertyRoutes(app: Express) {
       for (const { key, allowNull } of optionalNumericUpdateFields) {
         if (Object.prototype.hasOwnProperty.call(restUpdates, key)) {
           try {
-            const coerced = coerceNumericField(restUpdates[key as string], key as string, {
+            const coerced = coerceNumericField(restUpdates[key], key, {
               optional: true,
               allowNull: allowNull ?? false,
             });
@@ -500,7 +516,7 @@ export function registerPropertyRoutes(app: Express) {
             if (coerced === undefined) {
               delete normalizedUpdates[key];
             } else {
-              (normalizedUpdates as Record<string, unknown>)[key as string] = coerced;
+              (normalizedUpdates as Record<string, unknown>)[key] = coerced;
             }
           } catch (numericError) {
             const message = numericError instanceof Error ? numericError.message : `Invalid ${String(key)} value`;
@@ -587,7 +603,7 @@ export function registerPropertyRoutes(app: Express) {
         } catch (featureError) {
           const message = featureError instanceof Error ? featureError.message : 'Invalid features payload';
           logWarn("property.update.invalid_features", {
-            userId: req.user?.id,
+            ...(req.user?.id !== undefined ? { userId: req.user.id } : {}),
             meta: {
               request: buildRequestContext(req),
             },
@@ -607,7 +623,7 @@ export function registerPropertyRoutes(app: Express) {
         } catch (imageError) {
           const message = imageError instanceof Error ? imageError.message : 'Invalid image payload';
           logWarn("property.update.invalid_images", {
-            userId: req.user?.id,
+            ...(req.user?.id !== undefined ? { userId: req.user.id } : {}),
             meta: {
               request: buildRequestContext(req),
             },
@@ -625,7 +641,7 @@ export function registerPropertyRoutes(app: Express) {
       res.json(property);
     } catch (error) {
       logError("property.update.failed", {
-        userId: req.user?.id,
+        ...(req.user?.id !== undefined ? { userId: req.user.id } : {}),
         meta: buildRequestContext(req),
         error,
       });
@@ -636,7 +652,13 @@ export function registerPropertyRoutes(app: Express) {
   // Delete property - requires authentication and ownership or admin
   app.delete("/api/properties/:id", authenticate, async (req, res) => {
     try {
-      const propertyId = parseInt(req.params.id);
+      let propertyId: number;
+      try {
+        propertyId = parseNumericParam(req.params.id, 'Property id');
+      } catch (validationError) {
+        const message = validationError instanceof Error ? validationError.message : 'Invalid property ID';
+        return res.status(400).json({ message });
+      }
 
       // Check if user owns the property or is admin
       const existingProperty = await storage.getProperty(propertyId);
@@ -660,7 +682,7 @@ export function registerPropertyRoutes(app: Express) {
       res.json({ message: "Property deleted successfully" });
     } catch (error) {
       logError("property.delete.failed", {
-        userId: req.user?.id,
+        ...(req.user?.id !== undefined ? { userId: req.user.id } : {}),
         meta: buildRequestContext(req),
         error,
       });

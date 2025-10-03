@@ -1,17 +1,13 @@
 import type { Express } from "express";
 import { storage } from "../storage";
-import { authenticate, optionalAuthenticate, AuthService } from "../auth-middleware";
-import jwt from 'jsonwebtoken';
-
-// Assuming JWT_SECRET is defined elsewhere, e.g., in an environment variables file
-const JWT_SECRET = process.env.JWT_SECRET || 'your-fallback-secret'; // Replace with your actual secret or env variable
+import { authenticate, AuthService } from "../auth-middleware";
 
 export function registerUserRoutes(app: Express) {
   // Get user by ID - requires authentication
   app.get("/api/users/:id", authenticate, async (req, res) => {
     try {
       const userIdParam = req.params.id;
-      if (!userIdParam) {
+      if (typeof userIdParam !== 'string' || userIdParam.trim() === '') {
         return res.status(400).json({ message: "User id is required" });
       }
       const userId = Number.parseInt(userIdParam, 10);
@@ -51,7 +47,7 @@ export function registerUserRoutes(app: Express) {
       console.log('Dashboard stats request for user:', userId);
 
       // Initialize stats with default values
-      let stats = {
+      const stats = {
         savedProperties: 0,
         propertiesViewed: 0,
         inquiriesSent: 0,
@@ -109,7 +105,7 @@ export function registerUserRoutes(app: Express) {
   app.get("/api/users/:id/saved-properties", authenticate, async (req, res) => {
     try {
       const userIdParam = req.params.id;
-      if (!userIdParam) {
+      if (typeof userIdParam !== 'string' || userIdParam.trim() === '') {
         return res.status(400).json({ message: "User id is required" });
       }
       const userId = Number.parseInt(userIdParam, 10);
@@ -139,7 +135,7 @@ export function registerUserRoutes(app: Express) {
   app.get("/api/users/:id/inquiries", authenticate, async (req, res) => {
     try {
       const userIdParam = req.params.id;
-      if (!userIdParam) {
+      if (typeof userIdParam !== 'string' || userIdParam.trim() === '') {
         return res.status(400).json({ message: "User id is required" });
       }
       const userId = Number.parseInt(userIdParam, 10);
@@ -169,7 +165,7 @@ export function registerUserRoutes(app: Express) {
   app.get("/api/users/:id/listings", authenticate, async (req, res) => {
     try {
       const userIdParam = req.params.id;
-      if (!userIdParam) {
+      if (typeof userIdParam !== 'string' || userIdParam.trim() === '') {
         return res.status(400).json({ message: "User id is required" });
       }
       const userId = Number.parseInt(userIdParam, 10);
@@ -196,7 +192,7 @@ export function registerUserRoutes(app: Express) {
   app.get("/api/users/:id/appointments", authenticate, async (req, res) => {
     try {
       const userIdParam = req.params.id;
-      if (!userIdParam) {
+      if (typeof userIdParam !== 'string' || userIdParam.trim() === '') {
         return res.status(400).json({ message: "User id is required" });
       }
       const userId = Number.parseInt(userIdParam, 10);
@@ -228,7 +224,12 @@ export function registerUserRoutes(app: Express) {
       const userIdParam = req.params.userId;
       const propertyIdParam = req.params.propertyId;
 
-      if (!userIdParam || !propertyIdParam) {
+      if (
+        typeof userIdParam !== 'string' ||
+        userIdParam.trim() === '' ||
+        typeof propertyIdParam !== 'string' ||
+        propertyIdParam.trim() === ''
+      ) {
         return res.status(400).json({ message: "User id and property id are required" });
       }
 
@@ -264,7 +265,12 @@ export function registerUserRoutes(app: Express) {
       const userIdParam = req.params.userId;
       const propertyIdParam = req.params.propertyId;
 
-      if (!userIdParam || !propertyIdParam) {
+      if (
+        typeof userIdParam !== 'string' ||
+        userIdParam.trim() === '' ||
+        typeof propertyIdParam !== 'string' ||
+        propertyIdParam.trim() === ''
+      ) {
         return res.status(400).json({ message: "User id and property id are required" });
       }
 
@@ -297,7 +303,12 @@ export function registerUserRoutes(app: Express) {
       const userIdParam = req.params.userId;
       const propertyIdParam = req.params.propertyId;
 
-      if (!userIdParam || !propertyIdParam) {
+      if (
+        typeof userIdParam !== 'string' ||
+        userIdParam.trim() === '' ||
+        typeof propertyIdParam !== 'string' ||
+        propertyIdParam.trim() === ''
+      ) {
         return res.status(400).json({ message: "User id and property id are required" });
       }
 
