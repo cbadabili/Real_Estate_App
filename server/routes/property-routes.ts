@@ -16,7 +16,6 @@ export function registerPropertyRoutes(app: Express) {
       path: req.path,
     };
   };
-
   const parseNumericParam = (value: unknown, label: string): number => {
     if (typeof value !== 'string' || value.trim() === '') {
       throw new Error(`${label} is required`);
@@ -91,7 +90,6 @@ export function registerPropertyRoutes(app: Express) {
 
     throw new Error(`${field} must be a number`);
   };
-
   const isNum = (value: unknown): value is number =>
     typeof value === 'number' && Number.isFinite(value);
 
@@ -367,7 +365,6 @@ export function registerPropertyRoutes(app: Express) {
         features: featuresArray ?? [],
         images: imagesArray ?? [],
       };
-
       try {
         const priceValue = coerceNumericField(restPayload['price'], 'price');
         propertyData.price = priceValue;
@@ -603,6 +600,7 @@ export function registerPropertyRoutes(app: Express) {
         } catch (featureError) {
           const message = featureError instanceof Error ? featureError.message : 'Invalid features payload';
           logWarn("property.update.invalid_features", {
+
             ...(req.user?.id !== undefined ? { userId: req.user.id } : {}),
             meta: {
               request: buildRequestContext(req),
