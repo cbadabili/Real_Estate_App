@@ -169,9 +169,13 @@ app.get('/healthz', (_req: Request, res: Response) => {
 
 async function boot() {
   console.log('Testing database connection...');
-  const dbConnected = await testDatabaseConnection();
-  if (!dbConnected) {
-    console.error('Failed to connect to database. Server will not start.');
+  const dbHealth = await testDatabaseConnection();
+  if (!dbHealth.ok) {
+    if (dbHealth.error) {
+      console.error('Failed to connect to database. Server will not start.', dbHealth.error);
+    } else {
+      console.error('Failed to connect to database. Server will not start.');
+    }
     process.exit(1);
   }
 
