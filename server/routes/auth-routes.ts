@@ -4,6 +4,7 @@ import { storage } from "../storage";
 import { generateToken, authenticate } from "../auth-middleware";
 import { createDefaultEntitlements } from "../entitlements-service";
 import type { InsertUser } from "../../shared/schema";
+import { logError, logInfo, logWarn } from "../utils/logger";
 
 export function registerAuthRoutes(app: Express) {
   // User registration
@@ -83,8 +84,11 @@ export function registerAuthRoutes(app: Express) {
         try {
           await createDefaultEntitlements(user.id, userData.userType);
         } catch (entitlementError) {
-          const reason = entitlementError instanceof Error ? entitlementError.message : String(entitlementError);
-          console.warn(`entitlements non-fatal: ${reason}`);
+          logWarn("auth.entitlements.create_failed", {
+            req,
+            userId: user.id,
+            error: entitlementError,
+          });
         }
       }
 
@@ -106,8 +110,7 @@ export function registerAuthRoutes(app: Express) {
       if (code === "23505") {
         return res.status(409).json({ message: "Email already registered" });
       }
-      const reason = error instanceof Error ? error.message : String(error);
-      console.error("Registration error:", reason);
+      logError("auth.register.failed", { req, error });
       return res.status(500).json({ message: "Registration failed" });
     }
   });
@@ -119,7 +122,10 @@ export function registerAuthRoutes(app: Express) {
 
       // Validate input
       if (!email || !password) {
-        console.log('Login failed: Missing email or password');
+        logWarn("auth.login.validation_failed", {
+          req,
+          meta: { reason: "missing_credentials" },
+        });
         return res.status(400).json({ message: "Email and password are required" });
       }
 
@@ -127,37 +133,46 @@ export function registerAuthRoutes(app: Express) {
       const normalizedEmail = email.trim().toLowerCase();
       const trimmedPassword = password.trim();
 
-      console.log('Login attempt for email domain:', normalizedEmail.split('@')[1]);
-
       const user = await storage.getUserByEmail(normalizedEmail);
 
       if (!user) {
-        console.log('Login failed: user not found for domain:', normalizedEmail.split('@')[1]);
+        logWarn("auth.login.invalid_credentials", {
+          req,
+          meta: { outcome: "user_not_found" },
+        });
         return res.status(401).json({ message: "Invalid credentials" });
       }
 
       // Check if user is active
       if (!user.isActive) {
-        console.log('Login failed: account inactive for user:', user.id);
+        logWarn("auth.login.account_inactive", {
+          req,
+          userId: user.id,
+        });
         return res.status(401).json({ message: "Account is inactive" });
       }
 
       const isValidPassword = await bcrypt.compare(trimmedPassword, user.password);
 
       if (!isValidPassword) {
-        console.log('Login failed: invalid credentials for user:', user.id);
+        logWarn("auth.login.invalid_credentials", {
+          req,
+          userId: user.id,
+          meta: { outcome: "password_mismatch" },
+        });
         return res.status(401).json({ message: "Invalid credentials" });
       }
-
-      console.log('Login successful for user:', user.id);
 
       // Update last login time
       try {
         const loginTimestamp = new Date();
         await storage.updateUser(user.id, { lastLoginAt: loginTimestamp });
-        console.log('Updated last login time for user:', user.id);
       } catch (updateError) {
-        console.error('Error updating last login:', updateError);
+        logWarn("auth.login.last_login_update_failed", {
+          req,
+          userId: user.id,
+          error: updateError,
+        });
         // Don't fail login for this
       }
 
@@ -185,10 +200,13 @@ export function registerAuthRoutes(app: Express) {
         token: token // Include the JWT token
       };
 
-      console.log('Login successful for user:', userResponse.email, 'with ID:', userResponse.id);
+      logInfo("auth.login.success", {
+        req,
+        userId: user.id,
+      });
       res.json(userResponse);
     } catch (error) {
-      console.error("Login error:", error);
+      logError("auth.login.failed", { req, error });
       res.status(500).json({ message: "Login failed. Please try again." });
     }
   });
@@ -224,7 +242,7 @@ export function registerAuthRoutes(app: Express) {
 
       res.json(userResponse);
     } catch (error) {
-      console.error("Get current user error:", error);
+      logError("auth.me.failed", { req, error });
       res.status(500).json({ message: "Failed to get user data" });
     }
   });

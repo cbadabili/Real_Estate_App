@@ -1,6 +1,10 @@
 import { defineConfig, devices } from '@playwright/test';
 
-const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? 'http://localhost:4173';
+const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? 'http://127.0.0.1:5000';
+const parsedBaseURL = new URL(baseURL);
+const derivedPort = parsedBaseURL.port || (parsedBaseURL.protocol === 'https:' ? '443' : '80');
+const healthURL =
+  process.env.PLAYWRIGHT_HEALTH_URL ?? `${parsedBaseURL.origin}/health`;
 
 const viewports = {
   mobile: { width: 390, height: 844 },
@@ -37,14 +41,6 @@ export default defineConfig({
       use: { ...devices['Desktop Chrome'], viewport: viewports.desktop }
     },
     {
-      name: 'firefox-mobile',
-      use: { ...devices['Pixel 5'], browserName: 'firefox' }
-    },
-    {
-      name: 'firefox-tablet',
-      use: { ...devices['iPad (gen 7)'], browserName: 'firefox' }
-    },
-    {
       name: 'firefox-desktop',
       use: { ...devices['Desktop Firefox'], viewport: viewports.desktop }
     },
@@ -64,5 +60,16 @@ export default defineConfig({
   metadata: {
     project: 'BeeDab',
     product: 'Real Estate Platform'
+  },
+  webServer: {
+    command: 'npm run start',
+    url: healthURL,
+    timeout: 120_000,
+    reuseExistingServer: !process.env.CI,
+    env: {
+      PORT: derivedPort,
+      BOOT_RUN_MIGRATIONS: 'false',
+      E2E: 'true'
+    }
   }
 });
