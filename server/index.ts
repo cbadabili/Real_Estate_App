@@ -28,6 +28,7 @@ app.set('trust proxy', 1);
 
 const nodeEnv = process.env.NODE_ENV ?? 'development';
 const isDevelopment = nodeEnv === 'development';
+const shouldBootMigrations = (process.env.BOOT_RUN_MIGRATIONS ?? '').toLowerCase() !== 'false';
 
 if (!process.env.NODE_ENV) {
   process.env.NODE_ENV = nodeEnv;
@@ -171,7 +172,6 @@ async function boot() {
   }
 
   const isE2E = process.env.E2E === 'true';
-  const nodeEnv = process.env.NODE_ENV ?? 'development';
 
   app.use('/api/users/login', authWriteLimiter);
   app.use('/api/users/register', authWriteLimiter);
@@ -257,7 +257,8 @@ async function boot() {
   app.use(notFoundHandler);
   app.use(errorHandler);
 
-  const shouldRunMigrations = !isE2E || process.env.FORCE_DB_MIGRATIONS === 'true';
+  const shouldRunMigrations =
+    shouldBootMigrations && (!isE2E || process.env.FORCE_DB_MIGRATIONS === 'true');
 
   if (shouldRunMigrations) {
     try {
@@ -286,6 +287,8 @@ async function boot() {
       console.error('❌ Database initialization failed:', error);
       process.exit(1);
     }
+  } else if (!shouldBootMigrations) {
+    console.log('⏭️  Skipping migrations because BOOT_RUN_MIGRATIONS=false');
   } else {
     console.log('⏭️  Skipping migrations in E2E mode');
   }

@@ -24,12 +24,11 @@ jobs:
       # checkov:skip=CKV_SECRET_4 Ephemeral CI Postgres service credentials
       DATABASE_URL: postgresql://beedab:beedab@localhost:5432/beedab?sslmode=disable
       NODE_ENV: production
-      FORCE_DB_MIGRATIONS: 'true'
-      FORCE_DB_SEED: 'true'
       PLAYWRIGHT_BASE_URL: http://127.0.0.1:5000
-      PORT: 5000
       PGSSLMODE: disable
       JWT_SECRET: test-secret
+      SESSION_SECRET: test-session
+      CORS_ORIGIN: http://127.0.0.1:5173
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -37,33 +36,13 @@ jobs:
           node-version: 20
           cache: 'npm'
       - name: Install dependencies
-        run: npm ci
+        run: npm ci --include=dev
       - name: Install Playwright
         run: npx playwright install --with-deps
       - name: Prepare database
         run: |
-          npm run db:push || echo 'drizzle push skipped'
-          npm run db:seed || echo 'seed step failed, continuing because server handles seeding'
-      - name: Start API server
-        run: |
-          E2E=true PORT=${PORT:-5000} nohup npm run start >/tmp/server.log 2>&1 &
-          ready=0
-          for i in {1..60}; do
-            if curl -fsS "http://127.0.0.1:${PORT:-5000}/healthz" >/dev/null; then
-              ready=1
-              break
-            fi
-            echo "ready=0"
-            sleep 2
-          done
-          if [ "$ready" -ne 1 ]; then
-            echo "API failed to become healthy within expected time"
-            tail -n 200 /tmp/server.log || true
-            exit 1
-          fi
-      - name: Smoke check API
-        run: |
-          curl -f "http://127.0.0.1:${PORT:-5000}/healthz"
+          npm run db:migrate
+          npm run db:seed
       - name: Run Playwright
         run: npx playwright test --reporter=line,html
       - name: Upload Playwright report
@@ -72,11 +51,4 @@ jobs:
         with:
           name: playwright-report
           path: playwright-report
-          if-no-files-found: ignore
-      - name: Upload server logs
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: server-log
-          path: /tmp/server.log
           if-no-files-found: ignore

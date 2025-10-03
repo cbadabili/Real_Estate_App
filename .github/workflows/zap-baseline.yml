@@ -25,12 +25,12 @@ jobs:
     env:
       # checkov:skip=CKV_SECRET_4 Ephemeral CI Postgres service credentials
       DATABASE_URL: postgresql://beedab:beedab@localhost:5432/beedab?sslmode=disable
-      FORCE_DB_MIGRATIONS: 'true'
-      FORCE_DB_SEED: 'true'
       PORT: 5000
       PGSSLMODE: disable
       NODE_ENV: production
       JWT_SECRET: test-secret
+      SESSION_SECRET: test-session
+      CORS_ORIGIN: http://127.0.0.1:5173
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -38,27 +38,19 @@ jobs:
           node-version: 20
           cache: 'npm'
       - name: Install dependencies
-        run: npm ci
-      - name: Prepare database
-        run: |
-          npm run db:push || echo 'drizzle push skipped'
-          npm run db:seed || echo 'seed step failed; continuing because app can self-seed'
+        run: npm ci --include=dev
+      - name: Run database migrations
+        run: npm run db:migrate
       - name: Start BeeDab API
         run: |
-          nohup npm run start >/tmp/server.log 2>&1 &
-          ready=0
-          for i in {1..60}; do
-            if curl -fsS http://127.0.0.1:5000/healthz >/dev/null; then
-              ready=1
-              break
-            fi
-            sleep 2
-          done
-          if [ "$ready" -ne 1 ]; then
-            echo "API failed to start within timeout"
+          nohup env BOOT_RUN_MIGRATIONS=false PORT="${PORT:-5000}" npm run start >/tmp/server.log 2>&1 &
+      - name: Wait for API readiness
+        run: |
+          scripts/wait-for-http.sh "http://127.0.0.1:${PORT:-5000}/health" 120 || {
+            echo "API failed to become healthy for ZAP run"
             tail -n 200 /tmp/server.log || true
             exit 1
-          fi
+          }
       - name: Run ZAP Baseline Scan
         env:
           ZAP_AUTH_HEADER: ${{ secrets.ZAP_AUTH_HEADER }}
@@ -73,7 +65,7 @@ jobs:
             -e ZAP_AUTH_HEADER_SITE \
             -v "$(pwd)/zap-work":/zap/wrk/:rw \
             ghcr.io/zaproxy/zaproxy:stable \
-            zap-baseline.py -t http://127.0.0.1:5000 -J zap-report.json -w zap-report.md -r zap-report.html -a -j -l High
+            zap-baseline.py -t http://127.0.0.1:5000 -J zap-report.json -w zap-report.md -r zap-report.html -a -j -l FAIL
           cp zap-work/zap-report.* .
       - name: Package ZAP artifacts
         if: always()
