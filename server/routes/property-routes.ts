@@ -90,11 +90,35 @@ export function registerPropertyRoutes(app: Express) {
 
     throw new Error(`${field} must be a number`);
   };
-  const isNum = (value: unknown): value is number =>
-    typeof value === 'number' && Number.isFinite(value);
 
   const coordinatesWithinBotswana = (lng: number, lat: number) =>
-    lng >= 20 && lng <= 29 && lat >= -27 && lat <= -17;
+    lng >= 19.999535 && lng <= 29.368311 && lat >= -26.907379 && lat <= -17.780809;
+
+  const coerceCoordinate = (
+    value: unknown,
+    field: 'latitude' | 'longitude'
+  ): number | null | undefined => {
+    if (value === undefined) {
+      return undefined;
+    }
+    if (value === null || value === '') {
+      return null;
+    }
+    if (typeof value === 'number' && Number.isFinite(value)) {
+      return value;
+    }
+    if (typeof value === 'string') {
+      const trimmed = value.trim();
+      if (!trimmed) {
+        return null;
+      }
+      const numeric = Number(trimmed);
+      if (Number.isFinite(numeric)) {
+        return numeric;
+      }
+    }
+    throw new Error(`${field} must be a number`);
+  };
 
   // Get all properties
   app.get("/api/properties", async (req, res) => {
@@ -311,8 +335,41 @@ export function registerPropertyRoutes(app: Express) {
         ...rest
       } = req.body;
 
-      // Validate coordinates are within Botswana bounds
-      if (isNum(latitude) && isNum(longitude) && !coordinatesWithinBotswana(longitude, latitude)) {
+      let normalizedLatitude: number | null | undefined;
+      if (Object.prototype.hasOwnProperty.call(req.body ?? {}, 'latitude')) {
+        try {
+          normalizedLatitude = coerceCoordinate(latitude, 'latitude');
+        } catch (coordinateError) {
+          const message = coordinateError instanceof Error ? coordinateError.message : 'Invalid latitude';
+          return res.status(400).json({ error: message });
+        }
+      }
+
+      let normalizedLongitude: number | null | undefined;
+      if (Object.prototype.hasOwnProperty.call(req.body ?? {}, 'longitude')) {
+        try {
+          normalizedLongitude = coerceCoordinate(longitude, 'longitude');
+        } catch (coordinateError) {
+          const message = coordinateError instanceof Error ? coordinateError.message : 'Invalid longitude';
+          return res.status(400).json({ error: message });
+        }
+      } catch (imageError) {
+        const message = imageError instanceof Error ? imageError.message : 'Invalid image payload';
+        logWarn("property.create.invalid_images", {
+          ...(req.user?.id !== undefined ? { userId: req.user.id } : {}),
+          meta: {
+            request: buildRequestContext(req),
+          },
+          error: imageError,
+        });
+        return res.status(400).json({ error: message });
+      }
+
+      if (
+        typeof normalizedLatitude === 'number' &&
+        typeof normalizedLongitude === 'number' &&
+        !coordinatesWithinBotswana(normalizedLongitude, normalizedLatitude)
+      ) {
         return res.status(400).json({ error: "Coordinates must be within Botswana bounds." });
       }
 
@@ -359,12 +416,28 @@ export function registerPropertyRoutes(app: Express) {
         areaText: sanitizeNullableString(areaText),
         placeName: sanitizeNullableString(placeName),
         placeId: sanitizeNullableString(placeId),
-        latitude: isNum(latitude) ? latitude : null,
-        longitude: isNum(longitude) ? longitude : null,
+        latitude: normalizedLatitude ?? null,
+        longitude: normalizedLongitude ?? null,
         locationSource: sanitizeNullableString(locationSource) ?? 'geocode',
         features: featuresArray ?? [],
         images: imagesArray ?? [],
       };
+      try {
+        const priceValue = coerceNumericField(restPayload['price'], 'price');
+        propertyData.price = priceValue;
+      } catch (numericError) {
+        const message = numericError instanceof Error ? numericError.message : 'Invalid price value';
+        return res.status(400).json({ error: message });
+      }
+
+      const optionalNumericFields: Array<{ key: Extract<keyof InsertProperty, string>; allowNull?: boolean }> = [
+        { key: 'bedrooms', allowNull: true },
+        { key: 'bathrooms', allowNull: true },
+        { key: 'squareFeet', allowNull: true },
+        { key: 'areaBuild', allowNull: true },
+        { key: 'yearBuilt', allowNull: true },
+      ];
+
       try {
         const priceValue = coerceNumericField(restPayload['price'], 'price');
         propertyData.price = priceValue;
@@ -522,32 +595,6 @@ export function registerPropertyRoutes(app: Express) {
         }
       }
 
-      const coerceCoordinate = (
-        value: unknown,
-        field: 'latitude' | 'longitude'
-      ): number | null | undefined => {
-        if (value === undefined) {
-          return undefined;
-        }
-        if (value === null || value === '') {
-          return null;
-        }
-        if (typeof value === 'number' && Number.isFinite(value)) {
-          return value;
-        }
-        if (typeof value === 'string') {
-          const trimmed = value.trim();
-          if (!trimmed) {
-            return null;
-          }
-          const numeric = Number(trimmed);
-          if (Number.isFinite(numeric)) {
-            return numeric;
-          }
-        }
-        throw new Error(`${field} must be a number`);
-      };
-
       let normalizedLatitude: number | null | undefined;
       if (Object.prototype.hasOwnProperty.call(updates, 'latitude')) {
         try {
@@ -600,7 +647,6 @@ export function registerPropertyRoutes(app: Express) {
         } catch (featureError) {
           const message = featureError instanceof Error ? featureError.message : 'Invalid features payload';
           logWarn("property.update.invalid_features", {
-
             ...(req.user?.id !== undefined ? { userId: req.user.id } : {}),
             meta: {
               request: buildRequestContext(req),
