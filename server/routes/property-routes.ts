@@ -16,7 +16,80 @@ export function registerPropertyRoutes(app: Express) {
       path: req.path,
     };
   };
+  const parseNumericParam = (value: unknown, label: string): number => {
+    if (typeof value !== 'string' || value.trim() === '') {
+      throw new Error(`${label} is required`);
+    }
 
+    const parsed = Number.parseInt(value, 10);
+    if (Number.isNaN(parsed)) {
+      throw new Error(`${label} must be a number`);
+    }
+
+    return parsed;
+  };
+
+  const sanitizeNullableString = (value: unknown): string | null => {
+    if (value === undefined || value === null) {
+      return null;
+    }
+
+    const normalized = String(value).trim();
+    return normalized === '' ? null : normalized;
+  };
+
+  const coerceNumericField = (
+    value: unknown,
+    field: string,
+    options: { optional?: boolean; allowNull?: boolean } = {}
+  ): number | null | undefined => {
+    const { optional = false, allowNull = false } = options;
+
+    if (value === undefined) {
+      if (optional) {
+        return undefined;
+      }
+      throw new Error(`${field} is required`);
+    }
+
+    if (value === null) {
+      if (allowNull) {
+        return null;
+      }
+      if (optional) {
+        return undefined;
+      }
+      throw new Error(`${field} must be a number`);
+    }
+
+    if (typeof value === 'number') {
+      if (Number.isFinite(value)) {
+        return value;
+      }
+      throw new Error(`${field} must be a finite number`);
+    }
+
+    if (typeof value === 'string') {
+      const trimmed = value.trim();
+      if (!trimmed) {
+        if (allowNull) {
+          return null;
+        }
+        if (optional) {
+          return undefined;
+        }
+        throw new Error(`${field} is required`);
+      }
+
+      const parsed = Number(trimmed);
+      if (Number.isFinite(parsed)) {
+        return parsed;
+      }
+      throw new Error(`${field} must be a number`);
+    }
+
+    throw new Error(`${field} must be a number`);
+  };
   const isNum = (value: unknown): value is number =>
     typeof value === 'number' && Number.isFinite(value);
 
@@ -105,11 +178,12 @@ export function registerPropertyRoutes(app: Express) {
   // Get single property
   app.get("/api/properties/:id", optionalAuthenticate, async (req, res) => { // Changed to optionalAuthenticate for public view
     try {
-      const propertyId = parseInt(req.params.id);
-
-      // Validate that propertyId is a valid number
-      if (isNaN(propertyId) || propertyId <= 0) {
-        return res.status(400).json({ message: "Invalid property ID" });
+      let propertyId: number;
+      try {
+        propertyId = parseNumericParam(req.params.id, 'Property id');
+      } catch (validationError) {
+        const message = validationError instanceof Error ? validationError.message : 'Invalid property ID';
+        return res.status(400).json({ message });
       }
 
       const property = await storage.getProperty(propertyId);
@@ -156,7 +230,8 @@ export function registerPropertyRoutes(app: Express) {
 
         // Validate MIME type
         const mimeMatch = image.match(/^data:([^;]+);/);
-        if (!mimeMatch || !['image/jpeg', 'image/png', 'image/webp'].includes(mimeMatch[1])) {
+        const mimeType = mimeMatch?.[1];
+        if (!mimeType || !['image/jpeg', 'image/png', 'image/webp'].includes(mimeType)) {
           throw new Error('Invalid image type. Only JPEG, PNG, and WebP are allowed');
         }
       }
@@ -252,7 +327,7 @@ export function registerPropertyRoutes(app: Express) {
       } catch (imageError) {
         const message = imageError instanceof Error ? imageError.message : 'Invalid image payload';
         logWarn("property.create.invalid_images", {
-          userId: req.user?.id,
+          ...(req.user?.id !== undefined ? { userId: req.user.id } : {}),
           meta: {
             request: buildRequestContext(req),
           },
@@ -266,7 +341,7 @@ export function registerPropertyRoutes(app: Express) {
       } catch (featureError) {
         const message = featureError instanceof Error ? featureError.message : 'Invalid features payload';
         logWarn("property.create.invalid_features", {
-          userId: req.user?.id,
+          ...(req.user?.id !== undefined ? { userId: req.user.id } : {}),
           meta: {
             request: buildRequestContext(req),
           },
@@ -275,24 +350,61 @@ export function registerPropertyRoutes(app: Express) {
         return res.status(400).json({ error: message });
       }
 
+      const restPayload = rest as Record<string, unknown>;
+
       // Prepare property data with location fields and owner ID
-      const propertyData = {
-        ...rest,
+      const propertyData: Record<string, unknown> = {
+        ...restPayload,
         ownerId: req.user!.id, // Set the authenticated user as the owner
-        areaText: areaText || null,
-        placeName: placeName || null,
-        placeId: placeId || null,
+        areaText: sanitizeNullableString(areaText),
+        placeName: sanitizeNullableString(placeName),
+        placeId: sanitizeNullableString(placeId),
         latitude: isNum(latitude) ? latitude : null,
         longitude: isNum(longitude) ? longitude : null,
-        locationSource: locationSource || 'geocode',
+        locationSource: sanitizeNullableString(locationSource) ?? 'geocode',
         features: featuresArray ?? [],
         images: imagesArray ?? [],
       };
+      try {
+        const priceValue = coerceNumericField(restPayload['price'], 'price');
+        propertyData.price = priceValue;
+      } catch (numericError) {
+        const message = numericError instanceof Error ? numericError.message : 'Invalid price value';
+        return res.status(400).json({ error: message });
+      }
+
+      const optionalNumericFields: Array<{ key: Extract<keyof InsertProperty, string>; allowNull?: boolean }> = [
+        { key: 'bedrooms', allowNull: true },
+        { key: 'bathrooms', allowNull: true },
+        { key: 'squareFeet', allowNull: true },
+        { key: 'areaBuild', allowNull: true },
+        { key: 'yearBuilt', allowNull: true },
+      ];
+
+      for (const { key, allowNull } of optionalNumericFields) {
+        if (Object.prototype.hasOwnProperty.call(restPayload, key)) {
+          try {
+            const coerced = coerceNumericField(restPayload[key], key, {
+              optional: true,
+              allowNull: allowNull ?? false,
+            });
+
+            if (coerced === undefined) {
+              delete propertyData[key];
+            } else {
+              propertyData[key] = coerced;
+            }
+          } catch (numericError) {
+            const message = numericError instanceof Error ? numericError.message : `Invalid ${String(key)} value`;
+            return res.status(400).json({ error: message });
+          }
+        }
+      }
 
       const validatedData = insertPropertySchema.parse(propertyData) as InsertProperty;
       const property = await storage.createProperty(validatedData);
       logInfo("property.create.success", {
-        userId: req.user?.id,
+        ...(req.user?.id !== undefined ? { userId: req.user.id } : {}),
         meta: {
           propertyId: property.id,
           request: buildRequestContext(req),
@@ -302,7 +414,7 @@ export function registerPropertyRoutes(app: Express) {
     } catch (error) {
       if (error instanceof ZodError) {
         logWarn("property.create.validation_failed", {
-          userId: req.user?.id,
+          ...(req.user?.id !== undefined ? { userId: req.user.id } : {}),
           meta: {
             issues: error.errors,
             request: buildRequestContext(req),
@@ -316,7 +428,7 @@ export function registerPropertyRoutes(app: Express) {
 
       const message = error instanceof Error ? error.message : 'Invalid property data';
       logError("property.create.failed", {
-        userId: req.user?.id,
+        ...(req.user?.id !== undefined ? { userId: req.user.id } : {}),
         meta: buildRequestContext(req),
         error,
       });
@@ -327,11 +439,12 @@ export function registerPropertyRoutes(app: Express) {
   // Update property - requires authentication and ownership or admin
   app.put("/api/properties/:id", authenticate, async (req, res) => {
     try {
-      const propertyId = parseInt(req.params.id);
-
-      // Validate that propertyId is a valid number
-      if (isNaN(propertyId) || propertyId <= 0) {
-        return res.status(400).json({ message: "Invalid property ID" });
+      let propertyId: number;
+      try {
+        propertyId = parseNumericParam(req.params.id, 'Property id');
+      } catch (validationError) {
+        const message = validationError instanceof Error ? validationError.message : 'Invalid property ID';
+        return res.status(400).json({ message });
       }
 
       const existingProperty = await storage.getProperty(propertyId);
@@ -365,20 +478,48 @@ export function registerPropertyRoutes(app: Express) {
       };
 
       if (Object.prototype.hasOwnProperty.call(updates, 'areaText')) {
-        normalizedUpdates.areaText = areaText ? String(areaText) : null;
+        normalizedUpdates.areaText = sanitizeNullableString(areaText);
       }
 
       if (Object.prototype.hasOwnProperty.call(updates, 'placeName')) {
-        normalizedUpdates.placeName = placeName ? String(placeName) : null;
+        normalizedUpdates.placeName = sanitizeNullableString(placeName);
       }
 
       if (Object.prototype.hasOwnProperty.call(updates, 'placeId')) {
-        normalizedUpdates.placeId = placeId ? String(placeId) : null;
+        normalizedUpdates.placeId = sanitizeNullableString(placeId);
       }
 
       if (Object.prototype.hasOwnProperty.call(updates, 'locationSource')) {
-        const sourceString = typeof locationSource === 'string' ? locationSource.trim() : '';
-        normalizedUpdates.locationSource = sourceString || 'geocode';
+        normalizedUpdates.locationSource = sanitizeNullableString(locationSource) ?? 'geocode';
+      }
+
+      const optionalNumericUpdateFields: Array<{ key: Extract<keyof InsertProperty, string>; allowNull?: boolean }> = [
+        { key: 'price', allowNull: false },
+        { key: 'bedrooms', allowNull: true },
+        { key: 'bathrooms', allowNull: true },
+        { key: 'squareFeet', allowNull: true },
+        { key: 'areaBuild', allowNull: true },
+        { key: 'yearBuilt', allowNull: true },
+      ];
+
+      for (const { key, allowNull } of optionalNumericUpdateFields) {
+        if (Object.prototype.hasOwnProperty.call(restUpdates, key)) {
+          try {
+            const coerced = coerceNumericField(restUpdates[key], key, {
+              optional: true,
+              allowNull: allowNull ?? false,
+            });
+
+            if (coerced === undefined) {
+              delete normalizedUpdates[key];
+            } else {
+              (normalizedUpdates as Record<string, unknown>)[key] = coerced;
+            }
+          } catch (numericError) {
+            const message = numericError instanceof Error ? numericError.message : `Invalid ${String(key)} value`;
+            return res.status(400).json({ error: message });
+          }
+        }
       }
 
       const coerceCoordinate = (
@@ -459,7 +600,8 @@ export function registerPropertyRoutes(app: Express) {
         } catch (featureError) {
           const message = featureError instanceof Error ? featureError.message : 'Invalid features payload';
           logWarn("property.update.invalid_features", {
-            userId: req.user?.id,
+
+            ...(req.user?.id !== undefined ? { userId: req.user.id } : {}),
             meta: {
               request: buildRequestContext(req),
             },
@@ -479,7 +621,7 @@ export function registerPropertyRoutes(app: Express) {
         } catch (imageError) {
           const message = imageError instanceof Error ? imageError.message : 'Invalid image payload';
           logWarn("property.update.invalid_images", {
-            userId: req.user?.id,
+            ...(req.user?.id !== undefined ? { userId: req.user.id } : {}),
             meta: {
               request: buildRequestContext(req),
             },
@@ -497,7 +639,7 @@ export function registerPropertyRoutes(app: Express) {
       res.json(property);
     } catch (error) {
       logError("property.update.failed", {
-        userId: req.user?.id,
+        ...(req.user?.id !== undefined ? { userId: req.user.id } : {}),
         meta: buildRequestContext(req),
         error,
       });
@@ -508,7 +650,13 @@ export function registerPropertyRoutes(app: Express) {
   // Delete property - requires authentication and ownership or admin
   app.delete("/api/properties/:id", authenticate, async (req, res) => {
     try {
-      const propertyId = parseInt(req.params.id);
+      let propertyId: number;
+      try {
+        propertyId = parseNumericParam(req.params.id, 'Property id');
+      } catch (validationError) {
+        const message = validationError instanceof Error ? validationError.message : 'Invalid property ID';
+        return res.status(400).json({ message });
+      }
 
       // Check if user owns the property or is admin
       const existingProperty = await storage.getProperty(propertyId);
@@ -532,7 +680,7 @@ export function registerPropertyRoutes(app: Express) {
       res.json({ message: "Property deleted successfully" });
     } catch (error) {
       logError("property.delete.failed", {
-        userId: req.user?.id,
+        ...(req.user?.id !== undefined ? { userId: req.user.id } : {}),
         meta: buildRequestContext(req),
         error,
       });

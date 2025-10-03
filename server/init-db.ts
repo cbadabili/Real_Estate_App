@@ -45,36 +45,46 @@ async function initializeTables() {
     `);
     console.log('✅ Users table ready');
 
+    console.log('Ensuring spatial and text extensions...');
+    await db.execute(sql`CREATE EXTENSION IF NOT EXISTS postgis`);
+    await db.execute(sql`CREATE EXTENSION IF NOT EXISTS pg_trgm`);
+
     console.log('Creating properties table...');
     await db.execute(sql`
       CREATE TABLE properties (
         id SERIAL PRIMARY KEY,
+        owner_id INTEGER REFERENCES users(id),
+        agent_id INTEGER REFERENCES users(id),
         title TEXT NOT NULL,
         description TEXT,
-        price TEXT NOT NULL,
+        price NUMERIC(12, 2) NOT NULL DEFAULT 0,
+        currency TEXT NOT NULL DEFAULT 'BWP',
         address TEXT NOT NULL,
         city TEXT NOT NULL,
         state TEXT NOT NULL,
         zip_code TEXT NOT NULL,
-        latitude TEXT,
-        longitude TEXT,
+        latitude DOUBLE PRECISION,
+        longitude DOUBLE PRECISION,
+        geom geometry(Point, 4326),
+        area_text TEXT,
+        place_name TEXT,
+        place_id TEXT,
+        location_source TEXT DEFAULT 'geocode',
         property_type TEXT NOT NULL,
         listing_type TEXT NOT NULL,
+        status TEXT NOT NULL DEFAULT 'active',
         bedrooms INTEGER,
-        bathrooms TEXT,
+        bathrooms NUMERIC(3, 1),
         square_feet INTEGER,
         area_build INTEGER,
         lot_size TEXT,
         year_built INTEGER,
-        status TEXT NOT NULL DEFAULT 'active',
-        images TEXT,
-        features TEXT,
+        images JSONB NOT NULL DEFAULT '[]'::jsonb,
+        features JSONB NOT NULL DEFAULT '[]'::jsonb,
         virtual_tour_url TEXT,
         video_url TEXT,
         property_taxes TEXT,
         hoa_fees TEXT,
-        owner_id INTEGER REFERENCES users(id),
-        agent_id INTEGER REFERENCES users(id),
         views INTEGER DEFAULT 0,
         days_on_market INTEGER DEFAULT 0,
         auction_date BIGINT,
@@ -89,8 +99,9 @@ async function initializeTables() {
         deposit_required TEXT,
         auction_terms TEXT,
         lot_number TEXT,
-        created_at TIMESTAMPTZ DEFAULT NOW(),
-        updated_at TIMESTAMPTZ DEFAULT NOW()
+        for_map BOOLEAN DEFAULT true,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
       )
     `);
     console.log('✅ Properties table ready');

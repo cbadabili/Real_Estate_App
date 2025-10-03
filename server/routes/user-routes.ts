@@ -1,16 +1,19 @@
 import type { Express } from "express";
 import { storage } from "../storage";
-import { authenticate, optionalAuthenticate, AuthService } from "../auth-middleware";
-import jwt from 'jsonwebtoken';
-
-// Assuming JWT_SECRET is defined elsewhere, e.g., in an environment variables file
-const JWT_SECRET = process.env.JWT_SECRET || 'your-fallback-secret'; // Replace with your actual secret or env variable
+import { authenticate, AuthService } from "../auth-middleware";
 
 export function registerUserRoutes(app: Express) {
   // Get user by ID - requires authentication
   app.get("/api/users/:id", authenticate, async (req, res) => {
     try {
-      const userId = parseInt(req.params.id);
+      const userIdParam = req.params.id;
+      if (typeof userIdParam !== 'string' || userIdParam.trim() === '') {
+        return res.status(400).json({ message: "User id is required" });
+      }
+      const userId = Number.parseInt(userIdParam, 10);
+      if (Number.isNaN(userId)) {
+        return res.status(400).json({ message: "User id must be a number" });
+      }
 
       // Only allow users to view their own profile, or admins to view any profile
       if (req.user!.id !== userId && !AuthService.isAdmin(req.user!)) {
@@ -44,7 +47,7 @@ export function registerUserRoutes(app: Express) {
       console.log('Dashboard stats request for user:', userId);
 
       // Initialize stats with default values
-      let stats = {
+      const stats = {
         savedProperties: 0,
         propertiesViewed: 0,
         inquiriesSent: 0,
@@ -101,7 +104,14 @@ export function registerUserRoutes(app: Express) {
   // Get user's favorites/saved properties
   app.get("/api/users/:id/saved-properties", authenticate, async (req, res) => {
     try {
-      const userId = parseInt(req.params.id);
+      const userIdParam = req.params.id;
+      if (typeof userIdParam !== 'string' || userIdParam.trim() === '') {
+        return res.status(400).json({ message: "User id is required" });
+      }
+      const userId = Number.parseInt(userIdParam, 10);
+      if (Number.isNaN(userId)) {
+        return res.status(400).json({ message: "User id must be a number" });
+      }
 
       // Only allow users to view their own saved properties, or admins to view any
       if (req.user!.id !== userId && !AuthService.isAdmin(req.user!)) {
@@ -124,7 +134,14 @@ export function registerUserRoutes(app: Express) {
   // Get user's property inquiries
   app.get("/api/users/:id/inquiries", authenticate, async (req, res) => {
     try {
-      const userId = parseInt(req.params.id);
+      const userIdParam = req.params.id;
+      if (typeof userIdParam !== 'string' || userIdParam.trim() === '') {
+        return res.status(400).json({ message: "User id is required" });
+      }
+      const userId = Number.parseInt(userIdParam, 10);
+      if (Number.isNaN(userId)) {
+        return res.status(400).json({ message: "User id must be a number" });
+      }
 
       // Only allow users to view their own inquiries, or admins to view any
       if (req.user!.id !== userId && !AuthService.isAdmin(req.user!)) {
@@ -147,7 +164,14 @@ export function registerUserRoutes(app: Express) {
   // Get user's property listings
   app.get("/api/users/:id/listings", authenticate, async (req, res) => {
     try {
-      const userId = parseInt(req.params.id);
+      const userIdParam = req.params.id;
+      if (typeof userIdParam !== 'string' || userIdParam.trim() === '') {
+        return res.status(400).json({ message: "User id is required" });
+      }
+      const userId = Number.parseInt(userIdParam, 10);
+      if (Number.isNaN(userId)) {
+        return res.status(400).json({ message: "User id must be a number" });
+      }
 
       // Only allow users to view their own listings, or admins to view any
       if (req.user!.id !== userId && !AuthService.isAdmin(req.user!)) {
@@ -167,7 +191,14 @@ export function registerUserRoutes(app: Express) {
   // Get user's appointments
   app.get("/api/users/:id/appointments", authenticate, async (req, res) => {
     try {
-      const userId = parseInt(req.params.id);
+      const userIdParam = req.params.id;
+      if (typeof userIdParam !== 'string' || userIdParam.trim() === '') {
+        return res.status(400).json({ message: "User id is required" });
+      }
+      const userId = Number.parseInt(userIdParam, 10);
+      if (Number.isNaN(userId)) {
+        return res.status(400).json({ message: "User id must be a number" });
+      }
 
       // Only allow users to view their own appointments, or admins to view any
       if (req.user!.id !== userId && !AuthService.isAdmin(req.user!)) {
@@ -190,8 +221,24 @@ export function registerUserRoutes(app: Express) {
   // Save a property for a user
   app.post("/api/users/:userId/saved-properties/:propertyId", authenticate, async (req, res) => {
     try {
-      const userId = parseInt(req.params.userId);
-      const propertyId = parseInt(req.params.propertyId);
+      const userIdParam = req.params.userId;
+      const propertyIdParam = req.params.propertyId;
+
+      if (
+        typeof userIdParam !== 'string' ||
+        userIdParam.trim() === '' ||
+        typeof propertyIdParam !== 'string' ||
+        propertyIdParam.trim() === ''
+      ) {
+        return res.status(400).json({ message: "User id and property id are required" });
+      }
+
+      const userId = Number.parseInt(userIdParam, 10);
+      const propertyId = Number.parseInt(propertyIdParam, 10);
+
+      if (Number.isNaN(userId) || Number.isNaN(propertyId)) {
+        return res.status(400).json({ message: "User id and property id must be numbers" });
+      }
 
       // Only allow users to save to their own list or admins
       if (req.user!.id !== userId && !AuthService.isAdmin(req.user!)) {
@@ -215,8 +262,24 @@ export function registerUserRoutes(app: Express) {
   // Unsave a property for a user
   app.delete("/api/users/:userId/saved-properties/:propertyId", authenticate, async (req, res) => {
     try {
-      const userId = parseInt(req.params.userId);
-      const propertyId = parseInt(req.params.propertyId);
+      const userIdParam = req.params.userId;
+      const propertyIdParam = req.params.propertyId;
+
+      if (
+        typeof userIdParam !== 'string' ||
+        userIdParam.trim() === '' ||
+        typeof propertyIdParam !== 'string' ||
+        propertyIdParam.trim() === ''
+      ) {
+        return res.status(400).json({ message: "User id and property id are required" });
+      }
+
+      const userId = Number.parseInt(userIdParam, 10);
+      const propertyId = Number.parseInt(propertyIdParam, 10);
+
+      if (Number.isNaN(userId) || Number.isNaN(propertyId)) {
+        return res.status(400).json({ message: "User id and property id must be numbers" });
+      }
 
       // Only allow users to unsave from their own list or admins
       if (req.user!.id !== userId && !AuthService.isAdmin(req.user!)) {
@@ -237,8 +300,24 @@ export function registerUserRoutes(app: Express) {
 
   app.get("/api/users/:userId/saved-properties/:propertyId/check", authenticate, async (req, res) => {
     try {
-      const userId = parseInt(req.params.userId);
-      const propertyId = parseInt(req.params.propertyId);
+      const userIdParam = req.params.userId;
+      const propertyIdParam = req.params.propertyId;
+
+      if (
+        typeof userIdParam !== 'string' ||
+        userIdParam.trim() === '' ||
+        typeof propertyIdParam !== 'string' ||
+        propertyIdParam.trim() === ''
+      ) {
+        return res.status(400).json({ message: "User id and property id are required" });
+      }
+
+      const userId = Number.parseInt(userIdParam, 10);
+      const propertyId = Number.parseInt(propertyIdParam, 10);
+
+      if (Number.isNaN(userId) || Number.isNaN(propertyId)) {
+        return res.status(400).json({ message: "User id and property id must be numbers" });
+      }
 
       // Only allow users to check their own saved properties or admins
       if (req.user!.id !== userId && !AuthService.isAdmin(req.user!)) {
