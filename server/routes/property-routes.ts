@@ -16,7 +16,6 @@ export function registerPropertyRoutes(app: Express) {
       path: req.path,
     };
   };
-
   const parseNumericParam = (value: unknown, label: string): number => {
     if (typeof value !== 'string' || value.trim() === '') {
       throw new Error(`${label} is required`);
@@ -354,6 +353,16 @@ export function registerPropertyRoutes(app: Express) {
           const message = coordinateError instanceof Error ? coordinateError.message : 'Invalid longitude';
           return res.status(400).json({ error: message });
         }
+      } catch (imageError) {
+        const message = imageError instanceof Error ? imageError.message : 'Invalid image payload';
+        logWarn("property.create.invalid_images", {
+          ...(req.user?.id !== undefined ? { userId: req.user.id } : {}),
+          meta: {
+            request: buildRequestContext(req),
+          },
+          error: imageError,
+        });
+        return res.status(400).json({ error: message });
       }
 
       if (
@@ -413,6 +422,21 @@ export function registerPropertyRoutes(app: Express) {
         features: featuresArray ?? [],
         images: imagesArray ?? [],
       };
+      try {
+        const priceValue = coerceNumericField(restPayload['price'], 'price');
+        propertyData.price = priceValue;
+      } catch (numericError) {
+        const message = numericError instanceof Error ? numericError.message : 'Invalid price value';
+        return res.status(400).json({ error: message });
+      }
+
+      const optionalNumericFields: Array<{ key: Extract<keyof InsertProperty, string>; allowNull?: boolean }> = [
+        { key: 'bedrooms', allowNull: true },
+        { key: 'bathrooms', allowNull: true },
+        { key: 'squareFeet', allowNull: true },
+        { key: 'areaBuild', allowNull: true },
+        { key: 'yearBuilt', allowNull: true },
+      ];
 
       try {
         const priceValue = coerceNumericField(restPayload['price'], 'price');
