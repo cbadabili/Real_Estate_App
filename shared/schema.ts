@@ -39,9 +39,9 @@ export const users = pgTable("users", {
   isVerified: boolean("is_verified").default(false),
   isActive: boolean("is_active").default(true),
   reacNumber: varchar("reac_number", { length: 20 }), // For certified agents
-  lastLoginAt: timestamp("last_login_at"),
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
+  lastLoginAt: timestamp("last_login_at", { withTimezone: true }),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
 });
 
 // Refresh tokens table for JWT security

@@ -1,20 +1,35 @@
 import 'dotenv/config';
 
-function get(name: string, fallback?: string) {
-  const v = process.env[name] ?? fallback;
-  if (v === undefined) {
+type EnvOptions = {
+  /**
+   * Optional default that is only applied while running in development mode.
+   * This helps local contributors bootstrap quickly without weakening
+   * production safety checks.
+   */
+  devDefault?: string;
+};
+
+const NODE_ENV = process.env.NODE_ENV ?? 'development';
+const isDevelopment = NODE_ENV === 'development';
+
+function requireEnv(name: string, { devDefault }: EnvOptions = {}) {
+  const candidate = process.env[name] ?? (isDevelopment ? devDefault : undefined);
+  const trimmed = typeof candidate === 'string' ? candidate.trim() : candidate;
+
+  if (trimmed === undefined || trimmed === null || trimmed === '') {
     throw new Error(`Missing required env var: ${name}`);
   }
-  return v;
+
+  return trimmed;
 }
 
 export const env = {
-  NODE_ENV: process.env.NODE_ENV ?? 'development',
+  NODE_ENV,
   PORT: Number(process.env.PORT ?? 5000),
-  DATABASE_URL: get('DATABASE_URL'),
-  SESSION_SECRET: get('SESSION_SECRET', 'dev-secret-change-in-production'),
-  JWT_SECRET: get('JWT_SECRET', 'dev-jwt-secret-change-in-production-minimum-32-chars'),
-  CORS_ORIGIN: get('CORS_ORIGIN', 'http://localhost:5173'),
+  DATABASE_URL: requireEnv('DATABASE_URL'),
+  SESSION_SECRET: requireEnv('SESSION_SECRET', { devDefault: 'dev-only-insecure-secret' }),
+  JWT_SECRET: requireEnv('JWT_SECRET'),
+  CORS_ORIGIN: requireEnv('CORS_ORIGIN', { devDefault: 'http://localhost:5173' }),
   USE_INTEL: (process.env.USE_INTEL ?? 'false').toLowerCase() === 'true',
   REALESTATEINTEL_URL: process.env.REALESTATEINTEL_URL ?? '',
   REALESTATEINTEL_SUGGEST_URL: process.env.REALESTATEINTEL_SUGGEST_URL ?? '',
@@ -23,10 +38,10 @@ export const env = {
 };
 
 export const config = {
-  port: process.env.PORT || 3001,
-  nodeEnv: process.env.NODE_ENV || 'development',
-  dbPath: process.env.DATABASE_URL || './beedab.db',
-  jwtSecret: process.env.JWT_SECRET || 'your-secret-key-change-in-production',
+  port: env.PORT,
+  nodeEnv: env.NODE_ENV,
+  dbPath: env.DATABASE_URL,
+  jwtSecret: env.JWT_SECRET,
   openaiApiKey: process.env.OPENAI_API_KEY,
   mapboxToken: process.env.MAPBOX_TOKEN,
   rankingV2: process.env.RANKING_V2 === 'true'

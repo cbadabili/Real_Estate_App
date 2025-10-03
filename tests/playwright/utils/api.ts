@@ -1,4 +1,4 @@
-import { APIRequestContext, expect } from '@playwright/test';
+import { APIRequestContext, APIResponse, expect } from '@playwright/test';
 
 export interface RegisterUserInput {
   email: string;
@@ -20,24 +20,57 @@ const authHeaders = (auth: AuthContext) => ({
   Authorization: `Bearer ${auth.token}`
 });
 
-export async function registerUser(api: APIRequestContext, input: RegisterUserInput): Promise<AuthContext> {
-  const registerResponse = await api.post('/api/users/register', {
-    data: {
-      email: input.email,
-      password: input.password,
-      firstName: input.firstName ?? 'Test',
-      lastName: input.lastName ?? 'User',
-      acceptTerms: true,
-      acceptMarketing: false,
-      userType: input.userType ?? 'buyer'
-    }
-  });
+const wait = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
-  if (!registerResponse.ok() && registerResponse.status() !== 409) {
-    const body = await registerResponse.text();
+export async function registerUser(api: APIRequestContext, input: RegisterUserInput): Promise<AuthContext> {
+  const maxAttempts = 5;
+  let registerResponse: APIResponse | undefined;
+  let responseBody: string | undefined;
+  const firstName = input.firstName ?? 'Test';
+  const lastName = input.lastName ?? 'User';
+  const username = `${firstName.toLowerCase()}_${lastName.toLowerCase()}_${Date.now()}_${Math.random()
+    .toString(36)
+    .slice(2, 8)}`;
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    registerResponse = await api.post('/api/users/register', {
+      data: {
+        username,
+        email: input.email,
+        password: input.password,
+        firstName,
+        lastName,
+        acceptTerms: true,
+        acceptMarketing: false,
+        userType: input.userType ?? 'buyer'
+      }
+    });
+
+    if (registerResponse.ok() || registerResponse.status() === 409) {
+      break;
+    }
+
+    responseBody = await registerResponse.text();
+
+    if (registerResponse.status() === 429 && attempt < maxAttempts) {
+      const retryAfterHeader = registerResponse.headers()['retry-after'];
+      const retryAfterSeconds = retryAfterHeader ? Number(retryAfterHeader) : undefined;
+      const computedBackoff = Number.isFinite(retryAfterSeconds)
+        ? Math.max(0, Number(retryAfterSeconds) * 1000)
+        : 500 * attempt;
+      const backoffMs = Math.min(Math.max(computedBackoff, 250), 5000);
+      await wait(backoffMs);
+      continue;
+    }
+
+    break;
+  }
+
+  if (!registerResponse || (!registerResponse.ok() && registerResponse.status() !== 409)) {
+    const failureBody = responseBody ?? (registerResponse ? await registerResponse.text() : '');
     expect(
-      registerResponse.ok(),
-      `registration failed [${registerResponse.status()}]: ${body}`
+      registerResponse?.ok(),
+      `registration failed [${registerResponse?.status()}]: ${failureBody}`
     ).toBeTruthy();
   }
 
@@ -85,13 +118,46 @@ export async function createProperty(api: APIRequestContext, auth: AuthContext, 
   const ownerIdSource = payload.ownerId ?? auth.userId;
   const normalizedOwnerId = Number(ownerIdSource);
   expect(Number.isFinite(normalizedOwnerId), 'ownerId must be numeric').toBeTruthy();
+  const features = (payload.features ?? ['Automated Test Listing']).map(feature =>
+    typeof feature === 'string' ? feature : String(feature)
+  );
+
+  const images = (payload.images ?? [
+    'https://images.unsplash.com/photo-1613490493576-7fde63acd811'
+  ]).map(image => (typeof image === 'string' ? image : String(image)));
+
+  const normalizeNumber = (value: unknown, fallback: number, field: string) => {
+    if (value === undefined || value === null) {
+      return fallback;
+    }
+
+    if (typeof value === 'number' && Number.isFinite(value)) {
+      return value;
+    }
+
+    if (typeof value === 'string' && value.trim() !== '') {
+      const parsed = Number(value);
+      expect(Number.isFinite(parsed), `${field} must be numeric`).toBeTruthy();
+      return parsed;
+    }
+
+    expect(false, `${field} must be numeric`).toBeTruthy();
+    return fallback;
+  };
+
+  const price = normalizeNumber(payload.price, 0, 'price');
+  expect(price > 0, 'price must be greater than zero').toBeTruthy();
+
+  const bedrooms = normalizeNumber(payload.bedrooms, 3, 'bedrooms');
+  const bathrooms = normalizeNumber(payload.bathrooms, 2, 'bathrooms');
+
   const response = await api.post('/api/properties', {
     headers: authHeaders(auth),
     data: {
       ownerId: normalizedOwnerId,
       title: payload.title,
       description: payload.description ?? 'Automated listing',
-      price: payload.price,
+      price: price.toString(),
       currency: 'BWP',
       address: payload.address,
       city: payload.city,
@@ -100,13 +166,12 @@ export async function createProperty(api: APIRequestContext, auth: AuthContext, 
       propertyType: payload.propertyType,
       listingType: payload.listingType,
       status: 'active',
-      bedrooms: payload.bedrooms ?? 3,
-      bathrooms: payload.bathrooms ?? 2,
+      bedrooms,
+      bathrooms,
       latitude: payload.latitude ?? -24.6282,
       longitude: payload.longitude ?? 25.9231,
-      images: payload.images ?? ['https://images.unsplash.com/photo-1613490493576-7fde63acd811'],
-      features: payload.features ?? ['Automated Test Listing'],
-      areaText: 'Tlokweng',
+      images,
+      features,
       placeName: 'Tlokweng',
       placeId: 'test-place-id',
       locationSource: 'seeded'

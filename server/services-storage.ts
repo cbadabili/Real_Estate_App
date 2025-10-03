@@ -139,7 +139,11 @@ export class ServicesStorage implements IServicesStorage {
       .select({ category: serviceProviders.serviceCategory })
       .from(serviceProviders)
       .groupBy(serviceProviders.serviceCategory);
-    return result.map(r => r.category);
+
+    return result
+      .map((row: { category: string | null }) => row.category)
+      .filter((category): category is string => typeof category === 'string' && category.trim().length > 0)
+      .map((category: string) => category.trim());
   }
 
   async createServiceProvider(provider: InsertServiceProvider): Promise<ServiceProvider> {
@@ -147,6 +151,11 @@ export class ServicesStorage implements IServicesStorage {
       .insert(serviceProviders)
       .values(provider)
       .returning();
+
+    if (!newProvider) {
+      throw new Error('Failed to create service provider');
+    }
+
     return newProvider;
   }
 
@@ -201,6 +210,11 @@ export class ServicesStorage implements IServicesStorage {
       .insert(serviceAds)
       .values(ad)
       .returning();
+
+    if (!newAd) {
+      throw new Error('Failed to create service ad');
+    }
+
     return newAd;
   }
 
@@ -244,6 +258,10 @@ export class ServicesStorage implements IServicesStorage {
 
     if (typeof review.providerId === 'number') {
       await this.refreshProviderStats(review.providerId);
+    }
+
+    if (!newReview) {
+      throw new Error('Failed to create service review');
     }
 
     return newReview;
