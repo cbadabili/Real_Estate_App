@@ -26,14 +26,20 @@ export async function registerUser(api: APIRequestContext, input: RegisterUserIn
   const maxAttempts = 5;
   let registerResponse: APIResponse | undefined;
   let responseBody: string | undefined;
+  const firstName = input.firstName ?? 'Test';
+  const lastName = input.lastName ?? 'User';
+  const username = `${firstName.toLowerCase()}_${lastName.toLowerCase()}_${Date.now()}_${Math.random()
+    .toString(36)
+    .slice(2, 8)}`;
 
   for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
     registerResponse = await api.post('/api/users/register', {
       data: {
+        username,
         email: input.email,
         password: input.password,
-        firstName: input.firstName ?? 'Test',
-        lastName: input.lastName ?? 'User',
+        firstName,
+        lastName,
         acceptTerms: true,
         acceptMarketing: false,
         userType: input.userType ?? 'buyer'
