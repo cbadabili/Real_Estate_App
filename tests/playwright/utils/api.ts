@@ -120,13 +120,38 @@ export async function createProperty(api: APIRequestContext, auth: AuthContext, 
     'https://images.unsplash.com/photo-1613490493576-7fde63acd811'
   ]).map(image => (typeof image === 'string' ? image : String(image)));
 
+  const normalizeNumber = (value: unknown, fallback: number, field: string) => {
+    if (value === undefined || value === null) {
+      return fallback;
+    }
+
+    if (typeof value === 'number' && Number.isFinite(value)) {
+      return value;
+    }
+
+    if (typeof value === 'string' && value.trim() !== '') {
+      const parsed = Number(value);
+      expect(Number.isFinite(parsed), `${field} must be numeric`).toBeTruthy();
+      return parsed;
+    }
+
+    expect(false, `${field} must be numeric`).toBeTruthy();
+    return fallback;
+  };
+
+  const price = normalizeNumber(payload.price, 0, 'price');
+  expect(price > 0, 'price must be greater than zero').toBeTruthy();
+
+  const bedrooms = normalizeNumber(payload.bedrooms, 3, 'bedrooms');
+  const bathrooms = normalizeNumber(payload.bathrooms, 2, 'bathrooms');
+
   const response = await api.post('/api/properties', {
     headers: authHeaders(auth),
     data: {
       ownerId: normalizedOwnerId,
       title: payload.title,
       description: payload.description ?? 'Automated listing',
-      price: String(payload.price),
+      price,
       currency: 'BWP',
       address: payload.address,
       city: payload.city,
@@ -135,8 +160,8 @@ export async function createProperty(api: APIRequestContext, auth: AuthContext, 
       propertyType: payload.propertyType,
       listingType: payload.listingType,
       status: 'active',
-      bedrooms: String(payload.bedrooms ?? 3),
-      bathrooms: String(payload.bathrooms ?? 2),
+      bedrooms,
+      bathrooms,
       latitude: payload.latitude ?? -24.6282,
       longitude: payload.longitude ?? 25.9231,
       images,
