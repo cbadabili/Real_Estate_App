@@ -12,7 +12,7 @@ test.describe('Anonymous discovery experience', () => {
     const seededProperty = await createProperty(request, auth, {
       title: 'Playwright Verified Tlokweng Home',
       description: '3 bedroom semi-detached with secure parking',
-      price: "5800",
+      price: 5800,
       address: 'Plot 100 Tlokweng',
       city: 'Tlokweng',
       state: 'South East District',
