@@ -12,7 +12,7 @@ test.describe('Agent listing lifecycle', () => {
     const property = await createProperty(request, auth, {
       title: 'South East District Family Home',
       description: 'Spacious yard with borehole and solar backup',
-      price: 950000,
+      price: "950000",
       address: 'Plot 45, Tlokweng Road',
       city: 'Gaborone',
       state: 'South East District',
@@ -34,7 +34,7 @@ test.describe('Agent listing lifecycle', () => {
     const updateResponse = await request.put(`/api/properties/${property.id}`, {
       headers: authHeaders,
       data: {
-        price: 975000,
+        price: "975000",
         bedrooms: 5,
         latitude: -24.6286,
         longitude: 25.9239,

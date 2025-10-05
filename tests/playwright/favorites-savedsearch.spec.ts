@@ -11,7 +11,7 @@ test.describe('Buyer engagement journeys', () => {
 
     const property = await createProperty(request, agent, {
       title: 'Francistown Garden Apartment',
-      price: 4800,
+      price: "4800",
       address: 'Plot 12, Satellite, Francistown',
       city: 'Francistown',
       state: 'North East District',

@@ -1,7 +1,7 @@
 import type { Express, Request } from "express";
 import { ZodError } from 'zod';
 import { storage } from "../storage";
-import { insertPropertySchema, type InsertProperty } from "../../shared/schema";
+import { insertAppointmentSchema, insertPropertySchema, type InsertProperty } from "../../shared/schema";
 import { authenticate, optionalAuthenticate, AuthService } from "../auth-middleware";
 import { logError, logInfo, logWarn } from "../utils/logger";
 import { parsePropertyFilters } from "../validation/property-filters";
@@ -16,6 +16,7 @@ export function registerPropertyRoutes(app: Express) {
       path: req.path,
     };
   };
+
   const parseNumericParam = (value: unknown, label: string): number => {
     if (typeof value !== 'string' || value.trim() === '') {
       throw new Error(`${label} is required`);
@@ -353,16 +354,6 @@ export function registerPropertyRoutes(app: Express) {
           const message = coordinateError instanceof Error ? coordinateError.message : 'Invalid longitude';
           return res.status(400).json({ error: message });
         }
-      } catch (imageError) {
-        const message = imageError instanceof Error ? imageError.message : 'Invalid image payload';
-        logWarn("property.create.invalid_images", {
-          ...(req.user?.id !== undefined ? { userId: req.user.id } : {}),
-          meta: {
-            request: buildRequestContext(req),
-          },
-          error: imageError,
-        });
-        return res.status(400).json({ error: message });
       }
 
       if (
@@ -373,25 +364,33 @@ export function registerPropertyRoutes(app: Express) {
         return res.status(400).json({ error: "Coordinates must be within Botswana bounds." });
       }
 
-      let imagesArray: string[] | undefined;
       let featuresArray: string[] | undefined;
 
-      try {
-        imagesArray = parseStringArrayField(images, 'images');
-        if (imagesArray) {
-          validateImages(imagesArray);
+      const imageParseResult = (() => {
+        try {
+          const parsed = parseStringArrayField(images, 'images');
+          if (parsed) {
+            validateImages(parsed);
+          }
+          return { ok: true as const, value: parsed };
+        } catch (imageError) {
+          const message = imageError instanceof Error ? imageError.message : 'Invalid image payload';
+          return { ok: false as const, error: message, raw: imageError };
         }
-      } catch (imageError) {
-        const message = imageError instanceof Error ? imageError.message : 'Invalid image payload';
+      })();
+
+      if (!imageParseResult.ok) {
         logWarn("property.create.invalid_images", {
           ...(req.user?.id !== undefined ? { userId: req.user.id } : {}),
           meta: {
             request: buildRequestContext(req),
           },
-          error: imageError,
+          error: imageParseResult.raw,
         });
-        return res.status(400).json({ error: message });
+        return res.status(400).json({ error: imageParseResult.error });
       }
+
+      const imagesArray = imageParseResult.value;
 
       try {
         featuresArray = parseStringArrayField(features, 'features');
@@ -429,14 +428,6 @@ export function registerPropertyRoutes(app: Express) {
         const message = numericError instanceof Error ? numericError.message : 'Invalid price value';
         return res.status(400).json({ error: message });
       }
-
-      const optionalNumericFields: Array<{ key: Extract<keyof InsertProperty, string>; allowNull?: boolean }> = [
-        { key: 'bedrooms', allowNull: true },
-        { key: 'bathrooms', allowNull: true },
-        { key: 'squareFeet', allowNull: true },
-        { key: 'areaBuild', allowNull: true },
-        { key: 'yearBuilt', allowNull: true },
-      ];
 
       try {
         const priceValue = coerceNumericField(restPayload['price'], 'price');
@@ -735,31 +726,90 @@ export function registerPropertyRoutes(app: Express) {
   });
 
   // Create appointment for property viewing
-  app.post("/api/appointments", authenticate, async (req, res) => { // Added authenticate
+  app.post("/api/appointments", authenticate, async (req, res) => {
     try {
-      const appointmentData = req.body;
+      const payload = req.body ?? {};
 
-      // Basic validation
-      if (!appointmentData.propertyId || !appointmentData.buyerId || !appointmentData.appointmentDate) {
-        return res.status(400).json({ message: "Missing required fields" });
+      let propertyIdValue: number;
+      try {
+        const coerced = coerceNumericField(payload.propertyId, 'propertyId');
+        if (typeof coerced !== 'number') {
+          throw new Error('Property id must be a number');
+        }
+        propertyIdValue = coerced;
+      } catch (propertyError) {
+        const message = propertyError instanceof Error ? propertyError.message : 'Property id must be a number';
+        return res.status(400).json({ message });
       }
 
-      // For now, we'll just return a success response
-      // In a real implementation, you'd save to database
-      const appointment = {
-        id: Date.now(), // Mock ID
-        ...appointmentData,
-        status: 'pending',
-        createdAt: new Date().toISOString()
-      };
+      const property = await storage.getProperty(propertyIdValue);
+      if (!property) {
+        return res.status(404).json({ message: 'Property not found' });
+      }
+
+      if (!payload.appointmentDate) {
+        return res.status(400).json({ message: 'Appointment date is required' });
+      }
+
+      const appointmentDate = new Date(payload.appointmentDate);
+      if (Number.isNaN(appointmentDate.getTime())) {
+        return res.status(400).json({ message: 'Appointment date must be a valid date' });
+      }
+
+      let agentIdValue: number | null | undefined;
+      if (Object.prototype.hasOwnProperty.call(payload, 'agentId')) {
+        try {
+          const parsedAgent = coerceNumericField(payload.agentId, 'agentId', { optional: true, allowNull: true });
+          agentIdValue = parsedAgent;
+        } catch (agentError) {
+          const message = agentError instanceof Error ? agentError.message : 'Invalid agentId';
+          return res.status(400).json({ message });
+        }
+      }
+
+      const notes = typeof payload.notes === 'string' ? payload.notes.trim() : undefined;
+      const type = typeof payload.type === 'string' && payload.type.trim() ? payload.type.trim() : 'in-person';
+
+      const appointmentInput = insertAppointmentSchema.parse({
+        propertyId: propertyIdValue,
+        buyerId: req.user!.id,
+        appointmentDate,
+        type,
+        ...(agentIdValue !== undefined ? { agentId: agentIdValue } : {}),
+        ...(notes ? { notes } : {}),
+      });
+      const appointment = await storage.createAppointment(appointmentInput);
+
+      logInfo('property.appointment.created', {
+        userId: req.user!.id,
+        meta: {
+          propertyId: propertyIdValue,
+          appointmentId: appointment.id,
+          request: buildRequestContext(req),
+        },
+      });
 
       res.status(201).json(appointment);
     } catch (error) {
-      logError("property.appointment.failed", {
+      if (error instanceof ZodError) {
+        const userContext = req.user?.id !== undefined ? { userId: req.user.id } : {};
+        logWarn('property.appointment.validation_failed', {
+          ...userContext,
+          meta: {
+            issues: error.issues,
+            request: buildRequestContext(req),
+          },
+        });
+        return res.status(400).json({ message: 'Invalid appointment data', details: error.issues });
+      }
+
+      const userContext = req.user?.id !== undefined ? { userId: req.user.id } : {};
+      logError('property.appointment.failed', {
+        ...userContext,
         meta: buildRequestContext(req),
         error,
       });
-      res.status(500).json({ message: "Failed to create appointment" });
+      res.status(500).json({ message: 'Failed to create appointment' });
     }
   });
 }
