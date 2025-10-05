@@ -567,6 +567,10 @@ export function registerPropertyRoutes(app: Express) {
               allowNull: allowNull ?? false,
             });
 
+            if (key === 'price' && typeof coerced === 'number' && coerced <= 0) {
+              return res.status(400).json({ error: 'Price must be greater than zero' });
+            }
+
             if (coerced === undefined) {
               delete normalizedUpdates[key];
             } else {

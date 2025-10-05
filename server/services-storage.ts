@@ -142,9 +142,10 @@ export class ServicesStorage implements IServicesStorage {
 
     const categories = result
       .map((row: { category: string | null }) => row.category)
-      .filter((category): category is string => typeof category === 'string' && category.trim().length > 0);
+      .map((category) => (typeof category === 'string' ? category.trim() : category))
+      .filter((category): category is string => typeof category === 'string' && category.length > 0);
 
-    return categories.map((category) => category.trim());
+    return categories;
   }
 
   async createServiceProvider(provider: InsertServiceProvider): Promise<ServiceProvider> {
@@ -257,12 +258,12 @@ export class ServicesStorage implements IServicesStorage {
       .values(review)
       .returning();
 
-    if (typeof review.providerId === 'number') {
-      await this.refreshProviderStats(review.providerId);
-    }
-
     if (!newReview) {
       throw new Error('Failed to create service review');
+    }
+
+    if (typeof review.providerId === 'number') {
+      await this.refreshProviderStats(review.providerId);
     }
 
     return newReview;

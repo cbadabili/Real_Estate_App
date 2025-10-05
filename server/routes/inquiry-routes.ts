@@ -44,8 +44,15 @@ export function registerInquiryRoutes(app: Express) {
   };
 
   app.post("/api/inquiries", authenticate, async (req, res) => {
+    let propertyId: number;
     try {
-      const propertyId = parseNumericParam(String(req.body?.propertyId ?? ""), "Property id");
+      propertyId = parseNumericParam(String(req.body?.propertyId ?? ""), "Property id");
+    } catch (validationError) {
+      const message = validationError instanceof Error ? validationError.message : "Invalid property id";
+      return res.status(400).json({ message });
+    }
+
+    try {
       const property = await storage.getProperty(propertyId);
       if (!property) {
         return res.status(404).json({ message: "Property not found" });
@@ -78,20 +85,26 @@ export function registerInquiryRoutes(app: Express) {
         return res.status(400).json({ message: "Invalid inquiry payload", details: error.issues });
       }
 
-      const message = error instanceof Error ? error.message : "Unable to create inquiry";
       const userContext = req.user?.id !== undefined ? { userId: req.user.id } : {};
       logError("inquiry.create.failed", {
         ...userContext,
         meta: buildRequestContext(req),
         error,
       });
-      return res.status(400).json({ message });
+      return res.status(500).json({ message: "Unable to create inquiry" });
     }
   });
 
   app.get("/api/properties/:propertyId/inquiries", authenticate, async (req, res) => {
+    let propertyId: number;
     try {
-      const propertyId = parseNumericParam(req.params.propertyId, "Property id");
+      propertyId = parseNumericParam(req.params.propertyId, "Property id");
+    } catch (validationError) {
+      const message = validationError instanceof Error ? validationError.message : "Invalid property id";
+      return res.status(400).json({ message });
+    }
+
+    try {
       const property = await storage.getProperty(propertyId);
       if (!property) {
         return res.status(404).json({ message: "Property not found" });
@@ -117,20 +130,26 @@ export function registerInquiryRoutes(app: Express) {
       });
       return res.json(inquiries);
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Failed to fetch inquiries";
       const userContext = req.user?.id !== undefined ? { userId: req.user.id } : {};
       logError("inquiry.list.failed", {
         ...userContext,
         meta: buildRequestContext(req),
         error,
       });
-      return res.status(400).json({ message });
+      return res.status(500).json({ message: "Failed to fetch inquiries" });
     }
   });
 
   app.get("/api/users/:userId/inquiries", authenticate, async (req, res) => {
+    let userId: number;
     try {
-      const userId = parseNumericParam(req.params.userId, "User id");
+      userId = parseNumericParam(req.params.userId, "User id");
+    } catch (validationError) {
+      const message = validationError instanceof Error ? validationError.message : "Invalid user id";
+      return res.status(400).json({ message });
+    }
+
+    try {
       const currentUser = req.user!;
       if (currentUser.id !== userId && !AuthService.isAdmin(currentUser)) {
         return res.status(403).json({ message: "Not authorized to view these inquiries" });
@@ -147,20 +166,26 @@ export function registerInquiryRoutes(app: Express) {
       });
       return res.json(inquiries);
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Failed to fetch inquiries";
       const userContext = req.user?.id !== undefined ? { userId: req.user.id } : {};
       logError("inquiry.user_list.failed", {
         ...userContext,
         meta: buildRequestContext(req),
         error,
       });
-      return res.status(400).json({ message });
+      return res.status(500).json({ message: "Failed to fetch inquiries" });
     }
   });
 
   app.patch("/api/inquiries/:id/status", authenticate, async (req, res) => {
+    let inquiryId: number;
     try {
-      const inquiryId = parseNumericParam(req.params.id, "Inquiry id");
+      inquiryId = parseNumericParam(req.params.id, "Inquiry id");
+    } catch (validationError) {
+      const message = validationError instanceof Error ? validationError.message : "Invalid inquiry id";
+      return res.status(400).json({ message });
+    }
+
+    try {
       const statusRaw = typeof req.body?.status === "string" ? req.body.status.trim().toLowerCase() : "";
       if (!statusRaw) {
         return res.status(400).json({ message: "Status is required" });
@@ -212,14 +237,13 @@ export function registerInquiryRoutes(app: Express) {
       });
       return res.json(updated);
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Failed to update inquiry";
       const userContext = req.user?.id !== undefined ? { userId: req.user.id } : {};
       logError("inquiry.status.failed", {
         ...userContext,
         meta: buildRequestContext(req),
         error,
       });
-      return res.status(400).json({ message });
+      return res.status(500).json({ message: "Failed to update inquiry" });
     }
   });
 }

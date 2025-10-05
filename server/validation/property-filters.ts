@@ -86,7 +86,7 @@ const propertyFilterSchema = z
         if (candidate === undefined || candidate === null || candidate === '') {
           return undefined;
         }
-        return String(candidate);
+        return String(candidate).trim().toLowerCase();
       }, z.enum(sortByEnum).optional()),
     sortOrder: z
       .preprocess((value) => {
@@ -94,7 +94,7 @@ const propertyFilterSchema = z
         if (candidate === undefined || candidate === null || candidate === '') {
           return undefined;
         }
-        return String(candidate).toLowerCase();
+        return String(candidate).trim().toLowerCase();
       }, z.enum(sortOrderEnum).optional()),
     requireValidCoordinates: optionalBoolean(),
     searchTerm: optionalString(),
