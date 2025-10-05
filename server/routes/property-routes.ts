@@ -1,45 +1,156 @@
-import type { Express } from "express";
-import { Request, Response } from 'express';
+import type { Express, Request } from "express";
 import { ZodError } from 'zod';
 import { storage } from "../storage";
-import { insertPropertySchema, type InsertProperty, UserType } from "../../shared/schema";
-import { authenticate, optionalAuthenticate, requireUserType, AuthService } from "../auth-middleware";
+import { insertAppointmentSchema, insertPropertySchema, type InsertProperty } from "../../shared/schema";
+import { authenticate, optionalAuthenticate, AuthService } from "../auth-middleware";
+import { logError, logInfo, logWarn } from "../utils/logger";
+import { parsePropertyFilters } from "../validation/property-filters";
+import type { RequestWithId } from "../middleware/logging";
 
 export function registerPropertyRoutes(app: Express) {
+  const buildRequestContext = (req: Request) => {
+    const requestWithId = req as Request & Partial<RequestWithId>;
+    return {
+      requestId: requestWithId.id,
+      method: req.method,
+      path: req.path,
+    };
+  };
+
+  const parseNumericParam = (value: unknown, label: string): number => {
+    if (typeof value !== 'string' || value.trim() === '') {
+      throw new Error(`${label} is required`);
+    }
+
+    const parsed = Number.parseInt(value, 10);
+    if (Number.isNaN(parsed)) {
+      throw new Error(`${label} must be a number`);
+    }
+
+    return parsed;
+  };
+
+  const sanitizeNullableString = (value: unknown): string | null => {
+    if (value === undefined || value === null) {
+      return null;
+    }
+
+    const normalized = String(value).trim();
+    return normalized === '' ? null : normalized;
+  };
+
+  const coerceNumericField = (
+    value: unknown,
+    field: string,
+    options: { optional?: boolean; allowNull?: boolean } = {}
+  ): number | null | undefined => {
+    const { optional = false, allowNull = false } = options;
+
+    if (value === undefined) {
+      if (optional) {
+        return undefined;
+      }
+      throw new Error(`${field} is required`);
+    }
+
+    if (value === null) {
+      if (allowNull) {
+        return null;
+      }
+      if (optional) {
+        return undefined;
+      }
+      throw new Error(`${field} must be a number`);
+    }
+
+    if (typeof value === 'number') {
+      if (Number.isFinite(value)) {
+        return value;
+      }
+      throw new Error(`${field} must be a finite number`);
+    }
+
+    if (typeof value === 'string') {
+      const trimmed = value.trim();
+      if (!trimmed) {
+        if (allowNull) {
+          return null;
+        }
+        if (optional) {
+          return undefined;
+        }
+        throw new Error(`${field} is required`);
+      }
+
+      const parsed = Number(trimmed);
+      if (Number.isFinite(parsed)) {
+        return parsed;
+      }
+      throw new Error(`${field} must be a number`);
+    }
+
+    throw new Error(`${field} must be a number`);
+  };
+
+  const coordinatesWithinBotswana = (lng: number, lat: number) =>
+    lng >= 19.999535 && lng <= 29.368311 && lat >= -26.907379 && lat <= -17.780809;
+
+  const coerceCoordinate = (
+    value: unknown,
+    field: 'latitude' | 'longitude'
+  ): number | null | undefined => {
+    if (value === undefined) {
+      return undefined;
+    }
+    if (value === null || value === '') {
+      return null;
+    }
+    if (typeof value === 'number' && Number.isFinite(value)) {
+      return value;
+    }
+    if (typeof value === 'string') {
+      const trimmed = value.trim();
+      if (!trimmed) {
+        return null;
+      }
+      const numeric = Number(trimmed);
+      if (Number.isFinite(numeric)) {
+        return numeric;
+      }
+    }
+    throw new Error(`${field} must be a number`);
+  };
+
   // Get all properties
   app.get("/api/properties", async (req, res) => {
     try {
-      const filters = {
-        minPrice: req.query.minPrice ? parseFloat(req.query.minPrice as string) : undefined,
-        maxPrice: req.query.maxPrice ? parseFloat(req.query.maxPrice as string) : undefined,
-        propertyType: req.query.propertyType as string,
-        minBedrooms: req.query.minBedrooms ? parseInt(req.query.minBedrooms as string) : undefined,
-        minBathrooms: req.query.minBathrooms ? parseFloat(req.query.minBathrooms as string) : undefined,
-        minSquareFeet: req.query.minSquareFeet ? parseInt(req.query.minSquareFeet as string) : undefined,
-        maxSquareFeet: req.query.maxSquareFeet ? parseInt(req.query.maxSquareFeet as string) : undefined,
-        city: req.query.city as string,
-        state: req.query.state as string,
-        zipCode: req.query.zipCode as string,
-        location: req.query.location as string, // Add location search parameter
-        listingType: req.query.listingType as string,
-        status: req.query.status as string || 'active',
-        limit: req.query.limit ? parseInt(req.query.limit as string) : undefined,
-        offset: req.query.offset ? parseInt(req.query.offset as string) : undefined,
-        sortBy: req.query.sortBy as 'price' | 'date' | 'size' | 'bedrooms',
-        sortOrder: req.query.sortOrder as 'asc' | 'desc'
-      };
-
-      console.log('Fetching properties with filters:', JSON.stringify(filters, null, 2));
+      const filters = parsePropertyFilters(req.query);
       const properties = await storage.getProperties(filters);
-      console.log('Properties fetched:', properties.length);
-
-      properties.forEach(prop => {
-        console.log(`Property ${prop.id}: lat=${prop.latitude}, lng=${prop.longitude}`);
+      logInfo("property.list.success", {
+        meta: {
+          filters,
+          resultCount: properties.length,
+          request: buildRequestContext(req),
+        },
       });
-
       res.json(properties);
     } catch (error) {
-      console.error("Get properties error:", error);
+      if (error instanceof ZodError) {
+        logWarn("property.list.validation_failed", {
+          meta: {
+            issues: error.issues,
+            request: buildRequestContext(req),
+          },
+        });
+        return res.status(400).json({
+          message: "Invalid property filters",
+          details: error.issues,
+        });
+      }
+      logError("property.list.failed", {
+        error,
+        meta: buildRequestContext(req),
+      });
       res.status(500).json({ message: "Failed to fetch properties" });
     }
   });
@@ -80,7 +191,10 @@ export function registerPropertyRoutes(app: Express) {
 
       res.json(suggestions);
     } catch (error) {
-      console.error("Suggestions error:", error);
+      logError("property.suggest.failed", {
+        error,
+        meta: buildRequestContext(req),
+      });
       res.json([]);
     }
   });
@@ -89,11 +203,12 @@ export function registerPropertyRoutes(app: Express) {
   // Get single property
   app.get("/api/properties/:id", optionalAuthenticate, async (req, res) => { // Changed to optionalAuthenticate for public view
     try {
-      const propertyId = parseInt(req.params.id);
-
-      // Validate that propertyId is a valid number
-      if (isNaN(propertyId) || propertyId <= 0) {
-        return res.status(400).json({ message: "Invalid property ID" });
+      let propertyId: number;
+      try {
+        propertyId = parseNumericParam(req.params.id, 'Property id');
+      } catch (validationError) {
+        const message = validationError instanceof Error ? validationError.message : 'Invalid property ID';
+        return res.status(400).json({ message });
       }
 
       const property = await storage.getProperty(propertyId);
@@ -105,13 +220,16 @@ export function registerPropertyRoutes(app: Express) {
       await storage.incrementPropertyViews(propertyId);
       res.json(property);
     } catch (error) {
-      console.error("Get property error:", error);
+      logError("property.get.failed", {
+        error,
+        meta: buildRequestContext(req),
+      });
       res.status(500).json({ message: "Failed to fetch property" });
     }
   });
 
   // Image validation helper
-  const validateImages = (images: any[]): boolean => {
+  const validateImages = (images: unknown): boolean => {
     if (!Array.isArray(images)) return false;
 
     const MAX_IMAGES = 20;
@@ -137,7 +255,8 @@ export function registerPropertyRoutes(app: Express) {
 
         // Validate MIME type
         const mimeMatch = image.match(/^data:([^;]+);/);
-        if (!mimeMatch || !['image/jpeg', 'image/png', 'image/webp'].includes(mimeMatch[1])) {
+        const mimeType = mimeMatch?.[1];
+        if (!mimeType || !['image/jpeg', 'image/png', 'image/webp'].includes(mimeType)) {
           throw new Error('Invalid image type. Only JPEG, PNG, and WebP are allowed');
         }
       }
@@ -146,11 +265,70 @@ export function registerPropertyRoutes(app: Express) {
     return true;
   };
 
+  const parseStringArrayField = (value: unknown, field: string): string[] | undefined => {
+    if (value === undefined) {
+      return undefined;
+    }
+
+    if (value === null) {
+      return [];
+    }
+
+    if (Array.isArray(value)) {
+      return value.map(item => String(item));
+    }
+
+    if (typeof value === 'string') {
+      const trimmed = value.trim();
+      if (!trimmed) {
+        return [];
+      }
+
+      const splitCommaSeparated = (input: string) =>
+        input
+          .split(',')
+          .map(item => item.trim())
+          .filter(Boolean)
+          .map(item => String(item));
+
+      try {
+        const parsed = JSON.parse(trimmed);
+        if (Array.isArray(parsed)) {
+          return parsed.map(item => String(item));
+        }
+
+        if (typeof parsed === 'string') {
+          const normalized = parsed.trim();
+          if (!normalized) {
+            return [];
+          }
+          return normalized.includes(',')
+            ? splitCommaSeparated(normalized)
+            : [normalized];
+        }
+
+        if (trimmed.includes(',')) {
+          return splitCommaSeparated(trimmed);
+        }
+
+        throw new Error(`${field} must be an array of strings`);
+      } catch (parseError) {
+        if (parseError instanceof SyntaxError) {
+          if (trimmed.includes(',')) {
+            return splitCommaSeparated(trimmed);
+          }
+          return [trimmed];
+        }
+        throw parseError;
+      }
+    }
+
+    throw new Error(`${field} must be an array of strings`);
+  };
+
   // Create property - only sellers, agents, fsbo, and admin users can create properties
   app.post("/api/properties", authenticate, async (req, res) => {
     try {
-      console.log("Create property request body:", req.body);
-
       const {
         areaText, placeName, placeId,
         latitude, longitude, locationSource,
@@ -158,55 +336,159 @@ export function registerPropertyRoutes(app: Express) {
         ...rest
       } = req.body;
 
-      // Validate coordinates are within Botswana bounds
-      const isNum = (v: any) => typeof v === "number" && Number.isFinite(v);
-      const inBW = (lng: number, lat: number) => lng >= 20 && lng <= 29 && lat >= -27 && lat <= -17;
-
-      if (isNum(latitude) && isNum(longitude) && !inBW(longitude, latitude)) {
-        return res.status(400).json({ error: "Coordinates must be within Botswana bounds." });
-      }
-
-      // Validate images if provided
-      if (images) {
+      let normalizedLatitude: number | null | undefined;
+      if (Object.prototype.hasOwnProperty.call(req.body ?? {}, 'latitude')) {
         try {
-          const imageArray = Array.isArray(images) ? images : JSON.parse(images);
-          validateImages(imageArray);
-        } catch (imageError) {
-          const message = imageError instanceof Error ? imageError.message : 'Invalid image payload';
+          normalizedLatitude = coerceCoordinate(latitude, 'latitude');
+        } catch (coordinateError) {
+          const message = coordinateError instanceof Error ? coordinateError.message : 'Invalid latitude';
           return res.status(400).json({ error: message });
         }
       }
 
+      let normalizedLongitude: number | null | undefined;
+      if (Object.prototype.hasOwnProperty.call(req.body ?? {}, 'longitude')) {
+        try {
+          normalizedLongitude = coerceCoordinate(longitude, 'longitude');
+        } catch (coordinateError) {
+          const message = coordinateError instanceof Error ? coordinateError.message : 'Invalid longitude';
+          return res.status(400).json({ error: message });
+        }
+      }
+
+      if (
+        typeof normalizedLatitude === 'number' &&
+        typeof normalizedLongitude === 'number' &&
+        !coordinatesWithinBotswana(normalizedLongitude, normalizedLatitude)
+      ) {
+        return res.status(400).json({ error: "Coordinates must be within Botswana bounds." });
+      }
+
+      let featuresArray: string[] | undefined;
+
+      const imageParseResult = (() => {
+        try {
+          const parsed = parseStringArrayField(images, 'images');
+          if (parsed) {
+            validateImages(parsed);
+          }
+          return { ok: true as const, value: parsed };
+        } catch (imageError) {
+          const message = imageError instanceof Error ? imageError.message : 'Invalid image payload';
+          return { ok: false as const, error: message, raw: imageError };
+        }
+      })();
+
+      if (!imageParseResult.ok) {
+        logWarn("property.create.invalid_images", {
+          ...(req.user?.id !== undefined ? { userId: req.user.id } : {}),
+          meta: {
+            request: buildRequestContext(req),
+          },
+          error: imageParseResult.raw,
+        });
+        return res.status(400).json({ error: imageParseResult.error });
+      }
+
+      const imagesArray = imageParseResult.value;
+
+      try {
+        featuresArray = parseStringArrayField(features, 'features');
+      } catch (featureError) {
+        const message = featureError instanceof Error ? featureError.message : 'Invalid features payload';
+        logWarn("property.create.invalid_features", {
+          ...(req.user?.id !== undefined ? { userId: req.user.id } : {}),
+          meta: {
+            request: buildRequestContext(req),
+          },
+          error: featureError,
+        });
+        return res.status(400).json({ error: message });
+      }
+
+      const restPayload = rest as Record<string, unknown>;
+
       // Prepare property data with location fields and owner ID
-      const propertyData = {
-        ...rest,
+      const propertyData: Record<string, unknown> = {
+        ...restPayload,
         ownerId: req.user!.id, // Set the authenticated user as the owner
-        areaText: areaText || null,
-        placeName: placeName || null,
-        placeId: placeId || null,
-        latitude: isNum(latitude) ? latitude : null,
-        longitude: isNum(longitude) ? longitude : null,
-        locationSource: locationSource || 'geocode',
-        features: features ? (typeof features === 'string' ? features : JSON.stringify(features)) : null,
-        images: images ? (typeof images === 'string' ? images : JSON.stringify(images)) : null
+        areaText: sanitizeNullableString(areaText),
+        placeName: sanitizeNullableString(placeName),
+        placeId: sanitizeNullableString(placeId),
+        latitude: normalizedLatitude ?? null,
+        longitude: normalizedLongitude ?? null,
+        locationSource: sanitizeNullableString(locationSource) ?? 'geocode',
+        features: featuresArray ?? [],
+        images: imagesArray ?? [],
       };
 
-      console.log("Processed property data:", propertyData);
+      try {
+        const priceValue = coerceNumericField(restPayload['price'], 'price');
+        propertyData.price = priceValue;
+      } catch (numericError) {
+        const message = numericError instanceof Error ? numericError.message : 'Invalid price value';
+        return res.status(400).json({ error: message });
+      }
+
+      const optionalNumericFields: Array<{ key: Extract<keyof InsertProperty, string>; allowNull?: boolean }> = [
+        { key: 'bedrooms', allowNull: true },
+        { key: 'bathrooms', allowNull: true },
+        { key: 'squareFeet', allowNull: true },
+        { key: 'areaBuild', allowNull: true },
+        { key: 'yearBuilt', allowNull: true },
+      ];
+
+      for (const { key, allowNull } of optionalNumericFields) {
+        if (Object.prototype.hasOwnProperty.call(restPayload, key)) {
+          try {
+            const coerced = coerceNumericField(restPayload[key], key, {
+              optional: true,
+              allowNull: allowNull ?? false,
+            });
+
+            if (coerced === undefined) {
+              delete propertyData[key];
+            } else {
+              propertyData[key] = coerced;
+            }
+          } catch (numericError) {
+            const message = numericError instanceof Error ? numericError.message : `Invalid ${String(key)} value`;
+            return res.status(400).json({ error: message });
+          }
+        }
+      }
 
       const validatedData = insertPropertySchema.parse(propertyData) as InsertProperty;
       const property = await storage.createProperty(validatedData);
+      logInfo("property.create.success", {
+        ...(req.user?.id !== undefined ? { userId: req.user.id } : {}),
+        meta: {
+          propertyId: property.id,
+          request: buildRequestContext(req),
+        },
+      });
       res.status(201).json(property);
     } catch (error) {
-      console.error("Create property error:", error);
       if (error instanceof ZodError) {
-        console.error("Validation errors:", error.errors);
+        logWarn("property.create.validation_failed", {
+          ...(req.user?.id !== undefined ? { userId: req.user.id } : {}),
+          meta: {
+            issues: error.errors,
+            request: buildRequestContext(req),
+          },
+        });
         return res.status(400).json({
           message: "Invalid property data",
-          details: error.errors
+          details: error.errors,
         });
       }
 
       const message = error instanceof Error ? error.message : 'Invalid property data';
+      logError("property.create.failed", {
+        ...(req.user?.id !== undefined ? { userId: req.user.id } : {}),
+        meta: buildRequestContext(req),
+        error,
+      });
       res.status(400).json({ message: "Invalid property data", error: message });
     }
   });
@@ -214,16 +496,14 @@ export function registerPropertyRoutes(app: Express) {
   // Update property - requires authentication and ownership or admin
   app.put("/api/properties/:id", authenticate, async (req, res) => {
     try {
-      const propertyId = parseInt(req.params.id);
-
-      // Validate that propertyId is a valid number
-      if (isNaN(propertyId) || propertyId <= 0) {
-        return res.status(400).json({ message: "Invalid property ID" });
+      let propertyId: number;
+      try {
+        propertyId = parseNumericParam(req.params.id, 'Property id');
+      } catch (validationError) {
+        const message = validationError instanceof Error ? validationError.message : 'Invalid property ID';
+        return res.status(400).json({ message });
       }
 
-      const updates = req.body;
-
-      // Check if user owns the property or is admin
       const existingProperty = await storage.getProperty(propertyId);
       if (!existingProperty) {
         return res.status(404).json({ message: "Property not found" });
@@ -236,14 +516,163 @@ export function registerPropertyRoutes(app: Express) {
         return res.status(403).json({ message: "Not authorized to update this property" });
       }
 
-      const property = await storage.updateProperty(propertyId, updates);
+      const updates = (req.body ?? {}) as Record<string, unknown>;
+
+      const {
+        areaText,
+        placeName,
+        placeId,
+        latitude,
+        longitude,
+        locationSource,
+        features,
+        images,
+        ...restUpdates
+      } = updates;
+
+      const normalizedUpdates: Partial<InsertProperty> = {
+        ...(restUpdates as Partial<InsertProperty>),
+      };
+
+      if (Object.prototype.hasOwnProperty.call(updates, 'areaText')) {
+        normalizedUpdates.areaText = sanitizeNullableString(areaText);
+      }
+
+      if (Object.prototype.hasOwnProperty.call(updates, 'placeName')) {
+        normalizedUpdates.placeName = sanitizeNullableString(placeName);
+      }
+
+      if (Object.prototype.hasOwnProperty.call(updates, 'placeId')) {
+        normalizedUpdates.placeId = sanitizeNullableString(placeId);
+      }
+
+      if (Object.prototype.hasOwnProperty.call(updates, 'locationSource')) {
+        normalizedUpdates.locationSource = sanitizeNullableString(locationSource) ?? 'geocode';
+      }
+
+      const optionalNumericUpdateFields: Array<{ key: Extract<keyof InsertProperty, string>; allowNull?: boolean }> = [
+        { key: 'price', allowNull: false },
+        { key: 'bedrooms', allowNull: true },
+        { key: 'bathrooms', allowNull: true },
+        { key: 'squareFeet', allowNull: true },
+        { key: 'areaBuild', allowNull: true },
+        { key: 'yearBuilt', allowNull: true },
+      ];
+
+      for (const { key, allowNull } of optionalNumericUpdateFields) {
+        if (Object.prototype.hasOwnProperty.call(restUpdates, key)) {
+          try {
+            const coerced = coerceNumericField(restUpdates[key], key, {
+              optional: true,
+              allowNull: allowNull ?? false,
+            });
+
+            if (coerced === undefined) {
+              delete normalizedUpdates[key];
+            } else {
+              (normalizedUpdates as Record<string, unknown>)[key] = coerced;
+            }
+          } catch (numericError) {
+            const message = numericError instanceof Error ? numericError.message : `Invalid ${String(key)} value`;
+            return res.status(400).json({ error: message });
+          }
+        }
+      }
+
+      let normalizedLatitude: number | null | undefined;
+      if (Object.prototype.hasOwnProperty.call(updates, 'latitude')) {
+        try {
+          normalizedLatitude = coerceCoordinate(latitude, 'latitude');
+          if (normalizedLatitude !== undefined) {
+            normalizedUpdates.latitude = normalizedLatitude;
+          }
+        } catch (coordinateError) {
+          const message = coordinateError instanceof Error ? coordinateError.message : 'Invalid latitude';
+          return res.status(400).json({ error: message });
+        }
+      }
+
+      let normalizedLongitude: number | null | undefined;
+      if (Object.prototype.hasOwnProperty.call(updates, 'longitude')) {
+        try {
+          normalizedLongitude = coerceCoordinate(longitude, 'longitude');
+          if (normalizedLongitude !== undefined) {
+            normalizedUpdates.longitude = normalizedLongitude;
+          }
+        } catch (coordinateError) {
+          const message = coordinateError instanceof Error ? coordinateError.message : 'Invalid longitude';
+          return res.status(400).json({ error: message });
+        }
+      }
+
+      const finalLatitude =
+        normalizedLatitude !== undefined
+          ? normalizedLatitude
+          : (existingProperty.latitude ?? undefined);
+      const finalLongitude =
+        normalizedLongitude !== undefined
+          ? normalizedLongitude
+          : (existingProperty.longitude ?? undefined);
+
+      if (
+        typeof finalLatitude === 'number' &&
+        typeof finalLongitude === 'number' &&
+        !coordinatesWithinBotswana(finalLongitude, finalLatitude)
+      ) {
+        return res.status(400).json({ error: "Coordinates must be within Botswana bounds." });
+      }
+
+      if (Object.prototype.hasOwnProperty.call(updates, 'features')) {
+        try {
+          const parsedFeatures = parseStringArrayField(features, 'features');
+          if (parsedFeatures !== undefined) {
+            normalizedUpdates.features = parsedFeatures;
+          }
+        } catch (featureError) {
+          const message = featureError instanceof Error ? featureError.message : 'Invalid features payload';
+          logWarn("property.update.invalid_features", {
+            ...(req.user?.id !== undefined ? { userId: req.user.id } : {}),
+            meta: {
+              request: buildRequestContext(req),
+            },
+            error: featureError,
+          });
+          return res.status(400).json({ error: message });
+        }
+      }
+
+      if (Object.prototype.hasOwnProperty.call(updates, 'images')) {
+        try {
+          const parsedImages = parseStringArrayField(images, 'images');
+          if (parsedImages !== undefined) {
+            validateImages(parsedImages);
+            normalizedUpdates.images = parsedImages;
+          }
+        } catch (imageError) {
+          const message = imageError instanceof Error ? imageError.message : 'Invalid image payload';
+          logWarn("property.update.invalid_images", {
+            ...(req.user?.id !== undefined ? { userId: req.user.id } : {}),
+            meta: {
+              request: buildRequestContext(req),
+            },
+            error: imageError,
+          });
+          return res.status(400).json({ error: message });
+        }
+      }
+
+      const property = await storage.updateProperty(propertyId, normalizedUpdates);
       if (!property) {
         return res.status(404).json({ message: "Property not found" });
       }
 
       res.json(property);
     } catch (error) {
-      console.error("Update property error:", error);
+      logError("property.update.failed", {
+        ...(req.user?.id !== undefined ? { userId: req.user.id } : {}),
+        meta: buildRequestContext(req),
+        error,
+      });
       res.status(500).json({ message: "Failed to update property" });
     }
   });
@@ -251,7 +680,13 @@ export function registerPropertyRoutes(app: Express) {
   // Delete property - requires authentication and ownership or admin
   app.delete("/api/properties/:id", authenticate, async (req, res) => {
     try {
-      const propertyId = parseInt(req.params.id);
+      let propertyId: number;
+      try {
+        propertyId = parseNumericParam(req.params.id, 'Property id');
+      } catch (validationError) {
+        const message = validationError instanceof Error ? validationError.message : 'Invalid property ID';
+        return res.status(400).json({ message });
+      }
 
       // Check if user owns the property or is admin
       const existingProperty = await storage.getProperty(propertyId);
@@ -274,34 +709,100 @@ export function registerPropertyRoutes(app: Express) {
 
       res.json({ message: "Property deleted successfully" });
     } catch (error) {
-      console.error("Delete property error:", error);
+      logError("property.delete.failed", {
+        ...(req.user?.id !== undefined ? { userId: req.user.id } : {}),
+        meta: buildRequestContext(req),
+        error,
+      });
       res.status(500).json({ message: "Failed to delete property" });
     }
   });
 
   // Create appointment for property viewing
-  app.post("/api/appointments", authenticate, async (req, res) => { // Added authenticate
+  app.post("/api/appointments", authenticate, async (req, res) => {
     try {
-      const appointmentData = req.body;
+      const payload = req.body ?? {};
 
-      // Basic validation
-      if (!appointmentData.propertyId || !appointmentData.buyerId || !appointmentData.appointmentDate) {
-        return res.status(400).json({ message: "Missing required fields" });
+      let propertyIdValue: number;
+      try {
+        const coerced = coerceNumericField(payload.propertyId, 'propertyId');
+        if (typeof coerced !== 'number') {
+          throw new Error('Property id must be a number');
+        }
+        propertyIdValue = coerced;
+      } catch (propertyError) {
+        const message = propertyError instanceof Error ? propertyError.message : 'Property id must be a number';
+        return res.status(400).json({ message });
       }
 
-      // For now, we'll just return a success response
-      // In a real implementation, you'd save to database
-      const appointment = {
-        id: Date.now(), // Mock ID
-        ...appointmentData,
-        status: 'pending',
-        createdAt: new Date().toISOString()
-      };
+      const property = await storage.getProperty(propertyIdValue);
+      if (!property) {
+        return res.status(404).json({ message: 'Property not found' });
+      }
+
+      if (!payload.appointmentDate) {
+        return res.status(400).json({ message: 'Appointment date is required' });
+      }
+
+      const appointmentDate = new Date(payload.appointmentDate);
+      if (Number.isNaN(appointmentDate.getTime())) {
+        return res.status(400).json({ message: 'Appointment date must be a valid date' });
+      }
+
+      let agentIdValue: number | null | undefined;
+      if (Object.prototype.hasOwnProperty.call(payload, 'agentId')) {
+        try {
+          const parsedAgent = coerceNumericField(payload.agentId, 'agentId', { optional: true, allowNull: true });
+          agentIdValue = parsedAgent;
+        } catch (agentError) {
+          const message = agentError instanceof Error ? agentError.message : 'Invalid agentId';
+          return res.status(400).json({ message });
+        }
+      }
+
+      const notes = typeof payload.notes === 'string' ? payload.notes.trim() : undefined;
+      const type = typeof payload.type === 'string' && payload.type.trim() ? payload.type.trim() : 'in-person';
+
+      const appointmentInput = insertAppointmentSchema.parse({
+        propertyId: propertyIdValue,
+        buyerId: req.user!.id,
+        appointmentDate,
+        type,
+        ...(agentIdValue !== undefined ? { agentId: agentIdValue } : {}),
+        ...(notes ? { notes } : {}),
+      });
+      const appointment = await storage.createAppointment(appointmentInput);
+
+      logInfo('property.appointment.created', {
+        userId: req.user!.id,
+        meta: {
+          propertyId: propertyIdValue,
+          appointmentId: appointment.id,
+          request: buildRequestContext(req),
+        },
+      });
 
       res.status(201).json(appointment);
     } catch (error) {
-      console.error("Create appointment error:", error);
-      res.status(500).json({ message: "Failed to create appointment" });
+      if (error instanceof ZodError) {
+        const userContext = req.user?.id !== undefined ? { userId: req.user.id } : {};
+        logWarn('property.appointment.validation_failed', {
+          ...userContext,
+          meta: {
+            issues: error.issues,
+            request: buildRequestContext(req),
+          },
+        });
+        return res.status(400).json({ message: 'Invalid appointment data', details: error.issues });
+      }
+
+      const userContext = req.user?.id !== undefined ? { userId: req.user.id } : {};
+      logError('property.appointment.failed', {
+        ...userContext,
+        meta: buildRequestContext(req),
+        error,
+      });
+      res.status(500).json({ message: 'Failed to create appointment' });
     }
   });
 }
