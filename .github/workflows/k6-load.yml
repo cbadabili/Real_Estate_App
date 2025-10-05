@@ -55,7 +55,7 @@ jobs:
             exit 1
           fi
       - name: Set up k6
-        uses: grafana/setup-k6-action@v1.1.0
+        uses: grafana/setup-k6-action@v0.3.0
       - name: Run k6 smoke
         run: k6 run tests/load/properties-search.js
         env:

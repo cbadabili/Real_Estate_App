@@ -142,7 +142,7 @@ export class ServicesStorage implements IServicesStorage {
 
     const categories = result
       .map((row: { category: string | null }) => row.category)
-      .map((category) => (typeof category === 'string' ? category.trim() : category))
+      .map((category: string | null) => (typeof category === 'string' ? category.trim() : category))
       .filter((category): category is string => typeof category === 'string' && category.length > 0);
 
     return categories;
