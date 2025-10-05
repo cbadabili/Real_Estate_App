@@ -1,7 +1,7 @@
 import type { Express, Request } from "express";
 import { ZodError } from 'zod';
 import { storage } from "../storage";
-import { insertPropertySchema, type InsertProperty } from "../../shared/schema";
+import { insertAppointmentSchema, insertPropertySchema, type InsertProperty } from "../../shared/schema";
 import { authenticate, optionalAuthenticate, AuthService } from "../auth-middleware";
 import { logError, logInfo, logWarn } from "../utils/logger";
 import { parsePropertyFilters } from "../validation/property-filters";
@@ -720,31 +720,88 @@ export function registerPropertyRoutes(app: Express) {
   });
 
   // Create appointment for property viewing
-  app.post("/api/appointments", authenticate, async (req, res) => { // Added authenticate
+  app.post("/api/appointments", authenticate, async (req, res) => {
     try {
-      const appointmentData = req.body;
+      const payload = req.body ?? {};
 
-      // Basic validation
-      if (!appointmentData.propertyId || !appointmentData.buyerId || !appointmentData.appointmentDate) {
-        return res.status(400).json({ message: "Missing required fields" });
+      let propertyIdValue: number;
+      try {
+        const coerced = coerceNumericField(payload.propertyId, 'propertyId');
+        if (typeof coerced !== 'number') {
+          throw new Error('Property id must be a number');
+        }
+        propertyIdValue = coerced;
+      } catch (propertyError) {
+        const message = propertyError instanceof Error ? propertyError.message : 'Property id must be a number';
+        return res.status(400).json({ message });
       }
 
-      // For now, we'll just return a success response
-      // In a real implementation, you'd save to database
-      const appointment = {
-        id: Date.now(), // Mock ID
-        ...appointmentData,
-        status: 'pending',
-        createdAt: new Date().toISOString()
-      };
+      const property = await storage.getProperty(propertyIdValue);
+      if (!property) {
+        return res.status(404).json({ message: 'Property not found' });
+      }
+
+      if (!payload.appointmentDate) {
+        return res.status(400).json({ message: 'Appointment date is required' });
+      }
+
+      const appointmentDate = new Date(payload.appointmentDate);
+      if (Number.isNaN(appointmentDate.getTime())) {
+        return res.status(400).json({ message: 'Appointment date must be a valid date' });
+      }
+
+      let agentIdValue: number | null | undefined;
+      if (Object.prototype.hasOwnProperty.call(payload, 'agentId')) {
+        try {
+          const parsedAgent = coerceNumericField(payload.agentId, 'agentId', { optional: true, allowNull: true });
+          agentIdValue = parsedAgent;
+        } catch (agentError) {
+          const message = agentError instanceof Error ? agentError.message : 'Invalid agentId';
+          return res.status(400).json({ message });
+        }
+      }
+
+      const notes = typeof payload.notes === 'string' ? payload.notes.trim() : undefined;
+      const type = typeof payload.type === 'string' && payload.type.trim() ? payload.type.trim() : 'in-person';
+
+      const appointmentInput = insertAppointmentSchema.parse({
+        propertyId: propertyIdValue,
+        buyerId: req.user!.id,
+        appointmentDate,
+        type,
+        ...(agentIdValue !== undefined ? { agentId: agentIdValue } : {}),
+        ...(notes ? { notes } : {}),
+      });
+      const appointment = await storage.createAppointment(appointmentInput);
+
+      logInfo('property.appointment.created', {
+        userId: req.user!.id,
+        meta: {
+          propertyId: propertyIdValue,
+          appointmentId: appointment.id,
+          request: buildRequestContext(req),
+        },
+      });
 
       res.status(201).json(appointment);
     } catch (error) {
-      logError("property.appointment.failed", {
+      if (error instanceof ZodError) {
+        logWarn('property.appointment.validation_failed', {
+          userId: req.user?.id,
+          meta: {
+            issues: error.issues,
+            request: buildRequestContext(req),
+          },
+        });
+        return res.status(400).json({ message: 'Invalid appointment data', details: error.issues });
+      }
+
+      logError('property.appointment.failed', {
+        userId: req.user?.id,
         meta: buildRequestContext(req),
         error,
       });
-      res.status(500).json({ message: "Failed to create appointment" });
+      res.status(500).json({ message: 'Failed to create appointment' });
     }
   });
 }

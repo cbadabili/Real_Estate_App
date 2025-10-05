@@ -21,8 +21,8 @@ const describeDatabaseTarget = (): string | undefined => {
 
     return `${host}:${port}`;
   } catch (parseError) {
-    console.warn('⚠️ Unable to parse DATABASE_URL for diagnostics:', parseError);
-    return connectionString;
+    console.warn('⚠️ Unable to parse DATABASE_URL for diagnostics:', parseError instanceof Error ? parseError.message : parseError);
+    return undefined;
   }
 };
 

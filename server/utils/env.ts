@@ -23,11 +23,16 @@ function requireEnv(name: string, { devDefault }: EnvOptions = {}) {
   return trimmed;
 }
 
+const SESSION_SECRET = requireEnv('SESSION_SECRET', { devDefault: 'dev-only-insecure-secret' });
+if (isDevelopment && SESSION_SECRET === 'dev-only-insecure-secret') {
+  console.warn('⚠️ Using the built-in development SESSION_SECRET. Set SESSION_SECRET to a unique value for any shared environment.');
+}
+
 export const env = {
   NODE_ENV,
   PORT: Number(process.env.PORT ?? 5000),
   DATABASE_URL: requireEnv('DATABASE_URL'),
-  SESSION_SECRET: requireEnv('SESSION_SECRET', { devDefault: 'dev-only-insecure-secret' }),
+  SESSION_SECRET,
   JWT_SECRET: requireEnv('JWT_SECRET'),
   CORS_ORIGIN: requireEnv('CORS_ORIGIN', { devDefault: 'http://localhost:5173' }),
   USE_INTEL: (process.env.USE_INTEL ?? 'false').toLowerCase() === 'true',
