@@ -70,16 +70,18 @@ export function registerInquiryRoutes(app: Express) {
       return res.status(201).json(inquiry);
     } catch (error) {
       if (error instanceof ZodError) {
+        const userContext = req.user?.id !== undefined ? { userId: req.user.id } : {};
         logWarn("inquiry.create.validation_failed", {
-          userId: req.user?.id,
+          ...userContext,
           meta: { issues: error.issues, request: buildRequestContext(req) },
         });
         return res.status(400).json({ message: "Invalid inquiry payload", details: error.issues });
       }
 
       const message = error instanceof Error ? error.message : "Unable to create inquiry";
+      const userContext = req.user?.id !== undefined ? { userId: req.user.id } : {};
       logError("inquiry.create.failed", {
-        userId: req.user?.id,
+        ...userContext,
         meta: buildRequestContext(req),
         error,
       });
@@ -116,8 +118,9 @@ export function registerInquiryRoutes(app: Express) {
       return res.json(inquiries);
     } catch (error) {
       const message = error instanceof Error ? error.message : "Failed to fetch inquiries";
+      const userContext = req.user?.id !== undefined ? { userId: req.user.id } : {};
       logError("inquiry.list.failed", {
-        userId: req.user?.id,
+        ...userContext,
         meta: buildRequestContext(req),
         error,
       });
@@ -145,8 +148,9 @@ export function registerInquiryRoutes(app: Express) {
       return res.json(inquiries);
     } catch (error) {
       const message = error instanceof Error ? error.message : "Failed to fetch inquiries";
+      const userContext = req.user?.id !== undefined ? { userId: req.user.id } : {};
       logError("inquiry.user_list.failed", {
-        userId: req.user?.id,
+        ...userContext,
         meta: buildRequestContext(req),
         error,
       });
@@ -209,8 +213,9 @@ export function registerInquiryRoutes(app: Express) {
       return res.json(updated);
     } catch (error) {
       const message = error instanceof Error ? error.message : "Failed to update inquiry";
+      const userContext = req.user?.id !== undefined ? { userId: req.user.id } : {};
       logError("inquiry.status.failed", {
-        userId: req.user?.id,
+        ...userContext,
         meta: buildRequestContext(req),
         error,
       });

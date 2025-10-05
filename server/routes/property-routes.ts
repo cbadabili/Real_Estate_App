@@ -364,7 +364,6 @@ export function registerPropertyRoutes(app: Express) {
         return res.status(400).json({ error: "Coordinates must be within Botswana bounds." });
       }
 
-      let imagesArray: string[] | undefined;
       let featuresArray: string[] | undefined;
 
       const imageParseResult = (() => {
@@ -391,7 +390,7 @@ export function registerPropertyRoutes(app: Express) {
         return res.status(400).json({ error: imageParseResult.error });
       }
 
-      imagesArray = imageParseResult.value;
+      const imagesArray = imageParseResult.value;
 
       try {
         featuresArray = parseStringArrayField(features, 'features');
@@ -786,8 +785,9 @@ export function registerPropertyRoutes(app: Express) {
       res.status(201).json(appointment);
     } catch (error) {
       if (error instanceof ZodError) {
+        const userContext = req.user?.id !== undefined ? { userId: req.user.id } : {};
         logWarn('property.appointment.validation_failed', {
-          userId: req.user?.id,
+          ...userContext,
           meta: {
             issues: error.issues,
             request: buildRequestContext(req),
@@ -796,8 +796,9 @@ export function registerPropertyRoutes(app: Express) {
         return res.status(400).json({ message: 'Invalid appointment data', details: error.issues });
       }
 
+      const userContext = req.user?.id !== undefined ? { userId: req.user.id } : {};
       logError('property.appointment.failed', {
-        userId: req.user?.id,
+        ...userContext,
         meta: buildRequestContext(req),
         error,
       });

@@ -140,10 +140,11 @@ export class ServicesStorage implements IServicesStorage {
       .from(serviceProviders)
       .groupBy(serviceProviders.serviceCategory);
 
-    return result
+    const categories = result
       .map((row: { category: string | null }) => row.category)
-      .filter((category): category is string => typeof category === 'string' && category.trim().length > 0)
-      .map((category: string) => category.trim());
+      .filter((category): category is string => typeof category === 'string' && category.trim().length > 0);
+
+    return categories.map((category) => category.trim());
   }
 
   async createServiceProvider(provider: InsertServiceProvider): Promise<ServiceProvider> {
