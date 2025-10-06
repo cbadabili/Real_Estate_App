@@ -483,13 +483,12 @@ export function registerPropertyRoutes(app: Express) {
         });
       }
 
-      const message = error instanceof Error ? error.message : 'Invalid property data';
       logError("property.create.failed", {
         ...(req.user?.id !== undefined ? { userId: req.user.id } : {}),
         meta: buildRequestContext(req),
         error,
       });
-      res.status(400).json({ message: "Invalid property data", error: message });
+      res.status(500).json({ message: "Unable to create property" });
     }
   });
 
