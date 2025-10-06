@@ -73,7 +73,7 @@ export interface BeeDabProperty {
   id: number;
   title: string;
   description: string | null;
-  price: string;
+  price: number;
   address: string;
   city: string;
   state: string;
@@ -83,7 +83,7 @@ export interface BeeDabProperty {
   propertyType: string;
   listingType: string;
   bedrooms: number | null;
-  bathrooms: string | null;
+  bathrooms: number | null;
   squareFeet: number | null;
   areaBuild: number | null;
   lotSize: string | null;

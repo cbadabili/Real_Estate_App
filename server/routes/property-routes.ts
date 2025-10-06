@@ -445,6 +445,22 @@ export function registerPropertyRoutes(app: Express) {
         { key: 'yearBuilt', allowNull: true },
       ];
 
+      try {
+        const priceValue = coerceNumericField(restPayload['price'], 'price');
+        propertyData.price = priceValue;
+      } catch (numericError) {
+        const message = numericError instanceof Error ? numericError.message : 'Invalid price value';
+        return res.status(400).json({ error: message });
+      }
+
+      const optionalNumericFields: Array<{ key: Extract<keyof InsertProperty, string>; allowNull?: boolean }> = [
+        { key: 'bedrooms', allowNull: true },
+        { key: 'bathrooms', allowNull: true },
+        { key: 'squareFeet', allowNull: true },
+        { key: 'areaBuild', allowNull: true },
+        { key: 'yearBuilt', allowNull: true },
+      ];
+
       for (const { key, allowNull } of optionalNumericFields) {
         if (Object.prototype.hasOwnProperty.call(restPayload, key)) {
           try {
@@ -490,13 +506,12 @@ export function registerPropertyRoutes(app: Express) {
         });
       }
 
-      const message = error instanceof Error ? error.message : 'Invalid property data';
       logError("property.create.failed", {
         ...(req.user?.id !== undefined ? { userId: req.user.id } : {}),
         meta: buildRequestContext(req),
         error,
       });
-      res.status(400).json({ message: "Invalid property data", error: message });
+      res.status(500).json({ message: "Unable to create property" });
     }
   });
 
@@ -573,6 +588,10 @@ export function registerPropertyRoutes(app: Express) {
               optional: true,
               allowNull: allowNull ?? false,
             });
+
+            if (key === 'price' && typeof coerced === 'number' && coerced <= 0) {
+              return res.status(400).json({ error: 'Price must be greater than zero' });
+            }
 
             if (coerced === undefined) {
               delete normalizedUpdates[key];

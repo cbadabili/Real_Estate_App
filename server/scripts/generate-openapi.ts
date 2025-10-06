@@ -83,7 +83,7 @@ const spec = {
                     properties: {
                       id: { type: "number" },
                       title: { type: "string" },
-                      price: { type: "string" },
+                      price: { type: "number" },
                       location: { type: "string" },
                       type: { type: "string" },
                       bedrooms: { type: "number" },
@@ -242,7 +242,7 @@ const spec = {
           id: { type: "number" },
           title: { type: "string" },
           description: { type: "string" },
-          price: { type: "string" },
+          price: { type: "number" },
           location: { type: "string" },
           type: { type: "string" },
           bedrooms: { type: "number" },

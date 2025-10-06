@@ -435,7 +435,47 @@ export const insertUserSchema = createInsertSchema(users).omit({
   updatedAt: true,
 });
 
-export const insertPropertySchema = createInsertSchema(properties).omit({
+const preprocessRequiredNumeric = (value: unknown) => {
+  if (value === undefined || value === null) {
+    return undefined;
+  }
+
+  if (typeof value === 'string') {
+    const trimmed = value.trim();
+    return trimmed === '' ? undefined : trimmed;
+  }
+
+  return value;
+};
+
+const preprocessOptionalNumeric = (value: unknown) => {
+  if (value === undefined) {
+    return undefined;
+  }
+
+  if (value === null) {
+    return null;
+  }
+
+  if (typeof value === 'string') {
+    const trimmed = value.trim();
+    return trimmed === '' ? null : trimmed;
+  }
+
+  return value;
+};
+
+const finiteNumber = (field: string) =>
+  z
+    .coerce.number({
+      invalid_type_error: `${field} must be a number`,
+      required_error: `${field} is required`,
+    })
+    .refine(Number.isFinite, {
+      message: `${field} must be a finite number`,
+    });
+
+const baseInsertPropertySchema = createInsertSchema(properties).omit({
   id: true,
   views: true,
   daysOnMarket: true,
@@ -443,6 +483,21 @@ export const insertPropertySchema = createInsertSchema(properties).omit({
   updatedAt: true,
   fts: true,
   geom: true,
+});
+
+export const insertPropertySchema = baseInsertPropertySchema.extend({
+  price: z.preprocess(
+    preprocessRequiredNumeric,
+    finiteNumber('Price').gt(0, { message: 'Price must be greater than zero' })
+  ),
+  bathrooms: z
+    .preprocess(
+      preprocessOptionalNumeric,
+      finiteNumber('Bathrooms')
+        .min(0, { message: 'Bathrooms must be greater than or equal to zero' })
+        .nullable()
+    )
+    .optional(),
 });
 
 export const insertInquirySchema = createInsertSchema(inquiries).omit({
