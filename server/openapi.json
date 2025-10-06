@@ -103,7 +103,7 @@
                         "type": "string"
                       },
                       "price": {
-                        "type": "string"
+                        "type": "number"
                       },
                       "location": {
                         "type": "string"
@@ -342,7 +342,7 @@
             "type": "string"
           },
           "price": {
-            "type": "string"
+            "type": "number"
           },
           "location": {
             "type": "string"

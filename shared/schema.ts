@@ -435,7 +435,20 @@ export const insertUserSchema = createInsertSchema(users).omit({
   updatedAt: true,
 });
 
-const numericPreprocess = (value: unknown) => {
+const preprocessRequiredNumeric = (value: unknown) => {
+  if (value === undefined || value === null) {
+    return undefined;
+  }
+
+  if (typeof value === 'string') {
+    const trimmed = value.trim();
+    return trimmed === '' ? undefined : trimmed;
+  }
+
+  return value;
+};
+
+const preprocessOptionalNumeric = (value: unknown) => {
   if (value === undefined) {
     return undefined;
   }
@@ -444,22 +457,9 @@ const numericPreprocess = (value: unknown) => {
     return null;
   }
 
-  if (typeof value === 'number') {
-    return value;
-  }
-
   if (typeof value === 'string') {
     const trimmed = value.trim();
-    if (trimmed === '') {
-      return null;
-    }
-
-    const numericValue = Number(trimmed);
-    if (Number.isFinite(numericValue)) {
-      return numericValue;
-    }
-
-    return value;
+    return trimmed === '' ? null : trimmed;
   }
 
   return value;
@@ -467,7 +467,7 @@ const numericPreprocess = (value: unknown) => {
 
 const finiteNumber = (field: string) =>
   z
-    .number({
+    .coerce.number({
       invalid_type_error: `${field} must be a number`,
       required_error: `${field} is required`,
     })
@@ -487,12 +487,12 @@ const baseInsertPropertySchema = createInsertSchema(properties).omit({
 
 export const insertPropertySchema = baseInsertPropertySchema.extend({
   price: z.preprocess(
-    numericPreprocess,
+    preprocessRequiredNumeric,
     finiteNumber('Price').gt(0, { message: 'Price must be greater than zero' })
   ),
   bathrooms: z
     .preprocess(
-      numericPreprocess,
+      preprocessOptionalNumeric,
       finiteNumber('Bathrooms')
         .min(0, { message: 'Bathrooms must be greater than or equal to zero' })
         .nullable()
