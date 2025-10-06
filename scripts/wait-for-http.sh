@@ -2,7 +2,7 @@
 set -euo pipefail
 
 URL="${1:-http://127.0.0.1:5000/health}"
-TRIES="${2:-60}"
+TRIES="${2:-120}"
 
 for i in $(seq 1 "$TRIES"); do
   if curl -fsS "$URL" >/dev/null; then

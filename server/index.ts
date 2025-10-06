@@ -28,6 +28,7 @@ app.set('trust proxy', 1);
 
 const nodeEnv = process.env.NODE_ENV ?? 'development';
 const isDevelopment = nodeEnv === 'development';
+const shouldBootMigrations = (process.env.BOOT_RUN_MIGRATIONS ?? '').toLowerCase() !== 'false';
 
 if (!process.env.NODE_ENV) {
   process.env.NODE_ENV = nodeEnv;
@@ -108,10 +109,14 @@ app.use(cors(corsOptions));
 app.use(addRequestId);
 app.use(structuredLogger);
 
+const isTestLikeEnvironment = process.env.NODE_ENV === 'test' || process.env.E2E === 'true';
+const resolveRateLimit = (defaultLimit: number, testOverride = 1000) =>
+  isTestLikeEnvironment ? Math.max(defaultLimit, testOverride) : defaultLimit;
+
 // Rate limiting for auth and write endpoints
 const authWriteLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  limit: 100,
+  limit: resolveRateLimit(100),
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: 'Too many requests, please try again later' }
@@ -120,7 +125,7 @@ const authWriteLimiter = rateLimit({
 // General API rate limiting
 const generalApiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  limit: 1000, // More generous for general API usage
+  limit: resolveRateLimit(1000, 2000), // More generous for general API usage
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: 'API rate limit exceeded' }
@@ -129,7 +134,7 @@ const generalApiLimiter = rateLimit({
 // Write operations rate limiting
 const writeApiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  limit: 50,
+  limit: resolveRateLimit(50),
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: 'Too many write requests, please try again later' }
@@ -138,7 +143,7 @@ const writeApiLimiter = rateLimit({
 // Search rate limiting
 const searchLimiter = rateLimit({
   windowMs: 1 * 60 * 1000, // 1 minute
-  limit: 100,
+  limit: resolveRateLimit(100, 500),
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: 'Search rate limit exceeded' }
@@ -164,14 +169,17 @@ app.get('/healthz', (_req: Request, res: Response) => {
 
 async function boot() {
   console.log('Testing database connection...');
-  const dbConnected = await testDatabaseConnection();
-  if (!dbConnected) {
-    console.error('Failed to connect to database. Server will not start.');
+  const dbHealth = await testDatabaseConnection();
+  if (!dbHealth.ok) {
+    if (dbHealth.error) {
+      console.error('Failed to connect to database. Server will not start.', dbHealth.error);
+    } else {
+      console.error('Failed to connect to database. Server will not start.');
+    }
     process.exit(1);
   }
 
   const isE2E = process.env.E2E === 'true';
-  const nodeEnv = process.env.NODE_ENV ?? 'development';
 
   app.use('/api/users/login', authWriteLimiter);
   app.use('/api/users/register', authWriteLimiter);
@@ -257,7 +265,8 @@ async function boot() {
   app.use(notFoundHandler);
   app.use(errorHandler);
 
-  const shouldRunMigrations = !isE2E || process.env.FORCE_DB_MIGRATIONS === 'true';
+  const shouldRunMigrations =
+    shouldBootMigrations && (!isE2E || process.env.FORCE_DB_MIGRATIONS === 'true');
 
   if (shouldRunMigrations) {
     try {
@@ -286,6 +295,8 @@ async function boot() {
       console.error('❌ Database initialization failed:', error);
       process.exit(1);
     }
+  } else if (!shouldBootMigrations) {
+    console.log('⏭️  Skipping migrations because BOOT_RUN_MIGRATIONS=false');
   } else {
     console.log('⏭️  Skipping migrations in E2E mode');
   }

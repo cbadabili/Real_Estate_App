@@ -146,13 +146,15 @@ BEGIN
 
     UPDATE properties
     SET created_at_tmp = CASE
-      WHEN pg_typeof(created_at)::text LIKE 'timestamp%'
-        THEN created_at::timestamptz
       WHEN created_at IS NULL OR NULLIF(trim(created_at::text), '') IS NULL THEN NULL
-      WHEN created_at::text ~ '^[0-9]{13}$' THEN to_timestamp((created_at::text)::numeric / 1000.0)
-      WHEN created_at::text ~ '^[0-9]{10}$' THEN to_timestamp((created_at::text)::numeric)
-      WHEN created_at::text ~ '^[0-9]+(\.[0-9]+)?$' THEN to_timestamp((created_at::text)::numeric)
-      WHEN created_at::text ~ '^[0-9]{4}-[0-9]{2}-[0-9]{2}' THEN (created_at::text)::timestamptz
+      WHEN created_at::text ~ '^[0-9]{13}$'
+        THEN to_timestamp((created_at::text)::numeric / 1000.0)
+      WHEN created_at::text ~ '^[0-9]{10}$'
+        THEN to_timestamp((created_at::text)::numeric)
+      WHEN created_at::text ~ '^[+-]?[0-9]+(\.[0-9]+)?$'
+        THEN to_timestamp((created_at::text)::numeric)
+      WHEN created_at::text ~ '^[0-9]{4}-[0-9]{2}-[0-9]{2}'
+        THEN (created_at::text)::timestamptz
       ELSE NULL
     END;
 
@@ -180,13 +182,15 @@ BEGIN
 
     UPDATE properties
     SET updated_at_tmp = CASE
-      WHEN pg_typeof(updated_at)::text LIKE 'timestamp%'
-        THEN updated_at::timestamptz
       WHEN updated_at IS NULL OR NULLIF(trim(updated_at::text), '') IS NULL THEN NULL
-      WHEN updated_at::text ~ '^[0-9]{13}$' THEN to_timestamp((updated_at::text)::numeric / 1000.0)
-      WHEN updated_at::text ~ '^[0-9]{10}$' THEN to_timestamp((updated_at::text)::numeric)
-      WHEN updated_at::text ~ '^[0-9]+(\.[0-9]+)?$' THEN to_timestamp((updated_at::text)::numeric)
-      WHEN updated_at::text ~ '^[0-9]{4}-[0-9]{2}-[0-9]{2}' THEN (updated_at::text)::timestamptz
+      WHEN updated_at::text ~ '^[0-9]{13}$'
+        THEN to_timestamp((updated_at::text)::numeric / 1000.0)
+      WHEN updated_at::text ~ '^[0-9]{10}$'
+        THEN to_timestamp((updated_at::text)::numeric)
+      WHEN updated_at::text ~ '^[+-]?[0-9]+(\.[0-9]+)?$'
+        THEN to_timestamp((updated_at::text)::numeric)
+      WHEN updated_at::text ~ '^[0-9]{4}-[0-9]{2}-[0-9]{2}'
+        THEN (updated_at::text)::timestamptz
       ELSE NULL
     END;
 
