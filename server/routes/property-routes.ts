@@ -453,6 +453,14 @@ export function registerPropertyRoutes(app: Express) {
         return res.status(400).json({ error: message });
       }
 
+      try {
+        const priceValue = coerceNumericField(restPayload['price'], 'price');
+        propertyData.price = priceValue;
+      } catch (numericError) {
+        const message = numericError instanceof Error ? numericError.message : 'Invalid price value';
+        return res.status(400).json({ error: message });
+      }
+
       const optionalNumericFields: Array<{ key: Extract<keyof InsertProperty, string>; allowNull?: boolean }> = [
         { key: 'bedrooms', allowNull: true },
         { key: 'bathrooms', allowNull: true },

@@ -11,14 +11,21 @@ const normalizeValue = (value: unknown) => {
 const optionalNumber = (schema: z.ZodNumber) =>
   z.preprocess((value) => {
     const candidate = normalizeValue(value);
-    if (candidate === undefined || candidate === null || candidate === '') {
+    if (candidate === undefined || candidate === null) {
       return undefined;
     }
-    const numeric = Number(candidate);
-    if (!Number.isFinite(numeric)) {
-      return candidate;
+
+    if (typeof candidate === 'string') {
+      const trimmed = candidate.trim();
+      if (trimmed.length === 0) {
+        return undefined;
+      }
+      const numeric = Number(trimmed);
+      return Number.isFinite(numeric) ? numeric : candidate;
     }
-    return numeric;
+
+    const numeric = Number(candidate);
+    return Number.isFinite(numeric) ? numeric : candidate;
   }, schema.optional());
 
 const optionalString = () =>
@@ -34,17 +41,21 @@ const optionalString = () =>
 const optionalBoolean = () =>
   z.preprocess((value) => {
     const candidate = normalizeValue(value);
-    if (candidate === undefined || candidate === null || candidate === '') {
+    if (candidate === undefined || candidate === null) {
       return undefined;
     }
     if (typeof candidate === 'boolean') {
       return candidate;
     }
-    const normalized = String(candidate).trim().toLowerCase();
-    if (["true", "1", "yes"].includes(normalized)) {
+    const normalized = String(candidate).trim();
+    if (normalized.length === 0) {
+      return undefined;
+    }
+    const lowered = normalized.toLowerCase();
+    if (["true", "1", "yes"].includes(lowered)) {
       return true;
     }
-    if (["false", "0", "no"].includes(normalized)) {
+    if (["false", "0", "no"].includes(lowered)) {
       return false;
     }
     return candidate;

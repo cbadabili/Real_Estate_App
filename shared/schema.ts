@@ -471,9 +471,19 @@ const finiteNumber = (field: string) =>
       invalid_type_error: `${field} must be a number`,
       required_error: `${field} is required`,
     })
-    .refine(Number.isFinite, {
+    .finite({
       message: `${field} must be a finite number`,
     });
+
+const positiveNumber = (field: string) =>
+  finiteNumber(field).superRefine((value, ctx) => {
+    if (!(value > 0)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `${field} must be greater than zero`,
+      });
+    }
+  });
 
 const baseInsertPropertySchema = createInsertSchema(properties).omit({
   id: true,
@@ -486,10 +496,7 @@ const baseInsertPropertySchema = createInsertSchema(properties).omit({
 });
 
 export const insertPropertySchema = baseInsertPropertySchema.extend({
-  price: z.preprocess(
-    preprocessRequiredNumeric,
-    finiteNumber('Price').gt(0, { message: 'Price must be greater than zero' })
-  ),
+  price: z.preprocess(preprocessRequiredNumeric, positiveNumber('Price')),
   bathrooms: z
     .preprocess(
       preprocessOptionalNumeric,
