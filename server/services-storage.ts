@@ -266,6 +266,10 @@ export class ServicesStorage implements IServicesStorage {
       await this.refreshProviderStats(review.providerId);
     }
 
+    if (!newReview) {
+      throw new Error('Failed to create service review');
+    }
+
     return newReview;
   }
 
