@@ -141,9 +141,14 @@ export class ServicesStorage implements IServicesStorage {
       .groupBy(serviceProviders.serviceCategory);
 
     const categories = result
-      .map((row: { category: string | null }) => row.category)
-      .map((category: string | null) => (typeof category === 'string' ? category.trim() : category))
-      .filter((category: string | null): category is string => typeof category === 'string' && category.length > 0);
+      .map((row: { category: string | null }): string | null => {
+        if (typeof row.category !== 'string') {
+          return null;
+        }
+        const trimmed = row.category.trim();
+        return trimmed.length > 0 ? trimmed : null;
+      })
+      .filter((category): category is string => category !== null);
 
     return categories;
   }
