@@ -347,23 +347,25 @@ const ServicesPage: React.FC = () => {
                 </p>
 
                 {/* Specialties */}
-                <div className="flex flex-wrap gap-1 mb-4">
-                  {professional.specialties.slice(0, 2).map((specialty, index) => (
-                    <span
-                      key={index}
-                      className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full"
-                    >
-                      {specialty}
-                    </span>
-                  ))}
-                  {professional.specialties.length > 2 && (
-                    <span className="px-2 py-1 bg-neutral-100 text-neutral-600 text-xs rounded-full">
-                      +{professional.specialties.length - 2}
-                    </span>
-                  )}
-                </div>
+                {professional.specialties && professional.specialties.length > 0 && (
+                  <div className="flex flex-wrap gap-1 mb-4">
+                    {professional.specialties.slice(0, 2).map((specialty, index) => (
+                      <span
+                        key={index}
+                        className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full"
+                      >
+                        {specialty}
+                      </span>
+                    ))}
+                    {professional.specialties.length > 2 && (
+                      <span className="px-2 py-1 bg-neutral-100 text-neutral-600 text-xs rounded-full">
+                        +{professional.specialties.length - 2}
+                      </span>
+                    )}
+                  </div>
+                )}
 
-                <div className="flex items-center justify-between text-sm mb-4 min-h-[24px]">
+                <div className="flex items-center justify-between text-sm mb-3 min-h-[24px]">
                   <span className="text-neutral-700 font-medium">
                     {professional.priceRange}
                   </span>
