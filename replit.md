@@ -59,9 +59,10 @@ Note: There's a known non-fatal warning about `rental_listings` table during see
    - Build command: `npm run build`
    - Start command: Backend and preview server
 
-### Known Issues
-- Rental seed script references `rental_listings` table but migration creates `rentals` table
-- This causes a non-fatal error during seeding but doesn't affect application functionality
+### Recent Fixes (Oct 15, 2025)
+- Fixed rental table schema mismatch: Updated migration to create `rental_listings` table matching Drizzle schema
+- Fixed backend port configuration: Changed default from 5000 to 5001 to avoid conflict with Vite
+- All seeding now works correctly with no errors
 
 ## User Preferences
 - Package manager: npm

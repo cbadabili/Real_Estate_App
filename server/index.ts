@@ -301,7 +301,7 @@ async function boot() {
     console.log('⏭️  Skipping migrations in E2E mode');
   }
 
-  const PORT = Number(process.env.PORT ?? 5000);
+  const PORT = Number(process.env.PORT ?? 5001);
   const HOST = process.env.HOST ?? '0.0.0.0';
   await new Promise<void>((resolve) => {
     app.listen(PORT, HOST, () => {
