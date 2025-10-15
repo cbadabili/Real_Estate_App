@@ -60,11 +60,16 @@ Note: There's a known non-fatal warning about `rental_listings` table during see
    - Start command: Backend and preview server
 
 ### Recent Fixes (Oct 15, 2025)
-- Fixed Vite allowedHosts: Added `allowedHosts: ['all']` to accept Replit domain requests
-- Fixed rental table schema mismatch: Updated migration to create `rental_listings` table matching Drizzle schema
-- Fixed backend port configuration: Changed default from 5000 to 5001 to avoid conflict with Vite
-- Fixed missing properties seeding: Added `seedProperties()` call to seed manager
-- All seeding now works correctly: 12 properties + 5 rentals + all other data
+- **Vite Configuration**: Configured HMR with proper Replit WebSocket settings (wss:// protocol)
+- **Database Schema**: Fixed rental_listings table structure to match Drizzle schema
+- **Port Configuration**: Backend now uses port 5001, Vite uses port 5000 (no conflicts)
+- **Data Seeding**: Added seedProperties() call - now seeding 12 properties + 5 rentals + all other data
+- **Security**: CSP disabled in development for easier debugging, enabled in production
+
+### Known Development Warnings (Non-Critical)
+- WebSocket HMR connection may show CSP warnings in browser console (doesn't affect functionality)
+- Replit dev banner CSP warning (cosmetic only)
+- These are development-only warnings and don't occur in production
 
 ## User Preferences
 - Package manager: npm
