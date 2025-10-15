@@ -7,7 +7,7 @@
     "client"
   ],
   "scripts": {
-    "dev": "cd client && vite",
+    "dev": "vite --config client/vite.config.ts",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "start": "PORT=5001 npx tsx server/index.ts",
