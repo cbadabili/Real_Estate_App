@@ -4,7 +4,7 @@ import { useState, useEffect, type ComponentType } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { X, Plus, User, Package, Wrench, GraduationCap, LogIn } from 'lucide-react';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface ProviderTypeConfig {
   type: string;
@@ -18,7 +18,7 @@ interface ProviderTypeConfig {
 const RegisterProviderPage: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, isAuthenticated } = useAuth();
+  const { user } = useAuth();
   const [selectedType, setSelectedType] = useState('');
   const [specialties, setSpecialties] = useState<string[]>([]);
   const [newSpecialty, setNewSpecialty] = useState('');
@@ -77,7 +77,7 @@ const RegisterProviderPage: React.FC = () => {
   const isIndividual = selectedType === 'professional' || selectedType === 'artisan';
 
   // Check authentication first
-  if (!isAuthenticated) {
+  if (!user) {
     return (
       <div className="min-h-screen bg-gray-50 py-12">
         <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
