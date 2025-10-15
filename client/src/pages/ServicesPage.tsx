@@ -365,19 +365,20 @@ const ServicesPage: React.FC = () => {
                   </div>
                 )}
 
-                <div className="flex items-center justify-between text-sm mb-3 min-h-[24px]">
-                  <span className="text-neutral-700 font-medium">
-                    {professional.priceRange}
-                  </span>
-                  {professional.verified && (
-                    <span className="flex items-center text-green-600 text-xs font-semibold">
-                      <Shield className="h-4 w-4 mr-1" />
-                      Verified
+                <div className="mt-auto">
+                  <div className="flex items-center justify-between text-sm mb-3 min-h-[24px]">
+                    <span className="text-neutral-700 font-medium">
+                      {professional.priceRange}
                     </span>
-                  )}
-                </div>
+                    {professional.verified && (
+                      <span className="flex items-center text-green-600 text-xs font-semibold">
+                        <Shield className="h-4 w-4 mr-1" />
+                        Verified
+                      </span>
+                    )}
+                  </div>
 
-                <div className="flex gap-2 mt-auto">
+                  <div className="flex gap-2">
                   <button className="flex-1 bg-beedab-blue text-white py-2 px-4 rounded-lg hover:bg-beedab-darkblue transition-colors flex items-center justify-center text-sm font-medium">
                     <MessageCircle className="h-4 w-4 mr-2" />
                     Message
@@ -386,6 +387,7 @@ const ServicesPage: React.FC = () => {
                     <Phone className="h-4 w-4 mr-2" />
                     Call
                   </button>
+                  </div>
                 </div>
               </div>
             </motion.div>
