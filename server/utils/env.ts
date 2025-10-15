@@ -40,6 +40,8 @@ export const env = {
   REALESTATEINTEL_SUGGEST_URL: process.env.REALESTATEINTEL_SUGGEST_URL ?? '',
   REALESTATEINTEL_API_KEY: process.env.REALESTATEINTEL_API_KEY ?? '',
   OPENAI_API_KEY: process.env.OPENAI_API_KEY ?? '',
+  GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID || '',
+  GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET || '',
 };
 
 export const config = {

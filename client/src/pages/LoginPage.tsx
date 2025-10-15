@@ -69,6 +69,53 @@ const LoginPage = () => {
     }
   };
 
+  const handleGoogleLogin = async (response: any) => {
+    try {
+      setIsLoading(true);
+      const result = await fetch('/api/auth/google', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ credential: response.credential }),
+      });
+
+      if (!result.ok) {
+        throw new Error('Google authentication failed');
+      }
+
+      const data = await result.json();
+      await login(data.email, ''); // Use empty password for OAuth users
+      toast.success('Google login successful!');
+      navigate(redirectPath);
+    } catch (error) {
+      console.error('Google login error:', error);
+      toast.error('Google authentication failed');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    // Load Google Sign-In script
+    const script = document.createElement('script');
+    script.src = 'https://accounts.google.com/gsi/client';
+    script.async = true;
+    script.defer = true;
+    document.body.appendChild(script);
+
+    script.onload = () => {
+      if (window.google) {
+        window.google.accounts.id.initialize({
+          client_id: '93444781205-vnu3mdru4798lujet742msb6h4p7dbcv.apps.googleusercontent.com',
+          callback: handleGoogleLogin,
+        });
+      }
+    };
+
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-beedab-lightblue via-white to-beedab-blue/10">
       <div className="container mx-auto px-4 py-8">
@@ -186,10 +233,7 @@ const LoginPage = () => {
               
               <button
                 type="button"
-                onClick={() => {
-                  // TODO: Implement Google OAuth
-                  alert('Google authentication will be implemented soon');
-                }}
+                onClick={handleGoogleLogin}
                 className="mt-4 w-full flex items-center justify-center px-4 py-2 border border-neutral-300 rounded-lg text-neutral-700 bg-white hover:bg-neutral-50 transition-colors"
               >
                 <svg className="w-5 h-5 mr-3" viewBox="0 0 24 24">
