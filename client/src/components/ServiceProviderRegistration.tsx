@@ -57,6 +57,7 @@ const ServiceProviderRegistration: React.FC<ServiceProviderRegistrationProps> = 
 }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [isIndividual, setIsIndividual] = useState(false);
 
   const categoryIcons: { [key: string]: any } = {
     'Photography': Camera,
@@ -132,6 +133,7 @@ const ServiceProviderRegistration: React.FC<ServiceProviderRegistrationProps> = 
         body: JSON.stringify({
           ...data,
           serviceCategory: data.subCategory || data.serviceCategory,
+          isIndividual,
           logoUrl: '/api/placeholder/100/100',
           rating: 0,
           reviewCount: 0,
@@ -181,22 +183,48 @@ const ServiceProviderRegistration: React.FC<ServiceProviderRegistrationProps> = 
 
         {/* Form */}
         <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-6">
-          {/* Company Information */}
+          {/* Registration Type */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-gray-900">Registration Type</h3>
+            
+            <div className="flex gap-4">
+              <label className="flex items-center space-x-2 cursor-pointer">
+                <input
+                  type="radio"
+                  checked={!isIndividual}
+                  onChange={() => setIsIndividual(false)}
+                  className="h-4 w-4 text-beedab-blue focus:ring-beedab-blue"
+                />
+                <span className="text-sm font-medium text-gray-700">Business/Company</span>
+              </label>
+              <label className="flex items-center space-x-2 cursor-pointer">
+                <input
+                  type="radio"
+                  checked={isIndividual}
+                  onChange={() => setIsIndividual(true)}
+                  className="h-4 w-4 text-beedab-blue focus:ring-beedab-blue"
+                />
+                <span className="text-sm font-medium text-gray-700">Individual Contractor</span>
+              </label>
+            </div>
+          </div>
+
+          {/* Company/Individual Information */}
           <div className="space-y-4">
             <h3 className="text-lg font-semibold text-gray-900 flex items-center space-x-2">
-              <Building className="h-5 w-5 text-beedab-blue" />
-              <span>Company Information</span>
+              {isIndividual ? <User className="h-5 w-5 text-beedab-blue" /> : <Building className="h-5 w-5 text-beedab-blue" />}
+              <span>{isIndividual ? 'Personal Information' : 'Company Information'}</span>
             </h3>
 
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Company Name *
+                  {isIndividual ? 'Your Full Name *' : 'Company Name *'}
                 </label>
                 <input
                   {...register('companyName')}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
-                  placeholder="Your Company Name"
+                  placeholder={isIndividual ? 'Your Full Name' : 'Your Company Name'}
                 />
                 {errors.companyName && (
                   <p className="text-red-600 text-sm mt-1">{errors.companyName.message}</p>
@@ -251,18 +279,22 @@ const ServiceProviderRegistration: React.FC<ServiceProviderRegistrationProps> = 
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Business Description *
+                {isIndividual ? 'Professional Description *' : 'Business Description *'}
               </label>
               <textarea
                 {...register('description')}
                 rows={4}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
-                placeholder="Describe your services, experience, and what makes your business unique..."
+                placeholder={isIndividual 
+                  ? 'Describe your skills, experience, and what makes you a great professional...' 
+                  : 'Describe your services, experience, and what makes your business unique...'}
               />
               {errors.description && (
                 <p className="text-red-600 text-sm mt-1">{errors.description.message}</p>
               )}
-              <p className="mt-1 text-sm text-gray-500">Briefly describe your services</p>
+              <p className="mt-1 text-sm text-gray-500">
+                {isIndividual ? 'Briefly describe your professional background' : 'Briefly describe your services'}
+              </p>
             </div>
           </div>
 

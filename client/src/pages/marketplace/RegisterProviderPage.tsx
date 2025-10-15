@@ -72,6 +72,7 @@ const RegisterProviderPage: React.FC = () => {
   }, [location]);
 
   const selectedTypeConfig = providerTypes.find(pt => pt.type === selectedType);
+  const isIndividual = selectedType === 'professional' || selectedType === 'artisan';
 
   const addSpecialty = () => {
     if (newSpecialty.trim() && !specialties.includes(newSpecialty.trim())) {
@@ -86,7 +87,7 @@ const RegisterProviderPage: React.FC = () => {
 
   const onSubmit = async (data: any) => {
     setIsSubmitting(true);
-    
+
     try {
       const formData = {
         ...data,
@@ -201,31 +202,36 @@ const RegisterProviderPage: React.FC = () => {
           <form onSubmit={handleSubmit(onSubmit)} className="p-6 space-y-6">
             {/* Business Information */}
             <div className="space-y-4">
-              <h3 className="text-lg font-medium text-gray-900">Business Information</h3>
-              
+              <h3 className="text-lg font-medium text-gray-900">{isIndividual ? 'Personal Information' : 'Business Information'}</h3>
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Business Name *
+                  {isIndividual ? 'Full Name *' : 'Business Name *'}
                 </label>
                 <input
-                  {...register('business_name', { required: 'Business name is required' })}
+                  {...register(isIndividual ? 'full_name' : 'business_name', { required: `${isIndividual ? 'Full name' : 'Business name'} is required` })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-beedab-blue"
-                  placeholder="Enter your business name"
+                  placeholder={isIndividual ? 'Enter your full name' : 'Enter your business name'}
                 />
                 {errors.business_name && (
                   <p className="text-red-600 text-sm mt-1">{errors.business_name?.message}</p>
+                )}
+                {errors.full_name && (
+                  <p className="text-red-600 text-sm mt-1">{errors.full_name?.message}</p>
                 )}
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Business Description *
+                  {isIndividual ? 'Professional Description *' : 'Business Description *'}
                 </label>
                 <textarea
                   {...register('business_description', { required: 'Description is required' })}
                   rows={4}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-beedab-blue"
-                  placeholder="Describe your business and services"
+                  placeholder={isIndividual
+                    ? 'Describe your skills, experience, and what makes you a great professional...'
+                    : 'Describe your services, experience, and what makes your business unique...'}
                 />
                 {errors.business_description && (
                   <p className="text-red-600 text-sm mt-1">{errors.business_description?.message}</p>
@@ -271,7 +277,7 @@ const RegisterProviderPage: React.FC = () => {
                   Hourly Rate (Pula) *
                 </label>
                 <input
-                  {...register('hourly_rate', { 
+                  {...register('hourly_rate', {
                     required: 'Hourly rate is required',
                     pattern: {
                       value: /^\d+(\.\d{1,2})?$/,
@@ -292,7 +298,7 @@ const RegisterProviderPage: React.FC = () => {
             {/* Specialties */}
             <div className="space-y-4">
               <h3 className="text-lg font-medium text-gray-900">Specialties</h3>
-              
+
               <div className="flex space-x-2">
                 <input
                   value={newSpecialty}
@@ -334,7 +340,7 @@ const RegisterProviderPage: React.FC = () => {
             {/* Contact Information */}
             <div className="space-y-4">
               <h3 className="text-lg font-medium text-gray-900">Contact Information</h3>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -355,7 +361,7 @@ const RegisterProviderPage: React.FC = () => {
                     Email Address *
                   </label>
                   <input
-                    {...register('email', { 
+                    {...register('email', {
                       required: 'Email is required',
                       pattern: {
                         value: /^\S+@\S+$/i,
@@ -364,7 +370,7 @@ const RegisterProviderPage: React.FC = () => {
                     })}
                     type="email"
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-beedab-blue"
-                    placeholder="business@email.com"
+                    placeholder={isIndividual ? 'your.email@example.com' : 'business@email.com'}
                   />
                   {errors.email && (
                     <p className="text-red-600 text-sm mt-1">{errors.email?.message}</p>
