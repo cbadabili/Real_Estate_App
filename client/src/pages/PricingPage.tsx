@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Check, Star, Zap, Users, Award, Phone, Mail, MessageCircle } from 'lucide-react';
@@ -44,13 +45,6 @@ const PricingPage = () => {
 
   const handleSubscribe = async (planCode: string) => {
     if (!user) {
-      // For Business plan (agents), redirect to agent registration page
-      if (planCode === 'BUSINESS') {
-        window.location.href = '/agent-registration';
-        return;
-      }
-      
-      // For other plans, store the selected plan and show registration modal with this plan locked
       setModalPlanCode(planCode);
       setShowRegistrationModal(true);
       return;
@@ -69,10 +63,9 @@ const PricingPage = () => {
 
       if (data.success) {
         if (data.data.plan.price_bwp === 0) {
-          alert('Free plan activated successfully!');
+          alert('Free trial activated successfully! Enjoy 30 days of Pro features.');
           window.location.reload();
         } else {
-          // Show payment instructions modal
           showPaymentModal(data.data.paymentInstructions);
         }
       } else {
@@ -110,38 +103,51 @@ const PricingPage = () => {
     alert(modalContent);
   };
 
-  const getUpdatedDescription = (planCode: string) => {
-    switch (planCode) {
-      case 'LISTER_FREE':
-        return 'Perfect for first-time property listings';
-      case 'LISTER_PRO':
-        return 'For casual property listings with more exposure';
-      case 'BUSINESS':
-        return 'For contractors, artisans, and property service providers';
-      case 'LISTER_PREMIUM':
-        return 'For serious sellers and investors who want maximum visibility';
-      default:
-        return 'Select your plan';
-    }
-  };
-
   const getPlanIcon = (planCode: string) => {
     switch (planCode) {
-      case 'LISTER_FREE': return Star;
-      case 'LISTER_PRO': return Zap;
-      case 'LISTER_PREMIUM': return Award;
+      case 'FREE_TRIAL': return Star;
+      case 'PRO': return Zap;
       case 'BUSINESS': return Users;
+      case 'PREMIUM': return Award;
       default: return Star;
     }
   };
 
   const getPlanColor = (planCode: string) => {
     switch (planCode) {
-      case 'LISTER_FREE': return 'bg-gray-100 border-gray-200';
-      case 'LISTER_PRO': return 'bg-blue-50 border-blue-200';
-      case 'LISTER_PREMIUM': return 'bg-purple-50 border-purple-200 ring-2 ring-purple-500';
-      case 'BUSINESS': return 'bg-green-50 border-green-200';
+      case 'FREE_TRIAL': return 'bg-gray-50 border-gray-200';
+      case 'PRO': return 'bg-blue-50 border-blue-200';
+      case 'BUSINESS': return 'bg-green-50 border-green-200 ring-2 ring-green-500';
+      case 'PREMIUM': return 'bg-purple-50 border-purple-200 ring-2 ring-purple-500';
       default: return 'bg-gray-100 border-gray-200';
+    }
+  };
+
+  const getPlanBadge = (planCode: string) => {
+    switch (planCode) {
+      case 'BUSINESS': return { text: 'Best for Agents', color: 'bg-green-500' };
+      case 'PREMIUM': return { text: 'Most Powerful', color: 'bg-purple-500' };
+      default: return null;
+    }
+  };
+
+  const getPlanStats = (planCode: string) => {
+    switch (planCode) {
+      case 'FREE_TRIAL': return 'Join 500+ sellers in Botswana';
+      case 'PRO': return 'Most popular for individuals';
+      case 'BUSINESS': return 'Trusted by 127 agents across Botswana';
+      case 'PREMIUM': return 'Choice of top agencies • Limited availability';
+      default: return '';
+    }
+  };
+
+  const getVisibilityBoost = (planCode: string) => {
+    switch (planCode) {
+      case 'FREE_TRIAL': return 'Try Pro features free for 30 days!';
+      case 'PRO': return '3x more visibility than free listings';
+      case 'BUSINESS': return 'Average agents close 2-3 extra deals/month';
+      case 'PREMIUM': return 'Generate 5x more leads than standard listings';
+      default: return '';
     }
   };
 
@@ -151,13 +157,27 @@ const PricingPage = () => {
       PHOTO_LIMIT: 'Photos per Listing',
       ANALYTICS: 'Analytics Dashboard',
       HERO_SLOTS: 'Hero Carousel Slots',
-      PRIORITY_RANK: 'Priority Search Ranking',
-      LEAD_MANAGER: 'Lead Management',
+      PRIORITY_RANK: 'Priority Search Rankings',
+      LEAD_MANAGER: 'Lead Management System',
       DIRECTORY: 'Service Directory Listing',
-      BOOKING: 'Booking Widget'
+      BOOKING: 'Booking Widget Integration',
+      FEATURED_SEARCH: 'Featured in Search Results',
+      VERIFIED_BADGE: '"Verified Agent" Badge',
+      SUPPORT_24H: '24-Hour Email Support',
+      AGENCY_PROFILE: 'Featured Agency Profile Page',
+      PREMIUM_BADGE: '"Premium Partner" Badge',
+      MONTHLY_REPORTS: 'Monthly Performance Reports (PDF)',
+      PRIORITY_SUPPORT: 'Priority WhatsApp/Phone Support',
+      WHITE_LABEL: 'Remove BeeDab Branding',
+      EARLY_ACCESS: 'First Access to New Features',
+      ACCOUNT_MANAGER: 'Dedicated Account Manager',
+      TRIAL_DAYS: null // Hide trial days from features list
     };
 
     const name = featureNames[key] || key.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, l => l.toUpperCase());
+
+    // Skip features that should not be displayed
+    if (name === null || !name) return null;
 
     // Handle boolean values
     if (value === true || value === 'true') {
@@ -185,6 +205,18 @@ const PricingPage = () => {
     return `${value} ${name}`;
   };
 
+  const getButtonText = (planCode: string, isProcessing: boolean) => {
+    if (isProcessing) return 'Processing...';
+    
+    switch (planCode) {
+      case 'FREE_TRIAL': return 'Start Free Trial';
+      case 'PRO': return 'Subscribe Now';
+      case 'BUSINESS': return 'Go Professional';
+      case 'PREMIUM': return 'Contact Sales';
+      default: return 'Get Started';
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -202,29 +234,20 @@ const PricingPage = () => {
             Choose Your Plan
           </h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Select the perfect plan for your real estate journey in Botswana. 
-            Choose your plan first, then complete your registration.
+            Select the perfect plan for your real estate journey in Botswana. Start free, upgrade anytime.
           </p>
         </div>
 
         {/* Plans Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto mb-16">
           {plans.map((plan) => {
             const Icon = getPlanIcon(plan.code);
             const colorClass = getPlanColor(plan.code);
-            const isPopular = plan.code === 'LISTER_PREMIUM';
-            const isBusiness = plan.code === 'BUSINESS';
-            const isPremium = plan.code === 'LISTER_PREMIUM';
+            const badge = getPlanBadge(plan.code);
+            const stats = getPlanStats(plan.code);
+            const visibilityBoost = getVisibilityBoost(plan.code);
 
-            // Parse features if they're stored as JSON string
             const features = typeof plan.features === 'string' ? JSON.parse(plan.features) : plan.features;
-
-            // Get badge text based on plan
-            const getBadge = () => {
-              if (isPremium) return 'Best for visibility';
-              if (isBusiness) return 'Best for teams & tools';
-              return null;
-            };
 
             return (
               <motion.div
@@ -234,10 +257,10 @@ const PricingPage = () => {
                 transition={{ delay: 0.1 * plan.id }}
                 className={`relative bg-white rounded-lg border ${colorClass} p-6 shadow-sm hover:shadow-md transition-shadow flex flex-col h-full min-h-[600px]`}
               >
-                {(isPopular || isBusiness) && (
+                {badge && (
                   <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                    <span className={`${isPremium ? 'bg-purple-500' : 'bg-green-500'} text-white px-3 py-1 rounded-full text-sm font-medium`}>
-                      {getBadge()}
+                    <span className={`${badge.color} text-white px-3 py-1 rounded-full text-sm font-medium`}>
+                      {badge.text}
                     </span>
                   </div>
                 )}
@@ -248,11 +271,9 @@ const PricingPage = () => {
                   </div>
                   <h3 className="text-xl font-semibold text-gray-900 mb-2">
                     {plan.name}
-                    {(plan.code === 'LISTER_FREE' || plan.code === 'LISTER_PRO' || plan.code === 'LISTER_PREMIUM') && ' (Plan)'}
-                    {plan.code === 'BUSINESS' && ' (Agents & Providers)'}
                   </h3>
                   <p className="text-gray-600 text-sm mb-4">
-                    {getUpdatedDescription(plan.code)}
+                    {plan.description}
                   </p>
                   <div className="text-3xl font-bold text-gray-900">
                     BWP {plan.price_bwp}
@@ -261,7 +282,17 @@ const PricingPage = () => {
                         /{plan.interval}
                       </span>
                     )}
+                    {plan.code === 'FREE_TRIAL' && (
+                      <div className="text-sm font-normal text-gray-500 mt-1">
+                        First month free
+                      </div>
+                    )}
                   </div>
+                  {visibilityBoost && (
+                    <p className="text-sm text-beedab-blue font-medium mt-2">
+                      {visibilityBoost}
+                    </p>
+                  )}
                 </div>
 
                 {/* Features */}
@@ -285,22 +316,27 @@ const PricingPage = () => {
                     onClick={() => handleSubscribe(plan.code)}
                     disabled={selectedPlan === plan.code}
                     className={`w-full py-3 px-4 rounded-lg font-medium transition-colors ${
-                      isPopular
+                      plan.code === 'PREMIUM'
                         ? 'bg-purple-600 text-white hover:bg-purple-700'
+                        : plan.code === 'BUSINESS'
+                        ? 'bg-green-600 text-white hover:bg-green-700'
                         : 'bg-beedab-blue text-white hover:bg-beedab-darkblue'
                     } disabled:opacity-50 disabled:cursor-not-allowed`}
                   >
-                  {selectedPlan === plan.code ? (
-                    <span className="flex items-center justify-center">
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                      Processing...
-                    </span>
-                  ) : plan.price_bwp === 0 ? (
-                    'Get Started Free'
-                  ) : (
-                    'Subscribe Now'
-                  )}
+                    {selectedPlan === plan.code ? (
+                      <span className="flex items-center justify-center">
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                        Processing...
+                      </span>
+                    ) : (
+                      getButtonText(plan.code, false)
+                    )}
                   </button>
+                  {stats && (
+                    <p className="text-xs text-gray-500 text-center mt-2">
+                      {stats}
+                    </p>
+                  )}
                 </div>
               </motion.div>
             );
@@ -328,7 +364,7 @@ const PricingPage = () => {
                 </div>
                 
                 <p className="text-blue-100 mb-6 text-lg">
-                  Perfect for real estate agencies, property developers, and institutional investors who need more than 50 listings.
+                  Perfect for real estate agencies, property developers, and institutional investors who need more than 100 listings.
                 </p>
 
                 <ul className="space-y-3 mb-8">
@@ -506,10 +542,18 @@ const PricingPage = () => {
           <div className="space-y-6">
             <div className="bg-white rounded-lg p-6 shadow-sm">
               <h3 className="font-semibold text-gray-900 mb-2">
+                What happens after my free trial ends?
+              </h3>
+              <p className="text-gray-600">
+                After 30 days, your free trial will end. You can upgrade to Pro, Business, or Premium to continue enjoying enhanced features, or downgrade to our basic free tier with 1 listing.
+              </p>
+            </div>
+            <div className="bg-white rounded-lg p-6 shadow-sm">
+              <h3 className="font-semibold text-gray-900 mb-2">
                 Can I change my plan anytime?
               </h3>
               <p className="text-gray-600">
-                Yes, you can upgrade or downgrade your plan at any time. Changes take effect immediately.
+                Yes, you can upgrade or downgrade your plan at any time. Changes take effect immediately for upgrades, or at the end of your billing cycle for downgrades.
               </p>
             </div>
             <div className="bg-white rounded-lg p-6 shadow-sm">
@@ -525,23 +569,15 @@ const PricingPage = () => {
                 How long does it take to activate my subscription?
               </h3>
               <p className="text-gray-600">
-                Free plans are activated immediately. Paid plans are activated within 24 hours of payment verification.
+                Free trials are activated immediately. Paid plans are activated within 24 hours of payment verification by our admin team.
               </p>
             </div>
             <div className="bg-white rounded-lg p-6 shadow-sm">
               <h3 className="font-semibold text-gray-900 mb-2">
-                What if I need more than 50 listings?
+                What if I need more than 100 listings?
               </h3>
               <p className="text-gray-600">
-                Our Business and Premium plans include 50 listings each. For bulk listing needs above 50, we offer custom Enterprise solutions with unlimited listings, bulk discounts, and enhanced features. Contact us for a personalized quote.
-              </p>
-            </div>
-            <div className="bg-white rounded-lg p-6 shadow-sm">
-              <h3 className="font-semibold text-gray-900 mb-2">
-                How do auction listings work with my plan?
-              </h3>
-              <p className="text-gray-600">
-                Auction listings count towards your plan's listing limit just like regular property listings. For high-volume auction needs, we offer specialized bulk auction solutions with unlimited listings, live bidding tools, and custom pricing.
+                Our Premium plan includes 100 listings. For bulk listing needs above 100, we offer custom Enterprise solutions with unlimited listings, bulk discounts, and enhanced features. Contact us for a personalized quote.
               </p>
             </div>
           </div>
