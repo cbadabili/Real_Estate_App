@@ -88,7 +88,7 @@ const ServicesPage: React.FC = () => {
       location: "Maun",
       responseTime: "3 hours",
       description: "Mortgage and home loan specialists helping you secure the best financing options.",
-      priceRange: "P200 - P800",
+      priceRange: "P 200 - P 800",
       image: "/api/placeholder/80/80",
       specialties: ["Mortgage Advice", "Loan Processing", "Credit Assessment"],
       verified: true
@@ -102,7 +102,7 @@ const ServicesPage: React.FC = () => {
       location: "Gaborone",
       responseTime: "2 hours",
       description: "Comprehensive property insurance solutions for homeowners and investors.",
-      priceRange: "P150 - P600",
+      priceRange: "P 150 - P 600",
       image: "/api/placeholder/80/80",
       specialties: ["Home Insurance", "Investment Property", "Claims Support"],
       verified: true
@@ -116,7 +116,7 @@ const ServicesPage: React.FC = () => {
       location: "Gaborone",
       responseTime: "3 hours",
       description: "Full-service construction company specializing in residential and commercial projects.",
-      priceRange: "P2,000 - P15,000",
+      priceRange: "P 2,000 - P 15,000",
       image: "/api/placeholder/80/80",
       specialties: ["HVAC Systems", "Electrical Work", "Plumbing"],
       verified: true
@@ -130,7 +130,7 @@ const ServicesPage: React.FC = () => {
       location: "Francistown",
       responseTime: "1 hour",
       description: "Professional moving services with full insurance coverage across Botswana.",
-      priceRange: "P800 - P3,500",
+      priceRange: "P 800 - P 3,500",
       image: "/api/placeholder/80/80",
       specialties: ["Residential Moving", "Office Relocation", "Packing Services"],
       verified: true
@@ -144,7 +144,7 @@ const ServicesPage: React.FC = () => {
       location: "Gaborone",
       responseTime: "2 hours",
       description: "Professional cleaning services for move-in, move-out, and deep cleaning needs.",
-      priceRange: "P200 - P800",
+      priceRange: "P 200 - P 800",
       image: "/api/placeholder/80/80",
       specialties: ["Deep Cleaning", "Post-Construction", "Move-Out Cleaning"],
       verified: true
@@ -158,7 +158,7 @@ const ServicesPage: React.FC = () => {
       location: "Maun",
       responseTime: "4 hours",
       description: "Comprehensive property maintenance including garden, pool, and security services.",
-      priceRange: "P300 - P1,200",
+      priceRange: "P 300 - P 1,200",
       image: "/api/placeholder/80/80",
       specialties: ["Garden Maintenance", "Pool Services", "Security Systems"],
       verified: true
@@ -416,7 +416,7 @@ const ServicesPage: React.FC = () => {
           </p>
           <Link
             to="/pricing"
-            className="bg-white text-beedab-blue px-8 py-3 rounded-lg text-lg font-semibold hover:bg-neutral-100 transition-colors flex items-center space-x-2"
+            className="bg-white text-beedab-blue px-8 py-3 rounded-lg text-lg font-semibold hover:bg-neutral-100 transition-colors flex items-center space-x-2 justify-center"
           >
             <Award className="h-5 w-5" />
             <span>Register as Service Provider</span>
