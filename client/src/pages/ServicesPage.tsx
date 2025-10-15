@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Star, MapPin, Clock, DollarSign, Filter, Search, MessageCircle, Phone, Camera, Gavel, Home, Wrench, Calculator, Shield, Award, Users, FileCheck, ArrowRight, CheckCircle, FileText, Truck, Building } from 'lucide-react';
+import { Star, MapPin, Clock, Filter, Search, MessageCircle, Phone, Camera, Gavel, Home, Wrench, Calculator, Shield, Award, Truck, Building } from 'lucide-react';
 import ServiceProviderRegistration from '../components/ServiceProviderRegistration';
 import { Link } from 'react-router-dom'; // Assuming react-router-dom is used for navigation
 
@@ -60,7 +60,7 @@ const ServicesPage: React.FC = () => {
       location: "Francistown",
       responseTime: "1 hour",
       description: "Professional real estate photography and virtual tours. High-quality images that sell properties faster.",
-      priceRange: "300 - 1,500",
+      priceRange: "P300 - P1,500",
       image: "/api/placeholder/80/80",
       specialties: ["Real Estate Photography", "Virtual Tours", "Drone Photography"],
       verified: true
@@ -74,7 +74,7 @@ const ServicesPage: React.FC = () => {
       location: "Gaborone",
       responseTime: "4 hours",
       description: "Comprehensive property inspections covering structural, electrical, and plumbing systems.",
-      priceRange: "400 - 1,200",
+      priceRange: "P400 - P1,200",
       image: "/api/placeholder/80/80",
       specialties: ["Structural Inspection", "Electrical Systems", "Plumbing"],
       verified: true
@@ -88,7 +88,7 @@ const ServicesPage: React.FC = () => {
       location: "Maun",
       responseTime: "3 hours",
       description: "Mortgage and home loan specialists helping you secure the best financing options.",
-      priceRange: "200 - 800",
+      priceRange: "P200 - P800",
       image: "/api/placeholder/80/80",
       specialties: ["Mortgage Advice", "Loan Processing", "Credit Assessment"],
       verified: true
@@ -102,7 +102,7 @@ const ServicesPage: React.FC = () => {
       location: "Gaborone",
       responseTime: "2 hours",
       description: "Comprehensive property insurance solutions for homeowners and investors.",
-      priceRange: "150 - 600",
+      priceRange: "P150 - P600",
       image: "/api/placeholder/80/80",
       specialties: ["Home Insurance", "Investment Property", "Claims Support"],
       verified: true
@@ -116,7 +116,7 @@ const ServicesPage: React.FC = () => {
       location: "Gaborone",
       responseTime: "3 hours",
       description: "Full-service construction company specializing in residential and commercial projects.",
-      priceRange: "2,000 - 15,000",
+      priceRange: "P2,000 - P15,000",
       image: "/api/placeholder/80/80",
       specialties: ["HVAC Systems", "Electrical Work", "Plumbing"],
       verified: true
@@ -130,7 +130,7 @@ const ServicesPage: React.FC = () => {
       location: "Francistown",
       responseTime: "1 hour",
       description: "Professional moving services with full insurance coverage across Botswana.",
-      priceRange: "800 - 3,500",
+      priceRange: "P800 - P3,500",
       image: "/api/placeholder/80/80",
       specialties: ["Residential Moving", "Office Relocation", "Packing Services"],
       verified: true
@@ -144,7 +144,7 @@ const ServicesPage: React.FC = () => {
       location: "Gaborone",
       responseTime: "2 hours",
       description: "Professional cleaning services for move-in, move-out, and deep cleaning needs.",
-      priceRange: "200 - 800",
+      priceRange: "P200 - P800",
       image: "/api/placeholder/80/80",
       specialties: ["Deep Cleaning", "Post-Construction", "Move-Out Cleaning"],
       verified: true
@@ -158,7 +158,7 @@ const ServicesPage: React.FC = () => {
       location: "Maun",
       responseTime: "4 hours",
       description: "Comprehensive property maintenance including garden, pool, and security services.",
-      priceRange: "300 - 1,200",
+      priceRange: "P300 - P1,200",
       image: "/api/placeholder/80/80",
       specialties: ["Garden Maintenance", "Pool Services", "Security Systems"],
       verified: true
@@ -245,20 +245,6 @@ const ServicesPage: React.FC = () => {
     { id: 'structural-engineering', name: 'Structural Engineering', icon: Wrench },
   ];
 
-  const serviceCategories = [
-    { name: 'Legal Services', icon: '⚖️', description: 'Property lawyers and legal services' },
-    { name: 'Photography', icon: '📸', description: 'Property photography services' },
-    { name: 'Property Inspection', icon: '🔍', description: 'Professional property inspections' },
-    { name: 'Finance & Loans', icon: '💰', description: 'Mortgage brokers and financing' },
-    { name: 'Insurance', icon: '🛡️', description: 'Property and home insurance' },
-    { name: 'Construction', icon: '🏗️', description: 'General construction and specialized trades' },
-    { name: 'Moving', icon: '🚚', description: 'Professional moving and relocation services' },
-    { name: 'Cleaning', icon: '🧹', description: 'Move-in, move-out, and deep cleaning' },
-    { name: 'Maintenance', icon: '🔧', description: 'Property maintenance and repair services' },
-    { name: 'Architectural Services', icon: '🏛️', description: 'Building design and architectural planning' },
-    { name: 'Quantity Surveying', icon: '📏', description: 'Cost estimation and project management' },
-    { name: 'Structural Engineering', icon: '🏗️', description: 'Structural analysis and engineering design' }
-  ];
 
   return (
     <div className="min-h-screen bg-neutral-50">
@@ -377,9 +363,8 @@ const ServicesPage: React.FC = () => {
                   )}
                 </div>
 
-                <div className="flex items-center justify-between text-sm text-neutral-600 mb-4">
-                  <span className="flex items-center">
-                    <DollarSign className="h-4 w-4 mr-1" />
+                <div className="flex items-center justify-between text-sm mb-4">
+                  <span className="flex items-center text-neutral-700 font-medium">
                     {professional.priceRange}
                   </span>
                   {professional.verified && (
