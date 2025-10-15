@@ -316,9 +316,9 @@ const ServicesPage: React.FC = () => {
               key={professional.id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="bg-white rounded-lg shadow-sm border border-neutral-200 overflow-hidden hover:shadow-lg transition-shadow"
+              className="bg-white rounded-lg shadow-sm border border-neutral-200 overflow-hidden hover:shadow-lg transition-shadow flex flex-col h-full"
             >
-              <div className="p-6">
+              <div className="p-6 flex flex-col flex-grow">
                 <div className="flex items-start justify-between mb-3">
                   <h3 className="text-lg font-semibold text-neutral-900">
                     {professional.name}
@@ -375,12 +375,12 @@ const ServicesPage: React.FC = () => {
                   )}
                 </div>
 
-                <div className="flex space-x-2">
-                  <button className="flex-1 bg-beedab-blue text-white py-2 px-4 rounded-lg hover:bg-beedab-darkblue transition-colors flex items-center justify-center">
+                <div className="flex gap-2 mt-auto">
+                  <button className="flex-1 bg-beedab-blue text-white py-2 px-4 rounded-lg hover:bg-beedab-darkblue transition-colors flex items-center justify-center text-sm font-medium">
                     <MessageCircle className="h-4 w-4 mr-2" />
                     Message
                   </button>
-                  <button className="flex-1 bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center">
+                  <button className="flex-1 bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center text-sm font-medium">
                     <Phone className="h-4 w-4 mr-2" />
                     Call
                   </button>
