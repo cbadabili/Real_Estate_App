@@ -467,7 +467,7 @@ const preprocessOptionalNumeric = (value: unknown) => {
 
 const finiteNumber = (field: string) =>
   z
-    .coerce.number({
+    .number({
       invalid_type_error: `${field} must be a number`,
       required_error: `${field} is required`,
     })
@@ -488,14 +488,23 @@ const baseInsertPropertySchema = createInsertSchema(properties).omit({
 export const insertPropertySchema = baseInsertPropertySchema.extend({
   price: z.preprocess(
     preprocessRequiredNumeric,
-    finiteNumber('Price').gt(0, { message: 'Price must be greater than zero' })
+    z.number({
+      invalid_type_error: 'Price must be a number',
+      required_error: 'Price is required',
+    })
+    .gt(0, { message: 'Price must be greater than zero' })
+    .refine(Number.isFinite, { message: 'Price must be a finite number' })
   ),
   bathrooms: z
     .preprocess(
       preprocessOptionalNumeric,
-      finiteNumber('Bathrooms')
-        .min(0, { message: 'Bathrooms must be greater than or equal to zero' })
-        .nullable()
+      z.number({
+        invalid_type_error: 'Bathrooms must be a number',
+        required_error: 'Bathrooms is required',
+      })
+      .min(0, { message: 'Bathrooms must be greater than or equal to zero' })
+      .refine(Number.isFinite, { message: 'Bathrooms must be a finite number' })
+      .nullable()
     )
     .optional(),
 });
