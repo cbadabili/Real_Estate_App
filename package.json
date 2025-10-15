@@ -7,10 +7,10 @@
     "client"
   ],
   "scripts": {
-    "dev": "vite",
+    "dev": "cd client && vite",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
-    "start": "npx tsx server/index.ts",
+    "start": "PORT=5001 npx tsx server/index.ts",
     "typecheck": "npm run -w client typecheck",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",

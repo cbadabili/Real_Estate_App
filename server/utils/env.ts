@@ -30,11 +30,11 @@ if (isDevelopment && SESSION_SECRET === 'dev-only-insecure-secret') {
 
 export const env = {
   NODE_ENV,
-  PORT: Number(process.env.PORT ?? 5000),
+  PORT: Number(process.env.PORT ?? 5001),
   DATABASE_URL: requireEnv('DATABASE_URL'),
   SESSION_SECRET,
   JWT_SECRET: requireEnv('JWT_SECRET'),
-  CORS_ORIGIN: requireEnv('CORS_ORIGIN', { devDefault: 'http://localhost:5173' }),
+  CORS_ORIGIN: requireEnv('CORS_ORIGIN', { devDefault: 'http://localhost:5000' }),
   USE_INTEL: (process.env.USE_INTEL ?? 'false').toLowerCase() === 'true',
   REALESTATEINTEL_URL: process.env.REALESTATEINTEL_URL ?? '',
   REALESTATEINTEL_SUGGEST_URL: process.env.REALESTATEINTEL_SUGGEST_URL ?? '',
