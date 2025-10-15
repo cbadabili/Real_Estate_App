@@ -60,7 +60,7 @@ const ServicesPage: React.FC = () => {
       location: "Francistown",
       responseTime: "1 hour",
       description: "Professional real estate photography and virtual tours. High-quality images that sell properties faster.",
-      priceRange: "P300 - P1,500",
+      priceRange: "300 - 1,500",
       image: "/api/placeholder/80/80",
       specialties: ["Real Estate Photography", "Virtual Tours", "Drone Photography"],
       verified: true
@@ -74,7 +74,7 @@ const ServicesPage: React.FC = () => {
       location: "Gaborone",
       responseTime: "4 hours",
       description: "Comprehensive property inspections covering structural, electrical, and plumbing systems.",
-      priceRange: "P400 - P1,200",
+      priceRange: "400 - 1,200",
       image: "/api/placeholder/80/80",
       specialties: ["Structural Inspection", "Electrical Systems", "Plumbing"],
       verified: true
@@ -88,7 +88,7 @@ const ServicesPage: React.FC = () => {
       location: "Maun",
       responseTime: "3 hours",
       description: "Mortgage and home loan specialists helping you secure the best financing options.",
-      priceRange: "P 200 - P 800",
+      priceRange: "200 - 800",
       image: "/api/placeholder/80/80",
       specialties: ["Mortgage Advice", "Loan Processing", "Credit Assessment"],
       verified: true
@@ -102,7 +102,7 @@ const ServicesPage: React.FC = () => {
       location: "Gaborone",
       responseTime: "2 hours",
       description: "Comprehensive property insurance solutions for homeowners and investors.",
-      priceRange: "P 150 - P 600",
+      priceRange: "150 - 600",
       image: "/api/placeholder/80/80",
       specialties: ["Home Insurance", "Investment Property", "Claims Support"],
       verified: true
@@ -116,7 +116,7 @@ const ServicesPage: React.FC = () => {
       location: "Gaborone",
       responseTime: "3 hours",
       description: "Full-service construction company specializing in residential and commercial projects.",
-      priceRange: "P 2,000 - P 15,000",
+      priceRange: "2,000 - 15,000",
       image: "/api/placeholder/80/80",
       specialties: ["HVAC Systems", "Electrical Work", "Plumbing"],
       verified: true
@@ -130,7 +130,7 @@ const ServicesPage: React.FC = () => {
       location: "Francistown",
       responseTime: "1 hour",
       description: "Professional moving services with full insurance coverage across Botswana.",
-      priceRange: "P 800 - P 3,500",
+      priceRange: "800 - 3,500",
       image: "/api/placeholder/80/80",
       specialties: ["Residential Moving", "Office Relocation", "Packing Services"],
       verified: true
@@ -144,7 +144,7 @@ const ServicesPage: React.FC = () => {
       location: "Gaborone",
       responseTime: "2 hours",
       description: "Professional cleaning services for move-in, move-out, and deep cleaning needs.",
-      priceRange: "P 200 - P 800",
+      priceRange: "200 - 800",
       image: "/api/placeholder/80/80",
       specialties: ["Deep Cleaning", "Post-Construction", "Move-Out Cleaning"],
       verified: true
@@ -158,7 +158,7 @@ const ServicesPage: React.FC = () => {
       location: "Maun",
       responseTime: "4 hours",
       description: "Comprehensive property maintenance including garden, pool, and security services.",
-      priceRange: "P 300 - P 1,200",
+      priceRange: "300 - 1,200",
       image: "/api/placeholder/80/80",
       specialties: ["Garden Maintenance", "Pool Services", "Security Systems"],
       verified: true
@@ -271,7 +271,15 @@ const ServicesPage: React.FC = () => {
           <p className="text-xl text-neutral-600 max-w-3xl mx-auto">
             Connect with verified professionals for every step of your real estate journey
           </p>
-
+          {/* New Call to Action at the top */}
+          <div className="mt-6">
+            <Link
+              to="/register-provider"
+              className="inline-block bg-beedab-blue text-white px-6 py-3 rounded-lg text-lg font-semibold hover:bg-beedab-darkblue transition-colors"
+            >
+              Want to be a Service Provider?
+            </Link>
+          </div>
         </div>
 
         {/* Service Categories */}
@@ -410,12 +418,12 @@ const ServicesPage: React.FC = () => {
 
         {/* Call to Action */}
         <div className="mt-12 bg-gradient-to-r from-beedab-blue to-beedab-darkblue rounded-2xl p-8 text-center text-white">
-          <h2 className="text-2xl font-bold mb-4">Need Professional Services?</h2>
+          <h2 className="text-2xl font-bold mb-4">Do you want to be a service provider?</h2>
           <p className="text-blue-100 mb-6">
             Join our network of verified professionals and grow your business
           </p>
           <Link
-            to="/pricing"
+            to="/register-provider" // Changed the link to register-provider
             className="bg-white text-beedab-blue px-8 py-3 rounded-lg text-lg font-semibold hover:bg-neutral-100 transition-colors flex items-center space-x-2 justify-center"
           >
             <Award className="h-5 w-5" />
