@@ -212,6 +212,9 @@ export class SeedManager {
       // Seed marketplace
       await seedMarketplace();
 
+      // Seed properties
+      await seedProperties();
+
       // Seed rentals
       await seedRentals();
 

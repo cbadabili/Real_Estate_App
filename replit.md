@@ -60,9 +60,11 @@ Note: There's a known non-fatal warning about `rental_listings` table during see
    - Start command: Backend and preview server
 
 ### Recent Fixes (Oct 15, 2025)
+- Fixed Vite allowedHosts: Added `allowedHosts: ['all']` to accept Replit domain requests
 - Fixed rental table schema mismatch: Updated migration to create `rental_listings` table matching Drizzle schema
 - Fixed backend port configuration: Changed default from 5000 to 5001 to avoid conflict with Vite
-- All seeding now works correctly with no errors
+- Fixed missing properties seeding: Added `seedProperties()` call to seed manager
+- All seeding now works correctly: 12 properties + 5 rentals + all other data
 
 ## User Preferences
 - Package manager: npm
