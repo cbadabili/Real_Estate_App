@@ -193,6 +193,7 @@ function App() {
             <Route path="/marketplace/suppliers" element={<SuppliersPage />} />
             <Route path="/marketplace/training-providers" element={<TrainingProvidersPage />} />
             <Route path="/marketplace/register" element={<RegisterProviderPage />} />
+            <Route path="/register-provider" element={<RegisterProviderPage />} />
             <Route path="/property-management" element={<PropertyManagementPage />} />
             <Route path="/services/property-management" element={<PropertyManagementPage />} />
             <Route path="/legal-services" element={<LegalServicesPage />} />
