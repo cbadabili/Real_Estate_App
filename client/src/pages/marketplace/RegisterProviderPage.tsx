@@ -3,7 +3,8 @@
 import { useState, useEffect, type ComponentType } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import { X, Plus, User, Package, Wrench, GraduationCap } from 'lucide-react';
+import { X, Plus, User, Package, Wrench, GraduationCap, LogIn } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
 
 interface ProviderTypeConfig {
   type: string;
@@ -17,6 +18,7 @@ interface ProviderTypeConfig {
 const RegisterProviderPage: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { user, isAuthenticated } = useAuth();
   const [selectedType, setSelectedType] = useState('');
   const [specialties, setSpecialties] = useState<string[]>([]);
   const [newSpecialty, setNewSpecialty] = useState('');
@@ -73,6 +75,41 @@ const RegisterProviderPage: React.FC = () => {
 
   const selectedTypeConfig = providerTypes.find(pt => pt.type === selectedType);
   const isIndividual = selectedType === 'professional' || selectedType === 'artisan';
+
+  // Check authentication first
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-gray-50 py-12">
+        <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 text-center">
+            <div className="w-16 h-16 bg-beedab-blue rounded-full flex items-center justify-center mx-auto mb-4">
+              <LogIn className="h-8 w-8 text-white" />
+            </div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-3">
+              Sign In Required
+            </h2>
+            <p className="text-gray-600 mb-6">
+              You need to be signed in to register as a service provider. Please sign in or create an account to continue.
+            </p>
+            <div className="flex gap-4 justify-center">
+              <button
+                onClick={() => navigate('/login', { state: { from: location.pathname + location.search } })}
+                className="px-6 py-2 bg-beedab-blue text-white rounded-lg hover:bg-blue-700"
+              >
+                Sign In
+              </button>
+              <button
+                onClick={() => navigate('/services')}
+                className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+              >
+                Back to Services
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const addSpecialty = () => {
     if (newSpecialty.trim() && !specialties.includes(newSpecialty.trim())) {
