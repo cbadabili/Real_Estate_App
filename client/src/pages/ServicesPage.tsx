@@ -363,12 +363,12 @@ const ServicesPage: React.FC = () => {
                   )}
                 </div>
 
-                <div className="flex items-center justify-between text-sm mb-4">
-                  <span className="flex items-center text-neutral-700 font-medium">
+                <div className="flex items-center justify-between text-sm mb-4 min-h-[24px]">
+                  <span className="text-neutral-700 font-medium">
                     {professional.priceRange}
                   </span>
                   {professional.verified && (
-                    <span className="flex items-center text-green-600">
+                    <span className="flex items-center text-green-600 text-xs font-semibold">
                       <Shield className="h-4 w-4 mr-1" />
                       Verified
                     </span>
