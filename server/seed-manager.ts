@@ -6,6 +6,7 @@ import { seedRentals } from './rental-seed';
 import { seedProperties } from './properties-seed';
 import { seedMarketplace } from './marketplace-seed';
 import { seedBilling } from './billing-seed';
+import bcrypt from 'bcrypt';
 
 export class SeedManager {
   async seedUsers() {
@@ -18,11 +19,14 @@ export class SeedManager {
       return;
     }
 
+    // Hash the default password for test users
+    const hashedPassword = await bcrypt.hash('password123', 10);
+
     const testUsers = [
       {
         username: "admin",
         email: "admin@beedab.bw",
-        password: "$2b$10$hash", // In real app, hash this properly
+        password: hashedPassword,
         firstName: "Admin",
         lastName: "User",
         userType: "admin",
@@ -33,7 +37,7 @@ export class SeedManager {
       {
         username: "thabo_agent",
         email: "thabo@bwprimeproperties.bw",
-        password: "$2b$10$hash",
+        password: hashedPassword,
         firstName: "Thabo",
         lastName: "Motlhabi",
         userType: "agent",
@@ -45,7 +49,7 @@ export class SeedManager {
       {
         username: "mpho_supplier",
         email: "mpho@kalaharibuild.bw",
-        password: "$2b$10$hash",
+        password: hashedPassword,
         firstName: "Mpho",
         lastName: "Kgathi",
         userType: "seller",
@@ -56,7 +60,7 @@ export class SeedManager {
       {
         username: "tebogo_builder",
         email: "tebogo@masterbuilders.bw",
-        password: "$2b$10$hash",
+        password: hashedPassword,
         firstName: "Tebogo",
         lastName: "Seretse",
         userType: "seller",
@@ -67,7 +71,7 @@ export class SeedManager {
       {
         username: "kefilwe_trainer",
         email: "kefilwe@skillsacademy.bw",
-        password: "$2b$10$hash",
+        password: hashedPassword,
         firstName: "Kefilwe",
         lastName: "Mogami",
         userType: "seller",
