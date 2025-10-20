@@ -405,7 +405,7 @@ export default function AdminPage() {
         <TabsContent value="billing">
           <div className="space-y-6">
             {/* Billing Overview */}
-            {billingStats && (
+            {billingStats?.overview && (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <Card>
                   <CardHeader className="pb-2">
@@ -413,10 +413,10 @@ export default function AdminPage() {
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold text-orange-600">
-                      {billingStats.overview.pending_payments}
+                      {billingStats.overview.pending_payments || 0}
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      BWP {billingStats.overview.pending_revenue.toLocaleString()} pending
+                      BWP {(billingStats.overview.pending_revenue || 0).toLocaleString()} pending
                     </p>
                   </CardContent>
                 </Card>
@@ -426,10 +426,10 @@ export default function AdminPage() {
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold text-green-600">
-                      BWP {billingStats.overview.total_revenue.toLocaleString()}
+                      BWP {(billingStats.overview.total_revenue || 0).toLocaleString()}
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      {billingStats.overview.approved_payments} approved payments
+                      {billingStats.overview.approved_payments || 0} approved payments
                     </p>
                   </CardContent>
                 </Card>
@@ -439,7 +439,7 @@ export default function AdminPage() {
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold text-blue-600">
-                      {billingStats.overview.active_subscriptions}
+                      {billingStats.overview.active_subscriptions || 0}
                     </div>
                     <p className="text-xs text-muted-foreground">
                       Currently active
@@ -452,7 +452,7 @@ export default function AdminPage() {
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold text-red-600">
-                      {billingStats.overview.rejected_payments}
+                      {billingStats.overview.rejected_payments || 0}
                     </div>
                     <p className="text-xs text-muted-foreground">
                       Failed transactions
