@@ -448,13 +448,13 @@ router.get('/admin/stats', authenticate, async (req, res) => {
       .from(subscriptions)
       .where(eq(subscriptions.status, 'active'));
 
-    // Get plan distribution
+    // Get plan distribution (only active plans)
     const planDistribution = await db
       .select({
         plan_name: plans.name,
         plan_code: plans.code,
-        subscription_count: sql<number>`COUNT(${subscriptions.id})`,
-        revenue: sql<number>`SUM(CASE WHEN ${payments.status} = 'succeeded' THEN ${payments.amount_bwp} ELSE 0 END)`
+        subscription_count: sql<number>`COUNT(DISTINCT ${subscriptions.id})`,
+        revenue: sql<number>`COALESCE(SUM(CASE WHEN ${payments.status} = 'succeeded' THEN ${payments.amount_bwp} ELSE 0 END), 0)`
       })
       .from(plans)
       .leftJoin(subscriptions, and(
@@ -462,6 +462,7 @@ router.get('/admin/stats', authenticate, async (req, res) => {
         eq(subscriptions.status, 'active')
       ))
       .leftJoin(payments, eq(payments.plan_id, plans.id))
+      .where(eq(plans.is_active, true))
       .groupBy(plans.id, plans.name, plans.code)
       .orderBy(plans.price_bwp);
 
