@@ -750,7 +750,7 @@ export default function AdminPage() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                  {billingStats?.overview.active_subscriptions || 0}
+                  {billingStats?.overview?.active_subscriptions || 0}
                 </div>
                 <p className="text-xs text-muted-foreground">
                   Paying customers
@@ -763,7 +763,7 @@ export default function AdminPage() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-orange-600">
-                  {(billingStats?.overview.pending_payments || 0) + reviews.filter((r: AdminReview) => r.status === 'pending').length}
+                  {(billingStats?.overview?.pending_payments || 0) + reviews.filter((r: AdminReview) => r.status === 'pending').length}
                 </div>
                 <p className="text-xs text-muted-foreground">
                   Payments & reviews
@@ -776,7 +776,7 @@ export default function AdminPage() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-green-600">
-                  BWP {billingStats?.overview.total_revenue.toLocaleString() || '0'}
+                  BWP {(billingStats?.overview?.total_revenue || 0).toLocaleString()}
                 </div>
                 <p className="text-xs text-muted-foreground">
                   Lifetime revenue
