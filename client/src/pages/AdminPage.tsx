@@ -149,10 +149,13 @@ export default function AdminPage() {
   const pendingPayments = Array.isArray(paymentsData) ? paymentsData : [];
 
   // Fetch billing statistics
-  const { data: billingStats, isLoading: statsLoading } = useQuery({
+  const { data: billingStatsResponse, isLoading: statsLoading } = useQuery({
     queryKey: ['/api/billing/admin/stats'],
     queryFn: () => apiRequest('/api/billing/admin/stats'),
   });
+  
+  // Unwrap the data field from the response
+  const billingStats = billingStatsResponse?.data || null;
 
   // Payment approval mutation
   const approvePaymentMutation = useMutation({
