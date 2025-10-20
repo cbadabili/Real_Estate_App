@@ -2,7 +2,7 @@ import type { Express } from "express";
 import { storage } from "../storage";
 import { authenticate } from "../auth-middleware";
 import { db } from "../db";
-import { users, reviews, auditLog } from "../../shared/schema";
+import { users, userReviews, adminAuditLog } from "../../shared/schema";
 import { eq, or, ilike, desc, sql } from "drizzle-orm";
 
 export function registerAdminRoutes(app: Express) {
@@ -97,13 +97,13 @@ export function registerAdminRoutes(app: Express) {
 
       const status = req.query.status as string || 'all';
 
-      let query = db.select().from(reviews);
+      let query = db.select().from(userReviews);
 
       if (status && status !== 'all') {
-        query = query.where(eq(reviews.status, status));
+        query = query.where(eq(userReviews.status, status));
       }
 
-      const allReviews = await query.orderBy(desc(reviews.createdAt));
+      const allReviews = await query.orderBy(desc(userReviews.createdAt));
 
       res.json(allReviews);
     } catch (error) {
@@ -135,12 +135,12 @@ export function registerAdminRoutes(app: Express) {
         });
       }
 
-      await db.update(reviews)
+      await db.update(userReviews)
         .set({
           status: action === 'approve' ? 'approved' : 'rejected',
           updatedAt: Date.now()
         })
-        .where(eq(reviews.id, reviewId));
+        .where(eq(userReviews.id, reviewId));
 
       res.json({
         success: true,
@@ -168,8 +168,8 @@ export function registerAdminRoutes(app: Express) {
       const limit = parseInt(req.query.limit as string) || 50;
 
       const logs = await db.select()
-        .from(auditLog)
-        .orderBy(desc(auditLog.createdAt))
+        .from(adminAuditLog)
+        .orderBy(desc(adminAuditLog.createdAt))
         .limit(limit);
 
       res.json(logs);
