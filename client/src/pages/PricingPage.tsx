@@ -208,12 +208,24 @@ const PricingPage = () => {
   const getButtonText = (planCode: string, isProcessing: boolean) => {
     if (isProcessing) return 'Processing...';
     
+    // Different text for logged-in users
+    if (user) {
+      switch (planCode) {
+        case 'FREE_TRIAL': return 'Activate Free Trial';
+        case 'PRO': return 'Upgrade to Pro';
+        case 'BUSINESS': return 'Upgrade to Business';
+        case 'PREMIUM': return 'Contact Sales';
+        default: return 'Subscribe';
+      }
+    }
+    
+    // Text for non-logged-in users
     switch (planCode) {
       case 'FREE_TRIAL': return 'Start Free Trial';
-      case 'PRO': return 'Subscribe Now';
-      case 'BUSINESS': return 'Go Professional';
+      case 'PRO': return 'Get Started';
+      case 'BUSINESS': return 'Get Started';
       case 'PREMIUM': return 'Contact Sales';
-      default: return 'Get Started';
+      default: return 'Sign Up';
     }
   };
 
