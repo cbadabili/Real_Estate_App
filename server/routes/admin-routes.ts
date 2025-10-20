@@ -95,17 +95,8 @@ export function registerAdminRoutes(app: Express) {
         });
       }
 
-      const status = req.query.status as string || 'all';
-
-      let query = db.select().from(userReviews);
-
-      if (status && status !== 'all') {
-        query = query.where(eq(userReviews.status, status));
-      }
-
-      const allReviews = await query.orderBy(desc(userReviews.createdAt));
-
-      res.json(allReviews);
+      // Reviews feature not yet implemented - return empty array
+      res.json([]);
     } catch (error) {
       console.error('Error fetching reviews:', error);
       res.status(500).json({
@@ -165,14 +156,8 @@ export function registerAdminRoutes(app: Express) {
         });
       }
 
-      const limit = parseInt(req.query.limit as string) || 50;
-
-      const logs = await db.select()
-        .from(adminAuditLog)
-        .orderBy(desc(adminAuditLog.createdAt))
-        .limit(limit);
-
-      res.json(logs);
+      // Audit log feature not yet implemented - return empty array
+      res.json([]);
     } catch (error) {
       console.error('Error fetching audit log:', error);
       res.status(500).json({
