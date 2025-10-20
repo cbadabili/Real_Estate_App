@@ -119,28 +119,34 @@ export default function AdminPage() {
   }
 
   // Fetch users for management
-  const { data: users = [], isLoading: usersLoading } = useQuery({
+  const { data: usersData, isLoading: usersLoading } = useQuery({
     queryKey: ['/api/admin/users', userFilter],
     queryFn: () => apiRequest(`/api/admin/users?search=${userFilter}`),
   });
+  const users = Array.isArray(usersData) ? usersData : [];
 
   // Fetch reviews for moderation
-  const { data: reviews = [], isLoading: reviewsLoading } = useQuery({
+  const { data: reviewsData, isLoading: reviewsLoading } = useQuery({
     queryKey: ['/api/admin/reviews', reviewFilter],
     queryFn: () => apiRequest(`/api/admin/reviews?status=${reviewFilter}`),
   });
+  const reviews = Array.isArray(reviewsData) ? reviewsData : [];
 
   // Fetch audit log
-  const { data: auditLog = [], isLoading: auditLoading } = useQuery({
+  const { data: auditLogResponse, isLoading: auditLoading } = useQuery({
     queryKey: ['/api/admin/audit-log'],
     queryFn: () => apiRequest('/api/admin/audit-log?limit=50'),
   });
+  
+  // Ensure auditLog is always an array
+  const auditLog = Array.isArray(auditLogResponse) ? auditLogResponse : [];
 
   // Fetch pending payments
-  const { data: pendingPayments = [], isLoading: paymentsLoading } = useQuery({
+  const { data: paymentsData, isLoading: paymentsLoading } = useQuery({
     queryKey: ['/api/billing/payments/pending'],
     queryFn: () => apiRequest('/api/billing/payments/pending'),
   });
+  const pendingPayments = Array.isArray(paymentsData) ? paymentsData : [];
 
   // Fetch billing statistics
   const { data: billingStats, isLoading: statsLoading } = useQuery({

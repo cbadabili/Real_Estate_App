@@ -1,0 +1,21 @@
+Something went wrong
+We encountered an unexpected error. Please try refreshing the page or contact support if the problem persists.
+
+Error Details (Development)
+TypeError: auditLog.map is not a function
+    at AdminPage (https://bc950d3b-1020-47a6-8025-fa9a7db7c4fb-00-nnq5i1x2e95y.riker.replit.dev/src/pages/AdminPage.tsx:34:29)
+    at ProtectedRoute (https://bc950d3b-1020-47a6-8025-fa9a7db7c4fb-00-nnq5i1x2e95y.riker.replit.dev/src/components/auth/ProtectedRoute.tsx:24:3)
+    at RenderedRoute (https://bc950d3b-1020-47a6-8025-fa9a7db7c4fb-00-nnq5i1x2e95y.riker.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=e65f32fc:4088:5)
+    at Routes (https://bc950d3b-1020-47a6-8025-fa9a7db7c4fb-00-nnq5i1x2e95y.riker.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=e65f32fc:4558:5)
+    at div
+    at PropertyProvider (https://bc950d3b-1020-47a6-8025-fa9a7db7c4fb-00-nnq5i1x2e95y.riker.replit.dev/src/contexts/PropertyContext.tsx:29:36)
+    at AuthProvider (https://bc950d3b-1020-47a6-8025-fa9a7db7c4fb-00-nnq5i1x2e95y.riker.replit.dev/src/contexts/AuthContext.tsx:33:32)
+    at ToastProvider (https://bc950d3b-1020-47a6-8025-fa9a7db7c4fb-00-nnq5i1x2e95y.riker.replit.dev/src/components/ui/Toast.tsx:32:3)
+    at QueryClientProvider (https://bc950d3b-1020-47a6-8025-fa9a7db7c4fb-00-nnq5i1x2e95y.riker.replit.dev/node_modules/.vite/deps/@tanstack_react-query.js?v=e65f32fc:2933:3)
+    at ErrorBoundary (https://bc950d3b-1020-47a6-8025-fa9a7db7c4fb-00-nnq5i1x2e95y.riker.replit.dev/src/components/ui/ErrorBoundary.tsx:8:5)
+    at App
+    at QueryClientProvider (https://bc950d3b-1020-47a6-8025-fa9a7db7c4fb-00-nnq5i1x2e95y.riker.replit.dev/node_modules/.vite/deps/@tanstack_react-query.js?v=e65f32fc:2933:3)
+    at Router (https://bc950d3b-1020-47a6-8025-fa9a7db7c4fb-00-nnq5i1x2e95y.riker.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=e65f32fc:4501:15)
+    at BrowserRouter (https://bc950d3b-1020-47a6-8025-fa9a7db7c4fb-00-nnq5i1x2e95y.riker.replit.dev/node_modules/.vite/deps/react-router-dom.js?v=e65f32fc:5247:5)
+Try Again
+Go Home
