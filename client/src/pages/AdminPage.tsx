@@ -534,7 +534,7 @@ export default function AdminPage() {
             </Card>
 
             {/* Plan Distribution */}
-            {billingStats && (
+            {billingStats?.plan_distribution && Array.isArray(billingStats.plan_distribution) && (
               <Card>
                 <CardHeader>
                   <CardTitle>Plan Distribution</CardTitle>
@@ -549,11 +549,11 @@ export default function AdminPage() {
                         <div>
                           <h4 className="font-medium">{plan.plan_name}</h4>
                           <p className="text-sm text-muted-foreground">
-                            {plan.subscription_count} active subscriptions
+                            {plan.subscription_count || 0} active subscriptions
                           </p>
                         </div>
                         <div className="text-right">
-                          <p className="font-medium">BWP {plan.revenue.toLocaleString()}</p>
+                          <p className="font-medium">BWP {(plan.revenue || 0).toLocaleString()}</p>
                           <p className="text-sm text-muted-foreground">Total revenue</p>
                         </div>
                       </div>
