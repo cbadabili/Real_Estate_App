@@ -1,0 +1,118 @@
+Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+2AuthContext.tsx:105 Auth check successful: admin@beedab.bw
+queryClient.ts:61  GET https://bc950d3b-1020-47a6-8025-fa9a7db7c4fb-00-nnq5i1x2e95y.riker.replit.dev/api/billing/admin/stats 500 (Internal Server Error)
+apiRequest @ queryClient.ts:61
+queryFn @ AdminPage.tsx:154
+fetchFn @ @tanstack_react-query.js?v=e65f32fc:881
+run @ @tanstack_react-query.js?v=e65f32fc:513
+start @ @tanstack_react-query.js?v=e65f32fc:555
+fetch @ @tanstack_react-query.js?v=e65f32fc:969
+executeFetch_fn @ @tanstack_react-query.js?v=e65f32fc:2279
+onSubscribe @ @tanstack_react-query.js?v=e65f32fc:1983
+subscribe @ @tanstack_react-query.js?v=e65f32fc:24
+(anonymous) @ @tanstack_react-query.js?v=e65f32fc:3146
+subscribeToStore @ chunk-F3OYNICX.js?v=e65f32fc:11984
+commitHookEffectListMount @ chunk-F3OYNICX.js?v=e65f32fc:16915
+commitPassiveMountOnFiber @ chunk-F3OYNICX.js?v=e65f32fc:18156
+commitPassiveMountEffects_complete @ chunk-F3OYNICX.js?v=e65f32fc:18129
+commitPassiveMountEffects_begin @ chunk-F3OYNICX.js?v=e65f32fc:18119
+commitPassiveMountEffects @ chunk-F3OYNICX.js?v=e65f32fc:18109
+flushPassiveEffectsImpl @ chunk-F3OYNICX.js?v=e65f32fc:19490
+flushPassiveEffects @ chunk-F3OYNICX.js?v=e65f32fc:19447
+performSyncWorkOnRoot @ chunk-F3OYNICX.js?v=e65f32fc:18868
+flushSyncCallbacks @ chunk-F3OYNICX.js?v=e65f32fc:9119
+commitRootImpl @ chunk-F3OYNICX.js?v=e65f32fc:19432
+commitRoot @ chunk-F3OYNICX.js?v=e65f32fc:19277
+finishConcurrentRender @ chunk-F3OYNICX.js?v=e65f32fc:18805
+performConcurrentWorkOnRoot @ chunk-F3OYNICX.js?v=e65f32fc:18718
+workLoop @ chunk-F3OYNICX.js?v=e65f32fc:197
+flushWork @ chunk-F3OYNICX.js?v=e65f32fc:176
+performWorkUntilDeadline @ chunk-F3OYNICX.js?v=e65f32fc:384Understand this error
+queryClient.ts:61  GET https://bc950d3b-1020-47a6-8025-fa9a7db7c4fb-00-nnq5i1x2e95y.riker.replit.dev/api/billing/admin/stats 500 (Internal Server Error)
+apiRequest @ queryClient.ts:61
+queryFn @ AdminPage.tsx:154
+fetchFn @ @tanstack_react-query.js?v=e65f32fc:881
+run @ @tanstack_react-query.js?v=e65f32fc:513
+(anonymous) @ @tanstack_react-query.js?v=e65f32fc:538
+Promise.then
+(anonymous) @ @tanstack_react-query.js?v=e65f32fc:534
+Promise.catch
+run @ @tanstack_react-query.js?v=e65f32fc:517
+start @ @tanstack_react-query.js?v=e65f32fc:555
+fetch @ @tanstack_react-query.js?v=e65f32fc:969
+executeFetch_fn @ @tanstack_react-query.js?v=e65f32fc:2279
+onSubscribe @ @tanstack_react-query.js?v=e65f32fc:1983
+subscribe @ @tanstack_react-query.js?v=e65f32fc:24
+(anonymous) @ @tanstack_react-query.js?v=e65f32fc:3146
+subscribeToStore @ chunk-F3OYNICX.js?v=e65f32fc:11984
+commitHookEffectListMount @ chunk-F3OYNICX.js?v=e65f32fc:16915
+commitPassiveMountOnFiber @ chunk-F3OYNICX.js?v=e65f32fc:18156
+commitPassiveMountEffects_complete @ chunk-F3OYNICX.js?v=e65f32fc:18129
+commitPassiveMountEffects_begin @ chunk-F3OYNICX.js?v=e65f32fc:18119
+commitPassiveMountEffects @ chunk-F3OYNICX.js?v=e65f32fc:18109
+flushPassiveEffectsImpl @ chunk-F3OYNICX.js?v=e65f32fc:19490
+flushPassiveEffects @ chunk-F3OYNICX.js?v=e65f32fc:19447
+performSyncWorkOnRoot @ chunk-F3OYNICX.js?v=e65f32fc:18868
+flushSyncCallbacks @ chunk-F3OYNICX.js?v=e65f32fc:9119
+commitRootImpl @ chunk-F3OYNICX.js?v=e65f32fc:19432
+commitRoot @ chunk-F3OYNICX.js?v=e65f32fc:19277
+finishConcurrentRender @ chunk-F3OYNICX.js?v=e65f32fc:18805
+performConcurrentWorkOnRoot @ chunk-F3OYNICX.js?v=e65f32fc:18718
+workLoop @ chunk-F3OYNICX.js?v=e65f32fc:197
+flushWork @ chunk-F3OYNICX.js?v=e65f32fc:176
+performWorkUntilDeadline @ chunk-F3OYNICX.js?v=e65f32fc:384Understand this error
+queryClient.ts:61  GET https://bc950d3b-1020-47a6-8025-fa9a7db7c4fb-00-nnq5i1x2e95y.riker.replit.dev/api/billing/admin/stats 500 (Internal Server Error)
+apiRequest @ queryClient.ts:61
+queryFn @ AdminPage.tsx:154
+fetchFn @ @tanstack_react-query.js?v=e65f32fc:881
+run @ @tanstack_react-query.js?v=e65f32fc:513
+(anonymous) @ @tanstack_react-query.js?v=e65f32fc:538
+Promise.then
+(anonymous) @ @tanstack_react-query.js?v=e65f32fc:534
+Promise.catch
+run @ @tanstack_react-query.js?v=e65f32fc:517
+(anonymous) @ @tanstack_react-query.js?v=e65f32fc:538
+Promise.then
+(anonymous) @ @tanstack_react-query.js?v=e65f32fc:534
+Promise.catch
+run @ @tanstack_react-query.js?v=e65f32fc:517
+start @ @tanstack_react-query.js?v=e65f32fc:555
+fetch @ @tanstack_react-query.js?v=e65f32fc:969
+executeFetch_fn @ @tanstack_react-query.js?v=e65f32fc:2279
+onSubscribe @ @tanstack_react-query.js?v=e65f32fc:1983
+subscribe @ @tanstack_react-query.js?v=e65f32fc:24
+(anonymous) @ @tanstack_react-query.js?v=e65f32fc:3146
+subscribeToStore @ chunk-F3OYNICX.js?v=e65f32fc:11984
+commitHookEffectListMount @ chunk-F3OYNICX.js?v=e65f32fc:16915
+commitPassiveMountOnFiber @ chunk-F3OYNICX.js?v=e65f32fc:18156
+commitPassiveMountEffects_complete @ chunk-F3OYNICX.js?v=e65f32fc:18129
+commitPassiveMountEffects_begin @ chunk-F3OYNICX.js?v=e65f32fc:18119
+commitPassiveMountEffects @ chunk-F3OYNICX.js?v=e65f32fc:18109
+flushPassiveEffectsImpl @ chunk-F3OYNICX.js?v=e65f32fc:19490
+flushPassiveEffects @ chunk-F3OYNICX.js?v=e65f32fc:19447
+performSyncWorkOnRoot @ chunk-F3OYNICX.js?v=e65f32fc:18868
+flushSyncCallbacks @ chunk-F3OYNICX.js?v=e65f32fc:9119
+commitRootImpl @ chunk-F3OYNICX.js?v=e65f32fc:19432
+commitRoot @ chunk-F3OYNICX.js?v=e65f32fc:19277
+finishConcurrentRender @ chunk-F3OYNICX.js?v=e65f32fc:18805
+performConcurrentWorkOnRoot @ chunk-F3OYNICX.js?v=e65f32fc:18718
+workLoop @ chunk-F3OYNICX.js?v=e65f32fc:197
+flushWork @ chunk-F3OYNICX.js?v=e65f32fc:176
+performWorkUntilDeadline @ chunk-F3OYNICX.js?v=e65f32fc:384Understand this error
+react-router-dom.js?v=e65f32fc:214 No routes matched location "/admin/users" 
+warning @ react-router-dom.js?v=e65f32fc:214
+useRoutesImpl @ react-router-dom.js?v=e65f32fc:3983
+useRoutes @ react-router-dom.js?v=e65f32fc:3936
+Routes @ react-router-dom.js?v=e65f32fc:4561
+renderWithHooks @ chunk-F3OYNICX.js?v=e65f32fc:11548
+updateFunctionComponent @ chunk-F3OYNICX.js?v=e65f32fc:14582
+beginWork @ chunk-F3OYNICX.js?v=e65f32fc:15924
+beginWork$1 @ chunk-F3OYNICX.js?v=e65f32fc:19753
+performUnitOfWork @ chunk-F3OYNICX.js?v=e65f32fc:19198
+workLoopConcurrent @ chunk-F3OYNICX.js?v=e65f32fc:19189
+renderRootConcurrent @ chunk-F3OYNICX.js?v=e65f32fc:19164
+performConcurrentWorkOnRoot @ chunk-F3OYNICX.js?v=e65f32fc:18678
+workLoop @ chunk-F3OYNICX.js?v=e65f32fc:197
+flushWork @ chunk-F3OYNICX.js?v=e65f32fc:176
+performWorkUntilDeadline @ chunk-F3OYNICX.js?v=e65f32fc:384Understand this warning
+react-router-dom.js?v=e65f32fc:214 No routes matched location "/admin/users" 

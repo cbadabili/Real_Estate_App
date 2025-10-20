@@ -453,8 +453,8 @@ router.get('/admin/stats', authenticate, async (req, res) => {
       .select({
         plan_name: plans.name,
         plan_code: plans.code,
-        subscription_count: sql<number>`COUNT(s.id)`,
-        revenue: sql<number>`SUM(CASE WHEN p.status = 'succeeded' THEN p.amount_bwp ELSE 0 END)`
+        subscription_count: sql<number>`COUNT(${subscriptions.id})`,
+        revenue: sql<number>`SUM(CASE WHEN ${payments.status} = 'succeeded' THEN ${payments.amount_bwp} ELSE 0 END)`
       })
       .from(plans)
       .leftJoin(subscriptions, and(
