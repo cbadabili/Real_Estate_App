@@ -6,6 +6,7 @@ import { registerInquiryRoutes } from "./inquiry-routes";
 import { registerSearchRoutes } from "./search-routes";
 import { registerDocumentRoutes } from "./documents-routes";
 import { registerGoogleAuthRoutes } from "./google-auth-routes";
+import { registerAdminRoutes } from "./admin-routes";
 
 export function registerAllRoutes(app: Express) {
   // Register all route modules
@@ -16,6 +17,7 @@ export function registerAllRoutes(app: Express) {
   registerInquiryRoutes(app);
   registerSearchRoutes(app);
   registerDocumentRoutes(app);
+  registerAdminRoutes(app);
 }
 
 // For backwards compatibility
