@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { User, Mail, Phone, MapPin, Edit, Save, Camera, Settings, Home, Heart } from 'lucide-react';
+import { User, Mail, Phone, MapPin, Edit, Save, Camera, Settings, Home, Heart, Building2 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { apiRequest } from '../lib/queryClient';
 import { getToken } from '@/lib/storage';
@@ -159,7 +159,7 @@ const ProfilePage = () => {
                 />
               ) : (
                 <div className="w-24 h-24 bg-beedab-blue rounded-full flex items-center justify-center text-white">
-                  <Home className="h-12 w-12" />
+                  <Building2 className="h-12 w-12" />
                 </div>
               )}
               <button 

@@ -11,7 +11,8 @@ import {
   Eye,
   Calendar,
   TrendingUp,
-  Camera
+  Camera,
+  Building2
 } from 'lucide-react';
 
 interface PropertyCardProps {
@@ -36,7 +37,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, viewMode = 'grid'
     console.warn('Failed to parse property images:', error);
     imageUrls = [];
   }
-  const mainImage = imageUrls.length > 0 ? imageUrls[0] : '/placeholder-property.jpg';
+  const mainImage = imageUrls.length > 0 ? imageUrls[0] : null;
 
   return (
     <motion.div
@@ -46,11 +47,17 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, viewMode = 'grid'
       }`}
     >
       <div className={`relative ${isListView ? 'w-1/3' : ''}`}>
-        <img 
-          src={mainImage} 
-          alt={property.title}
-          className={`object-cover ${isListView ? 'w-full h-full' : 'w-full h-48'}`}
-        />
+        {mainImage ? (
+          <img 
+            src={mainImage} 
+            alt={property.title}
+            className={`object-cover ${isListView ? 'w-full h-full' : 'w-full h-48'}`}
+          />
+        ) : (
+          <div className={`bg-gray-100 flex items-center justify-center ${isListView ? 'w-full h-full' : 'w-full h-48'}`}>
+            <Building2 className="h-16 w-16 text-beedab-blue/40" />
+          </div>
+        )}
 
         {/* Status Badge */}
         <div className="absolute top-3 left-3">

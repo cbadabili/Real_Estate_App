@@ -11,7 +11,7 @@ import {
   CheckCircle,
   Calendar,
   User,
-  Home
+  Building2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
@@ -223,7 +223,7 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({
               <Avatar className="w-10 h-10">
                 <AvatarImage src={review.reviewer.avatar || undefined} />
                 <AvatarFallback>
-                  <Home className="text-white h-5 w-5" />
+                  <Building2 className="text-white h-5 w-5" />
                 </AvatarFallback>
               </Avatar>
               <div>

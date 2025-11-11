@@ -1,7 +1,7 @@
 // @ts-nocheck
 
 import React from 'react';
-import { Home } from 'lucide-react';
+import { Building2 } from 'lucide-react';
 
 export interface AvatarProps {
   src?: string;
@@ -36,7 +36,7 @@ export const Avatar: React.FC<AvatarProps> = ({
       ) : children ? (
         children
       ) : (
-        <Home className="text-white h-1/2 w-1/2" />
+        <Building2 className="text-white h-1/2 w-1/2" />
       )}
     </div>
   );

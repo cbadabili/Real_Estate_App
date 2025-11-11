@@ -1,7 +1,7 @@
 // @ts-nocheck
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Star, MapPin, Phone, Mail, Shield, Clock, Home } from 'lucide-react';
+import { Star, MapPin, Phone, Mail, Shield, Clock, Building2 } from 'lucide-react';
 
 interface ServiceProviderCardProps {
   provider: {
@@ -31,7 +31,7 @@ export const ServiceProviderCard: React.FC<ServiceProviderCardProps> = ({
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center space-x-3">
           <div className="w-12 h-12 bg-beedab-blue rounded-full flex items-center justify-center">
-            <Home className="text-white h-6 w-6" />
+            <Building2 className="text-white h-6 w-6" />
           </div>
           <div>
             <h3 className="font-semibold text-gray-900">{provider.name}</h3>

@@ -76,10 +76,15 @@ Note: There's a known non-fatal warning about `rental_listings` table during see
   - Platform now uses email/password authentication only
 
 ### UI Updates (Nov 11, 2025)
-- **Default Profile Pictures**: Implemented House icon as default avatar for users without profile pictures
+- **Default Profile Pictures**: Implemented Building2 icon as default avatar for users without profile pictures
   - Updated ProfilePage, Navbar, Avatar component, ReviewCard, and ServiceProviderCard
-  - All avatars now display a white House icon on blue background when no image is provided
+  - All avatars now display a white Building2 icon on blue background when no image is provided
   - Consistent branding across the platform with real estate theme
+  
+- **Default Property Images**: Implemented Building2 icon placeholder for property listings without photos
+  - Updated PropertyCard components (both shared and properties folders)
+  - Properties without images now display a Building2 icon on gray background
+  - Clean, professional appearance for listings awaiting professional photography
 
 ### Known Development Warnings (Non-Critical)
 - WebSocket HMR connection may show CSP warnings in browser console (doesn't affect functionality)

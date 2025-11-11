@@ -682,7 +682,7 @@ const Navbar = () => {
                       />
                     ) : (
                       <div className="h-8 w-8 bg-beedab-blue rounded-full flex items-center justify-center text-white">
-                        <Home className="h-4 w-4" />
+                        <Building2 className="h-4 w-4" />
                       </div>
                     )}
                     <span className="hidden md:inline">{user.firstName}</span>
