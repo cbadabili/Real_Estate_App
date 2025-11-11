@@ -83,8 +83,10 @@ Note: There's a known non-fatal warning about `rental_listings` table during see
   
 - **Default Property Images**: Implemented Building2 icon placeholder for property listings without photos
   - Updated PropertyCard components (both shared and properties folders)
+  - Updated ScheduleViewingPage to show Building2 icon for properties without images
   - Properties without images now display a Building2 icon on gray background
   - Clean, professional appearance for listings awaiting professional photography
+  - Consistent placeholder behavior across all property display contexts
 
 ### Routing Updates (Nov 11, 2025)
 - **Buyer Journey Routes**: Fixed routing structure for buyer journey pages
