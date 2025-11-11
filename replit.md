@@ -75,6 +75,12 @@ Note: There's a known non-fatal warning about `rental_listings` table during see
   - Uninstalled google-auth-library dependency
   - Platform now uses email/password authentication only
 
+### UI Updates (Nov 11, 2025)
+- **Default Profile Pictures**: Implemented House icon as default avatar for users without profile pictures
+  - Updated ProfilePage, Navbar, Avatar component, ReviewCard, and ServiceProviderCard
+  - All avatars now display a white House icon on blue background when no image is provided
+  - Consistent branding across the platform with real estate theme
+
 ### Known Development Warnings (Non-Critical)
 - WebSocket HMR connection may show CSP warnings in browser console (doesn't affect functionality)
 - Replit dev banner CSP warning (cosmetic only)

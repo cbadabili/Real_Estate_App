@@ -158,8 +158,8 @@ const ProfilePage = () => {
                   className="w-24 h-24 rounded-full object-cover"
                 />
               ) : (
-                <div className="w-24 h-24 bg-beedab-blue rounded-full flex items-center justify-center text-white text-2xl font-bold">
-                  {userInfo.name ? userInfo.name.split(' ').map(n => n[0]).join('') : 'U'}
+                <div className="w-24 h-24 bg-beedab-blue rounded-full flex items-center justify-center text-white">
+                  <Home className="h-12 w-12" />
                 </div>
               )}
               <button 

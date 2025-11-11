@@ -10,7 +10,8 @@ import {
   Trash,
   CheckCircle,
   Calendar,
-  User
+  User,
+  Home
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
@@ -222,7 +223,7 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({
               <Avatar className="w-10 h-10">
                 <AvatarImage src={review.reviewer.avatar || undefined} />
                 <AvatarFallback>
-                  {review.reviewer.firstName[0]}{review.reviewer.lastName[0]}
+                  <Home className="text-white h-5 w-5" />
                 </AvatarFallback>
               </Avatar>
               <div>

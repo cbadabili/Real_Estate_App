@@ -674,7 +674,17 @@ const Navbar = () => {
                   onMouseLeave={() => setProfileDropdownOpen(false)}
                 >
                   <button className="flex items-center space-x-2 text-neutral-600 hover:text-neutral-900">
-                    <User className="h-5 w-5" />
+                    {user.avatar ? (
+                      <img 
+                        src={user.avatar} 
+                        alt={`${user.firstName}'s profile`}
+                        className="h-8 w-8 rounded-full object-cover"
+                      />
+                    ) : (
+                      <div className="h-8 w-8 bg-beedab-blue rounded-full flex items-center justify-center text-white">
+                        <Home className="h-4 w-4" />
+                      </div>
+                    )}
                     <span className="hidden md:inline">{user.firstName}</span>
                     <ChevronDown className="h-4 w-4" />
                   </button>

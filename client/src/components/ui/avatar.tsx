@@ -1,6 +1,7 @@
 // @ts-nocheck
 
 import React from 'react';
+import { Home } from 'lucide-react';
 
 export interface AvatarProps {
   src?: string;
@@ -24,7 +25,7 @@ export const Avatar: React.FC<AvatarProps> = ({
   };
 
   return (
-    <div className={`relative inline-flex items-center justify-center overflow-hidden bg-gray-100 rounded-full ${className}`}>
+    <div className={`relative inline-flex items-center justify-center overflow-hidden bg-beedab-blue rounded-full ${className}`}>
       {src && !imageError ? (
         <img
           src={src}
@@ -35,9 +36,7 @@ export const Avatar: React.FC<AvatarProps> = ({
       ) : children ? (
         children
       ) : (
-        <span className="text-sm font-medium text-gray-600">
-          {fallback || alt.charAt(0).toUpperCase()}
-        </span>
+        <Home className="text-white h-1/2 w-1/2" />
       )}
     </div>
   );
