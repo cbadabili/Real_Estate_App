@@ -1,5 +1,4 @@
-import { Routes, Route } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ToastProvider } from './components/ui/Toast';
 import { ErrorBoundary } from './components/ui/ErrorBoundary';
@@ -46,7 +45,6 @@ import RegisterProviderPage from './pages/marketplace/RegisterProviderPage';
 import DocumentsPage from './pages/DocumentsPage';
 import LoginPage from './pages/LoginPage';
 import AdminPage from './pages/AdminPage';
-import AdminTestPage from './pages/AdminTestPage';
 import { AuthProvider } from './contexts/AuthContext';
 import { PropertyProvider } from './contexts/PropertyContext';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
@@ -200,12 +198,17 @@ function App() {
             <Route path="/financing" element={<FinancingPage />} />
             <Route path="/tenant-support" element={<TenantSupportPage />} />
             <Route path="/services/tenant-support" element={<TenantSupportPage />} />
-            <Route path="/offers" element={<ProtectedRoute><OffersPage /></ProtectedRoute>} />
-            <Route path="/buyer-journey/offers" element={<ProtectedRoute><OffersPage /></ProtectedRoute>} />
-            <Route path="/planning" element={<PlanningPage />} />
+            {/* Buyer Journey Routes - Grouped under /buyer-journey */}
             <Route path="/buyer-journey/planning" element={<PlanningPage />} />
-            <Route path="/searching" element={<SearchingPage />} />
-            <Route path="/viewing" element={<ProtectedRoute><ViewingPage /></ProtectedRoute>} />
+            <Route path="/buyer-journey/searching" element={<SearchingPage />} />
+            <Route path="/buyer-journey/viewing" element={<ProtectedRoute><ViewingPage /></ProtectedRoute>} />
+            <Route path="/buyer-journey/offers" element={<ProtectedRoute><OffersPage /></ProtectedRoute>} />
+            
+            {/* Legacy route redirects for backward compatibility */}
+            <Route path="/planning" element={<Navigate to="/buyer-journey/planning" replace />} />
+            <Route path="/searching" element={<Navigate to="/buyer-journey/searching" replace />} />
+            <Route path="/viewing" element={<Navigate to="/buyer-journey/viewing" replace />} />
+            <Route path="/offers" element={<Navigate to="/buyer-journey/offers" replace />} />
             <Route path="/market-intelligence" element={<MarketIntelligencePage />} />
             <Route path="/market-trends" element={<MarketTrendsPage />} />
             <Route path="/neighborhood-analytics" element={<NeighborhoodAnalyticsPage />} />

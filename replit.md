@@ -86,6 +86,13 @@ Note: There's a known non-fatal warning about `rental_listings` table during see
   - Properties without images now display a Building2 icon on gray background
   - Clean, professional appearance for listings awaiting professional photography
 
+### Routing Updates (Nov 11, 2025)
+- **Buyer Journey Routes**: Fixed routing structure for buyer journey pages
+  - Consolidated all buyer journey routes under `/buyer-journey/*` path
+  - Added redirects from legacy paths (`/planning`, `/searching`, `/viewing`, `/offers`) for backward compatibility
+  - Resolved "No routes matched location" warnings in browser console
+  - Routes now properly organized: `/buyer-journey/planning`, `/buyer-journey/searching`, `/buyer-journey/viewing`, `/buyer-journey/offers`
+
 ### Known Development Warnings (Non-Critical)
 - WebSocket HMR connection may show CSP warnings in browser console (doesn't affect functionality)
 - Replit dev banner CSP warning (cosmetic only)
