@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Check, Star, Zap, Users, Award } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { api } from '../../lib/api';
 
 interface Plan {
   id: number;
@@ -142,19 +143,13 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
       // Login the user - this sets the auth context and session
       await login(formData.email, formData.password);
 
-      // Subscribe to selected plan (uses session cookie for auth)
-      const subscribeResponse = await fetch('/api/billing/subscribe', {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          planCode: selectedPlan,
-          paymentMethod: 'bank_transfer'
-        }),
+      // Subscribe to selected plan (uses API client with authentication)
+      const subscribeResponse = await api.post('/api/billing/subscribe', {
+        planCode: selectedPlan,
+        paymentMethod: 'bank_transfer'
       });
 
-      const subscribeData = await subscribeResponse.json();
+      const subscribeData = subscribeResponse.data;
 
       if (subscribeData.success) {
         if (subscribeData.data.plan.price_bwp === 0) {
