@@ -139,17 +139,14 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
         throw new Error('Registration failed');
       }
       
-      const userData = registerData.user;
-      
-      // Login the user
+      // Login the user - this sets the auth context and session
       await login(formData.email, formData.password);
 
-      // Subscribe to selected plan
+      // Subscribe to selected plan (uses session cookie for auth)
       const subscribeResponse = await fetch('/api/billing/subscribe', {
         method: 'POST',
         headers: { 
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${userData.id}`
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           planCode: selectedPlan,

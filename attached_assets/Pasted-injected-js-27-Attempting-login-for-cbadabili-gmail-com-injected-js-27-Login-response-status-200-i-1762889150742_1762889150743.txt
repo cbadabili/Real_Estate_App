@@ -1,0 +1,62 @@
+injected.js:27 Attempting login for: cbadabili@gmail.com
+injected.js:27 Login response status: 200
+injected.js:27 Login response data keys: (17) ['id', 'username', 'email', 'firstName', 'lastName', 'phone', 'userType', 'role', 'permissions', 'avatar', 'bio', 'isVerified', 'isActive', 'reacNumber', 'lastLoginAt', 'createdAt', 'token']
+injected.js:27 Login successful for user: cbadabili@gmail.com
+injected.js:204  POST https://bc950d3b-1020-47a6-8025-fa9a7db7c4fb-00-nnq5i1x2e95y.riker.replit.dev/api/billing/subscribe 401 (Unauthorized)
+apply @ injected.js:204
+handleRegistration @ RegistrationModal.tsx:148
+await in handleRegistration
+callCallback2 @ chunk-F3OYNICX.js?v=263ac18b:3674
+invokeGuardedCallbackDev @ chunk-F3OYNICX.js?v=263ac18b:3699
+invokeGuardedCallback @ chunk-F3OYNICX.js?v=263ac18b:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-F3OYNICX.js?v=263ac18b:3736
+executeDispatch @ chunk-F3OYNICX.js?v=263ac18b:7014
+processDispatchQueueItemsInOrder @ chunk-F3OYNICX.js?v=263ac18b:7034
+processDispatchQueue @ chunk-F3OYNICX.js?v=263ac18b:7043
+dispatchEventsForPlugins @ chunk-F3OYNICX.js?v=263ac18b:7051
+(anonymous) @ chunk-F3OYNICX.js?v=263ac18b:7174
+batchedUpdates$1 @ chunk-F3OYNICX.js?v=263ac18b:18913
+batchedUpdates @ chunk-F3OYNICX.js?v=263ac18b:3579
+dispatchEventForPluginEventSystem @ chunk-F3OYNICX.js?v=263ac18b:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-F3OYNICX.js?v=263ac18b:5478
+dispatchEvent @ chunk-F3OYNICX.js?v=263ac18b:5472
+dispatchDiscreteEvent @ chunk-F3OYNICX.js?v=263ac18b:5449Understand this error
+injected.js:204  POST https://bc950d3b-1020-47a6-8025-fa9a7db7c4fb-00-nnq5i1x2e95y.riker.replit.dev/api/auth/register 409 (Conflict)
+apply @ injected.js:204
+handleRegistration @ RegistrationModal.tsx:124
+callCallback2 @ chunk-F3OYNICX.js?v=263ac18b:3674
+invokeGuardedCallbackDev @ chunk-F3OYNICX.js?v=263ac18b:3699
+invokeGuardedCallback @ chunk-F3OYNICX.js?v=263ac18b:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-F3OYNICX.js?v=263ac18b:3736
+executeDispatch @ chunk-F3OYNICX.js?v=263ac18b:7014
+processDispatchQueueItemsInOrder @ chunk-F3OYNICX.js?v=263ac18b:7034
+processDispatchQueue @ chunk-F3OYNICX.js?v=263ac18b:7043
+dispatchEventsForPlugins @ chunk-F3OYNICX.js?v=263ac18b:7051
+(anonymous) @ chunk-F3OYNICX.js?v=263ac18b:7174
+batchedUpdates$1 @ chunk-F3OYNICX.js?v=263ac18b:18913
+batchedUpdates @ chunk-F3OYNICX.js?v=263ac18b:3579
+dispatchEventForPluginEventSystem @ chunk-F3OYNICX.js?v=263ac18b:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-F3OYNICX.js?v=263ac18b:5478
+dispatchEvent @ chunk-F3OYNICX.js?v=263ac18b:5472
+dispatchDiscreteEvent @ chunk-F3OYNICX.js?v=263ac18b:5449Understand this error
+injected.js:27 Registration failed: {"message":"Email already registered"}
+(anonymous) @ injected.js:27
+handleRegistration @ RegistrationModal.tsx:132
+await in handleRegistration
+callCallback2 @ chunk-F3OYNICX.js?v=263ac18b:3674
+invokeGuardedCallbackDev @ chunk-F3OYNICX.js?v=263ac18b:3699
+invokeGuardedCallback @ chunk-F3OYNICX.js?v=263ac18b:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-F3OYNICX.js?v=263ac18b:3736
+executeDispatch @ chunk-F3OYNICX.js?v=263ac18b:7014
+processDispatchQueueItemsInOrder @ chunk-F3OYNICX.js?v=263ac18b:7034
+processDispatchQueue @ chunk-F3OYNICX.js?v=263ac18b:7043
+dispatchEventsForPlugins @ chunk-F3OYNICX.js?v=263ac18b:7051
+(anonymous) @ chunk-F3OYNICX.js?v=263ac18b:7174
+batchedUpdates$1 @ chunk-F3OYNICX.js?v=263ac18b:18913
+batchedUpdates @ chunk-F3OYNICX.js?v=263ac18b:3579
+dispatchEventForPluginEventSystem @ chunk-F3OYNICX.js?v=263ac18b:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-F3OYNICX.js?v=263ac18b:5478
+dispatchEvent @ chunk-F3OYNICX.js?v=263ac18b:5472
+dispatchDiscreteEvent @ chunk-F3OYNICX.js?v=263ac18b:5449Understand this error
+injected.js:27 Registration error: Error: Registration failed: 409
+    at handleRegistration (RegistrationModal.tsx:133:15)
