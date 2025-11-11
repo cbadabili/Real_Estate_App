@@ -5,13 +5,11 @@ import { registerPropertyRoutes } from "./property-routes";
 import { registerInquiryRoutes } from "./inquiry-routes";
 import { registerSearchRoutes } from "./search-routes";
 import { registerDocumentRoutes } from "./documents-routes";
-import { registerGoogleAuthRoutes } from "./google-auth-routes";
 import { registerAdminRoutes } from "./admin-routes";
 
 export function registerAllRoutes(app: Express) {
   // Register all route modules
   registerAuthRoutes(app);
-  registerGoogleAuthRoutes(app);
   registerUserRoutes(app);
   registerPropertyRoutes(app);
   registerInquiryRoutes(app);

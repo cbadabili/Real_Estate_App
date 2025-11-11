@@ -67,6 +67,14 @@ Note: There's a known non-fatal warning about `rental_listings` table during see
 - **Data Seeding**: Added seedProperties() call - now seeding 12 properties + 5 rentals + all other data
 - **Security**: CSP disabled in development for easier debugging, enabled in production
 
+### Authentication Updates (Nov 11, 2025)
+- **Google OAuth Removed**: Completely removed Google sign-in/sign-up functionality
+  - Removed Google OAuth UI from LoginPage and RegistrationModal
+  - Deleted Google authentication backend routes (google-auth-routes.ts)
+  - Removed GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET from environment config
+  - Uninstalled google-auth-library dependency
+  - Platform now uses email/password authentication only
+
 ### Known Development Warnings (Non-Critical)
 - WebSocket HMR connection may show CSP warnings in browser console (doesn't affect functionality)
 - Replit dev banner CSP warning (cosmetic only)
