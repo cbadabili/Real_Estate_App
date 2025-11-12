@@ -75,6 +75,17 @@ Note: There's a known non-fatal warning about `rental_listings` table during see
   - Uninstalled google-auth-library dependency
   - Platform now uses email/password authentication only
 
+### Return URL Feature (Nov 12, 2025)
+- **Plan Activation Redirect**: After activating a billing plan, users are now redirected back to their previous location instead of staying on the pricing page
+  - Supports both query parameters (`/pricing?returnUrl=/properties`) and React Router state
+  - Priority order: query params → location.state → '/' fallback
+  - **Security**: Validates returnUrl is a safe relative path to prevent open redirect attacks
+    * Only allows paths starting with '/' (e.g., '/properties', '/dashboard')
+    * Rejects protocol-relative URLs (e.g., '//evil.com')
+    * Rejects absolute URLs (e.g., 'https://evil.com')
+  - Implementation in both PricingPage and RegistrationModal for consistent behavior
+  - Architect-reviewed and production-ready
+
 ### UI Updates (Nov 11-12, 2025)
 - **Default Profile Pictures**: Implemented user initials as default avatars for users without profile pictures
   - Updated ProfilePage, Navbar, Avatar component, ReviewCard, and ServiceProviderCard
