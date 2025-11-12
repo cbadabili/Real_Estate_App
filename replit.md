@@ -75,11 +75,19 @@ Note: There's a known non-fatal warning about `rental_listings` table during see
   - Uninstalled google-auth-library dependency
   - Platform now uses email/password authentication only
 
-### UI Updates (Nov 11, 2025)
-- **Default Profile Pictures**: Implemented Building2 icon as default avatar for users without profile pictures
+### UI Updates (Nov 11-12, 2025)
+- **Default Profile Pictures**: Implemented user initials as default avatars for users without profile pictures
   - Updated ProfilePage, Navbar, Avatar component, ReviewCard, and ServiceProviderCard
-  - All avatars now display a white Building2 icon on blue background when no image is provided
-  - Consistent branding across the platform with real estate theme
+  - All avatars now display user initials (first letter of first name + first letter of last name) on blue background when no image is provided
+  - Initials logic with robust edge case handling:
+    * Multi-word names: "John Doe" → "JD"
+    * Single-word names: "John" → "JO"
+    * Single-letter names: "A" → "A"
+    * Partial names: Properly handles missing first or last names
+    * Empty/null names: Shows "?" fallback
+  - Shared getInitials helper function ensures consistency across all components
+  - Proper name sanitization prevents "undefined" in displays
+  - Consistent, personalized appearance across the platform
   
 - **Default Property Images**: Implemented Building2 icon placeholder for property listings without photos
   - Updated PropertyCard components (both shared and properties folders)

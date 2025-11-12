@@ -1,7 +1,8 @@
 // @ts-nocheck
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Star, MapPin, Phone, Mail, Shield, Clock, Building2 } from 'lucide-react';
+import { Star, MapPin, Phone, Mail, Shield, Clock } from 'lucide-react';
+import { getInitials } from '../../ui/avatar';
 
 interface ServiceProviderCardProps {
   provider: {
@@ -30,8 +31,8 @@ export const ServiceProviderCard: React.FC<ServiceProviderCardProps> = ({
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center space-x-3">
-          <div className="w-12 h-12 bg-beedab-blue rounded-full flex items-center justify-center">
-            <Building2 className="text-white h-6 w-6" />
+          <div className="w-12 h-12 bg-beedab-blue rounded-full flex items-center justify-center text-white">
+            <span className="text-lg font-semibold">{getInitials(provider.name)}</span>
           </div>
           <div>
             <h3 className="font-semibold text-gray-900">{provider.name}</h3>

@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { User, Mail, Phone, MapPin, Edit, Save, Camera, Settings, Home, Heart, Building2 } from 'lucide-react';
+import { User, Mail, Phone, MapPin, Edit, Save, Camera, Settings, Home, Heart } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { apiRequest } from '../lib/queryClient';
 import { getToken } from '@/lib/storage';
+import { getInitials } from '../components/ui/avatar';
 
 const ProfilePage = () => {
   const { user, updateUser } = useAuth();
@@ -27,7 +28,7 @@ const ProfilePage = () => {
   useEffect(() => {
     if (user) {
       setUserInfo({
-        name: `${user.firstName} ${user.lastName}`,
+        name: [user.firstName, user.lastName].filter(Boolean).join(' '),
         email: user.email,
         phone: user.phone || '',
         location: 'Gaborone, Botswana', // Default location
@@ -159,7 +160,7 @@ const ProfilePage = () => {
                 />
               ) : (
                 <div className="w-24 h-24 bg-beedab-blue rounded-full flex items-center justify-center text-white">
-                  <Building2 className="h-12 w-12" />
+                  <span className="text-3xl font-semibold">{getInitials(userInfo.name)}</span>
                 </div>
               )}
               <button 

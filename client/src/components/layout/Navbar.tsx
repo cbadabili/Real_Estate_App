@@ -21,14 +21,15 @@ import {
   Package,
   GraduationCap,
   Handshake,
-  Building2,
   FileCheck,
   PlusCircle,
   Calendar,
   Settings,
-  LogOut
+  LogOut,
+  Building2
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { getInitials } from '../ui/avatar';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -682,7 +683,9 @@ const Navbar = () => {
                       />
                     ) : (
                       <div className="h-8 w-8 bg-beedab-blue rounded-full flex items-center justify-center text-white">
-                        <Building2 className="h-4 w-4" />
+                        <span className="text-xs font-semibold">
+                          {getInitials([user.firstName, user.lastName].filter(Boolean).join(' '))}
+                        </span>
                       </div>
                     )}
                     <span className="hidden md:inline">{user.firstName}</span>
