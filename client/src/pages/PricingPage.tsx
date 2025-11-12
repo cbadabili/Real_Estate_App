@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Check, Star, Zap, Users, Award, Phone, Mail, MessageCircle } from 'lucide-react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { RegistrationModal } from '../components/auth/RegistrationModal';
 import { apiRequest } from '../lib/queryClient';
@@ -24,6 +25,10 @@ const PricingPage = () => {
   const [showRegistrationModal, setShowRegistrationModal] = useState(false);
   const [modalPlanCode, setModalPlanCode] = useState<string>('');
   const { user } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
+  
+  const returnUrl = (location.state as any)?.returnUrl || '/';
 
   useEffect(() => {
     fetchPlans();
@@ -64,7 +69,7 @@ const PricingPage = () => {
       if (data.success) {
         if (data.data.plan.price_bwp === 0) {
           alert('Free trial activated successfully! Enjoy 30 days of Pro features.');
-          window.location.reload();
+          navigate(returnUrl);
         } else {
           showPaymentModal(data.data.paymentInstructions);
         }
