@@ -608,6 +608,7 @@ const PricingPage = () => {
           plans={plans}
           preSelectedPlan={modalPlanCode}
           planLocked={true}
+          returnUrl={returnUrl}
         />
       </div>
     </div>

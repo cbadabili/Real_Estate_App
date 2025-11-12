@@ -23,6 +23,7 @@ interface RegistrationModalProps {
   plans: Plan[];
   preSelectedPlan?: string;
   planLocked?: boolean; // When true, user cannot change the selected plan
+  returnUrl?: string; // URL to redirect to after successful free plan activation
 }
 
 export const RegistrationModal: React.FC<RegistrationModalProps> = ({
@@ -31,7 +32,8 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
   triggerAction = "get_started",
   plans,
   preSelectedPlan,
-  planLocked = false
+  planLocked = false,
+  returnUrl = '/'
 }) => {
   const { login } = useAuth();
   const [step, setStep] = useState<'register' | 'payment'>('register');
@@ -155,8 +157,8 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
         if (subscribeData.data.plan.price_bwp === 0) {
           // Free plan - immediate access
           onClose();
-          // Redirect to pricing/dashboard instead of reloading
-          window.location.href = '/pricing';
+          // Redirect to return URL (where user came from before registration)
+          window.location.href = returnUrl;
         } else {
           // Paid plan - show payment instructions
           setStep('payment');
