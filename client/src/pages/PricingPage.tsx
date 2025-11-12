@@ -28,7 +28,23 @@ const PricingPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
   
-  const returnUrl = (location.state as any)?.returnUrl || '/';
+  // Get return URL from query params or state, validate it's a relative path
+  const getReturnUrl = (): string => {
+    const searchParams = new URLSearchParams(location.search);
+    const queryReturnUrl = searchParams.get('returnUrl');
+    const stateReturnUrl = (location.state as any)?.returnUrl;
+    
+    const candidateUrl = queryReturnUrl || stateReturnUrl || '/';
+    
+    // Security: Only allow relative paths (prevent open redirect)
+    if (candidateUrl.startsWith('/') && !candidateUrl.startsWith('//')) {
+      return candidateUrl;
+    }
+    
+    return '/';
+  };
+  
+  const returnUrl = getReturnUrl();
 
   useEffect(() => {
     fetchPlans();

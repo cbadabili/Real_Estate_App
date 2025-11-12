@@ -35,6 +35,8 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
   planLocked = false,
   returnUrl = '/'
 }) => {
+  // Security: Validate returnUrl is a safe relative path
+  const safeReturnUrl = (returnUrl.startsWith('/') && !returnUrl.startsWith('//')) ? returnUrl : '/';
   const { login } = useAuth();
   const [step, setStep] = useState<'register' | 'payment'>('register');
   const [selectedPlan, setSelectedPlan] = useState<string>(preSelectedPlan || 'LISTER_FREE');
@@ -158,7 +160,7 @@ export const RegistrationModal: React.FC<RegistrationModalProps> = ({
           // Free plan - immediate access
           onClose();
           // Redirect to return URL (where user came from before registration)
-          window.location.href = returnUrl;
+          window.location.href = safeReturnUrl;
         } else {
           // Paid plan - show payment instructions
           setStep('payment');
