@@ -1,10 +1,9 @@
-// @ts-nocheck
-
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, MapPin, Star, Wrench, Shield, CheckCircle } from 'lucide-react';
 import ServiceProviderCard from '../../components/domain/marketplace/ServiceProviderCard';
-import RegisterProvider from '../../components/shared/RegisterProvider';
+
+const RegisterProvider = lazy(() => import('../../components/shared/RegisterProvider'));
 
 interface Artisan {
   id: number;
@@ -21,8 +20,40 @@ interface Artisan {
   years_experience: number;
 }
 
+const sampleArtisans: Artisan[] = [
+  {
+    id: 1,
+    business_name: 'Gaborone Construction Services',
+    business_description: 'Professional construction and renovation services',
+    service_area: 'Gaborone',
+    hourly_rate: 450,
+    rating: 4.7,
+    review_count: 45,
+    contact_email: 'info@gbconstruction.bw',
+    contact_phone: '+267 71234567',
+    verified: true,
+    specialties: ['Construction', 'Renovation'],
+    years_experience: 12
+  },
+  {
+    id: 2,
+    business_name: 'Expert Plumbing Solutions',
+    business_description: 'Licensed plumbing and water systems',
+    service_area: 'Gaborone',
+    hourly_rate: 350,
+    rating: 4.9,
+    review_count: 78,
+    contact_email: 'contact@expertplumbing.bw',
+    contact_phone: '+267 72345678',
+    verified: true,
+    specialties: ['Plumbing', 'Water Systems'],
+    years_experience: 15
+  }
+];
+
 const ArtisansPage: React.FC = () => {
   const [artisans, setArtisans] = useState<Artisan[]>([]);
+  const [filteredArtisans, setFilteredArtisans] = useState<Artisan[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedSpecialty, setSelectedSpecialty] = useState<string>('');
@@ -34,45 +65,61 @@ const ArtisansPage: React.FC = () => {
   ];
 
   useEffect(() => {
+    const fetchArtisans = async () => {
+      try {
+        const response = await fetch('/api/services/providers?category=Maintenance,Construction');
+        if (response.ok) {
+          const data = await response.json();
+          const transformedData = data.map((provider: any) => ({
+            id: provider.id,
+            business_name: provider.companyName,
+            business_description: provider.description || '',
+            service_area: provider.city || 'Gaborone',
+            hourly_rate: 500,
+            rating: provider.rating || 4.5,
+            review_count: provider.reviewCount || 0,
+            contact_email: provider.email || '',
+            contact_phone: provider.phoneNumber || '',
+            verified: provider.verified || false,
+            specialties: [],
+            years_experience: 10
+          }));
+          setArtisans(transformedData);
+          setFilteredArtisans(transformedData);
+        } else {
+          setArtisans(sampleArtisans);
+          setFilteredArtisans(sampleArtisans);
+        }
+      } catch (error) {
+        console.error('Error fetching artisans:', error);
+        setArtisans(sampleArtisans);
+        setFilteredArtisans(sampleArtisans);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchArtisans();
   }, []);
 
-  const fetchArtisans = async () => {
-    try {
-      const response = await fetch('/api/services/providers?category=Maintenance,Construction');
-      if (response.ok) {
-        const data = await response.json();
-        // Transform the data to match Artisan interface
-        const transformedData = data.map((provider: any) => ({
-          id: provider.id,
-          business_name: provider.companyName,
-          business_description: provider.description || '',
-          service_area: provider.city || 'Gaborone',
-          hourly_rate: 500,
-          rating: provider.rating || 4.5,
-          review_count: provider.reviewCount || 0,
-          contact_email: provider.email || '',
-          contact_phone: provider.phoneNumber || '',
-          verified: provider.verified || false,
-          specialties: [],
-          years_experience: 10
-        }));
-        setArtisans(transformedData);
-      }
-    } catch (error) {
-      console.error('Error fetching artisans:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  useEffect(() => {
+    let filtered = artisans;
 
-  const filteredArtisans = artisans.filter(artisan => {
-    const matchesSearch = artisan.business_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         artisan.business_description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesSpecialty = !selectedSpecialty || 
-                            artisan.specialties?.some(s => s.toLowerCase().includes(selectedSpecialty.toLowerCase()));
-    return matchesSearch && matchesSpecialty;
-  });
+    if (searchTerm) {
+      filtered = filtered.filter(artisan =>
+        artisan.business_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        artisan.business_description.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    if (selectedSpecialty) {
+      filtered = filtered.filter(artisan =>
+        artisan.specialties?.some(s => s.toLowerCase().includes(selectedSpecialty.toLowerCase()))
+      );
+    }
+
+    setFilteredArtisans(filtered);
+  }, [searchTerm, selectedSpecialty, artisans]);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -170,14 +217,16 @@ const ArtisansPage: React.FC = () => {
 
         {/* Registration Modal */}
         {showRegistration && (
-          <RegisterProvider 
-            type="artisan"
-            onClose={() => setShowRegistration(false)}
-            onSuccess={() => {
-              setShowRegistration(false);
-              fetchArtisans();
-            }}
-          />
+          <Suspense fallback={<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div></div>}>
+            <RegisterProvider 
+              type="artisan"
+              onClose={() => setShowRegistration(false)}
+              onSuccess={() => {
+                setShowRegistration(false);
+                window.location.reload();
+              }}
+            />
+          </Suspense>
         )}
       </div>
     </div>

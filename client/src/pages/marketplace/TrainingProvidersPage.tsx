@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
@@ -62,39 +61,40 @@ const TrainingProvidersPage: React.FC = () => {
           setProviders(data.providers || []);
           setFilteredProviders(data.providers || []);
         } else {
-          // Fallback data
+          // If the API call fails, we still want to show something rather than an empty list.
+          // A lightweight fallback will be used here, similar to the Professional Services marketplace pattern.
           const sampleProviders: TrainingProvider[] = [
             {
               id: 1,
-              name: 'Real Estate Academy Botswana',
+              name: 'Sample Training Provider A',
               category: 'Professional Development',
-              description: 'Comprehensive real estate training and certification programs',
-              rating: 4.9,
-              reviews: 234,
-              location: 'Gaborone',
-              phone: '+267 318 7000',
-              email: 'info@reacademy.co.bw',
-              courses: ['Real Estate Fundamentals', 'Property Valuation', 'Real Estate Law', 'Marketing & Sales'],
-              verified: true,
-              accreditation: 'REAC Certified',
-              duration: '6 months',
-              price: 'P8,500'
+              description: 'Sample description for provider A.',
+              rating: 4.5,
+              reviews: 100,
+              location: 'Virtual',
+              phone: 'N/A',
+              email: 'N/A',
+              courses: ['Course A1', 'Course A2'],
+              verified: false,
+              accreditation: 'Sample Accredited',
+              duration: 'Varies',
+              price: 'Contact Us'
             },
             {
               id: 2,
-              name: 'Property Management Institute',
+              name: 'Sample Training Provider B',
               category: 'Certification Programs',
-              description: 'Professional property management certification and ongoing education',
-              rating: 4.7,
-              reviews: 156,
-              location: 'Francistown',
-              phone: '+267 241 3456',
-              email: 'training@pmi.bw',
-              courses: ['Property Management Basics', 'Tenant Relations', 'Maintenance Management', 'Financial Management'],
-              verified: true,
-              accreditation: 'PMI Certified',
-              duration: '3 months',
-              price: 'P5,200'
+              description: 'Sample description for provider B.',
+              rating: 4.0,
+              reviews: 50,
+              location: 'Virtual',
+              phone: 'N/A',
+              email: 'N/A',
+              courses: ['Course B1', 'Course B2'],
+              verified: false,
+              accreditation: 'Sample Certified',
+              duration: 'Varies',
+              price: 'Contact Us'
             }
           ];
           setProviders(sampleProviders);
@@ -102,8 +102,43 @@ const TrainingProvidersPage: React.FC = () => {
         }
       } catch (error) {
         console.error('Error fetching training providers:', error);
-        setProviders([]);
-        setFilteredProviders([]);
+        // In case of network error, provide a similar fallback
+        const sampleProviders: TrainingProvider[] = [
+          {
+            id: 1,
+            name: 'Sample Training Provider A',
+            category: 'Professional Development',
+            description: 'Sample description for provider A.',
+            rating: 4.5,
+            reviews: 100,
+            location: 'Virtual',
+            phone: 'N/A',
+            email: 'N/A',
+            courses: ['Course A1', 'Course A2'],
+            verified: false,
+            accreditation: 'Sample Accredited',
+            duration: 'Varies',
+            price: 'Contact Us'
+          },
+          {
+            id: 2,
+            name: 'Sample Training Provider B',
+            category: 'Certification Programs',
+            description: 'Sample description for provider B.',
+            rating: 4.0,
+            reviews: 50,
+            location: 'Virtual',
+            phone: 'N/A',
+            email: 'N/A',
+            courses: ['Course B1', 'Course B2'],
+            verified: false,
+            accreditation: 'Sample Certified',
+            duration: 'Varies',
+            price: 'Contact Us'
+          }
+        ];
+        setProviders(sampleProviders);
+        setFilteredProviders(sampleProviders);
       } finally {
         setLoading(false);
       }
@@ -197,7 +232,7 @@ const TrainingProvidersPage: React.FC = () => {
         </div>
       </section>
 
-      
+
 
       {/* Training Providers Grid */}
       <section className="py-16">

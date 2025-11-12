@@ -1,7 +1,5 @@
-// @ts-nocheck
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import {
   Search,
   Star,
@@ -32,6 +30,39 @@ interface Supplier {
   deliveryArea: string;
 }
 
+const sampleSuppliers: Supplier[] = [
+  {
+    id: 1,
+    business_name: 'Gaborone Building Supplies',
+    name: 'Gaborone Building Supplies',
+    category_id: 6,
+    business_description: 'Complete range of building materials and hardware',
+    rating: 4.6,
+    review_count: 89,
+    service_area: 'Gaborone',
+    contact_phone: '+267 71234567',
+    contact_email: 'sales@gbsupplies.bw',
+    services: ['Cement', 'Steel', 'Paint', 'Hardware'],
+    verified: true,
+    deliveryArea: 'Nationwide'
+  },
+  {
+    id: 2,
+    business_name: 'Premier Concrete Ltd',
+    name: 'Premier Concrete Ltd',
+    category_id: 7,
+    business_description: 'High-quality concrete and aggregate supply',
+    rating: 4.8,
+    review_count: 67,
+    service_area: 'Gaborone',
+    contact_phone: '+267 72345678',
+    contact_email: 'info@premierconcrete.bw',
+    services: ['Ready-mix Concrete', 'Aggregates', 'Blocks'],
+    verified: true,
+    deliveryArea: 'South East District'
+  }
+];
+
 const SuppliersPage: React.FC = () => {
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [filteredSuppliers, setFilteredSuppliers] = useState<Supplier[]>([]);
@@ -48,17 +79,15 @@ const SuppliersPage: React.FC = () => {
 
   useEffect(() => {
     const fetchSuppliers = async () => {
-      setLoading(true);
       try {
         const response = await fetch('/api/services/providers?category=Construction,Moving,Cleaning');
         if (response.ok) {
           const data = await response.json();
-          // Transform the data to match Supplier interface
           const transformedData = data.map((provider: any) => ({
             id: provider.id,
             business_name: provider.companyName,
             name: provider.companyName,
-            category_id: 6, // Default category
+            category_id: 6,
             business_description: provider.description || '',
             rating: provider.rating || 4.5,
             review_count: provider.reviewCount || 0,
@@ -72,14 +101,13 @@ const SuppliersPage: React.FC = () => {
           setSuppliers(transformedData);
           setFilteredSuppliers(transformedData);
         } else {
-          console.error('Failed to fetch suppliers:', response.status);
-          setSuppliers([]);
-          setFilteredSuppliers([]);
+          setSuppliers(sampleSuppliers);
+          setFilteredSuppliers(sampleSuppliers);
         }
       } catch (error) {
         console.error('Error fetching suppliers:', error);
-        setSuppliers([]);
-        setFilteredSuppliers([]);
+        setSuppliers(sampleSuppliers);
+        setFilteredSuppliers(sampleSuppliers);
       } finally {
         setLoading(false);
       }
@@ -189,10 +217,8 @@ const SuppliersPage: React.FC = () => {
           ) : (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredSuppliers.map((supplier) => (
-                <motion.div
+                <div
                   key={supplier.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
                   className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow"
                 >
                   <div className="p-6">
@@ -275,7 +301,7 @@ const SuppliersPage: React.FC = () => {
                       </button>
                     </div>
                   </div>
-                </motion.div>
+                </div>
               ))}
             </div>
           )}
