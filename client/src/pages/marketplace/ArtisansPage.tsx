@@ -39,10 +39,25 @@ const ArtisansPage: React.FC = () => {
 
   const fetchArtisans = async () => {
     try {
-      const response = await fetch('/api/services?section=artisans');
-      const data = await response.json();
-      if (data.success) {
-        setArtisans(data.data);
+      const response = await fetch('/api/services/providers?category=Maintenance,Construction');
+      if (response.ok) {
+        const data = await response.json();
+        // Transform the data to match Artisan interface
+        const transformedData = data.map((provider: any) => ({
+          id: provider.id,
+          business_name: provider.companyName,
+          business_description: provider.description || '',
+          service_area: provider.city || 'Gaborone',
+          hourly_rate: 500,
+          rating: provider.rating || 4.5,
+          review_count: provider.reviewCount || 0,
+          contact_email: provider.email || '',
+          contact_phone: provider.phoneNumber || '',
+          verified: provider.verified || false,
+          specialties: [],
+          years_experience: 10
+        }));
+        setArtisans(transformedData);
       }
     } catch (error) {
       console.error('Error fetching artisans:', error);

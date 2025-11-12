@@ -52,13 +52,28 @@ const ProfessionalsPage: React.FC = () => {
   useEffect(() => {
     const fetchProfessionals = async () => {
       try {
-        const response = await fetch('/api/services?section=professionals');
+        const response = await fetch('/api/services/providers?category=Legal Services,Financial Advisors');
         if (response.ok) {
           const data = await response.json();
-          if (data.success) {
-            setProfessionals(data.data || []);
-            setFilteredProfessionals(data.data || []);
-          }
+          // Transform the data to match Professional interface
+          const transformedData = data.map((provider: any) => ({
+            id: provider.id,
+            name: provider.companyName,
+            category: provider.serviceCategory,
+            specialization: provider.description || '',
+            rating: provider.rating || 4.5,
+            reviews: provider.reviewCount || 0,
+            experience: `${provider.yearsExperience || 10}+ years`,
+            location: provider.city || 'Gaborone',
+            phone: provider.phoneNumber || '',
+            email: provider.email || '',
+            hourlyRate: 'Contact for pricing',
+            availability: 'Available',
+            services: [],
+            verified: provider.verified || false
+          }));
+          setProfessionals(transformedData);
+          setFilteredProfessionals(transformedData);
         } else {
           // Fallback data
           const sampleProfessionals: Professional[] = [

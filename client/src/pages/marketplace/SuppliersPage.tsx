@@ -49,13 +49,27 @@ const SuppliersPage: React.FC = () => {
   useEffect(() => {
     const fetchSuppliers = async () => {
       try {
-        const response = await fetch('/api/services?section=suppliers');
+        const response = await fetch('/api/services/providers?category=Construction,Moving,Cleaning');
         if (response.ok) {
           const data = await response.json();
-          if (data.success) {
-            setSuppliers(data.data || []);
-            setFilteredSuppliers(data.data || []);
-          }
+          // Transform the data to match Supplier interface
+          const transformedData = data.map((provider: any) => ({
+            id: provider.id,
+            business_name: provider.companyName,
+            name: provider.companyName,
+            category_id: 6, // Default category
+            business_description: provider.description || '',
+            rating: provider.rating || 4.5,
+            review_count: provider.reviewCount || 0,
+            service_area: provider.city || 'Gaborone',
+            contact_phone: provider.phoneNumber || '',
+            contact_email: provider.email || '',
+            services: [],
+            verified: provider.verified || false,
+            deliveryArea: provider.city || 'Nationwide'
+          }));
+          setSuppliers(transformedData);
+          setFilteredSuppliers(transformedData);
         } else {
           // Fallback data
           const sampleSuppliers: Supplier[] = [
