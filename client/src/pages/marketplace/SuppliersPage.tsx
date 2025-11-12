@@ -48,6 +48,7 @@ const SuppliersPage: React.FC = () => {
 
   useEffect(() => {
     const fetchSuppliers = async () => {
+      setLoading(true);
       try {
         const response = await fetch('/api/services/providers?category=Construction,Moving,Cleaning');
         if (response.ok) {
@@ -71,41 +72,9 @@ const SuppliersPage: React.FC = () => {
           setSuppliers(transformedData);
           setFilteredSuppliers(transformedData);
         } else {
-          // Fallback data
-          const sampleSuppliers: Supplier[] = [
-            {
-              id: 1,
-              business_name: 'Gaborone Building Supplies',
-              name: 'Gaborone Building Supplies',
-              category_id: 6,
-              business_description: 'Complete range of building materials and construction supplies',
-              rating: 4.7,
-              review_count: 89,
-              service_area: 'Gaborone Industrial',
-              contact_phone: '+267 390 1234',
-              contact_email: 'info@gbsupplies.co.bw',
-              services: ['Cement', 'Steel', 'Roofing Materials', 'Tiles'],
-              verified: true,
-              deliveryArea: 'Greater Gaborone'
-            },
-            {
-              id: 2,
-              business_name: 'Modern Home Depot',
-              name: 'Modern Home Depot',
-              category_id: 8,
-              business_description: 'Modern fixtures and fittings for contemporary homes',
-              rating: 4.8,
-              review_count: 156,
-              service_area: 'Francistown',
-              contact_phone: '+267 241 5678',
-              contact_email: 'orders@modernhomedepot.bw',
-              services: ['Kitchen Fittings', 'Bathroom Fixtures', 'Lighting', 'Hardware'],
-              verified: true,
-              deliveryArea: 'Northern Botswana'
-            }
-          ];
-          setSuppliers(sampleSuppliers);
-          setFilteredSuppliers(sampleSuppliers);
+          console.error('Failed to fetch suppliers:', response.status);
+          setSuppliers([]);
+          setFilteredSuppliers([]);
         }
       } catch (error) {
         console.error('Error fetching suppliers:', error);

@@ -51,6 +51,7 @@ const ProfessionalsPage: React.FC = () => {
 
   useEffect(() => {
     const fetchProfessionals = async () => {
+      setLoading(true);
       try {
         const response = await fetch('/api/services/providers?category=Legal Services,Financial Advisors');
         if (response.ok) {
@@ -75,43 +76,9 @@ const ProfessionalsPage: React.FC = () => {
           setProfessionals(transformedData);
           setFilteredProfessionals(transformedData);
         } else {
-          // Fallback data
-          const sampleProfessionals: Professional[] = [
-            {
-              id: 1,
-              name: 'Advocate Kabo Mogapi',
-              category: 'Legal Services',
-              specialization: 'Property Law & Conveyancing',
-              rating: 4.9,
-              reviews: 156,
-              experience: '15+ years',
-              location: 'Gaborone CBD',
-              phone: '+267 391 2345',
-              email: 'kabo@mogapi.co.bw',
-              hourlyRate: 'P800/hour',
-              availability: 'Available',
-              services: ['Property Transfer', 'Contract Review', 'Title Verification', 'REAC Compliance'],
-              verified: true
-            },
-            {
-              id: 2,
-              name: 'Thabo Setlhare',
-              category: 'Financial Advisors',
-              specialization: 'Mortgage & Property Finance',
-              rating: 4.8,
-              reviews: 203,
-              experience: '12+ years',
-              location: 'Gaborone',
-              phone: '+267 395 8000',
-              email: 'thabo.setlhare@fnb.co.bw',
-              availability: 'Available',
-              verified: true,
-              services: ['Mortgage Consultation', 'Investment Advice', 'Financial Planning', 'Loan Structuring'],
-              hourlyRate: 'Free consultation'
-            }
-          ];
-          setProfessionals(sampleProfessionals);
-          setFilteredProfessionals(sampleProfessionals);
+          console.error('Failed to fetch professionals:', response.status);
+          setProfessionals([]);
+          setFilteredProfessionals([]);
         }
       } catch (error) {
         console.error('Error fetching professionals:', error);
@@ -124,6 +91,52 @@ const ProfessionalsPage: React.FC = () => {
 
     fetchProfessionals();
   }, []);
+
+  // Remove the old fallback code below and replace with:
+  /*
+  useEffect(() => {
+    const fetchProfessionals = async () => {
+      try {
+        const response = await fetch('/api/services/providers?category=Legal Services,Financial Advisors');
+        if (response.ok) {
+          const data = await response.json();
+          // Transform the data to match Professional interface
+          const transformedData = data.map((provider: any) => ({
+            id: provider.id,
+            name: provider.companyName,
+            category: provider.serviceCategory,
+            specialization: provider.description || '',
+            rating: provider.rating || 4.5,
+            reviews: provider.reviewCount || 0,
+            experience: `${provider.yearsExperience || 10}+ years`,
+            location: provider.city || 'Gaborone',
+            phone: provider.phoneNumber || '',
+            email: provider.email || '',
+            hourlyRate: 'Contact for pricing',
+            availability: 'Available',
+            services: [],
+            verified: provider.verified || false
+          }));
+          setProfessionals(transformedData);
+          setFilteredProfessionals(transformedData);
+        } else {
+          // No fallback - just show empty state
+          const sampleProfessionals: Professional[] = [
+            ];
+          // Remove this fallback logic entirely
+        }
+      } catch (error) {
+        console.error('Error fetching professionals:', error);
+        setProfessionals([]);
+        setFilteredProfessionals([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProfessionals();
+  }, []);
+  */
 
   useEffect(() => {
     let filtered = professionals;

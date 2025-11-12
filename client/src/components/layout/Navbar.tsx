@@ -667,7 +667,7 @@ const Navbar = () => {
             {user ? (
               <div className="flex items-center space-x-4">
                 {/* TODO: Add notification bell icon - NotificationCenter needs props */}
-                
+
                 {/* User Menu */}
                 <div
                   className="relative"
