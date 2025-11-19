@@ -154,12 +154,7 @@ const RenterDashboard = () => {
                   placeholder="Search by location, price, or features..."
                   className="flex-1 px-4 py-2 border border-neutral-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 />
-                <button 
-                  className="px-6 py-2 text-white rounded-lg transition-colors"
-                  style={{ backgroundColor: '#DC143C', borderColor: '#DC143C' }}
-                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#B22222'}
-                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#DC143C'}
-                >
+                <button className="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors">
                   Search
                 </button>
               </div>

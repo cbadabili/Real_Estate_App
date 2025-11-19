@@ -244,10 +244,7 @@ const HomePage = () => {
                   }}
                 />
                 <button 
-                  className="text-white px-4 sm:px-6 lg:px-8 py-3 sm:py-4 rounded-xl text-sm sm:text-base font-semibold transition-colors"
-                  style={{ backgroundColor: '#DC143C', borderColor: '#DC143C' }}
-                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#B22222'}
-                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#DC143C'}
+                  className="bg-beedab-blue text-white px-4 sm:px-6 lg:px-8 py-3 sm:py-4 rounded-xl text-sm sm:text-base font-semibold hover:bg-beedab-darkblue transition-colors"
                   onClick={(e) => {
                     const input = e.currentTarget.parentElement?.querySelector('input');
                     const query = input?.value;

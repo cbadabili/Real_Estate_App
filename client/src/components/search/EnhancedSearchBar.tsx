@@ -99,10 +99,7 @@ export const EnhancedSearchBar: React.FC<EnhancedSearchBarProps> = ({
         <button
           onClick={handleSearch}
           disabled={isSearching}
-          className="px-6 py-3 text-white rounded-lg transition-colors disabled:opacity-50 flex items-center space-x-2"
-          style={{ backgroundColor: isSearching ? undefined : '#DC143C', borderColor: '#DC143C' }}
-          onMouseEnter={(e) => !isSearching && (e.currentTarget.style.backgroundColor = '#B22222')}
-          onMouseLeave={(e) => !isSearching && (e.currentTarget.style.backgroundColor = '#DC143C')}
+          className="px-6 py-3 bg-beedab-blue text-white rounded-lg hover:bg-beedab-darkblue transition-colors disabled:opacity-50 flex items-center space-x-2"
         >
           {isSearching ? (
             <>
