@@ -75,14 +75,14 @@ Run Playwright specs on every pull request and nightly against a seeded PostgreS
 ### 1. Performance & reliability
 - **Lighthouse CI**: enforce LCP ≤ 2.5s, INP ≤ 200ms, CLS ≤ 0.1 on mid-range mobile (Moto G4 profile) over 4G, covering property list, property detail, and services category pages with media-heavy scenarios (20/50/100 images).
 - **k6 load tests**: `/api/properties` and `/api/search` with mixed cached/uncached distribution (10% warm, 90% cold). Targets: p95 ≤ 300ms @ 50 RPS, ≤ 500ms @ 150 RPS. Conduct 1-hour soak @ 50 RPS with < 0.1% error rate and monitor memory.
-- **Resilience drills**: simulate database failover (read-only mode), Mapbox outage (fallback to static map & manual coordinate entry), and AI service disablement. Capture runbooks for expected degradations.
+- **Resilience drills**: simulate database failover (read-only mode), Google Maps outage (fallback to static map & manual coordinate entry), and AI service disablement. Capture runbooks for expected degradations.
 
 ### 2. Security
 - **SAST**: Semgrep ruleset tuned for Node/React/Express/Drizzle.
 - **Dependency audits**: `npm audit` and OWASP dependency check for both client and server packages.
 - **DAST**: OWASP ZAP baseline scan against preview environment, gating merges on high severity issues.
 - **Auth hardening**: ensure HttpOnly/Secure/SameSite cookies, CSRF tokens for state-changing requests, and server-side RBAC. Add regression tests for privilege escalation.
-- **Secrets management**: enforce `.env` usage via GitHub encrypted secrets; ensure build output excludes secrets and Mapbox tokens restricted to BeeDab domains.
+- **Secrets management**: enforce `.env` usage via GitHub encrypted secrets; ensure build output excludes secrets and Google Maps tokens restricted to BeeDab domains.
 
 ### 3. Accessibility (WCAG 2.1 AA)
 - Combine Playwright with Axe for automated accessibility assertions: labels, alt text, keyboard navigation (filters, gallery, map controls).

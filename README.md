@@ -112,6 +112,16 @@ For detailed system architecture, components, and deployment information, see [A
 
 The application will be available at `http://localhost:5000`
 
+### Maps configuration
+
+Interactive maps now use the Google Maps JavaScript API. Add a browser-restricted key to your environment so map views, property pickers, and location search work correctly:
+
+```bash
+export VITE_GOOGLE_MAPS_API_KEY="<your-google-maps-key>"
+```
+
+For local development you can place this in a `.env` file at the repository root or export it in your shell before running `npm run dev`.
+
 ## Quality Gates
 
 Before opening a pull request, run the repository guard rails to ensure the codebase stays PostgreSQL-only:

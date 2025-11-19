@@ -1,35 +1,36 @@
 import fetch from "node-fetch";
 
-const MAPBOX_TOKEN = process.env.VITE_MAPBOX_ACCESS_TOKEN;
+const GOOGLE_MAPS_API_KEY = process.env.GOOGLE_MAPS_API_KEY ?? process.env.VITE_GOOGLE_MAPS_API_KEY;
 
 export type GeocodeResult = { longitude: number; latitude: number } | null;
 
 export async function geocodeAddress(address: string): Promise<GeocodeResult> {
-  if (!MAPBOX_TOKEN) {
-    console.warn('No Mapbox token available for geocoding');
+  if (!GOOGLE_MAPS_API_KEY) {
+    console.warn('No Google Maps API key available for geocoding');
     return null;
   }
 
   try {
     // Bias to Gaborone & restrict to Botswana (BW)
-    const q = encodeURIComponent(address + ", Gaborone, Botswana");
-    const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${q}.json?access_token=${MAPBOX_TOKEN}&country=bw&limit=1&proximity=25.92,-24.65`; // ~Gaborone
+    const q = encodeURIComponent(`${address}, Gaborone, Botswana`);
+    const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${q}&region=bw&key=${GOOGLE_MAPS_API_KEY}`;
 
     const res = await fetch(url);
     if (!res.ok) {
       console.warn(`Geocoding API error: ${res.status}`);
       return null;
     }
-    
+
     const data = await res.json() as any;
 
-    const f = data?.features?.[0];
-    if (!f?.center?.length) {
+    const result = data?.results?.[0];
+    const location = result?.geometry?.location;
+    if (!location) {
       console.warn(`No geocoding results for: ${address}`);
       return null;
     }
 
-    const [lng, lat] = f.center;
+    const { lat, lng } = location;
     // Botswana bounds sanity check
     if (lng < 20 || lng > 29 || lat < -27 || lat > -17) {
       console.warn(`Geocoding result outside Botswana bounds: ${lng}, ${lat}`);
