@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, Heart, FileText, Calendar, MapPin, MessageSquare, Star } from 'lucide-react';

@@ -26,16 +26,16 @@ export const EnhancedSearchBar: React.FC<EnhancedSearchBarProps> = ({
 
   const handleSearch = async () => {
     if (!query.trim() && !filters.location) return;
-    
+
     setIsSearching(true);
     try {
       // Build search parameters
       const searchParams = new URLSearchParams();
-      
+
       if (query.trim()) {
         searchParams.append('location', query);
       }
-      
+
       Object.entries(filters).forEach(([key, value]) => {
         if (value !== null && value !== undefined && value !== '') {
           if (Array.isArray(value)) {
@@ -87,7 +87,7 @@ export const EnhancedSearchBar: React.FC<EnhancedSearchBarProps> = ({
             className="block w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-beedab-blue focus:border-transparent"
           />
         </div>
-        
+
         <button
           onClick={() => setShowFilters(!showFilters)}
           className="px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
@@ -95,7 +95,7 @@ export const EnhancedSearchBar: React.FC<EnhancedSearchBarProps> = ({
         >
           <Filter className="h-5 w-5" />
         </button>
-        
+
         <button
           onClick={handleSearch}
           disabled={isSearching}
