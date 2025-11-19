@@ -376,7 +376,10 @@ const RentPage = () => {
                     <button
                       type="submit"
                       disabled={loading}
-                      className="flex items-center space-x-2 bg-beedab-blue text-white px-8 py-3 rounded-lg hover:bg-beedab-darkblue transition-colors font-medium disabled:opacity-50"
+                      className="flex items-center space-x-2 bg-crimson-600 text-white px-8 py-3 rounded-lg hover:bg-crimson-700 transition-colors font-medium disabled:opacity-50"
+                      style={{ backgroundColor: loading ? undefined : '#DC143C', borderColor: '#DC143C' }}
+                      onMouseEnter={(e) => !loading && (e.currentTarget.style.backgroundColor = '#B22222')}
+                      onMouseLeave={(e) => !loading && (e.currentTarget.style.backgroundColor = '#DC143C')}
                     >
                       <Search className="h-5 w-5" />
                       <span>{loading ? 'Searching...' : 'Search Properties'}</span>
