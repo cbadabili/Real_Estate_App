@@ -48,6 +48,5 @@ export const config = {
   dbPath: env.DATABASE_URL,
   jwtSecret: env.JWT_SECRET,
   openaiApiKey: process.env.OPENAI_API_KEY,
-  mapboxToken: process.env.MAPBOX_TOKEN,
   rankingV2: process.env.RANKING_V2 === 'true'
 };

@@ -1,7 +1,5 @@
-import { useEffect, useMemo, useRef, useState } from "react";
-import mapboxgl from "mapbox-gl";
-
-const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN;
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { GoogleMap, Marker, useJsApiLoader } from '@react-google-maps/api';
 
 type Props = {
   initialArea?: string;
@@ -12,203 +10,170 @@ type Props = {
     place_id?: string;
     latitude?: number;
     longitude?: number;
-    location_source: "user_pin" | "geocode";
+    location_source: 'user_pin' | 'geocode';
   }) => void;
 };
 
-const IN_BW = (lng: number, lat: number) =>
-  lng >= 20 && lng <= 29 && lat >= -27 && lat <= -17;
+type Suggestion = {
+  description: string;
+  placeId: string;
+};
 
-export default function PropertyLocationStep({ 
-  initialArea = "", 
-  initialCoords = null, 
-  onChange 
-}: Props) {
+const defaultCenter: google.maps.LatLngLiteral = { lat: -24.65, lng: 25.91 };
+const isWithinBotswana = (lng: number, lat: number) => lng >= 20 && lng <= 29 && lat >= -27 && lat <= -17;
+
+export default function PropertyLocationStep({ initialArea = '', initialCoords = null, onChange }: Props) {
+  const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY as string | undefined;
   const [area, setArea] = useState(initialArea);
-  const [suggestions, setSuggestions] = useState<Array<{ 
-    id: string; 
-    name: string; 
-    center: [number, number] 
-  }>>([]);
+  const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [loading, setLoading] = useState(false);
-  const mapRef = useRef<mapboxgl.Map | null>(null);
-  const markerRef = useRef<mapboxgl.Marker | null>(null);
-  const mapEl = useRef<HTMLDivElement | null>(null);
+  const [markerPosition, setMarkerPosition] = useState<google.maps.LatLngLiteral | null>(initialCoords);
 
-  useEffect(() => { 
-    if (MAPBOX_TOKEN) {
-      mapboxgl.accessToken = MAPBOX_TOKEN; 
-    }
-  }, []);
+  const mapRef = useRef<google.maps.Map | null>(null);
+  const geocoderRef = useRef<google.maps.Geocoder | null>(null);
+  const autocompleteServiceRef = useRef<google.maps.places.AutocompleteService | null>(null);
 
-  // Initialize map
+  const { isLoaded, loadError } = useJsApiLoader({
+    id: 'property-location-map',
+    googleMapsApiKey: apiKey ?? '',
+    libraries: ['places'],
+  });
+
   useEffect(() => {
-    if (!mapEl.current || mapRef.current || !MAPBOX_TOKEN) return;
+    if (isLoaded) {
+      geocoderRef.current = new google.maps.Geocoder();
+      autocompleteServiceRef.current = new google.maps.places.AutocompleteService();
+    }
+  }, [isLoaded]);
 
-    mapRef.current = new mapboxgl.Map({
-      container: mapEl.current,
-      style: "mapbox://styles/mapbox/streets-v12",
-      center: initialCoords ? [initialCoords.lng, initialCoords.lat] : [25.91, -24.65], // Gaborone
-      zoom: initialCoords ? 13 : 11,
-    });
+  useEffect(() => {
+    setMarkerPosition(initialCoords);
+  }, [initialCoords]);
 
-    // Add navigation controls
-    mapRef.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
-
-    // If we have initial coordinates, place marker
-    if (initialCoords) {
-      markerRef.current = new mapboxgl.Marker({ draggable: true })
-        .setLngLat([initialCoords.lng, initialCoords.lat])
-        .addTo(mapRef.current);
-      markerRef.current.on("dragend", handleDragEnd);
+  useEffect(() => {
+    if (!area || !autocompleteServiceRef.current) {
+      setSuggestions([]);
+      return;
     }
 
-    // Add click handler for placing marker
-    mapRef.current.on('click', handleMapClick);
+    const controller = new AbortController();
+    const service = autocompleteServiceRef.current;
+    setLoading(true);
+
+    const timeout = setTimeout(() => {
+      service.getPlacePredictions(
+        {
+          input: area,
+          componentRestrictions: { country: 'bw' },
+        },
+        predictions => {
+          if (controller.signal.aborted) return;
+          const next = (predictions ?? []).map(prediction => ({
+            description: prediction.description ?? '',
+            placeId: prediction.place_id ?? '',
+          }));
+          setSuggestions(next);
+          setLoading(false);
+        }
+      );
+    }, 250);
 
     return () => {
-      if (mapRef.current) {
-        mapRef.current.remove();
-        mapRef.current = null;
-      }
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mapEl.current]);
-
-  // Search suggestions (Mapbox forward geocode, BW only)
-  useEffect(() => {
-    const q = area.trim();
-    if (!q || !MAPBOX_TOKEN) { 
-      setSuggestions([]); 
-      return; 
-    }
-
-    const ctl = new AbortController();
-    const run = async () => {
-      try {
-        setLoading(true);
-        const url =
-          `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(q + ", Gaborone, Botswana")}.json` +
-          `?access_token=${MAPBOX_TOKEN}&country=bw&limit=5&proximity=25.91,-24.65`;
-        const res = await fetch(url, { signal: ctl.signal });
-        if (!res.ok) return;
-        const data = await res.json();
-        const sug = (data.features || []).map((f: any) => ({
-          id: f.id,
-          name: f.place_name as string,
-          center: f.center as [number, number], // [lng, lat]
-        }));
-        setSuggestions(sug);
-      } catch (error) {
-        if (error.name !== 'AbortError') {
-          console.error('Geocoding error:', error);
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    const t = setTimeout(run, 250); // debounce
-    return () => { 
-      clearTimeout(t); 
-      ctl.abort(); 
+      controller.abort();
+      clearTimeout(timeout);
+      setLoading(false);
     };
   }, [area]);
 
-  function handleChooseSuggestion(s: { id: string; name: string; center: [number, number] }) {
-    setArea(s.name);
+  const center = useMemo<google.maps.LatLngLiteral>(() => {
+    if (markerPosition) return markerPosition;
+    return defaultCenter;
+  }, [markerPosition]);
+
+  const handleSelectSuggestion = (suggestion: Suggestion) => {
+    setArea(suggestion.description);
     setSuggestions([]);
-    const [lng, lat] = s.center;
 
-    if (!IN_BW(lng, lat)) {
-      console.warn('Selected location is outside Botswana bounds');
-      return;
-    }
+    if (!geocoderRef.current) return;
 
-    // Place or move marker
-    if (!markerRef.current && mapRef.current) {
-      markerRef.current = new mapboxgl.Marker({ draggable: true, color: '#3B82F6' })
-        .setLngLat([lng, lat])
-        .addTo(mapRef.current);
-      markerRef.current.on("dragend", handleDragEnd);
-    } else if (markerRef.current) {
-      markerRef.current.setLngLat([lng, lat]);
-    }
+    geocoderRef.current.geocode({ placeId: suggestion.placeId }, (results, status) => {
+      if (status !== 'OK' || !results?.length) return;
 
-    if (mapRef.current) {
-      mapRef.current.flyTo({ center: [lng, lat], zoom: 14, essential: true });
-    }
+      const location = results[0].geometry?.location;
+      if (!location) return;
 
-    onChange({
-      area_text: area || s.name,
-      place_name: s.name,
-      place_id: s.id,
-      latitude: lat,
-      longitude: lng,
-      location_source: "geocode",
+      const lat = location.lat();
+      const lng = location.lng();
+
+      if (!isWithinBotswana(lng, lat)) return;
+
+      const latLng: google.maps.LatLngLiteral = { lat, lng };
+      setMarkerPosition(latLng);
+      mapRef.current?.panTo(latLng);
+      mapRef.current?.setZoom(14);
+
+      onChange({
+        area_text: suggestion.description,
+        place_name: suggestion.description,
+        place_id: suggestion.placeId,
+        latitude: lat,
+        longitude: lng,
+        location_source: 'geocode',
+      });
     });
-  }
+  };
 
-  function handleDragEnd() {
-    if (!markerRef.current) return;
-    const { lng, lat } = markerRef.current.getLngLat();
-    if (!IN_BW(lng, lat)) {
-      console.warn('Marker dragged outside Botswana bounds');
-      return;
-    }
+  const handleMapClick = (e: google.maps.MapMouseEvent) => {
+    if (!e.latLng) return;
 
-    onChange({
-      area_text: area,
-      latitude: lat,
-      longitude: lng,
-      location_source: "user_pin",
-    });
-  }
+    const lat = e.latLng.lat();
+    const lng = e.latLng.lng();
 
-  function handleMapClick(e: mapboxgl.MapMouseEvent) {
-    const { lng, lat } = e.lngLat;
+    if (!isWithinBotswana(lng, lat)) return;
 
-    if (!IN_BW(lng, lat)) {
-      console.warn('Click location is outside Botswana bounds');
-      return;
-    }
-
-    // Place or move marker
-    if (!markerRef.current && mapRef.current) {
-      markerRef.current = new mapboxgl.Marker({ draggable: true, color: '#3B82F6' })
-        .setLngLat([lng, lat])
-        .addTo(mapRef.current);
-      markerRef.current.on("dragend", handleDragEnd);
-    } else if (markerRef.current) {
-      markerRef.current.setLngLat([lng, lat]);
-    }
+    const latLng = { lat, lng };
+    setMarkerPosition(latLng);
 
     onChange({
       area_text: area,
       latitude: lat,
       longitude: lng,
-      location_source: "user_pin",
+      location_source: 'user_pin',
     });
-  }
+  };
 
-  if (!MAPBOX_TOKEN) {
+  const handleMarkerDrag = (e: google.maps.MapMouseEvent) => {
+    if (!e.latLng) return;
+
+    const lat = e.latLng.lat();
+    const lng = e.latLng.lng();
+
+    if (!isWithinBotswana(lng, lat)) return;
+
+    const latLng = { lat, lng };
+    setMarkerPosition(latLng);
+
+    onChange({
+      area_text: area,
+      latitude: lat,
+      longitude: lng,
+      location_source: 'user_pin',
+    });
+  };
+
+  if (!apiKey) {
     return (
       <div className="flex flex-col gap-3">
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-          <p className="text-yellow-800">
-            <strong>Map functionality unavailable:</strong> Mapbox access token not configured.
-            Please add your VITE_MAPBOX_ACCESS_TOKEN to use the interactive location picker.
-          </p>
+        <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-4 text-yellow-800">
+          <strong>Map functionality unavailable:</strong> Google Maps API key not configured. Add VITE_GOOGLE_MAPS_API_KEY to use the
+          interactive location picker.
         </div>
         <label className="text-sm font-medium">City / Town / Village</label>
         <input
           value={area}
-          onChange={(e) => {
-            setArea(e.target.value);
-            onChange({
-              area_text: e.target.value,
-              location_source: "geocode",
-            });
+          onChange={event => {
+            setArea(event.target.value);
+            onChange({ area_text: event.target.value, location_source: 'geocode' });
           }}
           placeholder="e.g., Gaborone, Francistown, Maun, Block 8..."
           className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
@@ -217,63 +182,82 @@ export default function PropertyLocationStep({
     );
   }
 
+  if (loadError) {
+    return (
+      <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-red-700">
+        Unable to load Google Maps. Please check your API key and network connection.
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col gap-3">
-      <label className="text-sm font-medium text-gray-700">
-        City / Town / Village
-      </label>
+      <label className="text-sm font-medium text-gray-700">City / Town / Village</label>
 
       <div className="relative">
         <input
           value={area}
-          onChange={(e) => setArea(e.target.value)}
+          onChange={e => setArea(e.target.value)}
           placeholder="e.g., Gaborone, Francistown, Maun, Block 8..."
           className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
         />
         {loading && (
-          <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-            <div className="animate-spin h-4 w-4 border-2 border-blue-500 border-t-transparent rounded-full"></div>
+          <div className="absolute right-3 top-1/2 -translate-y-1/2 transform">
+            <div className="h-4 w-4 animate-spin rounded-full border-2 border-blue-500 border-t-transparent" />
           </div>
         )}
       </div>
 
       {!!suggestions.length && (
-        <div className="rounded-md border border-gray-200 max-h-56 overflow-auto bg-white shadow-sm">
-          {suggestions.map((s) => (
+        <div className="max-h-56 overflow-auto rounded-md border border-gray-200 bg-white shadow-sm">
+          {suggestions.map(suggestion => (
             <button
-              key={s.id}
-              className="w-full text-left px-3 py-2 hover:bg-gray-50 border-b border-gray-100 last:border-b-0 focus:bg-blue-50 focus:outline-none"
-              onClick={() => handleChooseSuggestion(s)}
+              key={suggestion.placeId}
+              className="w-full border-b border-gray-100 px-3 py-2 text-left hover:bg-gray-50 last:border-b-0 focus:bg-blue-50 focus:outline-none"
+              onClick={() => handleSelectSuggestion(suggestion)}
               type="button"
             >
-              <div className="text-sm font-medium text-gray-900">{s.name}</div>
+              <div className="text-sm font-medium text-gray-900">{suggestion.description}</div>
             </button>
           ))}
         </div>
       )}
 
-      <div className="relative">
-        <div 
-          ref={mapEl} 
-          className="h-96 w-full rounded-lg border border-gray-300 bg-gray-100" 
-        />
-
-        {/* Map overlay instructions */}
-        <div className="absolute top-2 left-2 bg-white/90 backdrop-blur-sm rounded-md px-2 py-1 text-xs text-gray-600 shadow-sm">
-          Click or drag pin to set exact location
+      {isLoaded ? (
+        <GoogleMap
+          onLoad={map => {
+            mapRef.current = map;
+            if (markerPosition) {
+              map.setCenter(markerPosition);
+              map.setZoom(14);
+            }
+          }}
+          onClick={handleMapClick}
+          mapContainerStyle={{ height: '24rem', width: '100%' }}
+          center={center}
+          zoom={markerPosition ? 14 : 11}
+          options={{
+            streetViewControl: false,
+            fullscreenControl: false,
+            mapTypeControl: false,
+          }}
+        >
+          {markerPosition && (
+            <Marker
+              position={markerPosition}
+              draggable
+              onDragEnd={handleMarkerDrag}
+            />
+          )}
+        </GoogleMap>
+      ) : (
+        <div className="flex h-96 w-full items-center justify-center rounded-lg border border-gray-200 bg-gray-50">
+          <div className="text-center text-gray-500">
+            <div className="mx-auto mb-2 h-8 w-8 animate-spin rounded-full border-b-2 border-blue-600" />
+            <p className="text-sm">Loading Google Maps...</p>
+          </div>
         </div>
-      </div>
-
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-        <p className="text-xs text-blue-700 flex items-start gap-2">
-          <svg className="h-4 w-4 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-          </svg>
-          <span>
-            <strong>Tip:</strong> Type the area name to center the map, then click or drag the pin to mark the exact property location.
-          </span>
-        </p>
-      </div>
+      )}
     </div>
   );
 }
