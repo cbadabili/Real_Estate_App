@@ -395,8 +395,8 @@ const RentPage = () => {
                       </h3>
                       {searchQuery && (
                         <p className="text-sm text-gray-600 mt-1">
-                          {rentals.length > 0 
-                            ? `Results for "${searchQuery}"` 
+                          {rentals.length > 0
+                            ? `Results for "${searchQuery}"`
                             : `No results found for "${searchQuery}"`
                           }
                         </p>

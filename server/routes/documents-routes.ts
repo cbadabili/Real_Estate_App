@@ -54,4 +54,8 @@ router.post('/documents/:id/download', (req, res) => {
   res.json({ success: true, message: 'Download tracked' });
 });
 
+export function registerDocumentRoutes(app: any) {
+  app.use('/api', router);
+}
+
 export default router;

@@ -1,0 +1,91 @@
+LoginPage: Attempting login...
+AuthContext.tsx:140 Attempting login for: admin@beedab.bw
+AuthContext.tsx:142  POST https://bc950d3b-1020-47a6-8025-fa9a7db7c4fb-00-nnq5i1x2e95y.riker.replit.dev/api/users/login 401 (Unauthorized)
+login @ AuthContext.tsx:142
+onSubmit @ LoginPage.tsx:46
+(anonymous) @ chunk-GLZHPPWL.js?v=e65f32fc:1482
+await in (anonymous)
+callCallback2 @ chunk-F3OYNICX.js?v=e65f32fc:3674
+invokeGuardedCallbackDev @ chunk-F3OYNICX.js?v=e65f32fc:3699
+invokeGuardedCallback @ chunk-F3OYNICX.js?v=e65f32fc:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-F3OYNICX.js?v=e65f32fc:3736
+executeDispatch @ chunk-F3OYNICX.js?v=e65f32fc:7014
+processDispatchQueueItemsInOrder @ chunk-F3OYNICX.js?v=e65f32fc:7034
+processDispatchQueue @ chunk-F3OYNICX.js?v=e65f32fc:7043
+dispatchEventsForPlugins @ chunk-F3OYNICX.js?v=e65f32fc:7051
+(anonymous) @ chunk-F3OYNICX.js?v=e65f32fc:7174
+batchedUpdates$1 @ chunk-F3OYNICX.js?v=e65f32fc:18913
+batchedUpdates @ chunk-F3OYNICX.js?v=e65f32fc:3579
+dispatchEventForPluginEventSystem @ chunk-F3OYNICX.js?v=e65f32fc:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-F3OYNICX.js?v=e65f32fc:5478
+dispatchEvent @ chunk-F3OYNICX.js?v=e65f32fc:5472
+dispatchDiscreteEvent @ chunk-F3OYNICX.js?v=e65f32fc:5449Understand this error
+AuthContext.tsx:150 Login response status: 401
+AuthContext.tsx:154 Login failed with response: {"message":"Invalid credentials"}
+login @ AuthContext.tsx:154
+await in login
+onSubmit @ LoginPage.tsx:46
+(anonymous) @ chunk-GLZHPPWL.js?v=e65f32fc:1482
+await in (anonymous)
+callCallback2 @ chunk-F3OYNICX.js?v=e65f32fc:3674
+invokeGuardedCallbackDev @ chunk-F3OYNICX.js?v=e65f32fc:3699
+invokeGuardedCallback @ chunk-F3OYNICX.js?v=e65f32fc:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-F3OYNICX.js?v=e65f32fc:3736
+executeDispatch @ chunk-F3OYNICX.js?v=e65f32fc:7014
+processDispatchQueueItemsInOrder @ chunk-F3OYNICX.js?v=e65f32fc:7034
+processDispatchQueue @ chunk-F3OYNICX.js?v=e65f32fc:7043
+dispatchEventsForPlugins @ chunk-F3OYNICX.js?v=e65f32fc:7051
+(anonymous) @ chunk-F3OYNICX.js?v=e65f32fc:7174
+batchedUpdates$1 @ chunk-F3OYNICX.js?v=e65f32fc:18913
+batchedUpdates @ chunk-F3OYNICX.js?v=e65f32fc:3579
+dispatchEventForPluginEventSystem @ chunk-F3OYNICX.js?v=e65f32fc:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-F3OYNICX.js?v=e65f32fc:5478
+dispatchEvent @ chunk-F3OYNICX.js?v=e65f32fc:5472
+dispatchDiscreteEvent @ chunk-F3OYNICX.js?v=e65f32fc:5449Understand this error
+AuthContext.tsx:194 Login error: Error: Invalid credentials
+    at login (AuthContext.tsx:162:15)
+    at async onSubmit (LoginPage.tsx:46:7)
+    at async chunk-GLZHPPWL.js?v=e65f32fc:1482:9
+login @ AuthContext.tsx:194
+await in login
+onSubmit @ LoginPage.tsx:46
+(anonymous) @ chunk-GLZHPPWL.js?v=e65f32fc:1482
+await in (anonymous)
+callCallback2 @ chunk-F3OYNICX.js?v=e65f32fc:3674
+invokeGuardedCallbackDev @ chunk-F3OYNICX.js?v=e65f32fc:3699
+invokeGuardedCallback @ chunk-F3OYNICX.js?v=e65f32fc:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-F3OYNICX.js?v=e65f32fc:3736
+executeDispatch @ chunk-F3OYNICX.js?v=e65f32fc:7014
+processDispatchQueueItemsInOrder @ chunk-F3OYNICX.js?v=e65f32fc:7034
+processDispatchQueue @ chunk-F3OYNICX.js?v=e65f32fc:7043
+dispatchEventsForPlugins @ chunk-F3OYNICX.js?v=e65f32fc:7051
+(anonymous) @ chunk-F3OYNICX.js?v=e65f32fc:7174
+batchedUpdates$1 @ chunk-F3OYNICX.js?v=e65f32fc:18913
+batchedUpdates @ chunk-F3OYNICX.js?v=e65f32fc:3579
+dispatchEventForPluginEventSystem @ chunk-F3OYNICX.js?v=e65f32fc:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-F3OYNICX.js?v=e65f32fc:5478
+dispatchEvent @ chunk-F3OYNICX.js?v=e65f32fc:5472
+dispatchDiscreteEvent @ chunk-F3OYNICX.js?v=e65f32fc:5449Understand this error
+LoginPage.tsx:51 Auth error: Error: Invalid credentials
+    at login (AuthContext.tsx:162:15)
+    at async onSubmit (LoginPage.tsx:46:7)
+    at async chunk-GLZHPPWL.js?v=e65f32fc:1482:9
+onSubmit @ LoginPage.tsx:51
+await in onSubmit
+(anonymous) @ chunk-GLZHPPWL.js?v=e65f32fc:1482
+await in (anonymous)
+callCallback2 @ chunk-F3OYNICX.js?v=e65f32fc:3674
+invokeGuardedCallbackDev @ chunk-F3OYNICX.js?v=e65f32fc:3699
+invokeGuardedCallback @ chunk-F3OYNICX.js?v=e65f32fc:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-F3OYNICX.js?v=e65f32fc:3736
+executeDispatch @ chunk-F3OYNICX.js?v=e65f32fc:7014
+processDispatchQueueItemsInOrder @ chunk-F3OYNICX.js?v=e65f32fc:7034
+processDispatchQueue @ chunk-F3OYNICX.js?v=e65f32fc:7043
+dispatchEventsForPlugins @ chunk-F3OYNICX.js?v=e65f32fc:7051
+(anonymous) @ chunk-F3OYNICX.js?v=e65f32fc:7174
+batchedUpdates$1 @ chunk-F3OYNICX.js?v=e65f32fc:18913
+batchedUpdates @ chunk-F3OYNICX.js?v=e65f32fc:3579
+dispatchEventForPluginEventSystem @ chunk-F3OYNICX.js?v=e65f32fc:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-F3OYNICX.js?v=e65f32fc:5478
+dispatchEvent @ chunk-F3OYNICX.js?v=e65f32fc:5472
+dispatchDiscreteEvent @ chunk-F3OYNICX.js?v=e65f32fc:5449Understand this error

@@ -2,7 +2,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { MapPin, Bed, Bath, Square, Heart, Share2, Plus, Check } from 'lucide-react';
+import { MapPin, Bed, Bath, Square, Heart, Share2, Plus, Check, Building2 } from 'lucide-react';
 
 interface Property {
   id: number;
@@ -45,8 +45,7 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
   const displayLocation = property.location || property.address || 
     (property.city ? `${property.city}` : 'Location not specified');
 
-  const mainImage = property.imageUrl || (property.images && property.images[0]) || 
-    'https://images.unsplash.com/photo-1605146769289-440113cc3d00';
+  const mainImage = property.imageUrl || (property.images && property.images[0]) || null;
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-BW', {
@@ -65,11 +64,17 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
         onClick={handleClick}
       >
         <div className="flex">
-          <img
-            src={mainImage}
-            alt={property.title}
-            className="w-24 h-24 object-cover"
-          />
+          {mainImage ? (
+            <img
+              src={mainImage}
+              alt={property.title}
+              className="w-24 h-24 object-cover"
+            />
+          ) : (
+            <div className="w-24 h-24 bg-gray-100 flex items-center justify-center">
+              <Building2 className="h-10 w-10 text-beedab-blue/40" />
+            </div>
+          )}
           <div className="flex-1 p-3">
             <h3 className="font-semibold text-sm text-gray-900 mb-1">{property.title}</h3>
             <p className="text-lg font-bold text-beedab-blue mb-1">{formatPrice(property.price)}</p>
@@ -87,11 +92,17 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
       onClick={handleClick}
     >
       <div className="relative">
-        <img
-          src={mainImage}
-          alt={property.title}
-          className="w-full h-48 object-cover"
-        />
+        {mainImage ? (
+          <img
+            src={mainImage}
+            alt={property.title}
+            className="w-full h-48 object-cover"
+          />
+        ) : (
+          <div className="w-full h-48 bg-gray-100 flex items-center justify-center">
+            <Building2 className="h-20 w-20 text-beedab-blue/40" />
+          </div>
+        )}
         {showActions && (
           <div className="absolute top-3 right-3 flex space-x-2">
             <button

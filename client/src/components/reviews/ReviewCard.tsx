@@ -219,12 +219,11 @@ export const ReviewCard: React.FC<ReviewCardProps> = ({
         <CardHeader className="pb-3">
           <div className="flex items-start justify-between">
             <div className="flex items-center space-x-3">
-              <Avatar className="w-10 h-10">
-                <AvatarImage src={review.reviewer.avatar || undefined} />
-                <AvatarFallback>
-                  {review.reviewer.firstName[0]}{review.reviewer.lastName[0]}
-                </AvatarFallback>
-              </Avatar>
+              <Avatar 
+                className="w-10 h-10"
+                src={review.reviewer.avatar || undefined}
+                fallback={[review.reviewer.firstName, review.reviewer.lastName].filter(Boolean).join(' ')}
+              />
               <div>
                 <div className="flex items-center space-x-2">
                   <h4 className="font-semibold text-sm">

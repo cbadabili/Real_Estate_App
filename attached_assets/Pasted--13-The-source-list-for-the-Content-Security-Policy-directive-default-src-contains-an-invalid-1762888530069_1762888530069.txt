@@ -1,0 +1,98 @@
+
+﻿
+13
+The source list for the Content Security Policy directive 'default-src' contains an invalid source: ''unsafe-dynamic''. It will be ignored.
+13
+The Content-Security-Policy directive 'default-src' contains 'report-uri' as a source expression. Did you want to add it as a directive and forget a semicolon?
+13
+The source list for Content Security Policy directive 'default-src' contains a source with an invalid path: '/api/4509669501698048/security/?sentry_key=7eb3d90eb4660416caf507087367e67e'. The query component, including the '?', will be ignored.
+RealEstateApp:1 The source list for the Content Security Policy directive 'default-src' contains an invalid source: ''unsafe-dynamic''. It will be ignored.
+RealEstateApp:1 The Content-Security-Policy directive 'default-src' contains 'report-uri' as a source expression. Did you want to add it as a directive and forget a semicolon?
+RealEstateApp:1 The source list for Content Security Policy directive 'default-src' contains a source with an invalid path: '/api/4509669501698048/security/?sentry_key=7eb3d90eb4660416caf507087367e67e'. The query component, including the '?', will be ignored.
+0eb799b5cc89f147.js:2 
+      /////////////////////
+   ///////////////////////////
+  ////////@@@@@@@//////////////
+  ////////@@@@@@@//////////////
+  ////////@@@@@@@//////////////        Curious and driven?
+  ///////////////@@@@@@@///////        Work with us!
+  ///////////////@@@@@@@///////
+  ///////////////@@@@@@@///////        https://join.replit.com/hack.with.us
+  ////////@@@@@@@//////////////
+  ////////@@@@@@@//////////////
+  ////////@@@@@@#//////////////
+   ///////////////////////////
+      /////////////////////
+      
+0eb799b5cc89f147.js:2 Download the Apollo DevTools for a better development experience: https://chrome.google.com/webstore/detail/apollo-client-developer-t/jdkknkkbebbapilgoeccciglkfbmbnfm
+0eb799b5cc89f147.js:2 [Coframe] Replit Enterprise watcher loaded
+0eb799b5cc89f147.js:2 [LaunchDarkly] LaunchDarkly client initialized
+RealEstateApp:1 [Intervention] Slow network is detected. See https://www.chromestatus.com/feature/5636954674692096 for more details. Fallback font will be used while loading: https://replit.com/public/fonts/hack-regular.woff2?sha=3114f1256
+9872d95ef3243257.js:2 [Intervention] Slow network is detected. See https://www.chromestatus.com/feature/5636954674692096 for more details. Fallback font will be used while loading: https://replit.com/public/fonts/replit-icons.woff
+ed1e693c96a75807.js:2 Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+ed1e693c96a75807.js:2 Unrecognized feature: 'ambient-light-sensor'.
+ed1e693c96a75807.js:2 Unrecognized feature: 'battery'.
+ed1e693c96a75807.js:2 Unrecognized feature: 'execution-while-not-rendered'.
+ed1e693c96a75807.js:2 Unrecognized feature: 'execution-while-out-of-viewport'.
+ed1e693c96a75807.js:2 Unrecognized feature: 'layout-animations'.
+ed1e693c96a75807.js:2 Unrecognized feature: 'legacy-image-formats'.
+ed1e693c96a75807.js:2 Unrecognized feature: 'navigation-override'.
+ed1e693c96a75807.js:2 Unrecognized feature: 'oversized-images'.
+ed1e693c96a75807.js:2 Unrecognized feature: 'publickey-credentials'.
+ed1e693c96a75807.js:2 Unrecognized feature: 'speaker-selection'.
+ed1e693c96a75807.js:2 Unrecognized feature: 'unoptimized-images'.
+ed1e693c96a75807.js:2 Unrecognized feature: 'unsized-media'.
+ed1e693c96a75807.js:2 Unrecognized feature: 'pointer-lock'.
+ed1e693c96a75807.js:2 Allow attribute will take precedence over 'allowfullscreen'.
+ed1e693c96a75807.js:2 Allow attribute will take precedence over 'allowpaymentrequest'.
+RealEstateApp:1 [Intervention] Slow network is detected. See https://www.chromestatus.com/feature/5636954674692096 for more details. Fallback font will be used while loading: https://replit.com/public/fonts/ibm-plex-sans-v8-latin-600.woff2
+RealEstateApp:1 Banner not shown: beforeinstallpromptevent.preventDefault() called. The page must call beforeinstallpromptevent.prompt() to show the banner.
+ed1e693c96a75807.js:2 Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+workspace_iframe.htm…%2F&id=%3Are8%3A:32 Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+workspace_iframe.htm…%2F&id=%3Are8%3A:32 Unrecognized feature: 'ambient-light-sensor'.
+workspace_iframe.htm…%2F&id=%3Are8%3A:32 Unrecognized feature: 'battery'.
+workspace_iframe.htm…%2F&id=%3Are8%3A:32 Unrecognized feature: 'execution-while-not-rendered'.
+workspace_iframe.htm…%2F&id=%3Are8%3A:32 Unrecognized feature: 'execution-while-out-of-viewport'.
+workspace_iframe.htm…%2F&id=%3Are8%3A:32 Unrecognized feature: 'layout-animations'.
+workspace_iframe.htm…%2F&id=%3Are8%3A:32 Unrecognized feature: 'legacy-image-formats'.
+workspace_iframe.htm…%2F&id=%3Are8%3A:32 Unrecognized feature: 'navigation-override'.
+workspace_iframe.htm…%2F&id=%3Are8%3A:32 Unrecognized feature: 'oversized-images'.
+workspace_iframe.htm…%2F&id=%3Are8%3A:32 Unrecognized feature: 'publickey-credentials'.
+workspace_iframe.htm…%2F&id=%3Are8%3A:32 Unrecognized feature: 'speaker-selection'.
+workspace_iframe.htm…%2F&id=%3Are8%3A:32 Unrecognized feature: 'unoptimized-images'.
+workspace_iframe.htm…%2F&id=%3Are8%3A:32 Unrecognized feature: 'unsized-media'.
+workspace_iframe.htm…%2F&id=%3Are8%3A:32 Allow attribute will take precedence over 'allowfullscreen'.
+workspace_iframe.htm…%2F&id=%3Are8%3A:32 Allow attribute will take precedence over 'allowpaymentrequest'.
+bc950d3b-1020-47a6-8…riker.replit.dev/:1 Loading the script 'https://replit.com/public/js/replit-dev-banner.js' violates the following Content Security Policy directive: "script-src 'self' 'unsafe-inline' 'unsafe-eval'". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked.
+ Connecting to 'wss://workspace.admin4595.repl.co/?token=oFXDZPhq9NI2' violates the following Content Security Policy directive: "connect-src 'self' https:". The action has been blocked.
+workspace_iframe.htm…2F&id=%3Are8%3A:142 Loading the script 'https://replit.com/public/js/beacon.js' violates the following Content Security Policy directive: "script-src 'self' 'unsafe-inline' 'unsafe-eval'". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked.
+4
+RealEstateApp:1 Uncaught (in promise) Error: A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received
+workspace_iframe.htm…%2F&id=%3Are8%3A:32 Error while parsing the 'sandbox' attribute: 'allow-downloads-without-user-activation' is an invalid sandbox flag.
+bc950d3b-1020-47a6-8…riker.replit.dev/:1 Loading the script 'https://replit.com/public/js/replit-dev-banner.js' violates the following Content Security Policy directive: "script-src 'self' 'unsafe-inline' 'unsafe-eval'". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked.
+client:536 Connecting to 'wss://workspace.admin4595.repl.co/?token=vdnkawzk70aE' violates the following Content Security Policy directive: "connect-src 'self' https:". The action has been blocked.
+workspace_iframe.htm…2F&id=%3Are8%3A:142 Loading the script 'https://replit.com/public/js/beacon.js' violates the following Content Security Policy directive: "script-src 'self' 'unsafe-inline' 'unsafe-eval'". Note that 'script-src-elem' was not explicitly set, so 'script-src' is used as a fallback. The action has been blocked.
+injected.js:27 LoginPage: Attempting login...
+injected.js:27 Attempting login for: cbadabili@gmail.com
+bc950d3b-1020-47a6-8…v/api/users/login:1 
+ Failed to load resource: the server responded with a status of 401 (Unauthorized)
+injected.js:27 Login response status: 401
+injected.js:27 Login failed with response: {"message":"Invalid credentials"}
+injected.js:27 Login error: Error: Invalid credentials
+    at login (AuthContext.tsx:162:15)
+    at async onSubmit (LoginPage.tsx:46:7)
+injected.js:27 Auth error: Error: Invalid credentials
+    at login (AuthContext.tsx:162:15)
+    at async onSubmit (LoginPage.tsx:46:7)
+injected.js:27 LoginPage: Attempting login...
+injected.js:27 Attempting login for: cbadabili@gmail.com
+bc950d3b-1020-47a6-8…v/api/users/login:1 
+ Failed to load resource: the server responded with a status of 401 (Unauthorized)
+injected.js:27 Login response status: 401
+injected.js:27 Login failed with response: {"message":"Invalid credentials"}
+injected.js:27 Login error: Error: Invalid credentials
+    at login (AuthContext.tsx:162:15)
+    at async onSubmit (LoginPage.tsx:46:7)
+injected.js:27 Auth error: Error: Invalid credentials
+    at login (AuthContext.tsx:162:15)
+    at async onSubmit (LoginPage.tsx:46:7)

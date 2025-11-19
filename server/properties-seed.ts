@@ -141,8 +141,9 @@ export async function seedProperties() {
       yearBuilt: 2010,
       status: 'active',
       images: JSON.stringify([
-        'https://images.pexels.com/photos/106399/pexels-photo-106399.jpeg?auto=compress&cs=tinysrgb&w=800',
-        'https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=800'
+        '/properties/house-1.jpg',
+        '/properties/house-2.jpg',
+        '/properties/house-3.jpg'
       ]),
       features: JSON.stringify(['Hardwood Floors', 'Updated Kitchen', 'Large Backyard', 'Two-Car Garage']),
       propertyTaxes: '8500',
@@ -220,7 +221,8 @@ export async function seedProperties() {
       yearBuilt: 2005,
       status: 'active',
       images: JSON.stringify([
-        'https://images.pexels.com/photos/2121121/pexels-photo-2121121.jpeg?auto=compress&cs=tinysrgb&w=800'
+        '/properties/house-4.jpg',
+        '/properties/house-1.jpg'
       ]),
       features: JSON.stringify(['Open Floor Plan', 'Master Suite', 'Landscaping', 'Energy Efficient']),
       propertyTaxes: '7200',
@@ -387,7 +389,7 @@ export async function seedProperties() {
       state: "South East",
       zipCode: "0000",
       status: "active",
-      images: JSON.stringify(["/api/placeholder/600/400", "/api/placeholder/600/401", "/api/placeholder/600/402"]),
+      images: JSON.stringify(["/properties/house-2.jpg", "/properties/house-3.jpg", "/properties/house-4.jpg"]),
       features: JSON.stringify(["Swimming Pool", "Garden", "Garage", "Air Conditioning", "Security System"]),
       latitude: -24.6282,
       longitude: 25.9231,
@@ -411,7 +413,7 @@ export async function seedProperties() {
       zipCode: "0000",
       address: "Plot 123, Phakalane Estate",
       status: "active",
-      images: JSON.stringify(["/api/placeholder/600/400", "/api/placeholder/600/401", "/api/placeholder/600/402"]),
+      images: JSON.stringify(["/properties/house-3.jpg", "/properties/house-1.jpg", "/properties/house-2.jpg"]),
       features: JSON.stringify(["Modern Kitchen", "Master En-suite", "Double Garage", "Solar Geyser", "Alarm System"]),
       latitude: -24.5974,
       longitude: 25.9063,

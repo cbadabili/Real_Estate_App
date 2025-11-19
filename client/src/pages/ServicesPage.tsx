@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Star, MapPin, Clock, DollarSign, Filter, Search, MessageCircle, Phone, Camera, Gavel, Home, Wrench, Calculator, Shield, Award, Users, FileCheck, ArrowRight, CheckCircle, FileText, Truck, Building } from 'lucide-react';
+import { Star, MapPin, Clock, Filter, Search, MessageCircle, Phone, Camera, Gavel, Home, Wrench, Calculator, Shield, Award, Truck, Building } from 'lucide-react';
 import ServiceProviderRegistration from '../components/ServiceProviderRegistration';
 import { Link } from 'react-router-dom'; // Assuming react-router-dom is used for navigation
 
@@ -245,20 +245,6 @@ const ServicesPage: React.FC = () => {
     { id: 'structural-engineering', name: 'Structural Engineering', icon: Wrench },
   ];
 
-  const serviceCategories = [
-    { name: 'Legal Services', icon: '⚖️', description: 'Property lawyers and legal services' },
-    { name: 'Photography', icon: '📸', description: 'Property photography services' },
-    { name: 'Property Inspection', icon: '🔍', description: 'Professional property inspections' },
-    { name: 'Finance & Loans', icon: '💰', description: 'Mortgage brokers and financing' },
-    { name: 'Insurance', icon: '🛡️', description: 'Property and home insurance' },
-    { name: 'Construction', icon: '🏗️', description: 'General construction and specialized trades' },
-    { name: 'Moving', icon: '🚚', description: 'Professional moving and relocation services' },
-    { name: 'Cleaning', icon: '🧹', description: 'Move-in, move-out, and deep cleaning' },
-    { name: 'Maintenance', icon: '🔧', description: 'Property maintenance and repair services' },
-    { name: 'Architectural Services', icon: '🏛️', description: 'Building design and architectural planning' },
-    { name: 'Quantity Surveying', icon: '📏', description: 'Cost estimation and project management' },
-    { name: 'Structural Engineering', icon: '🏗️', description: 'Structural analysis and engineering design' }
-  ];
 
   return (
     <div className="min-h-screen bg-neutral-50">
@@ -271,7 +257,15 @@ const ServicesPage: React.FC = () => {
           <p className="text-xl text-neutral-600 max-w-3xl mx-auto">
             Connect with verified professionals for every step of your real estate journey
           </p>
-
+          {/* New Call to Action at the top */}
+          <div className="mt-6">
+            <Link
+              to="/register-provider"
+              className="inline-block bg-beedab-blue text-white px-6 py-3 rounded-lg text-lg font-semibold hover:bg-beedab-darkblue transition-colors"
+            >
+              Want to be a Service Provider?
+            </Link>
+          </div>
         </div>
 
         {/* Service Categories */}
@@ -322,9 +316,9 @@ const ServicesPage: React.FC = () => {
               key={professional.id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="bg-white rounded-lg shadow-sm border border-neutral-200 overflow-hidden hover:shadow-lg transition-shadow"
+              className="bg-white rounded-lg shadow-sm border border-neutral-200 overflow-hidden hover:shadow-lg transition-shadow flex flex-col h-full"
             >
-              <div className="p-6">
+              <div className="p-6 flex flex-col flex-grow">
                 <div className="flex items-start justify-between mb-3">
                   <h3 className="text-lg font-semibold text-neutral-900">
                     {professional.name}
@@ -353,44 +347,47 @@ const ServicesPage: React.FC = () => {
                 </p>
 
                 {/* Specialties */}
-                <div className="flex flex-wrap gap-1 mb-4">
-                  {professional.specialties.slice(0, 2).map((specialty, index) => (
-                    <span
-                      key={index}
-                      className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full"
-                    >
-                      {specialty}
-                    </span>
-                  ))}
-                  {professional.specialties.length > 2 && (
-                    <span className="px-2 py-1 bg-neutral-100 text-neutral-600 text-xs rounded-full">
-                      +{professional.specialties.length - 2}
-                    </span>
-                  )}
-                </div>
+                {professional.specialties && professional.specialties.length > 0 && (
+                  <div className="flex flex-wrap gap-1 mb-4">
+                    {professional.specialties.slice(0, 2).map((specialty, index) => (
+                      <span
+                        key={index}
+                        className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full"
+                      >
+                        {specialty}
+                      </span>
+                    ))}
+                    {professional.specialties.length > 2 && (
+                      <span className="px-2 py-1 bg-neutral-100 text-neutral-600 text-xs rounded-full">
+                        +{professional.specialties.length - 2}
+                      </span>
+                    )}
+                  </div>
+                )}
 
-                <div className="flex items-center justify-between text-sm text-neutral-600 mb-4">
-                  <span className="flex items-center">
-                    <DollarSign className="h-4 w-4 mr-1" />
-                    {professional.priceRange}
-                  </span>
-                  {professional.verified && (
-                    <span className="flex items-center text-green-600">
-                      <Shield className="h-4 w-4 mr-1" />
-                      Verified
+                <div className="mt-auto">
+                  <div className="flex items-center justify-between text-sm mb-3 min-h-[24px]">
+                    <span className="text-neutral-700 font-medium">
+                      {professional.priceRange}
                     </span>
-                  )}
-                </div>
+                    {professional.verified && (
+                      <span className="flex items-center text-green-600 text-xs font-semibold">
+                        <Shield className="h-4 w-4 mr-1" />
+                        Verified
+                      </span>
+                    )}
+                  </div>
 
-                <div className="flex space-x-2">
-                  <button className="flex-1 bg-beedab-blue text-white py-2 px-4 rounded-lg hover:bg-beedab-darkblue transition-colors flex items-center justify-center">
+                  <div className="flex gap-2">
+                  <button className="flex-1 bg-beedab-blue text-white py-2 px-4 rounded-lg hover:bg-beedab-darkblue transition-colors flex items-center justify-center text-sm font-medium">
                     <MessageCircle className="h-4 w-4 mr-2" />
                     Message
                   </button>
-                  <button className="flex-1 bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center">
+                  <button className="flex-1 bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center text-sm font-medium">
                     <Phone className="h-4 w-4 mr-2" />
                     Call
                   </button>
+                  </div>
                 </div>
               </div>
             </motion.div>
@@ -410,13 +407,13 @@ const ServicesPage: React.FC = () => {
 
         {/* Call to Action */}
         <div className="mt-12 bg-gradient-to-r from-beedab-blue to-beedab-darkblue rounded-2xl p-8 text-center text-white">
-          <h2 className="text-2xl font-bold mb-4">Need Professional Services?</h2>
+          <h2 className="text-2xl font-bold mb-4">Do you want to be a service provider?</h2>
           <p className="text-blue-100 mb-6">
             Join our network of verified professionals and grow your business
           </p>
           <Link
-            to="/pricing"
-            className="bg-white text-beedab-blue px-8 py-3 rounded-lg text-lg font-semibold hover:bg-neutral-100 transition-colors flex items-center space-x-2"
+            to="/register-provider" // Changed the link to register-provider
+            className="bg-white text-beedab-blue px-8 py-3 rounded-lg text-lg font-semibold hover:bg-neutral-100 transition-colors flex items-center space-x-2 justify-center"
           >
             <Award className="h-5 w-5" />
             <span>Register as Service Provider</span>

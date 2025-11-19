@@ -9,12 +9,12 @@ import {
   User,
   Phone,
   Mail,
-  MessageSquare,
   MapPin,
   Home,
   CheckCircle,
   AlertCircle,
-  ArrowLeft
+  ArrowLeft,
+  Building2
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { getToken } from '@/lib/storage';
@@ -25,9 +25,9 @@ const ScheduleViewingPage = () => {
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedTime, setSelectedTime] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [property, setProperty] = useState(null);
+  const [property, setProperty] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const { register, handleSubmit, watch, formState: { errors } } = useForm();
+  const { register, handleSubmit, formState: { errors } } = useForm();
 
   // Fetch actual property data
   useEffect(() => {
@@ -43,7 +43,7 @@ const ScheduleViewingPage = () => {
         const propertyData = await response.json();
         
         // Parse images safely
-        let images = ['/api/placeholder/600/400'];
+        let images = [];
         if (propertyData.images) {
           try {
             images = Array.isArray(propertyData.images) 
@@ -68,9 +68,9 @@ const ScheduleViewingPage = () => {
             email: 'sarah@beedab.com'
           }
         });
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error fetching property:', error);
-        toast.error(error.message || 'Failed to load property details');
+        toast.error(error?.message || 'Failed to load property details');
         // Don't redirect immediately, let user see the error
         setTimeout(() => {
           navigate('/properties');
@@ -220,11 +220,17 @@ const ScheduleViewingPage = () => {
           {/* Property Summary */}
           <div className="lg:col-span-1">
             <div className="bg-white rounded-xl shadow-lg border border-neutral-200 p-6 sticky top-8">
-              <img
-                src={property.images[0]}
-                alt={property.title}
-                className="w-full h-32 md:h-40 object-cover rounded-lg mb-4"
-              />
+              {property.images && property.images.length > 0 ? (
+                <img
+                  src={property.images[0]}
+                  alt={property.title}
+                  className="w-full h-32 md:h-40 object-cover rounded-lg mb-4"
+                />
+              ) : (
+                <div className="w-full h-32 md:h-40 bg-gray-100 flex items-center justify-center rounded-lg mb-4">
+                  <Building2 className="h-12 w-12 text-beedab-blue/40" />
+                </div>
+              )}
               
               <h3 className="text-lg font-semibold text-neutral-900 mb-2">
                 {property.title}
