@@ -115,9 +115,8 @@ export interface PropertyPayload {
 }
 
 export async function createProperty(api: APIRequestContext, auth: AuthContext, payload: PropertyPayload) {
-  const ownerIdSource = payload.ownerId ?? auth.userId;
-  const normalizedOwnerId = Number(ownerIdSource);
-  expect(Number.isFinite(normalizedOwnerId), 'ownerId must be numeric').toBeTruthy();
+  const ownerId = payload.ownerId ?? auth.userId;
+  expect(ownerId, 'ownerId must be provided').toBeTruthy();
   const features = (payload.features ?? ['Automated Test Listing']).map(feature =>
     typeof feature === 'string' ? feature : String(feature)
   );
@@ -154,7 +153,10 @@ export async function createProperty(api: APIRequestContext, auth: AuthContext, 
   const response = await api.post('/api/properties', {
     headers: authHeaders(auth),
     data: {
-      ownerId: normalizedOwnerId,
+      // The API derives the final ownerId from the authenticated session, so we
+      // only include the identifier when it is already numeric to aid legacy
+      // test fixtures without coercing arbitrary strings.
+      ...(typeof ownerId === 'number' && Number.isFinite(ownerId) ? { ownerId } : {}),
       title: payload.title,
       description: payload.description ?? 'Automated listing',
       price,
