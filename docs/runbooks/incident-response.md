@@ -39,9 +39,9 @@
    - Application logs: `docker logs beedab-app`
    - Database logs: Check PostgreSQL status
    - Error monitoring: Review Sentry/monitoring dashboards
-4. **Verify external dependencies**: 
+4. **Verify external dependencies**:
    - Database connectivity
-   - Third-party APIs (Mapbox, etc.)
+   - Third-party APIs (Google Maps, etc.)
 
 ### Communication
 

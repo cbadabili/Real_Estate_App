@@ -11,7 +11,8 @@ import {
   Eye,
   Calendar,
   TrendingUp,
-  Camera
+  Camera,
+  Building2
 } from 'lucide-react';
 
 interface PropertyCardProps {
@@ -36,21 +37,27 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, viewMode = 'grid'
     console.warn('Failed to parse property images:', error);
     imageUrls = [];
   }
-  const mainImage = imageUrls.length > 0 ? imageUrls[0] : '/placeholder-property.jpg';
+  const mainImage = imageUrls.length > 0 ? imageUrls[0] : null;
 
   return (
     <motion.div
       whileHover={{ y: -4 }}
       className={`bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 border border-neutral-200 ${
-        isListView ? 'flex' : ''
+        isListView ? 'flex h-64' : 'h-[450px] flex flex-col'
       }`}
     >
-      <div className={`relative ${isListView ? 'w-1/3' : ''}`}>
-        <img 
-          src={mainImage} 
-          alt={property.title}
-          className={`object-cover ${isListView ? 'w-full h-full' : 'w-full h-48'}`}
-        />
+      <div className={`relative ${isListView ? 'w-1/3 flex-shrink-0' : 'h-48 flex-shrink-0'}`}>
+        {mainImage ? (
+          <img 
+            src={mainImage} 
+            alt={property.title}
+            className={`object-cover ${isListView ? 'w-full h-full' : 'w-full h-full'}`}
+          />
+        ) : (
+          <div className={`bg-gray-100 flex items-center justify-center ${isListView ? 'w-full h-full' : 'w-full h-full'}`}>
+            <Building2 className="h-16 w-16 text-beedab-blue/40" />
+          </div>
+        )}
 
         {/* Status Badge */}
         <div className="absolute top-3 left-3">
@@ -100,12 +107,12 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, viewMode = 'grid'
         </div>
       </div>
 
-      <div className={`p-6 ${isListView ? 'flex-1' : ''}`}>
-        <div className={`${isListView ? 'flex justify-between h-full' : ''}`}>
-          <div className={`${isListView ? 'flex-1 pr-6' : ''}`}>
+      <div className={`p-6 ${isListView ? 'flex-1' : 'flex-1 flex flex-col justify-between'}`}>
+        <div className={`${isListView ? 'flex justify-between h-full' : 'flex flex-col h-full'}`}>
+          <div className={`${isListView ? 'flex-1 pr-6' : 'flex-1'}`}>
             {/* Header */}
             <div className="flex justify-between items-start mb-4">
-              <div>
+              <div className="flex-1 min-w-0">
                 <Link 
                   to={`/properties/${property.id}`}
                   className="block hover:text-beedab-darkblue transition-colors"
@@ -114,7 +121,7 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, viewMode = 'grid'
                     {property.title}
                   </h3>
                 </Link>
-                <p className="text-neutral-600 flex items-center text-sm">
+                <p className="text-neutral-600 flex items-center text-sm line-clamp-1">
                   <MapPin className="h-4 w-4 mr-1 flex-shrink-0" />
                   {property.location || `${property.city}, ${property.state}`}
                 </p>
@@ -148,8 +155,8 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, viewMode = 'grid'
             </div>
 
             {/* Features */}
-            {property.features && (
-              <div className="mb-4">
+            <div className="mb-4 min-h-[32px]">
+              {property.features && (
                 <div className="flex flex-wrap gap-2">
                   {(typeof property.features === 'string' ? JSON.parse(property.features) : property.features).slice(0, 3).map((feature: string, index: number) => (
                     <span 
@@ -165,11 +172,12 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, viewMode = 'grid'
                     </span>
                   )}
                 </div>
-              </div>
-            )}
+              )}
+            </div>
+          </div>
 
             {/* Bottom Row */}
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center mt-auto">
               <div className="flex items-center space-x-4 text-sm text-neutral-500">
                 <div className="flex items-center">
                   <Eye className="h-4 w-4 mr-1" />
@@ -190,7 +198,6 @@ const PropertyCard: React.FC<PropertyCardProps> = ({ property, viewMode = 'grid'
                 </Link>
               )}
             </div>
-          </div>
 
           {/* List View Price */}
           {isListView && (

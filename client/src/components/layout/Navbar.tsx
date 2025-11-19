@@ -21,14 +21,15 @@ import {
   Package,
   GraduationCap,
   Handshake,
-  Building2,
   FileCheck,
   PlusCircle,
   Calendar,
   Settings,
-  LogOut
+  LogOut,
+  Building2
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { getInitials } from '../ui/avatar';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -666,7 +667,7 @@ const Navbar = () => {
             {user ? (
               <div className="flex items-center space-x-4">
                 {/* TODO: Add notification bell icon - NotificationCenter needs props */}
-                
+
                 {/* User Menu */}
                 <div
                   className="relative"
@@ -674,7 +675,19 @@ const Navbar = () => {
                   onMouseLeave={() => setProfileDropdownOpen(false)}
                 >
                   <button className="flex items-center space-x-2 text-neutral-600 hover:text-neutral-900">
-                    <User className="h-5 w-5" />
+                    {user.avatar ? (
+                      <img 
+                        src={user.avatar} 
+                        alt={`${user.firstName}'s profile`}
+                        className="h-8 w-8 rounded-full object-cover"
+                      />
+                    ) : (
+                      <div className="h-8 w-8 bg-beedab-blue rounded-full flex items-center justify-center text-white">
+                        <span className="text-xs font-semibold">
+                          {getInitials([user.firstName, user.lastName].filter(Boolean).join(' '))}
+                        </span>
+                      </div>
+                    )}
                     <span className="hidden md:inline">{user.firstName}</span>
                     <ChevronDown className="h-4 w-4" />
                   </button>

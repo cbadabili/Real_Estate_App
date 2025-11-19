@@ -1,3 +1,4 @@
+
 import { db } from "./db";
 import { plans } from "../shared/schema";
 import { notInArray } from "drizzle-orm";
@@ -5,63 +6,78 @@ import { notInArray } from "drizzle-orm";
 export async function seedBilling() {
   console.log('🎯 Seeding billing plans (idempotent)...');
 
-  // Plans v2 – simple pricing & clear value (CANONICAL PLANS ONLY)
+  // Updated Plans - Free Trial, Pro, Business, Premium
   const CANONICAL_PLANS = [
     {
-      code: 'LISTER_FREE',
-      name: 'Free',
-      description: 'Perfect for first-time property listings',
+      code: 'FREE_TRIAL',
+      name: 'Free Trial',
+      description: 'Perfect for first-time sellers testing the platform',
       price_bwp: 0,
       interval: 'monthly',
       features: JSON.stringify({
         LISTING_LIMIT: '1',
         PHOTO_LIMIT: '5',
-        PRIORITY_RANK: '0'
+        ANALYTICS: 'false',
+        PRIORITY_RANK: '0',
+        HERO_SLOTS: '0',
+        TRIAL_DAYS: '30'
       }),
       is_active: true
     },
     {
-      code: 'LISTER_PRO',
+      code: 'PRO',
       name: 'Pro',
-      description: 'For casual property listings with more exposure',
+      description: 'For casual sellers with multiple properties',
       price_bwp: 100,
       interval: 'monthly',
       features: JSON.stringify({
         LISTING_LIMIT: '5',
         PHOTO_LIMIT: '20',
         ANALYTICS: 'true',
-        PRIORITY_RANK: '0'
+        PRIORITY_RANK: '1',
+        HERO_SLOTS: '0',
+        FEATURED_SEARCH: 'true'
       }),
       is_active: true
     },
     {
       code: 'BUSINESS',
       name: 'Business',
-      description: 'For contractors, artisans, and property service providers',
-      price_bwp: 150,
-      interval: 'monthly',
-      features: JSON.stringify({
-        LISTING_LIMIT: '50',
-        PHOTO_LIMIT: '50',
-        DIRECTORY: 'true',
-        BOOKING: 'true',
-        LEAD_MANAGER: 'true',
-        PRIORITY_RANK: '1'
-      }),
-      is_active: true
-    },
-    {
-      code: 'LISTER_PREMIUM',
-      name: 'Premium',
-      description: 'For serious sellers and investors who want maximum visibility',
+      description: 'For professional agents & service providers',
       price_bwp: 200,
       interval: 'monthly',
       features: JSON.stringify({
         LISTING_LIMIT: '50',
         PHOTO_LIMIT: '50',
         ANALYTICS: 'true',
-        HERO_SLOTS: '1',
-        PRIORITY_RANK: '2'
+        DIRECTORY: 'true',
+        BOOKING: 'true',
+        LEAD_MANAGER: 'true',
+        PRIORITY_RANK: '2',
+        VERIFIED_BADGE: 'true',
+        SUPPORT_24H: 'true'
+      }),
+      is_active: true
+    },
+    {
+      code: 'PREMIUM',
+      name: 'Premium',
+      description: 'For established agencies & developers with portfolios',
+      price_bwp: 500,
+      interval: 'monthly',
+      features: JSON.stringify({
+        LISTING_LIMIT: '100',
+        PHOTO_LIMIT: '75',
+        ANALYTICS: 'true',
+        HERO_SLOTS: '3',
+        PRIORITY_RANK: '5',
+        AGENCY_PROFILE: 'true',
+        PREMIUM_BADGE: 'true',
+        MONTHLY_REPORTS: 'true',
+        PRIORITY_SUPPORT: 'true',
+        WHITE_LABEL: 'true',
+        EARLY_ACCESS: 'true',
+        ACCOUNT_MANAGER: 'true'
       }),
       is_active: true
     }

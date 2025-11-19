@@ -2,6 +2,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Star, MapPin, Phone, Mail, Shield, Clock } from 'lucide-react';
+import { getInitials } from '../../ui/avatar';
 
 interface ServiceProviderCardProps {
   provider: {
@@ -26,24 +27,12 @@ export const ServiceProviderCard: React.FC<ServiceProviderCardProps> = ({
   provider,
   onContact
 }) => {
-  // Generate initials for avatar
-  const initials = provider.name
-    ? provider.name
-        .split(' ')
-        .map(word => word?.charAt(0) || '')
-        .join('')
-        .toUpperCase()
-        .slice(0, 2)
-    : 'N/A';
-
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center space-x-3">
-          <div className="w-12 h-12 bg-beedab-blue rounded-full flex items-center justify-center">
-            <span className="text-white font-semibold text-lg">
-              {initials}
-            </span>
+          <div className="w-12 h-12 bg-beedab-blue rounded-full flex items-center justify-center text-white">
+            <span className="text-lg font-semibold">{getInitials(provider.name)}</span>
           </div>
           <div>
             <h3 className="font-semibold text-gray-900">{provider.name}</h3>

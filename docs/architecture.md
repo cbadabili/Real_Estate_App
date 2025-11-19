@@ -29,7 +29,7 @@ graph TB
     end
     
     subgraph "External Services"
-        MAPS[Mapbox API<br/>Geocoding]
+        MAPS[Google Maps API<br/>Geocoding]
         AI[OpenAI API<br/>Search Intelligence]
         EMAIL[Email Service]
     end

@@ -119,34 +119,43 @@ export default function AdminPage() {
   }
 
   // Fetch users for management
-  const { data: users = [], isLoading: usersLoading } = useQuery({
+  const { data: usersData, isLoading: usersLoading } = useQuery({
     queryKey: ['/api/admin/users', userFilter],
     queryFn: () => apiRequest(`/api/admin/users?search=${userFilter}`),
   });
+  const users = Array.isArray(usersData) ? usersData : [];
 
   // Fetch reviews for moderation
-  const { data: reviews = [], isLoading: reviewsLoading } = useQuery({
+  const { data: reviewsData, isLoading: reviewsLoading } = useQuery({
     queryKey: ['/api/admin/reviews', reviewFilter],
     queryFn: () => apiRequest(`/api/admin/reviews?status=${reviewFilter}`),
   });
+  const reviews = Array.isArray(reviewsData) ? reviewsData : [];
 
   // Fetch audit log
-  const { data: auditLog = [], isLoading: auditLoading } = useQuery({
+  const { data: auditLogResponse, isLoading: auditLoading } = useQuery({
     queryKey: ['/api/admin/audit-log'],
     queryFn: () => apiRequest('/api/admin/audit-log?limit=50'),
   });
+  
+  // Ensure auditLog is always an array
+  const auditLog = Array.isArray(auditLogResponse) ? auditLogResponse : [];
 
   // Fetch pending payments
-  const { data: pendingPayments = [], isLoading: paymentsLoading } = useQuery({
+  const { data: paymentsData, isLoading: paymentsLoading } = useQuery({
     queryKey: ['/api/billing/payments/pending'],
     queryFn: () => apiRequest('/api/billing/payments/pending'),
   });
+  const pendingPayments = Array.isArray(paymentsData) ? paymentsData : [];
 
   // Fetch billing statistics
-  const { data: billingStats, isLoading: statsLoading } = useQuery({
+  const { data: billingStatsResponse, isLoading: statsLoading } = useQuery({
     queryKey: ['/api/billing/admin/stats'],
     queryFn: () => apiRequest('/api/billing/admin/stats'),
   });
+  
+  // Unwrap the data field from the response
+  const billingStats = billingStatsResponse?.data || null;
 
   // Payment approval mutation
   const approvePaymentMutation = useMutation({
@@ -399,7 +408,7 @@ export default function AdminPage() {
         <TabsContent value="billing">
           <div className="space-y-6">
             {/* Billing Overview */}
-            {billingStats && (
+            {billingStats?.overview && (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <Card>
                   <CardHeader className="pb-2">
@@ -407,10 +416,10 @@ export default function AdminPage() {
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold text-orange-600">
-                      {billingStats.overview.pending_payments}
+                      {billingStats.overview.pending_payments || 0}
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      BWP {billingStats.overview.pending_revenue.toLocaleString()} pending
+                      BWP {(billingStats.overview.pending_revenue || 0).toLocaleString()} pending
                     </p>
                   </CardContent>
                 </Card>
@@ -420,10 +429,10 @@ export default function AdminPage() {
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold text-green-600">
-                      BWP {billingStats.overview.total_revenue.toLocaleString()}
+                      BWP {(billingStats.overview.total_revenue || 0).toLocaleString()}
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      {billingStats.overview.approved_payments} approved payments
+                      {billingStats.overview.approved_payments || 0} approved payments
                     </p>
                   </CardContent>
                 </Card>
@@ -433,7 +442,7 @@ export default function AdminPage() {
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold text-blue-600">
-                      {billingStats.overview.active_subscriptions}
+                      {billingStats.overview.active_subscriptions || 0}
                     </div>
                     <p className="text-xs text-muted-foreground">
                       Currently active
@@ -446,7 +455,7 @@ export default function AdminPage() {
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold text-red-600">
-                      {billingStats.overview.rejected_payments}
+                      {billingStats.overview.rejected_payments || 0}
                     </div>
                     <p className="text-xs text-muted-foreground">
                       Failed transactions
@@ -528,7 +537,7 @@ export default function AdminPage() {
             </Card>
 
             {/* Plan Distribution */}
-            {billingStats && (
+            {billingStats?.plan_distribution && Array.isArray(billingStats.plan_distribution) && (
               <Card>
                 <CardHeader>
                   <CardTitle>Plan Distribution</CardTitle>
@@ -543,11 +552,11 @@ export default function AdminPage() {
                         <div>
                           <h4 className="font-medium">{plan.plan_name}</h4>
                           <p className="text-sm text-muted-foreground">
-                            {plan.subscription_count} active subscriptions
+                            {plan.subscription_count || 0} active subscriptions
                           </p>
                         </div>
                         <div className="text-right">
-                          <p className="font-medium">BWP {plan.revenue.toLocaleString()}</p>
+                          <p className="font-medium">BWP {(plan.revenue || 0).toLocaleString()}</p>
                           <p className="text-sm text-muted-foreground">Total revenue</p>
                         </div>
                       </div>
@@ -741,7 +750,7 @@ export default function AdminPage() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                  {billingStats?.overview.active_subscriptions || 0}
+                  {billingStats?.overview?.active_subscriptions || 0}
                 </div>
                 <p className="text-xs text-muted-foreground">
                   Paying customers
@@ -754,7 +763,7 @@ export default function AdminPage() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-orange-600">
-                  {(billingStats?.overview.pending_payments || 0) + reviews.filter((r: AdminReview) => r.status === 'pending').length}
+                  {(billingStats?.overview?.pending_payments || 0) + reviews.filter((r: AdminReview) => r.status === 'pending').length}
                 </div>
                 <p className="text-xs text-muted-foreground">
                   Payments & reviews
@@ -767,7 +776,7 @@ export default function AdminPage() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-green-600">
-                  BWP {billingStats?.overview.total_revenue.toLocaleString() || '0'}
+                  BWP {(billingStats?.overview?.total_revenue || 0).toLocaleString()}
                 </div>
                 <p className="text-xs text-muted-foreground">
                   Lifetime revenue

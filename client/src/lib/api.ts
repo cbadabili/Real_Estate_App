@@ -32,11 +32,17 @@ const createApiClient = (): AxiosInstance => {
     (response) => response,
     (error) => {
       if (error.response?.status === 401) {
-        // Token is invalid, clear it
-        TokenStorage.removeToken();
-        // Optionally redirect to login
-        if (typeof window !== 'undefined') {
-          window.location.href = '/login';
+        // Don't redirect on registration or login endpoints
+        const isAuthEndpoint = error.config?.url?.includes('/register') || 
+                               error.config?.url?.includes('/login');
+        
+        if (!isAuthEndpoint) {
+          // Token is invalid, clear it
+          TokenStorage.removeToken();
+          // Redirect to login for protected endpoints only
+          if (typeof window !== 'undefined') {
+            window.location.href = '/login';
+          }
         }
       }
       return Promise.reject(error);

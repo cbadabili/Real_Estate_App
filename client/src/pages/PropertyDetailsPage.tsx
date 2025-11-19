@@ -71,13 +71,14 @@ const PropertyDetailsPage: React.FC = () => {
   const [error, setError] = useState<Error | null>(null); // Added error state
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [showContactForm, setShowContactForm] = useState(false);
+  const [showMortgageCalculator, setShowMortgageCalculator] = useState(false); // Added state for mortgage calculator
   const { toggleFavorite, isFavorite } = useFavorites();
   const { user } = useAuth();
 
   // Parse images safely
   const images = React.useMemo(() => {
     if (!property?.images) return [];
-    
+
     try {
       if (typeof property.images === 'string') {
         return JSON.parse(property.images);
@@ -87,19 +88,19 @@ const PropertyDetailsPage: React.FC = () => {
     } catch (error) {
       console.warn('Failed to parse property images:', error);
     }
-    
+
     return [];
   }, [property?.images]);
 
   // Get coordinates safely with proper null checks - MOVED TO TOP
   const coordinates = React.useMemo(() => {
     if (!property?.coordinates) return null;
-    
+
     // Handle different coordinate formats
     if (Array.isArray(property.coordinates) && property.coordinates.length >= 2) {
       return [parseFloat(property.coordinates[0]), parseFloat(property.coordinates[1])];
     }
-    
+
     // Handle string coordinates (lat,lng format)
     if (typeof property.coordinates === 'string') {
       try {
@@ -111,12 +112,12 @@ const PropertyDetailsPage: React.FC = () => {
         console.warn('Failed to parse coordinates:', property.coordinates);
       }
     }
-    
+
     // Handle object coordinates {lat, lng}
     if (typeof property.coordinates === 'object' && property.coordinates.lat && property.coordinates.lng) {
       return [parseFloat(property.coordinates.lat), parseFloat(property.coordinates.lng)];
     }
-    
+
     return null;
   }, [property?.coordinates]);
 
@@ -388,11 +389,17 @@ const PropertyDetailsPage: React.FC = () => {
 
                 {/* Quick Actions */}
                 <div className="space-y-3">
-                  <button className="w-full bg-neutral-100 text-neutral-700 py-2 px-4 rounded-lg hover:bg-neutral-200 transition-colors flex items-center justify-center">
+                  <button 
+                    onClick={() => setShowMortgageCalculator(!showMortgageCalculator)}
+                    className="w-full bg-neutral-100 text-neutral-700 py-2 px-4 rounded-lg hover:bg-neutral-200 transition-colors flex items-center justify-center"
+                  >
                     <Calculator className="w-4 h-4 mr-2" />
                     Mortgage Calculator
                   </button>
-                  <button className="w-full bg-neutral-100 text-neutral-700 py-2 px-4 rounded-lg hover:bg-neutral-200 transition-colors flex items-center justify-center">
+                  <button 
+                    onClick={() => navigate(`/properties/${property.id}/schedule-viewing`)}
+                    className="w-full bg-neutral-100 text-neutral-700 py-2 px-4 rounded-lg hover:bg-neutral-200 transition-colors flex items-center justify-center"
+                  >
                     <Calendar className="w-4 h-4 mr-2" />
                     Schedule Viewing
                   </button>
@@ -401,7 +408,26 @@ const PropertyDetailsPage: React.FC = () => {
             </div>
           </div>
 
-          
+          {/* Mortgage Calculator Modal/Section - if showMortgageCalculator is true */}
+          {showMortgageCalculator && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+              <div className="bg-white rounded-lg p-6 shadow-lg max-w-sm w-full">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-lg font-semibold">Mortgage Calculator</h3>
+                  <button onClick={() => setShowMortgageCalculator(false)} className="text-neutral-400 hover:text-neutral-700">
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+                {/* Placeholder for actual mortgage calculator form/logic */}
+                <p className="text-neutral-600">Mortgage calculator content goes here.</p>
+                {/* Example input */}
+                <input type="number" placeholder="Loan Amount" className="w-full p-2 border rounded mt-2" />
+                <button className="w-full bg-beedab-blue text-white py-2 px-4 rounded-lg hover:bg-beedab-darkblue transition-colors mt-4" onClick={() => setShowMortgageCalculator(false)}>
+                  Close
+                </button>
+              </div>
+            </div>
+          )}
         </motion.div>
       </div>
     </div>

@@ -1,60 +1,125 @@
-# BeeDab Real Estate Platform
+# BeeDab Real Estate Platform - Replit Configuration
 
-## Overview
-BeeDab is a comprehensive real estate platform tailored for the Botswana market. It facilitates property listings, rental management, auctions, and integrated services for buyers, sellers, agents, and FSBO users. The platform supports English and Setswana languages and complies with local Real Estate Advisory Council (REAC) regulations, aiming to be a leading real estate solution in Botswana.
+## Project Overview
+A comprehensive real estate platform built with React, TypeScript, Node.js, Express, and PostgreSQL. Successfully migrated from Vercel to Replit on October 15, 2025.
+
+## Architecture
+
+### Technology Stack
+- **Frontend**: React 18 + Vite + TypeScript + Tailwind CSS
+- **Backend**: Node.js + Express + TypeScript  
+- **Database**: PostgreSQL (Replit-hosted)
+- **Package Manager**: npm
+
+### Port Configuration
+- **Frontend (Vite Dev Server)**: Port 5000
+- **Backend (Express API)**: Port 5001
+- **Vite Proxy**: `/api/*` → `http://localhost:5001`
+
+## Development Setup
+
+### Environment Variables
+The following environment variables are configured via Replit Secrets:
+- `DATABASE_URL` - PostgreSQL connection string (auto-configured by Replit)
+- `SESSION_SECRET` - Session encryption key
+- `JWT_SECRET` - JWT token signing key
+- `OPENAI_API_KEY` - OpenAI API key for AI-powered search features
+- `MAPBOX_TOKEN` - Mapbox access token for interactive maps
+- `CORS_ORIGIN` - Allowed CORS origins (set in .env file)
+
+### Running the Application
+The project uses a single workflow that runs both servers:
+```bash
+bash -c "npx tsx server/index.ts & vite --config client/vite.config.ts"
+```
+
+### Database Migrations
+Migrations run automatically on server start. Located in `server/migrations/`.
+
+Note: There's a known non-fatal warning about `rental_listings` table during seeding. The table exists as `rentals` in the migration but the seed script references `rental_listings`. This doesn't affect core functionality.
+
+## Migration Notes (Oct 15, 2025)
+
+### Changes Made for Replit Compatibility
+1. **Port Configuration**: 
+   - Frontend moved to port 5000 (required by Replit for web preview)
+   - Backend runs on port 5001
+   - Vite proxy configured to forward API requests
+
+2. **CORS Configuration**:
+   - Updated default CORS origin from localhost:5173 to localhost:5000
+   - Production CORS uses REPLIT_DOMAINS environment variable
+
+3. **Code Fixes**:
+   - Removed duplicate code blocks in `server/routes/property-routes.ts`
+   - Fixed Zod schema validation in `shared/schema.ts` (changed from `z.coerce.number()` to `z.number()` with proper method chaining)
+
+4. **Deployment Configuration**:
+   - Set up for Replit Autoscale deployment
+   - Build command: `npm run build`
+   - Start command: Backend and preview server
+
+### Recent Fixes (Oct 15, 2025)
+- **Vite Host Configuration**: Added `allowedHosts: true` to fix "Blocked request" errors in Replit proxy environment
+- **Vite HMR Configuration**: Configured WebSocket settings for Replit (wss:// protocol with proper host detection)
+- **Database Schema**: Fixed rental_listings table structure to match Drizzle schema
+- **Port Configuration**: Backend uses port 5001, Vite uses port 5000 (no conflicts)
+- **Data Seeding**: Added seedProperties() call - now seeding 12 properties + 5 rentals + all other data
+- **Security**: CSP disabled in development for easier debugging, enabled in production
+
+### Authentication Updates (Nov 11, 2025)
+- **Google OAuth Removed**: Completely removed Google sign-in/sign-up functionality
+  - Removed Google OAuth UI from LoginPage and RegistrationModal
+  - Deleted Google authentication backend routes (google-auth-routes.ts)
+  - Removed GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET from environment config
+  - Uninstalled google-auth-library dependency
+  - Platform now uses email/password authentication only
+
+### Return URL Feature (Nov 12, 2025)
+- **Plan Activation Redirect**: After activating a billing plan, users are now redirected back to their previous location instead of staying on the pricing page
+  - Supports both query parameters (`/pricing?returnUrl=/properties`) and React Router state
+  - Priority order: query params → location.state → '/' fallback
+  - **Security**: Validates returnUrl is a safe relative path to prevent open redirect attacks
+    * Only allows paths starting with '/' (e.g., '/properties', '/dashboard')
+    * Rejects protocol-relative URLs (e.g., '//evil.com')
+    * Rejects absolute URLs (e.g., 'https://evil.com')
+  - Implementation in both PricingPage and RegistrationModal for consistent behavior
+  - Architect-reviewed and production-ready
+
+### UI Updates (Nov 11-12, 2025)
+- **Default Profile Pictures**: Implemented user initials as default avatars for users without profile pictures
+  - Updated ProfilePage, Navbar, Avatar component, ReviewCard, and ServiceProviderCard
+  - All avatars now display user initials (first letter of first name + first letter of last name) on blue background when no image is provided
+  - Initials logic with robust edge case handling:
+    * Multi-word names: "John Doe" → "JD"
+    * Single-word names: "John" → "JO"
+    * Single-letter names: "A" → "A"
+    * Partial names: Properly handles missing first or last names
+    * Empty/null names: Shows "?" fallback
+  - Shared getInitials helper function ensures consistency across all components
+  - Proper name sanitization prevents "undefined" in displays
+  - Consistent, personalized appearance across the platform
+  
+- **Default Property Images**: Implemented Building2 icon placeholder for property listings without photos
+  - Updated PropertyCard components (both shared and properties folders)
+  - Updated ScheduleViewingPage to show Building2 icon for properties without images
+  - Properties without images now display a Building2 icon on gray background
+  - Clean, professional appearance for listings awaiting professional photography
+  - Consistent placeholder behavior across all property display contexts
+
+### Routing Updates (Nov 11, 2025)
+- **Buyer Journey Routes**: Fixed routing structure for buyer journey pages
+  - Consolidated all buyer journey routes under `/buyer-journey/*` path
+  - Added redirects from legacy paths (`/planning`, `/searching`, `/viewing`, `/offers`) for backward compatibility
+  - Resolved "No routes matched location" warnings in browser console
+  - Routes now properly organized: `/buyer-journey/planning`, `/buyer-journey/searching`, `/buyer-journey/viewing`, `/buyer-journey/offers`
+
+### Known Development Warnings (Non-Critical)
+- WebSocket HMR connection may show CSP warnings in browser console (doesn't affect functionality)
+- Replit dev banner CSP warning (cosmetic only)
+- These are development-only warnings and don't occur in production
 
 ## User Preferences
-Preferred communication style: Simple, everyday language.
-
-## System Architecture
-
-### UI/UX Decisions
--   **Frontend Framework**: React 18 with TypeScript.
--   **Styling**: Tailwind CSS for responsive design, utilizing BeeDab brand colors.
--   **State Management**: TanStack Query for server state, React Context for global state.
--   **Routing**: React Router.
--   **Animations**: Framer Motion for UI transitions.
--   **Component Library**: Radix UI with shadcn/ui components for design consistency.
-
-### Technical Implementations
--   **Backend Runtime**: Node.js with Express.js for REST APIs.
--   **Language**: TypeScript with strict type checking.
--   **Build System**: esbuild for fast backend compilation, Vite for frontend.
--   **API Design**: RESTful endpoints with Zod for validation.
--   **Error Handling**: Centralized middleware.
--   **Database**: PostgreSQL via Neon serverless, managed with Drizzle ORM for type-safe queries and migrations.
-
-### Feature Specifications
--   **User Management**: Multi-role authentication (buyer/seller/agent/FSBO) including REAC certification tracking and role-based authorization.
--   **Property Management**: CRUD operations, advanced search/filtering, and a plot marketplace with location-based search.
--   **Communication**: Bilingual chat widget, in-app messaging, and WhatsApp integration.
--   **Document Management**: Secure file upload.
--   **Services Directory**: Integrated service provider network with contextual advertising and hierarchical category organization.
--   **Auction Platform**: Property auction listings with bidding.
--   **AI Features**: Natural language search and property valuation.
--   **Financial Tools**: Mortgage calculator with local banking data.
--   **Compliance**: Legal requirement tracking for Botswana property law.
--   **Geography Selector**: Botswana-specific location hierarchy using official census data.
--   **Reviews**: Comprehensive user review system with moderation.
--   **Trust & Safety**: Verification badges for users and listings.
--   **Notifications**: Integrated toast notification and notification center system.
-
-### System Design Choices
--   **Deployment**: Vite dev server for development, static frontend served by Express in production, serverless PostgreSQL.
--   **Scalability**: Database connection pooling, query optimization, static asset caching, CDN integration, API rate limiting.
-
-## External Dependencies
-
--   **@neondatabase/serverless**: PostgreSQL database connection.
--   **drizzle-orm**: Type-safe database ORM.
--   **@tanstack/react-query**: Server state management.
--   **framer-motion**: Animation library.
--   **@radix-ui/***: UI component primitives.
--   **zod**: Runtime type validation.
--   **react-hook-form**: Form management.
--   **Vite**: Frontend build tool.
--   **TypeScript**: Language and type checking.
--   **Tailwind CSS**: Styling framework.
--   **esbuild**: Backend compilation.
--   **OpenAI API**: (Optional) AI-powered search.
--   **WebSocket**: (Planned) Real-time chat.
+- Package manager: npm
+- Database: PostgreSQL only (no file-based databases)
+- Development environment: Replit with auto-restart workflows

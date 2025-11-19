@@ -8,7 +8,7 @@ import { logError, logInfo, logWarn } from "../utils/logger";
 
 export function registerAuthRoutes(app: Express) {
   // User registration
-  app.post("/api/users/register", async (req, res) => {
+  app.post("/api/auth/register", async (req, res) => {
     try {
       const {
         username,

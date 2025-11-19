@@ -1,0 +1,39 @@
+LoginPage: Attempting login...
+AuthContext.tsx:140 Attempting login for: admin@beedab.bw
+AuthContext.tsx:150 Login response status: 200
+AuthContext.tsx:166 Login response data keys: (17) ['id', 'username', 'email', 'firstName', 'lastName', 'phone', 'userType', 'role', 'permissions', 'avatar', 'bio', 'isVerified', 'isActive', 'reacNumber', 'lastLoginAt', 'createdAt', 'token']
+AuthContext.tsx:187 Login successful for user: admin@beedab.bw
+LoginPage.tsx:47 LoginPage: Login successful!
+DashboardPage.tsx:363 Fetching dashboard stats...
+DashboardPage.tsx:363 Fetching dashboard stats...
+BuyerDashboard.tsx:37 Failed to fetch buyer stats: SyntaxError: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+fetchBuyerStats @ BuyerDashboard.tsx:37
+await in fetchBuyerStats
+(anonymous) @ BuyerDashboard.tsx:20
+commitHookEffectListMount @ chunk-F3OYNICX.js?v=e65f32fc:16915
+commitPassiveMountOnFiber @ chunk-F3OYNICX.js?v=e65f32fc:18156
+commitPassiveMountEffects_complete @ chunk-F3OYNICX.js?v=e65f32fc:18129
+commitPassiveMountEffects_begin @ chunk-F3OYNICX.js?v=e65f32fc:18119
+commitPassiveMountEffects @ chunk-F3OYNICX.js?v=e65f32fc:18109
+flushPassiveEffectsImpl @ chunk-F3OYNICX.js?v=e65f32fc:19490
+flushPassiveEffects @ chunk-F3OYNICX.js?v=e65f32fc:19447
+(anonymous) @ chunk-F3OYNICX.js?v=e65f32fc:19328
+workLoop @ chunk-F3OYNICX.js?v=e65f32fc:197
+flushWork @ chunk-F3OYNICX.js?v=e65f32fc:176
+performWorkUntilDeadline @ chunk-F3OYNICX.js?v=e65f32fc:384Understand this error
+DashboardPage.tsx:378 Dashboard stats received: {savedProperties: 0, propertiesViewed: 0, inquiriesSent: 0, viewingsScheduled: 0, activeListings: 0, …}
+BuyerDashboard.tsx:37 Failed to fetch buyer stats: SyntaxError: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
+fetchBuyerStats @ BuyerDashboard.tsx:37
+await in fetchBuyerStats
+(anonymous) @ BuyerDashboard.tsx:20
+commitHookEffectListMount @ chunk-F3OYNICX.js?v=e65f32fc:16915
+invokePassiveEffectMountInDEV @ chunk-F3OYNICX.js?v=e65f32fc:18324
+invokeEffectsInDev @ chunk-F3OYNICX.js?v=e65f32fc:19701
+commitDoubleInvokeEffectsInDEV @ chunk-F3OYNICX.js?v=e65f32fc:19686
+flushPassiveEffectsImpl @ chunk-F3OYNICX.js?v=e65f32fc:19503
+flushPassiveEffects @ chunk-F3OYNICX.js?v=e65f32fc:19447
+(anonymous) @ chunk-F3OYNICX.js?v=e65f32fc:19328
+workLoop @ chunk-F3OYNICX.js?v=e65f32fc:197
+flushWork @ chunk-F3OYNICX.js?v=e65f32fc:176
+performWorkUntilDeadline @ chunk-F3OYNICX.js?v=e65f32fc:384Understand this error
+DashboardPage.tsx:378 Dashboard stats received: {savedProperties: 0, propertiesViewed: 0, inquiriesSent: 0, viewingsScheduled: 0, activeListings: 0, …}
